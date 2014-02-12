@@ -9,8 +9,10 @@ For testing purposed I was using mariaDb (mysql descendant). I hadn't time, to t
 Db settings are in:       src\main\webapp\WEB-INF\database.properties
 hibernate db settings in: src\main\webapp\WEB-INF\application-context.xml
 
-log4j: 
+log4j:                    src\main\resources\log4j.properties
 ```
+
+I've added mariadb connector in the repo, I couldn't found maven server with recent version.
 
 mariadb setup
 ```
