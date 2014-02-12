@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+	<Call name="addConnector">
+		<Arg>
+			<New class="org.eclipse.jetty.server.ServerConnector">
+				<Arg name="server"><Ref refid="Server" /></Arg>
+				<Set name="host"><Property name="jetty.host" /></Set>
+				<Set name="port"><Property name="jetty.port" default="7890" /></Set>
+				<Set name="idleTimeout"><Property name="http.timeout" default="300"/></Set>
+			</New>
+		</Arg>
+	</Call>
+
+
+</Configure> 
