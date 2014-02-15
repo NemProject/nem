@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 public class HashesTest {
     @Test
@@ -14,6 +15,19 @@ public class HashesTest {
         // Act:
         byte[] hash1 = Hashes.sha3(input);
         byte[] hash2 = Hashes.sha3(input);
+
+        // Assert:
+        Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+    }
+
+    @Test
+    public void sha3GeneratesSameHashForSameMergedInputs() throws Exception {
+        // Arrange:
+        byte[] input = generateRandomBytes();
+
+        // Act:
+        byte[] hash1 = Hashes.sha3(input);
+        byte[] hash2 = Hashes.sha3(split(input));
 
         // Assert:
         Assert.assertThat(hash2, IsEqual.equalTo(hash1));
@@ -41,6 +55,19 @@ public class HashesTest {
         // Act:
         byte[] hash1 = Hashes.ripemd160(input);
         byte[] hash2 = Hashes.ripemd160(input);
+
+        // Assert:
+        Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+    }
+
+    @Test
+    public void ripemd160GeneratesSameHashForSameMergedInputs() throws Exception {
+        // Arrange:
+        byte[] input = generateRandomBytes();
+
+        // Act:
+        byte[] hash1 = Hashes.ripemd160(input);
+        byte[] hash2 = Hashes.ripemd160(split(input));
 
         // Assert:
         Assert.assertThat(hash2, IsEqual.equalTo(hash1));
@@ -79,4 +106,12 @@ public class HashesTest {
         rand.nextBytes(input);
         return input;
     }
+
+    private byte[][] split(final byte[] input) {
+        return new byte[][] {
+            Arrays.copyOfRange(input, 0, 17),
+            Arrays.copyOfRange(input, 18, 100),
+            Arrays.copyOfRange(input, 101,input.length - 1)
+        };
+    };
 }

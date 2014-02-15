@@ -8,16 +8,20 @@ public class Hashes {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static byte[] sha3(final byte[] input) throws Exception {
-        return hash("SHA3-256", input);
+    public static byte[] sha3(final byte[]... inputs) throws Exception {
+        return hash("SHA3-256", inputs);
     }
 
-    public static byte[] ripemd160(final byte[] input) throws Exception {
-        return hash("RIPEMD160", input);
+    public static byte[] ripemd160(final byte[]... inputs) throws Exception {
+        return hash("RIPEMD160", inputs);
     }
 
-    private static byte[] hash(final String algorithm, final byte[] input) throws Exception {
+    private static byte[] hash(final String algorithm, final byte[]... inputs) throws Exception {
         MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
-        return digest.digest(input);
+
+        for (byte[] input : inputs)
+            digest.update(input);
+
+        return digest.digest();
     }
 }
