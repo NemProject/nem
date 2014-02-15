@@ -7,6 +7,19 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class HashesTest {
+
+    @Test
+    public void sha3HashHas32ByteLength() throws Exception {
+        // Arrange:
+        byte[] input = generateRandomBytes();
+
+        // Act:
+        byte[] hash = Hashes.sha3(input);
+
+        // Assert:
+        Assert.assertThat(hash.length, IsEqual.equalTo(32));
+    }
+
     @Test
     public void sha3GeneratesSameHashForSameInputs() throws Exception {
         // Arrange:
@@ -17,6 +30,7 @@ public class HashesTest {
         byte[] hash2 = Hashes.sha3(input);
 
         // Assert:
+        Assert.assertThat(hash1.length, IsEqual.equalTo(32));
         Assert.assertThat(hash2, IsEqual.equalTo(hash1));
     }
 
@@ -45,6 +59,18 @@ public class HashesTest {
 
         // Assert:
         Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+    }
+
+    @Test
+    public void ripemd160HashHas20ByteLength() throws Exception {
+        // Arrange:
+        byte[] input = generateRandomBytes();
+
+        // Act:
+        byte[] hash = Hashes.ripemd160(input);
+
+        // Assert:
+        Assert.assertThat(hash.length, IsEqual.equalTo(20));
     }
 
     @Test
@@ -113,5 +139,5 @@ public class HashesTest {
             Arrays.copyOfRange(input, 17, 100),
             Arrays.copyOfRange(input, 100,input.length)
         };
-    };
+    }
 }
