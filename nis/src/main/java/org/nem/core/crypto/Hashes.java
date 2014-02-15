@@ -1,4 +1,4 @@
-package main.java.org.nem.core.crypto;
+package org.nem.core.crypto;
 
 import java.security.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
