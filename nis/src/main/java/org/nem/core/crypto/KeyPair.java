@@ -9,14 +9,14 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 public class KeyPair {
-    final static SecureRandom RANDOM;
+    private final static SecureRandom RANDOM;
 
     static {
         RANDOM = new SecureRandom();
     }
 
-    public BigInteger privateKey;
-    public byte[] publicKey;
+    private final BigInteger privateKey;
+    private final byte[] publicKey;
 
     public KeyPair() {
         ECKeyPairGenerator generator = new ECKeyPairGenerator();
@@ -32,25 +32,26 @@ public class KeyPair {
         this.publicKey = point.getEncoded(true);
     }
 
-    public KeyPair(BigInteger privateKey) {
+    public KeyPair(final BigInteger privateKey) {
         this(privateKey, publicKeyFromPrivateKey(privateKey));
     }
 
-    public KeyPair(byte[] publicKey) {
+    public KeyPair(final byte[] publicKey) {
         this(null, publicKey);
     }
 
-    private KeyPair(BigInteger privateKey, byte[] publicKey) {
+    private KeyPair(final BigInteger privateKey, final byte[] publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
     }
 
-    public static byte[] publicKeyFromPrivateKey(BigInteger privateKey) {
+    private static byte[] publicKeyFromPrivateKey(final BigInteger privateKey) {
         ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey);
         return point.getEncoded(true);
     }
 
     public BigInteger getPrivateKey() {
+
         return this.privateKey;
     }
 
@@ -58,11 +59,16 @@ public class KeyPair {
         return this.publicKey;
     }
 
-    public Boolean hasPrivateKey() {
-        return null != this.privateKey;
+    public Boolean hasPrivateKey() { return null != this.privateKey; }
+
+    public Boolean hasPublicKey() { return null != this.publicKey; }
+
+    public ECPrivateKeyParameters getPrivateKeyParameters() {
+        return new ECPrivateKeyParameters(this.getPrivateKey(), Curves.secp256k1().getParams());
     }
 
-    public Boolean hasPublicKey() {
-        return null != this.publicKey;
+    public ECPublicKeyParameters getPublicKeyParameters() {
+        ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey());
+        return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
     }
 }

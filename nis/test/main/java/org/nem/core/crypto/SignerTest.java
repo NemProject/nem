@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 public class SignerTest {
 

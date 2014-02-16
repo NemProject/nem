@@ -4,7 +4,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class HashesTest {

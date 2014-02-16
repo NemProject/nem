@@ -20,7 +20,7 @@ public class Curves {
         final ECDomainParameters params;
         final BigInteger halfCurveOrder;
 
-        private Curve(ECDomainParameters params, BigInteger halfCurveOrder) {
+        private Curve(final ECDomainParameters params, final BigInteger halfCurveOrder) {
             this.params = params;
             this.halfCurveOrder = halfCurveOrder;
         }

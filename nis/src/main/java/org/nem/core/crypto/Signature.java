@@ -7,7 +7,7 @@ public class Signature {
     private BigInteger r;
     private BigInteger s;
 
-    public Signature(BigInteger r, BigInteger s) {
+    public Signature(final BigInteger r, final BigInteger s) {
         this.r = r;
         this.s = s;
     }
