@@ -2,6 +2,7 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.Utils;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ public class HashesTest {
     @Test
     public void sha3HashHas32ByteLength() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash = Hashes.sha3(input);
@@ -23,7 +24,7 @@ public class HashesTest {
     @Test
     public void sha3GeneratesSameHashForSameInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.sha3(input);
@@ -37,7 +38,7 @@ public class HashesTest {
     @Test
     public void sha3GeneratesSameHashForSameMergedInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.sha3(input);
@@ -50,8 +51,8 @@ public class HashesTest {
     @Test
     public void sha3GeneratesDifferentHashForDifferentInputs() throws Exception {
         // Arrange:
-        byte[] input1 = generateRandomBytes();
-        byte[] input2 = generateRandomBytes();
+        byte[] input1 = Utils.generateRandomBytes();
+        byte[] input2 = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.sha3(input1);
@@ -64,7 +65,7 @@ public class HashesTest {
     @Test
     public void ripemd160HashHas20ByteLength() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash = Hashes.ripemd160(input);
@@ -76,7 +77,7 @@ public class HashesTest {
     @Test
     public void ripemd160GeneratesSameHashForSameInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.ripemd160(input);
@@ -89,7 +90,7 @@ public class HashesTest {
     @Test
     public void ripemd160GeneratesSameHashForSameMergedInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.ripemd160(input);
@@ -102,8 +103,8 @@ public class HashesTest {
     @Test
     public void ripemd160GeneratesDifferentHashForDifferentInputs() throws Exception {
         // Arrange:
-        byte[] input1 = generateRandomBytes();
-        byte[] input2 = generateRandomBytes();
+        byte[] input1 = Utils.generateRandomBytes();
+        byte[] input2 = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.ripemd160(input1);
@@ -116,7 +117,7 @@ public class HashesTest {
     @Test
     public void sha3AndRipemd160GenerateDifferentHashForSameInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         byte[] hash1 = Hashes.sha3(input);
@@ -124,13 +125,6 @@ public class HashesTest {
 
         // Assert:
         Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
-    }
-
-    private byte[] generateRandomBytes() {
-        SecureRandom rand = new SecureRandom();
-        byte[] input = new byte[214];
-        rand.nextBytes(input);
-        return input;
     }
 
     private byte[][] split(final byte[] input) {

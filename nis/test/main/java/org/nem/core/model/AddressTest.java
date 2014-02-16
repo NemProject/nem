@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.Utils;
+
 import java.security.SecureRandom;
 
 public class AddressTest {
@@ -9,7 +11,7 @@ public class AddressTest {
     @Test
     public void sameAddressIsGeneratedForSameInputs() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address1 = Address.fromPublicKey(input);
@@ -23,8 +25,8 @@ public class AddressTest {
     public void differentAddressesAreGeneratedForDifferentInputs() throws Exception {
 
         // Arrange:
-        byte[] input1 = generateRandomBytes();
-        byte[] input2 = generateRandomBytes();
+        byte[] input1 = Utils.generateRandomBytes();
+        byte[] input2 = Utils.generateRandomBytes();
 
         // Act:
         String address1 = Address.fromPublicKey(input1);
@@ -37,7 +39,7 @@ public class AddressTest {
     @Test
     public void generatedAddressIsValid() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address = Address.fromPublicKey(input);
@@ -49,7 +51,7 @@ public class AddressTest {
     @Test
     public void generatedAddressHas40CharLength() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address = Address.fromPublicKey(input);
@@ -61,7 +63,7 @@ public class AddressTest {
     @Test
     public void generatedAddressBeginsWithN() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address = Address.fromPublicKey(input);
@@ -73,7 +75,7 @@ public class AddressTest {
     @Test
     public void addressWithIncorrectLengthIsNotValid() throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address = Address.fromPublicKey(input);
@@ -103,7 +105,7 @@ public class AddressTest {
 
     private void assertAddressIsNotValidIfChangedAtIndex(final int index) throws Exception {
         // Arrange:
-        byte[] input = generateRandomBytes();
+        byte[] input = Utils.generateRandomBytes();
 
         // Act:
         String address = Address.fromPublicKey(input);
@@ -117,12 +119,5 @@ public class AddressTest {
         char[] chars = s.toCharArray();
         chars[index] = (char)(chars[index] + 1);
         return new String(chars);
-    }
-
-    private static byte[] generateRandomBytes() {
-        SecureRandom rand = new SecureRandom();
-        byte[] input = new byte[214];
-        rand.nextBytes(input);
-        return input;
     }
 }
