@@ -130,7 +130,7 @@ public class HashesTest {
         return new byte[][] {
             Arrays.copyOfRange(input, 0, 17),
             Arrays.copyOfRange(input, 17, 100),
-            Arrays.copyOfRange(input, 100,input.length)
+            Arrays.copyOfRange(input, 100, input.length)
         };
     }
 }

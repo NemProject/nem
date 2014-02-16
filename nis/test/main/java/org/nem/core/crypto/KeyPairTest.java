@@ -1,7 +1,11 @@
 package org.nem.core.crypto;
 
+import org.eclipse.jetty.util.ArrayUtil;
 import org.hamcrest.core.*;
 import org.junit.*;
+
+import java.security.InvalidParameterException;
+import java.util.Arrays;
 
 public class KeyPairTest {
 
@@ -65,5 +69,49 @@ public class KeyPairTest {
         Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(null));
         Assert.assertThat(kp2.hasPublicKey(), IsEqual.equalTo(true));
         Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+    }
+
+    @Test
+    public void ctorFailsIfPublicKeyLengthIsWrong() throws Exception {
+        // Arrange:
+        byte[] publicKey = (new KeyPair()).getPublicKey();
+
+        byte[] shortPublicKey = new byte[publicKey.length - 1];
+        System.arraycopy(publicKey, 0, shortPublicKey, 0, shortPublicKey.length);
+
+        byte[] longPublicKey = new byte[publicKey.length + 1];
+        System.arraycopy(publicKey, 0, longPublicKey, 0, publicKey.length);
+
+        // Assert:
+        assertInvalidPublicKey(shortPublicKey);
+        assertInvalidPublicKey(longPublicKey);
+    }
+
+    @Test
+         public void ctorFailsIfPublicKeyFirstByteIsWrong() throws Exception {
+        // Arrange:
+        byte[] publicKey = (new KeyPair()).getPublicKey();
+
+        byte[] smallBytePublicKey = new byte[publicKey.length];
+        System.arraycopy(publicKey, 0, smallBytePublicKey, 0, publicKey.length);
+        smallBytePublicKey[0] = 0x01;
+
+        byte[] largeBytePublicKey = new byte[publicKey.length];
+        System.arraycopy(publicKey, 0, largeBytePublicKey, 0, publicKey.length);
+        largeBytePublicKey[0] = 0x04;
+
+        // Assert:
+        assertInvalidPublicKey(smallBytePublicKey);
+        assertInvalidPublicKey(largeBytePublicKey);
+    }
+
+    private static void assertInvalidPublicKey(final byte[] publicKey) {
+        try {
+            // Act:
+            new KeyPair(publicKey);
+            Assert.fail("No exception was thrown");
+        } catch (InvalidParameterException ex) {
+            return;
+        }
     }
 }
