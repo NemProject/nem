@@ -10,7 +10,6 @@ public abstract class Transaction {
     public final int version;
     public final int type;
     public final Account sender;
-    private final Signer signer;
     public Signature signature;
 
     public int getVersion() { return this.version; }
@@ -22,7 +21,6 @@ public abstract class Transaction {
         this.version = version;
         this.type = type;
         this.sender = sender;
-        this.signer = new Signer(this.getSender().getKeyPair());
 
         if (!this.sender.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("sender must be owned to create transaction ");
@@ -33,7 +31,6 @@ public abstract class Transaction {
         this.version = deserializer.readInt();
         this.type = deserializer.readInt();
         this.sender = deserializer.readAccount();
-        this.signer = new Signer(this.getSender().getKeyPair());
     }
 
     public void serialize(final Serializer serializer) throws Exception {
@@ -66,6 +63,7 @@ public abstract class Transaction {
     }
 
     public Boolean verify() throws Exception {
+        Signer signer = new Signer(this.getSender().getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
 
