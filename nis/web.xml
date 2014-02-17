@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app>
+    <servlet>
+        <servlet-name>NEM Server</servlet-name>
+        <servlet-class>org.nem.NEM</servlet-class>
+        <async-supported>true</async-supported>
+        <load-on-startup>1</load-on-startup>
+
+        <init-param>
+            <param-name>myScheme</param-name>
+            <param-value>http</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>myPort</param-name>
+            <param-value>7874</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>myAddress</param-name>
+            <param-value>nxt.pucchiwerk.eu</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>shareMyAddress</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>myPlatform</param-name>
+            <param-value>VPS</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>myHallmark</param-name>
+            <param-value></param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>wellKnownPeers</param-name>
+            <param-value>46.19.137.116; nxt.homer.ru; 31.204.130.123 209.222.0.194,; 209.222.16.10</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>maxNumberOfConnectedPublicPeers</param-name>
+            <param-value>20</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>connectTimeout</param-name>
+            <param-value>2000</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>readTimeout</param-name>
+            <param-value>5000</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>enableHallmarkProtection</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>pushThreshold</param-name>
+            <param-value>0</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>pullThreshold</param-name>
+            <param-value>0</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>allowedUserHosts</param-name>
+            <param-value>127.0.0.1; localhost; 0:0:0:0:0:0:0:1;</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>allowedBotHosts</param-name>
+            <param-value>127.0.0.1; localhost; 0:0:0:0:0:0:0:1;</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>blacklistingPeriod</param-name>
+            <param-value>300000</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>sendToPeersLimit</param-name>
+            <param-value>10</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>communicationLoggingMask</param-name>
+            <param-value>0</param-value>
+        </init-param>
+
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NEM Server</servlet-name>
+        <url-pattern>/nem</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>DoSFilter</filter-name>
+        <filter-class>org.eclipse.jetty.servlets.DoSFilter</filter-class>
+        <init-param>
+            <param-name>maxRequestsPerSec</param-name>
+            <param-value>3000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>delayMs</param-name>
+            <param-value>1000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>trackSessions</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <async-supported>true</async-supported>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>DoSFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+</web-app>
