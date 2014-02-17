@@ -16,6 +16,7 @@ public class AccountTest {
         final Account account = new Account(kp);
 
         // Assert:
+        Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
         Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
         Assert.assertThat(account.getId(), IsEqual.equalTo(expectedAccountId));
         Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));

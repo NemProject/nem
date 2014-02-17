@@ -2,8 +2,11 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
 import org.nem.core.test.*;
+
+import java.math.BigInteger;
 
 public class BinarySerializerTest {
 
@@ -33,6 +36,23 @@ public class BinarySerializerTest {
             final byte[] expectedBytes = new byte[] {
                 0x50, 0x13, (byte)0x95, (byte)0xCE,
                 0x33, (byte)0xA0, 0x39, (byte)0xF2
+            };
+            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+        }
+    }
+
+    @Test
+    public void canWriteBigInteger() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            // Act:
+            final BigInteger i = new BigInteger("958A7561F014", 16);
+            serializer.writeBigInteger(i);
+
+            // Assert:
+            final byte[] expectedBytes = new byte[] {
+                    0x07, 0x00, 0x00, 0x00,
+                    0x00, (byte)0x95, (byte)0x8A, 0x75, 0x61, (byte)0xF0, 0x14
             };
             Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
         }
@@ -80,8 +100,25 @@ public class BinarySerializerTest {
 
             // Assert:
             final byte[] expectedBytes = new byte[] {
-                    0x07, 0x00, 0x00, 0x00,
-                    0x4D, 0x6F, 0x63, 0x6B, 0x41, 0x63, 0x63
+                0x07, 0x00, 0x00, 0x00,
+                0x4D, 0x6F, 0x63, 0x6B, 0x41, 0x63, 0x63
+            };
+            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+        }
+    }
+
+    @Test
+    public void canWriteSignature() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            // Act:
+            final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
+            serializer.writeSignature(signature);
+
+            // Assert:
+            final byte[] expectedBytes = new byte[] {
+                0x01, 0x00, 0x00, 0x00, 0x23,
+                0x02, 0x00, 0x00, 0x00, 0x00, (byte)0xA4
             };
             Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
         }
@@ -120,6 +157,24 @@ public class BinarySerializerTest {
 
                 // Assert:
                 Assert.assertThat(l, IsEqual.equalTo(0xF239A033CE951350L));
+                Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
+            }
+        }
+    }
+
+    @Test
+    public void canRoundtripBigInteger() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            // Act:
+            final BigInteger i = new BigInteger("958A7561F014", 16);
+            serializer.writeBigInteger(i);
+
+            try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+                final BigInteger readBigInteger = deserializer.readBigInteger();
+
+                // Assert:
+                Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
                 Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
             }
         }
@@ -174,6 +229,24 @@ public class BinarySerializerTest {
                 // Assert:
                 Assert.assertThat(account.getId(), IsEqual.equalTo("MockAcc"));
                 Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+                Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
+            }
+        }
+    }
+
+    @Test
+    public void canRoundtripSignature() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            // Act:
+            final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
+            serializer.writeSignature(signature);
+
+            try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+                final Signature readSignature = deserializer.readSignature();
+
+                // Assert:
+                Assert.assertThat(readSignature, IsEqual.equalTo(signature));
                 Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
             }
         }

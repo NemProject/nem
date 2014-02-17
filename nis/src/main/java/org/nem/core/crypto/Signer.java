@@ -11,21 +11,23 @@ public class Signer {
         this.keyPair = keyPair;
     }
 
-    public Signature sign(final byte[] input) {
+    public Signature sign(final byte[] data) throws Exception {
         ECDSASigner signer = new ECDSASigner();
         signer.init(true, this.keyPair.getPrivateKeyParameters());
-        BigInteger[] components = signer.generateSignature(input);
+        final byte[] hash = Hashes.sha3(data);
+        BigInteger[] components = signer.generateSignature(hash);
         final Signature signature = new Signature(components[0], components[1]);
         signature.makeCanonical();
         return signature;
     }
 
-    public boolean verify(final byte[] data, final Signature signature) {
+    public boolean verify(final byte[] data, final Signature signature) throws Exception {
         if (!signature.isCanonical())
             return false;
 
         ECDSASigner signer = new ECDSASigner();
         signer.init(false, this.keyPair.getPublicKeyParameters());
-        return signer.verifySignature(data, signature.getR(), signature.getS());
+        final byte[] hash = Hashes.sha3(data);
+        return signer.verifySignature(hash, signature.getR(), signature.getS());
     }
 }

@@ -6,12 +6,15 @@ import org.nem.core.serialization.AccountLookup;
 public class MockAccountLookup implements AccountLookup {
 
     private int numFindByIdCalls;
+    private Account mockAccount;
 
     @Override
     public Account findById(final String id) throws Exception {
         ++this.numFindByIdCalls;
-        return new MockAccount(id);
+        return null == this.mockAccount ? new MockAccount(id) : this.mockAccount;
     }
 
     public int getNumFindByIdCalls() { return this.numFindByIdCalls; }
+
+    public void setMockAccount(final Account account) { this.mockAccount = account; }
 }

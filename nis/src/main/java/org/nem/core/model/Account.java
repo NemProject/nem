@@ -18,6 +18,8 @@ public class Account {
         this.balance = 0;
     }
 
+    public KeyPair getKeyPair() { return this.keyPair; }
+
     public byte[] getPublicKey() { return this.keyPair.getPublicKey(); }
 
     public String getId() { return this.id; }

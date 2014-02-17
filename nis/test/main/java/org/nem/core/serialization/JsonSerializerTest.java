@@ -3,8 +3,11 @@ package org.nem.core.serialization;
 import org.hamcrest.core.*;
 import org.json.*;
 import org.junit.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
 import org.nem.core.test.*;
+
+import java.math.BigInteger;
 
 public class JsonSerializerTest {
 
@@ -36,6 +39,20 @@ public class JsonSerializerTest {
         final JSONObject object = serializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
         Assert.assertThat(object.getLong("1"), IsEqual.equalTo(0xF239A033CE951350L));
+    }
+
+    @Test
+    public void canWriteBigInteger() throws Exception {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        serializer.writeBigInteger(new BigInteger("958A7561F014", 16));
+
+        // Assert:
+        final JSONObject object = serializer.getObject();
+        Assert.assertThat(object.length(), IsEqual.equalTo(1));
+        Assert.assertThat(object.getString("1"), IsEqual.equalTo("AJWKdWHwFA=="));
     }
 
     @Test
@@ -81,6 +98,22 @@ public class JsonSerializerTest {
         Assert.assertThat(object.getString("1"), IsEqual.equalTo("MockAcc"));
     }
 
+    @Test
+    public void canWriteSignature() throws Exception {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
+        serializer.writeSignature(signature);
+
+        // Assert:
+        final JSONObject object = serializer.getObject();
+        Assert.assertThat(object.length(), IsEqual.equalTo(2));
+        Assert.assertThat(object.getString("1"), IsEqual.equalTo("Iw=="));
+        Assert.assertThat(object.getString("2"), IsEqual.equalTo("AKQ="));
+    }
+
     //endregion
 
     //region Roundtrip
@@ -113,6 +146,22 @@ public class JsonSerializerTest {
 
         // Assert:
         Assert.assertThat(l, IsEqual.equalTo(0xF239A033CE951350L));
+    }
+
+    @Test
+    public void canRoundtripBigInteger() throws Exception {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        final BigInteger i = new BigInteger("958A7561F014", 16);
+        serializer.writeBigInteger(i);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final BigInteger readBigInteger = deserializer.readBigInteger();
+
+        // Assert:
+        Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
     }
 
     @Test
@@ -161,6 +210,22 @@ public class JsonSerializerTest {
         // Assert:
         Assert.assertThat(account.getId(), IsEqual.equalTo("MockAcc"));
         Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+    }
+
+    @Test
+    public void canRoundtripSignature() throws Exception {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
+        serializer.writeSignature(signature);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final Signature readSignature = deserializer.readSignature();
+
+        // Assert:
+        Assert.assertThat(readSignature, IsEqual.equalTo(signature));
     }
 
     //endregion

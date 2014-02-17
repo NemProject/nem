@@ -22,7 +22,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void isCanonicalReturnsTrueForCanonicalSignature() {
+    public void isCanonicalReturnsTrueForCanonicalSignature() throws Exception {
         // Arrange:
         Signature signature = createCanonicalSignature();
 
@@ -31,7 +31,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void isCanonicalReturnsFalseForNonCanonicalSignature() {
+    public void isCanonicalReturnsFalseForNonCanonicalSignature() throws Exception {
         // Arrange:
         Signature signature = makeNonCanonical(createCanonicalSignature());
 
@@ -40,7 +40,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
+    public void makeCanonicalMakesNonCanonicalSignatureCanonical() throws Exception {
         // Arrange:
         Signature signature = createCanonicalSignature();
         Signature nonCanonicalSignature = makeNonCanonical(signature);
@@ -56,7 +56,34 @@ public class SignatureTest {
         Assert.assertThat(nonCanonicalSignature.getS(), IsEqual.equalTo(signature.getS()));
     }
 
-    private static Signature createCanonicalSignature() {
+    @Test
+    public void equalsOnlyReturnsTrueForEquivalentObjects() {
+        // Arrange:
+        Signature signature = createSignature(1235, 7789);
+
+        // Assert:
+        Assert.assertThat(signature, IsEqual.equalTo(createSignature(1235, 7789)));
+        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1234, 7789))));
+        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1235, 7790))));
+    }
+
+    @Test
+    public void hashCodesAreOnlyEqualForEquivalentObjects() {
+        // Arrange:
+        Signature signature = createSignature(1235, 7789);
+        int hashCode = signature.hashCode();
+
+        // Assert:
+        Assert.assertThat(hashCode, IsEqual.equalTo(createSignature(1235, 7789).hashCode()));
+        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(createSignature(1234, 7789).hashCode())));
+        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(createSignature(1235, 7790).hashCode())));
+    }
+
+    private static Signature createSignature(int r, int s) {
+        return new Signature(new BigInteger(String.format("%d", r)), new BigInteger(String.format("%d", s)));
+    }
+
+    private static Signature createCanonicalSignature() throws Exception {
         // Arrange:
         KeyPair kp = new KeyPair();
         Signer signer = new Signer(kp);

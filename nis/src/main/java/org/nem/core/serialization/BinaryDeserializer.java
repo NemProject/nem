@@ -1,7 +1,9 @@
 package org.nem.core.serialization;
 
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
 import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 
 public class BinaryDeserializer implements AutoCloseable, Deserializer {
 
@@ -30,6 +32,11 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
             | (highPart << 32) & 0xFFFFFFFF00000000L;
     }
 
+    public BigInteger readBigInteger() throws Exception {
+        byte[] bytes = this.readBytes();
+        return new BigInteger(bytes);
+    }
+
     @Override
     public byte[] readBytes() throws Exception {
         int numBytes = this.readInt();
@@ -48,6 +55,13 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
         return this.accountLookup.findById(accountId);
     }
 
+    @Override
+    public Signature readSignature() throws Exception {
+        BigInteger r = this.readBigInteger();
+        BigInteger s = this.readBigInteger();
+        return new Signature(r, s);
+    }
+
     public Boolean hasMoreData() {
         return 0 != this.stream.available();
     }
@@ -63,7 +77,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 
         byte[] bytes = new byte[numBytes];
         int numBytesRead = this.stream.read(bytes);
-        if (numBytesRead != numBytesRead)
+        if (numBytesRead != numBytes)
             throw new SerializationException("unexpected end of stream reached");
 
         return bytes;

@@ -28,4 +28,18 @@ public class Signature {
         if (!this.isCanonical())
             this.s = Curves.secp256k1().getParams().getN().subtract(this.s);
     }
+
+    @Override
+    public int hashCode() {
+        return r.hashCode() ^ s.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Signature))
+            return false;
+
+        Signature rhs = (Signature)obj;
+        return 0 == r.compareTo(rhs.r) && 0 == s.compareTo(rhs.s);
+    }
 }

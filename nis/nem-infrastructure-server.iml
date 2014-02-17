@@ -59,6 +59,7 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.50" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.6" level="project" />
+    <orderEntry type="library" name="org.json:json:20140107" level="project" />
   </component>
 </module>
 

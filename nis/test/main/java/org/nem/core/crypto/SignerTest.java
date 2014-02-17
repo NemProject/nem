@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class SignerTest {
 
     @Test
-    public void signedDataCanBeVerified() {
+    public void signedDataCanBeVerified() throws Exception {
         // Arrange:
         KeyPair kp = new KeyPair();
         Signer signer = new Signer(kp);
@@ -23,7 +23,7 @@ public class SignerTest {
     }
 
     @Test
-    public void dataSignedWithKeyPairCannotBeVerifiedWithDifferentKeyPair() {
+    public void dataSignedWithKeyPairCannotBeVerifiedWithDifferentKeyPair() throws Exception {
         // Arrange:
         KeyPair kp1 = new KeyPair();
         KeyPair kp2 = new KeyPair();
@@ -43,7 +43,7 @@ public class SignerTest {
     }
 
     @Test
-    public void verifyReturnsFalseForNonCanonicalSignature() {
+    public void verifyReturnsFalseForNonCanonicalSignature() throws Exception {
         // Arrange:
         KeyPair kp = new KeyPair();
         Signer signer = new Signer(kp);
