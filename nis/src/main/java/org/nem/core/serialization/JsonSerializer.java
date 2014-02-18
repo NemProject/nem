@@ -2,8 +2,6 @@ package org.nem.core.serialization;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.json.*;
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
 
 import java.math.BigInteger;
 
@@ -41,17 +39,6 @@ public class JsonSerializer implements Serializer {
     @Override
     public void writeString(final String s) throws Exception {
         this.object.put(this.getNextKey(), s);
-    }
-
-    @Override
-    public void writeAccount(final Account account) throws Exception {
-        this.writeString(account.getId());
-    }
-
-    @Override
-    public void writeSignature(final Signature signature) throws Exception {
-        this.writeBigInteger(signature.getR());
-        this.writeBigInteger(signature.getS());
     }
 
     public JSONObject getObject() {

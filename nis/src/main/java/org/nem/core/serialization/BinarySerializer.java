@@ -1,7 +1,5 @@
 package org.nem.core.serialization;
 
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 
@@ -44,17 +42,6 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     @Override
     public void writeString(final String s) throws Exception {
         this.writeBytes(s.getBytes("UTF-8"));
-    }
-
-    @Override
-    public void writeAccount(final Account account) throws Exception {
-        this.writeString(account.getId());
-    }
-
-    @Override
-    public void writeSignature(final Signature signature) throws Exception {
-        this.writeBigInteger(signature.getR());
-        this.writeBigInteger(signature.getS());
     }
 
     @Override

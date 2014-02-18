@@ -77,7 +77,7 @@ public class TransactionTest {
         final MockTransaction transaction = new MockTransaction(sender);
 
         // Act:
-        transaction.serialize(new JsonSerializer());
+        transaction.serialize(new DelegatingObjectSerializer(new JsonSerializer()));
     }
 
     //endregion
@@ -135,12 +135,15 @@ public class TransactionTest {
         originalTransaction.sign();
 
         // Act:
-        JsonSerializer serializer = new JsonSerializer();
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
         originalTransaction.serialize(serializer);
 
         final MockAccountLookup accountLookup = new MockAccountLookup();
         accountLookup.setMockAccount(deserializedSender);
-        JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), accountLookup);
+        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
+            new JsonDeserializer(jsonSerializer.getObject()),
+            accountLookup);
         return new MockTransaction(deserializer);
     }
 
@@ -157,7 +160,7 @@ public class TransactionTest {
             this.customField = customField;
         }
 
-        public MockTransaction(final Deserializer deserializer) throws Exception {
+        public MockTransaction(final ObjectDeserializer deserializer) throws Exception {
             super(deserializer);
             this.customField = deserializer.readInt();
         }
@@ -166,7 +169,7 @@ public class TransactionTest {
         public void setCustomField(final int customField) { this.customField = customField; }
 
         @Override
-        protected void serializeImpl(Serializer serializer) throws Exception {
+        protected void serializeImpl(ObjectSerializer serializer) throws Exception {
             serializer.writeInt(this.customField);
         }
     }

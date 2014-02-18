@@ -3,9 +3,6 @@ package org.nem.core.serialization;
 import org.hamcrest.core.*;
 import org.json.*;
 import org.junit.*;
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
-import org.nem.core.test.*;
 
 import java.math.BigInteger;
 
@@ -82,36 +79,6 @@ public class JsonSerializerTest {
         final JSONObject object = serializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
         Assert.assertThat(object.getString("1"), IsEqual.equalTo("BEta"));
-    }
-
-    @Test
-    public void canWriteAccount() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        serializer.writeAccount(new MockAccount("MockAcc"));
-
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("1"), IsEqual.equalTo("MockAcc"));
-    }
-
-    @Test
-    public void canWriteSignature() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
-        serializer.writeSignature(signature);
-
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(2));
-        Assert.assertThat(object.getString("1"), IsEqual.equalTo("Iw=="));
-        Assert.assertThat(object.getString("2"), IsEqual.equalTo("AKQ="));
     }
 
     //endregion
@@ -195,39 +162,6 @@ public class JsonSerializerTest {
         Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
     }
 
-    @Test
-    public void canRoundtripAccount() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-        MockAccountLookup accountLookup = new MockAccountLookup();
-
-        // Act:
-        serializer.writeAccount(new MockAccount("MockAcc"));
-
-        JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), accountLookup);
-        final Account account = deserializer.readAccount();
-
-        // Assert:
-        Assert.assertThat(account.getId(), IsEqual.equalTo("MockAcc"));
-        Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-    }
-
-    @Test
-    public void canRoundtripSignature() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
-        serializer.writeSignature(signature);
-
-        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-        final Signature readSignature = deserializer.readSignature();
-
-        // Assert:
-        Assert.assertThat(readSignature, IsEqual.equalTo(signature));
-    }
-
     //endregion
 
     @Test
@@ -238,7 +172,6 @@ public class JsonSerializerTest {
         // Act:
         serializer.writeInt(0x09513510);
         serializer.writeLong(0xF239A033CE951350L);
-        serializer.writeAccount(new MockAccount("Beta"));
         serializer.writeBytes(new byte[]{2, 4, 6});
         serializer.writeInt(7);
         serializer.writeString("FooBar");
@@ -249,7 +182,6 @@ public class JsonSerializerTest {
         // Assert:
         Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(0x09513510));
         Assert.assertThat(deserializer.readLong(), IsEqual.equalTo(0xF239A033CE951350L));
-        Assert.assertThat(deserializer.readAccount().getId(), IsEqual.equalTo("Beta"));
         Assert.assertThat(deserializer.readBytes(), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
         Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(7));
         Assert.assertThat(deserializer.readString(), IsEqual.equalTo("FooBar"));
@@ -257,6 +189,6 @@ public class JsonSerializerTest {
     }
 
     private JsonDeserializer createJsonDeserializer(final JSONObject object) throws Exception {
-        return new JsonDeserializer(object, new MockAccountLookup());
+        return new JsonDeserializer(object);
     }
 }

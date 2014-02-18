@@ -26,21 +26,21 @@ public abstract class Transaction {
             throw new InvalidParameterException("sender must be owned to create transaction ");
     }
 
-    public Transaction(final Deserializer deserializer) throws Exception {
+    public Transaction(final ObjectDeserializer deserializer) throws Exception {
         this.signature = deserializer.readSignature();
         this.version = deserializer.readInt();
         this.type = deserializer.readInt();
         this.sender = deserializer.readAccount();
     }
 
-    public void serialize(final Serializer serializer) throws Exception {
+    public void serialize(final ObjectSerializer serializer) throws Exception {
         if (null == this.signature)
             throw new SerializationException("cannot serialize a transaction without a signature");
 
         this.serialize(serializer, true);
     }
 
-    private void serialize(final Serializer serializer, Boolean includeSignature) throws Exception {
+    private void serialize(final ObjectSerializer serializer, Boolean includeSignature) throws Exception {
         if (includeSignature)
             serializer.writeSignature(this.signature);
 
@@ -67,11 +67,12 @@ public abstract class Transaction {
         return signer.verify(this.getBytes(), this.signature);
     }
 
-    protected abstract void serializeImpl(final Serializer serializer) throws Exception;
+    protected abstract void serializeImpl(final ObjectSerializer serializer) throws Exception;
 
     public byte[] getBytes() throws Exception {
         try (BinarySerializer binarySerializer = new BinarySerializer()) {
-            this.serialize(binarySerializer, false);
+            ObjectSerializer objectSerializer = new DelegatingObjectSerializer(binarySerializer);
+            this.serialize(objectSerializer, false);
             return binarySerializer.getBytes();
         }
     }

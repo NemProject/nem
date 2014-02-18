@@ -1,18 +1,14 @@
 package org.nem.core.serialization;
 
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 
 public class BinaryDeserializer implements AutoCloseable, Deserializer {
 
     private final ByteArrayInputStream stream;
-    private final AccountLookup accountLookup;
 
-    public BinaryDeserializer(final byte[] bytes, final AccountLookup accountLookup) throws Exception {
+    public BinaryDeserializer(final byte[] bytes) throws Exception {
         this.stream = new ByteArrayInputStream(bytes);
-        this.accountLookup = accountLookup;
     }
 
     @Override
@@ -47,19 +43,6 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     public String readString() throws Exception {
         byte[] bytes = this.readBytes();
         return new String(bytes, "UTF-8");
-    }
-
-    @Override
-    public Account readAccount() throws Exception {
-        String accountId = this.readString();
-        return this.accountLookup.findById(accountId);
-    }
-
-    @Override
-    public Signature readSignature() throws Exception {
-        BigInteger r = this.readBigInteger();
-        BigInteger s = this.readBigInteger();
-        return new Signature(r, s);
     }
 
     public Boolean hasMoreData() {

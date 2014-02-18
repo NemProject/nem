@@ -2,9 +2,6 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
-import org.nem.core.test.*;
 
 import java.math.BigInteger;
 
@@ -86,39 +83,6 @@ public class BinarySerializerTest {
             final byte[] expectedBytes = new byte[] {
                 0x04, 0x00, 0x00, 0x00,
                 0x42, 0x45, 0x74, 0x61
-            };
-            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
-        }
-    }
-
-    @Test
-    public void canWriteAccount() throws Exception {
-        // Arrange:
-        try (BinarySerializer serializer = new BinarySerializer()) {
-            // Act:
-            serializer.writeAccount(new MockAccount("MockAcc"));
-
-            // Assert:
-            final byte[] expectedBytes = new byte[] {
-                0x07, 0x00, 0x00, 0x00,
-                0x4D, 0x6F, 0x63, 0x6B, 0x41, 0x63, 0x63
-            };
-            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
-        }
-    }
-
-    @Test
-    public void canWriteSignature() throws Exception {
-        // Arrange:
-        try (BinarySerializer serializer = new BinarySerializer()) {
-            // Act:
-            final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
-            serializer.writeSignature(signature);
-
-            // Assert:
-            final byte[] expectedBytes = new byte[] {
-                0x01, 0x00, 0x00, 0x00, 0x23,
-                0x02, 0x00, 0x00, 0x00, 0x00, (byte)0xA4
             };
             Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
         }
@@ -215,43 +179,6 @@ public class BinarySerializerTest {
         }
     }
 
-    @Test
-    public void canRoundtripAccount() throws Exception {
-        // Arrange:
-        MockAccountLookup accountLookup = new MockAccountLookup();
-        try (BinarySerializer serializer = new BinarySerializer()) {
-            // Act:
-            serializer.writeAccount(new MockAccount("MockAcc"));
-
-            try (BinaryDeserializer deserializer = new BinaryDeserializer(serializer.getBytes(), accountLookup)) {
-                final Account account = deserializer.readAccount();
-
-                // Assert:
-                Assert.assertThat(account.getId(), IsEqual.equalTo("MockAcc"));
-                Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-                Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
-            }
-        }
-    }
-
-    @Test
-    public void canRoundtripSignature() throws Exception {
-        // Arrange:
-        try (BinarySerializer serializer = new BinarySerializer()) {
-            // Act:
-            final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
-            serializer.writeSignature(signature);
-
-            try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final Signature readSignature = deserializer.readSignature();
-
-                // Assert:
-                Assert.assertThat(readSignature, IsEqual.equalTo(signature));
-                Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
-            }
-        }
-    }
-
     //endregion
 
     @Test
@@ -261,7 +188,6 @@ public class BinarySerializerTest {
             // Act:
             serializer.writeInt(0x09513510);
             serializer.writeLong(0xF239A033CE951350L);
-            serializer.writeAccount(new MockAccount("Beta"));
             serializer.writeBytes(new byte[]{2, 4, 6});
             serializer.writeInt(7);
             serializer.writeString("FooBar");
@@ -271,7 +197,6 @@ public class BinarySerializerTest {
                 // Assert:
                 Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(0x09513510));
                 Assert.assertThat(deserializer.readLong(), IsEqual.equalTo(0xF239A033CE951350L));
-                Assert.assertThat(deserializer.readAccount().getId(), IsEqual.equalTo("Beta"));
                 Assert.assertThat(deserializer.readBytes(), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
                 Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(7));
                 Assert.assertThat(deserializer.readString(), IsEqual.equalTo("FooBar"));
@@ -314,6 +239,6 @@ public class BinarySerializerTest {
     }
 
     private BinaryDeserializer createBinaryDeserializer(final byte[] bytes) throws Exception {
-        return new BinaryDeserializer(bytes, new MockAccountLookup());
+        return new BinaryDeserializer(bytes);
     }
 }

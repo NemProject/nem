@@ -2,20 +2,16 @@ package org.nem.core.serialization;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.json.*;
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
 
 import java.math.BigInteger;
 
 public class JsonDeserializer implements Deserializer {
 
     private final JSONObject object;
-    private final AccountLookup accountLookup;
     private int counter;
 
-    public JsonDeserializer(final JSONObject object, final AccountLookup accountLookup) throws Exception {
+    public JsonDeserializer(final JSONObject object) throws Exception {
         this.object = object;
-        this.accountLookup = accountLookup;
         this.counter = 1;
     }
 
@@ -44,19 +40,6 @@ public class JsonDeserializer implements Deserializer {
     @Override
     public String readString() throws Exception {
         return this.object.getString(this.getNextKey());
-    }
-
-    @Override
-    public Account readAccount() throws Exception {
-        String accountId = readString();
-        return this.accountLookup.findById(accountId);
-    }
-
-    @Override
-    public Signature readSignature() throws Exception {
-        BigInteger r = this.readBigInteger();
-        BigInteger s = this.readBigInteger();
-        return new Signature(r, s);
     }
 
     private String getNextKey() {
