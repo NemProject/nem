@@ -24,13 +24,13 @@ public class AccountDaoImpl implements AccountDao {
 	@Override
 	@Transactional
 	public Account getAccount(Long id) {
-		 List<Account> userList = new ArrayList<Account>();
+		 List<?> userList = new ArrayList<Account>();
          Query query = getCurrentSession()
         		 .createQuery("from Account a where a.id = :id")
         		 .setParameter("id", id);
          userList = query.list();
          if (userList.size() > 0)
-                 return userList.get(0);
+                 return (Account)userList.get(0);
          else
                  return null;    
 	}
@@ -38,13 +38,13 @@ public class AccountDaoImpl implements AccountDao {
 	@Override
 	@Transactional
 	public Account getAccountByPrintableAddress(byte[] printableAddres) {
-		 List<Account> userList = new ArrayList<Account>();
+		 List<?> userList = new ArrayList<Account>();
          Query query = getCurrentSession()
         		 .createQuery("from Account a where a.printableKey = :key")
         		 .setParameter("key", printableAddres);
          userList = query.list();
          if (userList.size() > 0)
-                 return userList.get(0);
+                 return (Account)userList.get(0);
          else
                  return null;    
 	}

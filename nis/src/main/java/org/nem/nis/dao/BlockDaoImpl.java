@@ -37,13 +37,13 @@ public class BlockDaoImpl implements BlockDao
 	@Override
 	@Transactional
 	public Block findByShortId(long shortId) {
-		List<Block> userList = new ArrayList<Block>();
+		List<?> userList = new ArrayList<Block>();
         Query query = getCurrentSession()
        		 .createQuery("from Block a where a.shortId = :id")
        		 .setParameter("id", shortId);
         userList = query.list();
         if (userList.size() > 0)
-                return userList.get(0);
+                return (Block)userList.get(0);
         else
                 return null;  
 	}
