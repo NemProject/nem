@@ -14,38 +14,38 @@ public class DelegatingObjectSerializer implements ObjectSerializer {
     }
 
     @Override
-    public void writeInt(final int i) throws Exception {
-        this.serializer.writeInt(i);
+    public void writeInt(final String label, final int i) throws Exception {
+        this.serializer.writeInt(label, i);
     }
 
     @Override
-    public void writeLong(final long l) throws Exception {
-        this.serializer.writeLong(l);
+    public void writeLong(final String label, final long l) throws Exception {
+        this.serializer.writeLong(label, l);
     }
 
     @Override
-    public void writeBigInteger(final BigInteger i) throws Exception {
-        this.serializer.writeBigInteger(i);
+    public void writeBigInteger(final String label, final BigInteger i) throws Exception {
+        this.serializer.writeBigInteger(label, i);
     }
 
     @Override
-    public void writeBytes(final byte[] bytes) throws Exception {
-        this.serializer.writeBytes(bytes);
+    public void writeBytes(final String label, final byte[] bytes) throws Exception {
+        this.serializer.writeBytes(label, bytes);
     }
 
     @Override
-    public void writeString(final String s) throws Exception {
-        this.serializer.writeString(s);
+    public void writeString(final String label, final String s) throws Exception {
+        this.serializer.writeString(label, s);
     }
 
     @Override
-    public void writeAccount(final Account account) throws Exception {
-        this.writeString(account.getId());
+    public void writeAccount(final String label, final Account account) throws Exception {
+        this.writeString(label, account.getId());
     }
 
     @Override
-    public void writeSignature(final Signature signature) throws Exception {
-        this.writeBigInteger(signature.getR());
-        this.writeBigInteger(signature.getS());
+    public void writeSignature(final String label, final Signature signature) throws Exception {
+        this.writeBigInteger(label + "_r", signature.getR());
+        this.writeBigInteger(label + "_s", signature.getS());
     }
 }

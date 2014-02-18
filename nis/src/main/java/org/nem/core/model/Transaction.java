@@ -27,10 +27,10 @@ public abstract class Transaction {
     }
 
     public Transaction(final ObjectDeserializer deserializer) throws Exception {
-        this.signature = deserializer.readSignature();
-        this.version = deserializer.readInt();
-        this.type = deserializer.readInt();
-        this.sender = deserializer.readAccount();
+        this.signature = deserializer.readSignature("signature");
+        this.version = deserializer.readInt("version");
+        this.type = deserializer.readInt("type");
+        this.sender = deserializer.readAccount("sender");
     }
 
     public void serialize(final ObjectSerializer serializer) throws Exception {
@@ -42,11 +42,11 @@ public abstract class Transaction {
 
     private void serialize(final ObjectSerializer serializer, Boolean includeSignature) throws Exception {
         if (includeSignature)
-            serializer.writeSignature(this.signature);
+            serializer.writeSignature("signature", this.signature);
 
-        serializer.writeInt(this.getVersion());
-        serializer.writeInt(this.getType());
-        serializer.writeAccount(this.getSender());
+        serializer.writeInt("version", this.getVersion());
+        serializer.writeInt("type", this.getType());
+        serializer.writeAccount("sender", this.getSender());
         this.serializeImpl(serializer);
     }
 

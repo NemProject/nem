@@ -14,7 +14,7 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeInt(0x09513510);
+            serializer.writeInt("int", 0x09513510);
 
             // Assert:
             final byte[] expectedBytes = new byte[] { 0x10, 0x35, 0x51, 0x09 };
@@ -27,7 +27,7 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeLong(0xF239A033CE951350L);
+            serializer.writeLong("long", 0xF239A033CE951350L);
 
             // Assert:
             final byte[] expectedBytes = new byte[] {
@@ -44,7 +44,7 @@ public class BinarySerializerTest {
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
             final BigInteger i = new BigInteger("958A7561F014", 16);
-            serializer.writeBigInteger(i);
+            serializer.writeBigInteger("BigInteger", i);
 
             // Assert:
             final byte[] expectedBytes = new byte[] {
@@ -61,7 +61,7 @@ public class BinarySerializerTest {
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
             final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
-            serializer.writeBytes(bytes);
+            serializer.writeBytes("bytes", bytes);
 
             // Assert:
             final byte[] expectedBytes = new byte[] {
@@ -77,7 +77,7 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeString("BEta");
+            serializer.writeString("String", "BEta");
 
             // Assert:
             final byte[] expectedBytes = new byte[] {
@@ -97,10 +97,10 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeInt(0x09513510);
+            serializer.writeInt("int", 0x09513510);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final int i = deserializer.readInt();
+                final int i = deserializer.readInt("int");
 
                 // Assert:
                 Assert.assertThat(i, IsEqual.equalTo(0x09513510));
@@ -114,10 +114,10 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeLong(0xF239A033CE951350L);
+            serializer.writeLong("long", 0xF239A033CE951350L);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final long l = deserializer.readLong();
+                final long l = deserializer.readLong("long");
 
                 // Assert:
                 Assert.assertThat(l, IsEqual.equalTo(0xF239A033CE951350L));
@@ -132,10 +132,10 @@ public class BinarySerializerTest {
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
             final BigInteger i = new BigInteger("958A7561F014", 16);
-            serializer.writeBigInteger(i);
+            serializer.writeBigInteger("BigInteger", i);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final BigInteger readBigInteger = deserializer.readBigInteger();
+                final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
 
                 // Assert:
                 Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
@@ -150,10 +150,10 @@ public class BinarySerializerTest {
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
             final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
-            serializer.writeBytes(bytes);
+            serializer.writeBytes("bytes", bytes);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final byte[] readBytes = deserializer.readBytes();
+                final byte[] readBytes = deserializer.readBytes("bytes");
 
                 // Assert:
                 Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
@@ -167,10 +167,10 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeString("BEta GaMMa");
+            serializer.writeString("String", "BEta GaMMa");
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
-                final String s = deserializer.readString();
+                final String s = deserializer.readString("String");
 
                 // Assert:
                 Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
@@ -186,22 +186,21 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeInt(0x09513510);
-            serializer.writeLong(0xF239A033CE951350L);
-            serializer.writeBytes(new byte[]{2, 4, 6});
-            serializer.writeInt(7);
-            serializer.writeString("FooBar");
-            serializer.writeLong(8);
+            serializer.writeInt("alpha", 0x09513510);
+            serializer.writeLong("zeta", 0xF239A033CE951350L);
+            serializer.writeBytes("beta", new byte[]{2, 4, 6});
+            serializer.writeInt("gamma", 7);
+            serializer.writeString("epsilon", "FooBar");
+            serializer.writeLong("sigma", 8);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
                 // Assert:
-                Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(0x09513510));
-                Assert.assertThat(deserializer.readLong(), IsEqual.equalTo(0xF239A033CE951350L));
-                Assert.assertThat(deserializer.readBytes(), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
-                Assert.assertThat(deserializer.readInt(), IsEqual.equalTo(7));
-                Assert.assertThat(deserializer.readString(), IsEqual.equalTo("FooBar"));
-                Assert.assertThat(deserializer.readLong(), IsEqual.equalTo(8L));
-                Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
+                Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
+                Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
+                Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
+                Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
+                Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
+                Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
             }
         }
     }
@@ -211,7 +210,7 @@ public class BinarySerializerTest {
         // Arrange:
         try (BinarySerializer serializer = new BinarySerializer()) {
             // Act:
-            serializer.writeInt(0x09513510);
+            serializer.writeInt("int", 0x09513510);
 
             try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
                 // Assert:
@@ -225,7 +224,7 @@ public class BinarySerializerTest {
         byte[] bytes = new byte[] { 1, 2, 4 };
         try (BinaryDeserializer deserializer = createBinaryDeserializer(bytes)) {
             // Assert:
-            deserializer.readInt();
+            deserializer.readInt("int");
         }
     }
 
@@ -234,7 +233,7 @@ public class BinarySerializerTest {
         byte[] bytes = new byte[] { 0x02, 0x00, 0x00, 0x00, 0x01 };
         try (BinaryDeserializer deserializer = createBinaryDeserializer(bytes)) {
             // Assert:
-            deserializer.readBytes();
+            deserializer.readBytes("bytes");
         }
     }
 

@@ -162,7 +162,7 @@ public class TransactionTest {
 
         public MockTransaction(final ObjectDeserializer deserializer) throws Exception {
             super(deserializer);
-            this.customField = deserializer.readInt();
+            this.customField = deserializer.readInt("customField");
         }
 
         public int getCustomField() { return this.customField; }
@@ -170,7 +170,7 @@ public class TransactionTest {
 
         @Override
         protected void serializeImpl(ObjectSerializer serializer) throws Exception {
-            serializer.writeInt(this.customField);
+            serializer.writeInt("customField", this.customField);
         }
     }
 }

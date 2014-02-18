@@ -12,7 +12,7 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     }
 
     @Override
-    public void writeInt(final int i) throws Exception {
+    public void writeInt(final String label, final int i) throws Exception {
         byte[] bytes = {
             (byte)(i & 0xFF),
             (byte)((i >> 8) & 0xFF),
@@ -23,25 +23,25 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     }
 
     @Override
-    public void writeLong(final long l) throws Exception {
-        this.writeInt((int)l);
-        this.writeInt((int)(l >> 32));
+    public void writeLong(final String label, final long l) throws Exception {
+        this.writeInt(label, (int)l);
+        this.writeInt(label, (int)(l >> 32));
     }
 
     @Override
-    public void writeBigInteger(final BigInteger i) throws Exception {
-        this.writeBytes(i.toByteArray());
+    public void writeBigInteger(final String label, final BigInteger i) throws Exception {
+        this.writeBytes(label, i.toByteArray());
     }
 
     @Override
-    public void writeBytes(final byte[] bytes) throws Exception {
-        this.writeInt(bytes.length);
+    public void writeBytes(final String label, final byte[] bytes) throws Exception {
+        this.writeInt(label, bytes.length);
         this.writeBytesInternal(bytes);
     }
 
     @Override
-    public void writeString(final String s) throws Exception {
-        this.writeBytes(s.getBytes("UTF-8"));
+    public void writeString(final String label, final String s) throws Exception {
+        this.writeBytes(label, s.getBytes("UTF-8"));
     }
 
     @Override

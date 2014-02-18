@@ -8,43 +8,35 @@ import java.math.BigInteger;
 public class JsonDeserializer implements Deserializer {
 
     private final JSONObject object;
-    private int counter;
 
     public JsonDeserializer(final JSONObject object) throws Exception {
         this.object = object;
-        this.counter = 1;
     }
 
     @Override
-    public int readInt() throws Exception {
-        return this.object.getInt(this.getNextKey());
+    public int readInt(final String label) throws Exception {
+        return this.object.getInt(label);
     }
 
     @Override
-    public long readLong() throws Exception {
-        return this.object.getLong(this.getNextKey());
+    public long readLong(final String label) throws Exception {
+        return this.object.getLong(label);
     }
 
     @Override
-    public BigInteger readBigInteger() throws Exception {
-        final byte[] bytes = this.readBytes();
+    public BigInteger readBigInteger(final String label) throws Exception {
+        final byte[] bytes = this.readBytes(label);
         return new BigInteger(bytes);
     }
 
     @Override
-    public byte[] readBytes() throws Exception {
-        final String s = this.readString();
+    public byte[] readBytes(final String label) throws Exception {
+        final String s = this.readString(label);
         return Base64.decode(s.getBytes("UTF-8"));
     }
 
     @Override
-    public String readString() throws Exception {
-        return this.object.getString(this.getNextKey());
-    }
-
-    private String getNextKey() {
-        final String key = String.format("%d", this.counter);
-        ++this.counter;
-        return key;
+    public String readString(final String label) throws Exception {
+        return this.object.getString(label);
     }
 }

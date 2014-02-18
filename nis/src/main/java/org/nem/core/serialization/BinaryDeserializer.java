@@ -12,7 +12,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     }
 
     @Override
-    public int readInt() throws Exception {
+    public int readInt(final String label) throws Exception {
         byte[] bytes = this.readBytes(4);
         return bytes[0] & 0x000000FF
             | (bytes[1] << 8) & 0x0000FF00
@@ -21,27 +21,27 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     }
 
     @Override
-    public long readLong() throws Exception {
-        long lowPart = this.readInt();
-        long highPart = this.readInt();
+    public long readLong(final String label) throws Exception {
+        long lowPart = this.readInt(label);
+        long highPart = this.readInt(label);
         return lowPart & 0x00000000FFFFFFFFL
             | (highPart << 32) & 0xFFFFFFFF00000000L;
     }
 
-    public BigInteger readBigInteger() throws Exception {
-        byte[] bytes = this.readBytes();
+    public BigInteger readBigInteger(final String label) throws Exception {
+        byte[] bytes = this.readBytes(label);
         return new BigInteger(bytes);
     }
 
     @Override
-    public byte[] readBytes() throws Exception {
-        int numBytes = this.readInt();
+    public byte[] readBytes(final String label) throws Exception {
+        int numBytes = this.readInt(label);
         return this.readBytes(numBytes);
     }
 
     @Override
-    public String readString() throws Exception {
-        byte[] bytes = this.readBytes();
+    public String readString(final String label) throws Exception {
+        byte[] bytes = this.readBytes(label);
         return new String(bytes, "UTF-8");
     }
 

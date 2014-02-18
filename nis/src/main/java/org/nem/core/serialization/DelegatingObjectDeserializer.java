@@ -16,40 +16,40 @@ public class DelegatingObjectDeserializer implements ObjectDeserializer {
     }
 
     @Override
-    public int readInt() throws Exception {
-        return this.deserializer.readInt();
+    public int readInt(final String label) throws Exception {
+        return this.deserializer.readInt(label);
     }
 
     @Override
-    public long readLong() throws Exception {
-        return this.deserializer.readLong();
+    public long readLong(final String label) throws Exception {
+        return this.deserializer.readLong(label);
     }
 
     @Override
-    public BigInteger readBigInteger() throws Exception {
-        return this.deserializer.readBigInteger();
+    public BigInteger readBigInteger(final String label) throws Exception {
+        return this.deserializer.readBigInteger(label);
     }
 
     @Override
-    public byte[] readBytes() throws Exception {
-        return this.deserializer.readBytes();
+    public byte[] readBytes(final String label) throws Exception {
+        return this.deserializer.readBytes(label);
     }
 
     @Override
-    public String readString() throws Exception {
-        return this.deserializer.readString();
+    public String readString(final String label) throws Exception {
+        return this.deserializer.readString(label);
     }
 
     @Override
-    public Account readAccount() throws Exception {
-        String accountId = readString();
+    public Account readAccount(final String label) throws Exception {
+        String accountId = readString(label);
         return this.accountLookup.findById(accountId);
     }
 
     @Override
-    public Signature readSignature() throws Exception {
-        BigInteger r = this.readBigInteger();
-        BigInteger s = this.readBigInteger();
+    public Signature readSignature(final String label) throws Exception {
+        BigInteger r = this.readBigInteger(label + "_r");
+        BigInteger s = this.readBigInteger(label + "_s");
         return new Signature(r, s);
     }
 }
