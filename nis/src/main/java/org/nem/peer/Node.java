@@ -4,21 +4,45 @@
 package org.nem.peer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
-import javax.json.spi.JsonProvider;
+//import javax.json.JsonObject;
+//import javax.json.JsonObjectBuilder;
+//import javax.json.JsonReader;
+//import javax.json.JsonWriter;
+//import javax.json.spi.JsonProvider;
 
-import org.nem.NEM;
+
+
+
+
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.client.api.Response;
+import org.eclipse.jetty.client.util.BytesContentProvider;
+import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.eclipse.jetty.http.HttpMethod;
+
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+
+
+
+
+//import org.nem.NEM;
 import org.nem.util.NEMLogger;
 
 /**
@@ -40,8 +64,8 @@ public class Node implements Serializable {
 	private int myPort;
 
 	// The resources and their URI
-	private URL nodeURL;
-	private URL networkURL;
+	private URL nodeInfoURL;
+	private URL peerNewURL;
 	private URL chainURL;
 
 	private long startTime;
@@ -63,13 +87,13 @@ public class Node implements Serializable {
 		}
 
 		try {
-			address = new URL("http", addrStr, NEM.NEM_PORT, NEM.APP_CONTEXT);
-			nodeURL = new URL(address, "node");
-			networkURL = new URL(address, "network");
+			address = new URL("http", addrStr, PeerInitializer.NEM_PORT, "/");
+			nodeInfoURL = new URL(address, "node/info"); 
+			peerNewURL = new URL(address, "peer/new");
 			chainURL = new URL(address, "chain");
+			
 		} catch (MalformedURLException e) {
 			NEMLogger.LOG.warning("Peer address not valid: <" + address.toString() + ">");
-
 			throw new IllegalArgumentException("Peer address not valid: <" + address.toString() + ">");
 		}
 
@@ -109,7 +133,7 @@ public class Node implements Serializable {
 
 		// We verify by getting the Information from the peer
 		try {
-			JsonObject response = getNodeInfo();
+			JSONObject response = getNodeInfo();
 			response.isEmpty();
 
 			// Okay we are connected with the peer node
@@ -156,63 +180,82 @@ public class Node implements Serializable {
 		state = status;
 	}
 
-	private JsonObject getResponse(URL url) throws MalformedURLException, IOException {
-		// Now request verification via defined protocol
-		HttpURLConnection connection = null;
-		JsonReader reader = null;
-		JsonObject response = null;
+	private JSONObject getResponse(URL url) {
+		HttpClient httpClient = new HttpClient();
+		httpClient.setFollowRedirects(false);
 		try {
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setDoOutput(true);
-			connection.setConnectTimeout(1000); // TODO: configuration
-			connection.setReadTimeout(1000); // TODO: configuration
-
-			JsonProvider provider = JsonProvider.provider();
-			reader = provider.createReader(connection.getInputStream());
-			response = reader.readObject();
-			reader.close();
-		} finally {
-			// Do housekeeping
-			if (reader != null) {
-				reader.close();
-			}
+			httpClient.start();
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
-
-		return response;
-
+		JSONObject retObj = null;
+		try {
+			InputStreamResponseListener listener = new InputStreamResponseListener();
+			
+			URI uri = url.toURI();
+			Request req = httpClient.newRequest(uri);
+			req.method(HttpMethod.GET);
+			req.send(listener);
+			
+			Response res = listener.get(30, TimeUnit.SECONDS);
+			if (res.getStatus() == 200) {
+				InputStream responseContent = listener.getInputStream();
+				
+				NEMLogger.LOG.log(Level.FINE, "server returned: " + res.getStatus() + " " + res.getReason());
+    			retObj = (JSONObject) JSONValue.parse(responseContent);
+			}
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		return retObj;
 	}
 
-	private JsonObject putResponse(URL url, JsonObject nodeInfo) throws MalformedURLException, IOException {
-		// Now request verification via defined protocol
-		HttpURLConnection connection = null;
-		JsonWriter writer = null;
-		JsonReader reader = null;
-		JsonObject response = null;
+	private JSONObject putResponse(URL url, JSONObject request) {
+		HttpClient httpClient = new HttpClient();
+		httpClient.setFollowRedirects(false);
 		try {
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("PUT");
-			connection.setDoOutput(true);
-			connection.setConnectTimeout(1000); // TODO: configuration
-			connection.setReadTimeout(1000); // TODO: configuration
-
-			JsonProvider provider = JsonProvider.provider();
-			writer = provider.createWriter(connection.getOutputStream());
-			writer.write(nodeInfo);
-			reader = provider.createReader(connection.getInputStream());
-			response = reader.readObject();
-		} finally {
-			// Do housekeeping
-			if (writer != null) {
-				writer.close();
-			}
-			if (reader != null) {
-				reader.close();
-			}
+			httpClient.start();
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
-
-		return response;
-
+		JSONObject retObj = null;
+		try {
+			InputStreamResponseListener listener = new InputStreamResponseListener();
+			
+			URI uri = url.toURI();
+			Request req = httpClient.newRequest(uri);
+			
+			req.method(HttpMethod.POST);
+			req.content(new BytesContentProvider(request.toJSONString().getBytes()), "text/plain");
+			req.send(listener);
+			
+			Response res = listener.get(30, TimeUnit.SECONDS);
+			if (res.getStatus() == 200) {
+				InputStream responseContent = listener.getInputStream();
+				
+				NEMLogger.LOG.log(Level.FINE, "server returned: " + res.getStatus() + " " + res.getReason());
+    			retObj = (JSONObject) JSONValue.parse(responseContent);
+			}
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		return retObj;
 	}
 
 	public String toString() {
@@ -223,23 +266,31 @@ public class Node implements Serializable {
 		return strB.toString();
 	}
 
-	public JsonObject getNodeInfo() throws MalformedURLException, IOException {
-		JsonObject response = getResponse(nodeURL);
+	public JSONObject getNodeInfo() throws MalformedURLException, IOException {
+		NEMLogger.LOG.log(Level.WARNING, "node/info url: " + nodeInfoURL);
+		JSONObject response = getResponse(nodeInfoURL);
 
+		NEMLogger.LOG.log(Level.WARNING, "node/info response: " + response.toString());
 		return response;
 	}
 
-	public JsonObject extendNetworkBy(Node node) throws MalformedURLException, IOException {
-		JsonProvider provider = JsonProvider.provider();
-		JsonObjectBuilder builder = provider.createObjectBuilder();
-		builder.add("application", NEM.APP_NAME);
-		builder.add("version", NEM.VERSION);
-		builder.add("platform", node.getMyPlatform());
-		builder.add("address", node.getMyAddress());
-		JsonObject response = null;
-
-		response = putResponse(networkURL, builder.build());
-
+	public static JSONObject sendNodeInfo(Node node) {
+		JSONObject obj=new JSONObject();
+		obj.put("protocol",new Integer(1));
+		obj.put("application", PeerInitializer.APP_NAME);
+		obj.put("version", PeerInitializer.VERSION);
+		obj.put("platform", node.getMyPlatform());
+		obj.put("address", node.getMyAddress());
+		obj.put("port","7676");
+		obj.put("shareAddress", new Boolean(false));
+		return obj;
+	}
+	
+	public JSONObject extendNetworkBy(Node node) throws MalformedURLException, IOException {
+		NEMLogger.LOG.log(Level.WARNING, "node/info url: " + nodeInfoURL);
+		JSONObject response =  putResponse(peerNewURL, sendNodeInfo(node));
+		
+		NEMLogger.LOG.log(Level.WARNING, "peer/new response: " + response.toString());
 		return response;
 	}
 

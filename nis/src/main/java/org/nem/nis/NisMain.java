@@ -23,6 +23,7 @@ import org.nem.nis.model.Block;
 import org.nem.nis.model.Transfer;
 import org.nem.nis.virtual.VirtualAccounts;
 import org.nem.nis.virtual.VirtualBlockChain;
+import org.nem.peer.PeerInitializer;
 import org.nxt.nrs.Crypto;
 import org.nxt.nrs.NrsBlock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,10 @@ public class NisMain
     	blockAnalyzer = new BlockAnalyzer();
     	
     	analyzeBlocks();
-    	initEpoch();    	
+    	initEpoch();
+    	
+    	Thread th = new PeerInitializer();
+    	th.start();
     }
     
 	private void populateDb() {

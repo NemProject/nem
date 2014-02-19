@@ -108,11 +108,11 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/mariadb-java-client-1.1.5.jar</systemPath>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>net.tanesha.recaptcha4j</groupId>
-			<artifactId>recaptcha4j</artifactId>
-			<version>0.0.7</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
 		</dependency>
 		
 		<dependency>
@@ -155,8 +155,10 @@
         	<configuration>
           		<source>1.7</source>
           		<target>1.7</target>
+          		<compilerArgument></compilerArgument>
         	</configuration>
       	</plugin>
+      	
 		<plugin>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-maven-plugin</artifactId>

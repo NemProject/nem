@@ -9,7 +9,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.logging.Level;
 
-import org.nem.NEM;
+import org.apache.log4j.Logger;
+import org.nem.nis.NisMain;
 import org.nem.util.NEMLogger;
 
 /**
@@ -22,6 +23,8 @@ import org.nem.util.NEMLogger;
  * 
  */
 public class PeerNetwork {
+	private static final Logger logger = Logger.getLogger(PeerNetwork.class);
+	
 	// Do not known right now for what purposes but it is always good to have a
 	// name...
 	private String name;
@@ -75,7 +78,8 @@ public class PeerNetwork {
 		// First we loop through the set of defined hosts
 		Node node = null;
 		for (String peerAddr : initialPeerAddr) {
-			node = new Node(peerAddr, NEM.NEM_PORT);
+			logger.debug("Connecting to: " + peerAddr);
+			node = new Node(peerAddr, PeerInitializer.NEM_PORT);
 			if (node.verifyNEM()) {
 				// ok, so put myself into the network of node
 				try {
