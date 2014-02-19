@@ -13,7 +13,9 @@ import javax.annotation.PostConstruct;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.nem.nis.crypto.Hashes;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
@@ -31,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain
 {
-	private static final Logger logger = Logger.getLogger(NisMain.class);
+	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
     
 	@Autowired
 	private AccountDao accountDao;
@@ -240,7 +242,7 @@ public class NisMain
 			accountDao.save(a);
 				
 		} else {
-			logger.fatal("account counts: " + accountDao.count().toString());
+			logger.warning("account counts: " + accountDao.count().toString());
 			a = accountDao.getAccountByPrintableAddress(CREATOR_ADDRESS.getBase32Address());
 		}
 		
