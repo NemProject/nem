@@ -20,7 +20,7 @@
 	
 	<properties>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
-		<jetty.version>9.0.7.v20131107</jetty.version>
+		<jetty.version>9.1.2.v20140210</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
 		<spring.version>4.0.0.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
@@ -98,6 +98,11 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-client</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlets</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
 
