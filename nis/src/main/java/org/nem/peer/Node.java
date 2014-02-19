@@ -287,7 +287,7 @@ public class Node implements Serializable {
 	}
 	
 	public JSONObject extendNetworkBy(Node node) throws MalformedURLException, IOException {
-		NEMLogger.LOG.log(Level.WARNING, "node/info url: " + nodeInfoURL);
+		NEMLogger.LOG.log(Level.WARNING, "peer/new url: " + peerNewURL);
 		JSONObject response =  putResponse(peerNewURL, sendNodeInfo(node));
 		
 		NEMLogger.LOG.log(Level.WARNING, "peer/new response: " + response.toString());
