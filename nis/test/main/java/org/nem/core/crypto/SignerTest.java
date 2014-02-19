@@ -43,6 +43,21 @@ public class SignerTest {
     }
 
     @Test
+    public void signaturesAreDeterministic() throws Exception {
+        // Arrange:
+        KeyPair kp = new KeyPair();
+        Signer signer = new Signer(kp);
+        byte[] input = Utils.generateRandomBytes();
+
+        // Act:
+        Signature signature1 = signer.sign(input);
+        Signature signature2 = signer.sign(input);
+
+        // Assert:
+        Assert.assertThat(signature1, IsEqual.equalTo(signature2));
+    }
+
+    @Test
     public void verifyReturnsFalseForNonCanonicalSignature() throws Exception {
         // Arrange:
         KeyPair kp = new KeyPair();
