@@ -111,14 +111,13 @@ public class DelegatingObjectSerializerTest {
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
 
         // Act:
-        final Signature signature = new Signature(new BigInteger("23", 16), new BigInteger("A4", 16));
+        final Signature signature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
         serializer.writeSignature("Signature", signature);
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(2));
-        Assert.assertThat(object.getString("Signature_r"), IsEqual.equalTo("Iw=="));
-        Assert.assertThat(object.getString("Signature_s"), IsEqual.equalTo("AKQ="));
+        Assert.assertThat(object.length(), IsEqual.equalTo(1));
+        Assert.assertThat(object.getString("Signature"), IsEqual.equalTo("AQAAAHoDAAAAAKTw"));
     }
 
     //endregion
