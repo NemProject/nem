@@ -3,15 +3,12 @@
  */
 package org.nem.peer;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Set;
+import java.net.URISyntaxException;
 import java.util.HashSet;
-import java.util.logging.Level;
-
-import org.apache.log4j.Logger;
-import org.nem.nis.NisMain;
-import org.nem.util.NEMLogger;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 /**
  * Reflects a peer network. NEM might end up with parallel multiple peer
@@ -23,7 +20,7 @@ import org.nem.util.NEMLogger;
  * 
  */
 public class PeerNetwork {
-	private static final Logger logger = Logger.getLogger(PeerNetwork.class);
+	private static final Logger logger = Logger.getLogger(PeerNetwork.class.getName());
 	
 	// Do not known right now for what purposes but it is always good to have a
 	// name...
@@ -78,23 +75,31 @@ public class PeerNetwork {
 		// First we loop through the set of defined hosts
 		Node node = null;
 		for (String peerAddr : initialPeerAddr) {
-			logger.debug("Connecting to: " + peerAddr);
+			logger.fine("Connecting to: " + peerAddr);
 			node = new Node(peerAddr, PeerInitializer.NEM_PORT);
 			if (node.verifyNEM()) {
 				// ok, so put myself into the network of node
 				try {
 					node.extendNetworkBy(localNode);
 					allPeers.add(node);
-				} catch (MalformedURLException e) {
-					// Is unlikely that this would happen, but anyhow we have to
-					// be robust
-					NEMLogger.LOG.log(Level.WARNING, node.toString(), e);
+					
+				} catch (URISyntaxException e) {
+					logger.warning(toString() + e.toString());
 					node.setState(NodeStatus.FAILURE);
-
-				} catch (IOException e) {
-					NEMLogger.LOG.log(Level.WARNING, node.toString(), e);
+					
+				} catch (TimeoutException e) {
+					logger.warning(toString() + " timed out.");
 					node.setState(NodeStatus.INACTIVE);
-				}
+					
+				} catch (ExecutionException e) {
+					logger.warning(toString() + e.toString());
+					node.setState(NodeStatus.FAILURE);
+					
+				} catch (InterruptedException e) {
+					logger.warning(toString() + e.toString());
+					node.setState(NodeStatus.INACTIVE);
+				}	
+				
 			}
 		}
 		booted = true;

@@ -6,17 +6,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.nem.nis.NisMain;
-import org.nem.util.NEMLogger;
+import java.util.logging.Logger;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 
 public class PeerInitializer extends Thread {
-	private static final Logger logger = Logger.getLogger(PeerInitializer.class);
+	private static final Logger logger = Logger.getLogger(PeerInitializer.class.getName());
 
 	// All GLOBAL Definitions are going here
 	// No change during runtime
@@ -29,13 +26,12 @@ public class PeerInitializer extends Thread {
 	@Override
 	public void run() {
 		
-		NEMLogger.initializeLogger(APP_NAME);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
 		}
 		
-		logger.debug("Configure own node.");
+		logger.fine("Configure own node.");
 		Node localNode = null;
 
 		String tmpStr = null;
@@ -91,7 +87,7 @@ public class PeerInitializer extends Thread {
 			
 		} else {
 			wellKnownPeers = Collections.emptySet();
-			logger.warn("No wellKnownPeers defined, it is unlikely to work");
+			logger.warning("No wellKnownPeers defined, it is unlikely to work");
 		}
 		
 		PeerNetwork network = new PeerNetwork("Default network", localNode, wellKnownPeers);

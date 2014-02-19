@@ -13,5 +13,13 @@
 		</Arg>
 	</Call>
 
-
+	<Call id="logMgr" class="java.util.logging.LogManager" name="getLogManager">
+    <Call name="readConfiguration">
+      <Arg class="java.io.InputStream">
+        <New class="java.io.FileInputStream">
+          <Arg class="java.lang.String"><Property name="jetty.home" default="target/classes/"/>logging.properties</Arg>
+        </New>
+      </Arg>
+    </Call>
+  </Call>
 </Configure> 

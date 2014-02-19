@@ -21,6 +21,8 @@ I wasn't sure if both of you will be ok with the changes, so I've put it on sepa
 2014-02-19 17:46:23,951 [org.nem.peer.Node extendNetworkBy] WARNING: peer/new response: {"error":1,"reason":"trust no one"}
 ```
 
+* removed NEMLogger, moved location of logging.properties into jetty.xml
+* 
 
 Some configuration is in XML files, the rest of the stuff is annotation based.
 
