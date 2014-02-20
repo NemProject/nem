@@ -45,7 +45,10 @@ public class DelegatingObjectSerializer implements ObjectSerializer {
 
     @Override
     public void writeSignature(final String label, final Signature signature) throws Exception {
-        this.writeBigInteger(label + "_r", signature.getR());
-        this.writeBigInteger(label + "_s", signature.getS());
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            serializer.writeBigInteger(null, signature.getR());
+            serializer.writeBigInteger(null, signature.getS());
+            this.writeBytes(label, serializer.getBytes());
+        }
     }
 }
