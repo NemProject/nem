@@ -13,7 +13,9 @@ import javax.annotation.PostConstruct;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.nem.nis.crypto.Hashes;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
@@ -23,6 +25,7 @@ import org.nem.nis.model.Block;
 import org.nem.nis.model.Transfer;
 import org.nem.nis.virtual.VirtualAccounts;
 import org.nem.nis.virtual.VirtualBlockChain;
+import org.nem.peer.PeerInitializer;
 import org.nxt.nrs.Crypto;
 import org.nxt.nrs.NrsBlock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain
 {
-	private static final Logger logger = Logger.getLogger(NisMain.class);
+	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
     
 	@Autowired
 	private AccountDao accountDao;
@@ -90,7 +93,10 @@ public class NisMain
     	blockAnalyzer = new BlockAnalyzer();
     	
     	analyzeBlocks();
-    	initEpoch();    	
+    	initEpoch();
+    	
+    	Thread th = new PeerInitializer();
+    	th.start();
     }
     
 	private void populateDb() {
@@ -236,7 +242,7 @@ public class NisMain
 			accountDao.save(a);
 				
 		} else {
-			logger.fatal("account counts: " + accountDao.count().toString());
+			logger.warning("account counts: " + accountDao.count().toString());
 			a = accountDao.getAccountByPrintableAddress(CREATOR_ADDRESS.getBase32Address());
 		}
 		

@@ -1,3 +1,29 @@
+Merge Thies' peer
+-----------------
+
+I wasn't sure if both of you will be ok with the changes, so I've put it on separate branch
+
+* dropped NEMServer
+* moved most of stuff from org.nem.NEM to org.nem.peer.PeerInitializer
+* I think we shouldn't pollute web.xml with our stuff so I've changed reading of settings to JSON file peers-config.json
+* I've used jetty's HttpClient for communication: http://www.eclipse.org/jetty/documentation/current/http-client.html
+* Controllers in org.nem.nis.controller are handling the calls
+* I have host running, which is added to peers-config.json, so you should be able to try it out, here's sample output
+```
+[INFO] Started Jetty Server
+17:46:23,605  INFO PeerInitializer:51 - NIS settings:
+17:46:23,617  INFO PeerInitializer:58 -   "myPort" = 7890
+17:46:23,618  INFO PeerInitializer:67 -   "myAddress" = "localhost"
+17:46:23,622  INFO PeerInitializer:77 -   "myPlatform" = "ZX Spectrum"
+2014-02-19 17:46:23,623 [org.nem.peer.Node getNodeInfo] WARNING: node/info url: http://37.187.70.29:7890/node/info
+2014-02-19 17:46:23,858 [org.nem.peer.Node getNodeInfo] WARNING: node/info response: {"port":"7890","shareAddress":true,"platform":"PC x64","protocol":1,"application":"NIS","scheme":"http","version":"0.1.0"}
+2014-02-19 17:46:23,860 [org.nem.peer.Node extendNetworkBy] WARNING: node/info url: http://37.187.70.29:7890/node/info
+2014-02-19 17:46:23,951 [org.nem.peer.Node extendNetworkBy] WARNING: peer/new response: {"error":1,"reason":"trust no one"}
+```
+
+* removed NEMLogger, moved location of logging.properties into jetty.xml
+* 
+
 Some configuration is in XML files, the rest of the stuff is annotation based.
 
 
