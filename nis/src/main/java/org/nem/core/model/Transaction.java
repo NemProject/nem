@@ -11,26 +11,31 @@ public abstract class Transaction {
     public final int type;
     public final Account sender;
     public Signature signature;
+    public long fee;
 
     public int getVersion() { return this.version; }
     public int getType() { return this.type; }
     public Account getSender() { return this.sender; }
     public Signature getSignature() { return this.signature; }
+    public long getFee() { return Math.max(this.getMinimumFee(), this.fee); }
 
-    public Transaction(final int version, final int type, final Account sender) {
-        this.version = version;
+    public void setFee(final long fee) { this.fee = fee; }
+
+    public Transaction(final int type, final int version, final Account sender) {
         this.type = type;
+        this.version = version;
         this.sender = sender;
 
         if (!this.sender.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("sender must be owned to create transaction ");
     }
 
-    public Transaction(final ObjectDeserializer deserializer) throws Exception {
-        this.signature = deserializer.readSignature("signature");
+    public Transaction(final int type, final ObjectDeserializer deserializer) throws Exception {
+        this.type = type;
         this.version = deserializer.readInt("version");
-        this.type = deserializer.readInt("type");
         this.sender = deserializer.readAccount("sender");
+        this.fee = deserializer.readLong("fee");
+        this.signature = deserializer.readSignature("signature");
     }
 
     public void serialize(final ObjectSerializer serializer) throws Exception {
@@ -41,12 +46,14 @@ public abstract class Transaction {
     }
 
     private void serialize(final ObjectSerializer serializer, Boolean includeSignature) throws Exception {
+        serializer.writeInt("type", this.getType());
+        serializer.writeInt("version", this.getVersion());
+        serializer.writeAccount("sender", this.getSender());
+        serializer.writeLong("fee", this.getFee());
+
         if (includeSignature)
             serializer.writeSignature("signature", this.signature);
 
-        serializer.writeInt("version", this.getVersion());
-        serializer.writeInt("type", this.getType());
-        serializer.writeAccount("sender", this.getSender());
         this.serializeImpl(serializer);
     }
 
@@ -66,6 +73,10 @@ public abstract class Transaction {
         Signer signer = new Signer(this.getSender().getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
+
+    public abstract boolean isValid();
+
+    protected abstract long getMinimumFee();
 
     protected abstract void serializeImpl(final ObjectSerializer serializer) throws Exception;
 
