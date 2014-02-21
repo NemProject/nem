@@ -48,11 +48,8 @@ public class DelegatingObjectDeserializer implements ObjectDeserializer {
 
     @Override
     public Signature readSignature(final String label) throws Exception {
-        byte[] bytes = this.readBytes(label);
-        try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes)) {
-            BigInteger r = deserializer.readBigInteger(null);
-            BigInteger s = deserializer.readBigInteger(null);
-            return new Signature(r, s);
-        }
+        BigInteger r = this.readBigInteger(label + "_r");
+        BigInteger s = this.readBigInteger(label + "_s");
+        return new Signature(r, s);
     }
 }

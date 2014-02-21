@@ -20,7 +20,7 @@
 	
 	<properties>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
-		<jetty.version>9.0.7.v20131107</jetty.version>
+		<jetty.version>9.1.2.v20140210</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
 		<spring.version>4.0.0.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
@@ -100,6 +100,11 @@
 			<artifactId>jetty-client</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlets</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
@@ -108,11 +113,11 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/mariadb-java-client-1.1.5.jar</systemPath>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>net.tanesha.recaptcha4j</groupId>
-			<artifactId>recaptcha4j</artifactId>
-			<version>0.0.7</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
 		</dependency>
 		
 		<dependency>
@@ -121,12 +126,6 @@
 			<version>1.2</version>
 		</dependency>
  
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-		
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -155,8 +154,10 @@
         	<configuration>
           		<source>1.7</source>
           		<target>1.7</target>
+          		<compilerArgument></compilerArgument>
         	</configuration>
       	</plugin>
+      	
 		<plugin>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-maven-plugin</artifactId>

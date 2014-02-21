@@ -7,29 +7,19 @@ import java.math.BigInteger;
 
 public class JsonSerializer implements Serializer {
 
-    public static final String PROPERTY_ORDER_ARRAY_NAME = "_propertyOrderArray";
-
-    private final JSONArray propertyOrderArray;
     private final JSONObject object;
 
     public JsonSerializer() throws Exception {
-        this(false);
-    }
-
-    public JsonSerializer(boolean enforceReadWriteOrder) throws Exception {
         this.object = new JSONObject();
-        this.propertyOrderArray = enforceReadWriteOrder ? new JSONArray() : null;
     }
 
     @Override
     public void writeInt(final String label, final int i) throws Exception {
-        this.pushLabel(label);
         this.object.put(label, i);
     }
 
     @Override
     public void writeLong(final String label, final long l) throws Exception {
-        this.pushLabel(label);
         this.object.put(label, l);
     }
 
@@ -46,19 +36,10 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public void writeString(final String label, final String s) throws Exception {
-        this.pushLabel(label);
         this.object.put(label, s);
     }
 
     public JSONObject getObject() {
-        this.object.putOpt(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
         return this.object;
-    }
-
-    private void pushLabel(final String label) {
-        if (null == this.propertyOrderArray)
-            return;
-
-        this.propertyOrderArray.put(label);
     }
 }

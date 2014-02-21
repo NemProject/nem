@@ -22,26 +22,26 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 
     @Override
     public long readLong(final String label) throws Exception {
-        long lowPart = this.readInt(null);
-        long highPart = this.readInt(null);
+        long lowPart = this.readInt(label);
+        long highPart = this.readInt(label);
         return lowPart & 0x00000000FFFFFFFFL
             | (highPart << 32) & 0xFFFFFFFF00000000L;
     }
 
     public BigInteger readBigInteger(final String label) throws Exception {
-        byte[] bytes = this.readBytes(null);
+        byte[] bytes = this.readBytes(label);
         return new BigInteger(bytes);
     }
 
     @Override
     public byte[] readBytes(final String label) throws Exception {
-        int numBytes = this.readInt(null);
+        int numBytes = this.readInt(label);
         return this.readBytes(numBytes);
     }
 
     @Override
     public String readString(final String label) throws Exception {
-        byte[] bytes = this.readBytes(null);
+        byte[] bytes = this.readBytes(label);
         return new String(bytes, "UTF-8");
     }
 

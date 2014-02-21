@@ -5,7 +5,6 @@ import org.json.*;
 import org.junit.*;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 public class JsonSerializerTest {
 
@@ -149,22 +148,6 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripEmptyBytes() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        final byte[] bytes = new byte[] { };
-        serializer.writeBytes("bytes", bytes);
-
-        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-        final byte[] readBytes = deserializer.readBytes("bytes");
-
-        // Assert:
-        Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
-    }
-
-    @Test
     public void canRoundtripString() throws Exception {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
@@ -183,17 +166,9 @@ public class JsonSerializerTest {
 
     @Test
     public void canRoundtripMultipleValues() throws Exception {
-        // Assert:
-        assertRoundtripMultipleValues(new JsonSerializer());
-    }
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
 
-    @Test
-    public void canRoundtripMultipleValuesWithOrderingChecksEnabled() throws Exception {
-        // Assert:
-        assertRoundtripMultipleValues(new JsonSerializer(true));
-    }
-
-    private void assertRoundtripMultipleValues(final JsonSerializer serializer) throws Exception {
         // Act:
         serializer.writeInt("alpha", 0x09513510);
         serializer.writeLong("zeta", 0xF239A033CE951350L);
@@ -212,71 +187,6 @@ public class JsonSerializerTest {
         Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
         Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
     }
-
-    //region Order Enforcement
-
-    @Test
-    public void defaultSerializerDoesNotPublishPropertyOrderMetadata() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        serializer.writeInt("Foo", 17);
-        serializer.writeInt("Bar", 11);
-        JSONObject object = serializer.getObject();
-
-        // Assert:
-        Assert.assertThat(object.has("_order"), IsEqual.equalTo(false));
-    }
-
-    @Test
-    public void defaultDeserializerDoesNotEnforceOrderedReads() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer();
-
-        // Act:
-        serializer.writeInt("Foo", 17);
-        serializer.writeInt("Bar", 11);
-
-        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-
-        // Assert:
-        Assert.assertThat(deserializer.readInt("Bar"), IsEqual.equalTo(11));
-        Assert.assertThat(deserializer.readInt("Foo"), IsEqual.equalTo(17));
-    }
-
-    @Test
-    public void serializerCanOptionallyPublishPropertyOrderMetadata() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer(true);
-
-        // Act:
-        serializer.writeInt("Foo", 17);
-        serializer.writeInt("Bar", 11);
-        JSONObject object = serializer.getObject();
-        JSONArray orderArray = object.optJSONArray(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
-
-        // Assert:
-        Assert.assertThat(orderArray, IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(orderArray.length(), IsEqual.equalTo(2));
-        Assert.assertThat(orderArray.getString(0), IsEqual.equalTo("Foo"));
-        Assert.assertThat(orderArray.getString(1), IsEqual.equalTo("Bar"));
-    }
-
-    @Test(expected = InvalidParameterException.class)
-    public void deserializerCanOptionallyEnforceOrderedReads() throws Exception {
-        // Arrange:
-        JsonSerializer serializer = new JsonSerializer(true);
-
-        // Act:
-        serializer.writeInt("Foo", 17);
-        serializer.writeInt("Bar", 11);
-
-        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-        deserializer.readInt("Bar");
-    }
-
-    //endregion
 
     private JsonDeserializer createJsonDeserializer(final JSONObject object) throws Exception {
         return new JsonDeserializer(object);

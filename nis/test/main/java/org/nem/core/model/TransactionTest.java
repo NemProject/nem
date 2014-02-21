@@ -4,7 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockAccount;
+import org.nem.core.test.MockAccountLookup;
 
 import java.security.InvalidParameterException;
 
@@ -22,12 +23,11 @@ public class TransactionTest {
         final MockTransaction transaction = new MockTransaction(sender, 6);
 
         // Assert:
-        Assert.assertThat(transaction.getType(), IsEqual.equalTo(123));
-        Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(759));
+        Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(123));
+        Assert.assertThat(transaction.getType(), IsEqual.equalTo(759));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
         Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
         Assert.assertThat(transaction.getSignature(), IsEqual.equalTo(null));
-        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
     }
 
     @Test(expected = InvalidParameterException.class)
@@ -49,17 +49,14 @@ public class TransactionTest {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
-        final MockTransaction originalTransaction = new MockTransaction(sender, 7);
-        originalTransaction.setFee(130);
-        final MockTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
+        final MockTransaction transaction = createRoundTrippedTransaction(sender, 7, senderPublicKeyOnly);
 
         // Assert:
-        Assert.assertThat(transaction.getType(), IsEqual.equalTo(123));
-        Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(759));
+        Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(123));
+        Assert.assertThat(transaction.getType(), IsEqual.equalTo(759));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(transaction.getSender(), IsEqual.equalTo(senderPublicKeyOnly));
         Assert.assertThat(transaction.getSignature(), IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
     }
 
     @Test
@@ -129,46 +126,16 @@ public class TransactionTest {
 
     //endregion
 
-    //region Fees
-
-    @Test
-    public void feeIsMaximumOfMinimumFeeAndCurrentFee() throws Exception {
-        // Assert:
-        Assert.assertThat(getFee(15L, 50L), IsEqual.equalTo(50L));
-        Assert.assertThat(getFee(130L, 50L), IsEqual.equalTo(130L));
-    }
-
-    private long getFee(long minimumFee, long fee) throws Exception {
-        // Arrange:
-        final KeyPair publicPrivateKeyPair = new KeyPair();
-        final Account sender = new Account(publicPrivateKeyPair);
-
-        // Act:
-        final MockTransaction transaction = new MockTransaction(sender);
-        transaction.setMinimumFee(minimumFee);
-        transaction.setFee(fee);
-        return transaction.getFee();
-    }
-
-    //endregion
-
     private MockTransaction createRoundTrippedTransaction(
         final Account originalSender,
         final int customField,
         final Account deserializedSender) throws Exception {
-        // Act:
-        final MockTransaction originalTransaction = new MockTransaction(originalSender, customField);
-        return createRoundTrippedTransaction(originalTransaction, deserializedSender);
-    }
-
-    private MockTransaction createRoundTrippedTransaction(
-        Transaction originalTransaction,
-        final Account deserializedSender) throws Exception {
         // Arrange:
+        final MockTransaction originalTransaction = new MockTransaction(originalSender, customField);
         originalTransaction.sign();
 
         // Act:
-        JsonSerializer jsonSerializer = new JsonSerializer(true);
+        JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
         originalTransaction.serialize(serializer);
 
@@ -178,5 +145,32 @@ public class TransactionTest {
             new JsonDeserializer(jsonSerializer.getObject()),
             accountLookup);
         return new MockTransaction(deserializer);
+    }
+
+    private class MockTransaction extends Transaction {
+
+        private int customField;
+
+        public MockTransaction(final Account sender) throws Exception {
+            this(sender, 0);
+        }
+
+        public MockTransaction(final Account sender, final int customField) throws Exception {
+            super(123, 759, sender);
+            this.customField = customField;
+        }
+
+        public MockTransaction(final ObjectDeserializer deserializer) throws Exception {
+            super(deserializer);
+            this.customField = deserializer.readInt("customField");
+        }
+
+        public int getCustomField() { return this.customField; }
+        public void setCustomField(final int customField) { this.customField = customField; }
+
+        @Override
+        protected void serializeImpl(ObjectSerializer serializer) throws Exception {
+            serializer.writeInt("customField", this.customField);
+        }
     }
 }

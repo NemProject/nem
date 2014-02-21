@@ -1,9 +1,6 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
-
 import java.math.BigInteger;
 
 public class Signer {
@@ -15,7 +12,7 @@ public class Signer {
     }
 
     public Signature sign(final byte[] data) throws Exception {
-        ECDSASigner signer = createECDSASigner();
+        ECDSASigner signer = new ECDSASigner();
         signer.init(true, this.keyPair.getPrivateKeyParameters());
         final byte[] hash = Hashes.sha3(data);
         BigInteger[] components = signer.generateSignature(hash);
@@ -28,13 +25,9 @@ public class Signer {
         if (!signature.isCanonical())
             return false;
 
-        ECDSASigner signer = createECDSASigner();
+        ECDSASigner signer = new ECDSASigner();
         signer.init(false, this.keyPair.getPublicKeyParameters());
         final byte[] hash = Hashes.sha3(data);
         return signer.verifySignature(hash, signature.getR(), signature.getS());
-    }
-
-    private ECDSASigner createECDSASigner() {
-        return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest()));
     }
 }

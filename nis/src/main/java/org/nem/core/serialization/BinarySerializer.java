@@ -24,24 +24,24 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
     @Override
     public void writeLong(final String label, final long l) throws Exception {
-        this.writeInt(null, (int)l);
-        this.writeInt(null, (int)(l >> 32));
+        this.writeInt(label, (int)l);
+        this.writeInt(label, (int)(l >> 32));
     }
 
     @Override
     public void writeBigInteger(final String label, final BigInteger i) throws Exception {
-        this.writeBytes(null, i.toByteArray());
+        this.writeBytes(label, i.toByteArray());
     }
 
     @Override
     public void writeBytes(final String label, final byte[] bytes) throws Exception {
-        this.writeInt(null, bytes.length);
+        this.writeInt(label, bytes.length);
         this.writeBytesInternal(bytes);
     }
 
     @Override
     public void writeString(final String label, final String s) throws Exception {
-        this.writeBytes(null, s.getBytes("UTF-8"));
+        this.writeBytes(label, s.getBytes("UTF-8"));
     }
 
     @Override

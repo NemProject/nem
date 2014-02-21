@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.apache.commons.codec.binary.Base32;
 import java.util.Arrays;
 import org.nem.core.crypto.*;
-import org.nem.core.utils.ArrayUtils;
 
 public class Address {
     private static final int NUM_CHECKSUM_BYTES = 4;
@@ -18,13 +17,13 @@ public class Address {
         byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
 
         // step 3: add version byte in front of (2)
-        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{VERSION}, ripemd160StepOneHash);
+        byte[] versionPrefixedRipemd160Hash = concat(new byte[] { VERSION }, ripemd160StepOneHash);
 
         // step 4: get the checksum of (3)
         byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
 
         // step 5: concatenate (3) and (4)
-        byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
+        byte[] concatStepThreeAndStepSix = concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
         // step 6: base32 encode (5)
         return toBase32(concatStepThreeAndStepSix);
@@ -51,6 +50,13 @@ public class Address {
 
         // step 2: get the first X bytes of (1)
         return Arrays.copyOfRange(sha3StepThreeHash, 0, NUM_CHECKSUM_BYTES);
+    }
+
+    private static byte[] concat(final byte[] lhs, final byte[] rhs) {
+        byte[] result = new byte[lhs.length + rhs.length];
+        System.arraycopy(lhs, 0, result, 0, lhs.length);
+        System.arraycopy(rhs, 0, result, lhs.length, rhs.length);
+        return result;
     }
 
     private static String toBase32(final byte[] input) {
