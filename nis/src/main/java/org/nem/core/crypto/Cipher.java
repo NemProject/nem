@@ -21,8 +21,6 @@ public class Cipher {
         IES_PARAMETERS = new IESParameters(d, e, 64);
     }
 
-    private final KeyPair senderKeyPair;
-    private final KeyPair recipientKeyPair;
     private final IESEngine iesEncryptEngine;
     private final IESEngine iesDecryptEngine;
 
@@ -33,26 +31,23 @@ public class Cipher {
      * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
      */
     public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-        this.senderKeyPair = senderKeyPair;
-        this.recipientKeyPair = recipientKeyPair;
-
-        if (this.senderKeyPair.hasPrivateKey()) {
+        if (senderKeyPair.hasPrivateKey()) {
             this.iesEncryptEngine = createIesEngine();
             this.iesEncryptEngine.init(
                 true,
-                this.senderKeyPair.getPrivateKeyParameters(),
-                this.recipientKeyPair.getPublicKeyParameters(),
+                senderKeyPair.getPrivateKeyParameters(),
+                recipientKeyPair.getPublicKeyParameters(),
                 IES_PARAMETERS);
         } else {
             this.iesEncryptEngine = null;
         }
 
-        if (this.recipientKeyPair.hasPrivateKey()) {
+        if (recipientKeyPair.hasPrivateKey()) {
             this.iesDecryptEngine = createIesEngine();
             this.iesDecryptEngine.init(
                 false,
-                this.recipientKeyPair.getPrivateKeyParameters(),
-                this.senderKeyPair.getPublicKeyParameters(),
+                recipientKeyPair.getPrivateKeyParameters(),
+                senderKeyPair.getPublicKeyParameters(),
                 IES_PARAMETERS);
         } else {
             this.iesDecryptEngine = null;
