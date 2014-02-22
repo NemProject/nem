@@ -2,7 +2,7 @@ package org.nem.core.serialization;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.json.*;
-import org.nem.core.utils.StringEncoding;
+import org.nem.core.utils.StringEncoder;
 
 import java.math.BigInteger;
 
@@ -52,7 +52,7 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public void writeBytes(final String label, final byte[] bytes) {
-        final String s = StringEncoding.getString(Base64.encode(bytes));
+        final String s = StringEncoder.getString(Base64.encode(bytes));
         this.writeString(label, s);
     }
 

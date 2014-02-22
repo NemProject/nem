@@ -1,6 +1,6 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringEncoding;
+import org.nem.core.utils.StringEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     @Override
     public String readString(final String label) {
         byte[] bytes = this.readBytes(null);
-        return StringEncoding.getString(bytes);
+        return StringEncoder.getString(bytes);
     }
 
     @Override

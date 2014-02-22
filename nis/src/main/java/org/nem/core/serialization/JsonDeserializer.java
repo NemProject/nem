@@ -2,7 +2,7 @@ package org.nem.core.serialization;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.json.*;
-import org.nem.core.utils.StringEncoding;
+import org.nem.core.utils.StringEncoder;
 
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
@@ -48,7 +48,7 @@ public class JsonDeserializer implements Deserializer {
     @Override
     public byte[] readBytes(final String label) {
         final String s = this.readString(label);
-        return s.isEmpty() ? new byte[] { } : Base64.decode(StringEncoding.getBytes(s));
+        return s.isEmpty() ? new byte[] { } : Base64.decode(StringEncoder.getBytes(s));
     }
 
     @Override

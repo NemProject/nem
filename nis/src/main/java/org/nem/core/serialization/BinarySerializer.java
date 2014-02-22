@@ -1,6 +1,6 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringEncoding;
+import org.nem.core.utils.StringEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
     @Override
     public void writeString(final String label, final String s) {
-        this.writeBytes(null, StringEncoding.getBytes(s));
+        this.writeBytes(null, StringEncoder.getBytes(s));
     }
 
     @Override

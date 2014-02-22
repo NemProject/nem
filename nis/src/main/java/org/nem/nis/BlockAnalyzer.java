@@ -2,8 +2,8 @@ package org.nem.nis;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
+import org.nem.core.utils.StringEncoder;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.model.Block;
@@ -36,7 +36,7 @@ public class BlockAnalyzer {
 			System.out.print(" ");
 			System.out.print(tx.getShortId());
 			System.out.print(" ");
-			System.out.print(Converter.bytesToString(tx.getRecipient().getPrintableKey()));
+			System.out.print(StringEncoder.getString(tx.getRecipient().getPrintableKey()));
 			System.out.println();
 		}
 	}

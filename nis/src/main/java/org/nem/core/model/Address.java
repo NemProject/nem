@@ -49,7 +49,7 @@ public class Address {
         byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
         // step 6: base32 encode (5)
-        this.encoded = toBase32(concatStepThreeAndStepSix);
+        this.encoded = Base32Encoder.getString(concatStepThreeAndStepSix);
     }
 
     /**
@@ -79,7 +79,7 @@ public class Address {
      * @return true if the address is valid.
      */
     public static boolean isValid(final String address) {
-        byte[] encodedBytes = fromBase32(address);
+        byte[] encodedBytes = Base32Encoder.getBytes(address);
         if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
             return false;
 
@@ -99,18 +99,6 @@ public class Address {
 
         // step 2: get the first X bytes of (1)
         return Arrays.copyOfRange(sha3StepThreeHash, 0, NUM_CHECKSUM_BYTES);
-    }
-
-    private static String toBase32(final byte[] input) {
-        Base32 codec = new Base32();
-        byte[] decodedBytes = codec.encode(input);
-        return new String(decodedBytes);
-    }
-
-    private static byte[] fromBase32(final String encodedString) {
-        Base32 codec = new Base32();
-        byte[] encodedBytes = StringEncoding.getBytes(encodedString);
-        return codec.decode(encodedBytes);
     }
 
     /**

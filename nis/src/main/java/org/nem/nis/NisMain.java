@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.Hashes;
+import org.nem.core.utils.StringEncoder;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
@@ -105,15 +106,15 @@ public class NisMain
 			};
 			// super strong priv keys 
 			final byte[] recipientsSk[] = {
-					Hashes.sha3(Converter.stringToBytes("super-duper-special")),
-					Hashes.sha3(Converter.stringToBytes("Jaguar0625")),
-					Hashes.sha3(Converter.stringToBytes("BloodyRookie")),
-					Hashes.sha3(Converter.stringToBytes("Thies1965")),
-					Hashes.sha3(Converter.stringToBytes("borzalom")),
-					Hashes.sha3(Converter.stringToBytes("gimre")),
-					Hashes.sha3(Converter.stringToBytes("Makoto")),
-					Hashes.sha3(Converter.stringToBytes("UtopianFuture")),
-					Hashes.sha3(Converter.stringToBytes("minusbalancer"))
+					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
+					Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
+					Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
+					Hashes.sha3(StringEncoder.getBytes("Thies1965")),
+					Hashes.sha3(StringEncoder.getBytes("borzalom")),
+					Hashes.sha3(StringEncoder.getBytes("gimre")),
+					Hashes.sha3(StringEncoder.getBytes("Makoto")),
+					Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
+					Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
 			};
 			final long amounts[] = {
 					(new BigInteger("10000000000000")).longValue(),
@@ -225,7 +226,7 @@ public class NisMain
 
 	private Account populateGenesisAccount() {
 		final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
-        final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(Converter.stringToBytes(CREATOR_PASS)) );
+        final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );
         final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
         final byte[] CREATOR_PUBLIC_KEY = CREATOR_KEYPAIR.getPublicKey();
         final Address CREATOR_ADDRESS = Address.fromPublicKey(CREATOR_PUBLIC_KEY);
