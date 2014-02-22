@@ -1,33 +1,24 @@
 package org.nem.nis;
 
 import java.math.BigInteger;
-import java.security.CryptoPrimitive;
 import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.PostConstruct;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.nem.nis.crypto.Hashes;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.Hashes;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.model.Account;
 import org.nem.nis.model.Block;
 import org.nem.nis.model.Transfer;
-import org.nem.nis.virtual.VirtualAccounts;
-import org.nem.nis.virtual.VirtualBlockChain;
 import org.nem.peer.PeerInitializer;
+import org.nem.core.model.Address;
 import org.nxt.nrs.Crypto;
-import org.nxt.nrs.NrsBlock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -54,9 +45,9 @@ public class NisMain
     static private void initEpoch() {
     	Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.ERA, 0);
-        calendar.set(Calendar.YEAR, 2013);
-        calendar.set(Calendar.MONTH, 10);
-        calendar.set(Calendar.DAY_OF_MONTH, 24);
+        calendar.set(Calendar.YEAR, 2014);
+        calendar.set(Calendar.MONTH, 07);
+        calendar.set(Calendar.DAY_OF_MONTH, 01);
         calendar.set(Calendar.HOUR, 12);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -114,15 +105,15 @@ public class NisMain
 			};
 			// super strong priv keys 
 			final byte[] recipientsSk[] = {
-					Hashes.sha256(Converter.stringToBytes("super-duper-special")),
-					Hashes.sha256(Converter.stringToBytes("Jaguar0625")),
-					Hashes.sha256(Converter.stringToBytes("BloodyRookie")),
-					Hashes.sha256(Converter.stringToBytes("Thies1965")),
-					Hashes.sha256(Converter.stringToBytes("borzalom")),
-					Hashes.sha256(Converter.stringToBytes("gimre")),
-					Hashes.sha256(Converter.stringToBytes("Makoto")),
-					Hashes.sha256(Converter.stringToBytes("UtopianFuture")),
-					Hashes.sha256(Converter.stringToBytes("minusbalancer"))
+					Hashes.sha3(Converter.stringToBytes("super-duper-special")),
+					Hashes.sha3(Converter.stringToBytes("Jaguar0625")),
+					Hashes.sha3(Converter.stringToBytes("BloodyRookie")),
+					Hashes.sha3(Converter.stringToBytes("Thies1965")),
+					Hashes.sha3(Converter.stringToBytes("borzalom")),
+					Hashes.sha3(Converter.stringToBytes("gimre")),
+					Hashes.sha3(Converter.stringToBytes("Makoto")),
+					Hashes.sha3(Converter.stringToBytes("UtopianFuture")),
+					Hashes.sha3(Converter.stringToBytes("minusbalancer"))
 			};
 			final long amounts[] = {
 					(new BigInteger("10000000000000")).longValue(),
@@ -140,18 +131,20 @@ public class NisMain
 			if (accountDao.count() == 1) {
 				for (int i=0; i<txIds.length; ++i) {
 					byte[] recipientPk = Crypto.getPublicKey(recipientsSk[i]);
-					Address recipientAddr = new Address(Address.MAIN_NET, Address.VERSION, recipientPk);
-					
-					recipientsAccounts.add(new Account(recipientAddr.getBase32Address(), recipientPk));
+					Address recipientAddr = Address.fromPublicKey(recipientPk);
+                    byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
+
+					recipientsAccounts.add(new Account(recipientAddrBase32, recipientPk));
 				}
 				accountDao.saveMulti(recipientsAccounts);
 				
 			} else {
 				for (int i=0; i<txIds.length; ++i) {
 					byte[] recipientPk = Crypto.getPublicKey(recipientsSk[i]);
-					Address recipientAddr = new Address(Address.MAIN_NET, Address.VERSION, recipientPk);
+					Address recipientAddr = Address.fromPublicKey(recipientPk);
+                    byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
 
-					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddr.getBase32Address()));
+					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddrBase32));
 				}
 			}
 			
@@ -232,18 +225,24 @@ public class NisMain
 
 	private Account populateGenesisAccount() {
 		final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
-		final byte[] CREATOR_PRIVATE_KEY = Hashes.sha256(Converter.stringToBytes(CREATOR_PASS));
-		final byte[] CREATOR_PUBLIC_KEY = Crypto.getPublicKey(CREATOR_PRIVATE_KEY);
-		final Address CREATOR_ADDRESS = new Address(Address.MAIN_NET, Address.VERSION, CREATOR_PUBLIC_KEY);
+        final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(Converter.stringToBytes(CREATOR_PASS)) );
+        final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
+        final byte[] CREATOR_PUBLIC_KEY = CREATOR_KEYPAIR.getPublicKey();
+        final Address CREATOR_ADDRESS = Address.fromPublicKey(CREATOR_PUBLIC_KEY);
+
+        logger.info("genesis account public key: " + CREATOR_ADDRESS.getEncoded());
+
+        // will get changed, but I want to wait for thies changes first
+        byte base32Address[] = CREATOR_ADDRESS.getEncoded().getBytes();
 
 		Account a = null;
 		if (accountDao.count() == 0) {
-			a = new Account(CREATOR_ADDRESS.getBase32Address(), CREATOR_PUBLIC_KEY);
+            a = new Account(base32Address, CREATOR_PUBLIC_KEY);
 			accountDao.save(a);
 				
 		} else {
 			logger.warning("account counts: " + accountDao.count().toString());
-			a = accountDao.getAccountByPrintableAddress(CREATOR_ADDRESS.getBase32Address());
+			a = accountDao.getAccountByPrintableAddress(base32Address);
 		}
 		
 		logger.info("account id: " + a.getId().toString());
