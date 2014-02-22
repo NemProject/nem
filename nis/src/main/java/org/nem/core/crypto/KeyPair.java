@@ -17,6 +17,9 @@ public class KeyPair {
     private final BigInteger privateKey;
     private final byte[] publicKey;
 
+    /**
+     * Creates random key pair
+     */
     public KeyPair() {
         ECKeyPairGenerator generator = new ECKeyPairGenerator();
         ECKeyGenerationParameters keyGenParams = new ECKeyGenerationParameters(Curves.secp256k1().getParams(), RANDOM);
@@ -31,10 +34,20 @@ public class KeyPair {
         this.publicKey = point.getEncoded(true);
     }
 
+    /**
+     * Create key pair. Public key is calculated from provided private key
+     *
+     * @param privateKey
+     */
     public KeyPair(final BigInteger privateKey) {
         this(privateKey, publicKeyFromPrivateKey(privateKey));
     }
 
+    /**
+     * Create dummy key pair, where private key is empty.
+     *
+     * @param publicKey
+     */
     public KeyPair(final byte[] publicKey) {
         this(null, publicKey);
     }

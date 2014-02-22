@@ -103,7 +103,8 @@ public class DelegatingObjectSerializerTest {
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        // right now this tests looks ugly... ;/
+        // right now this tests looks ugly... it assumes that writing an account actually
+        // written an adderss
         Assert.assertThat(object.getString("Account"), IsEqual.equalTo(address.getEncoded()));
     }
 
