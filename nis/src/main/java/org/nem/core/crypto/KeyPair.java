@@ -91,14 +91,14 @@ public class KeyPair {
      *
      * @return true if the current key pair has a private key.
      */
-    public Boolean hasPrivateKey() { return null != this.privateKey; }
+    public boolean hasPrivateKey() { return null != this.privateKey; }
 
     /**
      * Determines if the current key pair has a public key.
      *
      * @return true if the current key pair has a public key.
      */
-    public Boolean hasPublicKey() { return null != this.publicKey; }
+    public boolean hasPublicKey() { return null != this.publicKey; }
 
     /**
      * Gets the EC private key parameters.
@@ -119,7 +119,7 @@ public class KeyPair {
         return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
     }
 
-    private static Boolean isPublicKeyCompressed(byte[] publicKey) {
+    private static boolean isPublicKeyCompressed(byte[] publicKey) {
         if (COMPRESSED_KEY_SIZE != publicKey.length)
             return false;
 

@@ -67,7 +67,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
      *
      * @return true if there is more data left to read.
      */
-    public Boolean hasMoreData() {
+    public boolean hasMoreData() {
         return 0 != this.stream.available();
     }
 

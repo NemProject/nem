@@ -104,7 +104,7 @@ public abstract class Transaction {
         this.serialize(serializer, true);
     }
 
-    private void serialize(final ObjectSerializer serializer, Boolean includeSignature) {
+    private void serialize(final ObjectSerializer serializer, boolean includeSignature) {
         serializer.writeInt("type", this.getType());
         serializer.writeInt("version", this.getVersion());
         serializer.writeAccount("sender", this.getSender());
@@ -134,7 +134,7 @@ public abstract class Transaction {
     /**
      * Verifies that this transaction has been signed by the sender's public key.
      */
-    public Boolean verify() {
+    public boolean verify() {
         if (null == this.signature)
             throw new CryptoException("cannot verify because signature does not exist");
 

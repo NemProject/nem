@@ -78,7 +78,7 @@ public class Address {
      * @param address The address to check.
      * @return true if the address is valid.
      */
-    public static Boolean isValid(final String address) {
+    public static boolean isValid(final String address) {
         byte[] encodedBytes = fromBase32(address);
         if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
             return false;
@@ -127,7 +127,7 @@ public class Address {
      *
      * @return true if the address is valid.
      */
-    public Boolean isValid() {
+    public boolean isValid() {
         return Address.isValid(this.encoded);
     }
 

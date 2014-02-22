@@ -44,7 +44,7 @@ public class Signature {
      *
      * @return true if this signature is canonical.
      */
-    public Boolean isCanonical() {
+    public boolean isCanonical() {
         return this.s.compareTo(Curves.secp256k1().getHalfCurveOrder()) <= 0;
     }
 
