@@ -1,11 +1,17 @@
 package org.nem.core.model;
 
 import org.apache.commons.codec.binary.Base32;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.logging.Logger;
+
 import org.nem.core.crypto.*;
 import org.nem.core.utils.ArrayUtils;
 
 public class Address {
+    private static final Logger logger = Logger.getLogger(Address.class.getName());
+
     private static final int NUM_CHECKSUM_BYTES = 4;
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
@@ -14,7 +20,7 @@ public class Address {
     public Address(String encoded) {
         this.encoded = encoded;
     }
-    public Address(byte version, final byte[] publicKey) throws Exception {
+    public Address(byte version, final byte[] publicKey) {
         // step 1: sha3 hash of the public key
         byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
 
@@ -34,7 +40,7 @@ public class Address {
         this.encoded = toBase32(concatStepThreeAndStepSix);
     }
 
-    public static Address fromPublicKey(final byte[] publicKey) throws Exception {
+    public static Address fromPublicKey(final byte[] publicKey) {
         return new Address(VERSION, publicKey);
     }
 
@@ -42,7 +48,7 @@ public class Address {
         return new Address(encoded);
     }
 
-    public static Boolean isValid(final String address) throws Exception {
+    public static Boolean isValid(final String address) {
         byte[] encodedBytes = fromBase32(address);
         if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
             return false;
@@ -57,7 +63,7 @@ public class Address {
         return Arrays.equals(addressChecksum, calculatedChecksum);
     }
 
-    private static byte[] generateChecksum(final byte[] input) throws Exception {
+    private static byte[] generateChecksum(final byte[] input) {
         // step 1: sha3 hash of (input
         byte[] sha3StepThreeHash = Hashes.sha3(input);
 
@@ -71,10 +77,17 @@ public class Address {
         return new String(decodedBytes);
     }
 
-    private static byte[] fromBase32(final String encodedString) throws Exception {
-        Base32 codec = new Base32();
-        byte[] encodedBytes = encodedString.getBytes("UTF-8");
-        return codec.decode(encodedBytes);
+    private static byte[] fromBase32(final String encodedString) {
+        try {
+            Base32 codec = new Base32();
+            byte[] encodedBytes = encodedString.getBytes("UTF-8");
+            return codec.decode(encodedBytes);
+
+        } catch (UnsupportedEncodingException e) {
+            logger.warning(e.toString());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // only getter for now
@@ -82,11 +95,11 @@ public class Address {
         return encoded;
     }
 
-    public Boolean isValid() throws Exception {
+    public Boolean isValid() {
         return Address.isValid(this.encoded);
     }
 
     public boolean equals(Object other) {
-        return this.encoded.equals(((Address)other).getEncoded());
+        return this.encoded.equals(((Address) other).getEncoded());
     }
 }
