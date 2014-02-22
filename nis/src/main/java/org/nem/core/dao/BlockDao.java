@@ -1,6 +1,6 @@
-package org.nem.nis.dao;
+package org.nem.core.dao;
 
-import org.nem.nis.model.Block;
+import org.nem.core.dbmodel.Block;
 
 public interface BlockDao {
 	public void save(Block block);

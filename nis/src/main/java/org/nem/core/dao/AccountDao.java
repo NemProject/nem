@@ -1,8 +1,8 @@
-package org.nem.nis.dao;
+package org.nem.core.dao;
 
 import java.util.List;
 
-import org.nem.nis.model.Account;
+import org.nem.core.dbmodel.Account;
 
 public interface AccountDao {
 	public Account getAccount(Long id);

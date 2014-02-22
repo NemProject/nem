@@ -1,8 +1,8 @@
-package org.nem.nis.dao;
+package org.nem.core.dao;
 
 import java.util.List;
 
-import org.nem.nis.model.Transfer;
+import org.nem.core.dbmodel.Transfer;
 
 public interface TransferDao {
 	public void save(Transfer block);

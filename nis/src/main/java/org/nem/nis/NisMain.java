@@ -10,14 +10,14 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.Hashes;
-import org.nem.core.model.Transaction;
+import org.nem.core.dao.AccountDao;
+import org.nem.core.dao.BlockDao;
+
+import org.nem.core.dao.TransferDao;
 import org.nem.core.utils.StringEncoder;
-import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.nis.model.Account;
-import org.nem.nis.model.Block;
-import org.nem.nis.model.Transfer;
+import org.nem.core.dbmodel.Account;
+import org.nem.core.dbmodel.Block;
+import org.nem.core.dbmodel.Transfer;
 import org.nem.peer.PeerInitializer;
 import org.nem.core.model.Address;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,6 +231,7 @@ public class NisMain
         final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
         final byte[] CREATOR_PUBLIC_KEY = CREATOR_KEYPAIR.getPublicKey();
         final Address CREATOR_ADDRESS = Address.fromPublicKey(CREATOR_PUBLIC_KEY);
+
 
         logger.info("genesis account public key: " + CREATOR_ADDRESS.getEncoded());
 

@@ -3,11 +3,11 @@ package org.nem.nis;
 import java.util.Iterator;
 import java.util.List;
 
+import org.nem.core.dao.BlockDao;
 import org.nem.core.utils.StringEncoder;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.nis.model.Block;
-import org.nem.nis.model.Transfer;
+import org.nem.core.dao.TransferDao;
+import org.nem.core.dbmodel.Block;
+import org.nem.core.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BlockAnalyzer {

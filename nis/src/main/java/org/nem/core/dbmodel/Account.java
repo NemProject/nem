@@ -1,4 +1,4 @@
-package org.nem.nis.model;
+package org.nem.core.dbmodel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
