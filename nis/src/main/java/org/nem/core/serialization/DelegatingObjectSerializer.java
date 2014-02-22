@@ -2,6 +2,7 @@ package org.nem.core.serialization;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 
 import java.math.BigInteger;
 
@@ -39,8 +40,13 @@ public class DelegatingObjectSerializer implements ObjectSerializer {
     }
 
     @Override
+    public void writeAddress(final String label, final Address address) throws Exception {
+        this.writeString(label, address.getEncoded());
+    }
+
+    @Override
     public void writeAccount(final String label, final Account account) throws Exception {
-        this.writeString(label, account.getId());
+        this.writeAddress(label, account.getAddress());
     }
 
     @Override

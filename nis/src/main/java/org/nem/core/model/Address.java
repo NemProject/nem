@@ -9,8 +9,12 @@ public class Address {
     private static final int NUM_CHECKSUM_BYTES = 4;
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
+    private String encoded; // base-32 encoded address
 
-    public static String fromPublicKey(final byte[] publicKey) throws Exception {
+    public Address(String encoded) {
+        this.encoded = encoded;
+    }
+    public Address(byte version, final byte[] publicKey) throws Exception {
         // step 1: sha3 hash of the public key
         byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
 
@@ -27,7 +31,15 @@ public class Address {
         byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
         // step 6: base32 encode (5)
-        return toBase32(concatStepThreeAndStepSix);
+        this.encoded = toBase32(concatStepThreeAndStepSix);
+    }
+
+    public static Address fromPublicKey(final byte[] publicKey) throws Exception {
+        return new Address(VERSION, publicKey);
+    }
+
+    public static Address fromEncoded(final String encoded) {
+        return new Address(encoded);
     }
 
     public static Boolean isValid(final String address) throws Exception {
@@ -63,5 +75,18 @@ public class Address {
         Base32 codec = new Base32();
         byte[] encodedBytes = encodedString.getBytes("UTF-8");
         return codec.decode(encodedBytes);
+    }
+
+    // only getter for now
+    public String getEncoded() {
+        return encoded;
+    }
+
+    public Boolean isValid() throws Exception {
+        return Address.isValid(this.encoded);
+    }
+
+    public boolean equals(Object other) {
+        return this.encoded.equals(((Address)other).getEncoded());
     }
 }

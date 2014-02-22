@@ -2,6 +2,7 @@ package org.nem.core.serialization;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 
 import java.math.BigInteger;
 
@@ -41,9 +42,15 @@ public class DelegatingObjectDeserializer implements ObjectDeserializer {
     }
 
     @Override
+    public Address readAddress(final String label) throws Exception {
+        String encodedAddress = readString(label);
+        return Address.fromEncoded(encodedAddress);
+    }
+
+    @Override
     public Account readAccount(final String label) throws Exception {
-        String accountId = readString(label);
-        return this.accountLookup.findById(accountId);
+        Address address = readAddress(label);
+        return this.accountLookup.findByAddress(address);
     }
 
     @Override

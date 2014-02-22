@@ -6,14 +6,14 @@ import java.util.*;
 public class Account {
 
     private final KeyPair keyPair;
-    private final String id;
+    private final Address address;
     private final List<byte[]> messages;
     private long balance;
     private String label;
 
     public Account(final KeyPair keyPair) throws Exception {
         this.keyPair = keyPair;
-        this.id = Address.fromPublicKey(keyPair.getPublicKey());
+        this.address = Address.fromPublicKey(keyPair.getPublicKey());
         this.messages = new ArrayList<>();
         this.balance = 0;
     }
@@ -22,7 +22,7 @@ public class Account {
 
     public byte[] getPublicKey() { return this.keyPair.getPublicKey(); }
 
-    public String getId() { return this.id; }
+    public Address getAddress() { return this.address; }
 
     public long getBalance() { return this.balance; }
     public void incrementBalance(final long balance) { this.balance += balance; }

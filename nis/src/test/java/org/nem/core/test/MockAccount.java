@@ -2,15 +2,16 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 
 public class MockAccount extends Account {
-    private final String id;
+    private final Address address;
 
-    public MockAccount(final String id) throws Exception {
+    public MockAccount(final Address address) throws Exception {
         super(new KeyPair());
-        this.id = id;
+        this.address = address;
     }
 
     @Override
-    public String getId() { return this.id; }
+    public Address getAddress() { return this.address; }
 }

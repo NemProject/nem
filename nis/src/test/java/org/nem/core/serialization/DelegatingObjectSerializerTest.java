@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
@@ -94,14 +95,16 @@ public class DelegatingObjectSerializerTest {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+        MockAddress address = new MockAddress("MockAcc");
 
         // Act:
-        serializer.writeAccount("Account", new MockAccount("MockAcc"));
+        serializer.writeAccount("Account", new MockAccount(address));
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("Account"), IsEqual.equalTo("MockAcc"));
+        // right now this tests looks ugly... ;/
+        Assert.assertThat(object.getString("Account"), IsEqual.equalTo(address.getEncoded()));
     }
 
     @Test
@@ -212,9 +215,10 @@ public class DelegatingObjectSerializerTest {
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
         MockAccountLookup accountLookup = new MockAccountLookup();
+        MockAddress address = new MockAddress("MockAcc");
 
         // Act:
-        serializer.writeAccount("Account", new MockAccount("MockAcc"));
+        serializer.writeAccount("Account", new MockAccount(address));
 
         ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
             new JsonDeserializer(jsonSerializer.getObject()),
@@ -222,7 +226,7 @@ public class DelegatingObjectSerializerTest {
         final Account account = deserializer.readAccount("Account");
 
         // Assert:
-        Assert.assertThat(account.getId(), IsEqual.equalTo("MockAcc"));
+        Assert.assertThat(account.getAddress().getEncoded(), IsEqual.equalTo(address.getEncoded()));
         Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
     }
 
@@ -250,11 +254,12 @@ public class DelegatingObjectSerializerTest {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+        MockAddress address = new MockAddress("Beta");
 
         // Act:
         serializer.writeInt("alpha", 0x09513510);
         serializer.writeLong("zeta", 0xF239A033CE951350L);
-        serializer.writeAccount("nu", new MockAccount("Beta"));
+        serializer.writeAccount("nu", new MockAccount(address));
         serializer.writeBytes("beta", new byte[]{2, 4, 6});
         serializer.writeInt("gamma", 7);
         serializer.writeString("epsilon", "FooBar");
@@ -265,7 +270,7 @@ public class DelegatingObjectSerializerTest {
         // Assert:
         Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
         Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
-        Assert.assertThat(deserializer.readAccount("nu").getId(), IsEqual.equalTo("Beta"));
+        Assert.assertThat(deserializer.readAccount("nu").getAddress().getEncoded(), IsEqual.equalTo(address.getEncoded()));
         Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
         Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
         Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));

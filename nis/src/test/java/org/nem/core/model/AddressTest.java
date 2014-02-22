@@ -12,8 +12,8 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address1 = Address.fromPublicKey(input);
-        String address2 = Address.fromPublicKey(input);
+        Address address1 = Address.fromPublicKey(input);
+        Address address2 = Address.fromPublicKey(input);
 
         // Assert:
         Assert.assertThat(address2, IsEqual.equalTo(address1));
@@ -27,8 +27,8 @@ public class AddressTest {
         byte[] input2 = Utils.generateRandomBytes();
 
         // Act:
-        String address1 = Address.fromPublicKey(input1);
-        String address2 = Address.fromPublicKey(input2);
+        Address address1 = Address.fromPublicKey(input1);
+        Address address2 = Address.fromPublicKey(input2);
 
         // Assert:
         Assert.assertThat(address2, IsNot.not(IsEqual.equalTo(address1)));
@@ -40,10 +40,10 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address = Address.fromPublicKey(input);
+        Address address = Address.fromPublicKey(input);
 
         // Assert:
-        Assert.assertThat(Address.isValid(address), IsEqual.equalTo(true));
+        Assert.assertThat(address.isValid(), IsEqual.equalTo(true));
     }
 
     @Test
@@ -52,10 +52,10 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address = Address.fromPublicKey(input);
+        Address address = Address.fromPublicKey(input);
 
         // Assert:
-        Assert.assertThat(address.length(), IsEqual.equalTo(40));
+        Assert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
     }
 
     @Test
@@ -64,10 +64,10 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address = Address.fromPublicKey(input);
+        Address address = Address.fromPublicKey(input);
 
         // Assert:
-        Assert.assertThat(address.charAt(0), IsEqual.equalTo('N'));
+        Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo('N'));
     }
 
     @Test
@@ -76,11 +76,13 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address = Address.fromPublicKey(input);
-        address = address.substring(0, address.length() - 1);
+        Address address = Address.fromPublicKey(input);
+        String realAddress = address.getEncoded();
+        String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
 
         // Assert:
-        Assert.assertThat(Address.isValid(address), IsEqual.equalTo(false));
+        Assert.assertThat(Address.isValid(realAddress), IsEqual.equalTo(true));
+        Assert.assertThat(Address.isValid(fakeAddress), IsEqual.equalTo(false));
     }
 
     @Test
@@ -106,11 +108,11 @@ public class AddressTest {
         byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        String address = Address.fromPublicKey(input);
-        address = incrementCharAtIndex(address, index);
+        Address address = Address.fromPublicKey(input);
+        String fakeAddress = incrementCharAtIndex(address.getEncoded(), index);
 
         // Assert:
-        Assert.assertThat(Address.isValid(address), IsEqual.equalTo(false));
+        Assert.assertThat(Address.isValid(fakeAddress), IsEqual.equalTo(false));
     }
 
     private static String incrementCharAtIndex(final String s, final int index) {

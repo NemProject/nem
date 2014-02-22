@@ -12,13 +12,13 @@ public class AccountTest {
     public void ctorInitializesAllFields() throws Exception {
         // Arrange:
         final KeyPair kp = new KeyPair();
-        final String expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
+        final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
         final Account account = new Account(kp);
 
         // Assert:
         Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
         Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
-        Assert.assertThat(account.getId(), IsEqual.equalTo(expectedAccountId));
+        Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
         Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
         Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
