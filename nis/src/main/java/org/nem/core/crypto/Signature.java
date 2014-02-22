@@ -58,7 +58,7 @@ public class Signature {
 
     @Override
     public int hashCode() {
-        return r.hashCode() ^ s.hashCode();
+        return this.r.hashCode() ^ this.s.hashCode();
     }
 
     @Override
@@ -67,6 +67,6 @@ public class Signature {
             return false;
 
         Signature rhs = (Signature)obj;
-        return 0 == r.compareTo(rhs.r) && 0 == s.compareTo(rhs.s);
+        return 0 == this.r.compareTo(rhs.r) && 0 == this.s.compareTo(rhs.s);
     }
 }

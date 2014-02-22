@@ -40,7 +40,7 @@ public class Address {
         byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
 
         // step 3: add version byte in front of (2)
-        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{ version }, ripemd160StepOneHash);
+        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
 
         // step 4: get the checksum of (3)
         byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
@@ -131,7 +131,17 @@ public class Address {
         return Address.isValid(this.encoded);
     }
 
-    public boolean equals(Object other) {
-        return this.encoded.equals(((Address) other).getEncoded());
+    @Override
+    public int hashCode() {
+        return this.encoded.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Address))
+            return false;
+
+        Address rhs = (Address)obj;
+        return this.encoded.equals(rhs.encoded);
     }
 }

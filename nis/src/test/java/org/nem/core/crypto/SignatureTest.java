@@ -65,6 +65,8 @@ public class SignatureTest {
         Assert.assertThat(signature, IsEqual.equalTo(createSignature(1235, 7789)));
         Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1234, 7789))));
         Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1235, 7790))));
+        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(null)));
+        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo((Object)new BigInteger("1235"))));
     }
 
     @Test

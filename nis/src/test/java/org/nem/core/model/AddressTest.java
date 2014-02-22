@@ -2,7 +2,10 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.test.Utils;
+
+import java.math.BigInteger;
 
 public class AddressTest {
 
@@ -109,15 +112,44 @@ public class AddressTest {
 
         // Act:
         Address address = Address.fromPublicKey(input);
-        String fakeAddress = incrementCharAtIndex(address.getEncoded(), index);
+        String fakeAddress = Utils.incrementAtIndex(address.getEncoded(), index);
 
         // Assert:
         Assert.assertThat(Address.isValid(fakeAddress), IsEqual.equalTo(false));
     }
 
-    private static String incrementCharAtIndex(final String s, final int index) {
-        char[] chars = s.toCharArray();
-        chars[index] = (char)(chars[index] + 1);
-        return new String(chars);
+    //region equals / hashCode
+
+    @Test
+    public void equalsOnlyReturnsTrueForEquivalentObjects() {
+        // Arrange:
+        byte[] publicKey = Utils.generateRandomBytes();
+        Address address = new Address((byte)12, publicKey);
+
+        // Assert:
+        Assert.assertThat(address, IsEqual.equalTo(new Address((byte)12, publicKey)));
+        Assert.assertThat(address, IsEqual.equalTo(new Address(address.getEncoded())));
+        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address((byte)13, publicKey))));
+        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address((byte)12, Utils.incrementAtIndex(publicKey, 12)))));
+        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address(Utils.incrementAtIndex(address.getEncoded(), 0)))));
+        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(null)));
+        Assert.assertThat(address, IsNot.not(IsEqual.equalTo((Object)new BigInteger("1235"))));
     }
+
+    @Test
+    public void hashCodesAreOnlyEqualForEquivalentObjects() {
+        // Arrange:
+        byte[] publicKey = Utils.generateRandomBytes();
+        Address address = new Address((byte)12, publicKey);
+        int hashCode = address.hashCode();
+
+        // Assert:
+        Assert.assertThat(hashCode, IsEqual.equalTo(new Address((byte)12, publicKey).hashCode()));
+        Assert.assertThat(hashCode, IsEqual.equalTo(new Address(address.getEncoded()).hashCode()));
+        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address((byte)13, publicKey).hashCode())));
+        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address((byte)12, Utils.incrementAtIndex(publicKey, 12)).hashCode())));
+        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode())));
+    }
+
+    //endregion
 }
