@@ -3,6 +3,9 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 import java.util.*;
 
+/**
+ * A NEM account.
+ */
 public class Account {
 
     private final KeyPair keyPair;

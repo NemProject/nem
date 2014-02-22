@@ -2,24 +2,36 @@ package org.nem.core.model;
 
 import org.apache.commons.codec.binary.Base32;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 import org.nem.core.crypto.*;
-import org.nem.core.utils.ArrayUtils;
+import org.nem.core.utils.*;
 
+/**
+ * A NEM address.
+ */
 public class Address {
-    private static final Logger logger = Logger.getLogger(Address.class.getName());
 
     private static final int NUM_CHECKSUM_BYTES = 4;
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
     private String encoded; // base-32 encoded address
 
+    /**
+     * Creates an address object from an encoded address.
+     *
+     * @param encoded The encoded address.
+     */
     public Address(String encoded) {
         this.encoded = encoded;
     }
+
+    /**
+     * Creates an address object from a version and public key.
+     *
+     * @param version The address version.
+     * @param publicKey The address public key.
+     */
     public Address(byte version, final byte[] publicKey) {
         // step 1: sha3 hash of the public key
         byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
@@ -28,7 +40,7 @@ public class Address {
         byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
 
         // step 3: add version byte in front of (2)
-        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{VERSION}, ripemd160StepOneHash);
+        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{ version }, ripemd160StepOneHash);
 
         // step 4: get the checksum of (3)
         byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
@@ -40,14 +52,32 @@ public class Address {
         this.encoded = toBase32(concatStepThreeAndStepSix);
     }
 
+    /**
+     * Creates an Address from a public key.
+     *
+     * @param publicKey The public key.
+     * @return An address object.
+     */
     public static Address fromPublicKey(final byte[] publicKey) {
         return new Address(VERSION, publicKey);
     }
 
+    /**
+     * Creates an Address from an encoded address string.
+     *
+     * @param encoded The encoded address string.
+     * @return An address object.
+     */
     public static Address fromEncoded(final String encoded) {
         return new Address(encoded);
     }
 
+    /**
+     * Determines if the specified address is valid.
+     *
+     * @param address The address to check.
+     * @return true if the address is valid.
+     */
     public static Boolean isValid(final String address) {
         byte[] encodedBytes = fromBase32(address);
         if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
@@ -78,23 +108,25 @@ public class Address {
     }
 
     private static byte[] fromBase32(final String encodedString) {
-        try {
-            Base32 codec = new Base32();
-            byte[] encodedBytes = encodedString.getBytes("UTF-8");
-            return codec.decode(encodedBytes);
-
-        } catch (UnsupportedEncodingException e) {
-            logger.warning(e.toString());
-            e.printStackTrace();
-            return null;
-        }
+        Base32 codec = new Base32();
+        byte[] encodedBytes = StringEncoding.getBytes(encodedString);
+        return codec.decode(encodedBytes);
     }
 
-    // only getter for now
+    /**
+     * Gets the encoded address string.
+     *
+     * @return The encoded address string.
+     */
     public String getEncoded() {
         return encoded;
     }
 
+    /**
+     * Determines if the address is valid.
+     *
+     * @return true if the address is valid.
+     */
     public Boolean isValid() {
         return Address.isValid(this.encoded);
     }

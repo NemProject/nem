@@ -13,7 +13,7 @@ public class TransactionTest {
     //region New
 
     @Test
-    public void ctorCanCreateTransactionForAccountWithSenderPrivateKey() throws Exception {
+    public void ctorCanCreateTransactionForAccountWithSenderPrivateKey() {
         // Arrange:
         final KeyPair publicPrivateKeyPair = new KeyPair();
         final Account sender = new Account(publicPrivateKeyPair);
@@ -31,7 +31,7 @@ public class TransactionTest {
     }
 
     @Test(expected = InvalidParameterException.class)
-    public void ctorCannotCreateTransactionForAccountWithoutSenderPrivateKey() throws Exception {
+    public void ctorCannotCreateTransactionForAccountWithoutSenderPrivateKey() {
         // Arrange:
         final KeyPair publicPrivateKeyPair = new KeyPair();
         final KeyPair publicOnlyKeyPair = new KeyPair(publicPrivateKeyPair.getPublicKey());
@@ -45,7 +45,7 @@ public class TransactionTest {
     //region Serialization
 
     @Test
-    public void transactionCanBeRoundTripped() throws Exception {
+    public void transactionCanBeRoundTripped() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
@@ -63,7 +63,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void roundTrippedTransactionCanBeVerified() throws Exception {
+    public void roundTrippedTransactionCanBeVerified() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
@@ -74,7 +74,7 @@ public class TransactionTest {
     }
 
     @Test(expected = SerializationException.class)
-    public void serializeFailsIfSignatureIsNotPresent() throws Exception {
+    public void serializeFailsIfSignatureIsNotPresent() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final MockTransaction transaction = new MockTransaction(sender);
@@ -88,7 +88,7 @@ public class TransactionTest {
     //region Sign / Verify
 
     @Test
-    public void signCreatesValidSignature() throws Exception {
+    public void signCreatesValidSignature() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final MockTransaction transaction = new MockTransaction(sender);
@@ -102,7 +102,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void changingFieldInvalidatesSignature() throws Exception {
+    public void changingFieldInvalidatesSignature() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final MockTransaction transaction = new MockTransaction(sender, 7);
@@ -117,7 +117,7 @@ public class TransactionTest {
     }
 
     @Test(expected = InvalidParameterException.class)
-    public void cannotSignWithoutPrivateKey() throws Exception {
+    public void cannotSignWithoutPrivateKey() {
         // Arrange:
         final Address address = new MockAddress("Gamma");
         final Account sender = new MockAccount(address);
@@ -133,13 +133,13 @@ public class TransactionTest {
     //region Fees
 
     @Test
-    public void feeIsMaximumOfMinimumFeeAndCurrentFee() throws Exception {
+    public void feeIsMaximumOfMinimumFeeAndCurrentFee() {
         // Assert:
         Assert.assertThat(getFee(15L, 50L), IsEqual.equalTo(50L));
         Assert.assertThat(getFee(130L, 50L), IsEqual.equalTo(130L));
     }
 
-    private long getFee(long minimumFee, long fee) throws Exception {
+    private long getFee(long minimumFee, long fee) {
         // Arrange:
         final KeyPair publicPrivateKeyPair = new KeyPair();
         final Account sender = new Account(publicPrivateKeyPair);
@@ -156,7 +156,7 @@ public class TransactionTest {
     private MockTransaction createRoundTrippedTransaction(
         final Account originalSender,
         final int customField,
-        final Account deserializedSender) throws Exception {
+        final Account deserializedSender) {
         // Act:
         final MockTransaction originalTransaction = new MockTransaction(originalSender, customField);
         return createRoundTrippedTransaction(originalTransaction, deserializedSender);
@@ -164,7 +164,7 @@ public class TransactionTest {
 
     private MockTransaction createRoundTrippedTransaction(
         Transaction originalTransaction,
-        final Account deserializedSender) throws Exception {
+        final Account deserializedSender) {
         // Arrange:
         originalTransaction.sign();
 

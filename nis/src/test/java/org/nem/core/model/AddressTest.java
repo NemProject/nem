@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 public class AddressTest {
 
     @Test
-    public void sameAddressIsGeneratedForSameInputs() throws Exception {
+    public void sameAddressIsGeneratedForSameInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -20,7 +20,7 @@ public class AddressTest {
     }
 
     @Test
-    public void differentAddressesAreGeneratedForDifferentInputs() throws Exception {
+    public void differentAddressesAreGeneratedForDifferentInputs() {
 
         // Arrange:
         byte[] input1 = Utils.generateRandomBytes();
@@ -35,7 +35,7 @@ public class AddressTest {
     }
 
     @Test
-    public void generatedAddressIsValid() throws Exception {
+    public void generatedAddressIsValid() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -47,7 +47,7 @@ public class AddressTest {
     }
 
     @Test
-    public void generatedAddressHas40CharLength() throws Exception {
+    public void generatedAddressHas40CharLength() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -59,7 +59,7 @@ public class AddressTest {
     }
 
     @Test
-    public void generatedAddressBeginsWithN() throws Exception {
+    public void generatedAddressBeginsWithN() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -71,7 +71,7 @@ public class AddressTest {
     }
 
     @Test
-    public void addressWithIncorrectLengthIsNotValid() throws Exception {
+    public void addressWithIncorrectLengthIsNotValid() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -86,7 +86,7 @@ public class AddressTest {
     }
 
     @Test
-    public void addressWithIncorrectVersionIsNotValid() throws Exception {
+    public void addressWithIncorrectVersionIsNotValid() {
         // Assert:
         assertAddressIsNotValidIfChangedAtIndex(0);
     }

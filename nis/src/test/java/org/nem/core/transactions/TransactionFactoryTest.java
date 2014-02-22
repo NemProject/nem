@@ -13,7 +13,7 @@ import java.security.InvalidParameterException;
 public class TransactionFactoryTest {
 
     @Test(expected = InvalidParameterException.class)
-    public void cannotDeserializeUnknownTransaction() throws Exception {
+    public void cannotDeserializeUnknownTransaction() {
         // Arrange:
         JSONObject object = new JSONObject();
         object.put("type", 7);
@@ -24,7 +24,7 @@ public class TransactionFactoryTest {
     }
 
     @Test
-    public void canDeserializeTransferTransaction() throws Exception {
+    public void canDeserializeTransferTransaction() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         Transaction originalTransaction = new TransferTransaction(sender, 100, null);

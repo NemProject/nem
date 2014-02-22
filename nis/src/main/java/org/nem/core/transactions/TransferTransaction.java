@@ -15,7 +15,7 @@ public class TransferTransaction extends Transaction {
         this.message = null == message ? new byte[] { } : message;
     }
 
-    public TransferTransaction(final ObjectDeserializer deserializer) throws Exception{
+    public TransferTransaction(final ObjectDeserializer deserializer) {
         super(TransactionTypes.TRANSFER, deserializer);
         this.amount = deserializer.readLong("amount");
         this.message = deserializer.readBytes("message");

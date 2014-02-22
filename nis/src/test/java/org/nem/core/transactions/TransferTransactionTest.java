@@ -12,7 +12,7 @@ public class TransferTransactionTest {
     //region Fee
 
     @Test
-    public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() throws Exception {
+    public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
         // Assert:
         Assert.assertThat(calculateFee(12000, 0), IsEqual.equalTo(12L));
         Assert.assertThat(calculateFee(12001, 0), IsEqual.equalTo(13L));
@@ -20,14 +20,14 @@ public class TransferTransactionTest {
     }
 
     @Test
-    public void feeIsCalculatedCorrectlyForTransactionWithMessage() throws Exception {
+    public void feeIsCalculatedCorrectlyForTransactionWithMessage() {
         // Assert:
         Assert.assertThat(calculateFee(12000, 1), IsEqual.equalTo(13L));
         Assert.assertThat(calculateFee(12000, 199), IsEqual.equalTo(13L));
         Assert.assertThat(calculateFee(13000, 200), IsEqual.equalTo(14L));
     }
 
-    private long calculateFee(final long amount, final int messageSize) throws Exception{
+    private long calculateFee(final long amount, final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
         TransferTransaction transaction = new TransferTransaction(sender, amount, new byte[messageSize]);
@@ -41,7 +41,7 @@ public class TransferTransactionTest {
     //region Valid
 
     @Test
-    public void largeMessagesAreInvalid() throws Exception {
+    public void largeMessagesAreInvalid() {
         // Assert:
         Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(true));
         Assert.assertThat(isMessageSizeValid(999), IsEqual.equalTo(true));
@@ -49,7 +49,7 @@ public class TransferTransactionTest {
         Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(false));
     }
 
-    private boolean isMessageSizeValid(final int messageSize) throws Exception{
+    private boolean isMessageSizeValid(final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
         TransferTransaction transaction = new TransferTransaction(sender, 1, new byte[messageSize]);
@@ -63,7 +63,7 @@ public class TransferTransactionTest {
     //region Serialization
 
     @Test
-    public void transactionCanBeRoundTripped() throws Exception {
+    public void transactionCanBeRoundTripped() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
@@ -79,7 +79,7 @@ public class TransferTransactionTest {
 
     private TransferTransaction createRoundTrippedTransaction(
         Transaction originalTransaction,
-        final Account deserializedSender) throws Exception {
+        final Account deserializedSender) {
         // Arrange:
         originalTransaction.sign();
 

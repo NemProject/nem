@@ -20,7 +20,7 @@ public class BlockTest {
     }
 
     @Test
-    public void blockFeeIsSumOfTransactionFees() throws Exception {
+    public void blockFeeIsSumOfTransactionFees() {
         // Arrange:
         Block block = new Block();
         block.addTransaction(createTransactionWithFee(17));
@@ -33,7 +33,7 @@ public class BlockTest {
 
     //endregion
 
-    private static Transaction createTransactionWithFee(final long fee) throws Exception{
+    private static Transaction createTransactionWithFee(final long fee) {
         // Arrange:
         Account sender = new Account(new KeyPair());
         MockTransaction transaction = new MockTransaction(sender);

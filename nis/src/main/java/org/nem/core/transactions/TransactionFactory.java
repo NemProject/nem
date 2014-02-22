@@ -6,7 +6,7 @@ import org.nem.core.serialization.*;
 import java.security.InvalidParameterException;
 
 public class TransactionFactory {
-    public static Transaction Deserialize(ObjectDeserializer deserializer) throws Exception {
+    public static Transaction Deserialize(ObjectDeserializer deserializer) {
         int type = deserializer.readInt("type");
 
         switch (type) {

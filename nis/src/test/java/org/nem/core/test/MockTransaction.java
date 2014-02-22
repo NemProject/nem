@@ -16,7 +16,7 @@ public class MockTransaction extends Transaction {
      *
      * @param sender The transaction sender's account.
      */
-    public MockTransaction(final Account sender) throws Exception {
+    public MockTransaction(final Account sender) {
         this(sender, 0);
     }
 
@@ -26,7 +26,7 @@ public class MockTransaction extends Transaction {
      * @param sender The transaction sender's account.
      * @param customField The initial custom field value.
      */
-    public MockTransaction(final Account sender, final int customField) throws Exception {
+    public MockTransaction(final Account sender, final int customField) {
         super(123, 759, sender);
         this.customField = customField;
     }
@@ -36,7 +36,7 @@ public class MockTransaction extends Transaction {
      *
      * @param deserializer The deserializer to use.
      */
-    public MockTransaction(final ObjectDeserializer deserializer) throws Exception {
+    public MockTransaction(final ObjectDeserializer deserializer) {
         super(deserializer.readInt("type"), deserializer);
         this.customField = deserializer.readInt("customField");
     }
@@ -72,7 +72,7 @@ public class MockTransaction extends Transaction {
     }
 
     @Override
-    protected void serializeImpl(ObjectSerializer serializer) throws Exception {
+    protected void serializeImpl(ObjectSerializer serializer) {
         serializer.writeInt("customField", this.customField);
     }
 }
