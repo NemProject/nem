@@ -128,6 +128,16 @@ public class TransactionTest {
         transaction.sign();
     }
 
+    @Test(expected = CryptoException.class)
+    public void cannotVerifyWithoutSignature() {
+        // Arrange:
+        final Account sender = new Account(new KeyPair());
+        final MockTransaction transaction = new MockTransaction(sender, 7);
+
+        // Act:
+        transaction.verify();
+    }
+
     //endregion
 
     //region Fees

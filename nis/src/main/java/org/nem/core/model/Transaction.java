@@ -135,6 +135,9 @@ public abstract class Transaction {
      * Verifies that this transaction has been signed by the sender's public key.
      */
     public Boolean verify() {
+        if (null == this.signature)
+            throw new CryptoException("cannot verify because signature does not exist");
+
         Signer signer = new Signer(this.getSender().getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
