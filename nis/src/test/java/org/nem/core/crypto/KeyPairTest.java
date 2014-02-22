@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class KeyPairTest {
 
     @Test
-    public void ctorCanCreateNewKeyPair() throws Exception {
+    public void ctorCanCreateNewKeyPair() {
         // Act:
         KeyPair kp = new KeyPair();
 
@@ -22,7 +22,7 @@ public class KeyPairTest {
     }
 
     @Test
-    public void ctorCanCreateNewKeyPairWithCompressedPublicKey() throws Exception {
+    public void ctorCanCreateNewKeyPairWithCompressedPublicKey() {
         // Act:
         KeyPair kp = new KeyPair();
 
@@ -31,7 +31,7 @@ public class KeyPairTest {
     }
 
     @Test
-    public void ctorCreatesDifferentInstancesWithDifferentKeys() throws Exception {
+    public void ctorCreatesDifferentInstancesWithDifferentKeys() {
         // Act:
         KeyPair kp1 = new KeyPair();
         KeyPair kp2 = new KeyPair();
@@ -42,7 +42,7 @@ public class KeyPairTest {
     }
 
     @Test
-    public void ctorCanCreateKeyPairAroundPrivateKey() throws Exception {
+    public void ctorCanCreateKeyPairAroundPrivateKey() {
         // Arrange:
         KeyPair kp1 = new KeyPair();
 
@@ -57,7 +57,7 @@ public class KeyPairTest {
     }
 
     @Test
-    public void ctorCanCreateKeyPairAroundPublicKey() throws Exception {
+    public void ctorCanCreateKeyPairAroundPublicKey() {
         // Arrange:
         KeyPair kp1 = new KeyPair();
 
@@ -72,7 +72,7 @@ public class KeyPairTest {
     }
 
     @Test
-    public void ctorFailsIfPublicKeyLengthIsWrong() throws Exception {
+    public void ctorFailsIfPublicKeyLengthIsWrong() {
         // Arrange:
         byte[] publicKey = (new KeyPair()).getPublicKey();
 
@@ -88,7 +88,7 @@ public class KeyPairTest {
     }
 
     @Test
-         public void ctorFailsIfPublicKeyFirstByteIsWrong() throws Exception {
+         public void ctorFailsIfPublicKeyFirstByteIsWrong() {
         // Arrange:
         byte[] publicKey = (new KeyPair()).getPublicKey();
 

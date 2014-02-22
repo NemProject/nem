@@ -8,6 +8,9 @@ import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.macs.HMac;
 
+/**
+ * Wraps EC IES encryption and decryption logic.
+ */
 public class Cipher {
 
     private final static IESParameters IES_PARAMETERS;
@@ -23,6 +26,12 @@ public class Cipher {
     private final IESEngine iesEncryptEngine;
     private final IESEngine iesDecryptEngine;
 
+    /**
+     * Creates a cipher around a sender KeyPair and recipient KeyPair.
+     *
+     * @param senderKeyPair The sender KeyPair. The sender's private key is required for encryption.
+     * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
+     */
     public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
         this.senderKeyPair = senderKeyPair;
         this.recipientKeyPair = recipientKeyPair;
@@ -50,15 +59,33 @@ public class Cipher {
         }
     }
 
-    public byte[] encrypt(final byte[] input) throws Exception {
-        return this.iesEncryptEngine.processBlock(input, 0, input.length);
+    /**
+     * Encrypts an arbitrarily-sized message.
+     *
+     * @param input The message to encrypt.
+     * @return The encrypted message.
+     * @throws CryptoException if the encryption operation failed.
+     */
+    public byte[] encrypt(final byte[] input) {
+        try {
+            return this.iesEncryptEngine.processBlock(input, 0, input.length);
+        } catch (InvalidCipherTextException e) {
+            throw new CryptoException(e);
+        }
     }
 
+    /**
+     * Decrypts an arbitrarily-sized message.
+     *
+     * @param input The message to decrypt.
+     * @return The decrypted message.
+     * * @throws CryptoException if the decryption operation failed.
+     */
     public byte[] decrypt(final byte[] input) {
         try {
             return this.iesDecryptEngine.processBlock(input, 0, input.length);
         } catch (InvalidCipherTextException e) {
-            return null;
+            throw new CryptoException(e);
         }
     }
 

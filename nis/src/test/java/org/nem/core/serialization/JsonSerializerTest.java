@@ -12,7 +12,7 @@ public class JsonSerializerTest {
     //region Write
 
     @Test
-    public void canWriteInt() throws Exception {
+    public void canWriteInt() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -26,7 +26,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canWriteLong() throws Exception {
+    public void canWriteLong() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -40,7 +40,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canWriteBigInteger() throws Exception {
+    public void canWriteBigInteger() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -54,7 +54,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canWriteBytes() throws Exception {
+    public void canWriteBytes() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -69,7 +69,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canWriteString() throws Exception {
+    public void canWriteString() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -87,7 +87,7 @@ public class JsonSerializerTest {
     //region Roundtrip
 
     @Test
-    public void canRoundtripInt() throws Exception {
+    public void canRoundtripInt() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -102,7 +102,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripLong() throws Exception {
+    public void canRoundtripLong() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -117,7 +117,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripBigInteger() throws Exception {
+    public void canRoundtripBigInteger() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -133,7 +133,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripBytes() throws Exception {
+    public void canRoundtripBytes() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -149,7 +149,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripEmptyBytes() throws Exception {
+    public void canRoundtripEmptyBytes() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -165,7 +165,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void canRoundtripString() throws Exception {
+    public void canRoundtripString() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -182,18 +182,18 @@ public class JsonSerializerTest {
     //endregion
 
     @Test
-    public void canRoundtripMultipleValues() throws Exception {
+    public void canRoundtripMultipleValues() {
         // Assert:
         assertRoundtripMultipleValues(new JsonSerializer());
     }
 
     @Test
-    public void canRoundtripMultipleValuesWithOrderingChecksEnabled() throws Exception {
+    public void canRoundtripMultipleValuesWithOrderingChecksEnabled() {
         // Assert:
         assertRoundtripMultipleValues(new JsonSerializer(true));
     }
 
-    private void assertRoundtripMultipleValues(final JsonSerializer serializer) throws Exception {
+    private void assertRoundtripMultipleValues(final JsonSerializer serializer) {
         // Act:
         serializer.writeInt("alpha", 0x09513510);
         serializer.writeLong("zeta", 0xF239A033CE951350L);
@@ -216,7 +216,7 @@ public class JsonSerializerTest {
     //region Order Enforcement
 
     @Test
-    public void defaultSerializerDoesNotPublishPropertyOrderMetadata() throws Exception {
+    public void defaultSerializerDoesNotPublishPropertyOrderMetadata() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -230,7 +230,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void defaultDeserializerDoesNotEnforceOrderedReads() throws Exception {
+    public void defaultDeserializerDoesNotEnforceOrderedReads() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
 
@@ -246,7 +246,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void serializerCanOptionallyPublishPropertyOrderMetadata() throws Exception {
+    public void serializerCanOptionallyPublishPropertyOrderMetadata() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer(true);
 
@@ -264,7 +264,7 @@ public class JsonSerializerTest {
     }
 
     @Test(expected = InvalidParameterException.class)
-    public void deserializerCanOptionallyEnforceOrderedReads() throws Exception {
+    public void deserializerCanOptionallyEnforceOrderedReads() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer(true);
 
@@ -278,7 +278,7 @@ public class JsonSerializerTest {
 
     //endregion
 
-    private JsonDeserializer createJsonDeserializer(final JSONObject object) throws Exception {
+    private JsonDeserializer createJsonDeserializer(final JSONObject object) {
         return new JsonDeserializer(object);
     }
 }

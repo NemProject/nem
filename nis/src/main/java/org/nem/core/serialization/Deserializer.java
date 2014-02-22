@@ -7,9 +7,44 @@ import java.math.BigInteger;
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public interface Deserializer {
-    public int readInt(final String label) throws Exception;
-    public long readLong(final String label) throws Exception;
-    public BigInteger readBigInteger(final String label) throws Exception;
-    public byte[] readBytes(final String label) throws Exception;
-    public String readString(final String label) throws Exception;
+
+    /**
+     * Reads a 32-bit integer value.
+     *
+     * @param label The optional name of the value.
+     * @return The read value.
+     */
+    public int readInt(final String label);
+
+    /**
+     * Reads a 64-bit long value.
+     *
+     * @param label The optional name of the value.
+     * @return The read value.
+     */
+    public long readLong(final String label);
+
+    /**
+     * Reads a BigInteger value.
+     *
+     * @param label The optional name of the value.
+     * @return The read value.
+     */
+    public BigInteger readBigInteger(final String label);
+
+    /**
+     * Reads a byte array value
+     *
+     * @param label The optional name of the value.
+     * @return The read value.
+     */
+    public byte[] readBytes(final String label);
+
+    /**
+     * Reads a String value.
+     *
+     * @param label The optional name of the value.
+     * @return The read value.
+     */
+    public String readString(final String label);
 }

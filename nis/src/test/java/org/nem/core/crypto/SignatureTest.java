@@ -22,7 +22,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void isCanonicalReturnsTrueForCanonicalSignature() throws Exception {
+    public void isCanonicalReturnsTrueForCanonicalSignature() {
         // Arrange:
         Signature signature = createCanonicalSignature();
 
@@ -31,7 +31,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void isCanonicalReturnsFalseForNonCanonicalSignature() throws Exception {
+    public void isCanonicalReturnsFalseForNonCanonicalSignature() {
         // Arrange:
         Signature signature = makeNonCanonical(createCanonicalSignature());
 
@@ -40,7 +40,7 @@ public class SignatureTest {
     }
 
     @Test
-    public void makeCanonicalMakesNonCanonicalSignatureCanonical() throws Exception {
+    public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
         // Arrange:
         Signature signature = createCanonicalSignature();
         Signature nonCanonicalSignature = makeNonCanonical(signature);
@@ -83,7 +83,7 @@ public class SignatureTest {
         return new Signature(new BigInteger(String.format("%d", r)), new BigInteger(String.format("%d", s)));
     }
 
-    private static Signature createCanonicalSignature() throws Exception {
+    private static Signature createCanonicalSignature() {
         // Arrange:
         KeyPair kp = new KeyPair();
         Signer signer = new Signer(kp);

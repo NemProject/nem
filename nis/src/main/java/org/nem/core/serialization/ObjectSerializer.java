@@ -9,7 +9,28 @@ import org.nem.core.model.Address;
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public interface ObjectSerializer extends Serializer {
-    public void writeAddress(final String label, final Address address) throws Exception;
-    public void writeAccount(final String label, final Account account) throws Exception;
-    public void writeSignature(final String label, final Signature signature) throws Exception;
+
+    /**
+     * Writes an address object.
+     *
+     * @param label The optional label.
+     * @param address The object.
+     */
+    public void writeAddress(final String label, final Address address);
+
+    /**
+     * Writes an account object.
+     *
+     * @param label The optional label.
+     * @param account The object.
+     */
+    public void writeAccount(final String label, final Account account);
+
+    /**
+     * Writes a signature object.
+     *
+     * @param label The optional label.
+     * @param signature The object.
+     */
+    public void writeSignature(final String label, final Signature signature);
 }

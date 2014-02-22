@@ -6,15 +6,29 @@ import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 
 import java.math.BigInteger;
 
+/**
+ * Wraps EC DSA signing and verification logic.
+ */
 public class Signer {
 
     private final KeyPair keyPair;
 
+    /**
+     * Creates a signer around a KeyPair.
+     *
+     * @param keyPair The KeyPair that should be used for signing and verification.
+     */
     public Signer(final KeyPair keyPair) {
         this.keyPair = keyPair;
     }
 
-    public Signature sign(final byte[] data) throws Exception {
+    /**
+     * Signs the SHA3 hash of an arbitrarily sized message.
+     *
+     * @param data The message to sign.
+     * @return The generated signature.
+     */
+    public Signature sign(final byte[] data) {
         ECDSASigner signer = createECDSASigner();
         signer.init(true, this.keyPair.getPrivateKeyParameters());
         final byte[] hash = Hashes.sha3(data);
@@ -24,7 +38,14 @@ public class Signer {
         return signature;
     }
 
-    public boolean verify(final byte[] data, final Signature signature) throws Exception {
+    /**
+     * Verifies that the signature is valid.
+     *
+     * @param data The original message.
+     * @param signature The generated signature.
+     * @return true if the signature is valid.
+     */
+    public boolean verify(final byte[] data, final Signature signature) {
         if (!signature.isCanonical())
             return false;
 

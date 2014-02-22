@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class HashesTest {
 
     @Test
-    public void sha3HashHas32ByteLength() throws Exception {
+    public void sha3HashHas32ByteLength() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -21,7 +21,7 @@ public class HashesTest {
     }
 
     @Test
-    public void sha3GeneratesSameHashForSameInputs() throws Exception {
+    public void sha3GeneratesSameHashForSameInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -35,7 +35,7 @@ public class HashesTest {
     }
 
     @Test
-    public void sha3GeneratesSameHashForSameMergedInputs() throws Exception {
+    public void sha3GeneratesSameHashForSameMergedInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -48,7 +48,7 @@ public class HashesTest {
     }
 
     @Test
-    public void sha3GeneratesDifferentHashForDifferentInputs() throws Exception {
+    public void sha3GeneratesDifferentHashForDifferentInputs() {
         // Arrange:
         byte[] input1 = Utils.generateRandomBytes();
         byte[] input2 = Utils.generateRandomBytes();
@@ -62,7 +62,7 @@ public class HashesTest {
     }
 
     @Test
-    public void ripemd160HashHas20ByteLength() throws Exception {
+    public void ripemd160HashHas20ByteLength() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -74,7 +74,7 @@ public class HashesTest {
     }
 
     @Test
-    public void ripemd160GeneratesSameHashForSameInputs() throws Exception {
+    public void ripemd160GeneratesSameHashForSameInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -87,7 +87,7 @@ public class HashesTest {
     }
 
     @Test
-    public void ripemd160GeneratesSameHashForSameMergedInputs() throws Exception {
+    public void ripemd160GeneratesSameHashForSameMergedInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 
@@ -100,7 +100,7 @@ public class HashesTest {
     }
 
     @Test
-    public void ripemd160GeneratesDifferentHashForDifferentInputs() throws Exception {
+    public void ripemd160GeneratesDifferentHashForDifferentInputs() {
         // Arrange:
         byte[] input1 = Utils.generateRandomBytes();
         byte[] input2 = Utils.generateRandomBytes();
@@ -114,7 +114,7 @@ public class HashesTest {
     }
 
     @Test
-    public void sha3AndRipemd160GenerateDifferentHashForSameInputs() throws Exception {
+    public void sha3AndRipemd160GenerateDifferentHashForSameInputs() {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 

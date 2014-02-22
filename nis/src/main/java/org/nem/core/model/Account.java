@@ -11,7 +11,7 @@ public class Account {
     private long balance;
     private String label;
 
-    public Account(final KeyPair keyPair) throws Exception {
+    public Account(final KeyPair keyPair) {
         this.keyPair = keyPair;
         this.address = Address.fromPublicKey(keyPair.getPublicKey());
         this.messages = new ArrayList<>();

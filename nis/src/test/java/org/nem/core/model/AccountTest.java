@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 public class AccountTest {
 
     @Test
-    public void ctorInitializesAllFields() throws Exception {
+    public void ctorInitializesAllFields() {
         // Arrange:
         final KeyPair kp = new KeyPair();
         final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
@@ -25,7 +25,7 @@ public class AccountTest {
     }
 
     @Test
-    public void labelCanBeSet() throws Exception {
+    public void labelCanBeSet() {
         // Arrange:
         final Account account = new Account(new KeyPair());
 
@@ -37,7 +37,7 @@ public class AccountTest {
     }
 
     @Test
-    public void balanceCanBeIncremented() throws Exception {
+    public void balanceCanBeIncremented() {
         // Arrange:
         final Account account = new Account(new KeyPair());
 
@@ -50,7 +50,7 @@ public class AccountTest {
     }
 
     @Test
-    public void balanceCanBeIncrementedMultipleTimes() throws Exception {
+    public void balanceCanBeIncrementedMultipleTimes() {
         // Arrange:
         final Account account = new Account(new KeyPair());
 
@@ -62,7 +62,7 @@ public class AccountTest {
     }
 
     @Test
-    public void encryptedMessagesCanBeDecrypted() throws Exception {
+    public void encryptedMessagesCanBeDecrypted() {
         // Arrange:
         final KeyPair skp = new KeyPair();
         final KeyPair rkp = new KeyPair();
@@ -81,7 +81,7 @@ public class AccountTest {
     }
 
     @Test
-    public void multipleEncryptedMessagesCanBeDecrypted() throws Exception {
+    public void multipleEncryptedMessagesCanBeDecrypted() {
         // Arrange:
         final KeyPair skp = new KeyPair();
         final KeyPair rkp = new KeyPair();

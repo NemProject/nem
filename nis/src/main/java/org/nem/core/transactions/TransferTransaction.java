@@ -15,7 +15,7 @@ public class TransferTransaction extends Transaction {
         this.message = null == message ? new byte[] { } : message;
     }
 
-    public TransferTransaction(final ObjectDeserializer deserializer) throws Exception {
+    public TransferTransaction(final ObjectDeserializer deserializer) throws Exception{
         super(TransactionTypes.TRANSFER, deserializer);
         this.amount = deserializer.readLong("amount");
         this.message = deserializer.readBytes("message");
@@ -37,7 +37,7 @@ public class TransferTransaction extends Transaction {
     }
 
     @Override
-    protected void serializeImpl(final ObjectSerializer serializer) throws Exception {
+    protected void serializeImpl(final ObjectSerializer serializer) {
         serializer.writeLong("amount", this.amount);
         serializer.writeBytes("message", this.message);
     }

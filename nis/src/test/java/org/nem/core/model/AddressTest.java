@@ -92,18 +92,18 @@ public class AddressTest {
     }
 
     @Test
-    public void addressWithIncorrectHashIsNotValid() throws Exception {
+    public void addressWithIncorrectHashIsNotValid() {
         // Assert:
         assertAddressIsNotValidIfChangedAtIndex(5);
     }
 
     @Test
-    public void addressWithIncorrectChecksumIsNotValid() throws Exception {
+    public void addressWithIncorrectChecksumIsNotValid() {
         // Assert:
         assertAddressIsNotValidIfChangedAtIndex(39);
     }
 
-    private void assertAddressIsNotValidIfChangedAtIndex(final int index) throws Exception {
+    private void assertAddressIsNotValidIfChangedAtIndex(final int index) {
         // Arrange:
         byte[] input = Utils.generateRandomBytes();
 

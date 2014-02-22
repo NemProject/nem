@@ -4,8 +4,7 @@ import org.hamcrest.core.*;
 import org.json.JSONObject;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
@@ -15,7 +14,7 @@ public class DelegatingObjectSerializerTest {
     //region Write
 
     @Test
-    public void canWriteInt() throws Exception {
+    public void canWriteInt() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -30,7 +29,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteLong() throws Exception {
+    public void canWriteLong() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -45,7 +44,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteBigInteger() throws Exception {
+    public void canWriteBigInteger() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -60,7 +59,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteBytes() throws Exception {
+    public void canWriteBytes() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -76,7 +75,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteString() throws Exception {
+    public void canWriteString() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -91,7 +90,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteAccount() throws Exception {
+    public void canWriteAccount() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -109,7 +108,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canWriteSignature() throws Exception {
+    public void canWriteSignature() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -129,7 +128,7 @@ public class DelegatingObjectSerializerTest {
     //region Roundtrip
 
     @Test
-    public void canRoundtripInt() throws Exception {
+    public void canRoundtripInt() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -145,7 +144,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripLong() throws Exception {
+    public void canRoundtripLong() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -161,7 +160,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripBigInteger() throws Exception {
+    public void canRoundtripBigInteger() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -178,7 +177,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripBytes() throws Exception {
+    public void canRoundtripBytes() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -195,7 +194,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripString() throws Exception {
+    public void canRoundtripString() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -211,7 +210,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripAccount() throws Exception {
+    public void canRoundtripAccount() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -232,7 +231,7 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
-    public void canRoundtripSignature() throws Exception {
+    public void canRoundtripSignature() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -251,7 +250,7 @@ public class DelegatingObjectSerializerTest {
     //endregion
 
     @Test
-    public void canRoundtripMultipleValues() throws Exception {
+    public void canRoundtripMultipleValues() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
@@ -278,7 +277,7 @@ public class DelegatingObjectSerializerTest {
         Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
     }
 
-    private ObjectDeserializer createObjectDeserializer(final JSONObject object) throws Exception {
+    private ObjectDeserializer createObjectDeserializer(final JSONObject object) {
         return new DelegatingObjectDeserializer(new JsonDeserializer(object), new MockAccountLookup());
     }
 }

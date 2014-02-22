@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 public class CipherTest {
 
     @Test
-    public void encryptedDataCanBeDecrypted() throws Exception {
+    public void encryptedDataCanBeDecrypted() {
         // Arrange:
         KeyPair kp = new KeyPair();
         Cipher cipher = new Cipher(kp, kp);
@@ -23,7 +23,7 @@ public class CipherTest {
     }
 
     @Test
-    public void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey() throws Exception {
+    public void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey() {
         // Arrange:
         KeyPair skp = new KeyPair();
         KeyPair rkp = new KeyPair();
@@ -38,7 +38,7 @@ public class CipherTest {
     }
 
     @Test
-    public void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey() throws Exception {
+    public void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey() {
         // Arrange:
         KeyPair skp = new KeyPair();
         KeyPair rkp = new KeyPair();
@@ -55,7 +55,7 @@ public class CipherTest {
     }
 
     @Test
-    public void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey() throws Exception {
+    public void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey() {
         // Arrange:
         Cipher cipher1 = new Cipher(new KeyPair(), new KeyPair());
         Cipher cipher2 = new Cipher(new KeyPair(), new KeyPair());
