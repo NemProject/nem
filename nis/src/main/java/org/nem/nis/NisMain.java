@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.Hashes;
+import org.nem.core.model.Transaction;
 import org.nem.core.utils.StringEncoder;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
@@ -19,7 +20,6 @@ import org.nem.nis.model.Block;
 import org.nem.nis.model.Transfer;
 import org.nem.peer.PeerInitializer;
 import org.nem.core.model.Address;
-import org.nxt.nrs.Crypto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -116,23 +116,22 @@ public class NisMain
 					Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
 					Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
 			};
+            final BigInteger genesisAmount = new BigInteger("40000000000000");
+            final BigInteger special       = new BigInteger("10000000000000");
+            final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(recipientsSk.length - 1));
 			final long amounts[] = {
-					(new BigInteger("10000000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue(),
-					(new BigInteger("3750000000000")).longValue()
+					special.longValue(),
+					share.longValue(), share.longValue(), share.longValue(), share.longValue(),
+                    share.longValue(), share.longValue(), share.longValue(), share.longValue()
 			};
 			
 			Vector<Account> recipientsAccounts = new Vector<Account>(txIds.length);
 			if (accountDao.count() == 1) {
 				for (int i=0; i<txIds.length; ++i) {
-					byte[] recipientPk = Crypto.getPublicKey(recipientsSk[i]);
-					Address recipientAddr = Address.fromPublicKey(recipientPk);
+                    final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
+                    final KeyPair recipientKeypair = new KeyPair(recipientSecret);
+                    final byte[] recipientPk = recipientKeypair.getPublicKey();
+                    final Address recipientAddr = Address.fromPublicKey(recipientPk);
                     byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
 
 					recipientsAccounts.add(new Account(recipientAddrBase32, recipientPk));
@@ -141,8 +140,10 @@ public class NisMain
 				
 			} else {
 				for (int i=0; i<txIds.length; ++i) {
-					byte[] recipientPk = Crypto.getPublicKey(recipientsSk[i]);
-					Address recipientAddr = Address.fromPublicKey(recipientPk);
+                    final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
+                    final KeyPair recipientKeypair = new KeyPair(recipientSecret);
+                    final byte[] recipientPk = recipientKeypair.getPublicKey();
+                    final Address recipientAddr = Address.fromPublicKey(recipientPk);
                     byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
 
 					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddrBase32));
