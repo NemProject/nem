@@ -78,14 +78,13 @@ public class Cipher {
      * Decrypts an arbitrarily-sized message.
      *
      * @param input The message to decrypt.
-     * @return The decrypted message.
-     * * @throws CryptoException if the decryption operation failed.
+     * @return The decrypted message or null if decryption failed.
      */
     public byte[] decrypt(final byte[] input) {
         try {
             return this.iesDecryptEngine.processBlock(input, 0, input.length);
         } catch (InvalidCipherTextException e) {
-            throw new CryptoException(e);
+            return null;
         }
     }
 

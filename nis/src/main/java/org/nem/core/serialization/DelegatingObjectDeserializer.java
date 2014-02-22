@@ -53,13 +53,13 @@ public class DelegatingObjectDeserializer implements ObjectDeserializer {
 
     @Override
     public Address readAddress(final String label) {
-        String encodedAddress = readString(label);
+        String encodedAddress = this.readString(label);
         return Address.fromEncoded(encodedAddress);
     }
 
     @Override
     public Account readAccount(final String label) {
-        Address address = readAddress(label);
+        Address address = this.readAddress(label);
         return this.accountLookup.findByAddress(address);
     }
 

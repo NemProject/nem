@@ -9,6 +9,12 @@ import org.nem.core.test.*;
 
 import java.math.BigInteger;
 
+/**
+ * Notice that this the write* tests are validating that the values were actually written to the
+ * underlying serializer (JSON in this case) and are thus dependent on the storage details of the
+ * JsonSerializer. Although the tests have this extra dependency, they give us a way to validate
+ * that a single property value is written for each object.
+ */
 public class DelegatingObjectSerializerTest {
 
     //region Write
@@ -90,6 +96,22 @@ public class DelegatingObjectSerializerTest {
     }
 
     @Test
+    public void canWriteAddress() {
+        // Arrange:
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+        MockAddress address = new MockAddress("MockAcc");
+
+        // Act:
+        serializer.writeAddress("Address", address);
+
+        // Assert:
+        final JSONObject object = jsonSerializer.getObject();
+        Assert.assertThat(object.length(), IsEqual.equalTo(1));
+        Assert.assertThat(object.getString("Address"), IsEqual.equalTo(address.getEncoded()));
+    }
+
+    @Test
     public void canWriteAccount() {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
@@ -102,8 +124,6 @@ public class DelegatingObjectSerializerTest {
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        // right now this tests looks ugly... it assumes that writing an account actually
-        // written an adderss
         Assert.assertThat(object.getString("Account"), IsEqual.equalTo(address.getEncoded()));
     }
 
@@ -207,6 +227,24 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
+    }
+
+    @Test
+    public void canRoundtripAddress() {
+        // Arrange:
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+
+        // Act:
+        serializer.writeAddress("Address", new MockAddress("MockAcc"));
+
+        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
+            new JsonDeserializer(jsonSerializer.getObject()),
+            new MockAccountLookup());
+        final Address address = deserializer.readAddress("Address");
+
+        // Assert:
+        Assert.assertThat(address.getEncoded(), IsEqual.equalTo(address.getEncoded()));
     }
 
     @Test
