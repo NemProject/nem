@@ -15,6 +15,7 @@ import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.Account;
+import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Block;
@@ -98,10 +99,10 @@ public class NisMain
 
 		Block b = populateGenesisBlock(dbGenesisAccout);
 
-		populateGenesisTxes(dbGenesisAccout, b);
+		populateGenesisTxes(genesisAccount, dbGenesisAccout, b);
 	}
 
-	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, Block b) {
+	private void populateGenesisTxes(Account genesisAccount, org.nem.core.dbmodel.Account a, Block b) {
 		if (transactionDao.count() == 0) {
 			final long txIds[] = {
 					1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -126,18 +127,20 @@ public class NisMain
 					share.longValue(), share.longValue(), share.longValue(), share.longValue(),
                     share.longValue(), share.longValue(), share.longValue(), share.longValue()
 			};
-			
-			Vector<org.nem.core.dbmodel.Account> recipientsAccounts = new Vector<org.nem.core.dbmodel.Account>(txIds.length);
+
+			Vector<Address> recipientsAddresses = new Vector<>(txIds.length);
+			Vector<org.nem.core.dbmodel.Account> recipientsDbAccounts = new Vector<>(txIds.length);
 			if (accountDao.count() == 1) {
 				for (int i=0; i<txIds.length; ++i) {
                     final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
                     final KeyPair recipientKeypair = new KeyPair(recipientSecret);
-                    final byte[] recipientPk = recipientKeypair.getPublicKey();
+					final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
 
-					recipientsAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipientPk));
+					recipientsAddresses.add(recipientAddr);
+					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipientPk));
 				}
-				accountDao.saveMulti(recipientsAccounts);
+				accountDao.saveMulti(recipientsDbAccounts);
 				
 			} else {
 				for (int i=0; i<txIds.length; ++i) {
@@ -146,18 +149,26 @@ public class NisMain
                     final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
 
-					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddr.getEncoded()));
+					recipientsDbAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddr.getEncoded()));
 				}
 			}
 			
-			Vector<Transfer> transactions = new Vector<Transfer>(txIds.length);
+			Vector<Transfer> transactions = new Vector<>(txIds.length);
 			for (int i=0; i<txIds.length; ++i) {
+				TransferTransaction transferTx = new TransferTransaction(genesisAccount, amounts[i], null);
+				transferTx.setFee(0);
+
+				transferTx.sign();
+
+				logger.warning(transferTx.getSignature().getR().toString(16) + " " + transferTx.getSignature().getS().toString(16));
+
 				Transfer t = new Transfer(
 						txIds[i],
-						1, 0x1001,
-						0L, // fee
+						transferTx.getVersion(),
+						transferTx.getType(),
+						transferTx.getFee(),
 						0, // timestamp
-						0,
+						0, // deadline
 						a,
 						// proof
 						new byte[] {
@@ -166,7 +177,7 @@ public class NisMain
 								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
 								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf
 						},
-						recipientsAccounts.get(i),
+						recipientsDbAccounts.get(i),
 						i, // index
 						amounts[i],
 						0L // referenced tx
