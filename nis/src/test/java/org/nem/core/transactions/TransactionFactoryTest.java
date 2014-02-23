@@ -27,7 +27,9 @@ public class TransactionFactoryTest {
     public void canDeserializeTransferTransaction() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
-        Transaction originalTransaction = new TransferTransaction(sender, 100, null);
+		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+
+        Transaction originalTransaction = new TransferTransaction(sender, 100, null, recipient);
         originalTransaction.sign();
 
         JsonSerializer jsonSerializer = new JsonSerializer();

@@ -8,7 +8,9 @@ import org.nem.core.serialization.*;
  */
 public class MockTransaction extends Transaction {
 
-    private int customField;
+	static final Address MOCK_RECIPIENT = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+
+	private int customField;
     private long minimumFee;
 
     /**
@@ -27,7 +29,7 @@ public class MockTransaction extends Transaction {
      * @param customField The initial custom field value.
      */
     public MockTransaction(final Account sender, final int customField) {
-        super(123, 759, sender);
+		super(123, 759, sender, MOCK_RECIPIENT);
         this.customField = customField;
     }
 

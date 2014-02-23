@@ -30,7 +30,8 @@ public class TransferTransactionTest {
     private long calculateFee(final long amount, final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
-        TransferTransaction transaction = new TransferTransaction(sender, amount, new byte[messageSize]);
+		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+		TransferTransaction transaction = new TransferTransaction(sender, amount, new byte[messageSize], recipient);
 
         // Act:
         return transaction.getFee();
@@ -52,7 +53,8 @@ public class TransferTransactionTest {
     private boolean isMessageSizeValid(final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
-        TransferTransaction transaction = new TransferTransaction(sender, 1, new byte[messageSize]);
+		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+		TransferTransaction transaction = new TransferTransaction(sender, 1, new byte[messageSize], recipient);
 
         // Act:
         return transaction.isValid();
@@ -67,7 +69,8 @@ public class TransferTransactionTest {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
-        final TransferTransaction originalTransaction = new TransferTransaction(sender, 123, new byte[] { 12, 50, 21 });
+		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+		final TransferTransaction originalTransaction = new TransferTransaction(sender, 123, new byte[] { 12, 50, 21 }, recipient);
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
 
         // Assert:
