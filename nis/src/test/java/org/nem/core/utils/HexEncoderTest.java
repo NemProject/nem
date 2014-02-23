@@ -4,8 +4,9 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 public class HexEncoderTest {
+
     private static final byte[] ENCODED_SIGMA_BYTES = new byte[] {
-            0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57
+        0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57
     };
 
     @Test

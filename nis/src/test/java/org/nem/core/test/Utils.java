@@ -1,5 +1,8 @@
 package org.nem.core.test;
 
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.model.*;
+
 import java.security.SecureRandom;
 
 /**
@@ -24,6 +27,15 @@ public class Utils {
         byte[] input = new byte[numBytes];
         rand.nextBytes(input);
         return input;
+    }
+
+    /**
+     * Generates a random address.
+     *
+     * @return A random address.
+     */
+    public static Address generateRandomAddress() {
+        return new Account(new KeyPair()).getAddress();
     }
 
     /**

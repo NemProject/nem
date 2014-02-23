@@ -5,9 +5,56 @@ import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.core.test.*;
+
+import java.security.InvalidParameterException;
 
 public class TransferTransactionTest {
+
+    //region Constructor
+
+    @Test(expected = InvalidParameterException.class)
+    public void recipientIsRequired() {
+        // Arrange:
+        final Account sender = new Account(new KeyPair());
+
+        // Act:
+        new TransferTransaction(sender, null, 123, new byte[] { 12, 50, 21 });
+    }
+
+    @Test
+    public void ctorCanCreateTransactionWithMessage() {
+        // Arrange:
+        final Account sender = new Account(new KeyPair());
+        final Address recipient = Utils.generateRandomAddress();
+
+        // Act:
+        TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, new byte[] { 12, 50, 21 });
+
+        // Assert:
+        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
+        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
+        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+    }
+
+    @Test
+    public void ctorCanCreateTransactionWithoutMessage() {
+        // Arrange:
+        final Account sender = new Account(new KeyPair());
+        final Address recipient = Utils.generateRandomAddress();
+
+        // Act:
+        TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, null);
+
+        // Assert:
+        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
+        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
+        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { }));
+    }
+
+    //endregion
 
     //region Fee
 
@@ -30,8 +77,8 @@ public class TransferTransactionTest {
     private long calculateFee(final long amount, final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
-		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		TransferTransaction transaction = new TransferTransaction(sender, amount, new byte[messageSize], recipient);
+        final Address recipient = Utils.generateRandomAddress();
+		TransferTransaction transaction = new TransferTransaction(sender, recipient, amount, new byte[messageSize]);
 
         // Act:
         return transaction.getFee();
@@ -53,8 +100,8 @@ public class TransferTransactionTest {
     private boolean isMessageSizeValid(final int messageSize){
         // Arrange:
         final Account sender = new Account(new KeyPair());
-		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		TransferTransaction transaction = new TransferTransaction(sender, 1, new byte[messageSize], recipient);
+        final Address recipient = Utils.generateRandomAddress();
+		TransferTransaction transaction = new TransferTransaction(sender, recipient, 1, new byte[messageSize]);
 
         // Act:
         return transaction.isValid();
@@ -69,11 +116,14 @@ public class TransferTransactionTest {
         // Arrange:
         final Account sender = new Account(new KeyPair());
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
-		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		final TransferTransaction originalTransaction = new TransferTransaction(sender, 123, new byte[] { 12, 50, 21 }, recipient);
+        final Address recipient = Utils.generateRandomAddress();
+		final TransferTransaction originalTransaction = new TransferTransaction(sender, recipient, 123, new byte[] { 12, 50, 21 });
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
 
         // Assert:
+        // TODO: add equality operator to account
+//        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
     }

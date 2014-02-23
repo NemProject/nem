@@ -5,7 +5,16 @@ import org.nem.core.serialization.*;
 
 import java.security.InvalidParameterException;
 
+/**
+ * Factory class that can deserialize all known transactions.
+ */
 public class TransactionFactory {
+    /**
+     * Deserializes a transaction.
+     *
+     * @param deserializer The deserializer.
+     * @return The deserialized transaction.
+     */
     public static Transaction Deserialize(ObjectDeserializer deserializer) {
         int type = deserializer.readInt("type");
 

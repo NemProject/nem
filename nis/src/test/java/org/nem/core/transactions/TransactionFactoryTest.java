@@ -6,7 +6,7 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.core.test.*;
 
 import java.security.InvalidParameterException;
 
@@ -27,9 +27,9 @@ public class TransactionFactoryTest {
     public void canDeserializeTransferTransaction() {
         // Arrange:
         final Account sender = new Account(new KeyPair());
-		final Address recipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+		final Address recipient = Utils.generateRandomAddress();
 
-        Transaction originalTransaction = new TransferTransaction(sender, 100, null, recipient);
+        Transaction originalTransaction = new TransferTransaction(sender, recipient, 100, null);
         originalTransaction.sign();
 
         JsonSerializer jsonSerializer = new JsonSerializer();

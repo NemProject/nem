@@ -17,7 +17,6 @@ public class TransactionTest {
         // Arrange:
         final KeyPair publicPrivateKeyPair = new KeyPair();
         final Account sender = new Account(publicPrivateKeyPair);
-		final Address mockRecipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
 
 		// Act:
         final MockTransaction transaction = new MockTransaction(sender, 6);
@@ -27,7 +26,6 @@ public class TransactionTest {
         Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(759));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
         Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(mockRecipient));
 		Assert.assertThat(transaction.getSignature(), IsEqual.equalTo(null));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
     }
@@ -54,14 +52,12 @@ public class TransactionTest {
         final MockTransaction originalTransaction = new MockTransaction(sender, 7);
         originalTransaction.setFee(130);
         final MockTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
-		final Address mockRecipient = Address.fromEncoded("NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
 
         // Assert:
         Assert.assertThat(transaction.getType(), IsEqual.equalTo(123));
         Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(759));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(transaction.getSender(), IsEqual.equalTo(senderPublicKeyOnly));
-		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(mockRecipient));
 		Assert.assertThat(transaction.getSignature(), IsNot.not(IsEqual.equalTo(null)));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
     }

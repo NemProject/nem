@@ -155,7 +155,7 @@ public class NisMain
 			
 			Vector<Transfer> transactions = new Vector<>(txIds.length);
 			for (int i=0; i<txIds.length; ++i) {
-				TransferTransaction transferTx = new TransferTransaction(genesisAccount, amounts[i], null, recipientsAddresses.get(i));
+				TransferTransaction transferTx = new TransferTransaction(genesisAccount, recipientsAddresses.get(i), amounts[i], null);
 				transferTx.setFee(0);
 
 				transferTx.sign();
