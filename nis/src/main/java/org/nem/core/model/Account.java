@@ -41,4 +41,18 @@ public class Account {
         byte[] decodedMessage = cipher.decrypt(message);
         this.messages.add(decodedMessage);
     }
+
+    @Override
+    public int hashCode() {
+        return this.address.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Account))
+            return false;
+
+        Account rhs = (Account)obj;
+        return this.address.equals(rhs.address);
+    }
 }

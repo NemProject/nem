@@ -1,10 +1,11 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Cipher;
-import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.*;
 import org.nem.core.test.Utils;
+
+import java.math.BigInteger;
 
 public class AccountTest {
 
@@ -102,4 +103,56 @@ public class AccountTest {
         Assert.assertThat(recipientAccount.getMessages().get(0), IsEqual.equalTo(input1));
         Assert.assertThat(recipientAccount.getMessages().get(1), IsEqual.equalTo(input2));
     }
+
+    //region equals / hashCode
+
+    @Test
+    public void equalsOnlyReturnsTrueForEquivalentObjects() {
+        // Arrange:
+        KeyPair kp = new KeyPair();
+        Account account = new Account(kp);
+
+        // Assert:
+        for (final Account account2 : createEquivalentAccounts(kp))
+            Assert.assertThat(account2, IsEqual.equalTo(account));
+
+        for (final Account account2 : createNonEquivalentAccounts(kp))
+            Assert.assertThat(account2, IsNot.not(IsEqual.equalTo(account)));
+
+        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(account)));
+        Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)account)));
+    }
+
+    @Test
+    public void hashCodesAreOnlyEqualForEquivalentObjects() {
+        // Arrange:
+        KeyPair kp = new KeyPair();
+        Account account = new Account(kp);
+        int hashCode = account.hashCode();
+
+        // Assert:
+        for (final Account account2 : createEquivalentAccounts(kp))
+            Assert.assertThat(account2.hashCode(), IsEqual.equalTo(hashCode));
+
+        for (final Account account2 : createNonEquivalentAccounts(kp))
+            Assert.assertThat(account2.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+    }
+
+    private static Account[] createEquivalentAccounts(final KeyPair keyPair) {
+        return new Account[] {
+            new Account(keyPair),
+            new Account(new KeyPair(keyPair.getPublicKey())),
+            new Account(new KeyPair(keyPair.getPrivateKey()))
+        };
+    }
+
+    private static Account[] createNonEquivalentAccounts(final KeyPair keyPair) {
+        return new Account[] {
+            new Account(new KeyPair()),
+            new Account(new KeyPair(Utils.incrementAtIndex(keyPair.getPublicKey(), 10))),
+            new Account(new KeyPair(keyPair.getPrivateKey().add(new BigInteger("1"))))
+        };
+    }
+
+    //endregion
 }

@@ -121,8 +121,7 @@ public class TransferTransactionTest {
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
 
         // Assert:
-        // TODO: add equality operator to account
-//        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
