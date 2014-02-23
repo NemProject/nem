@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `accounts` (  
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
 
-  `printableKey` VARBINARY(52) NOT NULL, -- for testing purposes
+  `printableKey` VARCHAR(52) NOT NULL, -- for testing purposes
 
   `publicKey` VARBINARY(32),
   PRIMARY KEY (`id`)  

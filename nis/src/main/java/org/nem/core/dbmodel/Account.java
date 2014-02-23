@@ -13,12 +13,14 @@ public class Account {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	private byte[] printableKey;
+    // base32 public key encoded with org.nem.core.model.Address
+	private String printableKey;
+    // public key, might be null
 	private byte[] publicKey;
 
 	public Account() {}
 	
-	public Account(byte[] printableKey, byte[] publicKey) {
+	public Account(String printableKey, byte[] publicKey) {
 		this.printableKey = printableKey;
 		this.publicKey = publicKey;
 	}
@@ -31,11 +33,11 @@ public class Account {
 		this.id = id;
 	}
 
-	public byte[] getPrintableKey() {
+	public String getPrintableKey() {
 		return printableKey;
 	}
 
-	public void setPrintableKey(byte[] printableKey) {
+	public void setPrintableKey(String printableKey) {
 		this.printableKey = printableKey;
 	}
 

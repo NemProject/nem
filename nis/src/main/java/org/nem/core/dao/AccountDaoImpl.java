@@ -1,6 +1,5 @@
 package org.nem.core.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -24,11 +23,10 @@ public class AccountDaoImpl implements AccountDao {
 	@Override
 	@Transactional
 	public Account getAccount(Long id) {
-		 List<?> userList = new ArrayList<Account>();
-         Query query = getCurrentSession()
+		 Query query = getCurrentSession()
         		 .createQuery("from Account a where a.id = :id")
         		 .setParameter("id", id);
-         userList = query.list();
+        List<?> userList = query.list();
          if (userList.size() > 0)
                  return (Account)userList.get(0);
          else
@@ -37,12 +35,11 @@ public class AccountDaoImpl implements AccountDao {
 	
 	@Override
 	@Transactional
-	public Account getAccountByPrintableAddress(byte[] printableAddres) {
-		 List<?> userList = new ArrayList<Account>();
+	public Account getAccountByPrintableAddress(String printableAddress) {
          Query query = getCurrentSession()
         		 .createQuery("from Account a where a.printableKey = :key")
-        		 .setParameter("key", printableAddres);
-         userList = query.list();
+        		 .setParameter("key", printableAddress);
+         List<?> userList = query.list();
          if (userList.size() > 0)
                  return (Account)userList.get(0);
          else

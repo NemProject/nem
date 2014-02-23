@@ -132,9 +132,8 @@ public class NisMain
                     final KeyPair recipientKeypair = new KeyPair(recipientSecret);
                     final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
-                    byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
 
-					recipientsAccounts.add(new Account(recipientAddrBase32, recipientPk));
+					recipientsAccounts.add(new Account(recipientAddr.getEncoded(), recipientPk));
 				}
 				accountDao.saveMulti(recipientsAccounts);
 				
@@ -144,9 +143,8 @@ public class NisMain
                     final KeyPair recipientKeypair = new KeyPair(recipientSecret);
                     final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
-                    byte[] recipientAddrBase32 = recipientAddr.getEncoded().getBytes();
 
-					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddrBase32));
+					recipientsAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddr.getEncoded()));
 				}
 			}
 			
@@ -232,20 +230,18 @@ public class NisMain
         final byte[] CREATOR_PUBLIC_KEY = CREATOR_KEYPAIR.getPublicKey();
         final Address CREATOR_ADDRESS = Address.fromPublicKey(CREATOR_PUBLIC_KEY);
 
+        //org.nem.core.model.Account account = new org.nem.core.model.Account(CREATOR_KEYPAIR);
 
         logger.info("genesis account public key: " + CREATOR_ADDRESS.getEncoded());
 
-        // will get changed, but I want to wait for thies changes first
-        byte base32Address[] = CREATOR_ADDRESS.getEncoded().getBytes();
-
 		Account a = null;
 		if (accountDao.count() == 0) {
-            a = new Account(base32Address, CREATOR_PUBLIC_KEY);
+            a = new Account(CREATOR_ADDRESS.getEncoded(), CREATOR_PUBLIC_KEY);
 			accountDao.save(a);
 				
 		} else {
 			logger.warning("account counts: " + accountDao.count().toString());
-			a = accountDao.getAccountByPrintableAddress(base32Address);
+			a = accountDao.getAccountByPrintableAddress(CREATOR_ADDRESS.getEncoded());
 		}
 		
 		logger.info("account id: " + a.getId().toString());

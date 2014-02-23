@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.nem.core.dao.BlockDao;
-import org.nem.core.utils.StringEncoder;
 import org.nem.core.dao.TransferDao;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
@@ -36,7 +35,7 @@ public class BlockAnalyzer {
 			System.out.print(" ");
 			System.out.print(tx.getShortId());
 			System.out.print(" ");
-			System.out.print(StringEncoder.getString(tx.getRecipient().getPrintableKey()));
+			System.out.print(tx.getRecipient().getPrintableKey());
 			System.out.println();
 		}
 	}

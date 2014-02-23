@@ -7,7 +7,7 @@ import org.nem.core.dbmodel.Account;
 public interface AccountDao {
 	public Account getAccount(Long id);
 	
-	public Account getAccountByPrintableAddress(byte[] printableAddres);
+	public Account getAccountByPrintableAddress(String printableAddres);
 	
 	public void save(Account account);
 	
