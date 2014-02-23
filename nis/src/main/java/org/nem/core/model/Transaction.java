@@ -14,6 +14,7 @@ public abstract class Transaction {
     public final int type;
     public final Account sender;
     public Signature signature;
+	public final Address recipient;
     public long fee;
 
     /**
@@ -22,11 +23,13 @@ public abstract class Transaction {
      * @param type The transaction type.
      * @param version The transaction version.
      * @param sender The transaction sender.
+	 * @param recipient The transaction recipient.
      */
-    public Transaction(final int type, final int version, final Account sender) {
+    public Transaction(final int type, final int version, final Account sender, final Address recipient) {
         this.type = type;
         this.version = version;
         this.sender = sender;
+		this.recipient = recipient;
 
         if (!this.sender.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("sender must be owned to create transaction ");
@@ -42,6 +45,7 @@ public abstract class Transaction {
         this.type = type;
         this.version = deserializer.readInt("version");
         this.sender = deserializer.readAccount("sender");
+		this.recipient = deserializer.readAddress("recipient");
         this.fee = deserializer.readLong("fee");
         this.signature = deserializer.readSignature("signature");
     }
@@ -76,6 +80,16 @@ public abstract class Transaction {
      */
     public Signature getSignature() { return this.signature; }
 
+
+	/**
+	 * Gets the recipient.
+	 *
+	 * @return The recipient.
+	 */
+	public Address getRecipient() {
+		return recipient;
+	}
+
     /**
      * Gets the fee.
      *
@@ -108,6 +122,7 @@ public abstract class Transaction {
         serializer.writeInt("type", this.getType());
         serializer.writeInt("version", this.getVersion());
         serializer.writeAccount("sender", this.getSender());
+		serializer.writeAddress("recipient", this.getRecipient());
         serializer.writeLong("fee", this.getFee());
 
         if (includeSignature)

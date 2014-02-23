@@ -9,8 +9,8 @@ public class TransferTransaction extends Transaction {
     private long amount;
     private byte[] message;
 
-    public TransferTransaction(final Account sender, final long amount, final byte[] message) {
-        super(TransactionTypes.TRANSFER, 1, sender);
+    public TransferTransaction(final Account sender, final long amount, final byte[] message, final Address recipient) {
+        super(TransactionTypes.TRANSFER, 1, sender, recipient);
         this.amount = amount;
         this.message = null == message ? new byte[] { } : message;
     }
