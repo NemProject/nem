@@ -2,12 +2,31 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Signature;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 
 public class AddressTest {
+
+    @Test
+    public void addressCanBeCreatedAroundEncodedAddress() {
+        // Act:
+        Address address = Address.fromEncoded("Sigma Gamma");
+
+        // Assert:
+        Assert.assertThat(address.getEncoded(), IsEqual.equalTo("Sigma Gamma"));
+    }
+
+    @Test
+    public void addressCanBeCreatedAroundPublicKey() {
+        // Act:
+        Address address = Address.fromPublicKey(Utils.generateRandomBytes());
+
+        // Assert:
+        Assert.assertThat(address.getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+        Assert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
+    }
+
 
     @Test
     public void sameAddressIsGeneratedForSameInputs() {
