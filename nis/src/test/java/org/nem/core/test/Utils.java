@@ -64,4 +64,19 @@ public class Utils {
         ++copy[index];
         return copy;
     }
+
+    /**
+     * Creates a string initialized with a single character.
+     *
+     * @param ch The character used in the string.
+     * @param numChars The number of characters in hte string.
+     * @return A string of length numChars initialized to ch.
+     */
+    public static String createString(final char ch, final int numChars) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < numChars; ++i)
+            builder.append(ch);
+
+        return builder.toString();
+    }
 }

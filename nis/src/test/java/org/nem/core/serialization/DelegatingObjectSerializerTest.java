@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 
@@ -140,7 +141,7 @@ public class DelegatingObjectSerializerTest {
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
         Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("Signature"), IsEqual.equalTo("AQAAAHoDAAAAAKTw"));
+        Assert.assertThat(object.getString("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
     }
 
     //endregion
