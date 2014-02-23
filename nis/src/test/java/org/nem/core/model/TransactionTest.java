@@ -119,7 +119,7 @@ public class TransactionTest {
     @Test(expected = InvalidParameterException.class)
     public void cannotSignWithoutPrivateKey() {
         // Arrange:
-        final Address address = new MockAddress("Gamma");
+        final Address address = Address.fromEncoded("Gamma");
         final Account sender = new MockAccount(address);
         final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
         final MockTransaction transaction = createRoundTrippedTransaction(sender, 7, senderPublicKeyOnly);

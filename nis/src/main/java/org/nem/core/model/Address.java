@@ -1,7 +1,5 @@
 package org.nem.core.model;
 
-import org.apache.commons.codec.binary.Base32;
-
 import java.util.Arrays;
 
 import org.nem.core.crypto.*;
@@ -16,41 +14,6 @@ public class Address {
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
     private String encoded; // base-32 encoded address
-
-    /**
-     * Creates an address object from an encoded address.
-     *
-     * @param encoded The encoded address.
-     */
-    public Address(String encoded) {
-        this.encoded = encoded;
-    }
-
-    /**
-     * Creates an address object from a version and public key.
-     *
-     * @param version The address version.
-     * @param publicKey The address public key.
-     */
-    public Address(byte version, final byte[] publicKey) {
-        // step 1: sha3 hash of the public key
-        byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
-
-        // step 2: ripemd160 hash of (1)
-        byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
-
-        // step 3: add version byte in front of (2)
-        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
-
-        // step 4: get the checksum of (3)
-        byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
-
-        // step 5: concatenate (3) and (4)
-        byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
-
-        // step 6: base32 encode (5)
-        this.encoded = Base32Encoder.getString(concatStepThreeAndStepSix);
-    }
 
     /**
      * Creates an Address from a public key.
@@ -73,24 +36,38 @@ public class Address {
     }
 
     /**
-     * Determines if the specified address is valid.
+     * Creates an address object from an encoded address.
      *
-     * @param address The address to check.
-     * @return true if the address is valid.
+     * @param encoded The encoded address.
      */
-    public static boolean isValid(final String address) {
-        byte[] encodedBytes = Base32Encoder.getBytes(address);
-        if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
-            return false;
+    private Address(String encoded) {
+        this.encoded = encoded;
+    }
 
-        if (VERSION != encodedBytes[0])
-            return false;
+    /**
+     * Creates an address object from a version and public key.
+     *
+     * @param version The address version.
+     * @param publicKey The address public key.
+     */
+    private Address(byte version, final byte[] publicKey) {
+        // step 1: sha3 hash of the public key
+        byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
 
-        int checksumStartIndex = NUM_ENCODED_BYTES_LENGTH - NUM_CHECKSUM_BYTES;
-        byte[] versionPrefixedHash = Arrays.copyOfRange(encodedBytes, 0, checksumStartIndex);
-        byte[] addressChecksum = Arrays.copyOfRange(encodedBytes, checksumStartIndex, checksumStartIndex + NUM_CHECKSUM_BYTES);
-        byte[] calculatedChecksum = generateChecksum(versionPrefixedHash);
-        return Arrays.equals(addressChecksum, calculatedChecksum);
+        // step 2: ripemd160 hash of (1)
+        byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
+
+        // step 3: add version byte in front of (2)
+        byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
+
+        // step 4: get the checksum of (3)
+        byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
+
+        // step 5: concatenate (3) and (4)
+        byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
+
+        // step 6: base32 encode (5)
+        this.encoded = Base32Encoder.getString(concatStepThreeAndStepSix);
     }
 
     private static byte[] generateChecksum(final byte[] input) {
@@ -116,7 +93,18 @@ public class Address {
      * @return true if the address is valid.
      */
     public boolean isValid() {
-        return Address.isValid(this.encoded);
+        byte[] encodedBytes = Base32Encoder.getBytes(this.encoded);
+        if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
+            return false;
+
+        if (VERSION != encodedBytes[0])
+            return false;
+
+        int checksumStartIndex = NUM_ENCODED_BYTES_LENGTH - NUM_CHECKSUM_BYTES;
+        byte[] versionPrefixedHash = Arrays.copyOfRange(encodedBytes, 0, checksumStartIndex);
+        byte[] addressChecksum = Arrays.copyOfRange(encodedBytes, checksumStartIndex, checksumStartIndex + NUM_CHECKSUM_BYTES);
+        byte[] calculatedChecksum = generateChecksum(versionPrefixedHash);
+        return Arrays.equals(addressChecksum, calculatedChecksum);
     }
 
     @Override

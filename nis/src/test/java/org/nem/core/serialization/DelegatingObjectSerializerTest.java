@@ -100,7 +100,7 @@ public class DelegatingObjectSerializerTest {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        MockAddress address = new MockAddress("MockAcc");
+        Address address = Address.fromEncoded("MockAcc");
 
         // Act:
         serializer.writeAddress("Address", address);
@@ -116,7 +116,7 @@ public class DelegatingObjectSerializerTest {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        MockAddress address = new MockAddress("MockAcc");
+        Address address = Address.fromEncoded("MockAcc");
 
         // Act:
         serializer.writeAccount("Account", new MockAccount(address));
@@ -236,7 +236,7 @@ public class DelegatingObjectSerializerTest {
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
 
         // Act:
-        serializer.writeAddress("Address", new MockAddress("MockAcc"));
+        serializer.writeAddress("Address", Address.fromEncoded("MockAcc"));
 
         ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
             new JsonDeserializer(jsonSerializer.getObject()),
@@ -253,7 +253,7 @@ public class DelegatingObjectSerializerTest {
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
         MockAccountLookup accountLookup = new MockAccountLookup();
-        MockAddress address = new MockAddress("MockAcc");
+        Address address = Address.fromEncoded("MockAcc");
 
         // Act:
         serializer.writeAccount("Account", new MockAccount(address));
@@ -292,7 +292,7 @@ public class DelegatingObjectSerializerTest {
         // Arrange:
         JsonSerializer jsonSerializer = new JsonSerializer();
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        MockAddress address = new MockAddress("Beta");
+        Address address = Address.fromEncoded("Beta");
 
         // Act:
         serializer.writeInt("alpha", 0x09513510);

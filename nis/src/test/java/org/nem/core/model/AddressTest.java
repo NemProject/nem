@@ -84,8 +84,8 @@ public class AddressTest {
         String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
 
         // Assert:
-        Assert.assertThat(Address.isValid(realAddress), IsEqual.equalTo(true));
-        Assert.assertThat(Address.isValid(fakeAddress), IsEqual.equalTo(false));
+        Assert.assertThat(Address.fromEncoded(realAddress).isValid(), IsEqual.equalTo(true));
+        Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class AddressTest {
         String fakeAddress = Utils.incrementAtIndex(address.getEncoded(), index);
 
         // Assert:
-        Assert.assertThat(Address.isValid(fakeAddress), IsEqual.equalTo(false));
+        Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
     }
 
     //region equals / hashCode
@@ -124,31 +124,29 @@ public class AddressTest {
     public void equalsOnlyReturnsTrueForEquivalentObjects() {
         // Arrange:
         byte[] publicKey = Utils.generateRandomBytes();
-        Address address = new Address((byte)12, publicKey);
+        Address address = Address.fromPublicKey(publicKey);
 
         // Assert:
-        Assert.assertThat(address, IsEqual.equalTo(new Address((byte)12, publicKey)));
-        Assert.assertThat(address, IsEqual.equalTo(new Address(address.getEncoded())));
-        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address((byte)13, publicKey))));
-        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address((byte)12, Utils.incrementAtIndex(publicKey, 12)))));
-        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(new Address(Utils.incrementAtIndex(address.getEncoded(), 0)))));
-        Assert.assertThat(address, IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(address, IsNot.not(IsEqual.equalTo((Object)new BigInteger("1235"))));
+        Assert.assertThat(Address.fromPublicKey(publicKey), IsEqual.equalTo(address));
+        Assert.assertThat(Address.fromEncoded(address.getEncoded()), IsEqual.equalTo(address));
+        Assert.assertThat(Address.fromPublicKey(Utils.incrementAtIndex(publicKey, 12)), IsNot.not(IsEqual.equalTo(address)));
+        Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)), IsNot.not(IsEqual.equalTo(address)));
+        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(address)));
+        Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)address)));
     }
 
     @Test
     public void hashCodesAreOnlyEqualForEquivalentObjects() {
         // Arrange:
         byte[] publicKey = Utils.generateRandomBytes();
-        Address address = new Address((byte)12, publicKey);
+        Address address = Address.fromPublicKey(publicKey);
         int hashCode = address.hashCode();
 
         // Assert:
-        Assert.assertThat(hashCode, IsEqual.equalTo(new Address((byte)12, publicKey).hashCode()));
-        Assert.assertThat(hashCode, IsEqual.equalTo(new Address(address.getEncoded()).hashCode()));
-        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address((byte)13, publicKey).hashCode())));
-        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address((byte)12, Utils.incrementAtIndex(publicKey, 12)).hashCode())));
-        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new Address(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode())));
+        Assert.assertThat(Address.fromPublicKey(publicKey).hashCode(), IsEqual.equalTo(hashCode));
+        Assert.assertThat(Address.fromEncoded(address.getEncoded()).hashCode(), IsEqual.equalTo(hashCode));
+        Assert.assertThat(Address.fromPublicKey(Utils.incrementAtIndex(publicKey, 12)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
     }
 
     //endregion

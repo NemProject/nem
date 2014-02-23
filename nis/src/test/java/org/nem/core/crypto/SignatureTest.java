@@ -62,11 +62,11 @@ public class SignatureTest {
         Signature signature = createSignature(1235, 7789);
 
         // Assert:
-        Assert.assertThat(signature, IsEqual.equalTo(createSignature(1235, 7789)));
-        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1234, 7789))));
-        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(createSignature(1235, 7790))));
-        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(signature, IsNot.not(IsEqual.equalTo((Object)new BigInteger("1235"))));
+        Assert.assertThat(createSignature(1235, 7789), IsEqual.equalTo(signature));
+        Assert.assertThat(createSignature(1234, 7789), IsNot.not(IsEqual.equalTo(signature)));
+        Assert.assertThat(createSignature(1235, 7790), IsNot.not(IsEqual.equalTo(signature)));
+        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(signature)));
+        Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)signature)));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class SignatureTest {
         int hashCode = signature.hashCode();
 
         // Assert:
-        Assert.assertThat(hashCode, IsEqual.equalTo(createSignature(1235, 7789).hashCode()));
-        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(createSignature(1234, 7789).hashCode())));
-        Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(createSignature(1235, 7790).hashCode())));
+        Assert.assertThat(createSignature(1235, 7789).hashCode(), IsEqual.equalTo(hashCode));
+        Assert.assertThat(createSignature(1234, 7789).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(createSignature(1235, 7790).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
     }
 
     private static Signature createSignature(int r, int s) {
