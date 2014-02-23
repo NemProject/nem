@@ -24,7 +24,6 @@ public class AddressTest {
 
         // Assert:
         Assert.assertThat(address.getEncoded(), IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
     }
 
 
