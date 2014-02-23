@@ -72,13 +72,23 @@
 		</dependency>
 
 		<!-- spring security -->
-		<!-- not used, and I doubt if we're gonna need it <dependency> <groupId>org.springframework.security</groupId> 
-			<artifactId>spring-security-core</artifactId> <version>${spring.security.version}</version> 
-			</dependency> <dependency> <groupId>org.springframework.security</groupId> 
-			<artifactId>spring-security-web</artifactId> <version>${spring.security.version}</version> 
-			</dependency> <dependency> <groupId>org.springframework.security</groupId> 
-			<artifactId>spring-security-config</artifactId> <version>${spring.security.version}</version> 
-			</dependency> -->
+		<!-- not used, and I doubt if we're gonna need it
+		<dependency>  
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>  
+		<dependency>  
+			<groupId>org.springframework.security</groupId>  
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>  
+		<dependency>  
+			<groupId>org.springframework.security</groupId>  
+			<artifactId>spring-security-config</artifactId>  
+			<version>${spring.security.version}</version>  
+		</dependency>
+		-->
 
 		<!-- jetty -->
 		<dependency>
@@ -96,6 +106,7 @@
 			<artifactId>jetty-servlets</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
@@ -119,13 +130,6 @@
 			<systemPath>${basedir}/mariadb-java-client-1.1.5.jar</systemPath>
 		</dependency>
 
-
-		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -191,7 +195,35 @@
 					<jettyXml>jetty.xml</jettyXml>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>de.juplo</groupId>
+				<artifactId>hibernate4-maven-plugin</artifactId>
+				<version>1.0.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>export</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.mariadb.jdbc</groupId>
+						<artifactId>mariadb</artifactId>
+						<version>1.1.5</version>
+						<scope>system</scope>
+						<systemPath>${basedir}/mariadb-java-client-1.1.5.jar</systemPath>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<driverClassName>org.mariadb.jdbc.Driver</driverClassName>
+					<hibernateDialect>org.hibernate.dialect.MySQLDialect</hibernateDialect>
+					<url><![CDATA[jdbc:mysql://localhost/nis]]></url>
+					<username>nisuser</username>
+					<password>nispass</password>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-	<packaging>war</packaging>
 </project>
