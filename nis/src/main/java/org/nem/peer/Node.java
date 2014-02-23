@@ -12,7 +12,6 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import java.util.logging.Logger;
 
 import net.minidev.json.JSONObject;
@@ -38,11 +37,9 @@ public class Node implements Serializable {
 	private static final long serialVersionUID = -5710930110703963436L;
 	private static final Logger logger = Logger.getLogger(Node.class.getName());
 	
-	private URL address;
+	private String address;
 	private NodeStatus state;
-	private String myPlatform;
-	private String myAddress;
-	private int myPort;
+	private String platform;
 
 	// The resources and their URI
 	private URL nodeInfoURL;
@@ -54,7 +51,7 @@ public class Node implements Serializable {
 	private long successfulCalls;
 	private long failedCalls;
 
-	public Node(String addrStr, int port) {
+	public Node(String addrStr) {
 		super();
 
 		if (addrStr == null) {
@@ -68,14 +65,17 @@ public class Node implements Serializable {
 		}
 
 		try {
-			address = new URL("http", addrStr, PeerInitializer.NEM_PORT, "/");
-			nodeInfoURL = new URL(address, "node/info"); 
-			peerNewURL = new URL(address, "peer/new");
-			chainURL = new URL(address, "chain");
+			URL testUrl = new URL("http", addrStr, 7890, "/"); 
+			address = addrStr;
+			
+			nodeInfoURL = new URL(testUrl, "node/info"); 
+			peerNewURL = new URL(testUrl, "peer/new");
+			chainURL = new URL(testUrl, "chain");
+			
 			
 		} catch (MalformedURLException e) {
-			logger.warning("Peer address not valid: <" + address.toString() + ">");
-			throw new IllegalArgumentException("Peer address not valid: <" + address.toString() + ">");
+			logger.warning("Peer address not valid: <" + address + ">");
+			throw new IllegalArgumentException("Peer address not valid: <" + address + ">");
 		}
 
 		// Hope all addressing issues are identified,
@@ -84,28 +84,16 @@ public class Node implements Serializable {
 
 	}
 
-	public String getMyPlatform() {
-		return myPlatform;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setMyPlatform(String myPlatform) {
-		this.myPlatform = myPlatform;
+	public String getPlatform() {
+		return platform;
 	}
 
-	public String getMyAddress() {
-		return myAddress;
-	}
-
-	public void setMyAddress(String myAddress) {
-		this.myAddress = myAddress;
-	}
-
-	public int getMyPort() {
-		return myPort;
-	}
-
-	public void setMyPort(int myPort) {
-		this.myPort = myPort;
+	public void setPlatform(String myPlatform) {
+		this.platform = myPlatform;
 	}
 
 	public NodeStatus getState() {
@@ -194,15 +182,15 @@ public class Node implements Serializable {
 		return response;
 	}
 
-	public static JSONObject prepareNodeInfo(Node node) {
+	public JSONObject generateNodeInfo() {
 		JSONObject obj=new JSONObject();
 		obj.put("protocol",new Integer(1));
 		obj.put("application", PeerInitializer.APP_NAME);
 		obj.put("version", PeerInitializer.VERSION);
-		obj.put("platform", node.getMyPlatform());
-		obj.put("address", node.getMyAddress());
-		obj.put("port","7676");
-		obj.put("shareAddress", new Boolean(false));
+		obj.put("platform", getPlatform());
+		obj.put("address", getAddress());
+//		obj.put("port","7676");
+//		obj.put("shareAddress", new Boolean(false));
 		return obj;
 	}
 	
@@ -256,7 +244,7 @@ public class Node implements Serializable {
 
 	public JSONObject extendNetworkBy(Node node) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
 		logger.warning(toString() + "peer/new url: " + peerNewURL);
-		JSONObject response = putResponse(peerNewURL, prepareNodeInfo(node));
+		JSONObject response = putResponse(peerNewURL, node.generateNodeInfo());
 			
 		logger.warning(toString() + "peer/new response: " + response.toString());
 		return response;

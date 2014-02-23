@@ -48,7 +48,6 @@
             <param-name>trackSessions</param-name>
             <param-value>false</param-value>
         </init-param>
-        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>
