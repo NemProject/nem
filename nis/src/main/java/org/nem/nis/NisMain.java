@@ -15,6 +15,7 @@ import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.Account;
+import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
@@ -92,11 +93,12 @@ public class NisMain
     }
     
 	private void populateDb() {
-		org.nem.core.dbmodel.Account a = populateGenesisAccount();
-		
-		Block b = populateGenesisBlock(a);
-		
-		populateGenesisTxes(a, b);
+		Account genesisAccount = getGenesisAccount();
+		org.nem.core.dbmodel.Account dbGenesisAccout = populateGenesisAccount(genesisAccount);
+
+		Block b = populateGenesisBlock(dbGenesisAccout);
+
+		populateGenesisTxes(dbGenesisAccout, b);
 	}
 
 	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, Block b) {
@@ -223,25 +225,28 @@ public class NisMain
 		return b;
 	}
 
-	private org.nem.core.dbmodel.Account populateGenesisAccount() {
-		final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
+    private Account getGenesisAccount() {
+        final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
         final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );
         final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
-        final byte[] CREATOR_PUBLIC_KEY = CREATOR_KEYPAIR.getPublicKey();
-        final Address CREATOR_ADDRESS = Address.fromPublicKey(CREATOR_PUBLIC_KEY);
 
-        //org.nem.core.model.Account account = new org.nem.core.model.Account(CREATOR_KEYPAIR);
+        return new Account(CREATOR_KEYPAIR);
+    }
+	private org.nem.core.dbmodel.Account populateGenesisAccount(Account genesisAccount) {
+        final byte[] genesisPublicKey = genesisAccount.getPublicKey();
+        final Address genesisAddress = Address.fromPublicKey(genesisPublicKey);
 
-        logger.info("genesis account public key: " + CREATOR_ADDRESS.getEncoded());
+        logger.info("genesis account            public key: " + HexEncoder.getString(genesisPublicKey));
+        logger.info("genesis account compressed public key: " + genesisAddress.getEncoded());
 
 		org.nem.core.dbmodel.Account a = null;
 		if (accountDao.count() == 0) {
-            a = new org.nem.core.dbmodel.Account(CREATOR_ADDRESS.getEncoded(), CREATOR_PUBLIC_KEY);
+            a = new org.nem.core.dbmodel.Account(genesisAddress.getEncoded(), genesisPublicKey);
 			accountDao.save(a);
 				
 		} else {
 			logger.warning("account counts: " + accountDao.count().toString());
-			a = accountDao.getAccountByPrintableAddress(CREATOR_ADDRESS.getEncoded());
+			a = accountDao.getAccountByPrintableAddress(genesisAddress.getEncoded());
 		}
 		
 		logger.info("account id: " + a.getId().toString());
