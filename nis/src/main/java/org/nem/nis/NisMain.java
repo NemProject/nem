@@ -14,8 +14,8 @@ import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
+import org.nem.core.model.Account;
 import org.nem.core.utils.StringEncoder;
-import org.nem.core.dbmodel.Account;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.peer.PeerInitializer;
@@ -92,14 +92,14 @@ public class NisMain
     }
     
 	private void populateDb() {
-		Account a = populateGenesisAccount();
+		org.nem.core.dbmodel.Account a = populateGenesisAccount();
 		
 		Block b = populateGenesisBlock(a);
 		
 		populateGenesisTxes(a, b);
 	}
 
-	private void populateGenesisTxes(Account a, Block b) {
+	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, Block b) {
 		if (transactionDao.count() == 0) {
 			final long txIds[] = {
 					1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -125,7 +125,7 @@ public class NisMain
                     share.longValue(), share.longValue(), share.longValue(), share.longValue()
 			};
 			
-			Vector<Account> recipientsAccounts = new Vector<Account>(txIds.length);
+			Vector<org.nem.core.dbmodel.Account> recipientsAccounts = new Vector<org.nem.core.dbmodel.Account>(txIds.length);
 			if (accountDao.count() == 1) {
 				for (int i=0; i<txIds.length; ++i) {
                     final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
@@ -133,7 +133,7 @@ public class NisMain
                     final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
 
-					recipientsAccounts.add(new Account(recipientAddr.getEncoded(), recipientPk));
+					recipientsAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipientPk));
 				}
 				accountDao.saveMulti(recipientsAccounts);
 				
@@ -176,7 +176,7 @@ public class NisMain
 		}
 	}
 
-	private Block populateGenesisBlock(Account a) {
+	private Block populateGenesisBlock(org.nem.core.dbmodel.Account a) {
 		Block b = null;
 		if (blockDao.count() == 0) {
 			
@@ -223,7 +223,7 @@ public class NisMain
 		return b;
 	}
 
-	private Account populateGenesisAccount() {
+	private org.nem.core.dbmodel.Account populateGenesisAccount() {
 		final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
         final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );
         final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
@@ -234,9 +234,9 @@ public class NisMain
 
         logger.info("genesis account public key: " + CREATOR_ADDRESS.getEncoded());
 
-		Account a = null;
+		org.nem.core.dbmodel.Account a = null;
 		if (accountDao.count() == 0) {
-            a = new Account(CREATOR_ADDRESS.getEncoded(), CREATOR_PUBLIC_KEY);
+            a = new org.nem.core.dbmodel.Account(CREATOR_ADDRESS.getEncoded(), CREATOR_PUBLIC_KEY);
 			accountDao.save(a);
 				
 		} else {
