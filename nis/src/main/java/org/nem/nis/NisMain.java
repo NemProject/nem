@@ -93,11 +93,11 @@ public class NisMain {
 		 * Just for my testing purposes, I commented the next lines out
 		 */
 		
-//		populateDb();
-//
-//		blockAnalyzer = new BlockAnalyzer();
-//
-//		analyzeBlocks();
+		populateDb();
+
+		blockAnalyzer = new BlockAnalyzer();
+
+		analyzeBlocks();
 
 		initEpoch();
 
