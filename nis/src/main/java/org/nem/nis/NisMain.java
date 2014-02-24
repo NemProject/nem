@@ -103,16 +103,12 @@ public class NisMain {
 
 		PeerNetwork peerNetwork = PeerNetwork.getDefaultNetwork();
 		if (peerNetwork == null) {
+			logger.severe("Cannot bring-up the PeerNetwork. Server is going down, no chance to work.");
 			// No chance to be successful
 			// Just for the moment we go down
 			// very ugly
 			System.exit(1);
 		}
-
-		// For the time being....hopefully the server is already up and running
-		//It brings up the wallet GUI if we stay with a web browser front end
-		WebStarter.openStartPage();
-
 	}
 
 	private void populateDb() {
