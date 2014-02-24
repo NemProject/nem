@@ -4,6 +4,11 @@ Try it out:
 
 Point your browser to http://nem.pucchiwerk.eu/nem/install.html
 
+IMPORTANT: Java 7 u51 or newer should be installed due to the self-signed certificate issue
+and also place the server name in the exception list of the Java Security Settings within the Java console.
+If there is no Java at all, on Windows an aut-install of the latest Java 7 should happen, all other plattforms should see the
+download page of Java.
+
 In order to use Java WebStart for deploying the application, I required a few adaptations
 
 - Jetty must be run as embedded server
