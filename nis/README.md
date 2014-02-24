@@ -31,11 +31,8 @@ Current operational model:
   
   Two future client options are available
   
-  -- A) a Java SWT Client
-     That client uses server code directly, no process communication in-between.
-  -- B) a HTML client
-     Browser uses port 7890 to communicate with the server. 
-     JSON objects are returned which are rendered using JavaScript/whatever JS framework  
+  A)	a Java SWT Client, That client uses server code directly, no process communication in-between.
+  B) 	a HTML client, Browser uses port 7890 to communicate with the server. JSON objects are returned which are rendered using JavaScript/whatever JS framework  
 
 Merge Thies' peer
 -----------------
