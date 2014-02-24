@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for SwingSet2 Demo Application -->
+<jnlp spec="7.0+" codebase="http://nem.pucchiwerk.eu/nem" href="nem-client.jnlp" version="0.0.1">
+  <information>
+    <title>NEM Wallet</title>
+    <vendor>NEM Community</vendor>
+    <homepage href="http://www.ournem.com"/>
+    <description>NEM Wallet</description>
+    <description kind="short">A sneak pre-view of the completely new NEM Wallet. Everything you need in one place.</description>
+    <description kind="one-line">Your NEM Wallet.</description>
+    <description kind="tooltip">Start your NEM Wallet.</description>
+    <icon href="pics/small-logo.png"/>
+    <icon kind="splash" href="pics/splash.png"/>
+    <offline-allowed/> 
+    <shortcut online="false" install="true">
+      <desktop/>
+      <menu submenu="NEM Community"/>
+    </shortcut>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <java version="1.7+" java-vm-args="-esa -Xnoclassgc"/>
+    <!-- Has to be the first entry: jetty-runner, since it is an executable JAR -->
+    <jar href="lib/jetty-runner-9.1.2.v20140210.jar"/>
+    <jar href="lib/nem-infrastructure-server-0.0.1-SNAPSHOT.war"/>
+  </resources>
+  <application-desc>
+    <argument>--port</argument>
+    <argument>7890</argument>
+    <argument>nem-infrastructure-server-0.0.1-SNAPSHOT.war</argument>
+  </application-desc>
+</jnlp> 
