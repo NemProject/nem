@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +47,7 @@ public class PeerNetwork {
 	private Set<Node> allPeers;
 
 	private boolean booted;
+	private ScheduledThreadPoolExecutor executor;
 
 	public static PeerNetwork getDefaultNetwork() {
 		if (DEFAULT_NETWORK == null) {
@@ -117,14 +120,6 @@ public class PeerNetwork {
 		return network;
 	}
 
-	public Set<Node> getAllPeers() {
-		return allPeers;
-	}
-
-	public Node getLocalNode() {
-		return localNode;
-	}
-
 	public PeerNetwork(String name, Node localNode, Set<String> initialHosts) {
 		super();
 
@@ -134,6 +129,15 @@ public class PeerNetwork {
 
 		booted = false;
 		allPeers = new HashSet<Node>();
+		executor = new ScheduledThreadPoolExecutor(1);
+	}
+
+	public Set<Node> getAllPeers() {
+		return allPeers;
+	}
+
+	public Node getLocalNode() {
+		return localNode;
 	}
 
 	/**
@@ -158,6 +162,7 @@ public class PeerNetwork {
 		}
 
 		// First we loop through the set of defined hosts
+		ClientConnector connector = new ClientConnector();
 		Node node = null;
 		for (String peerAddr : initialPeerAddr) {
 			logger.fine("Connecting to: " + peerAddr);
@@ -165,29 +170,37 @@ public class PeerNetwork {
 			if (node.verifyNEM()) {
 				// ok, so put myself into the network of node
 				try {
-					node.extendNetworkBy(localNode);
 					allPeers.add(node);
-
+					connector.putNewPeer(node, localNode);
 				} catch (URISyntaxException e) {
-					logger.warning(toString() + e.toString());
+					logger.warning(node.toString() + e.toString());
 					node.setState(NodeStatus.FAILURE);
+					//remove from all allPeers
+					allPeers.remove(node);
 
 				} catch (TimeoutException e) {
-					logger.warning(toString() + " timed out.");
+					logger.warning(node.toString() + " timed out.");
 					node.setState(NodeStatus.INACTIVE);
 
 				} catch (ExecutionException e) {
-					logger.warning(toString() + e.toString());
+					logger.warning(node.toString() + e.toString());
 					node.setState(NodeStatus.FAILURE);
+					//remove from all allPeers
+					allPeers.remove(node);
 
 				} catch (InterruptedException e) {
-					logger.warning(toString() + e.toString());
-					node.setState(NodeStatus.INACTIVE);
+					logger.warning("Interrupted execution.");
 				}
 
+			} else {
+				logger.fine("Ignoring peer, no NEM peer: " + peerAddr);
 			}
 		}
 		booted = true;
+		
+		//Schedule the loop for refreshing
+		Refresher command = new Refresher(allPeers);
+		executor.scheduleWithFixedDelay(command, 2, 10, TimeUnit.SECONDS);
 	}
 
 	private long countActive() {

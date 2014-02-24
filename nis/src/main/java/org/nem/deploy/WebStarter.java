@@ -30,7 +30,7 @@ import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.springframework.web.context.ContextLoaderListener;
 
 /**
- * Did not find a better way of launching Jetty in combination of WebStart The
+ * Did not find a better way of launching Jetty in combination with WebStart. The
  * physical location of the downloaded files is not pre-known, so passing a WAR
  * file to the Jetty runner does not work.
  * 
@@ -43,6 +43,12 @@ import org.springframework.web.context.ContextLoaderListener;
 @WebListener
 public class WebStarter implements ServletContextListener {
 	private static final Logger logger = Logger.getLogger(WebStarter.class.getName());
+	
+	public static final String VERSION = "0.1.0";
+	public static final String APP_NAME = "NIS";
+	public static final int NEM_PORT = 7890;
+	public static final Integer NEM_PROTOCOL = new Integer(1);
+
 
 	public static void main(String[] args) throws Exception {
 		logger.info("Starting embedded Jetty Server.");
@@ -80,8 +86,6 @@ public class WebStarter implements ServletContextListener {
         http.setPort(7890);
         http.setIdleTimeout(30000);
         server.addConnector(http);
-        
-        
 
 		logger.info("Calling start().");
 		server.start();
@@ -100,6 +104,7 @@ public class WebStarter implements ServletContextListener {
 			return bs.showDocument(homeURL);
 		} catch (UnavailableServiceException ue) {
 			// Service is not supported
+			logger.info("JNLP Basic Service not available...running headless.");
 			return false;
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
