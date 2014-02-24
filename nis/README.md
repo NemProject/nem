@@ -16,6 +16,7 @@ In order to use Java WebStart for deploying the application, I required a few ad
   otherwise our application will not be started by WebStart
 
 Current operational model:
+
 - WebStart downloads the code (everything is signed!)
 - NEM Wallet/Server is installed on Desktop
 - Can be launched either via Web-Page / from Desktop
@@ -24,9 +25,10 @@ Current operational model:
   but this is only for demonstration purposes. 
   
   Two future client options are available
-  A) a Java SWT Client
+  
+  -- A) a Java SWT Client
      That client uses server code directly, no process communication in-between.
-  B) a HTML client
+  -- B) a HTML client
      Browser uses port 7890 to communicate with the server. 
      JSON objects are returned which are rendered using JavaScript/whatever JS framework  
 
