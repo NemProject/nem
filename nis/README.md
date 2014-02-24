@@ -1,3 +1,35 @@
+WebStart added
+--------------
+Try it out:
+
+Point your browser to http://nem.pucchiwerk.eu/nem/install.html
+
+In order to use Java WebStart for deploying the application, I required a few adaptations
+
+- Jetty must be run as embedded server
+- Configuration of web settings (i.e. web.xml) had to move to programmatical configuration
+  which is possible since Servlet API 3.0/3.1
+- Configuration is done during start-up of ServletContext Lifecycle event (=>org.nem.deploy.WebStarter)
+- Any new or up-coming changes towards Jetty configuration have to go there
+- All jars have to be signed with the same certificate!
+  bouncy csatle provides already a signed jar which has to be unpacked, packed and then signed again with our certificate
+  otherwise our application will not be started by WebStart
+
+Current operational model:
+- WebStart downloads the code (everything is signed!)
+- NEM Wallet/Server is installed on Desktop
+- Can be launched either via Web-Page / from Desktop
+- Jetty server started and listens at 7890
+- org.nem.deploy.WebStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
+  but this is only for demonstration purposes. 
+  
+  Two future client options are available
+  A) a Java SWT Client
+     That client uses server code directly, no process communication in-between.
+  B) a HTML client
+     Browser uses port 7890 to communicate with the server. 
+     JSON objects are returned which are rendered using JavaScript/whatever JS framework  
+
 Merge Thies' peer
 -----------------
 

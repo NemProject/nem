@@ -8,7 +8,7 @@ To enable this a few initial set-up tasks for the Web Server hosting the code ha
 
 2) Place the "nem-client.jnlp" on the web server
 
-3) Place the HTML-pages from webstart/html onto the server
+3) Place the HTML-pages and all subdirectories from webstart/html onto the server
 
 4) Direct your browser to the server
 The web page for starting NEM should be shown.

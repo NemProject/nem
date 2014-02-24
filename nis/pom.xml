@@ -72,23 +72,13 @@
 		</dependency>
 
 		<!-- spring security -->
-		<!-- not used, and I doubt if we're gonna need it
-		<dependency>  
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-			<version>${spring.security.version}</version>
-		</dependency>  
-		<dependency>  
-			<groupId>org.springframework.security</groupId>  
-			<artifactId>spring-security-web</artifactId>
-			<version>${spring.security.version}</version>
-		</dependency>  
-		<dependency>  
-			<groupId>org.springframework.security</groupId>  
-			<artifactId>spring-security-config</artifactId>  
-			<version>${spring.security.version}</version>  
-		</dependency>
-		-->
+		<!-- not used, and I doubt if we're gonna need it <dependency> <groupId>org.springframework.security</groupId> 
+			<artifactId>spring-security-core</artifactId> <version>${spring.security.version}</version> 
+			</dependency> <dependency> <groupId>org.springframework.security</groupId> 
+			<artifactId>spring-security-web</artifactId> <version>${spring.security.version}</version> 
+			</dependency> <dependency> <groupId>org.springframework.security</groupId> 
+			<artifactId>spring-security-config</artifactId> <version>${spring.security.version}</version> 
+			</dependency> -->
 
 		<!-- jetty -->
 		<dependency>
@@ -167,11 +157,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.6</version>
 		</dependency>
-		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>3.1</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -186,7 +171,27 @@
 					<compilerArgument></compilerArgument>
 				</configuration>
 			</plugin>
-
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
@@ -224,6 +229,20 @@
 					<password>nispass</password>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.nem.deploy.WebStarter</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>
