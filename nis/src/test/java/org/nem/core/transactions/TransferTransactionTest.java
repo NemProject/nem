@@ -32,7 +32,7 @@ public class TransferTransactionTest {
         TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, new byte[] { 12, 50, 21 });
 
         // Assert:
-        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -48,7 +48,7 @@ public class TransferTransactionTest {
         TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, null);
 
         // Assert:
-        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { }));
@@ -121,7 +121,7 @@ public class TransferTransactionTest {
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
 
         // Assert:
-        Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));

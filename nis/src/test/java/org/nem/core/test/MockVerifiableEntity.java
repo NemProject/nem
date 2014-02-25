@@ -4,39 +4,38 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**
- * A mock Transaction implementation.
+ * A mock VerifiableEntity implementation.
  */
-public class MockTransaction extends Transaction {
+public class MockVerifiableEntity extends VerifiableEntity {
 
 	private int customField;
-    private long minimumFee;
 
     /**
-     * Creates a mock transaction.
+     * Creates a mock verifiable entity.
      *
-     * @param sender The transaction sender's account.
+     * @param signer The owner's account.
      */
-    public MockTransaction(final Account sender) {
-        this(sender, 0);
+    public MockVerifiableEntity(final Account signer) {
+        this(signer, 0);
     }
 
     /**
-     * Creates a mock transaction.
+     * Creates a mock verifiable entity.
      *
-     * @param sender The transaction sender's account.
+     * @param signer The owner's account.
      * @param customField The initial custom field value.
      */
-    public MockTransaction(final Account sender, final int customField) {
-		super(123, 759, sender);
+    public MockVerifiableEntity(final Account signer, final int customField) {
+		super(11, 23, signer);
         this.customField = customField;
     }
 
     /**
-     * Deserializes a MockTransaction.
+     * Deserializes a mock verifiable entity.
      *
      * @param deserializer The deserializer to use.
      */
-    public MockTransaction(final ObjectDeserializer deserializer) {
+    public MockVerifiableEntity(final ObjectDeserializer deserializer) {
         super(deserializer.readInt("type"), deserializer);
         this.customField = deserializer.readInt("customField");
     }
@@ -55,25 +54,8 @@ public class MockTransaction extends Transaction {
      */
     public void setCustomField(final int customField) { this.customField = customField; }
 
-    /**
-     * Sets the minimum fee.
-     * @param minimumFee The desired minimum fee.
-     */
-    public void setMinimumFee(final long minimumFee) { this.minimumFee = minimumFee; }
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    protected long getMinimumFee() {
-        return this.minimumFee;
-    }
-
     @Override
     protected void serializeImpl(ObjectSerializer serializer) {
-        super.serializeImpl(serializer);
         serializer.writeInt("customField", this.customField);
     }
 }

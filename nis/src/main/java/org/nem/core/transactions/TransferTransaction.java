@@ -82,6 +82,7 @@ public class TransferTransaction extends Transaction {
 
     @Override
     protected void serializeImpl(final ObjectSerializer serializer) {
+        super.serializeImpl(serializer);
         serializer.writeAddress("recipient", this.recipient);
         serializer.writeLong("amount", this.amount);
         serializer.writeBytes("message", this.message);
