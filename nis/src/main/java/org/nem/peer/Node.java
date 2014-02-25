@@ -30,6 +30,7 @@ import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.client.HttpClient;
+import org.nem.core.serialization.*;
 import org.nem.deploy.WebStarter;
 
 /**
@@ -198,16 +199,18 @@ public class Node implements Serializable {
 	}
 
 	public JSONObject generateNodeInfo() {
-		JSONObject obj = new JSONObject();
-		obj.put("protocol", protocol);
-		obj.put("application", WebStarter.APP_NAME);
-		obj.put("version", version);
-		obj.put("platform", platform);
-		obj.put("address", address);
-		// obj.put("port","7676");
-		// obj.put("shareAddress", new Boolean(false));
-		return obj;
+        JsonSerializer serializer = new JsonSerializer();
+        this.serialize(serializer);
+		return serializer.getObject();
 	}
+
+    public void serialize(final Serializer serializer) {
+        serializer.writeInt("protocol", protocol);
+        serializer.writeString("application", WebStarter.APP_NAME);
+        serializer.writeString("version", version);
+        serializer.writeString("platform", platform);
+        serializer.writeString("address", address);
+    }
 
 	//
 	public boolean verifyNEM() {
