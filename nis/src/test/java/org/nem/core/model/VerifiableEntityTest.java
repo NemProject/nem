@@ -149,19 +149,8 @@ public class VerifiableEntityTest {
     private MockVerifiableEntity createRoundTrippedEntity(
         MockVerifiableEntity originalEntity,
         final Account deserializedSigner) {
-        // Arrange:
-        originalEntity.sign();
-
         // Act:
-        JsonSerializer jsonSerializer = new JsonSerializer(true);
-        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        originalEntity.serialize(serializer);
-
-        final MockAccountLookup accountLookup = new MockAccountLookup();
-        accountLookup.setMockAccount(deserializedSigner);
-        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
-            new JsonDeserializer(jsonSerializer.getObject()),
-            accountLookup);
+        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalEntity, deserializedSigner);
         return new MockVerifiableEntity(deserializer);
     }
 }

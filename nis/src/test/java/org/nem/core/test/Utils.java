@@ -2,6 +2,7 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
+import org.nem.core.serialization.*;
 
 import java.security.SecureRandom;
 
@@ -78,5 +79,32 @@ public class Utils {
             builder.append(ch);
 
         return builder.toString();
+    }
+
+    /**
+     * Serializes originalEntity and returns an ObjectDeserializer
+     * that can deserialize it.
+     *
+     * @param originalEntity The original entity.
+     * @param deserializedSigner The signer that should be associated with the deserialized object.
+     * @param <T> The concrete VerifiableEntity type.
+     * @return The object deserializer.
+     */
+    public static <T extends VerifiableEntity> ObjectDeserializer RoundtripVerifiableEntity(
+        final T originalEntity,
+        final Account deserializedSigner) {
+        // Arrange:
+        originalEntity.sign();
+
+        // Act:
+        JsonSerializer jsonSerializer = new JsonSerializer(true);
+        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+        originalEntity.serialize(serializer);
+
+        final MockAccountLookup accountLookup = new MockAccountLookup();
+        accountLookup.setMockAccount(deserializedSigner);
+        return new DelegatingObjectDeserializer(
+            new JsonDeserializer(jsonSerializer.getObject()),
+            accountLookup);
     }
 }

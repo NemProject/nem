@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.transactions.TransferTransaction;
 
 public class TransactionTest {
 
@@ -72,19 +73,8 @@ public class TransactionTest {
     private MockTransaction createRoundTrippedTransaction(
         Transaction originalTransaction,
         final Account deserializedSigner) {
-        // Arrange:
-        originalTransaction.sign();
-
         // Act:
-        JsonSerializer jsonSerializer = new JsonSerializer(true);
-        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        originalTransaction.serialize(serializer);
-
-        final MockAccountLookup accountLookup = new MockAccountLookup();
-        accountLookup.setMockAccount(deserializedSigner);
-        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
-            new JsonDeserializer(jsonSerializer.getObject()),
-            accountLookup);
+        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, deserializedSigner);
         return new MockTransaction(deserializer);
     }
 }

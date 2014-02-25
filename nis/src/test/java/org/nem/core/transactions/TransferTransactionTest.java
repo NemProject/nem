@@ -16,23 +16,23 @@ public class TransferTransactionTest {
     @Test(expected = InvalidParameterException.class)
     public void recipientIsRequired() {
         // Arrange:
-        final Account sender = new Account(new KeyPair());
+        final Account signer = new Account(new KeyPair());
 
         // Act:
-        new TransferTransaction(sender, null, 123, new byte[] { 12, 50, 21 });
+        new TransferTransaction(signer, null, 123, new byte[] { 12, 50, 21 });
     }
 
     @Test
     public void ctorCanCreateTransactionWithMessage() {
         // Arrange:
-        final Account sender = new Account(new KeyPair());
+        final Account signer = new Account(new KeyPair());
         final Address recipient = Utils.generateRandomAddress();
 
         // Act:
-        TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, new byte[] { 12, 50, 21 });
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
 
         // Assert:
-        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -41,17 +41,33 @@ public class TransferTransactionTest {
     @Test
     public void ctorCanCreateTransactionWithoutMessage() {
         // Arrange:
-        final Account sender = new Account(new KeyPair());
+        final Account signer = new Account(new KeyPair());
         final Address recipient = Utils.generateRandomAddress();
 
         // Act:
-        TransferTransaction transaction = new TransferTransaction(sender, recipient, 123, null);
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
 
         // Assert:
-        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { }));
+    }
+
+    @Test
+    public void transactionCanBeRoundTripped() {
+        // Arrange:
+        final Account signer = new Account(new KeyPair());
+        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Address recipient = Utils.generateRandomAddress();
+        final TransferTransaction originalTransaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
+        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
+
+        // Assert:
+        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+        Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
+        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
+        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
     }
 
     //endregion
@@ -76,9 +92,9 @@ public class TransferTransactionTest {
 
     private long calculateFee(final long amount, final int messageSize){
         // Arrange:
-        final Account sender = new Account(new KeyPair());
+        final Account signer = new Account(new KeyPair());
         final Address recipient = Utils.generateRandomAddress();
-		TransferTransaction transaction = new TransferTransaction(sender, recipient, amount, new byte[messageSize]);
+		TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, new byte[messageSize]);
 
         // Act:
         return transaction.getFee();
@@ -99,9 +115,9 @@ public class TransferTransactionTest {
 
     private boolean isMessageSizeValid(final int messageSize){
         // Arrange:
-        final Account sender = new Account(new KeyPair());
+        final Account signer = new Account(new KeyPair());
         final Address recipient = Utils.generateRandomAddress();
-		TransferTransaction transaction = new TransferTransaction(sender, recipient, 1, new byte[messageSize]);
+		TransferTransaction transaction = new TransferTransaction(signer, recipient, 1, new byte[messageSize]);
 
         // Act:
         return transaction.isValid();
@@ -109,43 +125,11 @@ public class TransferTransactionTest {
 
     //endregion
 
-    //region Serialization
-
-    @Test
-    public void transactionCanBeRoundTripped() {
-        // Arrange:
-        final Account sender = new Account(new KeyPair());
-        final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
-        final Address recipient = Utils.generateRandomAddress();
-		final TransferTransaction originalTransaction = new TransferTransaction(sender, recipient, 123, new byte[] { 12, 50, 21 });
-        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, senderPublicKeyOnly);
-
-        // Assert:
-        Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(sender));
-        Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
-        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
-    }
-
-    //endregion
-
     private TransferTransaction createRoundTrippedTransaction(
         Transaction originalTransaction,
-        final Account deserializedSender) {
-        // Arrange:
-        originalTransaction.sign();
-
+        final Account deserializedSigner) {
         // Act:
-        JsonSerializer jsonSerializer = new JsonSerializer(true);
-        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        originalTransaction.serialize(serializer);
-
-        final MockAccountLookup accountLookup = new MockAccountLookup();
-        accountLookup.setMockAccount(deserializedSender);
-        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
-            new JsonDeserializer(jsonSerializer.getObject()),
-            accountLookup);
-
+        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, deserializedSigner);
         deserializer.readInt("type");
         return new TransferTransaction(deserializer);
     }
