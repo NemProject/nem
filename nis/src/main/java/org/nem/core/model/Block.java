@@ -1,11 +1,14 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.ObjectDeserializer;
+import org.nem.core.serialization.ObjectSerializer;
+
 import java.util.*;
 
 /**
  * A NEM block.
  */
-public class Block {
+public class Block extends VerifiableEntity {
 //    this.prevBlockHash = prevBlockHash;
 //    this.blockHash = blockHash;
 //    this.timestamp = timestamp;
@@ -16,13 +19,25 @@ public class Block {
 //    this.totalAmount = totalAmount;
 //    this.totalFee = totalFee;
 
-    private List<Transaction> transactions;
+    private final List<Transaction> transactions = new ArrayList<>();
 
     /**
      * Creates a new block.
+     *
+     * @param forger The forger.
      */
-    public Block() {
-        this.transactions = new ArrayList<>();
+    public Block(final Account forger) {
+        super(1, 1, forger);
+    }
+
+    /**
+     * Deserializes a new block.
+     *
+     * @param type The block type.
+     * @param deserializer The deserializer to use.
+     */
+    public Block(final int type, final ObjectDeserializer deserializer) {
+        super(type, deserializer);
     }
 
     /**
@@ -45,5 +60,10 @@ public class Block {
      */
     public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
+    }
+
+    @Override
+    protected void serializeImpl(ObjectSerializer serializer) {
+        // TODO: serialize block fields
     }
 }
