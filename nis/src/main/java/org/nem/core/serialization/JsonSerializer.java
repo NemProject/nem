@@ -1,6 +1,6 @@
 package org.nem.core.serialization;
 
-import org.json.*;
+import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
@@ -67,7 +67,9 @@ public class JsonSerializer implements Serializer {
      * @return The underlying JSON object.
      */
     public JSONObject getObject() {
-        this.object.putOpt(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
+        if (null != this.propertyOrderArray)
+            this.object.put(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
+
         return this.object;
     }
 
@@ -75,6 +77,6 @@ public class JsonSerializer implements Serializer {
         if (null == this.propertyOrderArray)
             return;
 
-        this.propertyOrderArray.put(label);
+        this.propertyOrderArray.add(label);
     }
 }

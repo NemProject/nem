@@ -1,6 +1,6 @@
 package org.nem.core.serialization;
 
-import org.json.*;
+import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
@@ -22,20 +22,20 @@ public class JsonDeserializer implements Deserializer {
      */
     public JsonDeserializer(final JSONObject object) {
         this.object = object;
-        this.propertyOrderArray = this.object.optJSONArray(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+        this.propertyOrderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
         this.propertyOrderArrayIndex = 0;
     }
 
     @Override
     public int readInt(final String label) {
         this.checkLabel(label);
-        return this.object.getInt(label);
+        return (Integer)this.object.get(label);
     }
 
     @Override
     public long readLong(final String label) {
         this.checkLabel(label);
-        return this.object.getLong(label);
+        return (Long)this.object.get(label);
     }
 
     @Override
@@ -53,14 +53,14 @@ public class JsonDeserializer implements Deserializer {
     @Override
     public String readString(final String label) {
         this.checkLabel(label);
-        return this.object.getString(label);
+        return (String)this.object.get(label);
     }
 
     private void checkLabel(final String label) {
         if (null == this.propertyOrderArray)
             return;
 
-        final String expectedLabel = this.propertyOrderArray.getString(this.propertyOrderArrayIndex++);
+        final String expectedLabel = (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
         if (label.equals(expectedLabel))
             return;
 

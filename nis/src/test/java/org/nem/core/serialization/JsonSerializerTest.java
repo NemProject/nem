@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
+import net.minidev.json.*;
 import org.hamcrest.core.*;
-import org.json.*;
 import org.junit.*;
 
 import java.math.BigInteger;
@@ -21,8 +21,8 @@ public class JsonSerializerTest {
 
         // Assert:
         final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getInt("int"), IsEqual.equalTo(0x09513510));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((Integer)object.get("int"), IsEqual.equalTo(0x09513510));
     }
 
     @Test
@@ -35,8 +35,8 @@ public class JsonSerializerTest {
 
         // Assert:
         final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getLong("long"), IsEqual.equalTo(0xF239A033CE951350L));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((Long)object.get("long"), IsEqual.equalTo(0xF239A033CE951350L));
     }
 
     @Test
@@ -49,8 +49,8 @@ public class JsonSerializerTest {
 
         // Assert:
         final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
     }
 
     @Test
@@ -64,8 +64,8 @@ public class JsonSerializerTest {
 
         // Assert:
         final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("bytes"), IsEqual.equalTo("UP8AfCFa"));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("bytes"), IsEqual.equalTo("UP8AfCFa"));
     }
 
     @Test
@@ -78,8 +78,8 @@ public class JsonSerializerTest {
 
         // Assert:
         final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("String"), IsEqual.equalTo("BEta"));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("String"), IsEqual.equalTo("BEta"));
     }
 
     //endregion
@@ -226,7 +226,7 @@ public class JsonSerializerTest {
         JSONObject object = serializer.getObject();
 
         // Assert:
-        Assert.assertThat(object.has("_order"), IsEqual.equalTo(false));
+        Assert.assertThat(object.containsKey("_order"), IsEqual.equalTo(false));
     }
 
     @Test
@@ -254,13 +254,13 @@ public class JsonSerializerTest {
         serializer.writeInt("Foo", 17);
         serializer.writeInt("Bar", 11);
         JSONObject object = serializer.getObject();
-        JSONArray orderArray = object.optJSONArray(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+        JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
         // Assert:
         Assert.assertThat(orderArray, IsNot.not(IsEqual.equalTo(null)));
-        Assert.assertThat(orderArray.length(), IsEqual.equalTo(2));
-        Assert.assertThat(orderArray.getString(0), IsEqual.equalTo("Foo"));
-        Assert.assertThat(orderArray.getString(1), IsEqual.equalTo("Bar"));
+        Assert.assertThat(orderArray.size(), IsEqual.equalTo(2));
+        Assert.assertThat((String)orderArray.get(0), IsEqual.equalTo("Foo"));
+        Assert.assertThat((String)orderArray.get(1), IsEqual.equalTo("Bar"));
     }
 
     @Test(expected = InvalidParameterException.class)

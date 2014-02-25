@@ -1,9 +1,8 @@
 package org.nem.core.transactions;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.json.*;
+import net.minidev.json.*;
+import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;

@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
+import net.minidev.json.*;
 import org.hamcrest.core.*;
-import org.json.JSONObject;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
@@ -31,8 +31,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getInt("int"), IsEqual.equalTo(0x09513510));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((Integer)object.get("int"), IsEqual.equalTo(0x09513510));
     }
 
     @Test
@@ -46,8 +46,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getLong("long"), IsEqual.equalTo(0xF239A033CE951350L));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((Long)object.get("long"), IsEqual.equalTo(0xF239A033CE951350L));
     }
 
     @Test
@@ -61,8 +61,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("bytes"), IsEqual.equalTo("UP8AfCFa"));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("bytes"), IsEqual.equalTo("UP8AfCFa"));
     }
 
     @Test
@@ -92,8 +92,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("String"), IsEqual.equalTo("BEta"));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("String"), IsEqual.equalTo("BEta"));
     }
 
     @Test
@@ -108,8 +108,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("Address"), IsEqual.equalTo(address.getEncoded()));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("Address"), IsEqual.equalTo(address.getEncoded()));
     }
 
     @Test
@@ -124,8 +124,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("Account"), IsEqual.equalTo(address.getEncoded()));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
     }
 
     @Test
@@ -140,8 +140,8 @@ public class DelegatingObjectSerializerTest {
 
         // Assert:
         final JSONObject object = jsonSerializer.getObject();
-        Assert.assertThat(object.length(), IsEqual.equalTo(1));
-        Assert.assertThat(object.getString("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((String)object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
     }
 
     //endregion
