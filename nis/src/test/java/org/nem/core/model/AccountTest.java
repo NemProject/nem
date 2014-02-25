@@ -28,7 +28,7 @@ public class AccountTest {
     @Test
     public void labelCanBeSet() {
         // Arrange:
-        final Account account = new Account(new KeyPair());
+        final Account account = Utils.generateRandomAccount();
 
         // Act:
         account.setLabel("Beta Gamma");
@@ -40,7 +40,7 @@ public class AccountTest {
     @Test
     public void balanceCanBeIncremented() {
         // Arrange:
-        final Account account = new Account(new KeyPair());
+        final Account account = Utils.generateRandomAccount();
 
         // Act:
         account.incrementBalance(7);
@@ -53,7 +53,7 @@ public class AccountTest {
     @Test
     public void balanceCanBeIncrementedMultipleTimes() {
         // Arrange:
-        final Account account = new Account(new KeyPair());
+        final Account account = Utils.generateRandomAccount();
 
         // Act:
         account.incrementBalance(7);
@@ -151,7 +151,7 @@ public class AccountTest {
 
     private static Account[] createNonEquivalentAccounts(final KeyPair keyPair) {
         return new Account[] {
-            new Account(new KeyPair()),
+            Utils.generateRandomAccount(),
             new Account(new KeyPair(Utils.incrementAtIndex(keyPair.getPublicKey(), 10))),
             new Account(new KeyPair(keyPair.getPrivateKey().add(new BigInteger("1"))))
         };

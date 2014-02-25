@@ -35,7 +35,7 @@ public class BlockTest {
 
     private static Transaction createTransactionWithFee(final long fee) {
         // Arrange:
-        Account sender = new Account(new KeyPair());
+        Account sender = Utils.generateRandomAccount();
         MockTransaction transaction = new MockTransaction(sender);
         transaction.setFee(fee);
         return transaction;

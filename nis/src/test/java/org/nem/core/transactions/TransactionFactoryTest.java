@@ -26,8 +26,8 @@ public class TransactionFactoryTest {
     @Test
     public void canDeserializeTransferTransaction() {
         // Arrange:
-        final Account sender = new Account(new KeyPair());
-		final Account recipient = new Account(new KeyPair());
+        final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
 
         Transaction originalTransaction = new TransferTransaction(sender, recipient, 100, null);
         originalTransaction.sign();

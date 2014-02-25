@@ -46,7 +46,7 @@ public class VerifiableEntityTest {
     @Test
     public void entityCanBeRoundTripped() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
         final MockVerifiableEntity originalEntity = new MockVerifiableEntity(signer, 7);
         final MockVerifiableEntity entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
@@ -62,7 +62,7 @@ public class VerifiableEntityTest {
     @Test
     public void roundTrippedEntityCanBeVerified() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
@@ -73,7 +73,7 @@ public class VerifiableEntityTest {
     @Test(expected = SerializationException.class)
     public void serializeFailsIfSignatureIsNotPresent() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
 
         // Act:
@@ -87,7 +87,7 @@ public class VerifiableEntityTest {
     @Test
     public void signCreatesValidSignature() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
 
         // Act:
@@ -101,7 +101,7 @@ public class VerifiableEntityTest {
     @Test
     public void changingFieldInvalidatesSignature() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
 
         // Act:
@@ -128,7 +128,7 @@ public class VerifiableEntityTest {
     @Test(expected = CryptoException.class)
     public void cannotVerifyWithoutSignature() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
 
         // Act:

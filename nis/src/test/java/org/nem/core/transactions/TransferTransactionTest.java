@@ -16,7 +16,7 @@ public class TransferTransactionTest {
     @Test(expected = InvalidParameterException.class)
     public void recipientIsRequired() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
 
         // Act:
         new TransferTransaction(signer, null, 123, new byte[] { 12, 50, 21 });
@@ -25,8 +25,8 @@ public class TransferTransactionTest {
     @Test
     public void ctorCanCreateTransactionWithMessage() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
-        final Account recipient = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
 
         // Act:
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
@@ -41,8 +41,8 @@ public class TransferTransactionTest {
     @Test
     public void ctorCanCreateTransactionWithoutMessage() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
-        final Account recipient = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
 
         // Act:
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
@@ -57,8 +57,8 @@ public class TransferTransactionTest {
     @Test
     public void transactionCanBeRoundTripped() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
-        final Account recipient = new Account(new KeyPair(new KeyPair().getPublicKey()));
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
         final TransferTransaction originalTransaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
             public Account findByAddress(final Address address) {
@@ -95,8 +95,8 @@ public class TransferTransactionTest {
 
     private long calculateFee(final long amount, final int messageSize){
         // Arrange:
-        final Account signer = new Account(new KeyPair());
-        final Account recipient = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
 		TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, new byte[messageSize]);
 
         // Act:
@@ -126,9 +126,9 @@ public class TransferTransactionTest {
 
     private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(senderBalance);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, null);
         transaction.setFee(fee);
 
@@ -152,9 +152,9 @@ public class TransferTransactionTest {
 
     private boolean isMessageSizeValid(final int messageSize) {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
 		TransferTransaction transaction = new TransferTransaction(signer, recipient, 1, new byte[messageSize]);
 
         // Act:
@@ -168,9 +168,9 @@ public class TransferTransactionTest {
     @Test
     public void executeTransfersAmountAndFeeFromSigner() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
@@ -184,9 +184,9 @@ public class TransferTransactionTest {
     @Test
     public void executeTransfersAmountToSigner() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
@@ -200,9 +200,9 @@ public class TransferTransactionTest {
     @Test
     public void executeDoesNotAppendEmptyMessageToAccount() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
@@ -217,9 +217,9 @@ public class TransferTransactionTest {
     public void executeAppendsNonEmptyMessageToAccount() {
         // Arrange:
         final byte[] message = new byte[] { 0x12, 0x33, 0x0A };
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
-        final Account recipient = new Account(new KeyPair());
+        final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, message);
         transaction.setFee(10);
 

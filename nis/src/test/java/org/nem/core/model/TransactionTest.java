@@ -28,7 +28,7 @@ public class TransactionTest {
     @Test
     public void transactionCanBeRoundTripped() {
         // Arrange:
-        final Account signer = new Account(new KeyPair());
+        final Account signer = Utils.generateRandomAccount();
         final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
         final MockTransaction originalTransaction = new MockTransaction(signer, 7);
         originalTransaction.setFee(130);

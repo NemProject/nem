@@ -31,12 +31,30 @@ public class Utils {
     }
 
     /**
+     * Generates a random account.
+     *
+     * @return A random account.
+     */
+    public static Account generateRandomAccount() {
+        return new Account(new KeyPair());
+    }
+
+    /**
+     * Generates a random account without a private key.
+     *
+     * @return A random account without a private key.
+     */
+    public static Account generateRandomAccountWithoutPrivateKey() {
+        return new Account(new KeyPair(new KeyPair().getPublicKey()));
+    }
+
+    /**
      * Generates a random address.
      *
      * @return A random address.
      */
     public static Address generateRandomAddress() {
-        return new Account(new KeyPair()).getAddress();
+        return generateRandomAccount().getAddress();
     }
 
     /**
