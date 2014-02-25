@@ -3,8 +3,8 @@ package org.nem.nis.virtual;
 import java.util.LinkedList;
 
 import org.nem.nis.NisMain;
-import org.nem.nis.model.Account;
-import org.nem.nis.model.Block;
+import org.nem.core.dbmodel.Account;
+import org.nem.core.dbmodel.Block;
 import org.nxt.nrs.Crypto;
 import org.nxt.nrs.NrsBlock;
 

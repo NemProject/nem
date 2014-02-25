@@ -2,12 +2,11 @@ package org.nem.nis;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.nis.model.Block;
-import org.nem.nis.model.Transfer;
+import org.nem.core.dao.BlockDao;
+import org.nem.core.dao.TransferDao;
+import org.nem.core.dbmodel.Block;
+import org.nem.core.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BlockAnalyzer {
@@ -36,7 +35,7 @@ public class BlockAnalyzer {
 			System.out.print(" ");
 			System.out.print(tx.getShortId());
 			System.out.print(" ");
-			System.out.print(Converter.bytesToString(tx.getRecipient().getPrintableKey()));
+			System.out.print(tx.getRecipient().getPrintableKey());
 			System.out.println();
 		}
 	}

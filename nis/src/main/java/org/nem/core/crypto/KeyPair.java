@@ -17,6 +17,9 @@ public class KeyPair {
     private final BigInteger privateKey;
     private final byte[] publicKey;
 
+    /**
+     * Creates a random key pair.
+     */
     public KeyPair() {
         ECKeyPairGenerator generator = new ECKeyPairGenerator();
         ECKeyGenerationParameters keyGenParams = new ECKeyGenerationParameters(Curves.secp256k1().getParams(), RANDOM);
@@ -31,10 +34,22 @@ public class KeyPair {
         this.publicKey = point.getEncoded(true);
     }
 
+    /**
+     * Creates a key pair around a private key.
+     * The public key is calculated from the private key.
+     *
+     * @param privateKey The private key.
+     */
     public KeyPair(final BigInteger privateKey) {
         this(privateKey, publicKeyFromPrivateKey(privateKey));
     }
 
+    /**
+     * Creates a key pair around a public key.
+     * The private key is empty.
+     *
+     * @param publicKey The public key.
+     */
     public KeyPair(final byte[] publicKey) {
         this(null, publicKey);
     }
@@ -52,29 +67,59 @@ public class KeyPair {
         return point.getEncoded(true);
     }
 
+    /**
+     * Gets the private key.
+     *
+     * @return The private key.
+     */
     public BigInteger getPrivateKey() {
 
         return this.privateKey;
     }
 
+    /**
+     * Gets the public key.
+     *
+     * @return the public key.
+     */
     public byte[] getPublicKey() {
         return this.publicKey;
     }
 
-    public Boolean hasPrivateKey() { return null != this.privateKey; }
+    /**
+     * Determines if the current key pair has a private key.
+     *
+     * @return true if the current key pair has a private key.
+     */
+    public boolean hasPrivateKey() { return null != this.privateKey; }
 
-    public Boolean hasPublicKey() { return null != this.publicKey; }
+    /**
+     * Determines if the current key pair has a public key.
+     *
+     * @return true if the current key pair has a public key.
+     */
+    public boolean hasPublicKey() { return null != this.publicKey; }
 
+    /**
+     * Gets the EC private key parameters.
+     *
+     * @return The EC private key parameters.
+     */
     public ECPrivateKeyParameters getPrivateKeyParameters() {
         return new ECPrivateKeyParameters(this.getPrivateKey(), Curves.secp256k1().getParams());
     }
 
+    /**
+     * Gets the EC public key parameters.
+     *
+     * @return The EC public key parameters.
+     */
     public ECPublicKeyParameters getPublicKeyParameters() {
         ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey());
         return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
     }
 
-    private static Boolean isPublicKeyCompressed(byte[] publicKey) {
+    private static boolean isPublicKeyCompressed(byte[] publicKey) {
         if (COMPRESSED_KEY_SIZE != publicKey.length)
             return false;
 

@@ -3,7 +3,7 @@ package org.nem.nis.virtual;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.nem.nis.model.Account;
+import org.nem.core.dbmodel.Account;
 
 public class VirtualAccounts {
 	public VirtualAccounts() {
