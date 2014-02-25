@@ -215,7 +215,7 @@ public class Node implements Serializable {
 
 		// We verify by getting the Information from the peer
 		try {
-			ClientConnector connector = new ClientConnector();
+			PeerConnector connector = new PeerConnector();
 			
 			JSONObject response = connector.requestNodeInfo(this);
 

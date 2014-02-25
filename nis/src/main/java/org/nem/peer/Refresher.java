@@ -18,11 +18,11 @@ public class Refresher implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private Set<Node> allPeers = null;
-	private ClientConnector connector = null;
+	private PeerConnector connector = null;
 	
 	public Refresher(Set<Node> allPeers) {
 		this.allPeers = allPeers;
-		connector = new ClientConnector();
+		connector = new PeerConnector();
 	}
 
 	@Override

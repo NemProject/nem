@@ -162,7 +162,7 @@ public class PeerNetwork {
 		}
 
 		// First we loop through the set of defined hosts
-		ClientConnector connector = new ClientConnector();
+		PeerConnector connector = new PeerConnector();
 		Node node = null;
 		for (String peerAddr : initialPeerAddr) {
 			logger.fine("Connecting to: " + peerAddr);
