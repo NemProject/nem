@@ -5,11 +5,10 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.core.transactions.TransferTransaction;
 
 public class TransactionTest {
 
-    //region Constructor
+    //region Constructors
 
     @Test
     public void ctorCanCreateTransactionForAccountWithSignerPrivateKey() {
@@ -25,10 +24,6 @@ public class TransactionTest {
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
     }
-
-    //endregion
-
-    //region Serialization
 
     @Test
     public void transactionCanBeRoundTripped() {

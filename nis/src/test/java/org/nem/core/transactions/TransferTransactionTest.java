@@ -26,7 +26,7 @@ public class TransferTransactionTest {
     public void ctorCanCreateTransactionWithMessage() {
         // Arrange:
         final Account signer = new Account(new KeyPair());
-        final Address recipient = Utils.generateRandomAddress();
+        final Account recipient = new Account(new KeyPair());
 
         // Act:
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
@@ -42,7 +42,7 @@ public class TransferTransactionTest {
     public void ctorCanCreateTransactionWithoutMessage() {
         // Arrange:
         final Account signer = new Account(new KeyPair());
-        final Address recipient = Utils.generateRandomAddress();
+        final Account recipient = new Account(new KeyPair());
 
         // Act:
         TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
@@ -58,10 +58,13 @@ public class TransferTransactionTest {
     public void transactionCanBeRoundTripped() {
         // Arrange:
         final Account signer = new Account(new KeyPair());
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
-        final Address recipient = Utils.generateRandomAddress();
+        final Account recipient = new Account(new KeyPair(new KeyPair().getPublicKey()));
         final TransferTransaction originalTransaction = new TransferTransaction(signer, recipient, 123, new byte[] { 12, 50, 21 });
-        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
+        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
+            public Account findByAddress(final Address address) {
+                return address.equals(signer.getAddress()) ? signer : recipient;
+            }
+        });
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -93,7 +96,7 @@ public class TransferTransactionTest {
     private long calculateFee(final long amount, final int messageSize){
         // Arrange:
         final Account signer = new Account(new KeyPair());
-        final Address recipient = Utils.generateRandomAddress();
+        final Account recipient = new Account(new KeyPair());
 		TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, new byte[messageSize]);
 
         // Act:
@@ -105,18 +108,53 @@ public class TransferTransactionTest {
     //region Valid
 
     @Test
-    public void largeMessagesAreInvalid() {
+    public void transactionsUpToSignerBalanceAreValid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(100, 10, 1), IsEqual.equalTo(true));
+        Assert.assertThat(isTransactionAmountValid(1000, 990, 10), IsEqual.equalTo(true));
+        Assert.assertThat(isTransactionAmountValid(1000, 50, 950), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void transactionsExceedingSignerBalanceAreInvalid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(1000, 990, 11), IsEqual.equalTo(false));
+        Assert.assertThat(isTransactionAmountValid(1000, 51, 950), IsEqual.equalTo(false));
+        Assert.assertThat(isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(false));
+        Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(false));
+    }
+
+    private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+        // Arrange:
+        final Account signer = new Account(new KeyPair());
+        signer.incrementBalance(senderBalance);
+        final Account recipient = new Account(new KeyPair());
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, null);
+        transaction.setFee(fee);
+
+        // Act:
+        return transaction.isValid();
+    }
+
+    @Test
+    public void smallMessagesAreValid() {
         // Assert:
         Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(true));
         Assert.assertThat(isMessageSizeValid(999), IsEqual.equalTo(true));
         Assert.assertThat(isMessageSizeValid(1000), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void largeMessagesAreInvalid() {
+        // Assert:
         Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(false));
     }
 
-    private boolean isMessageSizeValid(final int messageSize){
+    private boolean isMessageSizeValid(final int messageSize) {
         // Arrange:
         final Account signer = new Account(new KeyPair());
-        final Address recipient = Utils.generateRandomAddress();
+        signer.incrementBalance(1000);
+        final Account recipient = new Account(new KeyPair());
 		TransferTransaction transaction = new TransferTransaction(signer, recipient, 1, new byte[messageSize]);
 
         // Act:
@@ -125,11 +163,81 @@ public class TransferTransactionTest {
 
     //endregion
 
-    private TransferTransaction createRoundTrippedTransaction(
-        Transaction originalTransaction,
-        final Account deserializedSigner) {
+    //region Execute
+
+    @Test
+    public void executeTransfersAmountAndFeeFromSigner() {
+        // Arrange:
+        final Account signer = new Account(new KeyPair());
+        signer.incrementBalance(1000);
+        final Account recipient = new Account(new KeyPair());
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        transaction.setFee(10);
+
         // Act:
-        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, deserializedSigner);
+        transaction.execute();
+
+        // Assert:
+        Assert.assertThat(signer.getBalance(), IsEqual.equalTo(891L));
+    }
+
+    @Test
+    public void executeTransfersAmountToSigner() {
+        // Arrange:
+        final Account signer = new Account(new KeyPair());
+        signer.incrementBalance(1000);
+        final Account recipient = new Account(new KeyPair());
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        transaction.setFee(10);
+
+        // Act:
+        transaction.execute();
+
+        // Assert:
+        Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(99L));
+    }
+
+    @Test
+    public void executeDoesNotAppendEmptyMessageToAccount() {
+        // Arrange:
+        final Account signer = new Account(new KeyPair());
+        signer.incrementBalance(1000);
+        final Account recipient = new Account(new KeyPair());
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        transaction.setFee(10);
+
+        // Act:
+        transaction.execute();
+
+        // Assert:
+        Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
+    }
+
+    @Test
+    public void executeAppendsNonEmptyMessageToAccount() {
+        // Arrange:
+        final byte[] message = new byte[] { 0x12, 0x33, 0x0A };
+        final Account signer = new Account(new KeyPair());
+        signer.incrementBalance(1000);
+        final Account recipient = new Account(new KeyPair());
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, message);
+        transaction.setFee(10);
+
+        // Act:
+        transaction.execute();
+
+        // Assert:
+        Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
+        Assert.assertThat(recipient.getMessages().get(0).getEncryptedMessage(), IsEqual.equalTo(message));
+    }
+
+    //endregion
+
+    private TransferTransaction createRoundTrippedTransaction(
+        final Transaction originalTransaction,
+        final AccountLookup accountLookup) {
+        // Act:
+        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, accountLookup);
         deserializer.readInt("type");
         return new TransferTransaction(deserializer);
     }

@@ -49,22 +49,13 @@ public class MockTransaction extends Transaction {
     public int getCustomField() { return this.customField; }
 
     /**
-     * Sets the custom field value.
-     *
-     * @param customField The desired custom field value.
-     */
-    public void setCustomField(final int customField) { this.customField = customField; }
-
-    /**
      * Sets the minimum fee.
      * @param minimumFee The desired minimum fee.
      */
     public void setMinimumFee(final long minimumFee) { this.minimumFee = minimumFee; }
 
     @Override
-    public boolean isValid() {
-        return true;
-    }
+    public boolean isValid() { return true; }
 
     @Override
     protected long getMinimumFee() {
@@ -76,4 +67,7 @@ public class MockTransaction extends Transaction {
         super.serializeImpl(serializer);
         serializer.writeInt("customField", this.customField);
     }
+
+    @Override
+    public void execute() { }
 }

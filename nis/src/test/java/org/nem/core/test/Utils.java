@@ -94,6 +94,26 @@ public class Utils {
         final T originalEntity,
         final Account deserializedSigner) {
         // Arrange:
+        final MockAccountLookup accountLookup = new MockAccountLookup();
+        accountLookup.setMockAccount(deserializedSigner);
+
+        // Act:
+        return RoundtripVerifiableEntity(originalEntity, accountLookup);
+    }
+
+    /**
+     * Serializes originalEntity and returns an ObjectDeserializer
+     * that can deserialize it.
+     *
+     * @param originalEntity The original entity.
+     * @param accountLookup The account lookup policy to use.
+     * @param <T> The concrete VerifiableEntity type.
+     * @return The object deserializer.
+     */
+    public static <T extends VerifiableEntity> ObjectDeserializer RoundtripVerifiableEntity(
+        final T originalEntity,
+        final AccountLookup accountLookup) {
+        // Arrange:
         originalEntity.sign();
 
         // Act:
@@ -101,8 +121,6 @@ public class Utils {
         ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
         originalEntity.serialize(serializer);
 
-        final MockAccountLookup accountLookup = new MockAccountLookup();
-        accountLookup.setMockAccount(deserializedSigner);
         return new DelegatingObjectDeserializer(
             new JsonDeserializer(jsonSerializer.getObject()),
             accountLookup);

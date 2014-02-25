@@ -128,7 +128,7 @@ public class NisMain
                     share.longValue(), share.longValue(), share.longValue(), share.longValue()
 			};
 
-			Vector<Address> recipientsAddresses = new Vector<>(txIds.length);
+			Vector<Account> recipientsAccounts = new Vector<>(txIds.length);
 			Vector<org.nem.core.dbmodel.Account> recipientsDbAccounts = new Vector<>(txIds.length);
 			if (accountDao.count() == 1) {
 				for (int i=0; i<txIds.length; ++i) {
@@ -137,7 +137,7 @@ public class NisMain
 					final byte[] recipientPk = recipientKeypair.getPublicKey();
                     final Address recipientAddr = Address.fromPublicKey(recipientPk);
 
-					recipientsAddresses.add(recipientAddr);
+                    recipientsAccounts.add(new Account(recipientKeypair));
 					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipientPk));
 				}
 				accountDao.saveMulti(recipientsDbAccounts);
@@ -155,7 +155,7 @@ public class NisMain
 			
 			Vector<Transfer> transactions = new Vector<>(txIds.length);
 			for (int i=0; i<txIds.length; ++i) {
-				TransferTransaction transferTx = new TransferTransaction(genesisAccount, recipientsAddresses.get(i), amounts[i], null);
+				TransferTransaction transferTx = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
 				transferTx.setFee(0);
 
 				transferTx.sign();

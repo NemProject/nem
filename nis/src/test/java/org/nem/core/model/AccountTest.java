@@ -78,7 +78,8 @@ public class AccountTest {
 
         // Assert:
         Assert.assertThat(recipientAccount.getMessages().size(), IsEqual.equalTo(1));
-        Assert.assertThat(recipientAccount.getMessages().get(0), IsEqual.equalTo(input));
+        Assert.assertThat(recipientAccount.getMessages().get(0).getEncryptedMessage(), IsEqual.equalTo(encryptedInput));
+        Assert.assertThat(recipientAccount.getMessages().get(0).getDecryptedMessage(), IsEqual.equalTo(input));
     }
 
     @Test
@@ -100,8 +101,10 @@ public class AccountTest {
 
         // Assert:
         Assert.assertThat(recipientAccount.getMessages().size(), IsEqual.equalTo(2));
-        Assert.assertThat(recipientAccount.getMessages().get(0), IsEqual.equalTo(input1));
-        Assert.assertThat(recipientAccount.getMessages().get(1), IsEqual.equalTo(input2));
+        Assert.assertThat(recipientAccount.getMessages().get(0).getEncryptedMessage(), IsEqual.equalTo(encryptedInput1));
+        Assert.assertThat(recipientAccount.getMessages().get(0).getDecryptedMessage(), IsEqual.equalTo(input1));
+        Assert.assertThat(recipientAccount.getMessages().get(1).getEncryptedMessage(), IsEqual.equalTo(encryptedInput2));
+        Assert.assertThat(recipientAccount.getMessages().get(1).getDecryptedMessage(), IsEqual.equalTo(input2));
     }
 
     //region equals / hashCode

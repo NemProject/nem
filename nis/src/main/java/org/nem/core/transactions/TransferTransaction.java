@@ -14,7 +14,7 @@ public class TransferTransaction extends Transaction {
 
     private long amount;
     private byte[] message;
-    private Address recipient;
+    private Account recipient;
 
     /**
      * Creates a transfer transaction.
@@ -24,7 +24,7 @@ public class TransferTransaction extends Transaction {
      * @param amount The transaction amount.
      * @param message The transaction message.
      */
-    public TransferTransaction(final Account sender, final Address recipient, final long amount, final byte[] message) {
+    public TransferTransaction(final Account sender, final Account recipient, final long amount, final byte[] message) {
         super(TransactionTypes.TRANSFER, 1, sender);
         this.recipient = recipient;
         this.amount = amount;
@@ -41,7 +41,7 @@ public class TransferTransaction extends Transaction {
      */
     public TransferTransaction(final ObjectDeserializer deserializer) {
         super(TransactionTypes.TRANSFER, deserializer);
-        this.recipient = deserializer.readAddress("recipient");
+        this.recipient = deserializer.readAccount("recipient");
         this.amount = deserializer.readLong("amount");
         this.message = deserializer.readBytes("message");
     }
@@ -51,9 +51,10 @@ public class TransferTransaction extends Transaction {
      *
      * @return The recipient.
      */
-    public Address getRecipient() {
+    public Account getRecipient() {
         return this.recipient;
     }
+
     /**
      * Gets the transaction amount.
      *
@@ -70,6 +71,9 @@ public class TransferTransaction extends Transaction {
 
     @Override
     public boolean isValid() {
+        if (this.getSigner().getBalance() < this.amount + this.getFee())
+            return false;
+
         return message.length <= MAX_MESSAGE_SIZE;
     }
 
@@ -83,8 +87,17 @@ public class TransferTransaction extends Transaction {
     @Override
     protected void serializeImpl(final ObjectSerializer serializer) {
         super.serializeImpl(serializer);
-        serializer.writeAddress("recipient", this.recipient);
+        serializer.writeAccount("recipient", this.recipient);
         serializer.writeLong("amount", this.amount);
         serializer.writeBytes("message", this.message);
+    }
+
+    @Override
+    public void execute() {
+        this.getSigner().incrementBalance(-this.amount - this.getFee());
+        this.recipient.incrementBalance(this.amount);
+
+        if (0 != this.message.length)
+            this.recipient.addMessage(this.getSigner(), this.message);
     }
 }

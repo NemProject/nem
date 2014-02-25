@@ -55,6 +55,13 @@ public abstract class Transaction extends VerifiableEntity {
     }
 
     /**
+     * Executes the transaction.
+     *
+     * TODO: not sure about this api ... what do we want to happen if execution fails?
+     */
+    public abstract void execute();
+
+    /**
      * Determines if this transaction is valid.
      *
      * @return true if this transaction is valid.
