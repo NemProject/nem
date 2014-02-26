@@ -20,8 +20,7 @@ import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.http.HttpMethod;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import org.json.JSONObject;
 
 /**
  * Access remote nodes and knows about the various REST APIs
@@ -59,8 +58,8 @@ public class PeerConnector {
 	}
 
 	//TODO: Add Interceptor pattern
-	public JSONObject putNewPeer(Node node, Node peer) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
-		JSONObject response = putResponse(node.getRestURL(NodeRestIDs.REST_ADD_PEER), peer.generateNodeInfo());
+	public JSONObject postNewPeer(Node node, Node peer) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
+		JSONObject response = postResponse(node.getRestURL(NodeRestIDs.REST_ADD_PEER), peer.asJsonObject());
 		return response;
 	}
 
@@ -78,7 +77,7 @@ public class PeerConnector {
 			Response res = listener.get(30, TimeUnit.SECONDS);
 			if (res.getStatus() == 200) {
 				InputStream responseContent = listener.getInputStream();
-				retObj = (JSONObject) JSONValue.parse(responseContent);
+				retObj = new JSONObject(responseContent);
 			}
 
 		} finally {
@@ -87,31 +86,31 @@ public class PeerConnector {
 		return retObj;
 	}
 
-	private JSONObject putResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
-			ExecutionException {
-		JSONObject retObj = null;
-		try {
-			InputStreamResponseListener listener = new InputStreamResponseListener();
-
-			URI uri = url.toURI();
-			Request req = httpClient.newRequest(uri);
-
-			req.method(HttpMethod.PUT);
-			req.content(new BytesContentProvider(request.toJSONString().getBytes()), "text/plain");
-			req.send(listener);
-
-			Response res = listener.get(30, TimeUnit.SECONDS);
-			if (res.getStatus() == 200) {
-				InputStream responseContent = listener.getInputStream();
-				retObj = (JSONObject) JSONValue.parse(responseContent);
-			}
-
-		} finally {
-		}
-
-		return retObj;
-	}
-
+//	private JSONObject putResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
+//			ExecutionException {
+//		JSONObject retObj = null;
+//		try {
+//			InputStreamResponseListener listener = new InputStreamResponseListener();
+//
+//			URI uri = url.toURI();
+//			Request req = httpClient.newRequest(uri);
+//
+//			req.method(HttpMethod.PUT);
+//			req.content(new BytesContentProvider(request.toString().getBytes()), "text/plain");
+//			req.send(listener);
+//
+//			Response res = listener.get(30, TimeUnit.SECONDS);
+//			if (res.getStatus() == 200) {
+//				InputStream responseContent = listener.getInputStream();
+//				retObj = new JSONObject(responseContent);
+//			}
+//
+//		} finally {
+//		}
+//
+//		return retObj;
+//	}
+//
 	private JSONObject postResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
 			ExecutionException {
 		JSONObject retObj = null;
@@ -122,13 +121,13 @@ public class PeerConnector {
 			Request req = httpClient.newRequest(uri);
 
 			req.method(HttpMethod.POST);
-			req.content(new BytesContentProvider(request.toJSONString().getBytes()), "text/plain");
+			req.content(new BytesContentProvider(request.toString().getBytes()), "text/plain");
 			req.send(listener);
 
 			Response res = listener.get(30, TimeUnit.SECONDS);
 			if (res.getStatus() == 200) {
 				InputStream responseContent = listener.getInputStream();
-				retObj = (JSONObject) JSONValue.parse(responseContent);
+				retObj = new JSONObject(responseContent);
 			}
 
 		} finally {

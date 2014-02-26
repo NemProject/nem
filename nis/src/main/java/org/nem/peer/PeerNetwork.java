@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -16,9 +15,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * Reflects a peer network. NEM might end up with parallel multiple peer
@@ -30,7 +30,7 @@ import net.minidev.json.JSONValue;
  * 
  */
 public class PeerNetwork {
-	private static final Logger logger = Logger.getLogger(PeerNetwork.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private static PeerNetwork DEFAULT_NETWORK;
 
@@ -61,7 +61,7 @@ public class PeerNetwork {
 	}
 
 	private static PeerNetwork createDefaultNetwork() {
-		logger.fine("Configure own node.");
+		LOGGER.fine("Configure own node.");
 		Node localNode = null;
 
 		String tmpStr = null;
@@ -69,12 +69,12 @@ public class PeerNetwork {
 		InputStream fin = null;
 		fin = PeerNetwork.class.getClassLoader().getResourceAsStream("peers-config.json");
 		if (fin == null) {
-			logger.log(Level.SEVERE, "Configuration file <peers-config.json> not available.");
+			LOGGER.log(Level.SEVERE, "Configuration file <peers-config.json> not available.");
 			return null;
 		}
-		logger.info("NIS settings: ");
+		LOGGER.info("NIS settings: ");
 
-		JSONObject config = (JSONObject) JSONValue.parse(fin);
+		JSONObject config = new JSONObject(new JSONTokener(fin));
 
 		tmpStr = (String) config.get("myAddress");
 		if (tmpStr != null) {
@@ -83,7 +83,7 @@ public class PeerNetwork {
 		if (tmpStr == null || tmpStr.length() == 0) {
 			tmpStr = "localhost";
 		}
-		logger.info("  \"myAddress\" = \"" + tmpStr + "\"");
+		LOGGER.info("  \"myAddress\" = \"" + tmpStr + "\"");
 		localNode = new Node(tmpStr);
 
 		tmpStr = (String) config.get("myPlatform");
@@ -94,14 +94,15 @@ public class PeerNetwork {
 			tmpStr = tmpStr.trim();
 		}
 		localNode.setPlatform(tmpStr);
-		logger.info("  \"myPlatform\" = \"" + tmpStr + "\"");
+		LOGGER.info("  \"myPlatform\" = \"" + tmpStr + "\"");
 
-		JSONArray knownPeers = (JSONArray) config.get("knownPeers");
+		JSONArray knownPeers = config.getJSONArray("knownPeers");
 		Set<String> wellKnownPeers;
 		if (knownPeers != null) {
 			Set<String> hosts = new HashSet<String>();
-			for (Iterator<Object> i = knownPeers.iterator(); i.hasNext();) {
-				String hostEntry = (String) i.next();
+			for (int i = 0; i < knownPeers.length(); i++) {
+
+				String hostEntry = (String) knownPeers.get(i);
 				hostEntry = hostEntry.trim();
 				if (hostEntry.length() > 0) {
 					hosts.add(hostEntry);
@@ -111,7 +112,7 @@ public class PeerNetwork {
 
 		} else {
 			wellKnownPeers = Collections.emptySet();
-			logger.warning("No wellKnownPeers defined, it is unlikely to work");
+			LOGGER.warning("No wellKnownPeers defined, it is unlikely to work");
 		}
 
 		PeerNetwork network = new PeerNetwork("Default network", localNode, wellKnownPeers);
@@ -142,65 +143,177 @@ public class PeerNetwork {
 
 	/**
 	 * The peer network is being set-up. The known peers are tried to get
-	 * connected. Each peer connection will be separated in thread, that
-	 * requires that the peer network has to be shutdown, in order to have a
-	 * graceful stop.
+	 * connected. The peerNetwork gets refreshed on a scheduled time frame. This
+	 * is handled in a separate thread. Therefore the peer network requires to
+	 * get shut down, in order to have a graceful stop.
 	 * 
 	 * Initially, the number of outgoing connections is not limited.
 	 * 
 	 * Future enhancement might be that the current active network get stored in
 	 * DB for a faster start-up the next time.
 	 * 
-	 * The method can only called once. If the network does not come up, a
-	 * reboot has to be initiated (@see reboot).
+	 * The method can only called once.
 	 */
-	public void boot() {
+	public boolean boot() {
 		// check the status of the network
 		if (booted) {
 			// Just do nothing, even no exception
-			return;
+			return booted;
 		}
 
 		// First we loop through the set of defined hosts
-		PeerConnector connector = new PeerConnector();
-		Node node = null;
-		for (String peerAddr : initialPeerAddr) {
-			logger.fine("Connecting to: " + peerAddr);
-			node = new Node(peerAddr);
+		try {
+			PeerConnector connector = new PeerConnector();
+			for (String peerAddr : initialPeerAddr) {
+				addPeer(peerAddr, connector);
+			}
+			booted = true;
+
+			// Schedule the loop for refreshing
+			Refresher command = new Refresher(this);
+			executor.scheduleWithFixedDelay(command, 2, 10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			booted = false;
+		}
+
+		return booted;
+	}
+
+	/**
+	 * The peer network requires to get shutdown, in order to stop the separate
+	 * thread.
+	 * 
+	 * Future enhancement might be that the current active network gets stored
+	 * in DB for a faster start-up the next time.
+	 * 
+	 * The method can only called once.
+	 */
+	public long shutdown() {
+		// check the status of the network
+		if (!booted) {
+			// Just do nothing, even no exception
+			return 0L;
+		}
+
+		long result = 0;
+		// Check whether there is an executor available
+		if (executor != null) {
+			executor.shutdownNow();
+			result = executor.getTaskCount();
+		}
+		booted = false;
+
+		return result;
+	}
+
+	public boolean addPeer(JSONObject nodeJson, PeerConnector connector) throws InterruptedException {
+		boolean result = false;
+		Object value = nodeJson.get("address");
+
+		if (value == null) {
+			return result;
+		}
+
+		if (!(value instanceof String)) {
+			return result;
+		}
+
+		return addPeer((String) value, connector);
+	}
+
+	// TODO: local node must not be added to the list of peers, circle!!
+	public boolean addPeer(String addrStr, PeerConnector connector) throws InterruptedException {
+		boolean result = false;
+		LOGGER.fine("Connecting to: " + addrStr);
+		Node node = new Node(addrStr);
+		try {
 			if (node.verifyNEM()) {
 				// ok, so put myself into the network of node
-				try {
-					allPeers.add(node);
-					connector.putNewPeer(node, localNode);
-				} catch (URISyntaxException e) {
-					logger.warning(node.toString() + e.toString());
-					node.setState(NodeStatus.FAILURE);
-					//remove from all allPeers
-					allPeers.remove(node);
 
-				} catch (TimeoutException e) {
-					logger.warning(node.toString() + " timed out.");
-					node.setState(NodeStatus.INACTIVE);
-
-				} catch (ExecutionException e) {
-					logger.warning(node.toString() + e.toString());
-					node.setState(NodeStatus.FAILURE);
-					//remove from all allPeers
-					allPeers.remove(node);
-
-				} catch (InterruptedException e) {
-					logger.warning("Interrupted execution.");
-				}
-
+				allPeers.add(node);
+				connector.postNewPeer(node, localNode);
+				result = true;
 			} else {
-				logger.fine("Ignoring peer, no NEM peer: " + peerAddr);
+				LOGGER.fine("Ignoring peer, no NEM peer: " + node);
+			}
+
+		} catch (URISyntaxException e) {
+			LOGGER.warning(node.toString() + e.toString());
+			node.setState(NodeStatus.FAILURE);
+			// remove from allPeers
+			allPeers.remove(node);
+
+		} catch (TimeoutException e) {
+			LOGGER.warning(node.toString() + " timed out.");
+			node.setState(NodeStatus.INACTIVE);
+
+		} catch (ExecutionException e) {
+			LOGGER.warning(node.toString() + e.toString());
+			node.setState(NodeStatus.FAILURE);
+			// remove from all allPeers
+			allPeers.remove(node);
+
+		} catch (JSONException e) {
+			LOGGER.warning(node.toString() + e.toString());
+			node.setState(NodeStatus.FAILURE);
+			// remove from all allPeers
+			allPeers.remove(node);
+
+		}
+
+		return result;
+	}
+
+	/**
+	 * Refreshes the list of peers and also the state of peers.
+	 * 
+	 * Currently, it is sequential, but could be made parallel in separate
+	 * threads.
+	 * 
+	 * @param connector
+	 *            , the connector used to access the peer (remote)
+	 * @throws InterruptedException
+	 */
+	public void refreshPeerList(PeerConnector connector) throws InterruptedException {
+		LOGGER.info("Start refreshing peer list.");
+		JSONObject peerList = null;
+
+		for (Node peer : getAllPeers()) {
+			try {
+				switch (peer.getState()) {
+				case ACTIVE:
+					peerList = connector.requestPeerList(peer);
+					processPeerList(peerList, connector);
+					break;
+				case INACTIVE:
+					// maybe woke up in the meantime?
+					if (peer.verifyNEM()) {
+						peerList = connector.requestPeerList(peer);
+						processPeerList(peerList, connector);
+					}
+					break;
+				default:
+					break;
+				}
+			} catch (URISyntaxException | TimeoutException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		booted = true;
-		
-		//Schedule the loop for refreshing
-		Refresher command = new Refresher(allPeers);
-		executor.scheduleWithFixedDelay(command, 2, 10, TimeUnit.SECONDS);
+	}
+
+	private void processPeerList(JSONObject peerList, PeerConnector connector) throws InterruptedException {
+		JSONArray array = peerList.getJSONArray("active");
+		for (int i = 0; i < array.length(); i++) {
+			addPeer(array.getJSONObject(i), connector);
+		}
+
+		// Ok, let's do the same for those being inactive
+		array = peerList.getJSONArray("inactive");
+		for (int i = 0; i < array.length(); i++) {
+			addPeer(array.getJSONObject(i), connector);
+		}
+
 	}
 
 	private long countActive() {
@@ -229,10 +342,10 @@ public class PeerNetwork {
 		for (Node peer : allPeers) {
 			switch (peer.getState()) {
 			case ACTIVE:
-				allActive.add(peer.generateNodeInfo());
+				allActive.put(peer.asJsonObject());
 				break;
 			case INACTIVE:
-				allInactive.add(peer.generateNodeInfo());
+				allInactive.put(peer.asJsonObject());
 				break;
 			default:
 				break;

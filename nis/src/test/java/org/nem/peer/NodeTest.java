@@ -3,13 +3,15 @@ package org.nem.peer;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.serialization.JsonSerializer;
 
 public class NodeTest {
 
 	@Test
 	public void testNodeNULL() {
 		try {
-			new Node(null);
+			new Node((String) null);
 			fail("Creation with NULL possible.");
 		} catch (IllegalArgumentException ex) {
 			// As expected
@@ -53,7 +55,7 @@ public class NodeTest {
 		String urlStr = "127.0.0.1";
 
 		Node node = new Node(urlStr);
-		
+
 		assertNotNull(node);
 		assertNotNull(node.getAddress());
 		assertEquals(node.getState(), NodeStatus.INACTIVE);
@@ -69,5 +71,28 @@ public class NodeTest {
 		} catch (IllegalArgumentException ex) {
 			// As expected
 		}
+	}
+
+	@Test
+	public void testNodeSerialize() {
+		String urlStr = "127.0.0.1";
+		Node node = new Node(urlStr);
+		JsonSerializer serializer = new JsonSerializer();
+		node.serialize(serializer);
+		
+		JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject());
+		Node node2 = new Node(deserializer);
+		assertEquals(node.getAddress(), node2.getAddress());
+		assertEquals(node.getPlatform(), node2.getPlatform());
+		assertEquals(node.getProtocol(), node2.getProtocol());
+		assertEquals(node.getVersion(), node2.getVersion());
+	}
+
+	@Test
+	public void testNodeJson() {
+		String urlStr = "127.0.0.1";
+		Node node = new Node(urlStr);
+		
+		assertNotNull(node.asJsonObject());
 	}
 }
