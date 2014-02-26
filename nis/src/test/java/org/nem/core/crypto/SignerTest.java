@@ -1,12 +1,38 @@
 package org.nem.core.crypto;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.crypto.digests.SHA3Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.BigInteger;
 
 public class SignerTest {
+	@Test
+	public void sha3HmacUsedInSignerCreateEcdsaSigner() throws DecoderException {
+		// Arrange
+		SHA3Digest sha3 = new SHA3Digest(256);
+		HMac hMac = new HMac(sha3);
+
+		byte[] key = { 0xb,0xb,0xb,0xb, 0xb,0xb,0xb,0xb, 0xb,0xb,0xb,0xb, 0xb,0xb,0xb,0xb, 0xb,0xb,0xb,0xb };
+		byte[] data = { 0x48, 0x69, 0x20, 0x54, 0x68, 0x65, 0x72, 0x65 };
+
+		// Act:
+		hMac.init(new KeyParameter(key));
+		hMac.update(data, 0, data.length);
+		byte[] result = new byte[32];
+		hMac.doFinal(result, 0);
+
+		// Assert:
+		byte[] expectedResult = HexEncoder.getBytes("9663d10c73ee294054dc9faf95647cb99731d12210ff7075fb3d3395abfb9821");
+
+		Assert.assertArrayEquals(result, expectedResult);
+	}
 
     @Test
     public void signedDataCanBeVerified() {
