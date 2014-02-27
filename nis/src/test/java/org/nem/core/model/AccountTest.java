@@ -25,7 +25,26 @@ public class AccountTest {
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
     }
 
-    @Test
+	@Test
+	public void ctorWithUnknownPublic() {
+		// Arrange:
+		final Address expectedAccountId = Address.fromEncoded("NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW");
+		final Account account = new Account(expectedAccountId);
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
+		try {
+			Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+			Assert.fail("No exception was thrown");
+		} catch (NullPointerException ex) {
+		}
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
+		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+	}
+
+	@Test
     public void labelCanBeSet() {
         // Arrange:
         final Account account = Utils.generateRandomAccount();

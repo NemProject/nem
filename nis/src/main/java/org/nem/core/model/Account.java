@@ -21,6 +21,13 @@ public class Account {
         this.balance = 0;
     }
 
+	public Account(final Address address) {
+		this.keyPair = null;
+		this.address = address;
+		this.messages = new ArrayList<>();
+		this.balance = 0;
+	}
+
     public KeyPair getKeyPair() { return this.keyPair; }
 
     public byte[] getPublicKey() { return this.keyPair.getPublicKey(); }
