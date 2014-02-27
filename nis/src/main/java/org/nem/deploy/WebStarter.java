@@ -52,7 +52,10 @@ public class WebStarter implements ServletContextListener {
 
 	public static void main(String[] args) throws Exception {
 		logger.info("Starting embedded Jetty Server.");
-		
+
+		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
+		System.setProperty("JSON_SMART_SIMPLE", "om nem nem");
+
 		//Taken from Jetty doc 
 		QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setMaxThreads(500);
