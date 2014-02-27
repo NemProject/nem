@@ -5,6 +5,9 @@ import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
+import org.nem.core.transactions.TransferTransaction;
+
+import java.util.List;
 
 public class BlockTest {
 
@@ -23,6 +26,7 @@ public class BlockTest {
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
+        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
     }
 
     @Test
@@ -31,15 +35,52 @@ public class BlockTest {
         final Account signer = Utils.generateRandomAccount();
         final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
         final Block originalBlock = new Block(signer);
+        originalBlock.addTransaction(createSignedTransactionWithAmount(17));
+        originalBlock.addTransaction(createSignedTransactionWithAmount(290));
+        originalBlock.sign();
+
         final Block block = createRoundTrippedTransaction(originalBlock, signerPublicKeyOnly);
 
         // Assert:
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
-        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
-        // TODO: add transactions to this
+        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
+
+        final List<Transaction> transactions = block.getTransactions();
+        Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+        Assert.assertThat(((TransferTransaction)transactions.get(0)).getAmount(), IsEqual.equalTo(17L));
+        Assert.assertThat(((TransferTransaction)transactions.get(1)).getAmount(), IsEqual.equalTo(290L));
     }
+
+    private Transaction createSignedTransactionWithAmount(long amount) {
+        Transaction transaction = new TransferTransaction(
+            Utils.generateRandomAccount(),
+            Utils.generateRandomAccount(),
+            amount,
+            null);
+        transaction.sign();
+        return transaction;
+    }
+
+    //endregion
+
+    //region Transaction
+
+    @Test
+    public void transactionsCanBeAddedToBlock() {
+        // Arrange:
+        Block block = new Block(Utils.generateRandomAccount());
+        Transaction transaction = createTransactionWithFee(17);
+
+        // Act:
+        block.addTransaction(transaction);
+
+        // Assert:
+        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(1));
+        Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
+    }
+
 
     //endregion
 

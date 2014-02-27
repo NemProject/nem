@@ -89,7 +89,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
         try {
             byte[] bytes = this.readBytes(null);
             try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes, this.getContext())) {
-                return activator.deserialize(deserializer, null);
+                return activator.deserialize(deserializer);
             }
         }
         catch (Exception ex) {

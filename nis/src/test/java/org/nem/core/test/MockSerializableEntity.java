@@ -69,7 +69,7 @@ public class MockSerializableEntity implements SerializableEntity {
     public static class Activator implements ObjectDeserializer<MockSerializableEntity> {
 
         @Override
-        public MockSerializableEntity deserialize(final Deserializer deserializer, final DeserializationContext context) {
+        public MockSerializableEntity deserialize(final Deserializer deserializer) {
             return new MockSerializableEntity(deserializer);
         }
     }
