@@ -274,6 +274,8 @@ public class BinarySerializerTest {
 
     //endregion
 
+    //region Roundtrip Multiple
+
     @Test
     public void canRoundtripMultipleValues() throws Exception {
         // Arrange:
@@ -298,6 +300,44 @@ public class BinarySerializerTest {
         }
     }
 
+    //endregion
+
+    //region Context
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsUsed() throws Exception {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+
+        // Act:
+        try (BinaryDeserializer deserializer = new BinaryDeserializer(new byte[] { }, context)) {
+            // Assert:
+            Assert.assertThat(deserializer.getContext(), IsEqual.equalTo(context));
+        }
+    }
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsPassedToChildDeserializer() throws Exception {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            serializer.writeObject("test", new MockSerializableEntity(7, "a", 12));
+
+            // Act:
+            try (BinaryDeserializer deserializer = new BinaryDeserializer(serializer.getBytes(), context)) {
+                MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
+                deserializer.readObject("test", objectDeserializer);
+
+                // Assert:
+                Assert.assertThat(objectDeserializer.getLastContext(), IsEqual.equalTo(context));
+            }
+        }
+    }
+
+    //endregion
+
+    //region HasMoreData
+
     @Test
     public void deserializerInitiallyHasMoreData() throws Exception {
         // Arrange:
@@ -311,6 +351,10 @@ public class BinarySerializerTest {
             }
         }
     }
+
+    //endregion
+
+    //region Corrupt Data Handling
 
     @Test(expected=SerializationException.class)
     public void readOfPrimitiveTypeFailsIfStreamIsTooSmall() throws Exception {
@@ -329,6 +373,8 @@ public class BinarySerializerTest {
             deserializer.readBytes("bytes");
         }
     }
+
+    //endregion
 
     private BinaryDeserializer createBinaryDeserializer(final byte[] bytes) throws Exception {
         return new BinaryDeserializer(bytes, null);

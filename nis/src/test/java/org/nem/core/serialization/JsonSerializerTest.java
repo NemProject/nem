@@ -304,6 +304,39 @@ public class JsonSerializerTest {
 
     //endregion
 
+    //region Context
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsUsed() {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+
+        // Act:
+        JsonDeserializer deserializer = new JsonDeserializer(new JSONObject(), context);
+
+        // Assert:
+        Assert.assertThat(deserializer.getContext(), IsEqual.equalTo(context));
+    }
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsPassedToChildDeserializer() {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+        JsonSerializer serializer = new JsonSerializer();
+        serializer.writeObject("test", new MockSerializableEntity(7, "a", 12));
+
+        // Act:
+        JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), context);
+        MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
+        deserializer.readObject("test", objectDeserializer);
+
+        // Assert:
+        Assert.assertThat(objectDeserializer.getLastContext(), IsEqual.equalTo(context));
+
+    }
+
+    //endregion
+
     //region Order Enforcement
 
     @Test

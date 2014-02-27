@@ -68,8 +68,18 @@ public class MockSerializableEntity implements SerializableEntity {
      */
     public static class Activator implements ObjectDeserializer<MockSerializableEntity> {
 
+        private DeserializationContext lastContext;
+
+        /**
+         * Gets the last deserialization context passed to deserialize.
+         *
+         * @return The last deserialization context passed to deserialize
+         */
+        public DeserializationContext getLastContext() { return this.lastContext; }
+
         @Override
         public MockSerializableEntity deserialize(final Deserializer deserializer) {
+            this.lastContext = deserializer.getContext();
             return new MockSerializableEntity(deserializer);
         }
     }
