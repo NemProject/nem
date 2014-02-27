@@ -20,7 +20,8 @@ import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.http.HttpMethod;
 
-import org.json.JSONObject;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 
 /**
  * Access remote nodes and knows about the various REST APIs
@@ -77,7 +78,7 @@ public class PeerConnector {
 			Response res = listener.get(30, TimeUnit.SECONDS);
 			if (res.getStatus() == 200) {
 				InputStream responseContent = listener.getInputStream();
-				retObj = new JSONObject(responseContent);
+				retObj = (JSONObject) JSONValue.parse(responseContent);
 			}
 
 		} finally {
@@ -127,7 +128,7 @@ public class PeerConnector {
 			Response res = listener.get(30, TimeUnit.SECONDS);
 			if (res.getStatus() == 200) {
 				InputStream responseContent = listener.getInputStream();
-				retObj = new JSONObject(responseContent);
+				retObj = (JSONObject) JSONValue.parse(responseContent);
 			}
 
 		} finally {

@@ -72,7 +72,7 @@ public class PeerNetwork {
 		}
 		LOGGER.info("NIS settings: ");
 
-		JSONObject config = new JSONObject(new JSONTokener(fin));
+		JSONObject config = (JSONObject) JSONValue.parse(fin);
 
 		tmpStr = (String) config.get("myAddress");
 		if (tmpStr != null) {
@@ -98,7 +98,7 @@ public class PeerNetwork {
 		Set<String> wellKnownPeers;
 		if (knownPeers != null) {
 			Set<String> hosts = new HashSet<String>();
-			for (int i = 0; i < knownPeers.length(); i++) {
+			for (int i = 0; i < knownPeers.size(); i++) {
 
 				String hostEntry = (String) knownPeers.get(i);
 				hostEntry = hostEntry.trim();
@@ -251,12 +251,6 @@ public class PeerNetwork {
 			// remove from all allPeers
 			allPeers.remove(node);
 
-		} catch (JSONException e) {
-			LOGGER.warning(node.toString() + e.toString());
-			node.setState(NodeStatus.FAILURE);
-			// remove from all allPeers
-			allPeers.remove(node);
-
 		}
 
 		return result;
@@ -301,15 +295,15 @@ public class PeerNetwork {
 	}
 
 	private void processPeerList(JSONObject peerList, PeerConnector connector) throws InterruptedException {
-		JSONArray array = peerList.getJSONArray("active");
-		for (int i = 0; i < array.length(); i++) {
-			addPeer(array.getJSONObject(i), connector);
+		JSONArray array = (JSONArray) peerList.get("active");
+		for (int i = 0; i < array.size(); i++) {
+			addPeer((JSONObject)array.get(i), connector);
 		}
 
 		// Ok, let's do the same for those being inactive
-		array = peerList.getJSONArray("inactive");
-		for (int i = 0; i < array.length(); i++) {
-			addPeer(array.getJSONObject(i), connector);
+		array = (JSONArray) peerList.get("inactive");
+		for (int i = 0; i < array.size(); i++) {
+			addPeer((JSONObject)array.get(i), connector);
 		}
 
 	}

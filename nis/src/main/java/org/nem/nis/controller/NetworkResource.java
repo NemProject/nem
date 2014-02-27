@@ -1,8 +1,6 @@
 package org.nem.nis.controller;
 
-import org.json.JSONObject;
-
-import org.nem.peer.Node;
+import net.minidev.json.JSONObject;
 import org.nem.peer.PeerNetwork;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -15,7 +15,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONObject;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
@@ -71,10 +73,10 @@ public class Node implements SerializableEntity {
 
 	//TODO: Work-around as long as J's serializer is not extended to have arrays serialized.
 	public Node(JSONObject jsonNode) {
-		this.address = jsonNode.getString("address");
-		this.platform = jsonNode.getString("platform");
-		this.protocol = jsonNode.getInt("protocol");
-		this.version = jsonNode.getString("version");
+		this.address = (String) jsonNode.get("address");
+		this.platform = (String) jsonNode.get("platform");
+		this.protocol = (Integer) jsonNode.get("protocol");
+		this.version = (String) jsonNode.get("version");
 
 		populateURLs(address);
 

@@ -1,7 +1,6 @@
 package org.nem.nis.controller;
 
-import org.json.JSONObject;
-
+import net.minidev.json.JSONObject;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.peer.Node;
 import org.nem.peer.PeerNetwork;

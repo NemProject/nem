@@ -3,12 +3,9 @@
  */
 package org.nem.peer;
 
-import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
+import net.minidev.json.JSONObject;
 
-import org.json.JSONObject;
+import java.util.logging.Logger;
 
 /**
  * Walks through the list of nodes and refreshes list of peers

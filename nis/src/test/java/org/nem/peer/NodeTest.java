@@ -80,7 +80,7 @@ public class NodeTest {
 		JsonSerializer serializer = new JsonSerializer();
 		node.serialize(serializer);
 		
-		JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject());
+		JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 		Node node2 = new Node(deserializer);
 		assertEquals(node.getAddress(), node2.getAddress());
 		assertEquals(node.getPlatform(), node2.getPlatform());
