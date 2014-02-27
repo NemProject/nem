@@ -228,7 +228,7 @@ public class TransferTransactionTest {
 
         // Assert:
         Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
-        Assert.assertThat(recipient.getMessages().get(0).getEncryptedMessage(), IsEqual.equalTo(message));
+        Assert.assertThat(recipient.getMessages().get(0).getRawMessage(), IsEqual.equalTo(message));
     }
 
     //endregion

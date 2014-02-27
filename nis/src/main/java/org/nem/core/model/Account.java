@@ -37,7 +37,7 @@ public class Account {
 
     public List<Message> getMessages() { return this.messages; }
     public void addMessage(final Account sender, byte[] message) {
-        this.messages.add(new Message(this.keyPair, sender, message));
+        this.messages.add(new Message(this.keyPair, sender.getPublicKey(), message));
     }
 
     @Override
@@ -52,39 +52,5 @@ public class Account {
 
         Account rhs = (Account)obj;
         return this.address.equals(rhs.address);
-    }
-
-    /**
-     * A message sent from one account to another.
-     */
-    public class Message {
-        private final KeyPair recipientKeyPair;
-        private final byte[] senderPublicKey;
-        private final byte[] message;
-
-        public Message(final KeyPair recipientKeyPair, final Account sender, byte[] message) {
-            this.recipientKeyPair = recipientKeyPair;
-            this.senderPublicKey = sender.getPublicKey();
-            this.message = message;
-        }
-
-        /**
-         * Gets the raw encrypted message.
-         *
-         * @return The raw encrypted message.
-         */
-        public byte[] getEncryptedMessage() {
-            return this.message;
-        }
-
-        /**
-         * Gets the decrypted message.
-         *
-         * @return The decrypted message.
-         */
-        public byte[] getDecryptedMessage() {
-            Cipher cipher = new Cipher(new KeyPair(this.senderPublicKey), this.recipientKeyPair);
-            return cipher.decrypt(message);
-        }
     }
 }
