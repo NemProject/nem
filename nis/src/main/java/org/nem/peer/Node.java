@@ -3,33 +3,23 @@
  */
 package org.nem.peer;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-
-import org.eclipse.jetty.http.HttpMethod;
-import org.eclipse.jetty.client.util.BytesContentProvider;
-import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
-import org.eclipse.jetty.client.HttpClient;
+import org.json.JSONObject;
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.serialization.Serializer;
 import org.nem.deploy.WebStarter;
 
 /**
@@ -60,6 +50,39 @@ public class Node implements Serializable {
 	private transient long successfulCalls;
 	private transient long failedCalls;
 
+	/**
+	 * Deserializes a node.
+	 * 
+	 * @param deserializer
+	 *            The deserializer.
+	 */
+	public Node(final Deserializer deserializer) {
+		this.address = deserializer.readString("address");
+		this.platform = deserializer.readString("platform");
+		this.protocol = deserializer.readInt("protocol");
+		this.version = deserializer.readString("version");
+
+		populateURLs(address);
+
+		// Hope all addressing issues are identified,
+		// so the instance is valid.
+		state = NodeStatus.INACTIVE;
+	}
+
+	//TODO: Work-around as long as J's serializer is not extended to have arrays serialized.
+	public Node(JSONObject jsonNode) {
+		this.address = jsonNode.getString("address");
+		this.platform = jsonNode.getString("platform");
+		this.protocol = jsonNode.getInt("protocol");
+		this.version = jsonNode.getString("version");
+
+		populateURLs(address);
+
+		// Hope all addressing issues are identified,
+		// so the instance is valid.
+		state = NodeStatus.INACTIVE;
+	}
+
 	public Node(String addrStr) {
 		super();
 
@@ -72,12 +95,23 @@ public class Node implements Serializable {
 			throw new IllegalArgumentException("Node requires an address. An empty address is not supported.");
 		}
 
+		populateURLs(addrStr);
+
+		// Hope all addressing issues are identified,
+		// so the instance is valid.
+		state = NodeStatus.INACTIVE;
+		protocol = WebStarter.NEM_PROTOCOL;
+		platform = "";
+		version = "";
+
+	}
+
+	private void populateURLs(String addrStr) {
 		try {
 			baseURL = new URL("http", addrStr, WebStarter.NEM_PORT, "/");
-			InetAddress netAddr = InetAddress.getByName(addrStr);
+			InetAddress.getByName(addrStr); // For verification purposes
 
 			address = addrStr;
-
 			restURLs = new Hashtable<NodeRestIDs, URL>();
 			restURLs.put(NodeRestIDs.REST_NODE_INFO, new URL(baseURL, "node/info"));
 			restURLs.put(NodeRestIDs.REST_ADD_PEER, new URL(baseURL, "peer/new"));
@@ -91,11 +125,6 @@ public class Node implements Serializable {
 			logger.warning("Peer address not valid: <" + addrStr + ">");
 			throw new IllegalArgumentException("Peer address unknown: <" + addrStr + ">");
 		}
-
-		// Hope all addressing issues are identified,
-		// so the instance is valid.
-		state = NodeStatus.INACTIVE;
-
 	}
 
 	public String getAddress() {
@@ -127,68 +156,6 @@ public class Node implements Serializable {
 		state = status;
 	}
 
-	private JSONObject getResponse(URL url) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
-		HttpClient httpClient = new HttpClient();
-		httpClient.setFollowRedirects(false);
-		try {
-			httpClient.start();
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		JSONObject retObj = null;
-
-		try {
-			InputStreamResponseListener listener = new InputStreamResponseListener();
-
-			URI uri = url.toURI();
-			Request req = httpClient.newRequest(uri);
-			req.method(HttpMethod.GET);
-			req.send(listener);
-
-			Response res = listener.get(30, TimeUnit.SECONDS);
-			if (res.getStatus() == 200) {
-				InputStream responseContent = listener.getInputStream();
-				retObj = (JSONObject) JSONValue.parse(responseContent);
-			}
-
-		} finally {
-
-		}
-		return retObj;
-	}
-
-	private JSONObject putResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
-			ExecutionException {
-		HttpClient httpClient = new HttpClient();
-		httpClient.setFollowRedirects(false);
-		try {
-			httpClient.start();
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		JSONObject retObj = null;
-		try {
-			InputStreamResponseListener listener = new InputStreamResponseListener();
-
-			URI uri = url.toURI();
-			Request req = httpClient.newRequest(uri);
-
-			req.method(HttpMethod.POST);
-			req.content(new BytesContentProvider(request.toJSONString().getBytes()), "text/plain");
-			req.send(listener);
-
-			Response res = listener.get(30, TimeUnit.SECONDS);
-			if (res.getStatus() == 200) {
-				InputStream responseContent = listener.getInputStream();
-				retObj = (JSONObject) JSONValue.parse(responseContent);
-			}
-
-		} finally {
-		}
-
-		return retObj;
-	}
-
 	public String toString() {
 		StringBuilder strB = new StringBuilder();
 		strB.append("Node ").append(address.toString());
@@ -197,16 +164,28 @@ public class Node implements Serializable {
 		return strB.toString();
 	}
 
-	public JSONObject generateNodeInfo() {
-		JSONObject obj = new JSONObject();
-		obj.put("protocol", protocol);
-		obj.put("application", WebStarter.APP_NAME);
-		obj.put("version", version);
-		obj.put("platform", platform);
-		obj.put("address", address);
-		// obj.put("port","7676");
-		// obj.put("shareAddress", new Boolean(false));
-		return obj;
+	/**
+	 * Serializes this object.
+	 * 
+	 * @param serializer
+	 *            The serializer to use.
+	 */
+	public void serialize(final Serializer serializer) {
+		serializer.writeInt("protocol", protocol);
+		serializer.writeString("application", WebStarter.APP_NAME);
+		serializer.writeString("version", version);
+		serializer.writeString("platform", platform);
+		serializer.writeString("address", address);
+	}
+
+	/**
+	 * Short cut for creating JsonSerializer and serialize this.
+	 * 
+	 */
+	public JSONObject asJsonObject() {
+		JsonSerializer serializer = new JsonSerializer();
+		serialize(serializer);
+		return serializer.getObject();
 	}
 
 	//
@@ -215,8 +194,8 @@ public class Node implements Serializable {
 
 		// We verify by getting the Information from the peer
 		try {
-			ClientConnector connector = new ClientConnector();
-			
+			PeerConnector connector = new PeerConnector();
+
 			JSONObject response = connector.requestNodeInfo(this);
 
 			result = true;

@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import net.minidev.json.JSONObject;
+import org.json.JSONObject;
 
 import org.nem.peer.Node;
 import org.nem.peer.PeerNetwork;
@@ -26,7 +26,7 @@ public class NetworkResource {
     	
     	JSONObject obj= peerNetwork.generatePeerList();
 		
-        return obj.toJSONString() + "\r\n";
+        return obj.toString() + "\r\n";
     }
 	
 }

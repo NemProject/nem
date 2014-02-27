@@ -2,7 +2,7 @@
 	"_info": "commented fields are proceeded with '_'",
 	
 	"myPort": 7890,
-	"_myAddress": "nemcoin.info",
+	"myAddress": "nemcoin.info",
 	"myPlatform": "ZX Spectrum",
 	"knownPeers": [ "37.187.70.29" ],
 	
