@@ -15,7 +15,7 @@ public class TransactionFactory {
      * @param deserializer The deserializer.
      * @return The deserialized transaction.
      */
-    public static Transaction Deserialize(ObjectDeserializer deserializer) {
+    public static Transaction Deserialize(Deserializer deserializer) {
         int type = deserializer.readInt("type");
 
         switch (type) {

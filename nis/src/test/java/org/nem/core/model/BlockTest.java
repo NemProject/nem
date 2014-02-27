@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.serialization.ObjectDeserializer;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 
 public class BlockTest {
@@ -72,7 +71,7 @@ public class BlockTest {
         Block originalBlock,
         final Account deserializedSigner) {
         // Act:
-        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalBlock, deserializedSigner);
+        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalBlock, deserializedSigner);
         return new Block(deserializer.readInt("type"), deserializer);
     }
 }

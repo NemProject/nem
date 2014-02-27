@@ -26,7 +26,7 @@ public abstract class Transaction extends VerifiableEntity {
      * @param type The transaction type.
      * @param deserializer The deserializer to use.
      */
-    public Transaction(final int type, final ObjectDeserializer deserializer) {
+    public Transaction(final int type, final Deserializer deserializer) {
         super(type, deserializer);
         this.fee = deserializer.readLong("fee");
     }
@@ -50,7 +50,7 @@ public abstract class Transaction extends VerifiableEntity {
     //endregion
 
     @Override
-    protected void serializeImpl(final ObjectSerializer serializer) {
+    protected void serializeImpl(final Serializer serializer) {
         serializer.writeLong("fee", this.getFee());
     }
 

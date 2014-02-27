@@ -4,6 +4,7 @@ import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * A json serializer that supports forward-only serialization.
@@ -59,6 +60,26 @@ public class JsonSerializer implements Serializer {
     public void writeString(final String label, final String s) {
         this.pushLabel(label);
         this.object.put(label, s);
+    }
+
+    @Override
+    public void writeObject(final String label, final SerializableEntity object) {
+        this.object.put(label, serializeObject(object));
+    }
+
+    @Override
+    public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects) {
+        JSONArray jsonObjects = new JSONArray();
+        for (SerializableEntity object : objects)
+            jsonObjects.add(serializeObject(object));
+
+        this.object.put(label, jsonObjects);
+    }
+
+    private static JSONObject serializeObject(final SerializableEntity object) {
+        JsonSerializer serializer = new JsonSerializer();
+        object.serialize(serializer);
+        return serializer.getObject();
     }
 
     /**

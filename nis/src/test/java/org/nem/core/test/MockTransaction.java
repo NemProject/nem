@@ -36,7 +36,7 @@ public class MockTransaction extends Transaction {
      *
      * @param deserializer The deserializer to use.
      */
-    public MockTransaction(final ObjectDeserializer deserializer) {
+    public MockTransaction(final Deserializer deserializer) {
         super(deserializer.readInt("type"), deserializer);
         this.customField = deserializer.readInt("customField");
     }
@@ -63,7 +63,7 @@ public class MockTransaction extends Transaction {
     }
 
     @Override
-    protected void serializeImpl(ObjectSerializer serializer) {
+    protected void serializeImpl(Serializer serializer) {
         super.serializeImpl(serializer);
         serializer.writeInt("customField", this.customField);
     }

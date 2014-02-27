@@ -108,7 +108,7 @@ public class Utils {
      * @param <T> The concrete VerifiableEntity type.
      * @return The object deserializer.
      */
-    public static <T extends VerifiableEntity> ObjectDeserializer RoundtripVerifiableEntity(
+    public static <T extends VerifiableEntity> Deserializer RoundtripVerifiableEntity(
         final T originalEntity,
         final Account deserializedSigner) {
         // Arrange:
@@ -128,7 +128,7 @@ public class Utils {
      * @param <T> The concrete VerifiableEntity type.
      * @return The object deserializer.
      */
-    public static <T extends VerifiableEntity> ObjectDeserializer RoundtripVerifiableEntity(
+    public static <T extends VerifiableEntity> Deserializer RoundtripVerifiableEntity(
         final T originalEntity,
         final AccountLookup accountLookup) {
         // Arrange:
@@ -136,11 +136,7 @@ public class Utils {
 
         // Act:
         JsonSerializer jsonSerializer = new JsonSerializer(true);
-        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
-        originalEntity.serialize(serializer);
-
-        return new DelegatingObjectDeserializer(
-            new JsonDeserializer(jsonSerializer.getObject()),
-            accountLookup);
+        originalEntity.serialize(jsonSerializer);
+        return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
     }
 }

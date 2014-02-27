@@ -3,9 +3,11 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.*;
 
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
+import java.util.*;
 
 public class JsonSerializerTest {
 
@@ -80,6 +82,54 @@ public class JsonSerializerTest {
         final JSONObject object = serializer.getObject();
         Assert.assertThat(object.size(), IsEqual.equalTo(1));
         Assert.assertThat((String)object.get("String"), IsEqual.equalTo("BEta"));
+    }
+
+    @Test
+    public void canWriteObject() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
+
+        // Assert:
+        final JSONObject object = serializer.getObject();
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        assertMockSerializableJsonObject((JSONObject) object.get("SerializableEntity"), 17, "foo", 42);
+    }
+
+    @Test
+    public void canWriteObjectArray() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+        List<SerializableEntity> originalObjects = new ArrayList<>();
+        originalObjects.add(new MockSerializableEntity(17, "foo", 42));
+        originalObjects.add(new MockSerializableEntity(111, "bar", 22));
+        originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
+
+        // Act:
+        serializer.writeObjectArray("SerializableArray", originalObjects);
+
+        // Assert:
+        final JSONObject object = serializer.getObject();
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+
+        final JSONArray serializableArray = (JSONArray)object.get("SerializableArray");
+        Assert.assertThat(serializableArray.size(), IsEqual.equalTo(3));
+        assertMockSerializableJsonObject((JSONObject)serializableArray.get(0), 17, "foo", 42);
+        assertMockSerializableJsonObject((JSONObject)serializableArray.get(1), 111, "bar", 22);
+        assertMockSerializableJsonObject((JSONObject)serializableArray.get(2), 1, "alpha", 34);
+    }
+
+    private static void assertMockSerializableJsonObject(
+        JSONObject object,
+        int expectedIntValue,
+        String expectedStringValue,
+        long expectedLongValue) {
+        // Assert:
+        Assert.assertThat((Integer)object.get("int"), IsEqual.equalTo(expectedIntValue));
+        Assert.assertThat((String)object.get("s"), IsEqual.equalTo(expectedStringValue));
+        Assert.assertThat((Long)object.get("long"), IsEqual.equalTo(expectedLongValue));
     }
 
     //endregion
@@ -179,7 +229,46 @@ public class JsonSerializerTest {
         Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
     }
 
+    @Test
+    public void canRoundtripObject() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
+
+        // Assert:
+        CustomAsserts.assertMockSerializableEntity(object, 17, "foo", 42L);
+    }
+
+    @Test
+    public void canRoundtripObjectArray() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+        List<SerializableEntity> originalObjects = new ArrayList<>();
+        originalObjects.add(new MockSerializableEntity(17, "foo", 42));
+        originalObjects.add(new MockSerializableEntity(111, "bar", 22));
+        originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
+
+        // Act:
+        serializer.writeObjectArray("SerializableArray", originalObjects);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
+
+        // Assert:
+        Assert.assertThat(objects.size(), IsEqual.equalTo(3));
+        CustomAsserts.assertMockSerializableEntity(objects.get(0), 17, "foo", 42L);
+        CustomAsserts.assertMockSerializableEntity(objects.get(1), 111, "bar", 22L);
+        CustomAsserts.assertMockSerializableEntity(objects.get(2), 1, "alpha", 34L);
+    }
+
     //endregion
+
+    //region Roundtrip Multiple
 
     @Test
     public void canRoundtripMultipleValues() {
@@ -212,6 +301,8 @@ public class JsonSerializerTest {
         Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
         Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
     }
+
+    //endregion
 
     //region Order Enforcement
 
@@ -279,6 +370,6 @@ public class JsonSerializerTest {
     //endregion
 
     private JsonDeserializer createJsonDeserializer(final JSONObject object) {
-        return new JsonDeserializer(object);
+        return new JsonDeserializer(object, null);
     }
 }

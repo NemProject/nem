@@ -1,6 +1,7 @@
 package org.nem.core.serialization;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * An interface for forward-only serialization of primitive data types.
@@ -47,4 +48,20 @@ public interface Serializer {
      * @param s The value.
      */
     public void writeString(final String label, final String s);
+
+    /**
+     * Writes an object value.
+     *
+     * @param label The optional name of the value.
+     * @param object The value.
+     */
+    public void writeObject(final String label, final SerializableEntity object);
+
+    /**
+     * Writes an array of object values.
+     *
+     * @param label The optional name of the value.
+     * @param objects The array.
+     */
+    public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects);
 }

@@ -5,6 +5,8 @@ import org.nem.core.utils.StringEncoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
+
 /**
  * A binary serializer that supports forward-only serialization.
  */
@@ -53,8 +55,32 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     }
 
     @Override
+    public void writeObject(final String label, final SerializableEntity object) {
+        this.writeBytes(null, serializeObject(object));
+    }
+
+    @Override
+    public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects) {
+        this.writeInt(null, objects.size());
+        for (SerializableEntity object : objects)
+            this.writeBytes(null, serializeObject(object));
+    }
+
+    @Override
     public void close() throws IOException {
         this.stream.close();
+    }
+
+    private static byte[] serializeObject(final SerializableEntity object) {
+        try {
+            try (BinarySerializer serializer = new BinarySerializer()) {
+                object.serialize(serializer);
+                return serializer.getBytes();
+            }
+        }
+        catch (Exception ex) {
+            throw new SerializationException(ex);
+        }
     }
 
     /**

@@ -237,7 +237,7 @@ public class TransferTransactionTest {
         final Transaction originalTransaction,
         final AccountLookup accountLookup) {
         // Act:
-        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, accountLookup);
+        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, accountLookup);
         deserializer.readInt("type");
         return new TransferTransaction(deserializer);
     }
