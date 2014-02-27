@@ -1,9 +1,10 @@
 package org.nem.core.serialization;
 
-import org.json.*;
+import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * A json serializer that supports forward-only serialization.
@@ -61,13 +62,35 @@ public class JsonSerializer implements Serializer {
         this.object.put(label, s);
     }
 
+    @Override
+    public void writeObject(final String label, final SerializableEntity object) {
+        this.object.put(label, serializeObject(object));
+    }
+
+    @Override
+    public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects) {
+        JSONArray jsonObjects = new JSONArray();
+        for (SerializableEntity object : objects)
+            jsonObjects.add(serializeObject(object));
+
+        this.object.put(label, jsonObjects);
+    }
+
+    private static JSONObject serializeObject(final SerializableEntity object) {
+        JsonSerializer serializer = new JsonSerializer();
+        object.serialize(serializer);
+        return serializer.getObject();
+    }
+
     /**
      * Gets the underlying JSON object.
      *
      * @return The underlying JSON object.
      */
     public JSONObject getObject() {
-        this.object.putOpt(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
+        if (null != this.propertyOrderArray)
+            this.object.put(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
+
         return this.object;
     }
 
@@ -75,6 +98,6 @@ public class JsonSerializer implements Serializer {
         if (null == this.propertyOrderArray)
             return;
 
-        this.propertyOrderArray.put(label);
+        this.propertyOrderArray.add(label);
     }
 }

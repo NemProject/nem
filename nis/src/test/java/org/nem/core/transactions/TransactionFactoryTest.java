@@ -1,9 +1,8 @@
 package org.nem.core.transactions;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.json.*;
+import net.minidev.json.*;
+import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -17,7 +16,7 @@ public class TransactionFactoryTest {
         // Arrange:
         JSONObject object = new JSONObject();
         object.put("type", 7);
-        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(new JsonDeserializer(object), new MockAccountLookup());
+        JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
         // Act:
         TransactionFactory.Deserialize(deserializer);
@@ -32,13 +31,12 @@ public class TransactionFactoryTest {
         Transaction originalTransaction = new TransferTransaction(sender, recipient, 100, null);
         originalTransaction.sign();
 
-        JsonSerializer jsonSerializer = new JsonSerializer();
-        ObjectSerializer serializer = new DelegatingObjectSerializer(jsonSerializer);
+        JsonSerializer serializer = new JsonSerializer();
         originalTransaction.serialize(serializer);
 
-        ObjectDeserializer deserializer = new DelegatingObjectDeserializer(
-            new JsonDeserializer(jsonSerializer.getObject()),
-            new MockAccountLookup());
+        JsonDeserializer deserializer = new JsonDeserializer(
+            serializer.getObject(),
+            new DeserializationContext(new MockAccountLookup()));
 
         // Act:
         Transaction transaction = TransactionFactory.Deserialize(deserializer);

@@ -5,9 +5,7 @@ package org.nem.peer;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -15,10 +13,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+import org.nem.core.serialization.JsonSerializer;
 
 /**
  * Reflects a peer network. NEM might end up with parallel multiple peer
@@ -96,7 +94,7 @@ public class PeerNetwork {
 		localNode.setPlatform(tmpStr);
 		LOGGER.info("  \"myPlatform\" = \"" + tmpStr + "\"");
 
-		JSONArray knownPeers = config.getJSONArray("knownPeers");
+		JSONArray knownPeers = (JSONArray) config.get("knownPeers");
 		Set<String> wellKnownPeers;
 		if (knownPeers != null) {
 			Set<String> hosts = new HashSet<String>();
@@ -336,23 +334,24 @@ public class PeerNetwork {
 	}
 
 	public JSONObject generatePeerList() {
-		JSONObject result = new JSONObject();
-		JSONArray allInactive = new JSONArray();
-		JSONArray allActive = new JSONArray();
+		JsonSerializer serializer = new JsonSerializer();
+		List<Node> allInactive = new ArrayList<>();
+		List<Node> allActive = new ArrayList<>();
 		for (Node peer : allPeers) {
 			switch (peer.getState()) {
 			case ACTIVE:
-				allActive.put(peer.asJsonObject());
+				allActive.add(peer);
 				break;
 			case INACTIVE:
-				allInactive.put(peer.asJsonObject());
+				allInactive.add(peer);
 				break;
 			default:
 				break;
 			}
 		}
-		result.put("active", allActive);
-		result.put("inactive", allInactive);
-		return result;
+
+		serializer.writeObjectArray("active", allActive);
+		serializer.writeObjectArray("inactive", allInactive);
+		return serializer.getObject();
 	}
 }

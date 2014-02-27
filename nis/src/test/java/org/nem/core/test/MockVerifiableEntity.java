@@ -35,7 +35,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
      *
      * @param deserializer The deserializer to use.
      */
-    public MockVerifiableEntity(final ObjectDeserializer deserializer) {
+    public MockVerifiableEntity(final Deserializer deserializer) {
         super(deserializer.readInt("type"), deserializer);
         this.customField = deserializer.readInt("customField");
     }
@@ -55,7 +55,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
     public void setCustomField(final int customField) { this.customField = customField; }
 
     @Override
-    protected void serializeImpl(ObjectSerializer serializer) {
+    protected void serializeImpl(Serializer serializer) {
         serializer.writeInt("customField", this.customField);
     }
 }

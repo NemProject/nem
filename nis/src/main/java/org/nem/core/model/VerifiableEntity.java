@@ -9,7 +9,7 @@ import java.security.InvalidParameterException;
  * Base class for all entities that need to be verified
  * (e.g. blocks and transactions).
  */
-public abstract class VerifiableEntity {
+public abstract class VerifiableEntity implements SerializableEntity {
 
     private final int version;
     private final int type;
@@ -40,11 +40,11 @@ public abstract class VerifiableEntity {
      * @param type The transaction type.
      * @param deserializer The deserializer to use.
      */
-    public VerifiableEntity(final int type, final ObjectDeserializer deserializer) {
+    public VerifiableEntity(final int type, final Deserializer deserializer) {
         this.type = type;
         this.version = deserializer.readInt("version");
-        this.signer = deserializer.readAccount("signer");
-        this.signature = deserializer.readSignature("signature");
+        this.signer = SerializationUtils.readAccount(deserializer, "signer");
+        this.signature = SerializationUtils.readSignature(deserializer, "signature");
     }
 
     //endregion
@@ -81,12 +81,8 @@ public abstract class VerifiableEntity {
 
     //endregion
 
-    /**
-     * Serializes this object.
-     *
-     * @param serializer The serializer to use.
-     */
-    public void serialize(final ObjectSerializer serializer) {
+    @Override
+    public void serialize(final Serializer serializer) {
         if (null == this.signature)
             throw new SerializationException("cannot serialize a transaction without a signature");
 
@@ -99,13 +95,13 @@ public abstract class VerifiableEntity {
      * @param serializer The serializer to use.
      * @param includeSignature true if the serialization should include the signature.
      */
-    private void serialize(final ObjectSerializer serializer, boolean includeSignature) {
+    private void serialize(final Serializer serializer, boolean includeSignature) {
         serializer.writeInt("type", this.getType());
         serializer.writeInt("version", this.getVersion());
-        serializer.writeAccount("signer", this.getSigner());
+        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
 
         if (includeSignature)
-            serializer.writeSignature("signature", this.getSignature());
+            SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
 
         this.serializeImpl(serializer);
     }
@@ -115,7 +111,7 @@ public abstract class VerifiableEntity {
      *
      * @param serializer The serializer to use.
      */
-    protected abstract void serializeImpl(final ObjectSerializer serializer);
+    protected abstract void serializeImpl(final Serializer serializer);
 
     /**
      * Signs this entity with the owner's private key.
@@ -146,8 +142,7 @@ public abstract class VerifiableEntity {
     private byte[] getBytes() {
         try {
             try (BinarySerializer binarySerializer = new BinarySerializer()) {
-                ObjectSerializer objectSerializer = new DelegatingObjectSerializer(binarySerializer);
-                this.serialize(objectSerializer, false);
+                this.serialize(binarySerializer, false);
                 return binarySerializer.getBytes();
             }
         }

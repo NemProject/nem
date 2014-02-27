@@ -2,8 +2,10 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.*;
 
 import java.math.BigInteger;
+import java.util.*;
 
 public class BinarySerializerTest {
 
@@ -83,6 +85,56 @@ public class BinarySerializerTest {
             final byte[] expectedBytes = new byte[] {
                 0x04, 0x00, 0x00, 0x00,
                 0x42, 0x45, 0x74, 0x61
+            };
+            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+        }
+    }
+
+    @Test
+    public void canWriteObject() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+
+            // Act:
+            serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
+
+            // Assert:
+            final byte[] expectedBytes = new byte[] {
+                0x13, 0x00, 0x00, 0x00,
+                    0x11, 0x00, 0x00, 0x00,
+                    0x03, 0x00, 0x00, 0x00, 0x66, 0x6F, 0x6F,
+                    0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+            Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+        }
+    }
+    @Test
+    public void canWriteObjectArray() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+
+            // Act:
+            List<SerializableEntity> originalObjects = new ArrayList<>();
+            originalObjects.add(new MockSerializableEntity(17, "foo", 42));
+            originalObjects.add(new MockSerializableEntity(111, "bar", 22));
+            originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
+            serializer.writeObjectArray("SerializableEntity", originalObjects);
+
+            // Assert:
+            final byte[] expectedBytes = new byte[] {
+                0x03, 0x00, 0x00, 0x00,
+                    0x13, 0x00, 0x00, 0x00,
+                        0x11, 0x00, 0x00, 0x00,
+                        0x03, 0x00, 0x00, 0x00, 0x66, 0x6F, 0x6F,
+                        0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x13, 0x00, 0x00, 0x00,
+                        0x6F, 0x00, 0x00, 0x00,
+                        0x03, 0x00, 0x00, 0x00, 0x62, 0x61, 0x72,
+                        0x16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x15, 0x00, 0x00, 0x00,
+                        0x01, 0x00, 0x00, 0x00,
+                        0x05, 0x00, 0x00, 0x00, 0x61, 0x6C, 0x70, 0x68, 0x61,
+                        0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             };
             Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
         }
@@ -179,7 +231,50 @@ public class BinarySerializerTest {
         }
     }
 
+    @Test
+    public void canRoundtripObject() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+
+            // Act:
+            serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
+
+            try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+                final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
+
+                // Assert:
+                CustomAsserts.assertMockSerializableEntity(object, 17, "foo", 42L);
+            }
+        }
+    }
+
+    @Test
+    public void canRoundtripObjectArray() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            List<SerializableEntity> originalObjects = new ArrayList<>();
+            originalObjects.add(new MockSerializableEntity(17, "foo", 42));
+            originalObjects.add(new MockSerializableEntity(111, "bar", 22));
+            originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
+
+            // Act:
+            serializer.writeObjectArray("SerializableArray", originalObjects);
+
+            try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+                final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
+
+                // Assert:
+                Assert.assertThat(objects.size(), IsEqual.equalTo(3));
+                CustomAsserts.assertMockSerializableEntity(objects.get(0), 17, "foo", 42L);
+                CustomAsserts.assertMockSerializableEntity(objects.get(1), 111, "bar", 22L);
+                CustomAsserts.assertMockSerializableEntity(objects.get(2), 1, "alpha", 34L);
+            }
+        }
+    }
+
     //endregion
+
+    //region Roundtrip Multiple
 
     @Test
     public void canRoundtripMultipleValues() throws Exception {
@@ -205,6 +300,44 @@ public class BinarySerializerTest {
         }
     }
 
+    //endregion
+
+    //region Context
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsUsed() throws Exception {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+
+        // Act:
+        try (BinaryDeserializer deserializer = new BinaryDeserializer(new byte[] { }, context)) {
+            // Assert:
+            Assert.assertThat(deserializer.getContext(), IsEqual.equalTo(context));
+        }
+    }
+
+    @Test
+    public void contextPassedToDeserializerConstructorIsPassedToChildDeserializer() throws Exception {
+        // Arrange:
+        DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+        try (BinarySerializer serializer = new BinarySerializer()) {
+            serializer.writeObject("test", new MockSerializableEntity(7, "a", 12));
+
+            // Act:
+            try (BinaryDeserializer deserializer = new BinaryDeserializer(serializer.getBytes(), context)) {
+                MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
+                deserializer.readObject("test", objectDeserializer);
+
+                // Assert:
+                Assert.assertThat(objectDeserializer.getLastContext(), IsEqual.equalTo(context));
+            }
+        }
+    }
+
+    //endregion
+
+    //region HasMoreData
+
     @Test
     public void deserializerInitiallyHasMoreData() throws Exception {
         // Arrange:
@@ -218,6 +351,10 @@ public class BinarySerializerTest {
             }
         }
     }
+
+    //endregion
+
+    //region Corrupt Data Handling
 
     @Test(expected=SerializationException.class)
     public void readOfPrimitiveTypeFailsIfStreamIsTooSmall() throws Exception {
@@ -237,7 +374,9 @@ public class BinarySerializerTest {
         }
     }
 
+    //endregion
+
     private BinaryDeserializer createBinaryDeserializer(final byte[] bytes) throws Exception {
-        return new BinaryDeserializer(bytes);
+        return new BinaryDeserializer(bytes, null);
     }
 }

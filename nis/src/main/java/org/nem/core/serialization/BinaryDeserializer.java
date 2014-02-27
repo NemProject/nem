@@ -2,9 +2,9 @@ package org.nem.core.serialization;
 
 import org.nem.core.utils.StringEncoder;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
+import java.util.*;
 
 /**
  * A binary deserializer that supports forward-only deserialization.
@@ -12,14 +12,17 @@ import java.math.BigInteger;
 public class BinaryDeserializer implements AutoCloseable, Deserializer {
 
     private final ByteArrayInputStream stream;
+    private final DeserializationContext context;
 
     /**
      * Creates a new binary deserializer.
      *
      * @param bytes The byte array from which to read.
+     * @param  context The deserialization context.
      */
-    public BinaryDeserializer(final byte[] bytes) {
+    public BinaryDeserializer(final byte[] bytes, final DeserializationContext context) {
         this.stream = new ByteArrayInputStream(bytes);
+        this.context = context;
     }
 
     @Override
@@ -58,8 +61,40 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     }
 
     @Override
+    public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
+        return this.deserializeObject(activator);
+    }
+
+    @Override
+    public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
+        List<T> objects = new ArrayList<>();
+        int numObjects = this.readInt(null);
+        for (int i = 0; i < numObjects; ++i)
+            objects.add(deserializeObject(activator));
+
+        return objects;
+    }
+
+    @Override
+    public DeserializationContext getContext() {
+        return this.context;
+    }
+
+    @Override
     public void close() throws Exception {
         this.stream.close();
+    }
+
+    private <T> T deserializeObject(final ObjectDeserializer<T> activator) {
+        try {
+            byte[] bytes = this.readBytes(null);
+            try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes, this.getContext())) {
+                return activator.deserialize(deserializer);
+            }
+        }
+        catch (Exception ex) {
+            throw new SerializationException(ex);
+        }
     }
 
     /**

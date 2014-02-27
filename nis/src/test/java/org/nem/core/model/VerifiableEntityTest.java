@@ -77,7 +77,7 @@ public class VerifiableEntityTest {
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
 
         // Act:
-        entity.serialize(new DelegatingObjectSerializer(new JsonSerializer()));
+        entity.serialize(new JsonSerializer());
     }
 
     //endregion
@@ -150,7 +150,7 @@ public class VerifiableEntityTest {
         MockVerifiableEntity originalEntity,
         final Account deserializedSigner) {
         // Act:
-        ObjectDeserializer deserializer = Utils.RoundtripVerifiableEntity(originalEntity, deserializedSigner);
+        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalEntity, deserializedSigner);
         return new MockVerifiableEntity(deserializer);
     }
 }

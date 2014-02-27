@@ -56,6 +56,6 @@ public class Signer {
     }
 
     private ECDSASigner createECDSASigner() {
-        return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest()));
+        return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest(256)));
     }
 }

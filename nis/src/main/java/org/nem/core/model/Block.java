@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.ObjectDeserializer;
-import org.nem.core.serialization.ObjectSerializer;
+import org.nem.core.serialization.*;
+import org.nem.core.transactions.TransactionFactory;
 
 import java.util.*;
 
@@ -19,7 +19,7 @@ public class Block extends VerifiableEntity {
 //    this.totalAmount = totalAmount;
 //    this.totalFee = totalFee;
 
-    private final List<Transaction> transactions = new ArrayList<>();
+    private final List<Transaction> transactions;
 
     /**
      * Creates a new block.
@@ -28,6 +28,7 @@ public class Block extends VerifiableEntity {
      */
     public Block(final Account forger) {
         super(1, 1, forger);
+        this.transactions = new ArrayList<>();
     }
 
     /**
@@ -36,8 +37,23 @@ public class Block extends VerifiableEntity {
      * @param type The block type.
      * @param deserializer The deserializer to use.
      */
-    public Block(final int type, final ObjectDeserializer deserializer) {
+    public Block(final int type, final Deserializer deserializer) {
         super(type, deserializer);
+        this.transactions = deserializer.readObjectArray("transactions", new ObjectDeserializer<Transaction>() {
+            @Override
+            public Transaction deserialize(Deserializer deserializer) {
+                return TransactionFactory.Deserialize(deserializer);
+            }
+        });
+    }
+
+    /**
+     * Gets the transactions associated with this block.
+     *
+     * @return The transactions associated with this block.
+     */
+    List<Transaction> getTransactions() {
+        return this.transactions;
     }
 
     /**
@@ -63,7 +79,7 @@ public class Block extends VerifiableEntity {
     }
 
     @Override
-    protected void serializeImpl(ObjectSerializer serializer) {
-        // TODO: serialize block fields
+    protected void serializeImpl(Serializer serializer) {
+        serializer.writeObjectArray("transactions", this.transactions);
     }
 }

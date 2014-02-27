@@ -3,7 +3,6 @@
  */
 package org.nem.peer;
 
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -20,6 +19,7 @@ import org.json.JSONObject;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 import org.nem.deploy.WebStarter;
 
 /**
@@ -31,7 +31,7 @@ import org.nem.deploy.WebStarter;
  * @author Thies1965
  * 
  */
-public class Node implements Serializable {
+public class Node implements SerializableEntity {
 	private static final long serialVersionUID = -5710930110703963436L;
 	private static final Logger logger = Logger.getLogger(Node.class.getName());
 
@@ -186,7 +186,7 @@ public class Node implements Serializable {
 		JsonSerializer serializer = new JsonSerializer();
 		serialize(serializer);
 		return serializer.getObject();
-	}
+    }
 
 	//
 	public boolean verifyNEM() {
