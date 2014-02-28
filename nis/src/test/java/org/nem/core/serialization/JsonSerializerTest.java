@@ -245,6 +245,22 @@ public class JsonSerializerTest {
     }
 
     @Test
+    public void canRoundtripNullObject() {
+
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        serializer.writeObject("SerializableEntity", null);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
+
+        // Assert:
+        Assert.assertThat(object, IsEqual.equalTo(null));
+    }
+
+    @Test
     public void canRoundtripObjectArray() {
         // Arrange:
         JsonSerializer serializer = new JsonSerializer();
@@ -264,6 +280,24 @@ public class JsonSerializerTest {
         CustomAsserts.assertMockSerializableEntity(objects.get(0), 17, "foo", 42L);
         CustomAsserts.assertMockSerializableEntity(objects.get(1), 111, "bar", 22L);
         CustomAsserts.assertMockSerializableEntity(objects.get(2), 1, "alpha", 34L);
+    }
+
+    @Test
+    public void canRoundtripArrayContainingNullValue() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+        List<SerializableEntity> originalObjects = new ArrayList<>();
+        originalObjects.add(null);
+
+        // Act:
+        serializer.writeObjectArray("SerializableArray", originalObjects);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
+
+        // Assert:
+        Assert.assertThat(objects.size(), IsEqual.equalTo(1));
+        Assert.assertThat(objects.get(0), IsEqual.equalTo(null));
     }
 
     //endregion

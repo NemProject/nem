@@ -83,7 +83,7 @@ public class JsonDeserializer implements Deserializer {
 
     public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
         JsonDeserializer deserializer = new JsonDeserializer(object, this.context);
-        return activator.deserialize(deserializer);
+        return 0 == object.size() ? null : activator.deserialize(deserializer);
     }
 
     private void checkLabel(final String label) {
