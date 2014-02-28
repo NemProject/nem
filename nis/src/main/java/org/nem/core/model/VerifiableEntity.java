@@ -26,9 +26,6 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param signer The entity signer.
      */
     public VerifiableEntity(final int type, final int version, final Account signer) {
-        if (!signer.getKeyPair().hasPrivateKey())
-            throw new InvalidParameterException("signer private key is required to create a verifiable entity ");
-
         this.type = type;
         this.version = version;
         this.signer = signer;
@@ -79,6 +76,16 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public Signature getSignature() { return this.signature; }
 
+
+	/**
+	 * Sets the signature.
+	 *
+	 * @param signature The signature.
+	 */
+	public void setSignature(Signature signature) {
+		this.signature = signature;
+	}
+
     //endregion
 
     @Override
@@ -117,7 +124,10 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * Signs this entity with the owner's private key.
      */
     public void sign() {
-        if (!this.signer.getKeyPair().hasPrivateKey())
+        if (this.signer.getKeyPair() == null)
+			throw new InvalidParameterException("cannot sign, missing key");
+
+		if (!this.signer.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("cannot sign because sender is not self");
 
         // (1) serialize the entire transaction to a buffer
@@ -135,7 +145,10 @@ public abstract class VerifiableEntity implements SerializableEntity {
         if (null == this.signature)
             throw new CryptoException("cannot verify because signature does not exist");
 
-        Signer signer = new Signer(this.signer.getKeyPair());
+		if (this.signer.getKeyPair() == null)
+			throw new InvalidParameterException("cannot verify, missing key");
+
+		Signer signer = new Signer(this.signer.getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
 
@@ -151,4 +164,5 @@ public abstract class VerifiableEntity implements SerializableEntity {
             throw new SerializationException(e);
         }
     }
+
 }

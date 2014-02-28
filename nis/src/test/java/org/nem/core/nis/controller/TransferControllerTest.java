@@ -22,7 +22,7 @@ public class TransferControllerTest {
 		MockPeerConnector pc = new MockPeerConnector();
 
 		JSONObject obj = new JSONObject();
-		obj.put("recipient", "___NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
+		obj.put("recipient", "AAAANBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
 		obj.put("sender", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
 		obj.put("amount", Long.valueOf(42));
 		obj.put("message", "48656c6c6f20576f726c64");
