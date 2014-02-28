@@ -1,44 +1,53 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.*;
+import org.nem.core.serialization.*;
 
 /**
- * A message sent from one account to another.
+ * Base class for all messages.
  */
-public class Message {
-    private final KeyPair recipientKeyPair;
-    private final byte[] senderPublicKey;
-    private final byte[] message;
+public abstract class Message implements SerializableEntity {
+
+    private final int type;
 
     /**
-     * Creates a new Message.
+     * Creates a new message.
      *
-     * @param recipientKeyPair The recipient key pair.
-     * @param senderPublicKey The sender's public key.
-     * @param message The raw message.
+     * @param type The message type.
      */
-    public Message(final KeyPair recipientKeyPair, final byte[] senderPublicKey, byte[] message) {
-        this.recipientKeyPair = recipientKeyPair;
-        this.senderPublicKey = senderPublicKey;
-        this.message = message;
+    public Message(final int type) {
+        this.type = type;
     }
 
     /**
-     * Gets the raw message.
+     * Gets the type.
      *
-     * @return The raw message.
+     * @return The type.
      */
-    public byte[] getRawMessage() {
-        return this.message;
-    }
+    public int getType() { return this.type; }
 
     /**
-     * Gets the decrypted message.
+     * Determines if this message can be decoded.
      *
-     * @return The decrypted message.
+     * @return true if this message can be decoded.
      */
-    public byte[] getDecryptedMessage() {
-        Cipher cipher = new Cipher(new KeyPair(this.senderPublicKey), this.recipientKeyPair);
-        return cipher.decrypt(message);
+    public abstract boolean canDecode();
+
+    /**
+     * Gets the encoded message payload.
+     *
+     * @return The encoded message.
+     */
+    public abstract byte[] getEncodedPayload();
+
+    /**
+     * Gets the decoded message payload.
+     *
+     * @return The decoded message.
+     */
+    public abstract byte[] getDecodedPayload();
+
+    @Override
+    public void serialize(final Serializer serializer) {
+        serializer.writeInt("type", this.type);
     }
 }

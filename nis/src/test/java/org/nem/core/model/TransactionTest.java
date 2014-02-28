@@ -69,7 +69,7 @@ public class TransactionTest {
         Transaction originalTransaction,
         final Account deserializedSigner) {
         // Act:
-        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalTransaction, deserializedSigner);
+        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, deserializedSigner);
         return new MockTransaction(deserializer);
     }
 }

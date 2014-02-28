@@ -8,6 +8,9 @@ import org.nem.core.serialization.*;
  */
 public class MockVerifiableEntity extends VerifiableEntity {
 
+    public static final int TYPE = 12;
+    public static final int VERSION = 24;
+
 	private int customField;
 
     /**
@@ -26,7 +29,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
      * @param customField The initial custom field value.
      */
     public MockVerifiableEntity(final Account signer, final int customField) {
-		super(11, 23, signer);
+		super(TYPE, VERSION, signer);
         this.customField = customField;
     }
 

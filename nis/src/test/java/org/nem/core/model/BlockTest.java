@@ -112,7 +112,7 @@ public class BlockTest {
         Block originalBlock,
         final Account deserializedSigner) {
         // Act:
-        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalBlock, deserializedSigner);
+        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, deserializedSigner);
         return new Block(deserializer.readInt("type"), deserializer);
     }
 }

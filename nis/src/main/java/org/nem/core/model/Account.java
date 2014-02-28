@@ -43,8 +43,8 @@ public class Account {
      // TODO: the messaging API still needs to be cleaned up a little bit
 
     public List<Message> getMessages() { return this.messages; }
-    public void addMessage(final Account sender, byte[] message) {
-        this.messages.add(new Message(this.keyPair, sender.getPublicKey(), message));
+    public void addMessage(Message message) {
+        this.messages.add(message);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.nem.core.transactions;
 
+import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
@@ -13,7 +14,7 @@ public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 1000;
 
 	private long amount;
-	private byte[] message;
+	private Message message;
 	private Account recipient;
 
 	/**
@@ -24,11 +25,11 @@ public class TransferTransaction extends Transaction {
 	 * @param amount The transaction amount.
 	 * @param message The transaction message.
 	 */
-	public TransferTransaction(final Account sender, final Account recipient, final long amount, final byte[] message) {
+	public TransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
 		super(TransactionTypes.TRANSFER, 1, sender);
 		this.recipient = recipient;
 		this.amount = amount;
-		this.message = null == message ? new byte[] { } : message;
+		this.message = message;
 
 		if (null == this.recipient)
 			throw new InvalidParameterException("recipient is required");
@@ -43,7 +44,7 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, deserializer);
 		this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
 		this.amount = deserializer.readLong("amount");
-		this.message = deserializer.readBytes("message");
+		this.message = deserializer.readObject("message", MessageFactory.DESERIALIZER);
 	}
 
 	/**
@@ -67,20 +68,24 @@ public class TransferTransaction extends Transaction {
 	 *
 	 * @return The transaction message.
 	 */
-	public byte[] getMessage() { return this.message; }
+	public byte[] getMessage() {
+        return null == this.message ? null : this.message.getEncodedPayload();
+    }
+
+    private int getMessageLength() {
+        return null == this.message ? 0 : this.message.getEncodedPayload().length;
+    }
 
 	@Override
 	public boolean isValid() {
-		if (this.getSigner().getBalance() < this.amount + this.getFee())
-			return false;
-
-		return message.length <= MAX_MESSAGE_SIZE;
-	}
+        return this.getSigner().getBalance() >= this.amount + this.getFee()
+            && this.getMessageLength() <= MAX_MESSAGE_SIZE;
+    }
 
 	@Override
 	protected long getMinimumFee() {
 		long amountFee = (long)Math.ceil(this.amount * 0.001);
-		long messageFee = (long)Math.ceil(this.message.length * 0.005);
+		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
 		return amountFee + messageFee;
 	}
 
@@ -89,7 +94,7 @@ public class TransferTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		SerializationUtils.writeAccount(serializer, "recipient", this.recipient);
 		serializer.writeLong("amount", this.amount);
-		serializer.writeBytes("message", this.message);
+		serializer.writeObject("message", this.message);
 	}
 
 	@Override
@@ -97,7 +102,7 @@ public class TransferTransaction extends Transaction {
 		this.getSigner().incrementBalance(-this.amount - this.getFee());
 		this.recipient.incrementBalance(this.amount);
 
-		if (0 != this.message.length)
-			this.recipient.addMessage(this.getSigner(), this.message);
+		if (0 != this.getMessageLength())
+			this.recipient.addMessage(this.message);
 	}
 }

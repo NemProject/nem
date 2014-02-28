@@ -39,12 +39,7 @@ public class Block extends VerifiableEntity {
      */
     public Block(final int type, final Deserializer deserializer) {
         super(type, deserializer);
-        this.transactions = deserializer.readObjectArray("transactions", new ObjectDeserializer<Transaction>() {
-            @Override
-            public Transaction deserialize(Deserializer deserializer) {
-                return TransactionFactory.Deserialize(deserializer);
-            }
-        });
+        this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.DESERIALIZER);
     }
 
     /**

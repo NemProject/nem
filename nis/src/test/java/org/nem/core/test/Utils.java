@@ -108,7 +108,7 @@ public class Utils {
      * @param <T> The concrete VerifiableEntity type.
      * @return The object deserializer.
      */
-    public static <T extends VerifiableEntity> Deserializer RoundtripVerifiableEntity(
+    public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
         final T originalEntity,
         final Account deserializedSigner) {
         // Arrange:
@@ -116,7 +116,7 @@ public class Utils {
         accountLookup.setMockAccount(deserializedSigner);
 
         // Act:
-        return RoundtripVerifiableEntity(originalEntity, accountLookup);
+        return roundtripVerifiableEntity(originalEntity, accountLookup);
     }
 
     /**
@@ -128,12 +128,30 @@ public class Utils {
      * @param <T> The concrete VerifiableEntity type.
      * @return The object deserializer.
      */
-    public static <T extends VerifiableEntity> Deserializer RoundtripVerifiableEntity(
+    public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
         final T originalEntity,
         final AccountLookup accountLookup) {
         // Arrange:
         originalEntity.sign();
 
+        // Act:
+        JsonSerializer jsonSerializer = new JsonSerializer(true);
+        originalEntity.serialize(jsonSerializer);
+        return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+    }
+
+    /**
+     * Serializes serializable and returns an ObjectDeserializer
+     * that can deserialize it.
+     *
+     * @param originalEntity The original entity.
+     * @param accountLookup The account lookup policy to use.
+     * @param <T> The concrete SerializableEntity type.
+     * @return The object deserializer.
+     */
+    public static <T extends SerializableEntity> Deserializer roundtripSerializableEntity(
+        final T originalEntity,
+        final AccountLookup accountLookup) {
         // Act:
         JsonSerializer jsonSerializer = new JsonSerializer(true);
         originalEntity.serialize(jsonSerializer);

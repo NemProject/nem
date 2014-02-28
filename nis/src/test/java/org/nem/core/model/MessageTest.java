@@ -2,37 +2,35 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 public class MessageTest {
 
     @Test
-    public void unencryptedMessageCanBeCreated() {
-        // Arrange:
-        final byte[] input = Utils.generateRandomBytes();
-
+    public void ctorCanCreateMessage() {
         // Act:
-        final Message message = new Message(null, null, input);
+        final MockMessage message = new MockMessage(121);
 
         // Assert:
-        Assert.assertThat(message.getRawMessage(), IsEqual.equalTo(input));
+        Assert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
+        Assert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
     }
 
     @Test
-    public void encryptedMessageCanBeCreated() {
+    public void messageCanBeRoundTripped() {
         // Arrange:
-        final KeyPair skp = new KeyPair();
-        final KeyPair rkp = new KeyPair();
-        final Cipher cipher = new Cipher(skp, rkp);
-        final byte[] input = Utils.generateRandomBytes();
-        final byte[] encryptedInput = cipher.encrypt(input);
+        final MockMessage originalMessage = new MockMessage(121);
 
         // Act:
-        final Message message = new Message(rkp, skp.getPublicKey(), encryptedInput);
+        final MockMessage message = createRoundTrippedMessage(originalMessage);
 
         // Assert:
-        Assert.assertThat(message.getRawMessage(), IsEqual.equalTo(encryptedInput));
-        Assert.assertThat(message.getDecryptedMessage(), IsEqual.equalTo(input));
+        Assert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
+        Assert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
+    }
+
+    private static MockMessage createRoundTrippedMessage(final MockMessage originalMessage) {
+        // Act:
+        return new MockMessage(Utils.roundtripSerializableEntity(originalMessage, null));
     }
 }

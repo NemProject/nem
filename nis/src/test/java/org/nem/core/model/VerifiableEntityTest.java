@@ -22,8 +22,8 @@ public class VerifiableEntityTest {
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 6);
 
         // Assert:
-        Assert.assertThat(entity.getType(), IsEqual.equalTo(11));
-        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(23));
+        Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
@@ -52,8 +52,8 @@ public class VerifiableEntityTest {
         final MockVerifiableEntity entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
 
         // Assert:
-        Assert.assertThat(entity.getType(), IsEqual.equalTo(11));
-        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(23));
+        Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
@@ -150,7 +150,7 @@ public class VerifiableEntityTest {
         MockVerifiableEntity originalEntity,
         final Account deserializedSigner) {
         // Act:
-        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalEntity, deserializedSigner);
+        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalEntity, deserializedSigner);
         return new MockVerifiableEntity(deserializer);
     }
 }
