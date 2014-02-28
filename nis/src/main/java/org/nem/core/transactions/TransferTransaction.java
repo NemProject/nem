@@ -78,7 +78,8 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	public boolean isValid() {
-        return this.getSigner().getBalance() >= this.amount + this.getFee()
+        return this.amount >= 0
+            && this.getSigner().getBalance() >= this.amount + this.getFee()
             && this.getMessageLength() <= MAX_MESSAGE_SIZE;
     }
 
@@ -86,7 +87,7 @@ public class TransferTransaction extends Transaction {
 	protected long getMinimumFee() {
 		long amountFee = (long)Math.ceil(this.amount * 0.001);
 		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
-		return amountFee + messageFee;
+		return Math.max(1, amountFee + messageFee);
 	}
 
 	@Override

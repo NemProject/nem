@@ -100,6 +100,12 @@ public class TransferTransactionTest {
     //region Fee
 
     @Test
+    public void feeIsCalculatedCorrectlyForEmptyTransaction() {
+        // Assert:
+        Assert.assertThat(calculateFee(0, 0), IsEqual.equalTo(1L));
+    }
+
+    @Test
     public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
         // Assert:
         Assert.assertThat(calculateFee(12000, 0), IsEqual.equalTo(12L));
@@ -129,6 +135,20 @@ public class TransferTransactionTest {
     //endregion
 
     //region Valid
+
+    @Test
+    public void transactionsWithNonNegativeAmountAreValid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));
+        Assert.assertThat(isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void transactionsWithNegativeAmountAreInvalid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(1000, -1, 10), IsEqual.equalTo(false));
+        Assert.assertThat(isTransactionAmountValid(1000, -1000, 950), IsEqual.equalTo(false));
+    }
 
     @Test
     public void transactionsUpToSignerBalanceAreValid() {
