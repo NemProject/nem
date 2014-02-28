@@ -139,7 +139,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
         return signer.verify(this.getBytes(), this.signature);
     }
 
-    private byte[] getBytes() {
+	// want to have in public in order to let others sign the data
+    public byte[] getBytes() {
         try {
             try (BinarySerializer binarySerializer = new BinarySerializer()) {
                 this.serialize(binarySerializer, false);
