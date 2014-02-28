@@ -30,8 +30,6 @@ public class Account {
 
     public KeyPair getKeyPair() { return this.keyPair; }
 
-    public byte[] getPublicKey() { return this.keyPair.getPublicKey(); }
-
     public Address getAddress() { return this.address; }
 
     public long getBalance() { return this.balance; }

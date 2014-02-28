@@ -2,7 +2,6 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.KeyPair;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.transactions.TransferTransaction;
@@ -33,7 +32,7 @@ public class BlockTest {
     public void blockCanBeRoundTripped() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final Block originalBlock = new Block(signer);
         originalBlock.addTransaction(createSignedTransactionWithAmount(17));
         originalBlock.addTransaction(createSignedTransactionWithAmount(290));

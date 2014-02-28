@@ -47,7 +47,7 @@ public class VerifiableEntityTest {
     public void entityCanBeRoundTripped() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity originalEntity = new MockVerifiableEntity(signer, 7);
         final MockVerifiableEntity entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
 
@@ -63,7 +63,7 @@ public class VerifiableEntityTest {
     public void roundTrippedEntityCanBeVerified() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
         // Assert:
@@ -118,7 +118,7 @@ public class VerifiableEntityTest {
         // Arrange:
         final Address address = Address.fromEncoded("Gamma");
         final Account signer = new MockAccount(address);
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
         // Assert:

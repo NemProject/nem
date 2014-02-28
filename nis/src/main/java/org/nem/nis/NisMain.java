@@ -251,7 +251,7 @@ public class NisMain {
 		return new Account(CREATOR_KEYPAIR);
 	}
 	private org.nem.core.dbmodel.Account populateGenesisAccount(Account genesisAccount) {
-		final byte[] genesisPublicKey = genesisAccount.getPublicKey();
+		final byte[] genesisPublicKey = genesisAccount.getKeyPair().getPublicKey();
 		final Address genesisAddress = Address.fromPublicKey(genesisPublicKey);
 
 		logger.info("genesis account            public key: " + HexEncoder.getString(genesisPublicKey));

@@ -2,7 +2,6 @@ package org.nem.core.messages;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
@@ -71,7 +70,7 @@ public class SecureMessageTest {
         final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
 
         // Act:
-        final Account senderPublicKeyOnly = new Account(new KeyPair(sender.getPublicKey()));
+        final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
         new SecureMessage(senderPublicKeyOnly, recipient, input);
     }
 
@@ -84,7 +83,7 @@ public class SecureMessageTest {
         final SecureMessage originalMessage = new SecureMessage(sender, recipient, input);
 
         // Act:
-        final Account recipientPublicKeyOnly = new Account(new KeyPair(recipient.getPublicKey()));
+        final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
         final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientPublicKeyOnly);
 
         // Assert:
