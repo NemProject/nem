@@ -121,12 +121,32 @@ public class TransferTransactionTest {
         Assert.assertThat(calculateFee(13000, 200), IsEqual.equalTo(14L));
     }
 
-    private long calculateFee(final long amount, final int messageSize){
+    @Test
+    public void messageFeeIsBasedOnEncodedSize() {
+        // Assert:
+        Assert.assertThat(calculateMessageFee(1000, 2000), IsEqual.equalTo(5L));
+        Assert.assertThat(calculateMessageFee(2000, 3000), IsEqual.equalTo(10L));
+    }
+
+    private long calculateFee(final long amount, final int messageSize) {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, message);
+
+        // Act:
+        return transaction.getFee();
+    }
+
+    private long calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final MockMessage message = new MockMessage(7);
+        message.setEncodedPayload(new byte[encodedMessageSize]);
+        message.setDecodedPayload(new byte[decodedMessageSize]);
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 0, message);
 
         // Act:
         return transaction.getFee();
