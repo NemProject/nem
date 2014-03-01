@@ -20,7 +20,7 @@
     <bean
             class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-            <value>classpath:dbmaria.properties</value>
+            <value>classpath:dbh2.properties</value>
         </property>
     </bean>
     <bean id="dataSource"
