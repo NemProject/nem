@@ -39,9 +39,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public VerifiableEntity(final int type, final Deserializer deserializer) {
         this.type = type;
-        this.version = deserializer.readInt("version");
-        this.signer = SerializationUtils.readAccount(deserializer, "signer");
-        this.signature = SerializationUtils.readSignature(deserializer, "signature");
+		this.signature = SerializationUtils.readSignature(deserializer, "signature");
+		this.version = deserializer.readInt("version");
+		this.signer = SerializationUtils.readAccount(deserializer, "signer");
     }
 
     //endregion
@@ -103,12 +103,13 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param includeSignature true if the serialization should include the signature.
      */
     private void serialize(final Serializer serializer, boolean includeSignature) {
-        serializer.writeInt("type", this.getType());
-        serializer.writeInt("version", this.getVersion());
-        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
+		serializer.writeInt("type", this.getType());
 
-        if (includeSignature)
-            SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
+		if (includeSignature)
+			SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
+
+		serializer.writeInt("version", this.getVersion());
+        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
 
         this.serializeImpl(serializer);
     }
