@@ -117,7 +117,7 @@ public class TransferController {
 		// or maybe we'll force him?
 		TransferTransaction transaction = new TransferTransaction(deserializer);
 
-		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getPublicKey()));
+		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
 		logger.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
 		logger.info("   verify: " + Boolean.toString(transaction.verify()));
 
