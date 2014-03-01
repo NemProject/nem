@@ -20,7 +20,7 @@
     <bean
             class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-            <value>classpath:database.properties</value>
+            <value>classpath:dbmaria.properties</value>
         </property>
     </bean>
     <bean id="dataSource"
@@ -43,10 +43,10 @@
         </property>
         <property name="hibernateProperties">
             <value>
-                hibernate.dialect=org.hibernate.dialect.MySQLDialect
-                hibernate.show_sql=false
-                hibernate.use_sql_comments=false
-                hibernate.jdbc.batch_size=20
+                hibernate.dialect=${hibernate.dialect}
+                hibernate.show_sql=${hibernate.show_sql}
+                hibernate.use_sql_comments=${hibernate.use_sql_comments}
+                hibernate.jdbc.batch_size=${hibernate.jdbc.batch_size}
             </value>
         </property>
     </bean>
