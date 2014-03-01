@@ -10,14 +10,13 @@ This is done via dependency on session manager:
           depends-on="flyway">
 ```
 
-DB setup
---------
-
-For testing purposed I was using mariaDb (mysql descendant). I hadn't time, to try sqlite before pushing it.
 ```
 Db settings are in:
 src\main\webapp\WEB-INF\dbh2.properties
 ```
+
+maria DB setup
+--------------
 
 mariadb setup
 ```
@@ -25,11 +24,19 @@ mariadb setup
 
 MariaDB [(none)]> CREATE DATABASE `nis`;
 MariaDB [(none)]> GRANT CREATE, ALTER, INDEX, INSERT, SELECT, UPDATE, DELETE, DROP ON `nis`.* to 'nisuser'@'localhost' identified by 'nispass';
-
-mysql.exe nis -u nisuser --password=nispass < nem-infrastracture-server\createTables.sql
 ```
-(I know, I know, tables creation should rather be in code,
- also the sql, does not contain sensible primary keys now).
+
+```
+Db settings are in:
+src\main\webapp\WEB-INF\dbmaria.properties
+
+to switch, one must change (in application-context.xml)
+<property name="location">
+    <value>classpath:dbh2.properties</value>
+</property>
+
+(to "classpath:dbmaria.properties"
+```
 
 WebStart added
 --------------
