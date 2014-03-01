@@ -6,16 +6,16 @@ import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.test.MockPeerConnector;
-import org.nem.peer.PeerNetwork;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+// This would look better when we'll have possibility to .serialize()
+// unsigned transactions (similar to .getBytes)
 public class TransferControllerTest {
 
-	// this test will fail right now because condition in ctor in VerifiableEntity
 	@Test
 	public void transferIncorrectRecipient() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
 		// Arrange:
@@ -92,8 +92,6 @@ public class TransferControllerTest {
 		Assert.assertThat((Integer)res.get("error"), IsEqual.equalTo(5));
 	}
 
-
-	// this test will also fail right now
 	@Test
 	public void transferCorrectTransaction() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
 		// Arrange:
