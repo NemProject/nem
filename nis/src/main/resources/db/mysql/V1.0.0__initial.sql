@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS `accounts` (  
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
 
-  `printableKey` VARCHAR(42) NOT NULL,
+  `printableKey` VARCHAR(44) NOT NULL,
 
-  `publicKey` VARBINARY(32),
+  `publicKey` VARBINARY(34),
   PRIMARY KEY (`id`)  
 );  
 
@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS `blocks` (
   `shortId` BIGINT NOT NULL,
 
   `version` INT NOT NULL,
-  `prevBlockHash` VARBINARY(32) NOT NULL,
-  `blockHash` VARBINARY(32) NOT NULL,
+  `prevBlockHash` VARBINARY(34) NOT NULL,
+  `blockHash` VARBINARY(34) NOT NULL,
   `timestamp` INT NOT NULL,
 
   `forgerId` BIGINT NOT NULL, -- reference to account table
-  `forgerProof` VARBINARY(64) NOT NULL,
-  `blockSignature` VARBINARY(64) NOT NULL,
+  `forgerProof` VARBINARY(66) NOT NULL,
+  `blockSignature` VARBINARY(66) NOT NULL,
 
   `height` BIGINT NOT NULL,
 
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `transfers` (
   `deadline` INT NOT NULL,
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
-  `senderProof` VARBINARY(64) NOT NULL,
+  `senderProof` VARBINARY(66) NOT NULL,
   `recipientId` BIGINT NOT NULL, -- reference to accounts
 
   `blkIndex` INT NOT NULL, -- index inside block

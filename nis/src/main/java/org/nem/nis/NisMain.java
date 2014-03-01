@@ -116,7 +116,6 @@ public class NisMain {
 			// super strong priv keys
 			final byte[] recipientsSk[] = {
 					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
-					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
 					Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
 					Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
 					Hashes.sha3(StringEncoder.getBytes("Thies1965")),

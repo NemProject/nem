@@ -23,9 +23,7 @@ public class DbAccountLookup implements AccountLookup {
 
 	@Override
 	public Account findByAddress(final Address id) {
-		logger.info(id.getEncoded());
-		logger.warning(accountDao.toString());
-		logger.info(id.getEncoded());
+		logger.info("looking for [" + id.getEncoded() + "]");
 
 		org.nem.core.dbmodel.Account dbAccount = accountDao.getAccountByPrintableAddress(id.getEncoded());
 		if (dbAccount == null) {
