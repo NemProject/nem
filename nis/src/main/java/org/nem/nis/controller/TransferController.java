@@ -6,25 +6,28 @@ import net.minidev.json.JSONValue;
 import org.apache.commons.codec.DecoderException;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.messages.PlainMessage;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
-import org.nem.core.model.Message;
-import org.nem.core.model.MessageTypes;
-import org.nem.core.serialization.BinarySerializer;
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.model.*;
+import org.nem.core.serialization.*;
+import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
+import org.nem.nis.DbAccountLookup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
 import java.security.CryptoPrimitive;
 import java.util.logging.Logger;
 
 @RestController
 public class TransferController {
 	private static final Logger logger = Logger.getLogger(NcsMainController.class.getName());
+
+	@Autowired
+	DbAccountLookup dbAccountLookup;
 
 	private String jsonError(int num, String errorMessage) {
 		JSONObject obj=new JSONObject();
@@ -92,5 +95,32 @@ public class TransferController {
 		JSONObject obj=new JSONObject();
 		obj.put("data", HexEncoder.getString(transferData));
 		return obj.toJSONString() + "\r\n";
+	}
+
+	@RequestMapping(value="/transfer/announce", method = RequestMethod.POST)
+	public String transferAnnounce(@RequestBody String body) {
+		JSONObject par = (JSONObject) JSONValue.parse(body);
+		logger.info(par.toString());
+
+		String jsonData;
+		jsonData = (String) par.get("data");
+
+		byte[] data;
+		try {
+			data = HexEncoder.getBytes(jsonData);
+		} catch (DecoderException e) {
+			return jsonError(1, "Invalid data");
+		}
+
+		Deserializer deserializer = new BinaryDeserializer(data, new DeserializationContext(dbAccountLookup));
+		// can't use TransactionFactory here, as the client probably shouldn't care about "type"
+		// or maybe we'll force him?
+		TransferTransaction transaction = new TransferTransaction(deserializer);
+
+		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getPublicKey()));
+		logger.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
+		logger.info("   verify: " + Boolean.toString(transaction.verify()));
+
+		return jsonError(2, "All ok sending transaction to network : verified " + Boolean.toString(transaction.verify()));
 	}
 }
