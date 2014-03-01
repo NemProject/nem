@@ -31,6 +31,16 @@ public class Utils {
     }
 
     /**
+     * Creates a copy of account that only contains the account public key.
+     *
+     * @param account The account to copy.
+     * @return A copy of account that only contains the account public key.
+     */
+    public static Account createPublicOnlyKeyAccount(final Account account) {
+        return new Account(new KeyPair(account.getKeyPair().getPublicKey()));
+    }
+
+    /**
      * Generates a random account.
      *
      * @return A random account.
@@ -45,7 +55,7 @@ public class Utils {
      * @return A random account without a private key.
      */
     public static Account generateRandomAccountWithoutPrivateKey() {
-        return new Account(new KeyPair(new KeyPair().getPublicKey()));
+        return createPublicOnlyKeyAccount(generateRandomAccount());
     }
 
     /**

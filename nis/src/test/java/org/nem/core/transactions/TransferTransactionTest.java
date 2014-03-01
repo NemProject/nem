@@ -100,6 +100,12 @@ public class TransferTransactionTest {
     //region Fee
 
     @Test
+    public void feeIsCalculatedCorrectlyForEmptyTransaction() {
+        // Assert:
+        Assert.assertThat(calculateFee(0, 0), IsEqual.equalTo(1L));
+    }
+
+    @Test
     public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
         // Assert:
         Assert.assertThat(calculateFee(12000, 0), IsEqual.equalTo(12L));
@@ -115,7 +121,14 @@ public class TransferTransactionTest {
         Assert.assertThat(calculateFee(13000, 200), IsEqual.equalTo(14L));
     }
 
-    private long calculateFee(final long amount, final int messageSize){
+    @Test
+    public void messageFeeIsBasedOnEncodedSize() {
+        // Assert:
+        Assert.assertThat(calculateMessageFee(1000, 2000), IsEqual.equalTo(5L));
+        Assert.assertThat(calculateMessageFee(2000, 3000), IsEqual.equalTo(10L));
+    }
+
+    private long calculateFee(final long amount, final int messageSize) {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
@@ -126,9 +139,36 @@ public class TransferTransactionTest {
         return transaction.getFee();
     }
 
+    private long calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final MockMessage message = new MockMessage(7);
+        message.setEncodedPayload(new byte[encodedMessageSize]);
+        message.setDecodedPayload(new byte[decodedMessageSize]);
+        TransferTransaction transaction = new TransferTransaction(signer, recipient, 0, message);
+
+        // Act:
+        return transaction.getFee();
+    }
+
     //endregion
 
     //region Valid
+
+    @Test
+    public void transactionsWithNonNegativeAmountAreValid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));
+        Assert.assertThat(isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void transactionsWithNegativeAmountAreInvalid() {
+        // Assert:
+        Assert.assertThat(isTransactionAmountValid(1000, -1, 10), IsEqual.equalTo(false));
+        Assert.assertThat(isTransactionAmountValid(1000, -1000, 950), IsEqual.equalTo(false));
+    }
 
     @Test
     public void transactionsUpToSignerBalanceAreValid() {

@@ -11,6 +11,8 @@ public class MockMessage extends Message {
     public static final int TYPE = 19;
 
     private int customField;
+    private byte[] encodedPayload;
+    private byte[] decodedPayload;
 
     /**
      * Creates a mock message.
@@ -39,14 +41,28 @@ public class MockMessage extends Message {
      */
     public int getCustomField() { return this.customField; }
 
+    /**
+     * Sets the encoded payload.
+     *
+     * @param payload The desired encoded payload.
+     */
+    public void setEncodedPayload(final byte[] payload) { this.encodedPayload = payload; }
+
+    /**
+     * Sets the decoded payload.
+     *
+     * @param payload The desired decoded payload.
+     */
+    public void setDecodedPayload(final byte[] payload) { this.decodedPayload = payload; }
+
     @Override
     public boolean canDecode() { return true; }
 
     @Override
-    public byte[] getEncodedPayload() { return null; }
+    public byte[] getEncodedPayload() { return this.encodedPayload; }
 
     @Override
-    public byte[] getDecodedPayload() { return null; }
+    public byte[] getDecodedPayload() { return this.decodedPayload; }
 
     @Override
     public void serialize(final Serializer serializer) {

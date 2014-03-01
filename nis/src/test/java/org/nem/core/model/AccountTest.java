@@ -19,7 +19,6 @@ public class AccountTest {
 
         // Assert:
         Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
-        Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
         Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
         Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
         Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
@@ -29,16 +28,11 @@ public class AccountTest {
 	@Test
 	public void ctorWithUnknownPublic() {
 		// Arrange:
-		final Address expectedAccountId = Address.fromEncoded("NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW");
+		final Address expectedAccountId = Utils.generateRandomAddress();
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
-		try {
-			Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
-			Assert.fail("No exception was thrown");
-		} catch (NullPointerException ex) {
-		}
+		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
