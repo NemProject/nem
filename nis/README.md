@@ -1,3 +1,15 @@
+Flyway and H2
+-------------
+
+I've added Flyway, so tables in db should be created automagically upon startup
+This is done via dependency on session manager:
+
+```
+<bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+          depends-on="flyway">
+```
+
 DB setup
 --------
 
@@ -6,12 +18,6 @@ For testing purposed I was using mariaDb (mysql descendant). I hadn't time, to t
 Db settings are in:
 src\main\webapp\WEB-INF\dbh2.properties
 ```
-
-h2 development setup, run
-```
-mvn hibernate4:export
-````
-
 
 mariadb setup
 ```
