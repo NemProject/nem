@@ -16,13 +16,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.serialization.*;
-import org.nem.deploy.WebStarter;
+import org.nem.deploy.CommonStarter;
 
 /**
  * Reflects a node within a peer network A node is classified by its URI.
@@ -102,7 +101,7 @@ public class Node implements SerializableEntity {
 		// Hope all addressing issues are identified,
 		// so the instance is valid.
 		state = NodeStatus.INACTIVE;
-		protocol = WebStarter.NEM_PROTOCOL;
+		protocol = CommonStarter.NEM_PROTOCOL;
 		platform = "";
 		version = "";
 
@@ -110,7 +109,7 @@ public class Node implements SerializableEntity {
 
 	private void populateURLs(String addrStr) {
 		try {
-			baseURL = new URL("http", addrStr, WebStarter.NEM_PORT, "/");
+			baseURL = new URL("http", addrStr, CommonStarter.NEM_PORT, "/");
 			InetAddress.getByName(addrStr); // For verification purposes
 
 			address = addrStr;
@@ -174,7 +173,7 @@ public class Node implements SerializableEntity {
 	 */
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("protocol", protocol);
-		serializer.writeString("application", WebStarter.APP_NAME);
+		serializer.writeString("application", CommonStarter.APP_NAME);
 		serializer.writeString("version", version);
 		serializer.writeString("platform", platform);
 		serializer.writeString("address", address);
@@ -203,8 +202,8 @@ public class Node implements SerializableEntity {
 			result = true;
 			// Let's check
 			Object value = response.get("application");
-			if (!WebStarter.APP_NAME.equals(value)) {
-				logger.warning("Returned application <" + value + "> differs from requested: <" + WebStarter.APP_NAME + ">. No NEM node.");
+			if (!CommonStarter.APP_NAME.equals(value)) {
+				logger.warning("Returned application <" + value + "> differs from requested: <" + CommonStarter.APP_NAME + ">. No NEM node.");
 				result = false;
 			}
 
