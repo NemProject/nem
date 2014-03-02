@@ -101,4 +101,16 @@ public class JsonSerializer implements Serializer {
 
         this.propertyOrderArray.add(label);
     }
+
+    /**
+     * Helper function that serializes a SerializableEntity to a JSON object.
+     *
+     * @param entity The entity to serialize.
+     * @return The resulting JSON object.
+     */
+    public static JSONObject serializeToJson(final SerializableEntity entity) {
+        JsonSerializer serializer = new JsonSerializer();
+        entity.serialize(serializer);
+        return serializer.getObject();
+    }
 }
