@@ -35,49 +35,21 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void testBoot2() {
-		// Prep work
-		PeerNetwork network = PeerNetwork.getDefaultNetwork();
-		network.boot();
-
-		// second call
-		network.boot();
-
-		// Verify
-		assertNotNull(network.getAllPeers());
-		assertNotNull(network.generatePeerList());
-	}
-
-	@Test
-	public void testRefresh() {
-		// Prep work
-		PeerNetwork network = PeerNetwork.getDefaultNetwork();
-		network.boot();
-
-		// second call
-		network.boot();
-
-		// Verify
-		assertNotNull(network.getAllPeers());
-		assertNotNull(network.generatePeerList());
-	}
-
-	@Test
 	public void testShutdown() {
 		// Prep work
 		PeerNetwork network = PeerNetwork.getDefaultNetwork();
 		network.boot();
-		try {
-			Thread.sleep(15000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+//		try {
+//			Thread.sleep(15000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		long tasks = network.shutdown();
 		//Verify
-		assertTrue(tasks > 0);
-		;
+		assertTrue(tasks == 0);
 	}
 
 }
