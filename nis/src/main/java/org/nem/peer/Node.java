@@ -71,20 +71,6 @@ public class Node implements SerializableEntity {
 		state = NodeStatus.INACTIVE;
 	}
 
-	//TODO: Work-around as long as J's serializer is not extended to have arrays serialized.
-	public Node(JSONObject jsonNode) {
-		this.address = (String) jsonNode.get("address");
-		this.platform = (String) jsonNode.get("platform");
-		this.protocol = (Integer) jsonNode.get("protocol");
-		this.version = (String) jsonNode.get("version");
-
-		populateURLs(address);
-
-		// Hope all addressing issues are identified,
-		// so the instance is valid.
-		state = NodeStatus.INACTIVE;
-	}
-
 	public Node(String addrStr) {
 		super();
 
