@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -16,7 +17,9 @@ import java.util.logging.Logger;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.serialization.Serializer;
 
 /**
  * Reflects a peer network. NEM might end up with parallel multiple peer
@@ -170,6 +173,16 @@ public class PeerNetwork {
 			// Schedule the loop for refreshing
 			Refresher command = new Refresher(this);
 			executor.scheduleWithFixedDelay(command, 2, 10, TimeUnit.SECONDS);
+		} catch(RejectedExecutionException e) {
+			//Happens for instance of shutdown happens prior to the first run of the refresher
+			//Just means we have to go down. But we check the status
+			if(executor.isShutdown()) {
+				//early shutdown
+				LOGGER.info("Shutdown prior to first refresh cycle.");
+			} else {
+				//weird...???
+				LOGGER.log(Level.SEVERE, "Boot received exception but is not shutdown.", e);
+			}
 		} catch (InterruptedException e) {
 			booted = false;
 		}
@@ -326,9 +339,8 @@ public class PeerNetwork {
 
 		return strB.toString();
 	}
-
-	public JSONObject generatePeerList() {
-		JsonSerializer serializer = new JsonSerializer();
+	
+	public void serialize(Serializer serializer) {
 		List<Node> allInactive = new ArrayList<>();
 		List<Node> allActive = new ArrayList<>();
 		for (Node peer : allPeers) {
@@ -346,6 +358,12 @@ public class PeerNetwork {
 
 		serializer.writeObjectArray("active", allActive);
 		serializer.writeObjectArray("inactive", allInactive);
+
+	}
+
+	public JSONObject generatePeerList() {
+		JsonSerializer serializer = new JsonSerializer();
+		serialize(serializer);
 		return serializer.getObject();
 	}
 }
