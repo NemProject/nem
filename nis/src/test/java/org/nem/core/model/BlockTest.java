@@ -48,8 +48,14 @@ public class BlockTest {
 
         final List<Transaction> transactions = block.getTransactions();
         Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
-        Assert.assertThat(((TransferTransaction)transactions.get(0)).getAmount(), IsEqual.equalTo(17L));
-        Assert.assertThat(((TransferTransaction)transactions.get(1)).getAmount(), IsEqual.equalTo(290L));
+
+        final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+        Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(17L));
+        Assert.assertThat(transaction1.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+
+        final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+        Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(290L));
+        Assert.assertThat(transaction2.getSignature(), IsNot.not(IsEqual.equalTo(null)));
     }
 
     private Transaction createSignedTransactionWithAmount(long amount) {
@@ -112,6 +118,6 @@ public class BlockTest {
         final Account deserializedSigner) {
         // Act:
         Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, deserializedSigner);
-        return new Block(deserializer.readInt("type"), deserializer);
+        return new Block(deserializer.readInt("type"), VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
     }
 }

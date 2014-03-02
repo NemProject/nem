@@ -40,7 +40,7 @@ public class MockTransaction extends Transaction {
      * @param deserializer The deserializer to use.
      */
     public MockTransaction(final Deserializer deserializer) {
-        super(deserializer.readInt("type"), deserializer);
+        super(deserializer.readInt("type"), DeserializationOptions.VERIFIABLE, deserializer);
         this.customField = deserializer.readInt("customField");
     }
 

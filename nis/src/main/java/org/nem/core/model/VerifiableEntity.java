@@ -11,6 +11,21 @@ import java.security.InvalidParameterException;
  */
 public abstract class VerifiableEntity implements SerializableEntity {
 
+    /**
+     * Enumeration of deserialization options.
+     */
+    public enum DeserializationOptions {
+        /**
+         * The serialized data includes a signature and is verifiable.
+         */
+        VERIFIABLE,
+
+        /**
+         * The serialized data does not include a signature and is not verifiable.
+         */
+        NON_VERIFIABLE
+    }
+
     private final int version;
     private final int type;
     private Account signer;
@@ -38,13 +53,16 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * Deserializes a new transaction.
      *
      * @param type The transaction type.
+     * @param options Deserialization options.
      * @param deserializer The deserializer to use.
      */
-    public VerifiableEntity(final int type, final Deserializer deserializer) {
+    public VerifiableEntity(final int type, DeserializationOptions options,  Deserializer deserializer) {
         this.type = type;
         this.version = deserializer.readInt("version");
         this.signer = SerializationUtils.readAccount(deserializer, "signer");
-        this.signature = SerializationUtils.readSignature(deserializer, "signature");
+
+        if (DeserializationOptions.VERIFIABLE == options)
+            this.signature = SerializationUtils.readSignature(deserializer, "signature");
     }
 
     //endregion
@@ -140,14 +158,38 @@ public abstract class VerifiableEntity implements SerializableEntity {
     }
 
     private byte[] getBytes() {
-        try {
-            try (BinarySerializer binarySerializer = new BinarySerializer()) {
-                this.serialize(binarySerializer, false);
-                return binarySerializer.getBytes();
-            }
+        return BinarySerializer.serializeToBytes(this.asNonVerifiable());
+    }
+
+    /**
+     * Returns a non-verifiable serializer for the current entity.
+     *
+     * @return A non-verifiable serializer.
+     */
+    public SerializableEntity asNonVerifiable() {
+        return new NonVerifiableSerializationAdapter(this);
+    }
+
+    /**
+     * A serialization adapter for VerifiableEntity that serializes the entity
+     * without a signature.
+     */
+    public static class NonVerifiableSerializationAdapter implements SerializableEntity {
+
+        final VerifiableEntity entity;
+
+        /**
+         * Creates a non-verifiable serialization adapter for entity.
+         *
+         * @param entity The entity.
+         */
+        public NonVerifiableSerializationAdapter(final VerifiableEntity entity) {
+            this.entity = entity;
         }
-        catch (Exception e) {
-            throw new SerializationException(e);
+
+        @Override
+        public void serialize(Serializer serializer) {
+            entity.serialize(serializer, false);
         }
     }
 }

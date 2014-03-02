@@ -19,11 +19,11 @@ public class TransactionFactoryTest {
         JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
         // Act:
-        TransactionFactory.deserialize(deserializer);
+        TransactionFactory.VERIFIABLE.deserialize(deserializer);
     }
 
     @Test
-    public void canDeserializeTransferTransaction() {
+    public void canDeserializeVerifiableTransferTransaction() {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -31,10 +31,30 @@ public class TransactionFactoryTest {
         Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
         // Act:
-        Transaction transaction = TransactionFactory.deserialize(deserializer);
+        Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
         // Assert:
         Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
         Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
+        Assert.assertThat(transaction.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+    }
+
+    @Test
+    public void canDeserializeNonVerifiableTransferTransaction() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        Transaction originalTransaction = new TransferTransaction(sender, recipient, 100, null);
+        Deserializer deserializer = Utils.roundtripSerializableEntity(
+            originalTransaction.asNonVerifiable(),
+            new MockAccountLookup());
+
+        // Act:
+        Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+
+        // Assert:
+        Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
+        Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
+        Assert.assertThat(transaction.getSignature(), IsEqual.equalTo(null));
     }
 }

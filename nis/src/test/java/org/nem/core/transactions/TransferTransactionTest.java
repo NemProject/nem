@@ -303,6 +303,6 @@ public class TransferTransactionTest {
         // Act:
         Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
         deserializer.readInt("type");
-        return new TransferTransaction(deserializer);
+        return new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
     }
 }

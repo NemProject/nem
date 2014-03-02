@@ -37,9 +37,9 @@ public class Block extends VerifiableEntity {
      * @param type The block type.
      * @param deserializer The deserializer to use.
      */
-    public Block(final int type, final Deserializer deserializer) {
-        super(type, deserializer);
-        this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.DESERIALIZER);
+    public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {
+        super(type, options, deserializer);
+        this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
     }
 
     /**

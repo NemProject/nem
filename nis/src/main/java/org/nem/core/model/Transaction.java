@@ -26,8 +26,8 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @param type The transaction type.
 	 * @param deserializer The deserializer to use.
 	 */
-	public Transaction(final int type, final Deserializer deserializer) {
-		super(type, deserializer);
+	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
+		super(type, options, deserializer);
 		this.fee = deserializer.readLong("fee");
 	}
 
