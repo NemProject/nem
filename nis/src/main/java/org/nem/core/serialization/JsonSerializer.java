@@ -78,7 +78,8 @@ public class JsonSerializer implements Serializer {
 
     private static JSONObject serializeObject(final SerializableEntity object) {
         JsonSerializer serializer = new JsonSerializer();
-        object.serialize(serializer);
+        if (null != object)
+            object.serialize(serializer);
         return serializer.getObject();
     }
 

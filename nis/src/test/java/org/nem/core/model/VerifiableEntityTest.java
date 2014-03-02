@@ -22,8 +22,8 @@ public class VerifiableEntityTest {
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 6);
 
         // Assert:
-        Assert.assertThat(entity.getType(), IsEqual.equalTo(11));
-        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(23));
+        Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
@@ -47,13 +47,13 @@ public class VerifiableEntityTest {
     public void entityCanBeRoundTripped() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity originalEntity = new MockVerifiableEntity(signer, 7);
         final MockVerifiableEntity entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
 
         // Assert:
-        Assert.assertThat(entity.getType(), IsEqual.equalTo(11));
-        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(23));
+        Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+        Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
@@ -63,7 +63,7 @@ public class VerifiableEntityTest {
     public void roundTrippedEntityCanBeVerified() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
         // Assert:
@@ -118,7 +118,7 @@ public class VerifiableEntityTest {
         // Arrange:
         final Address address = Address.fromEncoded("Gamma");
         final Account signer = new MockAccount(address);
-        final Account signerPublicKeyOnly = new Account(new KeyPair(signer.getPublicKey()));
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
         // Assert:
@@ -150,7 +150,7 @@ public class VerifiableEntityTest {
         MockVerifiableEntity originalEntity,
         final Account deserializedSigner) {
         // Act:
-        Deserializer deserializer = Utils.RoundtripVerifiableEntity(originalEntity, deserializedSigner);
+        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalEntity, deserializedSigner);
         return new MockVerifiableEntity(deserializer);
     }
 }

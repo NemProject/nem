@@ -8,6 +8,9 @@ import org.nem.core.serialization.*;
  */
 public class MockTransaction extends Transaction {
 
+    public static final int TYPE = 124;
+    public static final int VERSION = 758;
+
 	private int customField;
     private long minimumFee;
 
@@ -27,7 +30,7 @@ public class MockTransaction extends Transaction {
      * @param customField The initial custom field value.
      */
     public MockTransaction(final Account sender, final int customField) {
-		super(123, 759, sender);
+		super(TYPE, VERSION, sender);
         this.customField = customField;
     }
 

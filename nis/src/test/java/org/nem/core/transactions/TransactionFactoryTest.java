@@ -19,7 +19,7 @@ public class TransactionFactoryTest {
         JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
         // Act:
-        TransactionFactory.Deserialize(deserializer);
+        TransactionFactory.deserialize(deserializer);
     }
 
     @Test
@@ -27,21 +27,14 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-
         Transaction originalTransaction = new TransferTransaction(sender, recipient, 100, null);
-        originalTransaction.sign();
-
-        JsonSerializer serializer = new JsonSerializer();
-        originalTransaction.serialize(serializer);
-
-        JsonDeserializer deserializer = new JsonDeserializer(
-            serializer.getObject(),
-            new DeserializationContext(new MockAccountLookup()));
+        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
         // Act:
-        Transaction transaction = TransactionFactory.Deserialize(deserializer);
+        Transaction transaction = TransactionFactory.deserialize(deserializer);
 
         // Assert:
         Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
+        Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
     }
 }

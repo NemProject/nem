@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
@@ -18,14 +19,27 @@ public class AccountTest {
 
         // Assert:
         Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
-        Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
         Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
         Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
         Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
     }
 
-    @Test
+	@Test
+	public void ctorWithUnknownPublic() {
+		// Arrange:
+		final Address expectedAccountId = Utils.generateRandomAddress();
+		final Account account = new Account(expectedAccountId);
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
+		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+	}
+
+	@Test
     public void labelCanBeSet() {
         // Arrange:
         final Account account = Utils.generateRandomAccount();
@@ -63,45 +77,34 @@ public class AccountTest {
     }
 
     @Test
-    public void encryptedMessagesCanBeDecrypted() {
+    public void singleMessageCanBeAdded() {
         // Arrange:
-        final KeyPair skp = new KeyPair();
-        final KeyPair rkp = new KeyPair();
-        final Cipher cipher = new Cipher(skp, rkp);
         final byte[] input = Utils.generateRandomBytes();
-        final byte[] encryptedInput = cipher.encrypt(input);
-        final Account senderAccount = new Account(new KeyPair(skp.getPublicKey()));
-        final Account recipientAccount = new Account(rkp);
+        final Account account = new Account(new KeyPair());
 
         // Act:
-        recipientAccount.addMessage(senderAccount, encryptedInput);
+        account.addMessage(new PlainMessage(input));
 
         // Assert:
-        Assert.assertThat(recipientAccount.getMessages().size(), IsEqual.equalTo(1));
-        Assert.assertThat(recipientAccount.getMessages().get(0).getDecryptedMessage(), IsEqual.equalTo(input));
+        Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
+        Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input));
     }
 
     @Test
-    public void multipleEncryptedMessagesCanBeDecrypted() {
+    public void multipleMessagesCanBeAdded() {
         // Arrange:
-        final KeyPair skp = new KeyPair();
-        final KeyPair rkp = new KeyPair();
-        final Cipher cipher = new Cipher(skp, rkp);
         final byte[] input1 = Utils.generateRandomBytes();
         final byte[] input2 = Utils.generateRandomBytes();
-        final byte[] encryptedInput1 = cipher.encrypt(input1);
-        final byte[] encryptedInput2 = cipher.encrypt(input2);
-        final Account senderAccount = new Account(new KeyPair(skp.getPublicKey()));
-        final Account recipientAccount = new Account(rkp);
+        final Account account = new Account(new KeyPair());
 
         // Act:
-        recipientAccount.addMessage(senderAccount, encryptedInput1);
-        recipientAccount.addMessage(senderAccount, encryptedInput2);
+        account.addMessage(new PlainMessage(input1));
+        account.addMessage(new PlainMessage(input2));
 
         // Assert:
-        Assert.assertThat(recipientAccount.getMessages().size(), IsEqual.equalTo(2));
-        Assert.assertThat(recipientAccount.getMessages().get(0).getDecryptedMessage(), IsEqual.equalTo(input1));
-        Assert.assertThat(recipientAccount.getMessages().get(1).getDecryptedMessage(), IsEqual.equalTo(input2));
+        Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(2));
+        Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
+        Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
     }
 
     //region equals / hashCode

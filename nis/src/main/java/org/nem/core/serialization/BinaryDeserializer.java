@@ -88,6 +88,9 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     private <T> T deserializeObject(final ObjectDeserializer<T> activator) {
         try {
             byte[] bytes = this.readBytes(null);
+            if (0 == bytes.length)
+                return null;
+
             try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes, this.getContext())) {
                 return activator.deserialize(deserializer);
             }
@@ -109,6 +112,9 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     private byte[] readBytes(int numBytes) {
         if (this.stream.available() < numBytes)
             throw new SerializationException("unexpected end of stream reached");
+
+        if (0 == numBytes)
+            return new byte[0];
 
         try {
             byte[] bytes = new byte[numBytes];

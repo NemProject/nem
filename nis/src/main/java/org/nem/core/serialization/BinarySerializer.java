@@ -72,6 +72,9 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     }
 
     private static byte[] serializeObject(final SerializableEntity object) {
+        if (null == object)
+            return new byte[0];
+
         try {
             try (BinarySerializer serializer = new BinarySerializer()) {
                 object.serialize(serializer);
