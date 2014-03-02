@@ -98,4 +98,22 @@ public class BinarySerializer implements AutoCloseable, Serializer {
     private void writeBytesInternal(final byte[] bytes) {
         this.stream.write(bytes, 0, bytes.length);
     }
+
+    /**
+     * Helper function that serializes a SerializableEntity to a byte array.
+     *
+     * @param entity The entity to serialize.
+     * @return The resulting byte array.
+     */
+    public static byte[] serializeToBytes(final SerializableEntity entity) {
+        try {
+            try (BinarySerializer binarySerializer = new BinarySerializer()) {
+                entity.serialize(binarySerializer);
+                return binarySerializer.getBytes();
+            }
+        }
+        catch (Exception e) {
+            throw new SerializationException(e);
+        }
+    }
 }
