@@ -17,10 +17,9 @@
                                 expression="org.springframework.stereotype.Controller" />
     </context:component-scan>
 
-    <bean
-            class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-            <value>classpath:database.properties</value>
+            <value>classpath:dbh2.properties</value>
         </property>
     </bean>
     <bean id="dataSource"
@@ -31,8 +30,14 @@
         <property name="password" value="${jdbc.password}" />
     </bean>
 
+    <bean id="flyway" class="com.googlecode.flyway.core.Flyway" init-method="migrate">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="locations" value="${flyway.locations}"/>
+    </bean>
+
     <bean id="sessionFactory"
-          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+          depends-on="flyway">
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses">
             <list>
@@ -43,10 +48,10 @@
         </property>
         <property name="hibernateProperties">
             <value>
-                hibernate.dialect=org.hibernate.dialect.MySQLDialect
-                hibernate.show_sql=false
-                hibernate.use_sql_comments=false
-                hibernate.jdbc.batch_size=20
+                hibernate.dialect=${hibernate.dialect}
+                hibernate.show_sql=${hibernate.show_sql}
+                hibernate.use_sql_comments=${hibernate.use_sql_comments}
+                hibernate.jdbc.batch_size=${hibernate.jdbc.batch_size}
             </value>
         </property>
     </bean>

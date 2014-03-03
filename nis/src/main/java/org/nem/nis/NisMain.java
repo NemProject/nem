@@ -116,7 +116,6 @@ public class NisMain {
 			// super strong priv keys
 			final byte[] recipientsSk[] = {
 					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
-					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
 					Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
 					Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
 					Hashes.sha3(StringEncoder.getBytes("Thies1965")),
@@ -164,10 +163,7 @@ public class NisMain {
 			for (int i = 0; i < txIds.length; ++i) {
 				TransferTransaction transferTx = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
 				transferTx.setFee(0);
-
 				transferTx.sign();
-
-				logger.warning(transferTx.getSignature().getR().toString(16) + " " + transferTx.getSignature().getS().toString(16));
 
 				Transfer t = new Transfer(
 						txIds[i],
@@ -178,12 +174,7 @@ public class NisMain {
 						0, // deadline
 						a,
 						// proof
-						new byte[] {
-								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
-								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
-								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
-								0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf
-						},
+						transferTx.getSignature().getBytes(),
 						recipientsDbAccounts.get(i),
 						i, // index
 						amounts[i],

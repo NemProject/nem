@@ -29,14 +29,13 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
     }
 
-    @Test(expected = InvalidParameterException.class)
-    public void ctorCannotCreateEntityForAccountWithoutSignerPrivateKey() {
+    @Test
+    public void ctorCanCreateEntityForAccountWithoutSignerKey() {
         // Arrange:
-        final KeyPair publicPrivateKeyPair = new KeyPair();
-        final KeyPair publicOnlyKeyPair = new KeyPair(publicPrivateKeyPair.getPublicKey());
+		final Address address = Address.fromEncoded("Alpha");
 
         // Act:
-        new MockVerifiableEntity(new Account(publicOnlyKeyPair));
+        new MockVerifiableEntity(new Account(address));
     }
 
     //endregion
@@ -84,7 +83,7 @@ public class VerifiableEntityTest {
 
     //region Sign / Verify
 
-    @Test
+	@Test
     public void signCreatesValidSignature() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
@@ -125,7 +124,33 @@ public class VerifiableEntityTest {
         entity.sign();
     }
 
-    @Test(expected = CryptoException.class)
+	@Test(expected = InvalidParameterException.class)
+	public void cannotSignWithoutKey() {
+		// Arrange:
+		final Address address = Address.fromEncoded("Beta");
+		final MockVerifiableEntity entity = new MockVerifiableEntity(new Account(address));
+
+		// Act:
+		entity.sign();
+	}
+
+	@Test(expected = InvalidParameterException.class)
+	public void cannotVerifyWithoutKey() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account fakeSigner = new Account(Address.fromEncoded("Alpha"));
+		final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
+		final MockVerifiableEntity fakeEntity = new MockVerifiableEntity(fakeSigner);
+
+		// Act:
+		entity.sign();
+		fakeEntity.setSignature(entity.getSignature());
+
+		fakeEntity.verify();
+	}
+
+
+	@Test(expected = CryptoException.class)
     public void cannotVerifyWithoutSignature() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();

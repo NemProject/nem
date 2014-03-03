@@ -26,9 +26,6 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param signer The entity signer.
      */
     public VerifiableEntity(final int type, final int version, final Account signer) {
-        if (!signer.getKeyPair().hasPrivateKey())
-            throw new InvalidParameterException("signer private key is required to create a verifiable entity ");
-
         this.type = type;
         this.version = version;
         this.signer = signer;
@@ -42,9 +39,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public VerifiableEntity(final int type, final Deserializer deserializer) {
         this.type = type;
-        this.version = deserializer.readInt("version");
-        this.signer = SerializationUtils.readAccount(deserializer, "signer");
-        this.signature = SerializationUtils.readSignature(deserializer, "signature");
+		this.signature = SerializationUtils.readSignature(deserializer, "signature");
+		this.version = deserializer.readInt("version");
+		this.signer = SerializationUtils.readAccount(deserializer, "signer");
     }
 
     //endregion
@@ -79,6 +76,16 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public Signature getSignature() { return this.signature; }
 
+
+	/**
+	 * Sets the signature.
+	 *
+	 * @param signature The signature.
+	 */
+	public void setSignature(Signature signature) {
+		this.signature = signature;
+	}
+
     //endregion
 
     @Override
@@ -96,12 +103,13 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param includeSignature true if the serialization should include the signature.
      */
     private void serialize(final Serializer serializer, boolean includeSignature) {
-        serializer.writeInt("type", this.getType());
-        serializer.writeInt("version", this.getVersion());
-        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
+		serializer.writeInt("type", this.getType());
 
-        if (includeSignature)
-            SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
+		if (includeSignature)
+			SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
+
+		serializer.writeInt("version", this.getVersion());
+        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
 
         this.serializeImpl(serializer);
     }
@@ -117,7 +125,10 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * Signs this entity with the owner's private key.
      */
     public void sign() {
-        if (!this.signer.getKeyPair().hasPrivateKey())
+        if (this.signer.getKeyPair() == null)
+			throw new InvalidParameterException("cannot sign, missing key");
+
+		if (!this.signer.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("cannot sign because sender is not self");
 
         // (1) serialize the entire transaction to a buffer
@@ -135,11 +146,15 @@ public abstract class VerifiableEntity implements SerializableEntity {
         if (null == this.signature)
             throw new CryptoException("cannot verify because signature does not exist");
 
-        Signer signer = new Signer(this.signer.getKeyPair());
+		if (this.signer.getKeyPair() == null)
+			throw new InvalidParameterException("cannot verify, missing key");
+
+		Signer signer = new Signer(this.signer.getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
 
-    private byte[] getBytes() {
+	// want to have in public in order to let others sign the data
+    public byte[] getBytes() {
         try {
             try (BinarySerializer binarySerializer = new BinarySerializer()) {
                 this.serialize(binarySerializer, false);
@@ -150,4 +165,5 @@ public abstract class VerifiableEntity implements SerializableEntity {
             throw new SerializationException(e);
         }
     }
+
 }
