@@ -66,7 +66,7 @@ Current operational model:
 - NEM Wallet/Server is installed on Desktop
 - Can be launched either via Web-Page / from Desktop
 - Jetty server started and listens at 7890
-- org.nem.deploy.WebStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
+- org.nem.deploy.CommonStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
   but this is only for demonstration purposes.
 
   Two future client options are available
