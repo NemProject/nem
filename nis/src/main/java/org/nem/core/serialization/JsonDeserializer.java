@@ -31,13 +31,13 @@ public class JsonDeserializer implements Deserializer {
     }
 
     @Override
-    public int readInt(final String label) {
+    public Integer readInt(final String label) {
         this.checkLabel(label);
         return (Integer)this.object.get(label);
     }
 
     @Override
-    public long readLong(final String label) {
+    public Long readLong(final String label) {
         this.checkLabel(label);
         return (Long)this.object.get(label);
     }

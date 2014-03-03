@@ -15,7 +15,7 @@ public interface Deserializer {
      * @param label The optional name of the value.
      * @return The read value.
      */
-    public int readInt(final String label);
+    public Integer readInt(final String label);
 
     /**
      * Reads a 64-bit long value.
@@ -23,7 +23,7 @@ public interface Deserializer {
      * @param label The optional name of the value.
      * @return The read value.
      */
-    public long readLong(final String label);
+    public Long readLong(final String label);
 
     /**
      * Reads a BigInteger value.
