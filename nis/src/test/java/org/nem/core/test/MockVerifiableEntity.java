@@ -39,7 +39,16 @@ public class MockVerifiableEntity extends VerifiableEntity {
      * @param deserializer The deserializer to use.
      */
     public MockVerifiableEntity(final Deserializer deserializer) {
-        super(deserializer.readInt("type"), deserializer);
+        this(DeserializationOptions.VERIFIABLE, deserializer);
+    }
+
+    /**
+     * Deserializes a mock verifiable entity.
+     *
+     * @param deserializer The deserializer to use.
+     */
+    public MockVerifiableEntity(final DeserializationOptions options, final Deserializer deserializer) {
+        super(deserializer.readInt("type"), options, deserializer);
         this.customField = deserializer.readInt("customField");
     }
 

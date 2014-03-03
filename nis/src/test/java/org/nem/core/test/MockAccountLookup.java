@@ -1,8 +1,9 @@
 package org.nem.core.test;
 
-import org.nem.core.model.Address;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+
+import java.util.HashMap;
 
 /**
  * A mock AccountLookup implementation.
@@ -10,12 +11,14 @@ import org.nem.core.serialization.AccountLookup;
 public class MockAccountLookup implements AccountLookup {
 
     private int numFindByIdCalls;
-    private Account mockAccount;
+    private HashMap<Address, Account> accountMap = new HashMap<>();
 
     @Override
     public Account findByAddress(final Address id) {
         ++this.numFindByIdCalls;
-        return null == this.mockAccount ? new MockAccount(id) : this.mockAccount;
+
+        final Account account = this.accountMap.get(id);
+        return null == account ? new MockAccount(id) : account;
     }
 
     /**
@@ -30,5 +33,7 @@ public class MockAccountLookup implements AccountLookup {
      *
      * @param account The account that should be returned by findByAddress.
      */
-    public void setMockAccount(final Account account) { this.mockAccount = account; }
+    public void setMockAccount(final Account account) {
+        this.accountMap.put(account.getAddress(), account);
+    }
 }
