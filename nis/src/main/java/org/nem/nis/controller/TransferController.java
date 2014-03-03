@@ -39,7 +39,13 @@ public class TransferController {
 		logger.info(par.toString());
 
 		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(dbAccountLookup));
-		TransferTransaction transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+		TransferTransaction transferTransaction;
+		try {
+			transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+
+		} catch (NullPointerException e) {
+			return jsonError(1, "incorrect data");
+		}
 
 		byte[] transferData = BinarySerializer.serializeToBytes(transferTransaction);
 
