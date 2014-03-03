@@ -22,6 +22,7 @@ import org.eclipse.jetty.http.HttpMethod;
 
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.nem.peer.v2.NodeApiId;
 
 /**
  * Access remote nodes and knows about the various REST APIs
@@ -48,19 +49,19 @@ public class PeerConnector {
 
 	//TODO: Add Interceptor pattern
 	public JSONObject requestNodeInfo(Node node) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
-		JSONObject response = getResponse(node.getRestURL(NodeRestIDs.REST_NODE_INFO));
+		JSONObject response = getResponse(node.getRestURL(NodeApiId.REST_NODE_INFO));
 		return response;
 	}
 
 	//TODO: Add Interceptor pattern
 	public JSONObject requestPeerList(Node node) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
-		JSONObject response = getResponse(node.getRestURL(NodeRestIDs.REST_NODE_PEER_LIST));
+		JSONObject response = getResponse(node.getRestURL(NodeApiId.REST_NODE_PEER_LIST));
 		return response;
 	}
 
 	//TODO: Add Interceptor pattern
 	public JSONObject postNewPeer(Node node, Node peer) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
-		JSONObject response = postResponse(node.getRestURL(NodeRestIDs.REST_ADD_PEER), peer.asJsonObject());
+		JSONObject response = postResponse(node.getRestURL(NodeApiId.REST_ADD_PEER), peer.asJsonObject());
 		return response;
 	}
 

@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.InvalidParameterException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +24,10 @@ import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.serialization.*;
 import org.nem.deploy.WebStarter;
+import org.nem.peer.v2.NodeAddress;
+import org.nem.peer.v2.NodeApiId;
+import org.nem.peer.v2.NodeInfo;
+import org.nem.peer.v2.NodeStatus;
 
 /**
  * Reflects a node within a peer network A node is classified by its URI.
@@ -37,20 +42,13 @@ public class Node implements SerializableEntity {
 	private static final long serialVersionUID = -5710930110703963436L;
 	private static final Logger logger = Logger.getLogger(Node.class.getName());
 
-	private String address;
-	private String platform;
-	private Integer protocol;
-	private String version;
-
 	// The resources and their URI
-	private transient URL baseURL;
-	private transient Dictionary<NodeRestIDs, URL> restURLs;
-
-	private transient NodeStatus state;
 	private transient long startTime;
 	private transient long totalTime;
 	private transient long successfulCalls;
 	private transient long failedCalls;
+
+    private org.nem.peer.v2.Node node;
 
 	/**
 	 * Deserializes a node.
@@ -59,97 +57,56 @@ public class Node implements SerializableEntity {
 	 *            The deserializer.
 	 */
 	public Node(final Deserializer deserializer) {
-		this.address = deserializer.readString("address");
-		this.platform = deserializer.readString("platform");
-		this.protocol = deserializer.readInt("protocol");
-		this.version = deserializer.readString("version");
-
-		populateURLs(address);
-
-		// Hope all addressing issues are identified,
-		// so the instance is valid.
-		state = NodeStatus.INACTIVE;
+        NodeInfo info = new NodeInfo(deserializer);
+        this.node = new org.nem.peer.v2.Node(info);
 	}
 
-	public Node(String addrStr) {
-		super();
+	public Node(String host) {
+        try {
+            NodeAddress address = new NodeAddress("http", host, WebStarter.NEM_PORT);
+            NodeInfo info = new NodeInfo(address, "", WebStarter.APP_NAME);
+            this.node = new org.nem.peer.v2.Node(info);
+        } catch (InvalidParameterException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
-		if (addrStr == null) {
-			throw new IllegalArgumentException("Node requires an address. Null as address is not supported.");
-		}
+    public Node(org.nem.peer.v2.Node node) {
+        this.node = node;
+    }
 
-		addrStr = addrStr.trim();
-		if (addrStr.length() == 0) {
-			throw new IllegalArgumentException("Node requires an address. An empty address is not supported.");
-		}
 
-		populateURLs(addrStr);
-
-		// Hope all addressing issues are identified,
-		// so the instance is valid.
-		state = NodeStatus.INACTIVE;
-		protocol = WebStarter.NEM_PROTOCOL;
-		platform = "";
-		version = "";
-
-	}
-
-	private void populateURLs(String addrStr) {
-		try {
-			baseURL = new URL("http", addrStr, WebStarter.NEM_PORT, "/");
-			InetAddress.getByName(addrStr); // For verification purposes
-
-			address = addrStr;
-			restURLs = new Hashtable<NodeRestIDs, URL>();
-			restURLs.put(NodeRestIDs.REST_NODE_INFO, new URL(baseURL, "node/info"));
-			restURLs.put(NodeRestIDs.REST_ADD_PEER, new URL(baseURL, "peer/new"));
-			restURLs.put(NodeRestIDs.REST_NODE_PEER_LIST, new URL(baseURL, "node/peerlist"));
-			restURLs.put(NodeRestIDs.REST_CHAIN, new URL(baseURL, "chain"));
-
-		} catch (MalformedURLException e) {
-			logger.warning("Peer address not valid: <" + addrStr + ">");
-			throw new IllegalArgumentException("Peer address not valid: <" + addrStr + ">");
-		} catch (UnknownHostException e) {
-			logger.warning("Peer address not valid: <" + addrStr + ">");
-			throw new IllegalArgumentException("Peer address unknown: <" + addrStr + ">");
-		}
-	}
-
-	public String getAddress() {
-		return address;
+    public String getAddress() {
+		return this.node.getInfo().getAddress().getBaseUrl().getHost();
 	}
 
 	public String getVersion() {
-		return version;
+		return String.format("%d", this.node.getInfo().getVersion());
 	}
 
 	public Integer getProtocol() {
-		return protocol;
+        return 0;
+//		return this.node.getInfo().getProtocol();
 	}
 
 	public String getPlatform() {
-		return platform;
+		return this.node.getInfo().getPlatform();
 	}
 
-	public void setPlatform(String myPlatform) {
-		this.platform = myPlatform;
-	}
+//	public void setPlatform(String myPlatform) {
+//		this.platform = myPlatform;
+//	}
 
 	public NodeStatus getState() {
-		return state;
+        return this.node.getStatus();
 	}
 
 	public void setState(NodeStatus status) {
-		logger.info(toString() + " changed to " + status.toString());
-		state = status;
+		this.node.setStatus(status);
 	}
 
 	public String toString() {
-		StringBuilder strB = new StringBuilder();
-		strB.append("Node ").append(address.toString());
-		strB.append(" [").append(state).append("]");
-
-		return strB.toString();
+        return this.node.toString();
 	}
 
 	/**
@@ -159,11 +116,7 @@ public class Node implements SerializableEntity {
 	 *            The serializer to use.
 	 */
 	public void serialize(final Serializer serializer) {
-		serializer.writeInt("protocol", protocol);
-		serializer.writeString("application", WebStarter.APP_NAME);
-		serializer.writeString("version", version);
-		serializer.writeString("platform", platform);
-		serializer.writeString("address", address);
+        this.node.getInfo().serialize(serializer);
 	}
 
 	/**
@@ -186,49 +139,11 @@ public class Node implements SerializableEntity {
 
 			JSONObject response = connector.requestNodeInfo(this);
 
-			result = true;
-			// Let's check
-			Object value = response.get("application");
-			if (!WebStarter.APP_NAME.equals(value)) {
-				logger.warning("Returned application <" + value + "> differs from requested: <" + WebStarter.APP_NAME + ">. No NEM node.");
-				result = false;
-			}
-
-			value = response.get("address"); // null value is also not allowed!
-			if (value == null) {
-				logger.warning("Returned address is empty. No NEM node.");
-				result = false;
-			} else {
-				// What if address is different to initial address?
-				if (!address.equals(value)) {
-					// At least we protocol it
-					logger.warning("Returned address <" + value + "> differs from requested: <" + address + ">. Keeping requested.");
-				}
-			}
-
-			value = response.get("protocol"); // null value is also not allowed!
-			if (value == null) {
-				logger.warning("Returned protocol is empty. No NEM node.");
-				result = false;
-			} else {
-				try {
-					protocol = (Integer) value;
-				} catch (ClassCastException e) {
-					logger.warning("Returned protocol <" + value + "> not a valid integer. No NEM node.");
-					result = false;
-				}
-			}
-
-			value = response.get("version"); // null value is also not allowed!
-			if (value == null) {
-				logger.warning("Returned version is empty. No NEM node.");
-				result = false;
-			} else {
-				version = (String) value;
-			}
+            NodeInfo info = new NodeInfo(new JsonDeserializer(response, new DeserializationContext(null)));
+            this.node = new org.nem.peer.v2.Node(info);
 
 			// Okay we are connected with the peer node
-			startTime = System.currentTimeMillis();
+			this.startTime = System.currentTimeMillis();
 
 		} catch (URISyntaxException e) {
 			// Connection error, so we do not consider the node for the next
@@ -236,7 +151,7 @@ public class Node implements SerializableEntity {
 			logger.warning(toString() + e.toString());
 
 			// set to not connected
-			setState(NodeStatus.FAILURE);
+			setState(NodeStatus.FAIlURE);
 
 		} catch (TimeoutException e) {
 			logger.warning(toString() + " timed out.");
@@ -254,15 +169,18 @@ public class Node implements SerializableEntity {
 			logger.warning(toString() + e1.toString());
 
 			// set to not connected
-			setState(NodeStatus.FAILURE);
+			setState(NodeStatus.FAIlURE);
 
-		}
+		} catch (Exception e) {
+            // TODO temporary
+            return false;
+        }
 
 		return result;
 	}
 
-	public URL getRestURL(NodeRestIDs restID) {
-		return restURLs.get(restID);
+	public URL getRestURL(NodeApiId restID) {
+		return this.node.getInfo().getAddress().getApiUrl(restID);
 	}
 
 }

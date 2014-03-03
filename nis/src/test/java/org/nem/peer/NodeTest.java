@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.peer.v2.NodeStatus;
 
 public class NodeTest {
 

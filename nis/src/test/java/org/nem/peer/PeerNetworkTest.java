@@ -5,6 +5,7 @@ import junit.framework.Assert;
 
 import org.hamcrest.core.IsNot;
 import org.junit.Test;
+import org.nem.peer.v2.NodeStatus;
 
 public class PeerNetworkTest {
 
@@ -17,7 +18,7 @@ public class PeerNetworkTest {
 		assertNotNull(network);
 		assertNotNull(network.getLocalNode());
 		assertNotNull(network.getLocalNode().getAddress());
-		assertNotSame(network.getLocalNode().getState(), NodeStatus.FAILURE);
+		assertNotSame(network.getLocalNode().getState(), NodeStatus.FAIlURE);
 
 		assertNotNull(network.getAllPeers());
 		assertNotNull(network.generatePeerList());

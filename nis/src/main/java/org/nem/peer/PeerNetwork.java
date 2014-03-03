@@ -20,6 +20,10 @@ import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
+import org.nem.deploy.WebStarter;
+import org.nem.peer.v2.NodeAddress;
+import org.nem.peer.v2.NodeInfo;
+import org.nem.peer.v2.NodeStatus;
 
 /**
  * Reflects a peer network. NEM might end up with parallel multiple peer
@@ -76,26 +80,11 @@ public class PeerNetwork {
 		LOGGER.info("NIS settings: ");
 
 		JSONObject config = (JSONObject) JSONValue.parse(fin);
-
-		tmpStr = (String) config.get("myAddress");
-		if (tmpStr != null) {
-			tmpStr = tmpStr.trim();
-		}
-		if (tmpStr == null || tmpStr.length() == 0) {
-			tmpStr = "localhost";
-		}
-		LOGGER.info("  \"myAddress\" = \"" + tmpStr + "\"");
-		localNode = new Node(tmpStr);
-
-		tmpStr = (String) config.get("myPlatform");
-		if (tmpStr == null) {
-			tmpStr = "PC";
-
-		} else {
-			tmpStr = tmpStr.trim();
-		}
-		localNode.setPlatform(tmpStr);
-		LOGGER.info("  \"myPlatform\" = \"" + tmpStr + "\"");
+        NodeInfo info = new NodeInfo(
+            new NodeAddress("http", (String) config.get("myAddress"), 80),
+            (String) config.get("myPlatform"),
+            WebStarter.APP_NAME);
+        org.nem.peer.v2.Node node = new org.nem.peer.v2.Node(info);
 
 		JSONArray knownPeers = (JSONArray) config.get("knownPeers");
 		Set<String> wellKnownPeers;
@@ -116,7 +105,7 @@ public class PeerNetwork {
 			LOGGER.warning("No wellKnownPeers defined, it is unlikely to work");
 		}
 
-		PeerNetwork network = new PeerNetwork("Default network", localNode, wellKnownPeers);
+		PeerNetwork network = new PeerNetwork("Default network", new Node(node), wellKnownPeers);
 		network.boot();
 
 		return network;
@@ -250,7 +239,7 @@ public class PeerNetwork {
 
 		} catch (URISyntaxException e) {
 			LOGGER.warning(node.toString() + e.toString());
-			node.setState(NodeStatus.FAILURE);
+			node.setState(NodeStatus.FAIlURE);
 			// remove from allPeers
 			allPeers.remove(node);
 
@@ -260,7 +249,7 @@ public class PeerNetwork {
 
 		} catch (ExecutionException e) {
 			LOGGER.warning(node.toString() + e.toString());
-			node.setState(NodeStatus.FAILURE);
+			node.setState(NodeStatus.FAIlURE);
 			// remove from all allPeers
 			allPeers.remove(node);
 
