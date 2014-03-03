@@ -3,9 +3,7 @@ package org.nem.nis.controller;
 import net.minidev.json.JSONObject;
 
 import net.minidev.json.JSONValue;
-import org.apache.commons.codec.DecoderException;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.messages.PlainMessage;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.transactions.TransactionFactory;
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
-import java.security.CryptoPrimitive;
 import java.util.logging.Logger;
 
 @RestController
@@ -39,61 +35,15 @@ public class TransferController {
 
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody String body) {
-		logger.info(body);
-		JSONObject par = (JSONObject) JSONValue.parse(body);
+		JSONObject par = (JSONObject)JSONValue.parse(body);
 		logger.info(par.toString());
 
-		String jsonSender;
-		String jsonRecipient;
-		Long jsonAmount;
-		String jsonMessage;
+		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(dbAccountLookup));
+		TransferTransaction transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
-		jsonSender = (String) par.get("sender");
-		jsonRecipient = (String) par.get("recipient");
-		jsonAmount = (Long) par.get("amount");
-		jsonMessage = (String) par.get("message");
+		byte[] transferData = BinarySerializer.serializeToBytes(transferTransaction);
 
-		logger.info(jsonSender);
-		logger.info(jsonRecipient);
-		logger.info(jsonAmount.toString());
-		logger.info(jsonMessage);
-		logger.warning( Boolean.toString(Address.fromEncoded(jsonRecipient).isValid()) );
-
-		if (! Address.fromEncoded(jsonRecipient).isValid()) {
-			return jsonError(2, "Invalid recipient");
-		}
-
-		// we don't check upper bound, as network will verify it...
-		if (jsonAmount < 0) {
-			return jsonError(3, "Negative amount");
-		}
-
-		byte[] transcodedMessage = null;
-		try {
-			transcodedMessage = HexEncoder.getBytes(jsonMessage);
-
-		} catch (DecoderException e) {
-			return jsonError(4, "Incorrectly formatted message, rejecting transaction");
-		}
-
-		byte[] senderPublicKey = null;
-		try {
-			senderPublicKey = HexEncoder.getBytes(jsonSender);
-		} catch (DecoderException e) {
-			return jsonError(5, "Incorrect sender");
-
-		}
-
-		KeyPair sendersKey = new KeyPair(senderPublicKey);
-		Account sender = new Account(sendersKey);
-		Account recipient = new Account(Address.fromEncoded(jsonRecipient));
-		Message message = new PlainMessage(transcodedMessage);
-
-		TransferTransaction transferTransaction = new TransferTransaction(sender, recipient, jsonAmount, message);
-		byte[] transferData = transferTransaction.getBytes();
-
-		JSONObject obj=new JSONObject();
-		obj.put("data", HexEncoder.getString(transferData));
+		JSONObject obj = JsonSerializer.serializeToJson(new RequestPrepare(transferData));
 		return obj.toJSONString() + "\r\n";
 	}
 
@@ -102,20 +52,12 @@ public class TransferController {
 		JSONObject par = (JSONObject) JSONValue.parse(body);
 		logger.info(par.toString());
 
-		String jsonData;
-		jsonData = (String) par.get("data");
+		JsonDeserializer jsonDeserializer = new JsonDeserializer(par, null);
+		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
 
-		byte[] data;
-		try {
-			data = HexEncoder.getBytes(jsonData);
-		} catch (DecoderException e) {
-			return jsonError(1, "Invalid data");
-		}
-
-		Deserializer deserializer = new BinaryDeserializer(data, new DeserializationContext(dbAccountLookup));
-		// can't use TransactionFactory here, as the client probably shouldn't care about "type"
-		// or maybe we'll force him?
-		TransferTransaction transaction = new TransferTransaction(deserializer);
+		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(dbAccountLookup));
+		TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 
 		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
 		logger.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
