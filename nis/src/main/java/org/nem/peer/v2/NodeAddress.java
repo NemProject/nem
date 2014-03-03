@@ -4,6 +4,7 @@ import org.nem.core.serialization.*;
 
 import java.net.*;
 import java.security.InvalidParameterException;
+import java.util.*;
 
 /**
  * The address of a node in the NEM network.
@@ -14,6 +15,7 @@ public class NodeAddress implements SerializableEntity {
     private final String address;
     private final int port;
     private final URL url;
+    private final Dictionary<NodeApiId, URL> nodeApiToUrlMap;
 
     /**
      * Creates a new node address.
@@ -27,6 +29,7 @@ public class NodeAddress implements SerializableEntity {
         this.address = address;
         this.port = port;
         this.url = this.createUrl();
+        this.nodeApiToUrlMap = this.createUrlMap();
     }
 
     /**
@@ -39,6 +42,7 @@ public class NodeAddress implements SerializableEntity {
         this.address = deserializer.readString("address");
         this.port = deserializer.readInt("port");
         this.url = this.createUrl();
+        this.nodeApiToUrlMap = this.createUrlMap();
     }
 
     /**
@@ -47,6 +51,15 @@ public class NodeAddress implements SerializableEntity {
      * @return The url.
      */
     public URL getBaseUrl() { return this.url; }
+
+    /**
+     * Gets the url for the specified API.
+     *
+     * @return The url for the specified API.
+     */
+    public URL getApiUrl(final NodeApiId id) {
+        return this.nodeApiToUrlMap.get(id);
+    }
 
     @Override
     public void serialize(final Serializer serializer) {
@@ -57,14 +70,27 @@ public class NodeAddress implements SerializableEntity {
 
     private URL createUrl() {
         try {
-            URL url = new URL(protocol, address, port, "/");
+            URL url = new URL(this.protocol, this.address, this.port, "/");
             //noinspection ResultOfMethodCallIgnored
-            InetAddress.getByName(address);
+            InetAddress.getByName(this.address);
             return url;
         } catch (MalformedURLException e) {
             throw new InvalidParameterException("url is malformed");
         } catch (UnknownHostException e) {
             throw new InvalidParameterException("host is unknown");
+        }
+    }
+
+    private Dictionary<NodeApiId, URL> createUrlMap() {
+        try {
+            Dictionary<NodeApiId, URL> nodeApiToUrlMap = new Hashtable<>();
+            nodeApiToUrlMap.put(NodeApiId.REST_NODE_INFO, new URL(this.url, "node/info"));
+            nodeApiToUrlMap.put(NodeApiId.REST_ADD_PEER, new URL(this.url, "peer/new"));
+            nodeApiToUrlMap.put(NodeApiId.REST_NODE_PEER_LIST, new URL(this.url, "node/peer-list"));
+            nodeApiToUrlMap.put(NodeApiId.REST_CHAIN, new URL(this.url, "chain"));
+            return nodeApiToUrlMap;
+        } catch (MalformedURLException e) {
+            throw new InvalidParameterException("url is malformed");
         }
     }
 

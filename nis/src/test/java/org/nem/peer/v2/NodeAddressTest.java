@@ -2,7 +2,6 @@ package org.nem.peer.v2;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Signature;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
@@ -16,22 +15,33 @@ public class NodeAddressTest {
     @Test
     public void ctorCanCreateNewNodeAddress() throws Exception {
         // Act:
-        NodeAddress address = new NodeAddress("ftp", "10.8.8.2", 12);
+        final NodeAddress address = new NodeAddress("ftp", "10.8.8.2", 12);
 
         // Assert:
-        Assert.assertThat(address.getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
+        final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
+        Assert.assertThat(address.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+        assertApiUrlsAreCorrect(expectedUrl, address);
     }
 
     @Test
     public void nodeAddressCanBeRoundTripped() throws Exception {
         // Arrange:
-        NodeAddress originalAddress = new NodeAddress("ftp", "10.8.8.2", 12);
+        final NodeAddress originalAddress = new NodeAddress("ftp", "10.8.8.2", 12);
 
         // Act:
-        NodeAddress address = new NodeAddress(Utils.roundtripSerializableEntity(originalAddress, null));
+        final NodeAddress address = new NodeAddress(Utils.roundtripSerializableEntity(originalAddress, null));
 
         // Assert:
-        Assert.assertThat(address.getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
+        final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
+        Assert.assertThat(address.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+        assertApiUrlsAreCorrect(expectedUrl, address);
+    }
+
+    private static void assertApiUrlsAreCorrect(final URL url, final NodeAddress address) throws Exception {
+        Assert.assertThat(address.getApiUrl(NodeApiId.REST_NODE_INFO), IsEqual.equalTo(new URL(url, "node/info")));
+        Assert.assertThat(address.getApiUrl(NodeApiId.REST_ADD_PEER), IsEqual.equalTo(new URL(url, "peer/new")));
+        Assert.assertThat(address.getApiUrl(NodeApiId.REST_NODE_PEER_LIST), IsEqual.equalTo(new URL(url, "node/peer-list")));
+        Assert.assertThat(address.getApiUrl(NodeApiId.REST_CHAIN), IsEqual.equalTo(new URL(url, "chain")));
     }
 
     @Test(expected = InvalidParameterException.class)

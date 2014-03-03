@@ -29,7 +29,6 @@ public class Node {
      */
     public NodeInfo getInfo() { return this.info; }
 
-
     /***
      * Gets this node's status.
      *
