@@ -54,7 +54,7 @@ public class CommonStarter implements ServletContextListener {
 		logger.info("Starting embedded Jetty Server.");
 
 		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
-		System.setProperty("JSON_SMART_SIMPLE", "om nem nem");
+		//JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
 
 		//Taken from Jetty doc 
 		QueuedThreadPool threadPool = new QueuedThreadPool();
