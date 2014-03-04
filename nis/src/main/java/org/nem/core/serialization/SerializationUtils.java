@@ -6,34 +6,17 @@ import org.nem.core.model.*;
 
 public class SerializationUtils {
 
+    //region Address
+
     /**
      * Writes an address object.
      *
-     * @param label The serializer to use.
+     * @param serializer The serializer to use.
+     * @param label The optional label.
      * @param address The object.
      */
     public static void writeAddress(final Serializer serializer, String label, final Address address) {
         serializer.writeString(label, address.getEncoded());
-    }
-
-    /**
-     * Writes an account object.
-     *
-     * @param label The serializer to use.
-     * @param account The object.
-     */
-    public static void writeAccount(final Serializer serializer, final String label, final Account account) {
-        writeAddress(serializer, label, account.getAddress());
-    }
-
-    /**
-     * Writes a signature object.
-     *
-     * @param label The serializer to use.
-     * @param signature The object.
-     */
-    public static void writeSignature(final Serializer serializer, final String label, final Signature signature) {
-        serializer.writeBytes(label, signature.getBytes());
     }
 
     /**
@@ -48,6 +31,42 @@ public class SerializationUtils {
         return Address.fromEncoded(encodedAddress);
     }
 
+    //endregion
+
+    //region Account
+
+    /**
+     * Writes an account object.
+     *
+     * @param serializer The serializer to use.
+     * @param label The optional label.
+     * @param account The object.
+     */
+    public static void writeAccount(final Serializer serializer, final String label, final Account account) {
+        writeAccount(serializer, label, account, AccountEncoding.ADDRESS);
+    }
+
+    /**
+     * Writes an account object.
+     *
+     * @param serializer The serializer to use.
+     * @param label The optional label.
+     * @param account The object.
+     * @param encoding The account encoding mode.
+     */
+    public static void writeAccount(final Serializer serializer, final String label, final Account account, final AccountEncoding encoding) {
+        switch (encoding){
+            case PUBLIC_KEY:
+                serializer.writeBytes(label, account.getKeyPair().getPublicKey());
+                break;
+
+            case ADDRESS:
+            default:
+                writeAddress(serializer, label, account.getAddress());
+                break;
+        }
+    }
+
     /**
      * Reads an account object.
      *
@@ -56,8 +75,46 @@ public class SerializationUtils {
      * @return The read object.
      */
     public static Account readAccount(final Deserializer deserializer, final String label) {
-        Address address = readAddress(deserializer, label);
+        return readAccount(deserializer, label, AccountEncoding.ADDRESS);
+    }
+
+    /**
+     * Reads an account object.
+     *
+     * @param deserializer The deserializer to use.
+     * @param encoding The account encoding.
+     * @param label The optional label.
+     * @return The read object.
+     */
+    public static Account readAccount(final Deserializer deserializer, final String label, final AccountEncoding encoding) {
+        Address address;
+        switch (encoding){
+            case PUBLIC_KEY:
+                address = Address.fromPublicKey(deserializer.readBytes(label));
+                break;
+
+            case ADDRESS:
+            default:
+                address = readAddress(deserializer, label);
+                break;
+        }
+
         return deserializer.getContext().findAccountByAddress(address);
+    }
+
+    //endregion
+
+    //region Signature
+
+    /**
+     * Writes a signature object.
+     *
+     * @param serializer The serializer to use.
+     * @param label The optional label.
+     * @param signature The object.
+     */
+    public static void writeSignature(final Serializer serializer, final String label, final Signature signature) {
+        serializer.writeBytes(label, signature.getBytes());
     }
 
     /**
@@ -71,4 +128,6 @@ public class SerializationUtils {
         byte[] bytes = deserializer.readBytes(label);
         return new Signature(bytes);
     }
+
+    //endregion
 }

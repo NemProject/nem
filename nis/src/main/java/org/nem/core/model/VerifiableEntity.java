@@ -59,9 +59,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     public VerifiableEntity(final int type, DeserializationOptions options,  Deserializer deserializer) {
         this.type = type;
         this.version = deserializer.readInt("version");
-        final Account signer = SerializationUtils.readAccount(deserializer, "signer");
-        final byte[] signerPublicKey = deserializer.readBytes("signerPublicKey");
-        this.signer = null != signer ? signer : new Account(new KeyPair(signerPublicKey));
+        this.signer = SerializationUtils.readAccount(deserializer, "signer", AccountEncoding.PUBLIC_KEY);
 
         if (DeserializationOptions.VERIFIABLE == options)
             this.signature = SerializationUtils.readSignature(deserializer, "signature");
@@ -125,8 +123,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     private void serialize(final Serializer serializer, boolean includeSignature) {
         serializer.writeInt("type", this.getType());
         serializer.writeInt("version", this.getVersion());
-        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
-        serializer.writeBytes("signerPublicKey", this.getSigner().getKeyPair().getPublicKey());
+        SerializationUtils.writeAccount(serializer, "signer", this.getSigner(), AccountEncoding.PUBLIC_KEY);
 
         if (includeSignature)
             SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
