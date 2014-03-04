@@ -21,6 +21,7 @@ import net.minidev.json.JSONValue;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.deploy.CommonStarter;
+import org.nem.peer.v2.Config;
 import org.nem.peer.v2.NodeAddress;
 import org.nem.peer.v2.NodeInfo;
 import org.nem.peer.v2.NodeStatus;
@@ -37,7 +38,7 @@ import org.nem.peer.v2.NodeStatus;
 public class PeerNetwork {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
-	private static PeerNetwork DEFAULT_NETWORK;
+	private static final PeerNetwork DEFAULT_NETWORK = createDefaultNetwork();
 
 	// Do not known right now for what purposes but it is always good to have a
 	// name...
@@ -55,13 +56,6 @@ public class PeerNetwork {
 	private ScheduledThreadPoolExecutor executor;
 
 	public static PeerNetwork getDefaultNetwork() {
-		if (DEFAULT_NETWORK == null) {
-			synchronized (PeerNetwork.class) {
-				if (DEFAULT_NETWORK == null) {
-					DEFAULT_NETWORK = createDefaultNetwork();
-				}
-			}
-		}
 		return DEFAULT_NETWORK;
 	}
 
@@ -79,33 +73,11 @@ public class PeerNetwork {
 		}
 		LOGGER.info("NIS settings: ");
 
-		JSONObject config = (JSONObject) JSONValue.parse(fin);
-        NodeInfo info = new NodeInfo(
-            new NodeAddress("http", (String) config.get("myAddress"), 80),
-            (String) config.get("myPlatform"),
-            CommonStarter.APP_NAME);
-        org.nem.peer.v2.Node node = new org.nem.peer.v2.Node(info);
-
-		JSONArray knownPeers = (JSONArray) config.get("knownPeers");
-		Set<String> wellKnownPeers;
-		if (knownPeers != null) {
-			Set<String> hosts = new HashSet<String>();
-			for (int i = 0; i < knownPeers.size(); i++) {
-
-				String hostEntry = (String) knownPeers.get(i);
-				hostEntry = hostEntry.trim();
-				if (hostEntry.length() > 0) {
-					hosts.add(hostEntry);
-				}
-			}
-			wellKnownPeers = Collections.unmodifiableSet(hosts);
-
-		} else {
-			wellKnownPeers = Collections.emptySet();
-			LOGGER.warning("No wellKnownPeers defined, it is unlikely to work");
-		}
-
-		PeerNetwork network = new PeerNetwork("Default network", new Node(node), wellKnownPeers);
+        Config config = new Config(CommonStarter.APP_NAME, (JSONObject)JSONValue.parse(fin));
+		PeerNetwork network = new PeerNetwork(
+            config.getNetworkName(),
+            new Node(config.getLocalNode()),
+            config.getWellKnownPeers());
 		network.boot();
 
 		return network;
