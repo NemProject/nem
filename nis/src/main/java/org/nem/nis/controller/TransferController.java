@@ -47,7 +47,9 @@ public class TransferController {
 			return jsonError(1, "incorrect data");
 		}
 
-		byte[] transferData = BinarySerializer.serializeToBytes(transferTransaction);
+		BinarySerializer binarySerializer = new BinarySerializer();
+		transferTransaction.asNonVerifiable().serialize(binarySerializer);
+		byte[] transferData = binarySerializer.getBytes();
 
 		JSONObject obj = JsonSerializer.serializeToJson(new RequestPrepare(transferData));
 		return obj.toJSONString() + "\r\n";
@@ -62,7 +64,7 @@ public class TransferController {
 		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
 
 		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(dbAccountLookup));
-		TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+		TransferTransaction transaction = (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 
 		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
