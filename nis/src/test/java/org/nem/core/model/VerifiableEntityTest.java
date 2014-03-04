@@ -85,40 +85,6 @@ public class VerifiableEntityTest {
         Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
     }
 
-    @Test
-    public void verifiableRoundTrippedEntityCanBeVerified() {
-        // Arrange:
-        final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
-        final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
-
-        // Assert:
-        Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
-    }
-
-    @Test
-    public void verifiableRoundTrippedEntityCanBeVerifiedWhenSignerAccountIsUnknown() {
-        // Arrange:
-        final Account signer = Utils.generateRandomAccount();
-        final AccountLookup accountLookup = new MockAccountLookup(true);
-        final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, accountLookup);
-
-        // Assert:
-        Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
-    }
-
-    @Test(expected = CryptoException.class)
-    public void nonVerifiableRoundTrippedEntityCannotBeVerified() {
-        // Arrange:
-        final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
-        final MockVerifiableEntity originalEntity = new MockVerifiableEntity(signer);
-        final MockVerifiableEntity entity = createNonVerifiableRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
-
-        // Assert:
-        entity.verify();
-    }
-
     @Test(expected = SerializationException.class)
     public void verifiableSerializationRequiresSignature() {
         // Arrange:
@@ -222,6 +188,40 @@ public class VerifiableEntityTest {
         final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
 
         // Act:
+        entity.verify();
+    }
+
+    @Test
+    public void verifiableRoundTrippedEntityCanBeVerified() {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
+        final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
+
+        // Assert:
+        Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void verifiableRoundTrippedEntityCanBeVerifiedWhenSignerAccountIsUnknown() {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final AccountLookup accountLookup = new MockAccountLookup(true);
+        final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, accountLookup);
+
+        // Assert:
+        Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+    }
+
+    @Test(expected = CryptoException.class)
+    public void nonVerifiableRoundTrippedEntityCannotBeVerified() {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
+        final MockVerifiableEntity originalEntity = new MockVerifiableEntity(signer);
+        final MockVerifiableEntity entity = createNonVerifiableRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
+
+        // Assert:
         entity.verify();
     }
 
