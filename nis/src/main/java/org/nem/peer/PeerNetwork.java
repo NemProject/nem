@@ -20,7 +20,7 @@ import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
-import org.nem.deploy.WebStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.peer.v2.NodeAddress;
 import org.nem.peer.v2.NodeInfo;
 import org.nem.peer.v2.NodeStatus;
@@ -83,7 +83,7 @@ public class PeerNetwork {
         NodeInfo info = new NodeInfo(
             new NodeAddress("http", (String) config.get("myAddress"), 80),
             (String) config.get("myPlatform"),
-            WebStarter.APP_NAME);
+            CommonStarter.APP_NAME);
         org.nem.peer.v2.Node node = new org.nem.peer.v2.Node(info);
 
 		JSONArray knownPeers = (JSONArray) config.get("knownPeers");

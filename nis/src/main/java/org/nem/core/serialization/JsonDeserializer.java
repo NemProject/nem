@@ -33,13 +33,24 @@ public class JsonDeserializer implements Deserializer {
     @Override
     public Integer readInt(final String label) {
         this.checkLabel(label);
-        return (Integer)this.object.get(label);
+		return (Integer)this.object.get(label);
     }
 
     @Override
     public Long readLong(final String label) {
         this.checkLabel(label);
-        return (Long)this.object.get(label);
+
+		// the alternative to this ugly piece, is setting up JSONParser.DEFAULT_PERMISSIVE_MODE
+		// in CommonStarter, but I was trying, but I don't know, how to set it up before tests :/
+		//
+		// additionally, readInt above, would have to be changed to:
+		// ((Long)this.object.get(label)).intValue();
+
+		Object object = this.object.get(label);
+		if (object instanceof Long) {
+			return (Long)object;
+		}
+        return ((Integer)object).longValue();
     }
 
     @Override

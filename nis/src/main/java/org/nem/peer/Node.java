@@ -23,7 +23,7 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.serialization.*;
-import org.nem.deploy.WebStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.peer.v2.NodeAddress;
 import org.nem.peer.v2.NodeApiId;
 import org.nem.peer.v2.NodeInfo;
@@ -63,8 +63,8 @@ public class Node implements SerializableEntity {
 
 	public Node(String host) {
         try {
-            NodeAddress address = new NodeAddress("http", host, WebStarter.NEM_PORT);
-            NodeInfo info = new NodeInfo(address, "", WebStarter.APP_NAME);
+            NodeAddress address = new NodeAddress("http", host, CommonStarter.NEM_PORT);
+            NodeInfo info = new NodeInfo(address, "", CommonStarter.APP_NAME);
             this.node = new org.nem.peer.v2.Node(info);
         } catch (InvalidParameterException e) {
             throw new IllegalArgumentException(e);

@@ -75,7 +75,7 @@
 <jar href="lib/validation-api-1.1.0.Final.jar"/>
 <jar href="lib/xml-apis-1.0.b2.jar"/>  
 </resources>
-  <application-desc main-class="org.nem.deploy.WebStarter">
+  <application-desc main-class="org.nem.deploy.CommonStarter">
 
   </application-desc>
 </jnlp> 

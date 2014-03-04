@@ -108,6 +108,7 @@ public class BinarySerializerTest {
             Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
         }
     }
+
     @Test
     public void canWriteObjectArray() throws Exception {
         // Arrange:
@@ -408,6 +409,25 @@ public class BinarySerializerTest {
         try (BinaryDeserializer deserializer = createBinaryDeserializer(bytes)) {
             // Assert:
             deserializer.readBytes("bytes");
+        }
+    }
+
+    //endregion
+
+    //region serializeToBytes
+
+    @Test
+    public void serializeToBytesProducesSameBytesAsEntitySerialize() throws Exception {
+        // Arrange:
+        try (BinarySerializer serializer = new BinarySerializer()) {
+
+            // Act:
+            SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
+            entity.serialize(serializer);
+            byte[] writeObjectBytes = serializer.getBytes();
+
+            // Assert:
+            Assert.assertThat(BinarySerializer.serializeToBytes(entity), IsEqual.equalTo(writeObjectBytes));
         }
     }
 

@@ -1,3 +1,43 @@
+Flyway and H2
+-------------
+
+I've added Flyway, so tables in db should be created automagically upon startup
+This is done via dependency on session manager:
+
+```
+<bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+          depends-on="flyway">
+```
+
+```
+Db settings are in:
+src\main\webapp\WEB-INF\dbh2.properties
+```
+
+maria DB setup
+--------------
+
+mariadb setup
+```
+> mysql.exe -u root --password=rootpass
+
+MariaDB [(none)]> CREATE DATABASE `nis`;
+MariaDB [(none)]> GRANT CREATE, ALTER, INDEX, INSERT, SELECT, UPDATE, DELETE, DROP ON `nis`.* to 'nisuser'@'localhost' identified by 'nispass';
+```
+
+```
+Db settings are in:
+src\main\webapp\WEB-INF\dbmaria.properties
+
+to switch, one must change (in application-context.xml)
+<property name="location">
+    <value>classpath:dbh2.properties</value>
+</property>
+
+(to "classpath:dbmaria.properties"
+```
+
 WebStart added
 --------------
 Try it out:
@@ -26,103 +66,13 @@ Current operational model:
 - NEM Wallet/Server is installed on Desktop
 - Can be launched either via Web-Page / from Desktop
 - Jetty server started and listens at 7890
-- org.nem.deploy.WebStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
-  but this is only for demonstration purposes. 
-  
+- org.nem.deploy.CommonStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
+  but this is only for demonstration purposes.
+
   Two future client options are available
-  
+
   A)	a Java SWT Client, That client uses server code directly, no process communication in-between.
-  B) 	a HTML client, Browser uses port 7890 to communicate with the server. JSON objects are returned which are rendered using JavaScript/whatever JS framework  
-
-Merge Thies' peer
------------------
-
-I wasn't sure if both of you will be ok with the changes, so I've put it on separate branch
-
-* dropped NEMServer
-* moved most of stuff from org.nem.NEM to org.nem.peer.PeerInitializer
-* I think we shouldn't pollute web.xml with our stuff so I've changed reading of settings to JSON file peers-config.json
-* I've used jetty's HttpClient for communication: http://www.eclipse.org/jetty/documentation/current/http-client.html
-* Controllers in org.nem.nis.controller are handling the calls
-* I have host running, which is added to peers-config.json, so you should be able to try it out, here's sample output
-```
-[INFO] Started Jetty Server
-17:46:23,605  INFO PeerInitializer:51 - NIS settings:
-17:46:23,617  INFO PeerInitializer:58 -   "myPort" = 7890
-17:46:23,618  INFO PeerInitializer:67 -   "myAddress" = "localhost"
-17:46:23,622  INFO PeerInitializer:77 -   "myPlatform" = "ZX Spectrum"
-2014-02-19 17:46:23,623 [org.nem.peer.Node getNodeInfo] WARNING: node/info url: http://37.187.70.29:7890/node/info
-2014-02-19 17:46:23,858 [org.nem.peer.Node getNodeInfo] WARNING: node/info response: {"port":"7890","shareAddress":true,"platform":"PC x64","protocol":1,"application":"NIS","scheme":"http","version":"0.1.0"}
-2014-02-19 17:46:23,860 [org.nem.peer.Node extendNetworkBy] WARNING: node/info url: http://37.187.70.29:7890/node/info
-2014-02-19 17:46:23,951 [org.nem.peer.Node extendNetworkBy] WARNING: peer/new response: {"error":1,"reason":"trust no one"}
-```
-
-* removed NEMLogger, moved location of logging.properties into jetty.xml
-* 
-
-Some configuration is in XML files, the rest of the stuff is annotation based.
-
-
-DB setup
---------
-
-For testing purposed I was using mariaDb (mysql descendant). I hadn't time, to try sqlite before pushing it.
-```
-Db settings are in:       src\main\webapp\WEB-INF\database.properties
-hibernate db settings in: src\main\webapp\WEB-INF\application-context.xml
-
-log4j:                    src\main\resources\log4j.properties
-```
-
-I've added mariadb connector in the repo, I couldn't found maven server with recent version.
-
-mariadb setup
-```
-> mysql.exe -u root --password=rootpass
-
-MariaDB [(none)]> CREATE DATABASE `nis`;
-MariaDB [(none)]> GRANT CREATE, ALTER, INDEX, INSERT, SELECT, UPDATE, DELETE, DROP ON `nis`.* to 'nisuser'@'localhost' identified by 'nispass';
-
-mysql.exe nis -u nisuser --password=nispass < nem-infrastracture-server\createTables.sql
-```
-(I know, I know, tables creation should rather be in code,
- also the sql, does not contain sensible primary keys now).
-
-
-Running nis
------------
-
-```
-mvn clean compile jetty:run
-```
-
-Flow
-----
-
-I've put main class as a bean inside application-context, and `init()` method inside this class has `@PostConstruct` annotation.
-(I'm quite aware, that this is probably ugly way, I just wanted to get to more interesting things faster)
-
-First thing `init()` does is call to `populateDb()`, which in turn calls `populateGenesisAccount()`, `populateGenesisBlock()` and `populateGenesisTxes()`.
-
-Right after that `analyze()` from `AccountsState` is called, which does some initial (dummy) analysis.
-
-
-The server itself should answer to /getInfo **POST** request on 7890 port
-```
-wget http://localhost:7890/getInfo --post-data="" -q -O -
-```
-
-This is done from `org.nem.nis.controller.InfoController`
-
-Other
------
-
-Some other things you'll find there.
-In `NcsMain`, there is big commented-out `unusedThread()` method, which was using
-`NxtRequests` to communicate with NXT server running on `localhost:7874`.
-
-The code won't compile/work now, due to differences in Account, Block, etc,
-but you can take a look.
+  B) 	a HTML client, Browser uses port 7890 to communicate with the server. JSON objects are returned which are rendered using JavaScript/whatever JS framework
 
 
 To Discuss

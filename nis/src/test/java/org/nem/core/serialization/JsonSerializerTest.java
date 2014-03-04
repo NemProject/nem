@@ -436,6 +436,24 @@ public class JsonSerializerTest {
 
     //endregion
 
+    //region serializeToBytes
+
+    @Test
+    public void serializeToJsonProducesSameBytesAsEntitySerialize() throws Exception {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
+        entity.serialize(serializer);
+        JSONObject writeObjectJson = serializer.getObject();
+
+        // Assert:
+        Assert.assertThat(JsonSerializer.serializeToJson(entity), IsEqual.equalTo(writeObjectJson));
+    }
+
+    //endregion
+
     private JsonDeserializer createJsonDeserializer(final JSONObject object) {
         return new JsonDeserializer(object, null);
     }

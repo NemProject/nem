@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.transactions.TransferTransaction;
 
@@ -28,17 +28,17 @@ public class BlockTest {
         Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
     }
 
+    //endregion
+
+    //region Serialization
+
     @Test
     public void blockCanBeRoundTripped() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
-        final Block originalBlock = new Block(signer);
-        originalBlock.addTransaction(createSignedTransactionWithAmount(17));
-        originalBlock.addTransaction(createSignedTransactionWithAmount(290));
-        originalBlock.sign();
 
-        final Block block = createRoundTrippedTransaction(originalBlock, signerPublicKeyOnly);
+        // Act:
+        final Block block = createBlockForRoundTripTests(true, signer);
 
         // Assert:
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
@@ -48,12 +48,78 @@ public class BlockTest {
 
         final List<Transaction> transactions = block.getTransactions();
         Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
-        Assert.assertThat(((TransferTransaction)transactions.get(0)).getAmount(), IsEqual.equalTo(17L));
-        Assert.assertThat(((TransferTransaction)transactions.get(1)).getAmount(), IsEqual.equalTo(290L));
+
+        final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+        Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(17L));
+
+        final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+        Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(290L));
     }
 
-    private Transaction createSignedTransactionWithAmount(long amount) {
-        Transaction transaction = new TransferTransaction(
+    @Test
+    public void blockAndTransactionsCanBeVerifiedAfterVerifiableRoundTrip() {
+        // Act:
+        final Block block = createBlockForRoundTripTests(true, null);
+
+        // Assert:
+        Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+
+        final List<Transaction> transactions = block.getTransactions();
+        Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+
+        final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+        Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
+
+        final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+        Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
+    }
+
+    @Test
+     public void transactionsCanBeVerifiedAfterNonVerifiableRoundTrip() {
+        // Act:
+        final Block block = createBlockForRoundTripTests(false, null);
+
+        // Assert:
+        Assert.assertThat(block.getSignature(), IsEqual.equalTo(null));
+
+        final List<Transaction> transactions = block.getTransactions();
+        Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+
+        final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+        Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
+
+        final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+        Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
+    }
+
+    private Block createBlockForRoundTripTests(boolean verifiable, final Account signer) {
+        // Arrange:
+        final Block originalBlock = new Block(null == signer ? Utils.generateRandomAccount() : signer);
+        TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
+        originalBlock.addTransaction(transaction1);
+
+        TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
+        originalBlock.addTransaction(transaction2);
+        originalBlock.sign();
+
+        // Arrange:
+        MockAccountLookup accountLookup = new MockAccountLookup();
+        accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(originalBlock.getSigner()));
+        accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(transaction1.getSigner()));
+        accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(transaction2.getSigner()));
+
+        // Act:
+        SerializableEntity entity = verifiable ? originalBlock : originalBlock.asNonVerifiable();
+        VerifiableEntity.DeserializationOptions options = verifiable
+            ? VerifiableEntity.DeserializationOptions.VERIFIABLE
+            : VerifiableEntity.DeserializationOptions.NON_VERIFIABLE;
+
+        Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
+        return new Block(deserializer.readInt("type"), options, deserializer);
+    }
+
+    private TransferTransaction createSignedTransactionWithAmount(long amount) {
+        TransferTransaction transaction = new TransferTransaction(
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
             amount,
@@ -105,13 +171,5 @@ public class BlockTest {
         MockTransaction transaction = new MockTransaction(sender);
         transaction.setFee(fee);
         return transaction;
-    }
-
-    private Block createRoundTrippedTransaction(
-        Block originalBlock,
-        final Account deserializedSigner) {
-        // Act:
-        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, deserializedSigner);
-        return new Block(deserializer.readInt("type"), deserializer);
     }
 }

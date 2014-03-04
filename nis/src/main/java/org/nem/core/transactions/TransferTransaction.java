@@ -40,8 +40,8 @@ public class TransferTransaction extends Transaction {
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public TransferTransaction(final Deserializer deserializer) {
-		super(TransactionTypes.TRANSFER, deserializer);
+	public TransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
+		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
 		this.amount = deserializer.readLong("amount");
 		this.message = deserializer.readObject("message", MessageFactory.DESERIALIZER);

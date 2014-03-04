@@ -65,7 +65,7 @@ public class PeerConnector {
 		return response;
 	}
 
-	private JSONObject getResponse(URL url) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
+	protected JSONObject getResponse(URL url) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
 		JSONObject retObj = null;
 
 		try {
@@ -113,7 +113,7 @@ public class PeerConnector {
 //		return retObj;
 //	}
 //
-	private JSONObject postResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
+	protected JSONObject postResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException,
 			ExecutionException {
 		JSONObject retObj = null;
 		try {
