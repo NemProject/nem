@@ -10,15 +10,36 @@ import java.util.HashMap;
  */
 public class MockAccountLookup implements AccountLookup {
 
+    private final boolean shouldReturnNulls;
     private int numFindByIdCalls;
     private HashMap<Address, Account> accountMap = new HashMap<>();
+
+    /**
+     * Creates a new mock account lookup that never returns nulls.
+     */
+    public MockAccountLookup() {
+        this(false);
+    }
+
+    /**
+     * Creates a new mock account lookup that can optionally return null accounts
+     * instead of mock accounts.
+     *
+     * @param shouldReturnNulls true if the default return value for an unknown account should be null.
+     */
+    public MockAccountLookup(final boolean shouldReturnNulls) {
+        this.shouldReturnNulls = shouldReturnNulls;
+    }
 
     @Override
     public Account findByAddress(final Address id) {
         ++this.numFindByIdCalls;
 
         final Account account = this.accountMap.get(id);
-        return null == account ? new MockAccount(id) : account;
+        if (null != account)
+            return account;
+
+        return this.shouldReturnNulls ? null : new MockAccount(id);
     }
 
     /**
