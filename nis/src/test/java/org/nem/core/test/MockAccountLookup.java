@@ -10,25 +10,45 @@ import java.util.HashMap;
  */
 public class MockAccountLookup implements AccountLookup {
 
-    private final boolean shouldReturnNulls;
+    private final UnknownAccountBehavior unknownAccountBehavior;
     private int numFindByIdCalls;
     private HashMap<Address, Account> accountMap = new HashMap<>();
 
     /**
-     * Creates a new mock account lookup that never returns nulls.
+     * The default behavior of findByAddress if the address is unknown.
+     */
+    public enum UnknownAccountBehavior {
+        /**
+         * Return a MockAccount (default).
+         */
+        MOCK_ACCOUNT,
+
+        /**
+         * Return a real Account.
+         */
+
+        REAL_ACCOUNT,
+        /**
+         * Return null.
+         */
+        NULL
+    }
+
+    /**
+     * Creates a new mock account lookup with the default unknown account behavior.
      */
     public MockAccountLookup() {
-        this(false);
+        this(UnknownAccountBehavior.MOCK_ACCOUNT);
     }
 
     /**
      * Creates a new mock account lookup that can optionally return null accounts
      * instead of mock accounts.
      *
-     * @param shouldReturnNulls true if the default return value for an unknown account should be null.
+     * @param unknownAccountBehavior The unknown account behavior.
      */
-    public MockAccountLookup(final boolean shouldReturnNulls) {
-        this.shouldReturnNulls = shouldReturnNulls;
+    public MockAccountLookup(final UnknownAccountBehavior unknownAccountBehavior) {
+        this.unknownAccountBehavior = unknownAccountBehavior;
     }
 
     @Override
@@ -39,7 +59,17 @@ public class MockAccountLookup implements AccountLookup {
         if (null != account)
             return account;
 
-        return this.shouldReturnNulls ? null : new MockAccount(id);
+        switch (unknownAccountBehavior) {
+            case REAL_ACCOUNT:
+                return new Account(id);
+
+            case NULL:
+                return null;
+
+            case MOCK_ACCOUNT:
+            default:
+                return new MockAccount(id);
+        }
     }
 
     /**

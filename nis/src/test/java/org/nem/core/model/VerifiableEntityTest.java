@@ -206,7 +206,7 @@ public class VerifiableEntityTest {
     public void verifiableRoundTrippedEntityCanBeVerifiedWhenSignerAccountIsUnknown() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        final AccountLookup accountLookup = new MockAccountLookup(true);
+        final AccountLookup accountLookup = new MockAccountLookup(MockAccountLookup.UnknownAccountBehavior.REAL_ACCOUNT);
         final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, accountLookup);
 
         // Assert:
