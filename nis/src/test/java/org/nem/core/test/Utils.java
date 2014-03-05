@@ -64,7 +64,7 @@ public class Utils {
      * @return A random address.
      */
     public static Address generateRandomAddress() {
-        return generateRandomAccount().getAddress();
+        return Address.fromEncoded(Utils.generateRandomAccount().getAddress().getEncoded());
     }
 
     /**
