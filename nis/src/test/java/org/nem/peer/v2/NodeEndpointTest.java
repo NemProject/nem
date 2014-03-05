@@ -44,6 +44,8 @@ public class NodeEndpointTest {
         Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN), IsEqual.equalTo(new URL(url, "chain")));
     }
 
+    //region invalid parameters
+
     @Test(expected = InvalidParameterException.class)
     public void ctorFailsIfProtocolIsInvalid() throws Exception {
         // Act:
@@ -56,20 +58,32 @@ public class NodeEndpointTest {
         new NodeEndpoint("ftp", "10.8.8.2.1", 12);
     }
 
+    //endregion
+
+    //region host name resolution
+
     @Test
     public void blankHostResolvesToLocalHost() throws Exception {
         // Assert:
-        assertHostNameResolvesToLocalhost(null);
-        assertHostNameResolvesToLocalhost("");
+        assertHostNameResolvesTo(null, "127.0.0.1");
+        assertHostNameResolvesTo("", "127.0.0.1");
     }
 
-    private static void assertHostNameResolvesToLocalhost(final String hostName) {
+    @Test
+    public void knownHostNameIsResolvedToAddress() {
+        // Assert:
+        assertHostNameResolvesTo("localhost", "127.0.0.1");
+    }
+
+    private static void assertHostNameResolvesTo(final String hostName, final String expectedHostName) {
         // Act:
         final NodeEndpoint endpoint = new NodeEndpoint("ftp", hostName, 12);
 
         // Assert:
-        Assert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo("localhost"));
+        Assert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo(expectedHostName));
     }
+
+    //endregion
 
     //endregion
 
@@ -100,6 +114,16 @@ public class NodeEndpointTest {
         Assert.assertThat(new NodeEndpoint("http", "10.8.8.2", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
         Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
         Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+    }
+
+    @Test
+    public void endpointCreatedAroundHostNameIsEquivalentToEndpointCreatedAroundResolvedAddress() {
+        // Arrange:
+        NodeEndpoint endpoint1 = new NodeEndpoint("ftp", "localhost", 12);
+        NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
+
+        // Assert:
+        Assert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));
     }
 
     //endregion

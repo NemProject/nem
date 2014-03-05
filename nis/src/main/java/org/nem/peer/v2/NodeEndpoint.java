@@ -68,23 +68,24 @@ public class NodeEndpoint implements SerializableEntity {
         serializer.writeInt("port", this.port);
     }
 
-    private static String normalizeHost(final String host) {
+    private static String normalizeHost(String host) {
         if (null == host || 0 == host.length())
-            return "localhost";
+            host = "localhost";
 
-        return host;
+        try {
+            final InetAddress address = InetAddress.getByName(host);
+            return address.getHostAddress();
+        }
+        catch (UnknownHostException e) {
+            throw new InvalidParameterException("host is unknown");
+        }
     }
 
     private URL createUrl() {
         try {
-            URL url = new URL(this.protocol, this.host, this.port, "/");
-            //noinspection ResultOfMethodCallIgnored
-            InetAddress.getByName(this.host);
-            return url;
+            return new URL(this.protocol, this.host, this.port, "/");
         } catch (MalformedURLException e) {
             throw new InvalidParameterException("url is malformed");
-        } catch (UnknownHostException e) {
-            throw new InvalidParameterException("host is unknown");
         }
     }
 
