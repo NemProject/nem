@@ -1,6 +1,7 @@
 package org.nem.peer.v2;
 
 import net.minidev.json.*;
+import org.nem.core.serialization.*;
 
 import java.util.*;
 
@@ -15,17 +16,10 @@ public class Config {
     /**
      * Creates a new configuration object from a JSON configuration object.
      *
-     * @param applicationName The name of the application.
      * @param jsonConfig A JSON configuration object.
      */
-    public Config(final String applicationName, final JSONObject jsonConfig) {
-
-        NodeInfo info = new NodeInfo(
-            new LocalNodeAddress((String)jsonConfig.get("myAddress")),
-            (String)jsonConfig.get("myPlatform"),
-            applicationName);
-        this.localNode = new Node(info);
-
+    public Config(final JSONObject jsonConfig) {
+        this.localNode = parseLocalNode(jsonConfig);
         this.wellKnownPeers = parseWellKnownPeers((JSONArray)jsonConfig.get("knownPeers"));
     }
 
@@ -50,13 +44,19 @@ public class Config {
      */
     public Set<String> getWellKnownPeers() { return this.wellKnownPeers; }
 
+    private static Node parseLocalNode(final JSONObject jsonConfig) {
+        JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
+        NodeInfo info = new NodeInfo(deserializer);
+        return new Node(info);
+    }
+
     private static Set<String> parseWellKnownPeers(final JSONArray jsonWellKnownPeers) {
         if (null == jsonWellKnownPeers)
             return Collections.emptySet();
 
         Set<String> wellKnownPeers = new HashSet<>();
-        for (int i = 0; i < jsonWellKnownPeers.size(); ++i) {
-            String host = ((String)jsonWellKnownPeers.get(i)).trim();
+        for (Object jsonWellKnownPeer : jsonWellKnownPeers) {
+            String host = ((String)jsonWellKnownPeer).trim();
             if (!host.isEmpty())
                 wellKnownPeers.add(host);
         }

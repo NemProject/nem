@@ -23,7 +23,6 @@ public class NodeInfoTest {
         // Assert:
         Assert.assertThat(info.getAddress().getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
         Assert.assertThat(info.getPlatform(), IsEqual.equalTo("plat"));
-        Assert.assertThat(info.getProtocol(), IsEqual.equalTo("https"));
         Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
         Assert.assertThat(info.getApplication(), IsEqual.equalTo("app"));
     }
@@ -39,7 +38,6 @@ public class NodeInfoTest {
         // Assert:
         Assert.assertThat(info.getAddress().getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
         Assert.assertThat(info.getPlatform(), IsEqual.equalTo("plat"));
-        Assert.assertThat(info.getProtocol(), IsEqual.equalTo("https"));
         Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
         Assert.assertThat(info.getApplication(), IsEqual.equalTo("app"));
     }
@@ -50,30 +48,22 @@ public class NodeInfoTest {
         new NodeInfo(null, "plat", "app");
     }
 
-    @Test(expected = InvalidParameterException.class)
-    public void protocolCannotBeNull() {
-        // Act:
-        deserializeWithoutProperty("protocol");
-    }
-
-    @Test(expected = InvalidParameterException.class)
-    public void versionCannotBeNull() {
-        // Act:
-        deserializeWithoutProperty("version");
-    }
-
-    public static void deserializeWithoutProperty(final String propertyName) {
+    @Test
+    public void currentVersionIsAssumedIfVersionIsNotSpecified() {
         // Arrange:
-        NodeInfo info = new NodeInfo(DEFAULT_ADDRESS, "plat", "app");
+        NodeInfo originalInfo = new NodeInfo(DEFAULT_ADDRESS, "plat", "app");
         JsonSerializer serializer = new JsonSerializer();
-        info.serialize(serializer);
+        originalInfo.serialize(serializer);
 
         JSONObject object = serializer.getObject();
-        object.remove(propertyName);
+        object.remove("version");
 
         // Act:
         JsonDeserializer deserializer = new JsonDeserializer(object, null);
-        new NodeInfo(deserializer);
+        NodeInfo info = new NodeInfo(deserializer);
+
+        // Assert:
+        Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
     }
 
     @Test

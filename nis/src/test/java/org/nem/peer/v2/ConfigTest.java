@@ -5,13 +5,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.net.URL;
-import java.util.Set;
+import java.util.*;
 
 public class ConfigTest {
 
     @Test
     public void networkNameIsInitializedCorrectly() {
-        // Act:
+        // Arrange:
         final Config config = createTestConfig();
 
         // Assert:
@@ -20,22 +20,27 @@ public class ConfigTest {
 
     @Test
     public void localNodeIsInitializedCorrectly() throws Exception {
-        // Act:
+        // Arrange:
         final Config config = createTestConfig();
-        final NodeInfo info = config.getLocalNode().getInfo();
+
+        // Act:
+        final Node localNode = config.getLocalNode();
+        final NodeInfo info = localNode.getInfo();
 
         // Assert:
-        Assert.assertThat(info.getAddress().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 80, "/")));
+        Assert.assertThat(info.getAddress().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
         Assert.assertThat(info.getPlatform(), IsEqual.equalTo("Mac"));
-        Assert.assertThat(info.getProtocol(), IsEqual.equalTo("https"));
         Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
         Assert.assertThat(info.getApplication(), IsEqual.equalTo("FooBar"));
+        Assert.assertThat(localNode.getStatus(), IsEqual.equalTo(NodeStatus.INACTIVE));
     }
 
     @Test
      public void wellKnownPeersAreInitializedCorrectly() {
-        // Act:
+        // Arrange:
         final Config config = createTestConfig();
+
+        // Act:
         final Set<String> wellKnownPeers = config.getWellKnownPeers();
 
         // Assert:
@@ -45,16 +50,66 @@ public class ConfigTest {
         Assert.assertThat(wellKnownPeers.contains("Gamma"), IsEqual.equalTo(true));
     }
 
-    public static Config createTestConfig() {
+    @Test
+    public void wellKnownPeersAreEmptyIfNotSpecified() {
+        // Arrange:
+        final JSONObject jsonConfig = createTestJsonConfig();
+        jsonConfig.remove("knownPeers");
+        final Config config = createTestConfig(jsonConfig);
+
+        // Act:
+        final Set<String> wellKnownPeers = config.getWellKnownPeers();
+
+        // Assert:
+        Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(0));
+    }
+
+    @Test
+    public void wellKnownPeersContainingAllWhitespaceAreIgnored() {
+        // Arrange:
+        final JSONObject jsonConfig = createTestJsonConfig(new String[] { "", "Beta", "  ", "Alpha", "\t \t" });
+        final Config config = createTestConfig(jsonConfig);
+
+        // Act:
+        final Set<String> wellKnownPeers = config.getWellKnownPeers();
+
+        // Assert:
+        Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(2));
+        Assert.assertThat(wellKnownPeers.contains("Beta"), IsEqual.equalTo(true));
+        Assert.assertThat(wellKnownPeers.contains("Alpha"), IsEqual.equalTo(true));
+    }
+
+    //region Factories
+
+    private static JSONObject createTestJsonConfig(final String[] hostNames) {
         JSONObject jsonConfig = new JSONObject();
-        jsonConfig.put("myAddress", "10.0.0.8");
-        jsonConfig.put("myPlatform", "Mac");
+
+        JSONObject jsonAddress = new JSONObject();
+        jsonAddress.put("protocol", "http");
+        jsonAddress.put("address", "10.0.0.8");
+        jsonAddress.put("port", 7890);
+        jsonConfig.put("address", jsonAddress);
+
+        jsonConfig.put("platform", "Mac");
+        jsonConfig.put("application", "FooBar");
 
         JSONArray jsonWellKnownPeers = new JSONArray();
-        jsonWellKnownPeers.add("Alpha");
-        jsonWellKnownPeers.add("Sigma");
-        jsonWellKnownPeers.add("Gamma");
+        Collections.addAll(jsonWellKnownPeers, hostNames);
         jsonConfig.put("knownPeers", jsonWellKnownPeers);
-        return new Config("FooBar", jsonConfig);
+        return jsonConfig;
     }
+
+    private static JSONObject createTestJsonConfig() {
+        return createTestJsonConfig(new String[] { "Alpha", "Sigma", "Gamma" });
+    }
+
+    private static Config createTestConfig() {
+        return createTestConfig(createTestJsonConfig());
+    }
+
+    private static Config createTestConfig(final JSONObject jsonConfig) {
+        return new Config(jsonConfig);
+    }
+
+    //endregion
 }

@@ -73,7 +73,7 @@ public class PeerNetwork {
 		}
 		LOGGER.info("NIS settings: ");
 
-        Config config = new Config(CommonStarter.APP_NAME, (JSONObject)JSONValue.parse(fin));
+        Config config = new Config((JSONObject)JSONValue.parse(fin));
 		PeerNetwork network = new PeerNetwork(
             config.getNetworkName(),
             new Node(config.getLocalNode()),

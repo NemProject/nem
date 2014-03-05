@@ -1,11 +1,16 @@
 {
 	"_info": "commented fields are proceeded with '_'",
-	
-	"myPort": 7890,
-	"myAddress": "nemcoin.info",
-	"myPlatform": "ZX Spectrum",
+
+	"address": {
+	    "protocol": "http",
+	    "address": "nemcoin.info",
+	    "port" 7890
+	},
+
+    "application": "NIS"
+	"platform": "ZX Spectrum",
+
 	"knownPeers": [ "37.187.70.29" ],
-	
-	
+
 	"_end": "end"
 }

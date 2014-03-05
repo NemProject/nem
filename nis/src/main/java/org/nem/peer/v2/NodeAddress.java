@@ -26,7 +26,7 @@ public class NodeAddress implements SerializableEntity {
      */
     public NodeAddress(final String protocol, final String address, final int port) {
         this.protocol = protocol;
-        this.address = address;
+        this.address = normalizeAddress(address);
         this.port = port;
         this.url = this.createUrl();
         this.nodeApiToUrlMap = this.createUrlMap();
@@ -39,7 +39,7 @@ public class NodeAddress implements SerializableEntity {
      */
     public NodeAddress(final Deserializer deserializer) {
         this.protocol = deserializer.readString("protocol");
-        this.address = deserializer.readString("address");
+        this.address = normalizeAddress(deserializer.readString("address"));
         this.port = deserializer.readInt("port");
         this.url = this.createUrl();
         this.nodeApiToUrlMap = this.createUrlMap();
@@ -66,6 +66,13 @@ public class NodeAddress implements SerializableEntity {
         serializer.writeString("protocol", this.protocol);
         serializer.writeString("address", this.address);
         serializer.writeInt("port", this.port);
+    }
+
+    private static String normalizeAddress(final String address) {
+        if (null == address || 0 == address.length())
+            return "localhost";
+
+        return address;
     }
 
     private URL createUrl() {

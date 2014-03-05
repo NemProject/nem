@@ -56,6 +56,21 @@ public class NodeAddressTest {
         new NodeAddress("ftp", "10.8.8.2.1", 12);
     }
 
+    @Test
+    public void blankAddressResolvesToLocalHost() throws Exception {
+        // Assert:
+        assertHostNameResolvesToLocalhost(null);
+        assertHostNameResolvesToLocalhost("");
+    }
+
+    private static void assertHostNameResolvesToLocalhost(final String hostName) {
+        // Act:
+        final NodeAddress address = new NodeAddress("ftp", hostName, 12);
+
+        // Assert:
+        Assert.assertThat(address.getBaseUrl().getHost(), IsEqual.equalTo("localhost"));
+    }
+
     //endregion
 
     //region equals / hashCode
