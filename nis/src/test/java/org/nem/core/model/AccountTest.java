@@ -10,8 +10,10 @@ import java.math.BigInteger;
 
 public class AccountTest {
 
+    //region Constructor
+
     @Test
-    public void ctorInitializesAllFields() {
+    public void accountCanBeCreatedAroundKeyPair() {
         // Arrange:
         final KeyPair kp = new KeyPair();
         final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
@@ -25,19 +27,37 @@ public class AccountTest {
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
     }
 
+    @Test
+    public void accountCanBeCreatedAroundAddressWithoutPublicKey() {
+        // Arrange:
+        final Address expectedAccountId = Utils.generateRandomAddress();
+        final Account account = new Account(expectedAccountId);
+
+        // Assert:
+        Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
+        Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+        Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
+        Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+    }
+
 	@Test
-	public void ctorWithUnknownPublic() {
+	public void accountCanBeCreatedAroundAddressWithPublicKey() {
 		// Arrange:
-		final Address expectedAccountId = Utils.generateRandomAddress();
+        final byte[] publicKey = new KeyPair().getPublicKey();
+		final Address expectedAccountId = Address.fromPublicKey(publicKey);
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
+        Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
+
+    //endregion
 
 	@Test
     public void labelCanBeSet() {
