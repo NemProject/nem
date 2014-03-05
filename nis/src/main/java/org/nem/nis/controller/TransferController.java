@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.InvalidParameterException;
+import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 @RestController
@@ -43,7 +45,20 @@ public class TransferController {
 		try {
 			transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
+		// not found in db
+		} catch (MissingResourceException e) {
+			return jsonError(1, "incorrect data");
+
+		// wrong transaction type
+		} catch (InvalidParameterException e) {
+			return jsonError(1, "incorrect data");
+
+		//
 		} catch (NullPointerException e) {
+			return jsonError(1, "incorrect data");
+		}
+
+		if (! transferTransaction.isValid()) {
 			return jsonError(1, "incorrect data");
 		}
 

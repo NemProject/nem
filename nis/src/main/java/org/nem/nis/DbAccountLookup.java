@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +28,7 @@ public class DbAccountLookup implements AccountLookup {
 
 		org.nem.core.dbmodel.Account dbAccount = accountDao.getAccountByPrintableAddress(id.getEncoded());
 		if (dbAccount == null) {
-			throw new RuntimeException("account not found in the db");
+			throw new MissingResourceException("account not found in the db", Address.class.getName(), id.getEncoded());
 		}
 
 		return new Account(new KeyPair(dbAccount.getPublicKey()));
