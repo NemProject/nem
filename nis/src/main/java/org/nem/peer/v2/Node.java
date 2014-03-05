@@ -48,6 +48,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return String.format("Node %s (%s)", this.getInfo().getAddress().getBaseUrl().getHost(), this.status);
+        return String.format("Node %s (%s)", this.getInfo().getEndpoint().getBaseUrl().getHost(), this.status);
     }
 }

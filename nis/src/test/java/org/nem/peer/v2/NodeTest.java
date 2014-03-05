@@ -5,12 +5,12 @@ import org.junit.*;
 
 public class NodeTest {
 
-    private final static NodeAddress DEFAULT_ADDRESS = new NodeAddress("ftp", "10.8.8.2", 12);
+    private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
     @Test
     public void ctorCreatesNewNode() {
         // Arrange:
-        NodeInfo info = new NodeInfo(DEFAULT_ADDRESS, "plat", "app");
+        NodeInfo info = new NodeInfo(DEFAULT_ENDPOINT, "plat", "app");
 
         // Act:
         Node node = new Node(info);
@@ -23,7 +23,7 @@ public class NodeTest {
     @Test
     public void statusCanBeUpdated() {
         // Arrange:
-        Node node = new Node(new NodeInfo(DEFAULT_ADDRESS, "plat", "app"));
+        Node node = new Node(new NodeInfo(DEFAULT_ENDPOINT, "plat", "app"));
 
         // Act:
         node.setStatus(NodeStatus.ACTIVE);
@@ -35,7 +35,7 @@ public class NodeTest {
     @Test
     public void toStringIncludesStatusAndHost() {
         // Act:
-        Node node = new Node(new NodeInfo(DEFAULT_ADDRESS, "plat", "app"));
+        Node node = new Node(new NodeInfo(DEFAULT_ENDPOINT, "plat", "app"));
 
         // Assert:
         Assert.assertThat(node.toString(), IsEqual.equalTo("Node 10.8.8.2 (INACTIVE)"));

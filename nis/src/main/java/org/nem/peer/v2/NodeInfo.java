@@ -12,7 +12,7 @@ public class NodeInfo implements SerializableEntity {
     private final static int DEFAULT_VERSION = 2;
     private final static String DEFAULT_PLATFORM = "PC";
 
-    private final NodeAddress address;
+    private final NodeEndpoint endpoint;
     private final String platform;
     private final Integer version;
     private final String application;
@@ -20,12 +20,12 @@ public class NodeInfo implements SerializableEntity {
     /**
      * Creates a new node info.
      *
-     * @param address The address.
+     * @param endpoint The endpoint.
      * @param platform The platform.
      * @param application The application.
      */
-    public NodeInfo(final NodeAddress address, final String platform, final String application) {
-        this.address = address;
+    public NodeInfo(final NodeEndpoint endpoint, final String platform, final String application) {
+        this.endpoint = endpoint;
         this.platform = null == platform ? DEFAULT_PLATFORM : platform;
         this.application = application;
         this.version = DEFAULT_VERSION;
@@ -38,10 +38,10 @@ public class NodeInfo implements SerializableEntity {
      * @param deserializer The deserializer.
      */
     public NodeInfo(final Deserializer deserializer) {
-        this.address = deserializer.readObject("address", new ObjectDeserializer<NodeAddress>() {
+        this.endpoint = deserializer.readObject("endpoint", new ObjectDeserializer<NodeEndpoint>() {
             @Override
-            public NodeAddress deserialize(final Deserializer deserializer) {
-                return new NodeAddress(deserializer);
+            public NodeEndpoint deserialize(final Deserializer deserializer) {
+                return new NodeEndpoint(deserializer);
             }
         });
 
@@ -56,7 +56,7 @@ public class NodeInfo implements SerializableEntity {
 
     @Override
     public void serialize(final Serializer serializer) {
-        serializer.writeObject("address", this.address);
+        serializer.writeObject("endpoint", this.endpoint);
         serializer.writeString("platform", this.platform);
         serializer.writeInt("version", this.version);
         serializer.writeString("application", this.application);
@@ -65,11 +65,11 @@ public class NodeInfo implements SerializableEntity {
     //region Getters and Setters
 
     /**
-     * Gets the address.
+     * Gets the endpoint.
      *
-     * @return The address.
+     * @return The endpoint.
      */
-    public NodeAddress getAddress() { return this.address; }
+    public NodeEndpoint getEndpoint() { return this.endpoint; }
 
     /**
      * Gets the platform.
@@ -99,13 +99,13 @@ public class NodeInfo implements SerializableEntity {
     //endregion
 
     private void ensureValidity() {
-        if (null == this.address)
-            throw new InvalidParameterException("address must be non-null");
+        if (null == this.endpoint)
+            throw new InvalidParameterException("endpoint must be non-null");
     }
 
     @Override
     public int hashCode() {
-        return this.address.hashCode() ^
+        return this.endpoint.hashCode() ^
             this.platform.hashCode() ^
             this.version.hashCode() ^
             this.application.hashCode();
@@ -117,7 +117,7 @@ public class NodeInfo implements SerializableEntity {
             return false;
 
         NodeInfo rhs = (NodeInfo)obj;
-        return this.address.equals(rhs.address) &&
+        return this.endpoint.equals(rhs.endpoint) &&
             this.platform.equals(rhs.platform) &&
             this.version.equals(rhs.version) &&
             this.application.equals(rhs.application);

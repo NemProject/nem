@@ -28,7 +28,7 @@ public class ConfigTest {
         final NodeInfo info = localNode.getInfo();
 
         // Assert:
-        Assert.assertThat(info.getAddress().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
+        Assert.assertThat(info.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
         Assert.assertThat(info.getPlatform(), IsEqual.equalTo("Mac"));
         Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
         Assert.assertThat(info.getApplication(), IsEqual.equalTo("FooBar"));
@@ -84,11 +84,11 @@ public class ConfigTest {
     private static JSONObject createTestJsonConfig(final String[] hostNames) {
         JSONObject jsonConfig = new JSONObject();
 
-        JSONObject jsonAddress = new JSONObject();
-        jsonAddress.put("protocol", "http");
-        jsonAddress.put("address", "10.0.0.8");
-        jsonAddress.put("port", 7890);
-        jsonConfig.put("address", jsonAddress);
+        JSONObject jsonEndpoint = new JSONObject();
+        jsonEndpoint.put("protocol", "http");
+        jsonEndpoint.put("host", "10.0.0.8");
+        jsonEndpoint.put("port", 7890);
+        jsonConfig.put("endpoint", jsonEndpoint);
 
         jsonConfig.put("platform", "Mac");
         jsonConfig.put("application", "FooBar");

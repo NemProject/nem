@@ -20,10 +20,7 @@ import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
-import org.nem.deploy.CommonStarter;
 import org.nem.peer.v2.Config;
-import org.nem.peer.v2.NodeAddress;
-import org.nem.peer.v2.NodeInfo;
 import org.nem.peer.v2.NodeStatus;
 
 /**

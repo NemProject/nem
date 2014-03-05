@@ -3,28 +3,22 @@
  */
 package org.nem.peer;
 
-import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.InvalidParameterException;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.serialization.*;
 import org.nem.deploy.CommonStarter;
-import org.nem.peer.v2.NodeAddress;
+import org.nem.peer.v2.NodeEndpoint;
 import org.nem.peer.v2.NodeApiId;
 import org.nem.peer.v2.NodeInfo;
 import org.nem.peer.v2.NodeStatus;
@@ -63,8 +57,8 @@ public class Node implements SerializableEntity {
 
 	public Node(String host) {
         try {
-            NodeAddress address = new NodeAddress("http", host, CommonStarter.NEM_PORT);
-            NodeInfo info = new NodeInfo(address, "", CommonStarter.APP_NAME);
+            NodeEndpoint endpoint = new NodeEndpoint("http", host, CommonStarter.NEM_PORT);
+            NodeInfo info = new NodeInfo(endpoint, "", CommonStarter.APP_NAME);
             this.node = new org.nem.peer.v2.Node(info);
         } catch (InvalidParameterException e) {
             throw new IllegalArgumentException(e);
@@ -77,7 +71,7 @@ public class Node implements SerializableEntity {
 
 
     public String getAddress() {
-		return this.node.getInfo().getAddress().getBaseUrl().getHost();
+		return this.node.getInfo().getEndpoint().getBaseUrl().getHost();
 	}
 
 	public String getVersion() {
@@ -180,7 +174,7 @@ public class Node implements SerializableEntity {
 	}
 
 	public URL getRestURL(NodeApiId restID) {
-		return this.node.getInfo().getAddress().getApiUrl(restID);
+		return this.node.getInfo().getEndpoint().getApiUrl(restID);
 	}
 
 }

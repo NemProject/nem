@@ -1,9 +1,9 @@
 {
 	"_info": "commented fields are proceeded with '_'",
 
-	"address": {
+	"endpoint": {
 	    "protocol": "http",
-	    "address": "nemcoin.info",
+	    "host": "nemcoin.info",
 	    "port" 7890
 	},
 
