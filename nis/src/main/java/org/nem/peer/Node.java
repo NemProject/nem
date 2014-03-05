@@ -118,9 +118,7 @@ public class Node implements SerializableEntity {
 	 * 
 	 */
 	public JSONObject asJsonObject() {
-		JsonSerializer serializer = new JsonSerializer();
-		serialize(serializer);
-		return serializer.getObject();
+        return JsonSerializer.serializeToJson(this);
     }
 
 	//

@@ -19,6 +19,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
 import org.nem.peer.v2.Config;
 import org.nem.peer.v2.NodeStatus;
@@ -32,7 +33,7 @@ import org.nem.peer.v2.NodeStatus;
  * @author Thies1965
  * 
  */
-public class PeerNetwork {
+public class PeerNetwork implements SerializableEntity {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private static final PeerNetwork DEFAULT_NETWORK = createDefaultNetwork();
@@ -320,8 +321,6 @@ public class PeerNetwork {
 	}
 
 	public JSONObject generatePeerList() {
-		JsonSerializer serializer = new JsonSerializer();
-		serialize(serializer);
-		return serializer.getObject();
+        return JsonSerializer.serializeToJson(this);
 	}
 }
