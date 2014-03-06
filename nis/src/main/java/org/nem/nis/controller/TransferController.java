@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.InvalidParameterException;
+import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 @RestController
@@ -43,11 +45,26 @@ public class TransferController {
 		try {
 			transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
+		// not found in db
+		} catch (MissingResourceException e) {
+			return jsonError(1, "incorrect data");
+
+		// wrong transaction type
+		} catch (InvalidParameterException e) {
+			return jsonError(1, "incorrect data");
+
+		//
 		} catch (NullPointerException e) {
 			return jsonError(1, "incorrect data");
 		}
 
-		byte[] transferData = BinarySerializer.serializeToBytes(transferTransaction);
+		if (! transferTransaction.isValid()) {
+			return jsonError(1, "incorrect data");
+		}
+
+		BinarySerializer binarySerializer = new BinarySerializer();
+		transferTransaction.asNonVerifiable().serialize(binarySerializer);
+		byte[] transferData = binarySerializer.getBytes();
 
 		JSONObject obj = JsonSerializer.serializeToJson(new RequestPrepare(transferData));
 		return obj.toJSONString() + "\r\n";
@@ -62,7 +79,7 @@ public class TransferController {
 		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
 
 		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(dbAccountLookup));
-		TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+		TransferTransaction transaction = (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 
 		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));

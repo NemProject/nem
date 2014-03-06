@@ -15,10 +15,11 @@ import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.Account;
+import org.nem.core.model.Block;
+import org.nem.core.model.Transaction;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
-import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Address;
 import org.nem.peer.PeerNetwork;
@@ -63,7 +64,7 @@ public class NisMain {
 
 	private void analyzeBlocks() {
 		Long curBlockId = GENESIS_BLOCK_ID;
-		Block curBlock;
+		org.nem.core.dbmodel.Block curBlock;
 		System.out.println("starting analysis...");
 		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
 			blockAnalyzer.analyze(curBlock);
@@ -103,95 +104,118 @@ public class NisMain {
 
 	private void populateDb() {
 		Account genesisAccount = getGenesisAccount();
-		org.nem.core.dbmodel.Account dbGenesisAccout = populateGenesisAccount(genesisAccount);
+		org.nem.core.dbmodel.Account dbGenesisAccount = populateGenesisAccount(genesisAccount);
 
-		Block b = populateGenesisBlock(dbGenesisAccout);
-
-		populateGenesisTxes(genesisAccount, dbGenesisAccout, b);
+		if (transactionDao.count() == 0) {
+			Block genesisBlock = prepareGenesisBlock(genesisAccount);
+			org.nem.core.dbmodel.Block b = populateGenesisBlock(dbGenesisAccount, genesisAccount);
+			populateGenesisTxes(genesisAccount, dbGenesisAccount, b, genesisBlock);
+		}
 	}
 
-	private void populateGenesisTxes(Account genesisAccount, org.nem.core.dbmodel.Account a, Block b) {
+	private Block prepareGenesisBlock(Account genesisAccount) {
+		// super strong priv keys
+		final byte[] recipientsSk[] = {
+			Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
+			Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
+			Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
+			Hashes.sha3(StringEncoder.getBytes("Thies1965")),
+			Hashes.sha3(StringEncoder.getBytes("borzalom")),
+			Hashes.sha3(StringEncoder.getBytes("gimre")),
+			Hashes.sha3(StringEncoder.getBytes("Makoto")),
+			Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
+			Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
+		};
+		final BigInteger genesisAmount = new BigInteger("40000000000000");
+		final BigInteger special       = new BigInteger("10000000000000");
+		final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(recipientsSk.length - 1));
+		final long amounts[] = {
+			special.longValue(),
+			share.longValue(), share.longValue(), share.longValue(), share.longValue(),
+			share.longValue(), share.longValue(), share.longValue(), share.longValue()
+		};
+
+		final long txIds[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		Vector<Account> recipientsAccounts = new Vector<>(txIds.length);
+		for (int i = 0; i < txIds.length; ++i) {
+			final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
+			final KeyPair recipientKeypair = new KeyPair(recipientSecret);
+			final byte[] recipientPk = recipientKeypair.getPublicKey();
+			final Address recipientAddr = Address.fromPublicKey(recipientPk);
+
+			recipientsAccounts.add(new Account(recipientKeypair));
+		}
+
+		Block genesisBlock = new Block(genesisAccount);
+		for (int i = 0; i < txIds.length; ++i) {
+			final TransferTransaction transferTransaction = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
+			transferTransaction.setFee(0);
+			transferTransaction.sign();
+
+			genesisBlock.addTransaction(transferTransaction);
+		}
+
+		return genesisBlock;
+	}
+
+	private void populateGenesisTxes(Account genesisAccount, org.nem.core.dbmodel.Account a, org.nem.core.dbmodel.Block b, Block genesisBlock) {
 		if (transactionDao.count() == 0) {
-			final long txIds[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			// super strong priv keys
-			final byte[] recipientsSk[] = {
-					Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
-					Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
-					Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
-					Hashes.sha3(StringEncoder.getBytes("Thies1965")),
-					Hashes.sha3(StringEncoder.getBytes("borzalom")),
-					Hashes.sha3(StringEncoder.getBytes("gimre")),
-					Hashes.sha3(StringEncoder.getBytes("Makoto")),
-					Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
-					Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
-			};
-			final BigInteger genesisAmount = new BigInteger("40000000000000");
-			final BigInteger special       = new BigInteger("10000000000000");
-			final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(recipientsSk.length - 1));
-			final long amounts[] = {
-					special.longValue(),
-					share.longValue(), share.longValue(), share.longValue(), share.longValue(),
-					share.longValue(), share.longValue(), share.longValue(), share.longValue()
-			};
+			int transactionsCount = genesisBlock.getTransactions().size();
+			Vector<org.nem.core.dbmodel.Account> recipientsDbAccounts = new Vector<>(transactionsCount);
 
-			Vector<Account> recipientsAccounts = new Vector<>(txIds.length);
-			Vector<org.nem.core.dbmodel.Account> recipientsDbAccounts = new Vector<>(txIds.length);
+			// recipients - add to or get from the db
 			if (accountDao.count() == 1) {
-				for (int i = 0; i < txIds.length; ++i) {
-					final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
-					final KeyPair recipientKeypair = new KeyPair(recipientSecret);
-					final byte[] recipientPk = recipientKeypair.getPublicKey();
-					final Address recipientAddr = Address.fromPublicKey(recipientPk);
+				for (Transaction transaction : genesisBlock.getTransactions()) {
+					final TransferTransaction transferTransaction = (TransferTransaction)transaction;
+					final Account recipient = transferTransaction.getRecipient();
+					final Address recipientAddr = recipient.getAddress();
 
-					recipientsAccounts.add(new Account(recipientKeypair));
-					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipientPk));
+					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipient.getKeyPair().getPublicKey()));
 				}
 				accountDao.saveMulti(recipientsDbAccounts);
 
 			} else {
-				for (int i = 0; i < txIds.length; ++i) {
-					final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
-					final KeyPair recipientKeypair = new KeyPair(recipientSecret);
-					final byte[] recipientPk = recipientKeypair.getPublicKey();
-					final Address recipientAddr = Address.fromPublicKey(recipientPk);
+				for (Transaction transaction : genesisBlock.getTransactions()) {
+					final TransferTransaction transferTransaction = (TransferTransaction)transaction;
+					final Address recipientAddr = transferTransaction.getRecipient().getAddress();
 
 					recipientsDbAccounts.add(accountDao.getAccountByPrintableAddress(recipientAddr.getEncoded()));
 				}
 			}
 
-			Vector<Transfer> transactions = new Vector<>(txIds.length);
-			for (int i = 0; i < txIds.length; ++i) {
-				TransferTransaction transferTx = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
-				transferTx.setFee(0);
-				transferTx.sign();
-
+			final long txIds[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			Vector<Transfer> transactions = new Vector<>(transactionsCount);
+			int i = 0;
+			for (Transaction transaction : genesisBlock.getTransactions()) {
+				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
 				Transfer t = new Transfer(
 						txIds[i],
-						transferTx.getVersion(),
-						transferTx.getType(),
-						transferTx.getFee(),
+						transferTransaction.getVersion(),
+						transferTransaction.getType(),
+						transferTransaction.getFee(),
 						0, // timestamp
 						0, // deadline
 						a,
 						// proof
-						transferTx.getSignature().getBytes(),
+						transferTransaction.getSignature().getBytes(),
 						recipientsDbAccounts.get(i),
 						i, // index
-						amounts[i],
+						transferTransaction.getAmount(),
 						0L // referenced tx
 				);
 				t.setBlock(b);
 				transactions.add(t);
+
+				i++;
 			}
 			transactionDao.saveMulti(transactions);
 		}
 	}
 
-	private Block populateGenesisBlock(org.nem.core.dbmodel.Account a) {
-		Block b = null;
+	private org.nem.core.dbmodel.Block populateGenesisBlock(org.nem.core.dbmodel.Account a, Account genesisAccount) {
+		org.nem.core.dbmodel.Block b = null;
 		if (blockDao.count() == 0) {
-			
-			b = new Block(
+			b = new org.nem.core.dbmodel.Block(
 					GENESIS_BLOCK_ID,
 					1,
 					// prev hash
@@ -241,6 +265,7 @@ public class NisMain {
 
 		return new Account(CREATOR_KEYPAIR);
 	}
+
 	private org.nem.core.dbmodel.Account populateGenesisAccount(Account genesisAccount) {
 		final byte[] genesisPublicKey = genesisAccount.getKeyPair().getPublicKey();
 		final Address genesisAddress = Address.fromPublicKey(genesisPublicKey);

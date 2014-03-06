@@ -28,7 +28,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
     private final int version;
     private final int type;
-    private Account signer;
+    private final Account signer;
     private Signature signature;
 
     //region Constructors
@@ -41,6 +41,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param signer The entity signer.
      */
     public VerifiableEntity(final int type, final int version, final Account signer) {
+        if (null == signer.getKeyPair())
+            throw new InvalidParameterException("signer key pair is required to create a verifiable entity ");
+
         this.type = type;
         this.version = version;
         this.signer = signer;
@@ -56,7 +59,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     public VerifiableEntity(final int type, DeserializationOptions options,  Deserializer deserializer) {
         this.type = type;
         this.version = deserializer.readInt("version");
-        this.signer = SerializationUtils.readAccount(deserializer, "signer");
+        this.signer = SerializationUtils.readAccount(deserializer, "signer", AccountEncoding.PUBLIC_KEY);
 
         if (DeserializationOptions.VERIFIABLE == options)
             this.signature = SerializationUtils.readSignature(deserializer, "signature");
@@ -94,15 +97,12 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public Signature getSignature() { return this.signature; }
 
-
-	/**
-	 * Sets the signature.
-	 *
-	 * @param signature The signature.
-	 */
-	public void setSignature(Signature signature) {
-		this.signature = signature;
-	}
+    /**
+     * Sets the signature.
+     *
+     * @param signature The signature.
+     */
+    public void setSignature(final Signature signature) { this.signature = signature; }
 
     //endregion
 
@@ -121,13 +121,12 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param includeSignature true if the serialization should include the signature.
      */
     private void serialize(final Serializer serializer, boolean includeSignature) {
-		serializer.writeInt("type", this.getType());
+        serializer.writeInt("type", this.getType());
+        serializer.writeInt("version", this.getVersion());
+        SerializationUtils.writeAccount(serializer, "signer", this.getSigner(), AccountEncoding.PUBLIC_KEY);
 
-		if (includeSignature)
-			SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
-
-		serializer.writeInt("version", this.getVersion());
-        SerializationUtils.writeAccount(serializer, "signer", this.getSigner());
+        if (includeSignature)
+            SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
 
         this.serializeImpl(serializer);
     }
@@ -143,11 +142,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * Signs this entity with the owner's private key.
      */
     public void sign() {
-        if (this.signer.getKeyPair() == null)
-			throw new InvalidParameterException("cannot sign, missing key");
-
-		if (!this.signer.getKeyPair().hasPrivateKey())
-            throw new InvalidParameterException("cannot sign because sender is not self");
+        if (!this.signer.getKeyPair().hasPrivateKey())
+            throw new InvalidParameterException("cannot sign because signer does not have private key");
 
         // (1) serialize the entire transaction to a buffer
         byte[] transactionBytes = this.getBytes();
@@ -164,10 +160,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
         if (null == this.signature)
             throw new CryptoException("cannot verify because signature does not exist");
 
-		if (this.signer.getKeyPair() == null)
-			throw new InvalidParameterException("cannot verify, missing key");
-
-		Signer signer = new Signer(this.signer.getKeyPair());
+        Signer signer = new Signer(this.signer.getKeyPair());
         return signer.verify(this.getBytes(), this.signature);
     }
 
@@ -206,5 +199,4 @@ public abstract class VerifiableEntity implements SerializableEntity {
             entity.serialize(serializer, false);
         }
     }
-
 }
