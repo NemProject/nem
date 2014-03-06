@@ -129,7 +129,9 @@ public class NisMain {
 			recipientsAccounts.add(new Account(recipientAddr));
 		}
 
-		Block genesisBlock = new Block(genesisAccount);
+		byte[] previousBlockHash = new byte[32];
+
+		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 		for (int i = 0; i < txIds.length; ++i) {
 			final TransferTransaction transferTransaction = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
 			transferTransaction.setFee(0);
@@ -176,7 +178,7 @@ public class NisMain {
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						transferTransaction.getFee(),
-						0, // timestamp
+						Genesis.INITIAL_TIME, // timestamp
 						0, // deadline
 						a,
 						// proof

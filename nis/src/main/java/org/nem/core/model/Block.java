@@ -9,15 +9,16 @@ import java.util.*;
  * A NEM block.
  */
 public class Block extends VerifiableEntity {
-//    this.prevBlockHash = prevBlockHash;
-//    this.blockHash = blockHash;
-//    this.timestamp = timestamp;
-//    this.forger = forger;
-//    this.forgerProof = forgerProof;
-//    this.blockSignature = blockSignature;
-//    this.height = height;
-//    this.totalAmount = totalAmount;
-//    this.totalFee = totalFee;
+	private byte[] prevBlockHash;
+	private int timestamp; // in seconds, max 68 years...
+	// forger == signer
+	// forgerProof = signature
+	private byte[] generationSignature; // hash(prevBlockHash || signer pubKey)
+	private int height; // unsure yet, but probably will be easier to talk on forums having that
+
+	// I think it can be worth to keep fee here, discrepancies
+	// might be one more 'input' for trust
+	private long totalFee;
 
     private final List<Transaction> transactions;
 
@@ -26,9 +27,13 @@ public class Block extends VerifiableEntity {
      *
      * @param forger The forger.
      */
-    public Block(final Account forger) {
+    public Block(final Account forger, final byte[] prevBlockHash, int timestamp, int height) {
         super(1, 1, forger);
         this.transactions = new ArrayList<>();
+		this.prevBlockHash = prevBlockHash;
+		this.timestamp = timestamp;
+		this.height = height;
+		this.totalFee = 0;
     }
 
     /**
@@ -39,7 +44,13 @@ public class Block extends VerifiableEntity {
      */
     public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {
         super(type, options, deserializer);
-        this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
+
+		this.prevBlockHash= deserializer.readBytes("prevBlockHash");
+		this.timestamp    = deserializer.readInt("timestamp");
+		this.height       = deserializer.readInt("height");
+		this.totalFee     = deserializer.readLong("totalFee");
+
+		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
     }
 
     /**
@@ -51,17 +62,37 @@ public class Block extends VerifiableEntity {
         return this.transactions;
     }
 
-    /**
-     * Calculates the total fee of all transactions stored in this block.
-     *
-     * @return The total fee of all transactions stored in this block.
+	/**
+	 * Gets the timestamp of this block since NEM epoch.
+	 *
+	 * @return timestamp of this block since NEM epoch.
+	 */
+	public int getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * Gets the height of this block in the blockchain.
+	 *
+	 * @return height of this block in the blockchain.
+	 */
+	public int getHeight() {
+		return height;
+	}
+
+
+	/**
+	 * Gets total amount of fees of all transactions stored in this block.
+	 *
+     * @return total amount of fees of all transactions stored in this block.
      */
     public long getTotalFee() {
-        long fee = 0;
-        for (Transaction transaction : this.transactions)
-            fee += transaction.getFee();
-
-        return fee;
+//        long fee = 0;
+//        for (Transaction transaction : this.transactions)
+//            fee += transaction.getFee();
+//
+//        return fee;
+		return this.totalFee;
     }
 
     /**
@@ -71,10 +102,18 @@ public class Block extends VerifiableEntity {
      */
     public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
+
+		this.totalFee += transaction.getFee();
     }
 
     @Override
     protected void serializeImpl(Serializer serializer) {
-        serializer.writeObjectArray("transactions", this.transactions);
+		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
+
+		serializer.writeInt("timestamp", this.timestamp);
+		serializer.writeInt("height", this.height);
+		serializer.writeLong("totalFee", this.totalFee);
+
+		serializer.writeObjectArray("transactions", this.transactions);
     }
 }

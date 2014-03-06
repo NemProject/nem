@@ -5,11 +5,13 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.transactions.TransferTransaction;
+import org.nem.nis.Genesis;
 
 import java.util.List;
 
 public class BlockTest {
 
+	final static byte[] DUMMY_PREVIOUS_HASH = { 0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9, 1,2 };
     //region Constructors
 
     @Test
@@ -18,14 +20,16 @@ public class BlockTest {
         final Account signer = Utils.generateRandomAccount();
 
         // Act:
-        final Block block = new Block(signer);
+        final Block block = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 
         // Assert:
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
-        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
+		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
     }
 
     //endregion
@@ -44,9 +48,12 @@ public class BlockTest {
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
-        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
 
-        final List<Transaction> transactions = block.getTransactions();
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
+		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
+
+		final List<Transaction> transactions = block.getTransactions();
         Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
         final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
@@ -94,7 +101,7 @@ public class BlockTest {
 
     private Block createBlockForRoundTripTests(boolean verifiable, final Account signer) {
         // Arrange:
-        final Block originalBlock = new Block(null == signer ? Utils.generateRandomAccount() : signer);
+        final Block originalBlock = new Block(null == signer ? Utils.generateRandomAccount() : signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
         TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
         originalBlock.addTransaction(transaction1);
 
@@ -135,7 +142,7 @@ public class BlockTest {
     @Test
     public void transactionsCanBeAddedToBlock() {
         // Arrange:
-        Block block = new Block(Utils.generateRandomAccount());
+        Block block = new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
         Transaction transaction = createTransactionWithFee(17);
 
         // Act:
@@ -144,6 +151,10 @@ public class BlockTest {
         // Assert:
         Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(1));
         Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
+
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(17L));
+		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
     }
 
 
@@ -154,7 +165,7 @@ public class BlockTest {
     @Test
     public void blockFeeIsSumOfTransactionFees() {
         // Arrange:
-        Block block = new Block(Utils.generateRandomAccount());
+        Block block = new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
         block.addTransaction(createTransactionWithFee(17));
         block.addTransaction(createTransactionWithFee(11));
         block.addTransaction(createTransactionWithFee(22));
