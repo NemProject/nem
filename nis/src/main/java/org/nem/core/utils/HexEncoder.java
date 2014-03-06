@@ -19,6 +19,24 @@ public class HexEncoder {
         return codec.decode(encodedBytes);
     }
 
+	/**
+	 * Converts a string to a byte array.
+	 * (does not throw exception, use only on OWN strings)
+	 *
+	 * @param hexString The input hex string.
+	 * @return The output byte array.
+	 */
+	public static byte[] getBytesSilent(final String hexString) {
+		Hex codec = new Hex();
+		byte[] encodedBytes = StringEncoder.getBytes(hexString);
+		try {
+			return codec.decode(encodedBytes);
+
+		} catch (DecoderException e) {
+			return null;
+		}
+	}
+
     /**
      * Converts a byte array to a hex string.
      *

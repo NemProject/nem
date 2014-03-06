@@ -40,7 +40,6 @@ public class NisMain {
 	public NisMain() {
 	}
 
-	final long GENESIS_BLOCK_ID = 0x1234567890abcdefL;
 	BlockAnalyzer blockAnalyzer;
 
 	static long epochBeginning;
@@ -63,7 +62,7 @@ public class NisMain {
 	}
 
 	private void analyzeBlocks() {
-		Long curBlockId = GENESIS_BLOCK_ID;
+		Long curBlockId = Genesis.BLOCK_ID;
 		org.nem.core.dbmodel.Block curBlock;
 		System.out.println("starting analysis...");
 		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
@@ -114,21 +113,9 @@ public class NisMain {
 	}
 
 	private Block prepareGenesisBlock(Account genesisAccount) {
-		// super strong priv keys
-		final byte[] recipientsSk[] = {
-			Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
-			Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
-			Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
-			Hashes.sha3(StringEncoder.getBytes("Thies1965")),
-			Hashes.sha3(StringEncoder.getBytes("borzalom")),
-			Hashes.sha3(StringEncoder.getBytes("gimre")),
-			Hashes.sha3(StringEncoder.getBytes("Makoto")),
-			Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
-			Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
-		};
 		final BigInteger genesisAmount = new BigInteger("40000000000000");
 		final BigInteger special       = new BigInteger("10000000000000");
-		final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(recipientsSk.length - 1));
+		final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(Genesis.RECIPIENT_IDS.length - 1));
 		final long amounts[] = {
 			special.longValue(),
 			share.longValue(), share.longValue(), share.longValue(), share.longValue(),
@@ -138,12 +125,8 @@ public class NisMain {
 		final long txIds[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		Vector<Account> recipientsAccounts = new Vector<>(txIds.length);
 		for (int i = 0; i < txIds.length; ++i) {
-			final BigInteger recipientSecret = new BigInteger( recipientsSk[i] );
-			final KeyPair recipientKeypair = new KeyPair(recipientSecret);
-			final byte[] recipientPk = recipientKeypair.getPublicKey();
-			final Address recipientAddr = Address.fromPublicKey(recipientPk);
-
-			recipientsAccounts.add(new Account(recipientKeypair));
+			final Address recipientAddr = Address.fromEncoded(Genesis.RECIPIENT_IDS[i]);
+			recipientsAccounts.add(new Account(recipientAddr));
 		}
 
 		Block genesisBlock = new Block(genesisAccount);
@@ -170,7 +153,7 @@ public class NisMain {
 					final Account recipient = transferTransaction.getRecipient();
 					final Address recipientAddr = recipient.getAddress();
 
-					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), recipient.getKeyPair().getPublicKey()));
+					recipientsDbAccounts.add(new org.nem.core.dbmodel.Account(recipientAddr.getEncoded(), null));
 				}
 				accountDao.saveMulti(recipientsDbAccounts);
 
@@ -216,7 +199,7 @@ public class NisMain {
 		org.nem.core.dbmodel.Block b = null;
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
-					GENESIS_BLOCK_ID,
+					Genesis.BLOCK_ID,
 					1,
 					// prev hash
 					new byte[] {
@@ -251,7 +234,7 @@ public class NisMain {
 			blockDao.save(b);
 
 		} else {
-			b = blockDao.findByShortId(GENESIS_BLOCK_ID);
+			b = blockDao.findByShortId(Genesis.BLOCK_ID);
 		}
 
 		logger.info("block id: " + b.getId().toString());
@@ -259,9 +242,7 @@ public class NisMain {
 	}
 
 	private Account getGenesisAccount() {
-		final String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
-		final BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );
-		final KeyPair CREATOR_KEYPAIR = new KeyPair(CREATOR_PRIVATE_KEY);
+		final KeyPair CREATOR_KEYPAIR = new KeyPair(Genesis.CREATOR_PRIVATE_KEY);
 
 		return new Account(CREATOR_KEYPAIR);
 	}
@@ -270,6 +251,7 @@ public class NisMain {
 		final byte[] genesisPublicKey = genesisAccount.getKeyPair().getPublicKey();
 		final Address genesisAddress = Address.fromPublicKey(genesisPublicKey);
 
+		logger.info("genedis account private key: " + HexEncoder.getString(genesisAccount.getKeyPair().getPrivateKey().toByteArray()));
 		logger.info("genesis account            public key: " + HexEncoder.getString(genesisPublicKey));
 		logger.info("genesis account compressed public key: " + genesisAddress.getEncoded());
 
