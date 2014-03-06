@@ -143,7 +143,7 @@ public class Node implements SerializableEntity {
 			logger.warning(toString() + e.toString());
 
 			// set to not connected
-			setState(NodeStatus.FAIlURE);
+			setState(NodeStatus.FAILURE);
 
 		} catch (TimeoutException e) {
 			logger.warning(toString() + " timed out.");
@@ -161,7 +161,7 @@ public class Node implements SerializableEntity {
 			logger.warning(toString() + e1.toString());
 
 			// set to not connected
-			setState(NodeStatus.FAIlURE);
+			setState(NodeStatus.FAILURE);
 
 		} catch (Exception e) {
             // TODO temporary

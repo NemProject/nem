@@ -209,7 +209,7 @@ public class PeerNetwork implements SerializableEntity {
 
 		} catch (URISyntaxException e) {
 			LOGGER.warning(node.toString() + e.toString());
-			node.setState(NodeStatus.FAIlURE);
+			node.setState(NodeStatus.FAILURE);
 			// remove from allPeers
 			allPeers.remove(node);
 
@@ -219,7 +219,7 @@ public class PeerNetwork implements SerializableEntity {
 
 		} catch (ExecutionException e) {
 			LOGGER.warning(node.toString() + e.toString());
-			node.setState(NodeStatus.FAIlURE);
+			node.setState(NodeStatus.FAILURE);
 			// remove from all allPeers
 			allPeers.remove(node);
 

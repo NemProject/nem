@@ -17,5 +17,5 @@ public enum NodeStatus {
     /**
      * The node is not a NEM node.
      */
-    FAIlURE
+    FAILURE
 }

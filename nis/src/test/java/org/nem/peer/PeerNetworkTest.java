@@ -18,7 +18,7 @@ public class PeerNetworkTest {
 		assertNotNull(network);
 		assertNotNull(network.getLocalNode());
 		assertNotNull(network.getLocalNode().getAddress());
-		assertNotSame(network.getLocalNode().getState(), NodeStatus.FAIlURE);
+		assertNotSame(network.getLocalNode().getState(), NodeStatus.FAILURE);
 
 		assertNotNull(network.getAllPeers());
 		assertNotNull(network.generatePeerList());
