@@ -34,6 +34,77 @@ public class BlockTest {
 
     //endregion
 
+	//region Hashing
+
+	@Test
+	public void identicalBlocksHaveSameHashes() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+
+		// Act:
+		byte[] hash1 = block1.getHash();
+		byte[] hash2 = block2.getHash();
+
+		// Assert:
+		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
+	}
+
+	@Test
+	public void differenBlocksHaveDifferentHashes() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME + 1, Genesis.INITIAL_HEIGHT);
+
+		// Act:
+		byte[] hash1 = block1.getHash();
+		byte[] hash2 = block2.getHash();
+
+		// Assert:
+		Assert.assertThat(hash1, IsNot.not(hash2));
+	}
+
+	@Test
+	public void signingDoesntChangeBlockHashes() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+
+		block1.sign();
+
+		// Act:
+		byte[] hash1 = block1.getHash();
+		byte[] hash2 = block2.getHash();
+
+		// Assert:
+		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
+	}
+
+	@Test
+	public void addingTransactionChangesBlockHash() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME + 1, Genesis.INITIAL_HEIGHT);
+
+		Transaction tx = createSignedTransactionWithAmount(100);
+		block1.addTransaction(tx);
+
+		// Act:
+		byte[] hash1 = block1.getHash();
+		byte[] hash2 = block2.getHash();
+
+		// Assert:
+		Assert.assertThat(hash1, IsNot.not(hash2));
+		Assert.assertThat(block1.getTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(block1.getTransactions().get(0), IsEqual.equalTo(tx));
+	}
+
+	//endregion
+
     //region Serialization
 
     @Test
