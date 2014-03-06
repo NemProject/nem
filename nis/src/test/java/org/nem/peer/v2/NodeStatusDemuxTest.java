@@ -2,7 +2,7 @@ package org.nem.peer.v2;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class NodeStatusDemuxTest {
         assertStatusListAssignment(NodeStatus.FAILURE, 0, 0);
     }
 
-    @Test
+     @Test
     public void inputListWithMultipleNodesIsPartitionedCorrectly() {
         // Arrange:
         final List<Node> nodes = new ArrayList<>();
@@ -39,22 +39,23 @@ public class NodeStatusDemuxTest {
         nodes.add(createNode(NodeStatus.FAILURE, "E"));
         nodes.add(createNode(NodeStatus.ACTIVE, "F"));
 
-        // Assert:
-        assertStatusListAssignment(nodes, 3, 2);
+         // Act:
+         final NodeStatusDemux demux = new NodeStatusDemux(nodes);
 
-        //TODO: validate specific nodes in addition to counts
+         // Assert:
+         Assert.assertThat(
+             getPlatforms(demux.getActiveNodes()),
+             IsEquivalent.equivalentTo(new String[] { "A", "D", "F" }));
+         Assert.assertThat(
+             getPlatforms(demux.getInactiveNodes()),
+             IsEquivalent.equivalentTo(new String[] { "B", "C" }));
     }
 
-    private static void assertStatusListAssignment(
-        final List<Node> nodes,
-        final int expectedNumActiveNodes,
-        final int expectedNumInactiveNodes) {
-        // Act:
-        final NodeStatusDemux demux = new NodeStatusDemux(nodes);
-
-        // Assert:
-        Assert.assertThat(demux.getActiveNodes().size(), IsEqual.equalTo(expectedNumActiveNodes));
-        Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(expectedNumInactiveNodes));
+    private static List<String> getPlatforms(final Collection<NodeInfo> nodes) {
+        final List<String> platforms = new ArrayList<>();
+        for (final NodeInfo node : nodes)
+            platforms.add(node.getPlatform());
+        return platforms;
     }
 
     private static void assertStatusListAssignment(
@@ -64,8 +65,12 @@ public class NodeStatusDemuxTest {
         // Arrange:
         final List<Node> nodes = createSingleItemNodeList(status, "Alpha");
 
+        // Act:
+        final NodeStatusDemux demux = new NodeStatusDemux(nodes);
+
         // Assert:
-        assertStatusListAssignment(nodes, expectedNumActiveNodes, expectedNumInactiveNodes);
+        Assert.assertThat(demux.getActiveNodes().size(), IsEqual.equalTo(expectedNumActiveNodes));
+        Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(expectedNumInactiveNodes));
     }
 
     //endregion
