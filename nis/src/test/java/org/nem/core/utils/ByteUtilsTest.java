@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 
 public class ByteUtilsTest {
@@ -31,6 +32,28 @@ public class ByteUtilsTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(b.longValue()));
+	}
+
+	@Test
+	public void conversionToLongIgnoresExcessiveData() {
+		// Arrange:
+		byte[] data = { 1,2,3,4,5,6,7,8, 9,9,9 };
+		BigInteger b = new BigInteger(new byte[]{data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7] });
+
+		// Act:
+		long result = ByteUtils.bytesToLong(data);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(b.longValue()));
+	}
+
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void conversionToLongFailsOnDataUnderflow() {
+		// Arrange:
+		byte[] data = { 1,2,3,4,5,6 };
+
+		// Act:
+		ByteUtils.bytesToLong(data);
 	}
 
 	@Test

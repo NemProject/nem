@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 public class ByteUtils {
 	public static long bytesToLong(byte[] bytes) {
 		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.put(bytes, 0, bytes.length);
+		buffer.put(bytes, 0, 8);
 		buffer.flip();
 		return buffer.getLong();
 	}
