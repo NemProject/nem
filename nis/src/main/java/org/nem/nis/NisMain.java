@@ -180,7 +180,7 @@ public class NisMain {
 						ByteUtils.bytesToLong(transferTransaction.getSignature().getBytes()),
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
-						transferTransaction.getFee(),
+						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
 						0, // timestamp
 						0, // deadline
 						a,
