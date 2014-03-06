@@ -18,6 +18,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.Transaction;
 import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Transfer;
@@ -41,6 +42,7 @@ public class NisMain {
 	}
 
 	BlockAnalyzer blockAnalyzer;
+	AccountAnalyzer accountAnalyzer;
 
 	static long epochBeginning;
 
@@ -67,6 +69,8 @@ public class NisMain {
 		System.out.println("starting analysis...");
 		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
 			blockAnalyzer.analyze(curBlock);
+			accountAnalyzer.analyze(curBlock);
+
 			curBlockId = curBlock.getNextBlockId();
 			if (curBlockId == null) {
 				break;
@@ -86,6 +90,7 @@ public class NisMain {
 		populateDb();
 
 		blockAnalyzer = new BlockAnalyzer();
+		accountAnalyzer = new AccountAnalyzer();
 
 		analyzeBlocks();
 
@@ -172,7 +177,7 @@ public class NisMain {
 			for (Transaction transaction : genesisBlock.getTransactions()) {
 				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
 				Transfer t = new Transfer(
-						txIds[i],
+						ByteUtils.bytesToLong(transferTransaction.getSignature().getBytes()),
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						transferTransaction.getFee(),

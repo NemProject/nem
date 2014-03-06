@@ -12,7 +12,7 @@ import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class AccountsState {
+public class AccountAnalyzer {
 	@Autowired
 	private BlockDao blockDao;
 	
@@ -22,7 +22,7 @@ public class AccountsState {
 	private Map<byte[], Long> accountBalance;
 	private Map<byte[], Long> accountUnconfirmedBalance;
 	
-	public AccountsState() {
+	public AccountAnalyzer() {
 		accountBalance = new HashMap<byte[], Long>();
 		accountUnconfirmedBalance = new HashMap<byte[], Long>();
 	}
