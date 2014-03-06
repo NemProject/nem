@@ -47,7 +47,7 @@ public class Block extends VerifiableEntity {
      *
      * @return The transactions associated with this block.
      */
-    List<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         return this.transactions;
     }
 

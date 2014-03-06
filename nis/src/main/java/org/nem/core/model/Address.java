@@ -14,6 +14,7 @@ public class Address {
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
     private String encoded; // base-32 encoded address
+    private byte[] publicKey;
 
     /**
      * Creates an Address from a public key.
@@ -40,8 +41,9 @@ public class Address {
      *
      * @param encoded The encoded address.
      */
-    private Address(String encoded) {
+    private Address(final String encoded) {
         this.encoded = encoded;
+        this.publicKey = null;
     }
 
     /**
@@ -50,7 +52,12 @@ public class Address {
      * @param version The address version.
      * @param publicKey The address public key.
      */
-    private Address(byte version, final byte[] publicKey) {
+    private Address(final byte version, final byte[] publicKey) {
+        this.encoded = generateEncoded(version, publicKey);
+        this.publicKey = publicKey;
+    }
+
+    private static String generateEncoded(final byte version, final byte[] publicKey) {
         // step 1: sha3 hash of the public key
         byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
 
@@ -67,7 +74,7 @@ public class Address {
         byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
         // step 6: base32 encode (5)
-        this.encoded = Base32Encoder.getString(concatStepThreeAndStepSix);
+        return Base32Encoder.getString(concatStepThreeAndStepSix);
     }
 
     private static byte[] generateChecksum(final byte[] input) {
@@ -86,6 +93,13 @@ public class Address {
     public String getEncoded() {
         return encoded;
     }
+
+    /**
+     * Gets the address public key.
+     *
+     * @return The address public key.
+     */
+    public byte[] getPublicKey() { return this.publicKey; }
 
     /**
      * Determines if the address is valid.

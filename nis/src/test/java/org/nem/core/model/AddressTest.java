@@ -11,30 +11,32 @@ public class AddressTest {
     @Test
     public void addressCanBeCreatedAroundEncodedAddress() {
         // Act:
-        Address address = Address.fromEncoded("Sigma Gamma");
+        final Address address = Address.fromEncoded("Sigma Gamma");
 
         // Assert:
         Assert.assertThat(address.getEncoded(), IsEqual.equalTo("Sigma Gamma"));
+        Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(null));
     }
 
     @Test
     public void addressCanBeCreatedAroundPublicKey() {
         // Act:
-        Address address = Address.fromPublicKey(Utils.generateRandomBytes());
+        final byte[] publicKey = Utils.generateRandomBytes();
+        final Address address = Address.fromPublicKey(publicKey);
 
         // Assert:
         Assert.assertThat(address.getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+        Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
     }
-
 
     @Test
     public void sameAddressIsGeneratedForSameInputs() {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address1 = Address.fromPublicKey(input);
-        Address address2 = Address.fromPublicKey(input);
+        final Address address1 = Address.fromPublicKey(input);
+        final Address address2 = Address.fromPublicKey(input);
 
         // Assert:
         Assert.assertThat(address2, IsEqual.equalTo(address1));
@@ -42,14 +44,13 @@ public class AddressTest {
 
     @Test
     public void differentAddressesAreGeneratedForDifferentInputs() {
-
         // Arrange:
-        byte[] input1 = Utils.generateRandomBytes();
-        byte[] input2 = Utils.generateRandomBytes();
+        final byte[] input1 = Utils.generateRandomBytes();
+        final byte[] input2 = Utils.generateRandomBytes();
 
         // Act:
-        Address address1 = Address.fromPublicKey(input1);
-        Address address2 = Address.fromPublicKey(input2);
+        final Address address1 = Address.fromPublicKey(input1);
+        final Address address2 = Address.fromPublicKey(input2);
 
         // Assert:
         Assert.assertThat(address2, IsNot.not(IsEqual.equalTo(address1)));
@@ -58,10 +59,10 @@ public class AddressTest {
     @Test
     public void generatedAddressIsValid() {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address = Address.fromPublicKey(input);
+        final Address address = Address.fromPublicKey(input);
 
         // Assert:
         Assert.assertThat(address.isValid(), IsEqual.equalTo(true));
@@ -70,10 +71,10 @@ public class AddressTest {
     @Test
     public void generatedAddressHas40CharLength() {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address = Address.fromPublicKey(input);
+        final Address address = Address.fromPublicKey(input);
 
         // Assert:
         Assert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
@@ -82,10 +83,10 @@ public class AddressTest {
     @Test
     public void generatedAddressBeginsWithN() {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address = Address.fromPublicKey(input);
+        final Address address = Address.fromPublicKey(input);
 
         // Assert:
         Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo('N'));
@@ -94,12 +95,12 @@ public class AddressTest {
     @Test
     public void addressWithIncorrectLengthIsNotValid() {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address = Address.fromPublicKey(input);
-        String realAddress = address.getEncoded();
-        String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
+        final Address address = Address.fromPublicKey(input);
+        final String realAddress = address.getEncoded();
+        final String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
 
         // Assert:
         Assert.assertThat(Address.fromEncoded(realAddress).isValid(), IsEqual.equalTo(true));
@@ -126,11 +127,11 @@ public class AddressTest {
 
     private void assertAddressIsNotValidIfChangedAtIndex(final int index) {
         // Arrange:
-        byte[] input = Utils.generateRandomBytes();
+        final byte[] input = Utils.generateRandomBytes();
 
         // Act:
-        Address address = Address.fromPublicKey(input);
-        String fakeAddress = Utils.incrementAtIndex(address.getEncoded(), index);
+        final Address address = Address.fromPublicKey(input);
+        final String fakeAddress = Utils.incrementAtIndex(address.getEncoded(), index);
 
         // Assert:
         Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
@@ -141,8 +142,8 @@ public class AddressTest {
     @Test
     public void equalsOnlyReturnsTrueForEquivalentObjects() {
         // Arrange:
-        byte[] publicKey = Utils.generateRandomBytes();
-        Address address = Address.fromPublicKey(publicKey);
+        final byte[] publicKey = Utils.generateRandomBytes();
+        final Address address = Address.fromPublicKey(publicKey);
 
         // Assert:
         Assert.assertThat(Address.fromPublicKey(publicKey), IsEqual.equalTo(address));
@@ -156,9 +157,9 @@ public class AddressTest {
     @Test
     public void hashCodesAreOnlyEqualForEquivalentObjects() {
         // Arrange:
-        byte[] publicKey = Utils.generateRandomBytes();
-        Address address = Address.fromPublicKey(publicKey);
-        int hashCode = address.hashCode();
+        final byte[] publicKey = Utils.generateRandomBytes();
+        final Address address = Address.fromPublicKey(publicKey);
+        final int hashCode = address.hashCode();
 
         // Assert:
         Assert.assertThat(Address.fromPublicKey(publicKey).hashCode(), IsEqual.equalTo(hashCode));

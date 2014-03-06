@@ -33,7 +33,7 @@ public class Account {
      * @param address The address.
      */
 	public Account(final Address address) {
-		this.keyPair = null;
+		this.keyPair = null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.balance = 0;

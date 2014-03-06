@@ -1,6 +1,7 @@
 package org.nem.core.nis.controller;
 
 import net.minidev.json.JSONObject;
+import org.apache.commons.codec.DecoderException;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
@@ -9,9 +10,12 @@ import org.junit.Test;
 import org.nem.core.model.MessageTypes;
 import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.MockPeerConnector;
+import org.nem.core.utils.Base64Encoder;
+import org.nem.core.utils.HexEncoder;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.security.InvalidParameterException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -22,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 public class TransferControllerTest {
 
 	@Test
-	public void transferIncorrectType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	public void transferIncorrectType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -30,8 +34,10 @@ public class TransferControllerTest {
 		obj.put("type", 123456);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -45,7 +51,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	public void transferIncorrectRecipient() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	public void transferIncorrectRecipient() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -53,8 +59,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "AAAANBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -68,7 +76,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	 public void transferIncorrectAmount() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	 public void transferIncorrectAmount() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -76,8 +84,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(-13));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -91,7 +101,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	 public void transferIncorrectMessageType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	 public void transferIncorrectMessageType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -99,8 +109,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", 66);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -114,7 +126,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	public void transferIncorrectMessagePayload() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	public void transferIncorrectMessagePayload() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -122,8 +134,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "dbcdefghijklmnopqrstuvwxyz)(*&^%$#@!");
@@ -137,7 +151,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	public void transferIncorrectSigner() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	public void transferIncorrectSigner() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -145,8 +159,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "x03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("4202a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -160,7 +176,7 @@ public class TransferControllerTest {
 	}
 
 	@Test
-	public void transferCorrectTransaction() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+	public void transferCorrectTransaction() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -168,8 +184,10 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
+		byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
+		obj.put("fee", Long.valueOf(1));
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
