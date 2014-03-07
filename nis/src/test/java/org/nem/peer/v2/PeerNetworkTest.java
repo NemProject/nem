@@ -87,20 +87,50 @@ public class PeerNetworkTest {
         Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
     }
 
-    // TODO: test refresh exception handling
+    @Test
+    public void refreshSuccessMovesNodesToActive() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.NONE);
 
-//    @Test
-//    public void refreshCallsGetInfoForEveryNode() {
-//        // Arrange:
-//        final MockPeerConnector connector = new MockPeerConnector();
-//        final PeerNetwork network = createTestNetwork(connector);
-//
-//        // Act:
-//        network.refresh();
-//
-//        // Assert:
-//        Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
-//    }
+        // Act:
+        network.refresh();
+        final NodeStatusDemux demux = network.getNodes();
+
+        // Assert:
+        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
+    }
+   
+    @Test
+    public void refreshTransientFailureMovesNodesToInactive() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+
+        // Act:
+        network.refresh();
+        final NodeStatusDemux demux = network.getNodes();
+
+        // Assert:
+        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+    }
+
+    @Test
+    public void refreshFatalFailureRemovesNodesFromBothLists() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+
+        // Act:
+        network.refresh();
+        final NodeStatusDemux demux = network.getNodes();
+
+        // Assert:
+        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+    }
 
     //endregion
 
@@ -168,13 +198,38 @@ public class PeerNetworkTest {
         private int numGetInfoCalls;
         private int numGetKnownPeerCalls;
 
+        private String getErrorTrigger;
+        public TriggerAction getErrorTriggerAction;
+
+        public enum TriggerAction {
+            NONE,
+            INACTIVE,
+            FATAL
+        }
+
         public int getNumGetInfoCalls() { return this.numGetInfoCalls; }
         public int getNumGetKnownPeerCalls() { return this.numGetKnownPeerCalls; }
 
+        public void setGetInfoError(final String trigger, final TriggerAction action) {
+            this.getErrorTrigger = trigger;
+            this.getErrorTriggerAction = action;
+        }
+
         @Override
         public NodeInfo getInfo(final NodeEndpoint endpoint) {
-            ++numGetInfoCalls;
-            return null;
+            ++this.numGetInfoCalls;
+
+            if (endpoint.getBaseUrl().getHost().equals(this.getErrorTrigger)) {
+                switch (this.getErrorTriggerAction) {
+                    case INACTIVE:
+                        throw new InactivePeerException("inactive peer");
+
+                    case FATAL:
+                        throw new FatalPeerException("fatal peer");
+                }
+            }
+
+            return new NodeInfo(endpoint, "P", "A");
         }
 
         @Override

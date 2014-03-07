@@ -104,6 +104,15 @@ public class NodeStatusDemuxTest {
 
     //region update
 
+    @Test(expected = NullPointerException.class)
+    public void updateCannotAddNullNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(new ArrayList<Node>());
+
+        // Act:
+        demux.update(null, NodeStatus.ACTIVE);
+    }
+
     @Test
     public void updateCanAddNewActiveNode() {
         // Arrange:

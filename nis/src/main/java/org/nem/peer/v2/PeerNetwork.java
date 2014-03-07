@@ -8,7 +8,7 @@ import java.util.*;
 public class PeerNetwork {
 
     private final Config config;
-    private final NodeStatusDemux nodes;
+    private NodeStatusDemux nodes;
     private final PeerConnector connector;
 
     /**
@@ -48,10 +48,14 @@ public class PeerNetwork {
         // TODO: need to add back calls for requesting peer lists
         // TODO: should we check for node consistency?
 
-        for (final NodeInfo node : this.nodes.getActiveNodes())
+        // TODO: not sure if i like this, but it's late ... revisit
+        NodeStatusDemux oldNodes = this.nodes;
+        this.nodes = new NodeStatusDemux(new ArrayList<Node>());
+
+        for (final NodeInfo node : oldNodes.getActiveNodes())
             this.refreshNode(node);
 
-        for (final NodeInfo node : this.nodes.getInactiveNodes())
+        for (final NodeInfo node : oldNodes.getInactiveNodes())
             this.refreshNode(node);
     }
 

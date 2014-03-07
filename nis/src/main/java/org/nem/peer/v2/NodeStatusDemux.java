@@ -85,6 +85,9 @@ public class NodeStatusDemux implements SerializableEntity {
      * @param status The node status.
      */
     public void update(final NodeInfo node, final NodeStatus status) {
+        if (null == node)
+            throw new NullPointerException("node cannot be null");
+
         this.activeNodes.remove(node);
         this.inactiveNodes.remove(node);
 
