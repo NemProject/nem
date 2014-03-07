@@ -6,6 +6,8 @@ import java.util.*;
 
 /**
  * Demultiplexes a node collection into separate node info collections based on node status.
+ * TODO: The naming no longer makes sense since there isn't a list that needs demultiplexing.
+ * TODO: A name like NodeCollection makes more sense since the PeerNetwork uses this to hold all of its nodes.
  */
 public class NodeStatusDemux implements SerializableEntity {
 

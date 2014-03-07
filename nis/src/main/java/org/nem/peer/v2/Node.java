@@ -4,6 +4,8 @@ import java.util.logging.Logger;
 
 /**
  * A node in the NEM network.
+ * TODO: With the current structure this class isn't needed.
+ * TODO: It probably makes sense to remove this one and rename NodeInfo -> Node.
  */
 public class Node {
 
