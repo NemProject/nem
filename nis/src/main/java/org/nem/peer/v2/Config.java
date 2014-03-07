@@ -11,7 +11,7 @@ import java.util.*;
 public class Config {
 
     private final Node localNode;
-    private final Set<String> wellKnownPeers;
+    private final Set<NodeEndpoint> wellKnownPeers;
 
     /**
      * Creates a new configuration object from a JSON configuration object.
@@ -19,8 +19,9 @@ public class Config {
      * @param jsonConfig A JSON configuration object.
      */
     public Config(final JSONObject jsonConfig) {
-        this.localNode = parseLocalNode(jsonConfig);
-        this.wellKnownPeers = parseWellKnownPeers((JSONArray)jsonConfig.get("knownPeers"));
+        final JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
+        this.localNode = parseLocalNode(deserializer);
+        this.wellKnownPeers = parseWellKnownPeers(deserializer);
     }
 
     /**
@@ -42,25 +43,15 @@ public class Config {
      *
      * @return The set of well known peers.
      */
-    public Set<String> getWellKnownPeers() { return this.wellKnownPeers; }
+    public Set<NodeEndpoint> getWellKnownPeers() { return this.wellKnownPeers; }
 
-    private static Node parseLocalNode(final JSONObject jsonConfig) {
-        JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
+    private static Node parseLocalNode(final Deserializer deserializer) {
         NodeInfo info = new NodeInfo(deserializer);
         return new Node(info);
     }
 
-    private static Set<String> parseWellKnownPeers(final JSONArray jsonWellKnownPeers) {
-        if (null == jsonWellKnownPeers)
-            return Collections.emptySet();
-
-        Set<String> wellKnownPeers = new HashSet<>();
-        for (Object jsonWellKnownPeer : jsonWellKnownPeers) {
-            String host = ((String)jsonWellKnownPeer).trim();
-            if (!host.isEmpty())
-                wellKnownPeers.add(host);
-        }
-
-        return Collections.unmodifiableSet(wellKnownPeers);
+    private static Set<NodeEndpoint> parseWellKnownPeers(final Deserializer deserializer) {
+        final List<NodeEndpoint> wellKnownPeers = deserializer.readObjectArray("knownPeers", NodeEndpoint.DESERIALIZER);
+        return Collections.unmodifiableSet(new HashSet<>(wellKnownPeers));
     }
 }

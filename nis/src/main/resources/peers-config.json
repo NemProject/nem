@@ -10,7 +10,9 @@
     "application": "NIS"
 	"platform": "ZX Spectrum",
 
-	"knownPeers": [ "37.187.70.29" ],
+	"knownPeers": [
+        { "protocol": "http", "host": "37.187.70.29", "port" 7890 }
+    ],
 
 	"_end": "end"
 }

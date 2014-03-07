@@ -41,13 +41,14 @@ public class ConfigTest {
         final Config config = createTestConfig();
 
         // Act:
-        final Set<String> wellKnownPeers = config.getWellKnownPeers();
+        final Set<NodeEndpoint> wellKnownPeers = config.getWellKnownPeers();
 
         // Assert:
         Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(3));
-        Assert.assertThat(wellKnownPeers.contains("Alpha"), IsEqual.equalTo(true));
-        Assert.assertThat(wellKnownPeers.contains("Sigma"), IsEqual.equalTo(true));
-        Assert.assertThat(wellKnownPeers.contains("Gamma"), IsEqual.equalTo(true));
+        Assert.assertThat(wellKnownPeers.contains(new NodeEndpoint("ftp", "10.0.0.5", 12)), IsEqual.equalTo(true));
+        Assert.assertThat(wellKnownPeers.contains(new NodeEndpoint("ftp", "10.0.0.8", 12)), IsEqual.equalTo(true));
+        Assert.assertThat(wellKnownPeers.contains(new NodeEndpoint("ftp", "10.0.0.3", 12)), IsEqual.equalTo(true));
+
     }
 
     @Test
@@ -58,49 +59,40 @@ public class ConfigTest {
         final Config config = createTestConfig(jsonConfig);
 
         // Act:
-        final Set<String> wellKnownPeers = config.getWellKnownPeers();
+        final Set<NodeEndpoint> wellKnownPeers = config.getWellKnownPeers();
 
         // Assert:
         Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(0));
     }
 
-    @Test
-    public void wellKnownPeersContainingAllWhitespaceAreIgnored() {
-        // Arrange:
-        final JSONObject jsonConfig = createTestJsonConfig(new String[] { "", "Beta", "  ", "Alpha", "\t \t" });
-        final Config config = createTestConfig(jsonConfig);
-
-        // Act:
-        final Set<String> wellKnownPeers = config.getWellKnownPeers();
-
-        // Assert:
-        Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(2));
-        Assert.assertThat(wellKnownPeers.contains("Beta"), IsEqual.equalTo(true));
-        Assert.assertThat(wellKnownPeers.contains("Alpha"), IsEqual.equalTo(true));
-    }
-
     //region Factories
+
+    private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {
+        JSONObject jsonEndpoint = new JSONObject();
+        jsonEndpoint.put("protocol", protocol);
+        jsonEndpoint.put("host", host);
+        jsonEndpoint.put("port", port);
+        return jsonEndpoint;
+    }
 
     private static JSONObject createTestJsonConfig(final String[] hostNames) {
         JSONObject jsonConfig = new JSONObject();
 
-        JSONObject jsonEndpoint = new JSONObject();
-        jsonEndpoint.put("protocol", "http");
-        jsonEndpoint.put("host", "10.0.0.8");
-        jsonEndpoint.put("port", 7890);
-        jsonConfig.put("endpoint", jsonEndpoint);
+        jsonConfig.put("endpoint", createEndpointJsonObject("http", "10.0.0.8", 7890));
 
         jsonConfig.put("platform", "Mac");
         jsonConfig.put("application", "FooBar");
 
         JSONArray jsonWellKnownPeers = new JSONArray();
-        Collections.addAll(jsonWellKnownPeers, hostNames);
+        for (final String hostName : hostNames)
+            jsonWellKnownPeers.add(createEndpointJsonObject("ftp", hostName, 12));
+
         jsonConfig.put("knownPeers", jsonWellKnownPeers);
         return jsonConfig;
     }
 
     private static JSONObject createTestJsonConfig() {
-        return createTestJsonConfig(new String[] { "Alpha", "Sigma", "Gamma" });
+        return createTestJsonConfig(new String[] { "10.0.0.5", "10.0.0.8", "10.0.0.3" });
     }
 
     private static Config createTestConfig() {
