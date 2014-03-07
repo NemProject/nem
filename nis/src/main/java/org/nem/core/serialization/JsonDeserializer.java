@@ -73,13 +73,19 @@ public class JsonDeserializer implements Deserializer {
 
     @Override
     public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
+        this.checkLabel(label);
         JSONObject childObject = (JSONObject)this.object.get(label);
         return this.deserializeObject(childObject, activator);
     }
 
     @Override
     public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
+        this.checkLabel(label);
         JSONArray jsonArray = (JSONArray)this.object.get(label);
+
+        if (null == jsonArray)
+            return new ArrayList<>();
+
         List<T> objects = new ArrayList<>();
         for (Object jsonObject : jsonArray)
             objects.add(this.deserializeObject((JSONObject) jsonObject, activator));
