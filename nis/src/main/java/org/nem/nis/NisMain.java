@@ -14,15 +14,12 @@ import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.Transaction;
+import org.nem.core.model.*;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Transfer;
-import org.nem.core.model.Address;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.v2.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -92,14 +89,7 @@ public class NisMain {
 
 		initEpoch();
 
-		PeerNetwork peerNetwork = PeerNetwork.getDefaultNetwork();
-		if (peerNetwork == null) {
-			logger.severe("Cannot bring-up the PeerNetwork. Server is going down, no chance to work.");
-			// No chance to be successful
-			// Just for the moment we go down
-			// very ugly
-			System.exit(1);
-		}
+		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 	}
 
 	private void populateDb() {
