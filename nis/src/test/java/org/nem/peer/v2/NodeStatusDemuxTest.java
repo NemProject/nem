@@ -43,12 +43,7 @@ public class NodeStatusDemuxTest {
          final NodeStatusDemux demux = new NodeStatusDemux(nodes);
 
          // Assert:
-         Assert.assertThat(
-             getPlatforms(demux.getActiveNodes()),
-             IsEquivalent.equivalentTo(new String[] { "A", "D", "F" }));
-         Assert.assertThat(
-             getPlatforms(demux.getInactiveNodes()),
-             IsEquivalent.equivalentTo(new String[] { "B", "C" }));
+         assertStatusListNodes(demux, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
     }
 
     private static List<String> getPlatforms(final Collection<NodeInfo> nodes) {
@@ -73,6 +68,15 @@ public class NodeStatusDemuxTest {
         Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(expectedNumInactiveNodes));
     }
 
+    private static void assertStatusListNodes(
+        final NodeStatusDemux demux,
+        final String[] expectedActivePlatforms,
+        final String[] expectedInactivePlatforms) {
+        // Assert:
+        Assert.assertThat(getPlatforms(demux.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePlatforms));
+        Assert.assertThat(getPlatforms(demux.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
+    }
+
     //endregion
 
     //region serialization
@@ -93,8 +97,122 @@ public class NodeStatusDemuxTest {
         NodeStatusDemux demux = new NodeStatusDemux(Utils.roundtripSerializableEntity(originalDemux, null));
 
         // Assert:
-        Assert.assertThat(demux.getActiveNodes().size(), IsEqual.equalTo(3));
-        Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(2));
+        assertStatusListNodes(demux, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
+    }
+
+    //endregion
+
+    //region update
+
+    @Test
+    public void updateCanAddNewActiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(new ArrayList<Node>());
+
+        // Act:
+        final Node node = createNode(NodeStatus.ACTIVE, "A");
+        demux.update(node.getInfo(), NodeStatus.ACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[]{ "A" }, new String[]{ });
+    }
+
+    @Test
+    public void updateCanAddNewInactiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(new ArrayList<Node>());
+
+        // Act:
+        final Node node = createNode(NodeStatus.INACTIVE, "A");
+        demux.update(node.getInfo(), NodeStatus.INACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { }, new String[] { "A" });
+    }
+
+    @Test
+    public void updateDoesNotAddNewFailureNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(new ArrayList<Node>());
+
+        // Act:
+        final Node node = createNode(NodeStatus.FAILURE, "A");
+        demux.update(node.getInfo(), NodeStatus.FAILURE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { }, new String[] { });
+    }
+
+    @Test
+    public void updateCanUpdateActiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(createSingleItemNodeList(NodeStatus.ACTIVE, "A"));
+
+        // Act:
+        final Node node = createNode(NodeStatus.ACTIVE, "B", "A".codePointAt(0));
+        demux.update(node.getInfo(), NodeStatus.ACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { "B" }, new String[] { });
+    }
+
+    @Test
+    public void updateCanUpdateActiveNodeAsInactiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(createSingleItemNodeList(NodeStatus.ACTIVE, "A"));
+
+        // Act:
+        final Node node = createNode(NodeStatus.INACTIVE, "B", "A".codePointAt(0));
+        demux.update(node.getInfo(), NodeStatus.INACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { }, new String[] { "B" });
+    }
+
+    @Test
+    public void updateCanUpdateInactiveNodeAsActiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(createSingleItemNodeList(NodeStatus.INACTIVE, "A"));
+
+        // Act:
+        final Node node = createNode(NodeStatus.ACTIVE, "B", "A".codePointAt(0));
+        demux.update(node.getInfo(), NodeStatus.ACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { "B" }, new String[] { });
+    }
+
+    @Test
+    public void updateCanUpdateInactiveNode() {
+        // Arrange:
+        final NodeStatusDemux demux = new NodeStatusDemux(createSingleItemNodeList(NodeStatus.INACTIVE, "A"));
+
+        // Act:
+        final Node node = createNode(NodeStatus.INACTIVE, "B", "A".codePointAt(0));
+        demux.update(node.getInfo(), NodeStatus.INACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { }, new String[] { "B" });
+    }
+
+    @Test
+    public void updateOnlyUpdatesMatchingNode() {
+        // Arrange:
+        final List<Node> nodes = new ArrayList<>();
+        nodes.add(createNode(NodeStatus.ACTIVE, "A"));
+        nodes.add(createNode(NodeStatus.INACTIVE, "B"));
+        nodes.add(createNode(NodeStatus.INACTIVE, "C"));
+        nodes.add(createNode(NodeStatus.ACTIVE, "D"));
+        nodes.add(createNode(NodeStatus.FAILURE, "E"));
+        nodes.add(createNode(NodeStatus.ACTIVE, "F"));
+        final NodeStatusDemux demux = new NodeStatusDemux(nodes);
+
+        // Act:
+        final Node node = createNode(NodeStatus.INACTIVE, "Z", "D".codePointAt(0));
+        demux.update(node.getInfo(), NodeStatus.INACTIVE);
+
+        // Assert:
+        assertStatusListNodes(demux, new String[] { "A", "F" }, new String[] { "B", "C", "Z" });
     }
 
     //endregion
@@ -108,7 +226,12 @@ public class NodeStatusDemuxTest {
 
     private static Node createNode(final NodeStatus status, final String platform) {
         // Arrange:
-        final NodeInfo info = new NodeInfo(new NodeEndpoint("http", "localhost", 80), platform, "FooBar");
+        return createNode(status, platform, platform.codePointAt(0));
+    }
+
+    private static Node createNode(final NodeStatus status, final String platform, int port) {
+        // Arrange:
+        final NodeInfo info = new NodeInfo(new NodeEndpoint("http", "localhost", port), platform, "FooBar");
         final Node node = new Node(info);
         node.setStatus(status);
         return node;

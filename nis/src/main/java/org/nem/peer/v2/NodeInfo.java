@@ -38,12 +38,7 @@ public class NodeInfo implements SerializableEntity {
      * @param deserializer The deserializer.
      */
     public NodeInfo(final Deserializer deserializer) {
-        this.endpoint = deserializer.readObject("endpoint", new ObjectDeserializer<NodeEndpoint>() {
-            @Override
-            public NodeEndpoint deserialize(final Deserializer deserializer) {
-                return new NodeEndpoint(deserializer);
-            }
-        });
+        this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
 
         this.platform = deserializer.readString("platform");
 
@@ -105,10 +100,7 @@ public class NodeInfo implements SerializableEntity {
 
     @Override
     public int hashCode() {
-        return this.endpoint.hashCode() ^
-            this.platform.hashCode() ^
-            this.version.hashCode() ^
-            this.application.hashCode();
+        return this.endpoint.hashCode();
     }
 
     @Override
@@ -116,10 +108,8 @@ public class NodeInfo implements SerializableEntity {
         if (obj == null || !(obj instanceof NodeInfo))
             return false;
 
+        // TODO: review this change (making node equality the same as endpoint equality)
         NodeInfo rhs = (NodeInfo)obj;
-        return this.endpoint.equals(rhs.endpoint) &&
-            this.platform.equals(rhs.platform) &&
-            this.version.equals(rhs.version) &&
-            this.application.equals(rhs.application);
+        return this.endpoint.equals(rhs.endpoint);
     }
 }

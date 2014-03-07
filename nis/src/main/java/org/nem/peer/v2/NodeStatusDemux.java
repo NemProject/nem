@@ -16,8 +16,8 @@ public class NodeStatusDemux implements SerializableEntity {
         }
     };
 
-    final List<NodeInfo> activeNodes;
-    final List<NodeInfo> inactiveNodes;
+    final Set<NodeInfo> activeNodes;
+    final Set<NodeInfo> inactiveNodes;
 
     /**
      * Demultiplexes an collection of nodes.
@@ -25,11 +25,11 @@ public class NodeStatusDemux implements SerializableEntity {
      * @param nodes The collection to demux.
      */
     public NodeStatusDemux(final Iterable<Node> nodes) {
-        this.activeNodes = new ArrayList<>();
-        this.inactiveNodes = new ArrayList<>();
+        this.activeNodes = new HashSet<>();
+        this.inactiveNodes = new HashSet<>();
 
         for (final Node node : nodes) {
-            final List<NodeInfo> nodeList;
+            final Set<NodeInfo> nodeList;
             switch (node.getStatus()) {
                 case ACTIVE:
                     nodeList = this.activeNodes;
@@ -57,8 +57,8 @@ public class NodeStatusDemux implements SerializableEntity {
      * @param deserializer The deserializer.
      */
     public NodeStatusDemux(final Deserializer deserializer) {
-        this.activeNodes = deserializer.readObjectArray("active", NODE_INFO_DESERIALIZER);
-        this.inactiveNodes = deserializer.readObjectArray("inactive", NODE_INFO_DESERIALIZER);
+        this.activeNodes = new HashSet<>(deserializer.readObjectArray("active", NODE_INFO_DESERIALIZER));
+        this.inactiveNodes = new HashSet<>(deserializer.readObjectArray("inactive", NODE_INFO_DESERIALIZER));
     }
 
     /**
@@ -75,9 +75,38 @@ public class NodeStatusDemux implements SerializableEntity {
      */
     public Collection<NodeInfo> getInactiveNodes() { return this.inactiveNodes; }
 
+    /**
+     * Updates this collection to include the specified node with the associated status.
+     * The new node information will replace any previous node information.
+     *
+     * @param node The node.
+     * @param status The node status.
+     */
+    public void update(final NodeInfo node, final NodeStatus status) {
+        this.activeNodes.remove(node);
+        this.inactiveNodes.remove(node);
+
+        final Set<NodeInfo> nodes;
+        switch (status) {
+            case ACTIVE:
+                nodes = this.activeNodes;
+                break;
+
+            case INACTIVE:
+                nodes = this.inactiveNodes;
+                break;
+
+            case FAILURE:
+            default:
+                return;
+        }
+
+        nodes.add(node);
+    }
+
     @Override
     public void serialize(final Serializer serializer) {
-        serializer.writeObjectArray("active", this.activeNodes);
-        serializer.writeObjectArray("inactive", this.inactiveNodes);
+        serializer.writeObjectArray("active", new ArrayList<>(this.activeNodes));
+        serializer.writeObjectArray("inactive", new ArrayList<>(this.inactiveNodes));
     }
 }

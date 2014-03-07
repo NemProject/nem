@@ -11,6 +11,13 @@ import java.util.*;
  */
 public class NodeEndpoint implements SerializableEntity {
 
+    public static ObjectDeserializer<NodeEndpoint> DESERIALIZER = new ObjectDeserializer<NodeEndpoint>() {
+        @Override
+        public NodeEndpoint deserialize(final Deserializer deserializer) {
+            return new NodeEndpoint(deserializer);
+        }
+    };
+
     private final String protocol;
     private final String host;
     private final int port;
