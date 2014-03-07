@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +48,7 @@ public class NisMain {
 	static long epochBeginning;
 
 	static private void initEpoch() {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, 0);
 		calendar.set(Calendar.YEAR, 2014);
 		calendar.set(Calendar.MONTH, 07);
