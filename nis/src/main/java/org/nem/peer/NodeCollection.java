@@ -52,6 +52,22 @@ public class NodeCollection implements SerializableEntity {
     public Collection<Node> getInactiveNodes() { return this.inactiveNodes; }
 
     /**
+     * Gets the status of the specified node.
+     *
+     * @param node The node.
+     * @return The node's status.
+     */
+    public NodeStatus getNodeStatus(final Node node) {
+        if (this.activeNodes.contains(node))
+            return NodeStatus.ACTIVE;
+
+        if (this.inactiveNodes.contains(node))
+            return NodeStatus.INACTIVE;
+
+        return NodeStatus.FAILURE;
+    }
+
+    /**
      * Updates this collection to include the specified node with the associated status.
      * The new node information will replace any previous node information.
      *

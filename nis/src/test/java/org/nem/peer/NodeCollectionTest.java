@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
 import org.nem.peer.test.*;
@@ -31,6 +32,41 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
+    }
+
+    //endregion
+
+    //region getNodeStatus
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForActiveNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.ACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("F")), IsEqual.equalTo(NodeStatus.ACTIVE));
+    }
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForInactiveNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.INACTIVE));
+    }
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForFailureNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("E")), IsEqual.equalTo(NodeStatus.FAILURE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("G")), IsEqual.equalTo(NodeStatus.FAILURE));
     }
 
     //endregion
