@@ -1,11 +1,12 @@
-package org.nem.peer;
+package org.nem.peer.test;
 
 import net.minidev.json.*;
+import org.nem.peer.Config;
 
 /**
- * Static class containing utility functions that are used by multiple peer test suites.
+ * Static class containing utility functions for creating Config objects.
  */
-public class PeerTestUtils {
+public class ConfigFactory {
 
     //region config
 

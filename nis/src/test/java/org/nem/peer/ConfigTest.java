@@ -3,6 +3,7 @@ package org.nem.peer;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.peer.test.*;
 
 import java.net.URL;
 import java.util.*;
@@ -36,7 +37,8 @@ public class ConfigTest {
     @Test
      public void wellKnownPeersAreInitializedCorrectly() {
         // Arrange:
-        final Config config = createTestConfig();
+        final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.8", "10.0.0.3" };
+        final Config config = new Config(ConfigFactory.createTestJsonConfig(knownHosts));
 
         // Act:
         final Set<NodeEndpoint> wellKnownPeers = config.getWellKnownPeers();
@@ -51,7 +53,7 @@ public class ConfigTest {
     @Test
     public void wellKnownPeersAreEmptyIfNotSpecified() {
         // Arrange:
-        final JSONObject jsonConfig = PeerTestUtils.createTestJsonConfig();
+        final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
         jsonConfig.remove("knownPeers");
         final Config config = new Config(jsonConfig);
 
@@ -69,7 +71,7 @@ public class ConfigTest {
     }
 
     private static Config createTestConfig() {
-        return PeerTestUtils.createDefaultTestConfig();
+        return ConfigFactory.createDefaultTestConfig();
     }
 
     //endregion

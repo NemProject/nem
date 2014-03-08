@@ -2,9 +2,7 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
+import org.nem.peer.test.*;
 
 public class PeerNetworkTest {
 
@@ -17,7 +15,7 @@ public class PeerNetworkTest {
         final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { }, new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" });
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { }, new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" });
     }
 
     @Test
@@ -98,7 +96,7 @@ public class PeerNetworkTest {
         final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
     }
    
     @Test
@@ -113,7 +111,7 @@ public class PeerNetworkTest {
         final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
     }
 
     @Test
@@ -128,29 +126,12 @@ public class PeerNetworkTest {
         final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
     }
 
     //endregion
 
     //region factories
-
-    // TODO: refactor
-    private static void assertStatusListNodes(
-        final NodeCollection nodes,
-        final String[] expectedActiveHosts,
-        final String[] expectedInactiveHosts) {
-        // Assert:
-        Assert.assertThat(getHosts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
-        Assert.assertThat(getHosts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
-    }
-
-    private static List<String> getHosts(final Collection<Node> nodes) {
-        final List<String> platforms = new ArrayList<>();
-        for (final Node node : nodes)
-            platforms.add(node.getEndpoint().getBaseUrl().getHost());
-        return platforms;
-    }
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
         return new PeerNetwork(createTestConfig(), connector);
@@ -161,7 +142,7 @@ public class PeerNetworkTest {
     }
 
     private static Config createTestConfig() {
-        return PeerTestUtils.createDefaultTestConfig();
+        return ConfigFactory.createDefaultTestConfig();
     }
 
     //endregion

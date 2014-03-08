@@ -2,8 +2,7 @@ package org.nem.peer;
 
 import org.junit.*;
 import org.nem.core.test.*;
-
-import java.util.*;
+import org.nem.peer.test.*;
 
 public class NodeCollectionTest {
 
@@ -15,7 +14,7 @@ public class NodeCollectionTest {
         final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
          // Assert:
-         assertStatusListNodes(nodes, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
+         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
     }
 
     //endregion
@@ -31,7 +30,7 @@ public class NodeCollectionTest {
         final NodeCollection nodes = new NodeCollection(Utils.roundtripSerializableEntity(originalNodes, null));
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
     }
 
     //endregion
@@ -56,7 +55,7 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[]{ "A" }, new String[]{ });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A" }, new String[]{ });
     }
 
     @Test
@@ -68,7 +67,7 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { }, new String[] { "A" });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "A" });
     }
 
     @Test
@@ -80,7 +79,7 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.FAILURE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { }, new String[] { });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ });
     }
 
     @Test
@@ -90,10 +89,10 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Act:
-        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
+        nodes.update(createNode("B", 'A'), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { "B" }, new String[] { });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "B" }, new String[]{ });
     }
 
     @Test
@@ -103,10 +102,10 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Act:
-        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("B", 'A'), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { }, new String[] { "B" });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "B" });
     }
 
     @Test
@@ -116,10 +115,10 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Act:
-        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
+        nodes.update(createNode("B", 'A'), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { "B" }, new String[] { });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "B" }, new String[]{ });
     }
 
     @Test
@@ -129,10 +128,10 @@ public class NodeCollectionTest {
         nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Act:
-        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("B", 'A'), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { }, new String[] { "B" });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "B" });
     }
 
     @Test
@@ -141,38 +140,24 @@ public class NodeCollectionTest {
         final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
         // Act:
-        nodes.update(createNode("Z", "D".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("Z", 'D'), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(nodes, new String[] { "A", "F" }, new String[] { "B", "C", "Z" });
+        NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "F" }, new String[]{ "B", "C", "Z" });
     }
+
+    // TODO: add port validation too
 
     //endregion
 
     private static Node createNode(final String platform) {
         // Arrange:
-        return createNode(platform, platform.codePointAt(0));
+        return createNode(platform, platform.charAt(0));
     }
 
-    private static Node createNode(final String platform, int port) {
+    private static Node createNode(final String platform, final char port) {
         // Arrange:
         return new Node(new NodeEndpoint("http", "localhost", port), platform, "FooBar");
-    }
-
-    private static List<String> getPlatforms(final Collection<Node> nodes) {
-        final List<String> platforms = new ArrayList<>();
-        for (final Node node : nodes)
-            platforms.add(node.getPlatform());
-        return platforms;
-    }
-
-    private static void assertStatusListNodes(
-        final NodeCollection nodes,
-        final String[] expectedActivePlatforms,
-        final String[] expectedInactivePlatforms) {
-        // Assert:
-        Assert.assertThat(getPlatforms(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePlatforms));
-        Assert.assertThat(getPlatforms(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
     }
 
     private static NodeCollection createNodeCollectionWithMultipleNodes() {
