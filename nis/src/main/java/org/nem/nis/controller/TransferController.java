@@ -10,6 +10,7 @@ import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.DbAccountLookup;
+//import org.nem.peer.v2.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +38,16 @@ public class TransferController {
 
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody String body) {
-		JSONObject par = (JSONObject)JSONValue.parse(body);
+		JSONObject par;
+		try {
+			par = (JSONObject)JSONValue.parse(body);
+
+		} catch (ClassCastException e) {
+			return jsonError(1, "invalid json");
+		}
 		logger.info(par.toString());
+
+		logger.info("threadId : " + Long.toString(Thread.currentThread().getId()) );
 
 		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(dbAccountLookup));
 		TransferTransaction transferTransaction;

@@ -3,7 +3,9 @@ package org.nem.peer;
 import net.minidev.json.*;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.*;
+import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.eclipse.jetty.http.HttpMethod;
 import org.nem.core.serialization.*;
 
 import java.io.*;
@@ -71,4 +73,36 @@ public class HttpPeerConnector implements PeerConnector {
             throw new FatalPeerException(e);
         }
     }
+
+	protected JsonDeserializer postResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
+		JSONObject retObj = null;
+		try {
+			InputStreamResponseListener listener = new InputStreamResponseListener();
+
+			URI uri = url.toURI();
+			Request req = httpClient.newRequest(uri);
+
+			req.method(HttpMethod.POST);
+			req.content(new BytesContentProvider(request.toString().getBytes()), "text/plain");
+			req.send(listener);
+
+			Response res = listener.get(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+			if (res.getStatus() != HTTP_STATUS_OK) {
+				return null;
+			}
+
+			try (InputStream responseStream = listener.getInputStream()) {
+				return new JsonDeserializer(
+						(JSONObject)JSONValue.parse(responseStream),
+						new DeserializationContext(null));
+			}
+
+		}
+		catch (TimeoutException e) {
+			throw new InactivePeerException(e);
+		}
+		catch (URISyntaxException|InterruptedException|ExecutionException|IOException e) {
+			throw new FatalPeerException(e);
+		}
+	}
 }

@@ -1,6 +1,8 @@
 package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
+import org.nem.core.serialization.JsonDeserializer;
+import org.nem.peer.v2.HttpPeerConnector;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -11,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * ugliness
  */
-public class MockPeerConnector {
+public class MockPeerConnector extends HttpPeerConnector {
 	private URL baseURL;
 
 	public MockPeerConnector() throws MalformedURLException {
@@ -20,10 +22,8 @@ public class MockPeerConnector {
 		this.baseURL = new URL("http", "127.0.0.1", 7890, "/");
 	}
 
-	public JSONObject transferPrepare(JSONObject transferPrepareData) throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
-//		JSONObject response = postResponse(new URL(this.baseURL, "transfer/prepare"), transferPrepareData);
-//		return response;
-        // TODO: fix this
-        return new JSONObject();
+	public JsonDeserializer transferPrepare(JSONObject transferPrepareData) throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+		JsonDeserializer response = postResponse(new URL(this.baseURL, "transfer/prepare"), transferPrepareData);
+		return response;
 	}
 }

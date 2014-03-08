@@ -9,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.nem.core.model.MessageTypes;
 import org.nem.core.model.TransactionTypes;
+import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.test.MockPeerConnector;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.core.utils.HexEncoder;
@@ -44,10 +45,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -69,10 +70,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -94,10 +95,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -119,10 +120,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -144,10 +145,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -169,10 +170,10 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
 	}
 
 	@Test
@@ -194,9 +195,9 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		JSONObject res = pc.transferPrepare(obj);
+		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.get("error"), IsNull.nullValue());
+		Assert.assertThat(res.readInt("error"), IsNull.nullValue());
 	}
 }
