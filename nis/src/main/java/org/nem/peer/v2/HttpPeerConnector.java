@@ -35,9 +35,9 @@ public class HttpPeerConnector implements PeerConnector {
     }
 
     @Override
-    public NodeInfo getInfo(final NodeEndpoint endpoint) {
+    public Node getInfo(final NodeEndpoint endpoint) {
         final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_INFO);
-        return new NodeInfo(this.getResponse(url));
+        return new Node(this.getResponse(url));
     }
 
     @Override

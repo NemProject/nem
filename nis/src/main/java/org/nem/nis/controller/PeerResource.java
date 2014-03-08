@@ -14,7 +14,7 @@ public class PeerResource {
     public String getInfo()
     {
     	final PeerNetwork network = PeerNetworkHost.getDefaultHost().getNetwork();
-    	final NodeInfo node = network.getLocalNode();
+    	final Node node = network.getLocalNode();
         return JsonSerializer.serializeToJson(node).toString() + "\r\n";
     }
     

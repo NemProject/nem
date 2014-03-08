@@ -40,7 +40,7 @@ public class PeerNetworkTest {
 
         // Assert:
         Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(3));
-        for (final NodeInfo node : demux.getInactiveNodes())
+        for (final Node node : demux.getInactiveNodes())
             Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
     }
 
@@ -52,7 +52,7 @@ public class PeerNetworkTest {
 
         // Assert:
         Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(3));
-        for (final NodeInfo node : demux.getInactiveNodes())
+        for (final Node node : demux.getInactiveNodes())
             Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
     }
 
@@ -67,7 +67,7 @@ public class PeerNetworkTest {
         final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector());
 
         // Assert:
-        Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode().getInfo()));
+        Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
     }
 
     //endregion
@@ -144,9 +144,9 @@ public class PeerNetworkTest {
         Assert.assertThat(getHosts(demux.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
     }
 
-    private static List<String> getHosts(final Collection<NodeInfo> nodes) {
+    private static List<String> getHosts(final Collection<Node> nodes) {
         final List<String> platforms = new ArrayList<>();
-        for (final NodeInfo node : nodes)
+        for (final Node node : nodes)
             platforms.add(node.getEndpoint().getBaseUrl().getHost());
         return platforms;
     }
@@ -216,7 +216,7 @@ public class PeerNetworkTest {
         }
 
         @Override
-        public NodeInfo getInfo(final NodeEndpoint endpoint) {
+        public Node getInfo(final NodeEndpoint endpoint) {
             ++this.numGetInfoCalls;
 
             if (endpoint.getBaseUrl().getHost().equals(this.getErrorTrigger)) {
@@ -229,7 +229,7 @@ public class PeerNetworkTest {
                 }
             }
 
-            return new NodeInfo(endpoint, "P", "A");
+            return new Node(endpoint, "P", "A");
         }
 
         @Override

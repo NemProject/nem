@@ -11,7 +11,7 @@ public interface PeerConnector {
      * @param endpoint The endpoint.
      * @return Information about the specified node.
      */
-    public NodeInfo getInfo(final NodeEndpoint endpoint);
+    public Node getInfo(final NodeEndpoint endpoint);
 
     /**
      * Requests information about all known peers from the specified node.

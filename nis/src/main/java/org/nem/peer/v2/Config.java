@@ -46,8 +46,7 @@ public class Config {
     public Set<NodeEndpoint> getWellKnownPeers() { return this.wellKnownPeers; }
 
     private static Node parseLocalNode(final Deserializer deserializer) {
-        NodeInfo info = new NodeInfo(deserializer);
-        return new Node(info);
+        return new Node(deserializer);
     }
 
     private static Set<NodeEndpoint> parseWellKnownPeers(final Deserializer deserializer) {

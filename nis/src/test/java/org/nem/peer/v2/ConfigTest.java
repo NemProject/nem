@@ -24,15 +24,13 @@ public class ConfigTest {
         final Config config = createTestConfig();
 
         // Act:
-        final Node localNode = config.getLocalNode();
-        final NodeInfo info = localNode.getInfo();
+        final Node node = config.getLocalNode();
 
         // Assert:
-        Assert.assertThat(info.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
-        Assert.assertThat(info.getPlatform(), IsEqual.equalTo("Mac"));
-        Assert.assertThat(info.getVersion(), IsEqual.equalTo(2));
-        Assert.assertThat(info.getApplication(), IsEqual.equalTo("FooBar"));
-        Assert.assertThat(localNode.getStatus(), IsEqual.equalTo(NodeStatus.INACTIVE));
+        Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
+        Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
+        Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+        Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
     }
 
     @Test

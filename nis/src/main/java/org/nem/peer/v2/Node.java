@@ -1,55 +1,120 @@
 package org.nem.peer.v2;
 
-import java.util.logging.Logger;
+import org.nem.core.serialization.*;
+
+import java.security.InvalidParameterException;
 
 /**
- * A node in the NEM network.
- * TODO: With the current structure this class isn't needed.
- * TODO: It probably makes sense to remove this one and rename NodeInfo -> Node.
+ * Represents a node in the NEM network.
  */
-public class Node {
+public class Node implements SerializableEntity {
 
-    private static final Logger LOGGER = Logger.getLogger(Node.class.getName());
+    private final static int DEFAULT_VERSION = 2;
+    private final static String DEFAULT_PLATFORM = "PC";
 
-    private final NodeInfo info;
-    private NodeStatus status;
+    private final NodeEndpoint endpoint;
+    private final String platform;
+    private final Integer version;
+    private final String application;
 
     /**
      * Creates a new node.
      *
-     * @param info Information about the node.
+     * @param endpoint The endpoint.
+     * @param platform The platform.
+     * @param application The application.
      */
-    public Node(final NodeInfo info) {
-        this.info = info;
-        this.status = NodeStatus.INACTIVE;
+    public Node(final NodeEndpoint endpoint, final String platform, final String application) {
+        this.endpoint = endpoint;
+        this.platform = null == platform ? DEFAULT_PLATFORM : platform;
+        this.application = application;
+        this.version = DEFAULT_VERSION;
+        this.ensureValidity();
     }
 
     /**
-     * Gets information about the node.
+     * Deserializes a node.
      *
-     * @return Information about the node.
+     * @param deserializer The deserializer.
      */
-    public NodeInfo getInfo() { return this.info; }
+    public Node(final Deserializer deserializer) {
+        this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
 
-    /***
-     * Gets this node's status.
-     *
-     * @return This node's status.
-     */
-    public NodeStatus getStatus() { return this.status; }
+        this.platform = deserializer.readString("platform");
+
+        final Integer version = deserializer.readInt("version");
+        this.version = null == version ? DEFAULT_VERSION : version;
+
+        this.application = deserializer.readString("application");
+        this.ensureValidity();
+    }
+
+    @Override
+    public void serialize(final Serializer serializer) {
+        serializer.writeObject("endpoint", this.endpoint);
+        serializer.writeString("platform", this.platform);
+        serializer.writeInt("version", this.version);
+        serializer.writeString("application", this.application);
+    }
+
+    //region Getters and Setters
 
     /**
-     * Sets this node's status.
+     * Gets the endpoint.
      *
-     * @param status The desired status.
+     * @return The endpoint.
      */
-    public void setStatus(final NodeStatus status) {
-        LOGGER.info(String.format("%s changed to %s", this, status));
-        this.status = status;
+    public NodeEndpoint getEndpoint() { return this.endpoint; }
+
+    /**
+     * Gets the platform.
+     *
+     * @return The platform.
+     */
+    public String getPlatform() { return this.platform; }
+
+    /**
+     * Gets the version.
+     *
+     * @return The version.
+     */
+    public int getVersion() {
+        return this.version;
+    }
+
+    /**
+     * Gets the application.
+     *
+     * @return The application.
+     */
+    public String getApplication() {
+        return this.application;
+    }
+
+    //endregion
+
+    private void ensureValidity() {
+        if (null == this.endpoint)
+            throw new InvalidParameterException("endpoint must be non-null");
+    }
+
+    @Override
+    public int hashCode() {
+        return this.endpoint.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Node))
+            return false;
+
+        // TODO: review this change (making node equality the same as endpoint equality)
+        Node rhs = (Node)obj;
+        return this.endpoint.equals(rhs.endpoint);
     }
 
     @Override
     public String toString() {
-        return String.format("Node %s (%s)", this.getInfo().getEndpoint().getBaseUrl().getHost(), this.status);
+        return String.format("Node %s", this.endpoint.getBaseUrl().getHost());
     }
 }

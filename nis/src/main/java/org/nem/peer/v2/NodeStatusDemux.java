@@ -5,62 +5,37 @@ import org.nem.core.serialization.*;
 import java.util.*;
 
 /**
- * Demultiplexes a node collection into separate node info collections based on node status.
- * TODO: The naming no longer makes sense since there isn't a list that needs demultiplexing.
- * TODO: A name like NodeCollection makes more sense since the PeerNetwork uses this to hold all of its nodes.
+ * Represents a collection of nodes.
+ * TODO: rename to NodeCollection
  */
 public class NodeStatusDemux implements SerializableEntity {
 
-    private static ObjectDeserializer<NodeInfo> NODE_INFO_DESERIALIZER = new ObjectDeserializer<NodeInfo>() {
+    private static ObjectDeserializer<Node> NODE_DESERIALIZER = new ObjectDeserializer<Node>() {
         @Override
-        public NodeInfo deserialize(final Deserializer deserializer) {
-            return new NodeInfo(deserializer);
+        public Node deserialize(final Deserializer deserializer) {
+            return new Node(deserializer);
         }
     };
 
-    final Set<NodeInfo> activeNodes;
-    final Set<NodeInfo> inactiveNodes;
+    final Set<Node> activeNodes;
+    final Set<Node> inactiveNodes;
 
     /**
-     * Demultiplexes an collection of nodes.
-     *
-     * @param nodes The collection to demux.
+     * Creates a node collection.
      */
-    public NodeStatusDemux(final Iterable<Node> nodes) {
+    public NodeStatusDemux() {
         this.activeNodes = new HashSet<>();
         this.inactiveNodes = new HashSet<>();
-
-        for (final Node node : nodes) {
-            final Set<NodeInfo> nodeList;
-            switch (node.getStatus()) {
-                case ACTIVE:
-                    nodeList = this.activeNodes;
-                    break;
-
-                case INACTIVE:
-                    nodeList = this.inactiveNodes;
-                    break;
-
-                default:
-                    nodeList = null;
-                    break;
-            }
-
-            if (null == nodeList)
-                continue;
-
-            nodeList.add(node.getInfo());
-        }
     }
 
     /**
-     * Deserializes demultiplexed nodes.
+     * Deserializes a node collection.
      *
      * @param deserializer The deserializer.
      */
     public NodeStatusDemux(final Deserializer deserializer) {
-        this.activeNodes = new HashSet<>(deserializer.readObjectArray("active", NODE_INFO_DESERIALIZER));
-        this.inactiveNodes = new HashSet<>(deserializer.readObjectArray("inactive", NODE_INFO_DESERIALIZER));
+        this.activeNodes = new HashSet<>(deserializer.readObjectArray("active", NODE_DESERIALIZER));
+        this.inactiveNodes = new HashSet<>(deserializer.readObjectArray("inactive", NODE_DESERIALIZER));
     }
 
     /**
@@ -68,14 +43,14 @@ public class NodeStatusDemux implements SerializableEntity {
      *
      * @return A collection of active nodes.
      */
-    public Collection<NodeInfo> getActiveNodes() { return this.activeNodes; }
+    public Collection<Node> getActiveNodes() { return this.activeNodes; }
 
     /**
      * Gets a collection of inactive nodes.
      *
      * @return A collection of active nodes.
      */
-    public Collection<NodeInfo> getInactiveNodes() { return this.inactiveNodes; }
+    public Collection<Node> getInactiveNodes() { return this.inactiveNodes; }
 
     /**
      * Updates this collection to include the specified node with the associated status.
@@ -84,14 +59,14 @@ public class NodeStatusDemux implements SerializableEntity {
      * @param node The node.
      * @param status The node status.
      */
-    public void update(final NodeInfo node, final NodeStatus status) {
+    public void update(final Node node, final NodeStatus status) {
         if (null == node)
             throw new NullPointerException("node cannot be null");
 
         this.activeNodes.remove(node);
         this.inactiveNodes.remove(node);
 
-        final Set<NodeInfo> nodes;
+        final Set<Node> nodes;
         switch (status) {
             case ACTIVE:
                 nodes = this.activeNodes;

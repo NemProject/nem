@@ -1,7 +1,5 @@
 package org.nem.peer.v2;
 
-import java.util.*;
-
 /**
  * Represents a collection of all known NEM nodes.
  */
@@ -19,11 +17,11 @@ public class PeerNetwork {
      */
     public PeerNetwork(final Config config, final PeerConnector connector) {
         this.config = config;
-        this.nodes = new NodeStatusDemux(new ArrayList<Node>());
+        this.nodes = new NodeStatusDemux();
         this.connector = connector;
 
         for (final NodeEndpoint endpoint : config.getWellKnownPeers())
-            nodes.update(new NodeInfo(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
+            nodes.update(new Node(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
     }
 
     /**
@@ -31,7 +29,7 @@ public class PeerNetwork {
      *
      * @return The local node.
      */
-    public NodeInfo getLocalNode() { return this.config.getLocalNode().getInfo(); }
+    public Node getLocalNode() { return this.config.getLocalNode(); }
 
     /**
      * Gets all nodes known to the network.
@@ -50,17 +48,17 @@ public class PeerNetwork {
 
         // TODO: not sure if i like this, but it's late ... revisit
         NodeStatusDemux oldNodes = this.nodes;
-        this.nodes = new NodeStatusDemux(new ArrayList<Node>());
+        this.nodes = new NodeStatusDemux();
 
-        for (final NodeInfo node : oldNodes.getActiveNodes())
+        for (final Node node : oldNodes.getActiveNodes())
             this.refreshNode(node);
 
-        for (final NodeInfo node : oldNodes.getInactiveNodes())
+        for (final Node node : oldNodes.getInactiveNodes())
             this.refreshNode(node);
     }
 
-    private void refreshNode(final NodeInfo node) {
-        NodeInfo updatedNode = node;
+    private void refreshNode(final Node node) {
+        Node updatedNode = node;
         NodeStatus updatedStatus = NodeStatus.ACTIVE;
         try {
             updatedNode = this.connector.getInfo(node.getEndpoint());
