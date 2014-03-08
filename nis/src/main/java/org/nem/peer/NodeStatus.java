@@ -1,16 +1,21 @@
-/**
- * 
- */
 package org.nem.peer;
 
 /**
- * Status values
- * - ACTIVE, the node is connected and we exchange data
- * - INACTIVE, the node is not connected
- * - FAILURE, the node is not a NEM node
- * @author Thies1965
- *
+ * Possible statuses of a NEM node.
  */
 public enum NodeStatus {
-    ACTIVE, INACTIVE, FAILURE
+    /**
+     * The node is connected.
+     */
+    ACTIVE,
+
+    /**
+     * The node is not connected.
+     */
+    INACTIVE,
+
+    /**
+     * The node is not a NEM node.
+     */
+    FAILURE
 }

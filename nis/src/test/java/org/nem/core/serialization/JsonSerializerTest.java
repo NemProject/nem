@@ -300,6 +300,21 @@ public class JsonSerializerTest {
         Assert.assertThat(objects.get(0), IsEqual.equalTo(null));
     }
 
+    @Test
+    public void canRoundtripNullArray() {
+        // Arrange:
+        JsonSerializer serializer = new JsonSerializer();
+
+        // Act:
+        serializer.writeObjectArray("oa", null);
+
+        JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+        final List<MockSerializableEntity> objects = deserializer.readObjectArray("oa", new MockSerializableEntity.Activator());
+
+        // Assert:
+        Assert.assertThat(objects.size(), IsEqual.equalTo(0));
+    }
+
     //endregion
 
     //region Roundtrip Multiple
@@ -321,8 +336,14 @@ public class JsonSerializerTest {
         serializer.writeInt("alpha", 0x09513510);
         serializer.writeLong("zeta", 0xF239A033CE951350L);
         serializer.writeBytes("beta", new byte[]{2, 4, 6});
+        serializer.writeObject("object", new MockSerializableEntity(7, "foo", 5));
         serializer.writeInt("gamma", 7);
         serializer.writeString("epsilon", "FooBar");
+        serializer.writeObjectArray("entities", Arrays.asList(
+            new MockSerializableEntity(5, "ooo", 62),
+            new MockSerializableEntity(8, "ala", 15)
+        ));
+        serializer.writeBigInteger("bi", new BigInteger("14"));
         serializer.writeLong("sigma", 8);
 
         JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
@@ -331,8 +352,18 @@ public class JsonSerializerTest {
         Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
         Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
         Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
+
+        final MockSerializableEntity entity = deserializer.readObject("object", new MockSerializableEntity.Activator());
+        CustomAsserts.assertMockSerializableEntity(entity, 7, "foo", 5);
+
         Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
         Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
+
+        final List<MockSerializableEntity> entities = deserializer.readObjectArray("entities", new MockSerializableEntity.Activator());
+        CustomAsserts.assertMockSerializableEntity(entities.get(0), 5, "ooo", 62L);
+        CustomAsserts.assertMockSerializableEntity(entities.get(1), 8, "ala", 15L);
+
+        Assert.assertThat(deserializer.readBigInteger("bi"), IsEqual.equalTo(new BigInteger("14")));
         Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
     }
 

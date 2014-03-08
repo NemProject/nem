@@ -1,55 +1,199 @@
 package org.nem.peer;
 
-import static org.junit.Assert.*;
-import junit.framework.Assert;
-
-import org.hamcrest.core.IsNot;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.peer.test.*;
 
 public class PeerNetworkTest {
 
-	@Test
-	public void testGetDefaultNetwork() {
-		// Prep work
-		PeerNetwork network = PeerNetwork.getDefaultNetwork();
+    //region constructor
 
-		// Verify
-		assertNotNull(network);
-		assertNotNull(network.getLocalNode());
-		assertNotNull(network.getLocalNode().getAddress());
-		assertNotSame(network.getLocalNode().getState(), NodeStatus.FAILURE);
+    @Test
+    public void ctorAddsAllWellKnownPeersAsInactive() {
+        // Act:
+        final PeerNetwork network = createTestNetwork();
+        final NodeCollection nodes = network.getNodes();
 
-		assertNotNull(network.getAllPeers());
-		assertNotNull(network.generatePeerList());
-	}
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { }, new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" });
+    }
 
-	@Test
-	public void testBoot() {
-		// Prep work
-		PeerNetwork network = PeerNetwork.getDefaultNetwork();
+    @Test
+    public void ctorDoesNotTriggerConnectorCalls() {
+        // Act:
+        final MockPeerConnector connector = new MockPeerConnector();
+        createTestNetwork(connector);
 
-		// Verify
-		assertTrue(network.boot());
-		assertNotNull(network.getAllPeers());
-		assertNotNull(network.generatePeerList());
-	}
+        // Assert:
+        Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(0));
+        Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(0));
+    }
 
-	@Test
-	public void testShutdown() {
-		// Prep work
-		PeerNetwork network = PeerNetwork.getDefaultNetwork();
-		network.boot();
-		
-//		try {
-//			Thread.sleep(15000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		long tasks = network.shutdown();
-		//Verify
-		assertTrue(tasks == 0);
-	}
+    @Test
+    public void ctorInitializesNodePlatformToUnknown() {
+        // Act:
+        final PeerNetwork network = createTestNetwork();
+        final NodeCollection nodes = network.getNodes();
 
+        // Assert:
+        Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
+        for (final Node node : nodes.getInactiveNodes())
+            Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
+    }
+
+    @Test
+    public void ctorInitializesNodeApplicationToUnknown() {
+        // Act:
+        final PeerNetwork network = createTestNetwork();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
+        for (final Node node : nodes.getInactiveNodes())
+            Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
+    }
+
+    //endregion
+
+    //region getLocalNode
+
+    @Test
+    public void getLocalNodeReturnsConfigLocalNode() {
+        // Act:
+        final Config config = createTestConfig();
+        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector());
+
+        // Assert:
+        Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
+    }
+
+    //endregion
+
+    //region refresh
+
+    @Test
+    public void refreshCallsGetInfoForEveryNode() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        // Act:
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void refreshSuccessMovesNodesToActive() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.NONE);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
+    }
+   
+    @Test
+    public void refreshTransientFailureMovesNodesToInactive() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+    }
+
+    @Test
+    public void refreshFatalFailureRemovesNodesFromBothLists() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+    }
+
+    //endregion
+
+    //region factories
+
+    private static PeerNetwork createTestNetwork(final PeerConnector connector) {
+        return new PeerNetwork(createTestConfig(), connector);
+    }
+
+    private static PeerNetwork createTestNetwork() {
+        return createTestNetwork(new MockPeerConnector());
+    }
+
+    private static Config createTestConfig() {
+        return ConfigFactory.createDefaultTestConfig();
+    }
+
+    //endregion
+
+    //region mocks
+
+    private static class MockPeerConnector implements PeerConnector {
+
+        private int numGetInfoCalls;
+        private int numGetKnownPeerCalls;
+
+        private String getErrorTrigger;
+        public TriggerAction getErrorTriggerAction;
+
+        public enum TriggerAction {
+            NONE,
+            INACTIVE,
+            FATAL
+        }
+
+        public int getNumGetInfoCalls() { return this.numGetInfoCalls; }
+        public int getNumGetKnownPeerCalls() { return this.numGetKnownPeerCalls; }
+
+        public void setGetInfoError(final String trigger, final TriggerAction action) {
+            this.getErrorTrigger = trigger;
+            this.getErrorTriggerAction = action;
+        }
+
+        @Override
+        public Node getInfo(final NodeEndpoint endpoint) {
+            ++this.numGetInfoCalls;
+
+            if (endpoint.getBaseUrl().getHost().equals(this.getErrorTrigger)) {
+                switch (this.getErrorTriggerAction) {
+                    case INACTIVE:
+                        throw new InactivePeerException("inactive peer");
+
+                    case FATAL:
+                        throw new FatalPeerException("fatal peer");
+                }
+            }
+
+            return new Node(endpoint, "P", "A");
+        }
+
+        @Override
+        public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
+            ++numGetKnownPeerCalls;
+            return null;
+        }
+    }
+
+    //endregion
 }
