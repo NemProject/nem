@@ -1,4 +1,4 @@
-package org.nem.peer.v2;
+package org.nem.peer;
 
 /**
  * Represents a collection of all known NEM nodes.

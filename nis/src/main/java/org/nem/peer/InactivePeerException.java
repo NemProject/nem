@@ -1,4 +1,4 @@
-package org.nem.peer.v2;
+package org.nem.peer;
 
 /**
  * A exception that is thrown when attempting to communicate with an inactive peer.

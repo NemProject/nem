@@ -19,7 +19,7 @@ import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Transfer;
-import org.nem.peer.v2.*;
+import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {

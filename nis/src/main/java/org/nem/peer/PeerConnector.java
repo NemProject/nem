@@ -1,4 +1,4 @@
-package org.nem.peer.v2;
+package org.nem.peer;
 
 /**
  * A interface that is used to request information from nodes.

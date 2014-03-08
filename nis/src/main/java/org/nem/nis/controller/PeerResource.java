@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.serialization.JsonSerializer;
-import org.nem.peer.v2.*;
+import org.nem.peer.*;
 import org.springframework.web.bind.annotation.*;
 
 /**
