@@ -71,8 +71,10 @@ public class PeerNetworkTest {
 
     //region refresh
 
+    //region getInfo
+
     @Test
-    public void refreshCallsGetInfoForEveryNode() {
+    public void refreshCallsGetInfoForEveryInactiveNode() {
         // Arrange:
         final MockPeerConnector connector = new MockPeerConnector();
         final PeerNetwork network = createTestNetwork(connector);
@@ -82,6 +84,20 @@ public class PeerNetworkTest {
 
         // Assert:
         Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void refreshCallsGetInfoForEveryActiveNode() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        // Act:
+        network.refresh(); // transition all nodes to active
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(6));
     }
 
     @Test
@@ -100,7 +116,7 @@ public class PeerNetworkTest {
     }
    
     @Test
-    public void refreshTransientFailureMovesNodesToInactive() {
+    public void refreshGetInfoTransientFailureMovesNodesToInactive() {
         // Arrange:
         final MockPeerConnector connector = new MockPeerConnector();
         final PeerNetwork network = createTestNetwork(connector);
@@ -115,7 +131,7 @@ public class PeerNetworkTest {
     }
 
     @Test
-    public void refreshFatalFailureRemovesNodesFromBothLists() {
+    public void refreshGetInfoFatalFailureRemovesNodesFromBothLists() {
         // Arrange:
         final MockPeerConnector connector = new MockPeerConnector();
         final PeerNetwork network = createTestNetwork(connector);
@@ -127,6 +143,157 @@ public class PeerNetworkTest {
 
         // Assert:
         NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+    }
+
+    @Test
+    public void refreshNodeChangeAddressRemovesNodesFromBothLists() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.CHANGE_ADDRESS);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+    }
+
+    //endregion
+
+    //region getKnownPeers
+
+    @Test
+    public void refreshCallsGetKnownPeersForActiveNodes() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        // Act:
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void refreshDoesNotCallGetKnownPeersForInactiveNodes() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+
+        // Act:
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
+    }
+
+    @Test
+    public void refreshDoesNotCallGetKnownPeersForFatalFailureNodes() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+
+        // Act:
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
+    }
+
+    @Test
+    public void refreshDoesNotCallGetKnownPeersForChangeAddressNodes() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.CHANGE_ADDRESS);
+
+        // Act:
+        network.refresh();
+
+        // Assert:
+        Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
+    }
+
+    @Test
+    public void refreshGetKnownPeersTransientFailureMovesNodesToInactive() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetKnownPeersError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+    }
+
+    @Test
+    public void refreshGetKnownPeersFatalFailureRemovesNodesFromBothLists() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetKnownPeersError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+    }
+
+    @Test
+    public void refreshMergesInKnownPeers() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+
+        // Arrange: set up a node peers list that indicates the reverse of direct communication
+        // (i.e. 10.0.0.2 is active and all other nodes are inactive)
+        NodeCollection knownPeers = new NodeCollection();
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.1", 12), "p", "a"), NodeStatus.INACTIVE);
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.3", 12), "p", "a"), NodeStatus.INACTIVE);
+        connector.setKnownPeers(knownPeers);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+    }
+
+    @Test
+    public void refreshGivesPrecedenceToFirstHandExperience() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        NodeCollection knownPeers = new NodeCollection();
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.11", 12), "p", "a"), NodeStatus.INACTIVE);
+        knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.8", 12), "p", "a"), NodeStatus.ACTIVE);
+        connector.setKnownPeers(knownPeers);
+
+        // Act:
+        network.refresh();
+        final NodeCollection nodes = network.getNodes();
+
+        // Assert:
+        NodeCollectionAssert.areHostsEquivalent(
+            nodes,
+            new String[]{ "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
+            new String[]{ "10.0.0.7", "10.0.0.11" });
     }
 
     //endregion
