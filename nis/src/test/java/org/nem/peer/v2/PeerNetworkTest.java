@@ -1,6 +1,5 @@
 package org.nem.peer.v2;
 
-import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
@@ -63,7 +62,7 @@ public class PeerNetworkTest {
     @Test
     public void getLocalNodeReturnsConfigLocalNode() {
         // Act:
-        final Config config = new Config(createTestJsonConfig());
+        final Config config = createTestConfig();
         final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector());
 
         // Assert:
@@ -134,6 +133,8 @@ public class PeerNetworkTest {
 
     //endregion
 
+    //region factories
+
     // TODO: refactor
     private static void assertStatusListNodes(
         final NodeCollection nodes,
@@ -152,46 +153,20 @@ public class PeerNetworkTest {
     }
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-        return new PeerNetwork(new Config(createTestJsonConfig()), connector);
+        return new PeerNetwork(createTestConfig(), connector);
     }
 
     private static PeerNetwork createTestNetwork() {
         return createTestNetwork(new MockPeerConnector());
     }
 
+    private static Config createTestConfig() {
+        return PeerTestUtils.createDefaultTestConfig();
+    }
+
+    //endregion
+
     //region mocks
-
-    // TODO: refactor (copied from configtest.java)
-    private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {
-        JSONObject jsonEndpoint = new JSONObject();
-        jsonEndpoint.put("protocol", protocol);
-        jsonEndpoint.put("host", host);
-        jsonEndpoint.put("port", port);
-        return jsonEndpoint;
-    }
-
-    private static JSONObject createTestJsonConfig(final String[] hostNames) {
-        JSONObject jsonConfig = new JSONObject();
-
-        JSONObject jsonEndpoint = new JSONObject();
-        jsonEndpoint.put("protocol", "http");
-        jsonEndpoint.put("host", "10.0.0.8");
-        jsonEndpoint.put("port", 7890);
-        jsonConfig.put("endpoint", jsonEndpoint);
-
-        jsonConfig.put("platform", "Mac");
-        jsonConfig.put("application", "FooBar");
-
-        JSONArray jsonWellKnownPeers = new JSONArray();
-        for (final String hostName : hostNames)
-            jsonWellKnownPeers.add(createEndpointJsonObject("ftp", hostName, 12));
-        jsonConfig.put("knownPeers", jsonWellKnownPeers);
-        return jsonConfig;
-    }
-
-    private static JSONObject createTestJsonConfig() {
-        return createTestJsonConfig(new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.2" });
-    }
 
     private static class MockPeerConnector implements PeerConnector {
 
