@@ -30,18 +30,27 @@ public class PeerNetworkHost implements AutoCloseable {
      * @param configFileName The network configuration file name.
      */
     public PeerNetworkHost(final String configFileName) {
-        final Config config = loadConfig(configFileName);
+        this(new PeerNetwork(loadConfig(configFileName), new HttpPeerConnector()), 200, 10000);
+    }
 
-        this.network = new PeerNetwork(config, new HttpPeerConnector());
+    /**
+     * Creates a host that hosts the specified network.
+     *
+     * @param network The network.
+     * @param refreshInitialDelay The initial delay before starting the refresh loop (in ms).
+     * @param refreshInterval The refresh interval (in ms).
+     */
+    public PeerNetworkHost(final PeerNetwork network, int refreshInitialDelay, int refreshInterval) {
+        this.network = network;
 
         this.peerListRefresherExecutor = new ScheduledThreadPoolExecutor(1);
         this.peerListRefresherExecutor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("Start refreshing peer list.");
+                LOGGER.info("Refreshing network");
                 network.refresh();
             }
-        }, 2, 10, TimeUnit.SECONDS);
+        }, refreshInitialDelay, refreshInterval, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -53,6 +62,7 @@ public class PeerNetworkHost implements AutoCloseable {
 
     @Override
     public void close() {
+        LOGGER.info("Stopping network refresh thread");
         this.peerListRefresherExecutor.shutdownNow();
     }
 
