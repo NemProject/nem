@@ -29,20 +29,6 @@ public class TransferController {
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
-	private String jsonError(int num, String errorMessage) {
-		JSONObject obj=new JSONObject();
-		obj.put("error", new Integer(num));
-		obj.put("reason", errorMessage);
-		return obj.toJSONString() + "\r\n";
-	}
-
-	private String jsonOk() {
-		JSONObject obj=new JSONObject();
-		obj.put("ok", 42);
-		return obj.toJSONString() + "\r\n";
-	}
-
-
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody String body) {
 		JSONObject par;
@@ -50,7 +36,7 @@ public class TransferController {
 			par = (JSONObject)JSONValue.parse(body);
 
 		} catch (ClassCastException e) {
-			return jsonError(1, "invalid json");
+			return Utils.jsonError(1, "invalid json");
 		}
 		logger.info(par.toString());
 
@@ -61,21 +47,12 @@ public class TransferController {
 		try {
 			transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
-		// not found in db
-		} catch (MissingResourceException e) {
-			return jsonError(1, "incorrect data");
-
-		// wrong transaction type
-		} catch (InvalidParameterException e) {
-			return jsonError(1, "incorrect data");
-
-		//
-		} catch (NullPointerException e) {
-			return jsonError(1, "incorrect data");
+		} catch (MissingResourceException|InvalidParameterException|NullPointerException e) {
+			return Utils.jsonError(1, "incorrect data");
 		}
 
 		if (! transferTransaction.isValid()) {
-			return jsonError(1, "incorrect data");
+			return Utils.jsonError(1, "incorrect data");
 		}
 
 		BinarySerializer binarySerializer = new BinarySerializer();
@@ -95,7 +72,13 @@ public class TransferController {
 		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
 
 		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(accountAnalyzer));
-		TransferTransaction transaction = (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+		TransferTransaction transaction;
+		try {
+			transaction = (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+
+		} catch (MissingResourceException|InvalidParameterException|NullPointerException e) {
+			return Utils.jsonError(1, "incorrect data");
+		}
 		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 
 		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
@@ -104,9 +87,16 @@ public class TransferController {
 
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+
+			// TODO: add to unconfirmed transactions
+
+			// TODO: propagate transactions
+
 			//peerNetworkHost.getNetwork().announceTransaction(transaction);
-			return jsonOk();
+			return Utils.jsonOk();
 		}
-		return jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
+		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
 	}
+
+
 }
