@@ -5,17 +5,17 @@ import org.nem.core.test.*;
 
 import java.util.*;
 
-public class NodeStatusDemuxTest {
+public class NodeCollectionTest {
 
     //region basic partitioning
 
      @Test
     public void multipleNodesArePartitionedCorrectly() {
         // Act:
-        final NodeStatusDemux demux = createNodeCollectionWithMultipleNodes();
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
          // Assert:
-         assertStatusListNodes(demux, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
+         assertStatusListNodes(nodes, new String[]{ "A", "D", "F" }, new String[]{ "B", "C" });
     }
 
     //endregion
@@ -23,15 +23,15 @@ public class NodeStatusDemuxTest {
     //region serialization
 
     @Test
-    public void canRoundTripNodeStatusDemux() {
+    public void canRoundTripNodeCollection() {
         // Arrange:
-        final NodeStatusDemux originalDemux = createNodeCollectionWithMultipleNodes();
+        final NodeCollection originalNodes = createNodeCollectionWithMultipleNodes();
 
         // Assert:
-        final NodeStatusDemux demux = new NodeStatusDemux(Utils.roundtripSerializableEntity(originalDemux, null));
+        final NodeCollection nodes = new NodeCollection(Utils.roundtripSerializableEntity(originalNodes, null));
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
+        assertStatusListNodes(nodes, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
     }
 
     //endregion
@@ -41,110 +41,110 @@ public class NodeStatusDemuxTest {
     @Test(expected = NullPointerException.class)
     public void updateCannotAddNullNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
+        final NodeCollection nodes = new NodeCollection();
 
         // Act:
-        demux.update(null, NodeStatus.ACTIVE);
+        nodes.update(null, NodeStatus.ACTIVE);
     }
 
     @Test
     public void updateCanAddNewActiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
+        final NodeCollection nodes = new NodeCollection();
 
         // Act:
-        demux.update(createNode("A"), NodeStatus.ACTIVE);
+        nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[]{ "A" }, new String[]{ });
+        assertStatusListNodes(nodes, new String[]{ "A" }, new String[]{ });
     }
 
     @Test
     public void updateCanAddNewInactiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
+        final NodeCollection nodes = new NodeCollection();
 
         // Act:
-        demux.update(createNode("A"), NodeStatus.INACTIVE);
+        nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { }, new String[] { "A" });
+        assertStatusListNodes(nodes, new String[] { }, new String[] { "A" });
     }
 
     @Test
     public void updateDoesNotAddNewFailureNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
+        final NodeCollection nodes = new NodeCollection();
 
         // Act:
-        demux.update(createNode("A"), NodeStatus.FAILURE);
+        nodes.update(createNode("A"), NodeStatus.FAILURE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { }, new String[] { });
+        assertStatusListNodes(nodes, new String[] { }, new String[] { });
     }
 
     @Test
     public void updateCanUpdateActiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
-        demux.update(createNode("A"), NodeStatus.ACTIVE);
+        final NodeCollection nodes = new NodeCollection();
+        nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Act:
-        demux.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
+        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { "B" }, new String[] { });
+        assertStatusListNodes(nodes, new String[] { "B" }, new String[] { });
     }
 
     @Test
     public void updateCanUpdateActiveNodeAsInactiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
-        demux.update(createNode("A"), NodeStatus.ACTIVE);
+        final NodeCollection nodes = new NodeCollection();
+        nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
         // Act:
-        demux.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { }, new String[] { "B" });
+        assertStatusListNodes(nodes, new String[] { }, new String[] { "B" });
     }
 
     @Test
     public void updateCanUpdateInactiveNodeAsActiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
-        demux.update(createNode("A"), NodeStatus.INACTIVE);
+        final NodeCollection nodes = new NodeCollection();
+        nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Act:
-        demux.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
+        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.ACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { "B" }, new String[] { });
+        assertStatusListNodes(nodes, new String[] { "B" }, new String[] { });
     }
 
     @Test
     public void updateCanUpdateInactiveNode() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
-        demux.update(createNode("A"), NodeStatus.INACTIVE);
+        final NodeCollection nodes = new NodeCollection();
+        nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
         // Act:
-        demux.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("B", "A".codePointAt(0)), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { }, new String[] { "B" });
+        assertStatusListNodes(nodes, new String[] { }, new String[] { "B" });
     }
 
     @Test
     public void updateOnlyUpdatesMatchingNode() {
         // Arrange:
-        final NodeStatusDemux demux = createNodeCollectionWithMultipleNodes();
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
         // Act:
-        demux.update(createNode("Z", "D".codePointAt(0)), NodeStatus.INACTIVE);
+        nodes.update(createNode("Z", "D".codePointAt(0)), NodeStatus.INACTIVE);
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { "A", "F" }, new String[] { "B", "C", "Z" });
+        assertStatusListNodes(nodes, new String[] { "A", "F" }, new String[] { "B", "C", "Z" });
     }
 
     //endregion
@@ -167,23 +167,23 @@ public class NodeStatusDemuxTest {
     }
 
     private static void assertStatusListNodes(
-        final NodeStatusDemux demux,
+        final NodeCollection nodes,
         final String[] expectedActivePlatforms,
         final String[] expectedInactivePlatforms) {
         // Assert:
-        Assert.assertThat(getPlatforms(demux.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePlatforms));
-        Assert.assertThat(getPlatforms(demux.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
+        Assert.assertThat(getPlatforms(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePlatforms));
+        Assert.assertThat(getPlatforms(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
     }
 
-    private static NodeStatusDemux createNodeCollectionWithMultipleNodes() {
+    private static NodeCollection createNodeCollectionWithMultipleNodes() {
         // Arrange:
-        final NodeStatusDemux demux = new NodeStatusDemux();
-        demux.update(createNode("A"), NodeStatus.ACTIVE);
-        demux.update(createNode("B"), NodeStatus.INACTIVE);
-        demux.update(createNode("C"), NodeStatus.INACTIVE);
-        demux.update(createNode("D"), NodeStatus.ACTIVE);
-        demux.update(createNode("E"), NodeStatus.FAILURE);
-        demux.update(createNode("F"), NodeStatus.ACTIVE);
-        return demux;
+        final NodeCollection nodes = new NodeCollection();
+        nodes.update(createNode("A"), NodeStatus.ACTIVE);
+        nodes.update(createNode("B"), NodeStatus.INACTIVE);
+        nodes.update(createNode("C"), NodeStatus.INACTIVE);
+        nodes.update(createNode("D"), NodeStatus.ACTIVE);
+        nodes.update(createNode("E"), NodeStatus.FAILURE);
+        nodes.update(createNode("F"), NodeStatus.ACTIVE);
+        return nodes;
     }
 }
