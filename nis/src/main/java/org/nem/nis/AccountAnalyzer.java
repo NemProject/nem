@@ -11,10 +11,7 @@ import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 public class AccountAnalyzer implements AccountLookup {
 	private static final Logger logger = Logger.getLogger(AccountAnalyzer.class.getName());
@@ -69,12 +66,8 @@ public class AccountAnalyzer implements AccountLookup {
 	 * Currently it analyzes ONLY "transfers"
 	 */
 	public void analyze(Block curBlock) {
-		System.out.print("analyzing block: ");
-		System.out.print(curBlock.getShortId());
-		System.out.print(", #tx ");
-
 		List<Transfer> txes = curBlock.getBlockTransfers();
-		System.out.println(txes.size());
+		logger.info("analyzing block: " + Long.toString(curBlock.getShortId()) + ", #tx " + Integer.toString(txes.size()));
 
 		// add fee's to block forger
 		//
@@ -85,7 +78,7 @@ public class AccountAnalyzer implements AccountLookup {
 			addToBalanceAndUnconfirmedBalance(tx.getSender(), -(tx.getAmount() + tx.getFee()));
 			Account recipient = addToBalanceAndUnconfirmedBalance(tx.getRecipient(), tx.getAmount());
 
-			System.out.println(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
+			logger.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
 	}
 
@@ -96,7 +89,7 @@ public class AccountAnalyzer implements AccountLookup {
 	 * @param encodedAddress - encoded address of an account
 	 * @return null if account is unknown or Account associated with an address
 	 */
-	private Account findByAddressImpl(byte[] publicKey, String encodedAddress) {
+	protected Account findByAddressImpl(byte[] publicKey, String encodedAddress) {
 		// if possible return by public key
 		if (publicKey != null) {
 			if (mapByPublicKey.containsKey(publicKey)) {
