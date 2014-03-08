@@ -2,7 +2,7 @@ package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
 import org.nem.core.serialization.JsonDeserializer;
-import org.nem.peer.v2.HttpPeerConnector;
+import org.nem.peer.HttpPeerConnector;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
