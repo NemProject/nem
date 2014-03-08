@@ -11,6 +11,7 @@ import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,48 +35,31 @@ public class AccountAnalyzer implements AccountLookup {
 
 	private Account addToBalanceAndUnconfirmedBalance(org.nem.core.dbmodel.Account a, long amount) {
 		byte[] publicKey = a.getPublicKey();
+		String encodedAddress = a.getPrintableKey();
 
-		Account account;
-		if (publicKey != null) {
-			if (! mapByPublicKey.containsKey(publicKey)) {
+		Account account = findByAddressImpl(publicKey, encodedAddress);
+		if (account == null) {
+			if (publicKey != null) {
 				account = new Account(new KeyPair(publicKey));
+
 				mapByPublicKey.put(publicKey, account);
 
-				String accountId = account.getAddress().getEncoded();
-				// in case of genesis account we must 'insert'
-				if (accountId.equals(Genesis.CREATOR_ACCOUNT_ID)) {
-					mapByAddressId.put(accountId, account);
-
-				// in case of other accounts, simply update the field
-				// not to loose the amounts...
-				} else {
-
-					// not sure, probably mapByAddressId.get(accountId).setKeyPair(account.getKeyPair)
-					// would be better
-					long balance = mapByAddressId.get(accountId).getBalance();
-					account.incrementBalance(balance);
-					mapByAddressId.put(accountId, account);
+				// in case of genesis account we didn't knew it's //encoded address//
+				// earlier, so additionally insert it in mapByAddressId
+				if (encodedAddress.equals(Genesis.CREATOR_ACCOUNT_ID)) {
+					mapByAddressId.put(encodedAddress, account);
 				}
 
 			} else {
-				account = mapByPublicKey.get(publicKey);
-			}
-
-		} else {
-			String addressId = a.getPrintableKey();
-			if (!mapByAddressId.containsKey(addressId)) {
-				account = new Account(Address.fromEncoded(a.getPrintableKey()));
-				mapByAddressId.put(account.getAddress().getEncoded(), account);
-
-			} else {
-				account = mapByAddressId.get(addressId);
+				account = new Account(Address.fromEncoded(encodedAddress));
+				mapByAddressId.put(encodedAddress, account);
 			}
 		}
 
 		account.incrementBalance(amount);
 		return account;
 	}
-	
+
 	/*
 	 * analyze block from db
 	 * 
@@ -105,17 +89,70 @@ public class AccountAnalyzer implements AccountLookup {
 		}
 	}
 
-	@Override
-	public org.nem.core.model.Account findByAddress(Address id) {
-		logger.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
-
-		if (mapByAddressId.containsKey(id.getEncoded())) {
-			logger.info("found");
-			return mapByAddressId.get(id.getEncoded());
+	/**
+	 * Finds an account, updating it's public key if there's a need.
+	 *
+	 * @param publicKey - public key of an account, might be null
+	 * @param encodedAddress - encoded address of an account
+	 * @return null if account is unknown or Account associated with an address
+	 */
+	private Account findByAddressImpl(byte[] publicKey, String encodedAddress) {
+		// if possible return by public key
+		if (publicKey != null) {
+			if (mapByPublicKey.containsKey(publicKey)) {
+				return mapByPublicKey.get(publicKey);
+			}
 		}
 
-		throw new MissingResourceException("account not found in the db", Address.class.getName(), id.getEncoded());
+		// otherwise try to return by address
+		if (mapByAddressId.containsKey(encodedAddress)) {
+			Account oldAccount = mapByAddressId.get(encodedAddress);
 
-		// TODO: will we have separate APIs: findByAddress + findBy (issue/11)
+			// if possible update account's public key
+			if (publicKey != null) {
+				Account account = new Account(new KeyPair(publicKey));
+				long balance = oldAccount.getBalance();
+				account.incrementBalance(balance);
+				mapByAddressId.put(encodedAddress, account);
+
+				// associate public key with an account
+				mapByPublicKey.put(publicKey, account);
+			}
+
+			return mapByAddressId.get(encodedAddress);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Finds an account, updating it's public key if there's a need.
+	 *
+	 * @param id - Address of an account
+	 *
+	 * @return Account associated with an address or new Account if address was unknown
+	 */
+	@Override
+	public Account findByAddress(Address id) {
+		logger.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
+
+		if (! id.isValid()) {
+			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());
+		}
+
+		Account account = findByAddressImpl(id.getPublicKey(), id.getEncoded());
+
+		// we don't know it yet, so create dummy account
+		// without adding it anywhere yet
+		if (account == null) {
+			if (id.getPublicKey() != null) {
+				account = new Account(new KeyPair(id.getPublicKey()));
+
+			} else {
+				account = new Account(Address.fromEncoded(id.getEncoded()));
+			}
+		}
+
+		return account;
 	}
 }
