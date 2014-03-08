@@ -9,7 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
-import org.nem.nis.DbAccountLookup;
+import org.nem.nis.AccountAnalyzer;
 //import org.nem.peer.v2.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +26,7 @@ public class TransferController {
 	private static final Logger logger = Logger.getLogger(NcsMainController.class.getName());
 
 	@Autowired
-	DbAccountLookup dbAccountLookup;
+	AccountAnalyzer accountAnalyzer;
 
 	private String jsonError(int num, String errorMessage) {
 		JSONObject obj=new JSONObject();
@@ -49,7 +49,7 @@ public class TransferController {
 
 		logger.info("threadId : " + Long.toString(Thread.currentThread().getId()) );
 
-		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(dbAccountLookup));
+		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(accountAnalyzer));
 		TransferTransaction transferTransaction;
 		try {
 			transferTransaction = (TransferTransaction) TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
@@ -87,7 +87,7 @@ public class TransferController {
 		JsonDeserializer jsonDeserializer = new JsonDeserializer(par, null);
 		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
 
-		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(dbAccountLookup));
+		BinaryDeserializer deserializer = new BinaryDeserializer(requestAnnounce.getData(), new DeserializationContext(accountAnalyzer));
 		TransferTransaction transaction = (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 

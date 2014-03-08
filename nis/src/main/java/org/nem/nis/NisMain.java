@@ -23,6 +23,9 @@ import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
@@ -36,11 +39,13 @@ public class NisMain {
 	@Autowired
 	private TransferDao transactionDao;
 
-	public NisMain() {
-	}
+	@Autowired
+	private AccountAnalyzer accountAnalyzer;
 
 	BlockAnalyzer blockAnalyzer;
-	AccountAnalyzer accountAnalyzer;
+
+	public NisMain() {
+	}
 
 	static long epochBeginning;
 
@@ -78,6 +83,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
+		logger.warning("context ================== ");
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -88,7 +94,6 @@ public class NisMain {
 		populateDb();
 
 		blockAnalyzer = new BlockAnalyzer();
-		accountAnalyzer = new AccountAnalyzer();
 
 		analyzeBlocks();
 

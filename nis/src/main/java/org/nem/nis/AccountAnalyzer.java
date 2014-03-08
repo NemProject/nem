@@ -1,9 +1,7 @@
 package org.nem.nis;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.dao.BlockDao;
@@ -14,8 +12,12 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.AccountLookup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 public class AccountAnalyzer implements AccountLookup {
+	private static final Logger logger = Logger.getLogger(AccountAnalyzer.class.getName());
+
 	@Autowired
 	private BlockDao blockDao;
 	
@@ -105,6 +107,15 @@ public class AccountAnalyzer implements AccountLookup {
 
 	@Override
 	public org.nem.core.model.Account findByAddress(Address id) {
-		return null;
+		logger.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
+
+		if (mapByAddressId.containsKey(id.getEncoded())) {
+			logger.info("found");
+			return mapByAddressId.get(id.getEncoded());
+		}
+
+		throw new MissingResourceException("account not found in the db", Address.class.getName(), id.getEncoded());
+
+		// TODO: will we have separate APIs: findByAddress + findBy (issue/11)
 	}
 }

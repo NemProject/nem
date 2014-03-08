@@ -61,7 +61,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
-
+    <bean class="org.nem.nis.AccountAnalyzer" />
     <bean class="org.nem.nis.NisMain" />
 
 </beans>
