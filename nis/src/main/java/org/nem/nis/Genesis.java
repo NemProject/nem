@@ -7,7 +7,8 @@ import org.nem.core.utils.StringEncoder;
 import java.math.BigInteger;
 
 public class Genesis {
-	final static long BLOCK_ID = 0x1234567890abcdefL;
+	// ByteUtils.bytesToLong(genesisBlock.getHash())
+	final static long BLOCK_ID = 0x6C70183459B3CDB2L;
 
 	//final static String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
 	// final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );

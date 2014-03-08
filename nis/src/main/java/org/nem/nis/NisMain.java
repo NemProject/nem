@@ -108,8 +108,8 @@ public class NisMain {
 
 		if (transactionDao.count() == 0) {
 			Block genesisBlock = prepareGenesisBlock(genesisAccount);
-			org.nem.core.dbmodel.Block b = populateGenesisBlock(dbGenesisAccount, genesisAccount);
-			populateGenesisTxes(genesisAccount, dbGenesisAccount, b, genesisBlock);
+			org.nem.core.dbmodel.Block b = populateGenesisBlock(genesisBlock, dbGenesisAccount);
+			populateGenesisTxes(dbGenesisAccount, b, genesisBlock);
 		}
 	}
 
@@ -141,10 +141,12 @@ public class NisMain {
 			genesisBlock.addTransaction(transferTransaction);
 		}
 
+		genesisBlock.sign();
+
 		return genesisBlock;
 	}
 
-	private void populateGenesisTxes(Account genesisAccount, org.nem.core.dbmodel.Account a, org.nem.core.dbmodel.Block b, Block genesisBlock) {
+	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, org.nem.core.dbmodel.Block b, Block genesisBlock) {
 		if (transactionDao.count() == 0) {
 			int transactionsCount = genesisBlock.getTransactions().size();
 			Vector<org.nem.core.dbmodel.Account> recipientsDbAccounts = new Vector<>(transactionsCount);
@@ -198,8 +200,11 @@ public class NisMain {
 		}
 	}
 
-	private org.nem.core.dbmodel.Block populateGenesisBlock(org.nem.core.dbmodel.Account a, Account genesisAccount) {
+	private org.nem.core.dbmodel.Block populateGenesisBlock(Block genesisBlock, org.nem.core.dbmodel.Account a) {
 		org.nem.core.dbmodel.Block b = null;
+		System.out.println(HexEncoder.getString(genesisBlock.getHash()));
+		System.out.println(ByteUtils.bytesToLong(genesisBlock.getHash()));
+
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
 					Genesis.BLOCK_ID,
@@ -209,20 +214,11 @@ public class NisMain {
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					},
-					// current block hash
-					new byte[] {
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-					},
+					genesisBlock.getHash(),
 					0, // timestamp 
 					a,
 					// proof
-					new byte[] {
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
-					},
+					genesisBlock.getSignature().getBytes(),
 					// block sig
 					new byte[] {
 						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
