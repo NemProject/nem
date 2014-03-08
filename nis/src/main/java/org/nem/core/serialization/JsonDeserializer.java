@@ -31,13 +31,13 @@ public class JsonDeserializer implements Deserializer {
     }
 
     @Override
-    public int readInt(final String label) {
+    public Integer readInt(final String label) {
         this.checkLabel(label);
 		return (Integer)this.object.get(label);
     }
 
     @Override
-    public long readLong(final String label) {
+    public Long readLong(final String label) {
         this.checkLabel(label);
 
 		// the alternative to this ugly piece, is setting up JSONParser.DEFAULT_PERMISSIVE_MODE
@@ -73,13 +73,19 @@ public class JsonDeserializer implements Deserializer {
 
     @Override
     public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
+        this.checkLabel(label);
         JSONObject childObject = (JSONObject)this.object.get(label);
         return this.deserializeObject(childObject, activator);
     }
 
     @Override
     public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
+        this.checkLabel(label);
         JSONArray jsonArray = (JSONArray)this.object.get(label);
+
+        if (null == jsonArray)
+            return new ArrayList<>();
+
         List<T> objects = new ArrayList<>();
         for (Object jsonObject : jsonArray)
             objects.add(this.deserializeObject((JSONObject) jsonObject, activator));

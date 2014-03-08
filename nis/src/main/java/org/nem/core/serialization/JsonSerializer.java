@@ -64,11 +64,16 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public void writeObject(final String label, final SerializableEntity object) {
+        this.pushLabel(label);
         this.object.put(label, serializeObject(object));
     }
 
     @Override
     public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects) {
+        this.pushLabel(label);
+        if (null == objects)
+            return;
+
         JSONArray jsonObjects = new JSONArray();
         for (SerializableEntity object : objects)
             jsonObjects.add(serializeObject(object));

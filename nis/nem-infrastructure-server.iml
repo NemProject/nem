@@ -80,6 +80,8 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.6" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.flyway:flyway-maven-plugin:2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.flyway:flyway-core:2.3" level="project" />
   </component>
 </module>
 

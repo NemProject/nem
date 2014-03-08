@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.annotation.PostConstruct;
@@ -14,16 +15,17 @@ import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.Transaction;
+import org.nem.core.model.*;
 import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.core.utils.StringEncoder;
 import org.nem.core.dbmodel.Transfer;
-import org.nem.core.model.Address;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
@@ -37,15 +39,18 @@ public class NisMain {
 	@Autowired
 	private TransferDao transactionDao;
 
-	public NisMain() {
-	}
+	@Autowired
+	private AccountAnalyzer accountAnalyzer;
 
 	BlockAnalyzer blockAnalyzer;
+
+	public NisMain() {
+	}
 
 	static long epochBeginning;
 
 	static private void initEpoch() {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, 0);
 		calendar.set(Calendar.YEAR, 2014);
 		calendar.set(Calendar.MONTH, 07);
@@ -67,6 +72,8 @@ public class NisMain {
 		System.out.println("starting analysis...");
 		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
 			blockAnalyzer.analyze(curBlock);
+			accountAnalyzer.analyze(curBlock);
+
 			curBlockId = curBlock.getNextBlockId();
 			if (curBlockId == null) {
 				break;
@@ -76,6 +83,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
+		logger.warning("context ================== ");
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -91,14 +99,7 @@ public class NisMain {
 
 		initEpoch();
 
-		PeerNetwork peerNetwork = PeerNetwork.getDefaultNetwork();
-		if (peerNetwork == null) {
-			logger.severe("Cannot bring-up the PeerNetwork. Server is going down, no chance to work.");
-			// No chance to be successful
-			// Just for the moment we go down
-			// very ugly
-			System.exit(1);
-		}
+		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 	}
 
 	private void populateDb() {
@@ -174,10 +175,10 @@ public class NisMain {
 			for (Transaction transaction : genesisBlock.getTransactions()) {
 				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
 				Transfer t = new Transfer(
-						txIds[i],
+						ByteUtils.bytesToLong(transferTransaction.getSignature().getBytes()),
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
-						transferTransaction.getFee(),
+						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
 						Genesis.INITIAL_TIME, // timestamp
 						0, // deadline
 						a,

@@ -26,7 +26,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     }
 
     @Override
-    public int readInt(final String label) {
+    public Integer readInt(final String label) {
         byte[] bytes = this.readBytes(4);
         return bytes[0] & 0x000000FF
             | (bytes[1] << 8) & 0x0000FF00
@@ -35,7 +35,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
     }
 
     @Override
-    public long readLong(final String label) {
+    public Long readLong(final String label) {
         long lowPart = this.readInt(null);
         long highPart = this.readInt(null);
         return lowPart & 0x00000000FFFFFFFFL
