@@ -38,6 +38,29 @@ public class NodeCollectionAssert {
     }
 
     /**
+     * Asserts that nodes have matching active and inactive ports.
+     *
+     * @param nodes The nodes.
+     * @param expectedActiveHosts The expected active ports.
+     * @param expectedInactiveHosts The expected inactive ports.
+     */
+    public static void arePortsEquivalent(
+        final NodeCollection nodes,
+        final Integer[] expectedActiveHosts,
+        final Integer[] expectedInactiveHosts) {
+        // Assert:
+        Assert.assertThat(getPorts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
+        Assert.assertThat(getPorts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
+    }
+
+    private static List<Integer> getPorts(final Collection<Node> nodes) {
+        final List<Integer> posts = new ArrayList<>();
+        for (final Node node : nodes)
+            posts.add(node.getEndpoint().getBaseUrl().getPort());
+        return posts;
+    }
+
+    /**
      * Asserts that nodes have matching active and inactive platforms.
      *
      * @param nodes The nodes.
