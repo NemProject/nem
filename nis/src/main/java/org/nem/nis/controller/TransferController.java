@@ -11,6 +11,7 @@ import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 //import org.nem.peer.v2.PeerNetwork;
+import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,12 @@ public class TransferController {
 		JSONObject obj=new JSONObject();
 		obj.put("error", new Integer(num));
 		obj.put("reason", errorMessage);
+		return obj.toJSONString() + "\r\n";
+	}
+
+	private String jsonOk() {
+		JSONObject obj=new JSONObject();
+		obj.put("ok", 42);
 		return obj.toJSONString() + "\r\n";
 	}
 
@@ -95,6 +102,11 @@ public class TransferController {
 		logger.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
 		logger.info("   verify: " + Boolean.toString(transaction.verify()));
 
-		return jsonError(2, "All ok sending transaction to network : verified " + Boolean.toString(transaction.verify()));
+		if (transaction.isValid() && transaction.verify()) {
+			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+			//peerNetworkHost.getNetwork().announceTransaction(transaction);
+			return jsonOk();
+		}
+		return jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
 	}
 }
