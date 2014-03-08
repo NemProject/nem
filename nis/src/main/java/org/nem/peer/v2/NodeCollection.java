@@ -6,9 +6,8 @@ import java.util.*;
 
 /**
  * Represents a collection of nodes.
- * TODO: rename to NodeCollection
  */
-public class NodeStatusDemux implements SerializableEntity {
+public class NodeCollection implements SerializableEntity {
 
     private static ObjectDeserializer<Node> NODE_DESERIALIZER = new ObjectDeserializer<Node>() {
         @Override
@@ -23,7 +22,7 @@ public class NodeStatusDemux implements SerializableEntity {
     /**
      * Creates a node collection.
      */
-    public NodeStatusDemux() {
+    public NodeCollection() {
         this.activeNodes = new HashSet<>();
         this.inactiveNodes = new HashSet<>();
     }
@@ -33,7 +32,7 @@ public class NodeStatusDemux implements SerializableEntity {
      *
      * @param deserializer The deserializer.
      */
-    public NodeStatusDemux(final Deserializer deserializer) {
+    public NodeCollection(final Deserializer deserializer) {
         this.activeNodes = new HashSet<>(deserializer.readObjectArray("active", NODE_DESERIALIZER));
         this.inactiveNodes = new HashSet<>(deserializer.readObjectArray("inactive", NODE_DESERIALIZER));
     }

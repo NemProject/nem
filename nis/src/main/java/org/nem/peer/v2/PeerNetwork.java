@@ -6,7 +6,7 @@ package org.nem.peer.v2;
 public class PeerNetwork {
 
     private final Config config;
-    private NodeStatusDemux nodes;
+    private NodeCollection nodes;
     private final PeerConnector connector;
 
     /**
@@ -17,7 +17,7 @@ public class PeerNetwork {
      */
     public PeerNetwork(final Config config, final PeerConnector connector) {
         this.config = config;
-        this.nodes = new NodeStatusDemux();
+        this.nodes = new NodeCollection();
         this.connector = connector;
 
         for (final NodeEndpoint endpoint : config.getWellKnownPeers())
@@ -36,7 +36,7 @@ public class PeerNetwork {
      *
      * @return All nodes known to the network.
      */
-    public NodeStatusDemux getNodes() { return this.nodes; }
+    public NodeCollection getNodes() { return this.nodes; }
 
     /**
      * Refreshes the network.
@@ -47,8 +47,8 @@ public class PeerNetwork {
         // TODO: should we check for node consistency?
 
         // TODO: not sure if i like this, but it's late ... revisit
-        NodeStatusDemux oldNodes = this.nodes;
-        this.nodes = new NodeStatusDemux();
+        NodeCollection oldNodes = this.nodes;
+        this.nodes = new NodeCollection();
 
         for (final Node node : oldNodes.getActiveNodes())
             this.refreshNode(node);

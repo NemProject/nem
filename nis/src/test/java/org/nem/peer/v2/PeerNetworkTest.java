@@ -15,10 +15,10 @@ public class PeerNetworkTest {
     public void ctorAddsAllWellKnownPeersAsInactive() {
         // Act:
         final PeerNetwork network = createTestNetwork();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(demux, new String[] { }, new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" });
+        assertStatusListNodes(nodes, new String[] { }, new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" });
     }
 
     @Test
@@ -36,11 +36,11 @@ public class PeerNetworkTest {
     public void ctorInitializesNodePlatformToUnknown() {
         // Act:
         final PeerNetwork network = createTestNetwork();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(3));
-        for (final Node node : demux.getInactiveNodes())
+        Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
+        for (final Node node : nodes.getInactiveNodes())
             Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
     }
 
@@ -48,11 +48,11 @@ public class PeerNetworkTest {
     public void ctorInitializesNodeApplicationToUnknown() {
         // Act:
         final PeerNetwork network = createTestNetwork();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        Assert.assertThat(demux.getInactiveNodes().size(), IsEqual.equalTo(3));
-        for (final Node node : demux.getInactiveNodes())
+        Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
+        for (final Node node : nodes.getInactiveNodes())
             Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
     }
 
@@ -96,10 +96,10 @@ public class PeerNetworkTest {
 
         // Act:
         network.refresh();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
+        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[]{ });
     }
    
     @Test
@@ -111,10 +111,10 @@ public class PeerNetworkTest {
 
         // Act:
         network.refresh();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
+        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ "10.0.0.2" });
     }
 
     @Test
@@ -126,22 +126,22 @@ public class PeerNetworkTest {
 
         // Act:
         network.refresh();
-        final NodeStatusDemux demux = network.getNodes();
+        final NodeCollection nodes = network.getNodes();
 
         // Assert:
-        assertStatusListNodes(demux, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
+        assertStatusListNodes(nodes, new String[]{ "10.0.0.1", "10.0.0.3" }, new String[]{ });
     }
 
     //endregion
 
     // TODO: refactor
     private static void assertStatusListNodes(
-        final NodeStatusDemux demux,
+        final NodeCollection nodes,
         final String[] expectedActiveHosts,
         final String[] expectedInactiveHosts) {
         // Assert:
-        Assert.assertThat(getHosts(demux.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
-        Assert.assertThat(getHosts(demux.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
+        Assert.assertThat(getHosts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
+        Assert.assertThat(getHosts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
     }
 
     private static List<String> getHosts(final Collection<Node> nodes) {
@@ -233,7 +233,7 @@ public class PeerNetworkTest {
         }
 
         @Override
-        public NodeStatusDemux getKnownPeers(final NodeEndpoint endpoint) {
+        public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
             ++numGetKnownPeerCalls;
             return null;
         }

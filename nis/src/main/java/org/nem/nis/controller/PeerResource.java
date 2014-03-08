@@ -22,7 +22,7 @@ public class PeerResource {
     public String getPeerList()
     {
         final PeerNetwork network = PeerNetworkHost.getDefaultHost().getNetwork();
-    	final NodeStatusDemux demux = network.getNodes();
-        return JsonSerializer.serializeToJson(demux).toString() + "\r\n";
+    	final NodeCollection nodes = network.getNodes();
+        return JsonSerializer.serializeToJson(nodes).toString() + "\r\n";
     }
 }

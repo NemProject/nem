@@ -17,7 +17,7 @@ public interface PeerConnector {
      * Requests information about all known peers from the specified node.
      *
      * @param endpoint The endpoint.
-     * @return A demultiplexed list of peers.
+     * @return A collection of all known peers.
      */
-    public NodeStatusDemux getKnownPeers(final NodeEndpoint endpoint);
+    public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
 }

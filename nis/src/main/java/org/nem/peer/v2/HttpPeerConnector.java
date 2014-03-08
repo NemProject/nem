@@ -41,9 +41,9 @@ public class HttpPeerConnector implements PeerConnector {
     }
 
     @Override
-    public NodeStatusDemux getKnownPeers(final NodeEndpoint endpoint) {
+    public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
         final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
-        return new NodeStatusDemux(this.getResponse(url));
+        return new NodeCollection(this.getResponse(url));
     }
 
     private JsonDeserializer getResponse(final URL url) {
