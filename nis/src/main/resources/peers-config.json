@@ -4,14 +4,14 @@
 	"endpoint": {
 	    "protocol": "http",
 	    "host": "nemcoin.info",
-	    "port" 7890
+	    "port" : 7890
 	},
 
-    "application": "NIS"
+    "application": "NIS",
 	"platform": "ZX Spectrum",
 
 	"knownPeers": [
-        { "protocol": "http", "host": "37.187.70.29", "port" 7890 }
+        { "protocol": "http", "host": "37.187.70.29", "port" : 7890 }
     ],
 
 	"_end": "end"
