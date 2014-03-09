@@ -40,7 +40,7 @@ public class BlockChainTest {
 
 		// Assert:
 		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result1, IsEqual.equalTo(false));
+		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(false));
 	}
 }

@@ -15,4 +15,17 @@ public class ByteUtils {
 		buffer.putLong(x);
 		return buffer.array();
 	}
+
+	public static int bytesToInt(byte[] bytes) {
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.put(bytes, 0, 4);
+		buffer.flip();
+		return buffer.getInt();
+	}
+
+	public static byte[] intToBytes(int x) {
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.putInt(x);
+		return buffer.array();
+	}
 }
