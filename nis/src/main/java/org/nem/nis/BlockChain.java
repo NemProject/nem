@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 public class BlockChain {
 	private ConcurrentMap<byte[], Transaction> unconfirmedTransactions;
 
-	BlockChain() {
+	public BlockChain() {
 		unconfirmedTransactions = new ConcurrentHashMap<>();
 	}
 
