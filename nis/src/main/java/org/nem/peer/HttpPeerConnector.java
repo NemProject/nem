@@ -6,6 +6,8 @@ import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.http.HttpMethod;
+import org.nem.core.model.RequestPrepare;
+import org.nem.core.model.Transaction;
 import org.nem.core.serialization.*;
 
 import java.io.*;
@@ -48,6 +50,12 @@ public class HttpPeerConnector implements PeerConnector {
         return new NodeCollection(this.getResponse(url));
     }
 
+	@Override
+	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_PUSH_TRANSACTION);
+		this.postResponse(url, JsonSerializer.serializeToJson(transaction));
+	}
+
     private JsonDeserializer getResponse(final URL url) {
         try {
             final URI uri = url.toURI();
@@ -74,7 +82,7 @@ public class HttpPeerConnector implements PeerConnector {
         }
     }
 
-	protected JsonDeserializer postResponse(URL url, JSONObject request) throws URISyntaxException, InterruptedException, TimeoutException, ExecutionException {
+	protected JsonDeserializer postResponse(URL url, JSONObject request) {
 		JSONObject retObj = null;
 		try {
 			InputStreamResponseListener listener = new InputStreamResponseListener();

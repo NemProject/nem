@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import org.nem.core.model.Transaction;
+
 import java.util.*;
 
 /**
@@ -48,7 +50,14 @@ public class PeerNetwork {
         refresher.refresh();
     }
 
-    private static class NodeRefresher {
+	//
+	public void announceTransaction(Transaction transaction) {
+		for (final Node node : nodes.getActiveNodes()) {
+			this.connector.pushTransaction(node.getEndpoint(), transaction);
+		}
+	}
+
+	private static class NodeRefresher {
         final NodeCollection nodes;
         final PeerConnector connector;
         final Map<Node, NodeStatus> nodesToUpdate;

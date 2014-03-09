@@ -95,9 +95,8 @@ public class TransferController {
 			// add to unconfirmed transactions
 			blockChain.processTransaction(transaction);
 
-			// TODO: propagate transactions
-
-			//peerNetworkHost.getNetwork().announceTransaction(transaction);
+			// propagate transactions
+			peerNetworkHost.getNetwork().announceTransaction(transaction);
 			return Utils.jsonOk();
 		}
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
