@@ -2,7 +2,6 @@ package org.nem.peer;
 
 /**
  * IDs of node-related APIs.
- * TODO: consider changing these to strings.
  */
 public enum NodeApiId {
     /**
