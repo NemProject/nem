@@ -202,8 +202,9 @@ public class NisMain {
 
 	private org.nem.core.dbmodel.Block populateGenesisBlock(Block genesisBlock, org.nem.core.dbmodel.Account a) {
 		org.nem.core.dbmodel.Block b = null;
-		System.out.println(HexEncoder.getString(genesisBlock.getHash()));
-		System.out.println(ByteUtils.bytesToLong(genesisBlock.getHash()));
+        byte[] genesisBlockHash = HashUtils.calculateHash(genesisBlock);
+		System.out.println(HexEncoder.getString(genesisBlockHash));
+		System.out.println(ByteUtils.bytesToLong(genesisBlockHash));
 
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
@@ -214,7 +215,7 @@ public class NisMain {
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					},
-					genesisBlock.getHash(),
+                    genesisBlockHash,
 					0, // timestamp 
 					a,
 					// proof

@@ -107,16 +107,6 @@ public class Block extends VerifiableEntity {
 		this.totalFee += transaction.getFee();
     }
 
-	/**
-	 * Calculates and returns hash of this block
-	 *
-	 * @return hash of this block.
-	 */
-	public byte[] getHash() {
-		byte[] data = BinarySerializer.serializeToBytes(this.asNonVerifiable());
-		return Hashes.sha3(data);
-	}
-
     @Override
     protected void serializeImpl(Serializer serializer) {
 		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
