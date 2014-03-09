@@ -10,12 +10,12 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.*;
+import org.nem.core.time.*;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
+
+    public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
 	@Autowired
 	private AccountDao accountDao;
@@ -45,25 +47,6 @@ public class NisMain {
 	BlockAnalyzer blockAnalyzer;
 
 	public NisMain() {
-	}
-
-	static long epochBeginning;
-
-	static private void initEpoch() {
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.set(Calendar.ERA, 0);
-		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, 07);
-		calendar.set(Calendar.DAY_OF_MONTH, 01);
-		calendar.set(Calendar.HOUR, 12);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		epochBeginning = calendar.getTimeInMillis();
-	}
-
-	public static int getEpochTime(long time) {
-		return (int) ((time - epochBeginning + 500L) / 1000L);
 	}
 
 	private void analyzeBlocks() {
@@ -96,8 +79,6 @@ public class NisMain {
 		blockAnalyzer = new BlockAnalyzer();
 
 		analyzeBlocks();
-
-		initEpoch();
 
 		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 	}
