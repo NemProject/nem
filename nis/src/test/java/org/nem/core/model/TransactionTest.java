@@ -95,6 +95,36 @@ public class TransactionTest {
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void transactionWithTooDistantDeadlineIsInvalid() {
+		// Arrange:
+		final KeyPair publicPrivateKeyPair = new KeyPair();
+		final Account signer = new Account(publicPrivateKeyPair);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setTimestamp(5*24*60*60);
+		transaction.setDeadline(6*24*60*60);
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void transactionMaxDeadlineIsValid() {
+		// Arrange:
+		final KeyPair publicPrivateKeyPair = new KeyPair();
+		final Account signer = new Account(publicPrivateKeyPair);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setTimestamp(5*24*60*60);
+		transaction.setDeadline(6*24*60*60 - 1);
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+	}
+
     @Test
     public void transactionCanBeRoundTripped() {
         // Arrange:

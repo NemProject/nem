@@ -119,7 +119,7 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-		return this.timestamp >= 0 && this.deadline > this.timestamp && this.deadline < 24*60*60;
+		return this.timestamp >= 0 && this.deadline > this.timestamp && (this.deadline - this.timestamp) < 24*60*60;
 	}
 
 	/**
