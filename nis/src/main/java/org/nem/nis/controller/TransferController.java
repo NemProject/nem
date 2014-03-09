@@ -11,6 +11,7 @@ import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 //import org.nem.peer.v2.PeerNetwork;
+import org.nem.nis.BlockChain;
 import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,9 @@ public class TransferController {
 
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
+
+	@Autowired
+	BlockChain blockChain;
 
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody String body) {
@@ -88,7 +92,8 @@ public class TransferController {
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
-			// TODO: add to unconfirmed transactions
+			// add to unconfirmed transactions
+			blockChain.processTransaction(transaction);
 
 			// TODO: propagate transactions
 

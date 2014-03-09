@@ -8,6 +8,7 @@ import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
+import org.nem.nis.BlockChain;
 import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,9 @@ public class PushController {
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
+	@Autowired
+	BlockChain blockChain;
+
 	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
 	public String pushEntity(@RequestBody String body)
 	{
@@ -63,10 +67,10 @@ public class PushController {
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
-			// TODO: add to unconfirmed transactions
+			// add to unconfirmed transactions
+			blockChain.processTransaction(transaction);
 
 			// TODO: propagate transactions
-
 			//peerNetworkHost.getNetwork().announceTransaction(transaction);
 			return Utils.jsonOk();
 		}
