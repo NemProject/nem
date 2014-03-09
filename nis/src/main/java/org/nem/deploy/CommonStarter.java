@@ -115,7 +115,7 @@ public class CommonStarter implements ServletContextListener {
 			showDocument.invoke(basicService, homeURL);
 			
 			result = true;
-		} catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException | NoClassDefFoundError ex) {
 		  // handle exception case
 			logger.info("JNLP not available, not started via WebStart. Assuming headless run.");
 		} catch (NoSuchMethodException e) {
