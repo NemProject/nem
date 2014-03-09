@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `blocks` (
 CREATE TABLE IF NOT EXISTS `transfers` (  
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
   `shortId` BIGINT NOT NULL,  
+  `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
   `type` INT NOT NULL,

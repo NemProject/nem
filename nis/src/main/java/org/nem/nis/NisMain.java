@@ -176,8 +176,11 @@ public class NisMain {
 			int i = 0;
 			for (Transaction transaction : genesisBlock.getTransactions()) {
 				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
+
+				byte[] hash = transferTransaction.getHash();
 				Transfer t = new Transfer(
-						ByteUtils.bytesToLong(transferTransaction.getSignature().getBytes()),
+						ByteUtils.bytesToLong(hash),
+						hash,
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
