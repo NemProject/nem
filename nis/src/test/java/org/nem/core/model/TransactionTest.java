@@ -22,8 +22,60 @@ public class TransactionTest {
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
+		Assert.assertThat(transaction.getTimestamp(), IsEqual.equalTo(0));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(0));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
     }
+
+	@Test
+	public void transactionWithWrongDeadlineIsInvalid() {
+		// Arrange:
+		final KeyPair publicPrivateKeyPair = new KeyPair();
+		final Account signer = new Account(publicPrivateKeyPair);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+
+		// Assert:
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
+		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void transactionWithCorrectDeadlineIsValid() {
+		// Arrange:
+		final KeyPair publicPrivateKeyPair = new KeyPair();
+		final Account signer = new Account(publicPrivateKeyPair);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setDeadline(1);
+
+		// Assert:
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
+		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void transactionWithNegativeTimestampIsInvalid() {
+		// Arrange:
+		final KeyPair publicPrivateKeyPair = new KeyPair();
+		final Account signer = new Account(publicPrivateKeyPair);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setTimestamp(-10);
+
+		// Assert:
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
+		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
 
     @Test
     public void transactionCanBeRoundTripped() {
@@ -37,6 +89,8 @@ public class TransactionTest {
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
+		Assert.assertThat(transaction.getTimestamp(), IsEqual.equalTo(0));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(0));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
     }
 

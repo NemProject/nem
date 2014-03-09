@@ -58,7 +58,9 @@ public class MockTransaction extends Transaction {
     public void setMinimumFee(final long minimumFee) { this.minimumFee = minimumFee; }
 
     @Override
-    public boolean isValid() { return true; }
+    public boolean isValid() {
+		return super.isValid();
+	}
 
     @Override
     protected long getMinimumFee() {

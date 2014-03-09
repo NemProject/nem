@@ -78,7 +78,8 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	public boolean isValid() {
-        return this.amount >= 0
+		return super.isValid()
+			&& this.amount >= 0
             && this.getSigner().getBalance() >= this.amount + this.getFee()
             && this.getMessageLength() <= MAX_MESSAGE_SIZE;
     }
