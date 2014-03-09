@@ -39,6 +39,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -64,6 +66,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -89,6 +93,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(-13));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -114,6 +120,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", 66);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -139,6 +147,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "dbcdefghijklmnopqrstuvwxyz)(*&^%$#@!");
@@ -164,6 +174,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
@@ -189,6 +201,8 @@ public class TransferControllerTest {
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", Long.valueOf(42));
 		obj.put("fee", Long.valueOf(1));
+		obj.put("timestamp", 0);
+		obj.put("deadline", 1);
 		JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
