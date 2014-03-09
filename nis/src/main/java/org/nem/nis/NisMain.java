@@ -47,23 +47,22 @@ public class NisMain {
 	public NisMain() {
 	}
 
-	static long epochBeginning;
+	static long epochBeginning = NisMain.initEpoch();
 
-	static private void initEpoch() {
+	static private long initEpoch() {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.set(Calendar.ERA, 0);
 		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, 07);
+		calendar.set(Calendar.MONTH, Calendar.MARCH);
 		calendar.set(Calendar.DAY_OF_MONTH, 01);
 		calendar.set(Calendar.HOUR, 12);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		epochBeginning = calendar.getTimeInMillis();
+		return calendar.getTimeInMillis();
 	}
 
-	public static int getEpochTime(long time) {
-		return (int) ((time - epochBeginning + 500L) / 1000L);
+	public static int getEpochTime() {
+		return (int) ((System.currentTimeMillis() - epochBeginning + 500L) / 1000L);
 	}
 
 	private void analyzeBlocks() {
@@ -83,7 +82,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
-		logger.warning("context ================== ");
+		logger.warning("context ================== epoch: " + Long.toHexString(epochBeginning) + " current: " + Long.toHexString(getEpochTime()));
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -96,8 +95,6 @@ public class NisMain {
 		blockAnalyzer = new BlockAnalyzer();
 
 		analyzeBlocks();
-
-		initEpoch();
 
 		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 	}
