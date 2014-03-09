@@ -89,6 +89,16 @@ public abstract class Transaction extends VerifiableEntity {
 	}
 	//endregion
 
+	/**
+	 * Calculates and returns hash of this transaction
+	 *
+	 * @return hash of this block.
+	 */
+	public byte[] getHash() {
+		byte[] data = BinarySerializer.serializeToBytes(this.asNonVerifiable());
+		return Hashes.sha3(data);
+	}
+
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeLong("fee", this.getFee());

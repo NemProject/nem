@@ -63,7 +63,7 @@ public class BlockTest {
 		byte[] hash2 = block2.getHash();
 
 		// Assert:
-		Assert.assertThat(hash1, IsNot.not(hash2));
+		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class BlockTest {
 		byte[] hash2 = block2.getHash();
 
 		// Assert:
-		Assert.assertThat(hash1, IsNot.not(hash2));
+		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 		Assert.assertThat(block1.getTransactions().size(), IsEqual.equalTo(1));
 		Assert.assertThat(block1.getTransactions().get(0), IsEqual.equalTo(tx));
 	}
