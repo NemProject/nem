@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
 import org.nem.peer.test.*;
@@ -35,7 +36,49 @@ public class NodeCollectionTest {
 
     //endregion
 
+    //region getNodeStatus
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForActiveNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.ACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("F")), IsEqual.equalTo(NodeStatus.ACTIVE));
+    }
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForInactiveNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.INACTIVE));
+    }
+
+    @Test
+    public void getNodeStatusReturnsCorrectStatusForFailureNodes() {
+        // Act:
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+        // Assert:
+        Assert.assertThat(nodes.getNodeStatus(createNode("E")), IsEqual.equalTo(NodeStatus.FAILURE));
+        Assert.assertThat(nodes.getNodeStatus(createNode("G")), IsEqual.equalTo(NodeStatus.FAILURE));
+    }
+
+    //endregion
+
     //region update
+
+    /**
+     * NOTE: The update tests are using a node's port as its "hallmark" (in other words, nodes with the same port
+     * are deemed equal). The arePortsEquivalent validation ensures that the node we are checking is the one we expect.
+     * The "platform" is used as a non-identifying field that should be updated in the collection.
+     * The arePlatformsEquivalent ensures that it was updated.
+     */
 
     @Test(expected = NullPointerException.class)
     public void updateCannotAddNullNode() {
@@ -56,6 +99,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A" }, new String[]{ });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ (int)'A' }, new Integer[]{ });
     }
 
     @Test
@@ -68,6 +112,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "A" });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ }, new Integer[]{ (int)'A' });
     }
 
     @Test
@@ -93,6 +138,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "B" }, new String[]{ });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ (int)'A' }, new Integer[]{ });
     }
 
     @Test
@@ -106,6 +152,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "B" });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ }, new Integer[]{ (int)'A' });
     }
 
     @Test
@@ -119,6 +166,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "B" }, new String[]{ });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ (int)'A' }, new Integer[]{ });
     }
 
     @Test
@@ -132,6 +180,7 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ }, new String[]{ "B" });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[]{ }, new Integer[]{ (int)'A' });
     }
 
     @Test
@@ -144,9 +193,8 @@ public class NodeCollectionTest {
 
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "F" }, new String[]{ "B", "C", "Z" });
+        NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { (int)'A', (int)'F' }, new Integer[]{ (int)'B', (int)'C', (int)'D' });
     }
-
-    // TODO: add port validation too
 
     //endregion
 

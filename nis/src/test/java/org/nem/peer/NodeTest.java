@@ -94,8 +94,8 @@ public class NodeTest {
         // Assert:
         Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app"), IsEqual.equalTo(node));
         Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 13), "plat", "app"), IsNot.not(IsEqual.equalTo(node)));
-        Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat2", "app"), IsNot.not(IsEqual.equalTo(node)));
-        Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app2"), IsNot.not(IsEqual.equalTo(node)));
+        Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat2", "app"), IsEqual.equalTo(node));
+        Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app2"), IsEqual.equalTo(node));
         Assert.assertThat(null, IsNot.not(IsEqual.equalTo(node)));
         Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)node)));
     }
@@ -115,10 +115,10 @@ public class NodeTest {
             IsNot.not(IsEqual.equalTo(hashCode)));
         Assert.assertThat(
             new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat2", "app").hashCode(),
-            IsNot.not(IsEqual.equalTo(hashCode)));
+            IsEqual.equalTo(hashCode));
         Assert.assertThat(
             new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app2").hashCode(),
-            IsNot.not(IsEqual.equalTo(hashCode)));
+            IsEqual.equalTo(hashCode));
     }
 
     //endregion

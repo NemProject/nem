@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import java.util.*;
+
 /**
  * Represents a collection of all known NEM nodes.
  */
@@ -42,34 +44,83 @@ public class PeerNetwork {
      * Refreshes the network.
      */
     public void refresh() {
-
-        // TODO: need to add back calls for requesting peer lists
-        // TODO: should we check for node consistency?
-
-        // TODO: not sure if i like this, but it's late ... revisit
-        NodeCollection oldNodes = this.nodes;
-        this.nodes = new NodeCollection();
-
-        for (final Node node : oldNodes.getActiveNodes())
-            this.refreshNode(node);
-
-        for (final Node node : oldNodes.getInactiveNodes())
-            this.refreshNode(node);
+        final NodeRefresher refresher = new NodeRefresher(this.nodes, this.connector);
+        refresher.refresh();
     }
 
-    private void refreshNode(final Node node) {
-        Node updatedNode = node;
-        NodeStatus updatedStatus = NodeStatus.ACTIVE;
-        try {
-            updatedNode = this.connector.getInfo(node.getEndpoint());
-        }
-        catch (InactivePeerException e) {
-            updatedStatus = NodeStatus.INACTIVE;
-        }
-        catch (FatalPeerException e) {
-            updatedStatus = NodeStatus.FAILURE;
+    private static class NodeRefresher {
+        final NodeCollection nodes;
+        final PeerConnector connector;
+        final Map<Node, NodeStatus> nodesToUpdate;
+
+        public NodeRefresher(final NodeCollection nodes, final PeerConnector connector) {
+            this.nodes = nodes;
+            this.connector = connector;
+            this.nodesToUpdate = new HashMap<>();
         }
 
-        this.nodes.update(updatedNode, updatedStatus);
+        public void refresh() {
+            this.refresh(nodes.getActiveNodes());
+            this.refresh(nodes.getInactiveNodes());
+
+            for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+                this.nodes.update(entry.getKey(), entry.getValue());
+        }
+
+        private void refresh(final Iterable<Node> iterable) {
+            for (final Node node : iterable)
+                this.refreshNode(node);
+        }
+
+        private void refreshNode(final Node node) {
+            Node refreshedNode = node;
+            NodeStatus updatedStatus = NodeStatus.ACTIVE;
+            try {
+                refreshedNode = this.connector.getInfo(node.getEndpoint());
+
+                // if the node returned inconsistent information, drop it for this round
+                if (!areCompatible(node, refreshedNode)) {
+                    updatedStatus = NodeStatus.FAILURE;
+                    refreshedNode = node;
+                } else {
+                    this.mergePeers(this.connector.getKnownPeers(node.getEndpoint()));
+                }
+            }
+            catch (InactivePeerException e) {
+                updatedStatus = NodeStatus.INACTIVE;
+            }
+            catch (FatalPeerException e) {
+                updatedStatus = NodeStatus.FAILURE;
+            }
+
+            this.update(refreshedNode, updatedStatus);
+        }
+
+        private static boolean areCompatible(final Node lhs, final Node rhs) {
+            return lhs.equals(rhs);
+        }
+
+        private void update(final Node node, final NodeStatus status) {
+            if (status == this.nodes.getNodeStatus(node))
+                return;
+
+            this.nodesToUpdate.put(node, status);
+        }
+
+        private void mergePeers(final NodeCollection nodes) {
+            this.mergePeers(nodes.getActiveNodes(), NodeStatus.ACTIVE);
+            this.mergePeers(nodes.getInactiveNodes(), NodeStatus.INACTIVE);
+        }
+
+        private void mergePeers(final Iterable<Node> iterable, final NodeStatus status) {
+            for (final Node node : iterable) {
+                // nodes directly communicated with are already in this.nodes
+                // give their direct connection precedence over what peers report
+                if (NodeStatus.FAILURE != this.nodes.getNodeStatus(node))
+                    continue;
+
+                this.update(node, status);
+            }
+        }
     }
 }

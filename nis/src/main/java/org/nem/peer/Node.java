@@ -6,6 +6,7 @@ import java.security.InvalidParameterException;
 
 /**
  * Represents a node in the NEM network.
+ * Each Node is uniquely identified by its endpoint.
  */
 public class Node implements SerializableEntity {
 
@@ -108,7 +109,6 @@ public class Node implements SerializableEntity {
         if (obj == null || !(obj instanceof Node))
             return false;
 
-        // TODO: review this change (making node equality the same as endpoint equality)
         Node rhs = (Node)obj;
         return this.endpoint.equals(rhs.endpoint);
     }
