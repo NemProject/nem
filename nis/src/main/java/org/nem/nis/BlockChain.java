@@ -1,12 +1,9 @@
 package org.nem.nis;
 
 
-import org.nem.core.dao.TransferDao;
-import org.nem.core.dbmodel.Block;
+import org.nem.core.model.ByteArray;
 import org.nem.core.model.HashUtils;
-import org.nem.core.model.Hashcode;
 import org.nem.core.model.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class BlockChain {
-	private ConcurrentMap<Hashcode, Transaction> unconfirmedTransactions;
+	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 
 	public BlockChain() {
 		unconfirmedTransactions = new ConcurrentHashMap<>();
@@ -33,7 +30,7 @@ public class BlockChain {
 			return false;
 		}
 
-		Hashcode transactionHash = new Hashcode(HashUtils.calculateHash(transaction));
+		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
 		synchronized (BlockChain.class) {
 			// TODO: check if transaction isn't already in DB
