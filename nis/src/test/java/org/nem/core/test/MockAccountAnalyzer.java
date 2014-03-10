@@ -1,6 +1,7 @@
 package org.nem.core.test;
 
 import org.nem.core.model.Account;
+import org.nem.core.model.ByteArray;
 import org.nem.nis.AccountAnalyzer;
 
 public class MockAccountAnalyzer extends AccountAnalyzer {
@@ -9,6 +10,6 @@ public class MockAccountAnalyzer extends AccountAnalyzer {
 	}
 
 	public Account findByPublicKey(Account account) {
-		return findByAddressImpl(account.getKeyPair().getPublicKey(), null);
+		return findByAddressImpl(new ByteArray(account.getKeyPair().getPublicKey()), null);
 	}
 }

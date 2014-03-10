@@ -10,6 +10,7 @@ import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
+import org.nem.core.model.ByteArray;
 import org.nem.core.serialization.AccountLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,7 +23,7 @@ public class AccountAnalyzer implements AccountLookup {
 	@Autowired
 	private TransferDao transferDao;
 
-	Map<byte[], Account> mapByPublicKey;
+	Map<ByteArray, Account> mapByPublicKey;
 	Map<String, Account> mapByAddressId;
 
 	public AccountAnalyzer() {
@@ -31,13 +32,13 @@ public class AccountAnalyzer implements AccountLookup {
 	}
 
 	private Account addToBalanceAndUnconfirmedBalance(org.nem.core.dbmodel.Account a, long amount) {
-		byte[] publicKey = a.getPublicKey();
+		ByteArray publicKey = a.getPublicKey() != null ? new ByteArray(a.getPublicKey()) : null;
 		String encodedAddress = a.getPrintableKey();
 
 		Account account = findByAddressImpl(publicKey, encodedAddress);
 		if (account == null) {
 			if (publicKey != null) {
-				account = new Account(new KeyPair(publicKey));
+				account = new Account(new KeyPair(publicKey.get()));
 
 				mapByPublicKey.put(publicKey, account);
 
@@ -89,7 +90,7 @@ public class AccountAnalyzer implements AccountLookup {
 	 * @param encodedAddress - encoded address of an account
 	 * @return null if account is unknown or Account associated with an address
 	 */
-	protected Account findByAddressImpl(byte[] publicKey, String encodedAddress) {
+	protected Account findByAddressImpl(ByteArray publicKey, String encodedAddress) {
 		// if possible return by public key
 		if (publicKey != null) {
 			if (mapByPublicKey.containsKey(publicKey)) {
@@ -103,7 +104,7 @@ public class AccountAnalyzer implements AccountLookup {
 
 			// if possible update account's public key
 			if (publicKey != null) {
-				Account account = new Account(new KeyPair(publicKey));
+				Account account = new Account(new KeyPair(publicKey.get()));
 				long balance = oldAccount.getBalance();
 				account.incrementBalance(balance);
 				mapByAddressId.put(encodedAddress, account);
@@ -133,7 +134,7 @@ public class AccountAnalyzer implements AccountLookup {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());
 		}
 
-		Account account = findByAddressImpl(id.getPublicKey(), id.getEncoded());
+		Account account = findByAddressImpl(new ByteArray(id.getPublicKey()), id.getEncoded());
 
 		// we don't know it yet, so create dummy account
 		// without adding it anywhere yet
