@@ -4,3 +4,4 @@ superlog.txt
 *~
 *.eml
 *.pyc
+*.db
