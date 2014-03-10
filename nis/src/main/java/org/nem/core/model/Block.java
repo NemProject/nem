@@ -83,6 +83,13 @@ public class Block extends VerifiableEntity {
     }
 
     /**
+     * Gets the hash of the previous block.
+     *
+     * @return The hash of the previous block.
+     */
+    public byte[] getPreviousBlockHash() { return this.prevBlockHash; }
+
+    /**
      * Adds a new transaction to this block.
      *
      * @param transaction The transaction to add.

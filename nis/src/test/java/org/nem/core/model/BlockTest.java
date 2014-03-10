@@ -27,6 +27,7 @@ public class BlockTest {
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
+        Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
@@ -50,6 +51,7 @@ public class BlockTest {
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
+        Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
 

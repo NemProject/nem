@@ -31,6 +31,7 @@ public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
 
     public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+    public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -115,8 +116,7 @@ public class NisMain {
 
 		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 		for (int i = 0; i < txIds.length; ++i) {
-			final TransferTransaction transferTransaction = new TransferTransaction(
-                TIME_PROVIDER.getCurrentTime(),
+			final TransferTransaction transferTransaction = ENTITY_FACTORY.createTransfer(
                 genesisAccount,
                 recipientsAccounts.get(i),
                 amounts[i],
