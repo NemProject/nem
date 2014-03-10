@@ -115,7 +115,12 @@ public class NisMain {
 
 		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 		for (int i = 0; i < txIds.length; ++i) {
-			final TransferTransaction transferTransaction = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
+			final TransferTransaction transferTransaction = new TransferTransaction(
+                TIME_PROVIDER.getCurrentTime(),
+                genesisAccount,
+                recipientsAccounts.get(i),
+                amounts[i],
+                null);
 			transferTransaction.setFee(0);
 			transferTransaction.sign();
 
