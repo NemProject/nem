@@ -134,7 +134,8 @@ public class AccountAnalyzer implements AccountLookup {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());
 		}
 
-		Account account = findByAddressImpl(new ByteArray(id.getPublicKey()), id.getEncoded());
+		ByteArray byteArray = id.getPublicKey() != null ? new ByteArray(id.getPublicKey()) : null;
+		Account account = findByAddressImpl(byteArray, id.getEncoded());
 
 		// we don't know it yet, so create dummy account
 		// without adding it anywhere yet

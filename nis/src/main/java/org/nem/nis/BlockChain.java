@@ -23,12 +23,7 @@ public class BlockChain {
 		unconfirmedTransactions = new ConcurrentHashMap<>();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				LOGGER.info("block generation");
-			}
-		}, 10, 10, TimeUnit.SECONDS);
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 10, 10, TimeUnit.SECONDS);
 	}
 
 	public void bootup() {
@@ -60,5 +55,13 @@ public class BlockChain {
 		}
 
 		return true;
+	}
+
+	class BlockGenerator implements Runnable {
+
+		@Override
+		public void run() {
+			LOGGER.info("block generation" + Integer.toString(unconfirmedTransactions.size()) );
+		}
 	}
 }
