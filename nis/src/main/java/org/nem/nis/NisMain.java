@@ -82,6 +82,8 @@ public class NisMain {
 		analyzeBlocks();
 
 		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+
+		BlockChain.MAIN_CHAIN.bootup();
 	}
 
 	private void populateDb() {

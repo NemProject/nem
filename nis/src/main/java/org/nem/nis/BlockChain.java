@@ -8,15 +8,33 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
-@Component
 public class BlockChain {
+	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	public static BlockChain MAIN_CHAIN = new BlockChain();
+
 	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
+	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
 	public BlockChain() {
 		unconfirmedTransactions = new ConcurrentHashMap<>();
+
+		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				LOGGER.info("block generation");
+			}
+		}, 10, 10, TimeUnit.SECONDS);
 	}
 
+	public void bootup() {
+		LOGGER.info("booting up block generator");
+	}
+	
 	/**
 	 *
 	 * @param transaction - transaction that isValid() and verify()-ed
