@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
+import org.nem.peer.net.HttpPeerConnector;
 
 import java.io.InputStream;
 import java.util.concurrent.*;
@@ -19,7 +20,7 @@ public class PeerNetworkHost implements AutoCloseable {
      *
      * @return The default peer network host.
      */
-    public static final PeerNetworkHost getDefaultHost() { return DEFAULT_HOST; }
+    public static PeerNetworkHost getDefaultHost() { return DEFAULT_HOST; }
 
     private final PeerNetwork network;
     private final ScheduledThreadPoolExecutor peerListRefresherExecutor;

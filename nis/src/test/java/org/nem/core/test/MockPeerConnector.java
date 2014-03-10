@@ -1,38 +1,36 @@
 package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
-import org.nem.core.model.Transaction;
 import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.serialization.JsonSerializer;
-import org.nem.peer.HttpPeerConnector;
-import org.nem.peer.NodeApiId;
-import org.nem.peer.NodeEndpoint;
+import org.nem.peer.net.HttpMethodClient;
 
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * ugliness
  */
-public class MockPeerConnector extends HttpPeerConnector {
+public class MockPeerConnector {
 	private URL baseURL;
+
+    private final HttpMethodClient httpMethodClient;
 
 	public MockPeerConnector() throws MalformedURLException {
 		super();
 
 		this.baseURL = new URL("http", "127.0.0.1", 7890, "/");
+        this.httpMethodClient = new HttpMethodClient(30);
 	}
 
-	public JsonDeserializer transferPrepare(JSONObject transferPrepareData) throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
-		JsonDeserializer response = postResponse(new URL(this.baseURL, "transfer/prepare"), transferPrepareData);
-		return response;
+	public JsonDeserializer transferPrepare(JSONObject transferPrepareData) throws MalformedURLException {
+        return this.post("transfer/prepare", transferPrepareData);
 	}
 
 	public JsonDeserializer pushTransaction(JSONObject transferData) throws MalformedURLException {
-		JsonDeserializer response = postResponse(new URL(this.baseURL, "push/transaction"), transferData);
-		return response;
+		return this.post("push/transaction", transferData);
 	}
+
+    private JsonDeserializer post(final String path, final JSONObject requestData) throws MalformedURLException {
+        return this.httpMethodClient.post(new URL(this.baseURL, path), requestData);
+    }
 }
