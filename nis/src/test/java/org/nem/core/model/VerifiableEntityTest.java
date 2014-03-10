@@ -25,6 +25,7 @@ public class VerifiableEntityTest {
         // Assert:
         Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
         Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+        Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
@@ -64,6 +65,7 @@ public class VerifiableEntityTest {
         // Assert:
         Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
         Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+        Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
@@ -80,6 +82,7 @@ public class VerifiableEntityTest {
         // Assert:
         Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
         Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+        Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
         Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
         Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
         Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));

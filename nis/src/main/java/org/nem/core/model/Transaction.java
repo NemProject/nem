@@ -17,10 +17,11 @@ public abstract class Transaction extends VerifiableEntity {
 	 *
 	 * @param type The transaction type.
 	 * @param version The transaction version.
+     * @param timestamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final Account sender) {
-		super(type, version, sender);
+	public Transaction(final int type, final int version, final int timestamp, final Account sender) {
+		super(type, version, timestamp, sender);
 	}
 
 	/**

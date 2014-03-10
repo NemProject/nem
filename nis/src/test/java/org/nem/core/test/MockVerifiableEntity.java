@@ -10,6 +10,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 
     public static final int TYPE = 12;
     public static final int VERSION = 24;
+    public static final int TIMESTAMP = 127435;
 
 	private int customField;
 
@@ -29,7 +30,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
      * @param customField The initial custom field value.
      */
     public MockVerifiableEntity(final Account signer, final int customField) {
-		super(TYPE, VERSION, signer);
+		super(TYPE, VERSION, TIMESTAMP, signer);
         this.customField = customField;
     }
 

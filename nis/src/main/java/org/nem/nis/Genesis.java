@@ -39,5 +39,5 @@ public class Genesis {
 	};
 	public static final String CREATOR_ACCOUNT_ID = "NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
 	public static final int INITIAL_HEIGHT = 1;
-	public static final int INITIAL_TIME = 0;
+	public static final int INITIAL_TIME = NisMain.TIME_PROVIDER.getEpochTime();
 }

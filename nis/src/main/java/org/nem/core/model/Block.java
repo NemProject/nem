@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.Hashes;
 import org.nem.core.serialization.*;
 import org.nem.core.transactions.TransactionFactory;
 
@@ -11,10 +10,9 @@ import java.util.*;
  */
 public class Block extends VerifiableEntity {
 	private byte[] prevBlockHash;
-	private int timestamp; // in seconds, max 68 years...
 	// forger == signer
 	// forgerProof = signature
-	private byte[] generationSignature; // hash(prevBlockHash || signer pubKey)
+    //	private byte[] generationSignature; // hash(prevBlockHash || signer pubKey)
 	private int height; // unsure yet, but probably will be easier to talk on forums having that
 
 	// I think it can be worth to keep fee here, discrepancies
@@ -29,10 +27,9 @@ public class Block extends VerifiableEntity {
      * @param forger The forger.
      */
     public Block(final Account forger, final byte[] prevBlockHash, int timestamp, int height) {
-        super(1, 1, forger);
+        super(1, 1, timestamp, forger);
         this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
-		this.timestamp = timestamp;
 		this.height = height;
 		this.totalFee = 0;
     }
@@ -46,10 +43,9 @@ public class Block extends VerifiableEntity {
     public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {
         super(type, options, deserializer);
 
-		this.prevBlockHash= deserializer.readBytes("prevBlockHash");
-		this.timestamp    = deserializer.readInt("timestamp");
-		this.height       = deserializer.readInt("height");
-		this.totalFee     = deserializer.readLong("totalFee");
+		this.prevBlockHash = deserializer.readBytes("prevBlockHash");
+		this.height = deserializer.readInt("height");
+		this.totalFee = deserializer.readLong("totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
     }
@@ -64,15 +60,6 @@ public class Block extends VerifiableEntity {
     }
 
 	/**
-	 * Gets the timestamp of this block since NEM epoch.
-	 *
-	 * @return timestamp of this block since NEM epoch.
-	 */
-	public int getTimestamp() {
-		return timestamp;
-	}
-
-	/**
 	 * Gets the height of this block in the blockchain.
 	 *
 	 * @return height of this block in the blockchain.
@@ -80,7 +67,6 @@ public class Block extends VerifiableEntity {
 	public int getHeight() {
 		return height;
 	}
-
 
 	/**
 	 * Gets total amount of fees of all transactions stored in this block.
@@ -97,6 +83,13 @@ public class Block extends VerifiableEntity {
     }
 
     /**
+     * Gets the hash of the previous block.
+     *
+     * @return The hash of the previous block.
+     */
+    public byte[] getPreviousBlockHash() { return this.prevBlockHash; }
+
+    /**
      * Adds a new transaction to this block.
      *
      * @param transaction The transaction to add.
@@ -107,21 +100,10 @@ public class Block extends VerifiableEntity {
 		this.totalFee += transaction.getFee();
     }
 
-	/**
-	 * Calculates and returns hash of this block
-	 *
-	 * @return hash of this block.
-	 */
-	public byte[] getHash() {
-		byte[] data = BinarySerializer.serializeToBytes(this.asNonVerifiable());
-		return Hashes.sha3(data);
-	}
-
     @Override
     protected void serializeImpl(Serializer serializer) {
 		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
 
-		serializer.writeInt("timestamp", this.timestamp);
 		serializer.writeInt("height", this.height);
 		serializer.writeLong("totalFee", this.totalFee);
 

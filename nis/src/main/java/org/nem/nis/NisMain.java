@@ -10,12 +10,12 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.*;
+import org.nem.core.time.*;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
 
 public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
+
+    public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+    public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -45,24 +48,6 @@ public class NisMain {
 	BlockAnalyzer blockAnalyzer;
 
 	public NisMain() {
-	}
-
-	static long epochBeginning = NisMain.initEpoch();
-
-	static private long initEpoch() {
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, Calendar.MARCH);
-		calendar.set(Calendar.DAY_OF_MONTH, 01);
-		calendar.set(Calendar.HOUR, 12);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		return calendar.getTimeInMillis();
-	}
-
-	public static int getEpochTime() {
-		return (int) ((System.currentTimeMillis() - epochBeginning + 500L) / 1000L);
 	}
 
 	private void analyzeBlocks() {
@@ -131,7 +116,11 @@ public class NisMain {
 
 		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 		for (int i = 0; i < txIds.length; ++i) {
-			final TransferTransaction transferTransaction = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
+			final TransferTransaction transferTransaction = ENTITY_FACTORY.createTransfer(
+                genesisAccount,
+                recipientsAccounts.get(i),
+                amounts[i],
+                null);
 			transferTransaction.setFee(0);
 			transferTransaction.sign();
 
@@ -202,8 +191,9 @@ public class NisMain {
 
 	private org.nem.core.dbmodel.Block populateGenesisBlock(Block genesisBlock, org.nem.core.dbmodel.Account a) {
 		org.nem.core.dbmodel.Block b = null;
-		System.out.println(HexEncoder.getString(genesisBlock.getHash()));
-		System.out.println(ByteUtils.bytesToLong(genesisBlock.getHash()));
+        byte[] genesisBlockHash = HashUtils.calculateHash(genesisBlock);
+		System.out.println(HexEncoder.getString(genesisBlockHash));
+		System.out.println(ByteUtils.bytesToLong(genesisBlockHash));
 
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
@@ -214,7 +204,7 @@ public class NisMain {
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					},
-					genesisBlock.getHash(),
+                    genesisBlockHash,
 					0, // timestamp 
 					a,
 					// proof
