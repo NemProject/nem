@@ -1,8 +1,12 @@
 package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
+import org.nem.core.model.Transaction;
 import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.peer.HttpPeerConnector;
+import org.nem.peer.NodeApiId;
+import org.nem.peer.NodeEndpoint;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -24,6 +28,11 @@ public class MockPeerConnector extends HttpPeerConnector {
 
 	public JsonDeserializer transferPrepare(JSONObject transferPrepareData) throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
 		JsonDeserializer response = postResponse(new URL(this.baseURL, "transfer/prepare"), transferPrepareData);
+		return response;
+	}
+
+	public JsonDeserializer pushTransaction(JSONObject transferData) throws MalformedURLException {
+		JsonDeserializer response = postResponse(new URL(this.baseURL, "push/transaction"), transferData);
 		return response;
 	}
 }

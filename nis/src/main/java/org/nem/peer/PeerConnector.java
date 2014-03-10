@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import org.nem.core.model.Transaction;
+
 /**
  * A interface that is used to request information from nodes.
  */
@@ -20,4 +22,9 @@ public interface PeerConnector {
      * @return A collection of all known peers.
      */
     public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
+
+	/**
+	 * Not sure if this is proper place for this
+	 */
+	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction);
 }

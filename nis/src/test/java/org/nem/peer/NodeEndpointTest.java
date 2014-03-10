@@ -41,6 +41,7 @@ public class NodeEndpointTest {
         Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_NODE_INFO), IsEqual.equalTo(new URL(url, "node/info")));
         Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_ADD_PEER), IsEqual.equalTo(new URL(url, "peer/new")));
         Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST), IsEqual.equalTo(new URL(url, "node/peer-list")));
+		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_PUSH_TRANSACTION), IsEqual.equalTo(new URL(url, "push/transaction")));
         Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN), IsEqual.equalTo(new URL(url, "chain")));
     }
 

@@ -113,7 +113,7 @@ public class AccountAnalyzerTest {
 	}
 
 	private Transfer prepareTransfer(Account sender, Account recipient, long amount, int idInBlock) {
-		return new Transfer(1L, 1, TransactionTypes.TRANSFER,
+		return new Transfer(1L, new byte[32], 1, TransactionTypes.TRANSFER,
 				0L, // fee
 				0, 0,
 				sender,

@@ -20,7 +20,7 @@ public class TransferTransactionTest {
         final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 
         // Act:
-        new TransferTransaction(signer, null, 123, message);
+        createTransferTransaction(signer, null, 123, message);
     }
 
     @Test
@@ -31,7 +31,7 @@ public class TransferTransactionTest {
         final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 
         // Act:
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, message);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 123, message);
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -47,7 +47,7 @@ public class TransferTransactionTest {
         final Account recipient = Utils.generateRandomAccount();
 
         // Act:
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 123, null);
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -62,7 +62,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
         final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
-        final TransferTransaction originalTransaction = new TransferTransaction(signer, recipient, 123, message);
+        final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, message);
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
             public Account findByAddress(final Address address) {
             return address.equals(signer.getAddress()) ? signer : recipient;
@@ -81,7 +81,7 @@ public class TransferTransactionTest {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
-        final TransferTransaction originalTransaction = new TransferTransaction(signer, recipient, 123, null);
+        final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, null);
         final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
             public Account findByAddress(final Address address) {
             return address.equals(signer.getAddress()) ? signer : recipient;
@@ -133,7 +133,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
-		TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, message);
+		TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, message);
 
         // Act:
         return transaction.getFee();
@@ -146,7 +146,7 @@ public class TransferTransactionTest {
         final MockMessage message = new MockMessage(7);
         message.setEncodedPayload(new byte[encodedMessageSize]);
         message.setDecodedPayload(new byte[decodedMessageSize]);
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 0, message);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 0, message);
 
         // Act:
         return transaction.getFee();
@@ -192,8 +192,9 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(senderBalance);
         final Account recipient = Utils.generateRandomAccount();
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, amount, null);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
         transaction.setFee(fee);
+		transaction.setDeadline(transaction.getTimestamp() + 1);
 
         // Act:
         return transaction.isValid();
@@ -219,9 +220,10 @@ public class TransferTransactionTest {
         signer.incrementBalance(1000);
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
-		TransferTransaction transaction = new TransferTransaction(signer, recipient, 1, message);
+		TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
+		transaction.setDeadline(transaction.getTimestamp() + 1);
 
-        // Act:
+		// Act:
         return transaction.isValid();
     }
 
@@ -235,7 +237,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
         final Account recipient = Utils.generateRandomAccount();
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
         // Act:
@@ -251,7 +253,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
         final Account recipient = Utils.generateRandomAccount();
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
         // Act:
@@ -267,7 +269,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
         final Account recipient = Utils.generateRandomAccount();
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, null);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(10);
 
         // Act:
@@ -284,7 +286,7 @@ public class TransferTransactionTest {
         final Account signer = Utils.generateRandomAccount();
         signer.incrementBalance(1000);
         final Account recipient = Utils.generateRandomAccount();
-        TransferTransaction transaction = new TransferTransaction(signer, recipient, 99, message);
+        TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
         transaction.setFee(10);
 
         // Act:
@@ -296,6 +298,10 @@ public class TransferTransactionTest {
     }
 
     //endregion
+
+    private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
+        return new TransferTransaction(0, sender, recipient, amount, message);
+    }
 
     private TransferTransaction createRoundTrippedTransaction(
         final Transaction originalTransaction,

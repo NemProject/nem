@@ -1,5 +1,6 @@
 package org.nem.peer.test;
 
+import org.nem.core.model.Transaction;
 import org.nem.peer.*;
 
 import java.net.URL;
@@ -114,6 +115,11 @@ public class MockPeerConnector implements PeerConnector {
 
         return this.knownPeers;
     }
+
+	@Override
+	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction) {
+		throw new RuntimeException("unhandled pushTransaction");
+	}
 
     private static boolean shouldTriggerAction(final NodeEndpoint endpoint, final String trigger) {
         return endpoint.getBaseUrl().getHost().equals(trigger);

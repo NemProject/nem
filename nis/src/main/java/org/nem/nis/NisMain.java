@@ -10,12 +10,12 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.model.*;
+import org.nem.core.time.*;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
 
 public class NisMain {
 	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
+
+    public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+    public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -45,25 +48,6 @@ public class NisMain {
 	BlockAnalyzer blockAnalyzer;
 
 	public NisMain() {
-	}
-
-	static long epochBeginning;
-
-	static private void initEpoch() {
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.set(Calendar.ERA, 0);
-		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, 07);
-		calendar.set(Calendar.DAY_OF_MONTH, 01);
-		calendar.set(Calendar.HOUR, 12);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		epochBeginning = calendar.getTimeInMillis();
-	}
-
-	public static int getEpochTime(long time) {
-		return (int) ((time - epochBeginning + 500L) / 1000L);
 	}
 
 	private void analyzeBlocks() {
@@ -83,7 +67,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
-		logger.warning("context ================== ");
+		logger.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -96,8 +80,6 @@ public class NisMain {
 		blockAnalyzer = new BlockAnalyzer();
 
 		analyzeBlocks();
-
-		initEpoch();
 
 		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 	}
@@ -134,7 +116,11 @@ public class NisMain {
 
 		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
 		for (int i = 0; i < txIds.length; ++i) {
-			final TransferTransaction transferTransaction = new TransferTransaction(genesisAccount, recipientsAccounts.get(i), amounts[i], null);
+			final TransferTransaction transferTransaction = ENTITY_FACTORY.createTransfer(
+                genesisAccount,
+                recipientsAccounts.get(i),
+                amounts[i],
+                null);
 			transferTransaction.setFee(0);
 			transferTransaction.sign();
 
@@ -176,8 +162,11 @@ public class NisMain {
 			int i = 0;
 			for (Transaction transaction : genesisBlock.getTransactions()) {
 				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
+
+				byte[] hash = HashUtils.calculateHash(transferTransaction);
 				Transfer t = new Transfer(
-						ByteUtils.bytesToLong(transferTransaction.getSignature().getBytes()),
+						ByteUtils.bytesToLong(hash),
+						hash,
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
@@ -202,8 +191,9 @@ public class NisMain {
 
 	private org.nem.core.dbmodel.Block populateGenesisBlock(Block genesisBlock, org.nem.core.dbmodel.Account a) {
 		org.nem.core.dbmodel.Block b = null;
-		System.out.println(HexEncoder.getString(genesisBlock.getHash()));
-		System.out.println(ByteUtils.bytesToLong(genesisBlock.getHash()));
+        byte[] genesisBlockHash = HashUtils.calculateHash(genesisBlock);
+		System.out.println(HexEncoder.getString(genesisBlockHash));
+		System.out.println(ByteUtils.bytesToLong(genesisBlockHash));
 
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
@@ -214,7 +204,7 @@ public class NisMain {
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					},
-					genesisBlock.getHash(),
+                    genesisBlockHash,
 					0, // timestamp 
 					a,
 					// proof

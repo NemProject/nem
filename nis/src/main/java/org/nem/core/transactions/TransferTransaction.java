@@ -20,13 +20,14 @@ public class TransferTransaction extends Transaction {
 	/**
 	 * Creates a transfer transaction.
 	 *
+     * @param timestamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
 	 * @param message The transaction message.
 	 */
-	public TransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-		super(TransactionTypes.TRANSFER, 1, sender);
+	public TransferTransaction(final int timestamp, final Account sender, final Account recipient, final long amount, final Message message) {
+		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.message = message;
@@ -78,7 +79,8 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	public boolean isValid() {
-        return this.amount >= 0
+		return super.isValid()
+			&& this.amount >= 0
             && this.getSigner().getBalance() >= this.amount + this.getFee()
             && this.getMessageLength() <= MAX_MESSAGE_SIZE;
     }

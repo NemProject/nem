@@ -10,6 +10,7 @@ public class MockTransaction extends Transaction {
 
     public static final int TYPE = 124;
     public static final int VERSION = 758;
+    public static final int TIMESTAMP = 1122448;
 
 	private int customField;
     private long minimumFee;
@@ -30,7 +31,7 @@ public class MockTransaction extends Transaction {
      * @param customField The initial custom field value.
      */
     public MockTransaction(final Account sender, final int customField) {
-		super(TYPE, VERSION, sender);
+		super(TYPE, VERSION, TIMESTAMP, sender);
         this.customField = customField;
     }
 
@@ -58,7 +59,9 @@ public class MockTransaction extends Transaction {
     public void setMinimumFee(final long minimumFee) { this.minimumFee = minimumFee; }
 
     @Override
-    public boolean isValid() { return true; }
+    public boolean isValid() {
+		return super.isValid();
+	}
 
     @Override
     protected long getMinimumFee() {

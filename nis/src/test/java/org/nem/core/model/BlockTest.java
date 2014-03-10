@@ -27,83 +27,13 @@ public class BlockTest {
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
-		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+        Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
+		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
     }
 
     //endregion
-
-	//region Hashing
-
-	@Test
-	public void identicalBlocksHaveSameHashes() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-
-		// Act:
-		byte[] hash1 = block1.getHash();
-		byte[] hash2 = block2.getHash();
-
-		// Assert:
-		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
-	}
-
-	@Test
-	public void differenBlocksHaveDifferentHashes() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME + 1, Genesis.INITIAL_HEIGHT);
-
-		// Act:
-		byte[] hash1 = block1.getHash();
-		byte[] hash2 = block2.getHash();
-
-		// Assert:
-		Assert.assertThat(hash1, IsNot.not(hash2));
-	}
-
-	@Test
-	public void signingDoesntChangeBlockHashes() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-
-		block1.sign();
-
-		// Act:
-		byte[] hash1 = block1.getHash();
-		byte[] hash2 = block2.getHash();
-
-		// Assert:
-		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
-	}
-
-	@Test
-	public void addingTransactionChangesBlockHash() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Block block1 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-		final Block block2 = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME + 1, Genesis.INITIAL_HEIGHT);
-
-		Transaction tx = createSignedTransactionWithAmount(100);
-		block1.addTransaction(tx);
-
-		// Act:
-		byte[] hash1 = block1.getHash();
-		byte[] hash2 = block2.getHash();
-
-		// Assert:
-		Assert.assertThat(hash1, IsNot.not(hash2));
-		Assert.assertThat(block1.getTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(block1.getTransactions().get(0), IsEqual.equalTo(tx));
-	}
-
-	//endregion
 
     //region Serialization
 
@@ -121,7 +51,8 @@ public class BlockTest {
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
-		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+        Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
+		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
 
 		final List<Transaction> transactions = block.getTransactions();
@@ -198,6 +129,7 @@ public class BlockTest {
 
     private TransferTransaction createSignedTransactionWithAmount(long amount) {
         TransferTransaction transaction = new TransferTransaction(
+            0,
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
             amount,
@@ -224,7 +156,7 @@ public class BlockTest {
         Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(17L));
-		Assert.assertThat(block.getTimestamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
+		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
     }
 

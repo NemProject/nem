@@ -16,6 +16,7 @@ public class Transfer {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private Long shortId;
+	private byte[] transferHash;
 	
 	private Integer version;
 	private Integer type;
@@ -49,6 +50,7 @@ public class Transfer {
 	
 	public Transfer(
 			Long shortId,
+			byte[] transferHash,
 			Integer version,
 			Integer type,
 			Long fee,
@@ -63,6 +65,7 @@ public class Transfer {
 			)
 	{
 		this.shortId = shortId;
+		this.transferHash = transferHash;
 		this.version = version;
 		this.type = type;
 		this.fee = fee;
@@ -90,6 +93,14 @@ public class Transfer {
 
 	public void setShortId(Long shortId) {
 		this.shortId = shortId;
+	}
+
+	public byte[] getTransferHash() {
+		return transferHash;
+	}
+
+	public void setTransferHash(byte[] transferHash) {
+		this.transferHash = transferHash;
 	}
 
 	public Integer getVersion() {
@@ -187,6 +198,4 @@ public class Transfer {
 	public void setBlock(Block block) {
 		this.block = block;
 	}
-	
-	
 }

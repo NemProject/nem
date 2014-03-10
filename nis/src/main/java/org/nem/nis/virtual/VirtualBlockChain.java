@@ -26,7 +26,7 @@ public class VirtualBlockChain {
 		return true;
 	}
 	public boolean add(NrsBlock nrsBlock, Block block, Account generator) {
-		int curTime = NisMain.getEpochTime(System.currentTimeMillis());
+		int curTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		Block lastVirtBlock = m_blockChain.getLast();
 		
 		System.out.print("yo, ho, hello there ");
