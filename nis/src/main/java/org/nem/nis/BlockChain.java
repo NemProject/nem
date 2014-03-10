@@ -1,10 +1,8 @@
 package org.nem.nis;
 
 
-import org.nem.core.model.ByteArray;
-import org.nem.core.model.HashUtils;
-import org.nem.core.model.Transaction;
-import org.springframework.stereotype.Component;
+import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.model.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -19,11 +17,16 @@ public class BlockChain {
 	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
+	// this should be somewhere else
+	private ConcurrentHashSet<Account> unlockedAccounts;
+
 	public BlockChain() {
-		unconfirmedTransactions = new ConcurrentHashMap<>();
+		this.unconfirmedTransactions = new ConcurrentHashMap<>();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 10, 10, TimeUnit.SECONDS);
+
+		this.unlockedAccounts = new ConcurrentHashSet<>();
 	}
 
 	public void bootup() {
@@ -57,11 +60,17 @@ public class BlockChain {
 		return true;
 	}
 
+	public void addUnlockedAccount(Account account) {
+		unlockedAccounts.add(account);
+	}
+
 	class BlockGenerator implements Runnable {
 
 		@Override
 		public void run() {
-			LOGGER.info("block generation" + Integer.toString(unconfirmedTransactions.size()) );
+
+
+			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 		}
 	}
 }
