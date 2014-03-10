@@ -14,6 +14,15 @@ public class SystemTimeProviderTest {
         Assert.assertThat(provider.getEpochTime(), IsEqual.equalTo(0));
     }
 
+	@Test
+	public void getCurrentTimeIsPositive() {
+		// Arrange:
+		TimeProvider provider = new SystemTimeProvider();
+
+		// Assert:
+		Assert.assertThat(provider.getCurrentTime() >= 0, IsEqual.equalTo(true));
+	}
+
     @Test
     public void getCurrentTimeReturnsExpectedTime() {
         // Act:

@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.BlockChain;
 
@@ -14,9 +15,10 @@ public class BlockChainTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final BlockChain blockChain = new BlockChain();
+		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(0, signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, 123, null);
 		transaction.sign();
 		boolean result = blockChain.processTransaction(transaction);
 
@@ -30,9 +32,10 @@ public class BlockChainTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final BlockChain blockChain = new BlockChain();
+		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(0, signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, 123, null);
 		transaction.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction);
