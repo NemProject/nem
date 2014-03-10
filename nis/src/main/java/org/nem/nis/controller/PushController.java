@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 @RestController
 public class PushController {
-	private static final Logger logger = Logger.getLogger(NcsMainController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
 
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
@@ -50,7 +50,7 @@ public class PushController {
 		} catch (ClassCastException e) {
 			return Utils.jsonError(1, "invalid json");
 		}
-		logger.info(par.toString());
+		LOGGER.info(par.toString());
 
 		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(accountAnalyzer));
 		Transaction transaction;
@@ -61,8 +61,8 @@ public class PushController {
 			return Utils.jsonError(1, "incorrect data");
 		}
 
-		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
-		logger.info("   verify: " + Boolean.toString(transaction.verify()));
+		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();

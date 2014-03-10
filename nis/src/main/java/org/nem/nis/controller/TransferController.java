@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 @RestController
 public class TransferController {
-	private static final Logger logger = Logger.getLogger(NcsMainController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
 
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
@@ -42,9 +42,9 @@ public class TransferController {
 		} catch (ClassCastException e) {
 			return Utils.jsonError(1, "invalid json");
 		}
-		logger.info(par.toString());
+		LOGGER.info(par.toString());
 
-		logger.info("threadId : " + Long.toString(Thread.currentThread().getId()) );
+		LOGGER.info("threadId : " + Long.toString(Thread.currentThread().getId()) );
 
 		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(accountAnalyzer));
 		TransferTransaction transferTransaction;
@@ -70,7 +70,7 @@ public class TransferController {
 	@RequestMapping(value="/transfer/announce", method = RequestMethod.POST)
 	public String transferAnnounce(@RequestBody String body) {
 		JSONObject par = (JSONObject) JSONValue.parse(body);
-		logger.info(par.toString());
+		LOGGER.info(par.toString());
 
 		JsonDeserializer jsonDeserializer = new JsonDeserializer(par, null);
 		RequestAnnounce requestAnnounce = new RequestAnnounce(jsonDeserializer);
@@ -85,9 +85,9 @@ public class TransferController {
 		}
 		transaction.setSignature(new Signature(requestAnnounce.getSignature()));
 
-		logger.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
-		logger.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
-		logger.info("   verify: " + Boolean.toString(transaction.verify()));
+		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("recipient: " + transaction.getRecipient().getAddress().getEncoded());
+		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();

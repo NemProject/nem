@@ -14,7 +14,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AccountAnalyzer implements AccountLookup {
-	private static final Logger logger = Logger.getLogger(AccountAnalyzer.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
 	@Autowired
 	private BlockDao blockDao;
@@ -67,7 +67,7 @@ public class AccountAnalyzer implements AccountLookup {
 	 */
 	public void analyze(Block curBlock) {
 		List<Transfer> txes = curBlock.getBlockTransfers();
-		logger.info("analyzing block: " + Long.toString(curBlock.getShortId()) + ", #tx " + Integer.toString(txes.size()));
+		LOGGER.info("analyzing block: " + Long.toString(curBlock.getShortId()) + ", #tx " + Integer.toString(txes.size()));
 
 		// add fee's to block forger
 		//
@@ -78,7 +78,7 @@ public class AccountAnalyzer implements AccountLookup {
 			addToBalanceAndUnconfirmedBalance(tx.getSender(), -(tx.getAmount() + tx.getFee()));
 			Account recipient = addToBalanceAndUnconfirmedBalance(tx.getRecipient(), tx.getAmount());
 
-			logger.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
+			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
 	}
 
@@ -127,7 +127,7 @@ public class AccountAnalyzer implements AccountLookup {
 	 */
 	@Override
 	public Account findByAddress(Address id) {
-		logger.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
+		LOGGER.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
 
 		if (! id.isValid()) {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());

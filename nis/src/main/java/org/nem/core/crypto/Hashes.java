@@ -9,7 +9,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * Static class that exposes hash functions.
  */
 public class Hashes {
-    private static final Logger logger = Logger.getLogger(Hashes.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Hashes.class.getName());
 
     static {
         Security.addProvider(new BouncyCastleProvider());

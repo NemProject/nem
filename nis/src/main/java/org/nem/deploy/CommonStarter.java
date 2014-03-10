@@ -42,7 +42,7 @@ import org.springframework.web.context.ContextLoaderListener;
 
 @WebListener
 public class CommonStarter implements ServletContextListener {
-	private static final Logger logger = Logger.getLogger(CommonStarter.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 	
 	public static final String VERSION = "0.1.0";
 	public static final String APP_NAME = "NIS";
@@ -51,7 +51,7 @@ public class CommonStarter implements ServletContextListener {
 
 
 	public static void main(String[] args) throws Exception {
-		logger.info("Starting embedded Jetty Server.");
+		LOGGER.info("Starting embedded Jetty Server.");
 
 		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
 		//JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
@@ -90,7 +90,7 @@ public class CommonStarter implements ServletContextListener {
         http.setIdleTimeout(30000);
         server.addConnector(http);
 
-		logger.info("Calling start().");
+		LOGGER.info("Calling start().");
 		server.start();
 		//
 		openStartPage();
@@ -117,16 +117,16 @@ public class CommonStarter implements ServletContextListener {
 			result = true;
 		} catch (ClassNotFoundException | NoClassDefFoundError ex) {
 		  // handle exception case
-			logger.info("JNLP not available, not started via WebStart. Assuming headless run.");
+			LOGGER.info("JNLP not available, not started via WebStart. Assuming headless run.");
 		} catch (NoSuchMethodException e) {
-			logger.log(Level.SEVERE, "Method reflection failed.", e);
+			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
 		} catch (InvocationTargetException e) {
-			logger.log(Level.INFO, "WebStart services failed: <" + e.getCause().getMessage() + ">. Not started via WebStart. Assuming headless run.");
+			LOGGER.log(Level.INFO, "WebStart services failed: <" + e.getCause().getMessage() + ">. Not started via WebStart. Assuming headless run.");
 		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
-			logger.log(Level.SEVERE, "Method reflection failed.", e);
+			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			logger.log(Level.SEVERE, "home URL incorrect", e);
+			LOGGER.log(Level.SEVERE, "home URL incorrect", e);
 		} 
 
 		return result;

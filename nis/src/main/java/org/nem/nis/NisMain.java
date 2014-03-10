@@ -28,7 +28,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 public class NisMain {
-	private static final Logger logger = Logger.getLogger(NisMain.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
     public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
     public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
@@ -67,7 +67,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
-		logger.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
+		LOGGER.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -226,7 +226,7 @@ public class NisMain {
 			b = blockDao.findByShortId(Genesis.BLOCK_ID);
 		}
 
-		logger.info("block id: " + b.getId().toString());
+		LOGGER.info("block id: " + b.getId().toString());
 		return b;
 	}
 
@@ -240,9 +240,9 @@ public class NisMain {
 		final byte[] genesisPublicKey = genesisAccount.getKeyPair().getPublicKey();
 		final Address genesisAddress = Address.fromPublicKey(genesisPublicKey);
 
-		logger.info("genedis account private key: " + HexEncoder.getString(genesisAccount.getKeyPair().getPrivateKey().toByteArray()));
-		logger.info("genesis account            public key: " + HexEncoder.getString(genesisPublicKey));
-		logger.info("genesis account compressed public key: " + genesisAddress.getEncoded());
+		LOGGER.info("genesis account private key: " + HexEncoder.getString(genesisAccount.getKeyPair().getPrivateKey().toByteArray()));
+		LOGGER.info("genesis account            public key: " + HexEncoder.getString(genesisPublicKey));
+		LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
 
 		org.nem.core.dbmodel.Account a = null;
 		if (accountDao.count() == 0) {
@@ -250,11 +250,11 @@ public class NisMain {
 			accountDao.save(a);
 
 		} else {
-			logger.warning("account counts: " + accountDao.count().toString());
+			LOGGER.warning("account counts: " + accountDao.count().toString());
 			a = accountDao.getAccountByPrintableAddress(genesisAddress.getEncoded());
 		}
 
-		logger.info("account id: " + a.getId().toString());
+		LOGGER.info("account id: " + a.getId().toString());
 		return a;
 	}
 }

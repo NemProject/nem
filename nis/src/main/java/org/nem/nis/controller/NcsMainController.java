@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class NcsMainController {
-	private static final Logger logger = Logger.getLogger(NcsMainController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
 	
     @RequestMapping(value="/nis", method = RequestMethod.POST)
     public String index(@RequestBody String body) throws IOException
     {
-    	logger.info(body);
+    	LOGGER.info(body);
     	
     	return "forward:/error";
     }
