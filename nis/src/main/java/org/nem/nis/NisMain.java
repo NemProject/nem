@@ -67,7 +67,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
-		logger.warning("context ================== epoch: " + Long.toHexString(epochBeginning) + " current: " + Long.toHexString(getEpochTime()));
+		logger.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
 
 		/** 
 		 * Thies1965, something is still wrong with my set-up
@@ -163,7 +163,7 @@ public class NisMain {
 			for (Transaction transaction : genesisBlock.getTransactions()) {
 				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
 
-				byte[] hash = transferTransaction.getHash();
+				byte[] hash = HashUtils.calculateHash(transferTransaction);
 				Transfer t = new Transfer(
 						ByteUtils.bytesToLong(hash),
 						hash,

@@ -16,7 +16,7 @@ public class BlockChainTest {
 		final BlockChain blockChain = new BlockChain();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(0, signer, recipient, 123, null);
 		transaction.sign();
 		boolean result = blockChain.processTransaction(transaction);
 
@@ -32,7 +32,7 @@ public class BlockChainTest {
 		final BlockChain blockChain = new BlockChain();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(0, signer, recipient, 123, null);
 		transaction.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction);

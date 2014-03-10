@@ -3,6 +3,7 @@ package org.nem.nis;
 
 import org.nem.core.dao.TransferDao;
 import org.nem.core.dbmodel.Block;
+import org.nem.core.model.HashUtils;
 import org.nem.core.model.Hashcode;
 import org.nem.core.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,13 @@ public class BlockChain {
 	 */
 	public boolean processTransaction(Transaction transaction) {
 
-		int currentTime = NisMain.getEpochTime();
+		int currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		// rest is checked by isValid()
 		if (transaction.getTimestamp() > currentTime + 30) {
 			return false;
 		}
 
-		Hashcode transactionHash = new Hashcode(transaction.getHash());
+		Hashcode transactionHash = new Hashcode(HashUtils.calculateHash(transaction));
 
 		synchronized (BlockChain.class) {
 			// TODO: check if transaction isn't already in DB

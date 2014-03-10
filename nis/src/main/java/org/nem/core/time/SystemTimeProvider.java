@@ -15,7 +15,7 @@ public class SystemTimeProvider implements TimeProvider {
         calendar.set(Calendar.ERA, 0);
         calendar.set(Calendar.YEAR, 2014);
         calendar.set(Calendar.MONTH, 3);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 9);
         calendar.set(Calendar.HOUR, 12);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);

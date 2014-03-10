@@ -2,10 +2,8 @@ package org.nem.core.nis.controller;
 
 import net.minidev.json.JSONObject;
 import org.apache.commons.codec.DecoderException;
-import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.nem.core.model.MessageTypes;
 import org.nem.core.model.TransactionTypes;
@@ -16,7 +14,6 @@ import org.nem.core.utils.HexEncoder;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.security.InvalidParameterException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 

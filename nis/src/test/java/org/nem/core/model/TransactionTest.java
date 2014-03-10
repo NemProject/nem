@@ -28,24 +28,6 @@ public class TransactionTest {
     }
 
 	@Test
-	public void differentTransactionsHaveDifferentHashes() {
-		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
-
-		// Act:
-		final MockTransaction t1 = new MockTransaction(signer, 6);
-		final MockTransaction t2 = new MockTransaction(signer, 7);
-
-		// Assert:
-		Assert.assertThat(t1.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(t2.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(t1.getCustomField(), IsEqual.equalTo(6));
-		Assert.assertThat(t2.getCustomField(), IsEqual.equalTo(7));
-		Assert.assertThat(t1.getHash(), IsNot.not(IsEqual.equalTo(t2.getHash())));
-	}
-
-	@Test
 	public void transactionWithWrongDeadlineIsInvalid() {
 		// Arrange:
 		final KeyPair publicPrivateKeyPair = new KeyPair();
