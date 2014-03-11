@@ -59,7 +59,18 @@ public class HttpMethodClient {
      * Issues a HTTP POST response.
      *
      * @param url The url.
-     * @param requestData The request data
+     * @param entity The request data.
+     * @return The response from the server.
+     */
+    public JsonDeserializer post(final URL url, final SerializableEntity entity) {
+        return this.post(url, JsonSerializer.serializeToJson(entity));
+    }
+
+    /**
+     * Issues a HTTP POST response.
+     *
+     * @param url The url.
+     * @param requestData The request data.
      * @return The response from the server.
      */
     public JsonDeserializer post(final URL url, final JSONObject requestData) {

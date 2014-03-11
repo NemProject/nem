@@ -1,9 +1,9 @@
 package org.nem.peer.net;
 
-import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.test.MockSerializableEntity;
 import org.nem.peer.*;
 
 import java.net.URL;
@@ -58,7 +58,7 @@ public class HttpMethodClientTest {
         final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
 
         // Act:
-        JsonDeserializer deserializer = client.post(new URL(GOOD_URL), new JSONObject());
+        JsonDeserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity());
 
         // Assert:
         Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -72,7 +72,7 @@ public class HttpMethodClientTest {
         final HttpMethodClient client = new HttpMethodClient(0);
 
         // Act:
-        client.post(new URL(GOOD_URL), new JSONObject());
+        client.post(new URL(GOOD_URL), new MockSerializableEntity());
     }
 
     @Test(expected = FatalPeerException.class)
@@ -81,7 +81,7 @@ public class HttpMethodClientTest {
         final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
 
         // Act:
-        client.post(new URL(MALFORMED_URI), new JSONObject());
+        client.post(new URL(MALFORMED_URI), new MockSerializableEntity());
     }
 
     //endregion

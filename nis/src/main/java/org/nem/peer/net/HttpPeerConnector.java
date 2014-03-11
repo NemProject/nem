@@ -1,7 +1,6 @@
 package org.nem.peer.net;
 
-import org.nem.core.model.Transaction;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
 import java.net.*;
@@ -34,9 +33,9 @@ public class HttpPeerConnector implements PeerConnector {
         return new NodeCollection(this.httpMethodClient.get(url));
     }
 
-	@Override
-	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_PUSH_TRANSACTION);
-        this.httpMethodClient.post(url, JsonSerializer.serializeToJson(transaction));
-	}
+    @Override
+    public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+        final URL url = endpoint.getApiUrl(announceId);
+        this.httpMethodClient.post(url, entity);
+    }
 }

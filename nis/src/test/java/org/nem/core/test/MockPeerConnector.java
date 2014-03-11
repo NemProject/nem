@@ -22,11 +22,11 @@ public class MockPeerConnector {
         this.httpMethodClient = new HttpMethodClient(30);
 	}
 
-	public JsonDeserializer transferPrepare(JSONObject transferPrepareData) throws MalformedURLException {
+	public JsonDeserializer transferPrepare(final JSONObject transferPrepareData) throws MalformedURLException {
         return this.post("transfer/prepare", transferPrepareData);
 	}
 
-	public JsonDeserializer pushTransaction(JSONObject transferData) throws MalformedURLException {
+	public JsonDeserializer pushTransaction(final JSONObject transferData) throws MalformedURLException {
 		return this.post("push/transaction", transferData);
 	}
 

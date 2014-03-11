@@ -1,6 +1,6 @@
 package org.nem.peer;
 
-import org.nem.core.model.Transaction;
+import org.nem.core.serialization.SerializableEntity;
 
 import java.util.*;
 
@@ -50,12 +50,16 @@ public class PeerNetwork {
         refresher.refresh();
     }
 
-	//
-	public void announceTransaction(Transaction transaction) {
-		for (final Node node : nodes.getActiveNodes()) {
-			this.connector.pushTransaction(node.getEndpoint(), transaction);
-		}
-	}
+    /**
+     * Broadcasts an entity to all active nodes.
+     *
+     * @param broadcastId The type of entity.
+     * @param entity The entity.
+     */
+    public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+        for (final Node node : this.nodes.getActiveNodes())
+            this.connector.announce(node.getEndpoint(), broadcastId, entity);
+    }
 
 	private static class NodeRefresher {
         final NodeCollection nodes;
@@ -69,8 +73,8 @@ public class PeerNetwork {
         }
 
         public void refresh() {
-            this.refresh(nodes.getActiveNodes());
-            this.refresh(nodes.getInactiveNodes());
+            this.refresh(this.nodes.getActiveNodes());
+            this.refresh(this.nodes.getInactiveNodes());
 
             for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
                 this.nodes.update(entry.getKey(), entry.getValue());

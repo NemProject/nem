@@ -20,7 +20,7 @@ public enum NodeApiId {
     REST_NODE_PEER_LIST,
 
 	/**
-	 * Transaction announcement
+	 * Transaction announcement.
 	 */
 	REST_PUSH_TRANSACTION,
 
