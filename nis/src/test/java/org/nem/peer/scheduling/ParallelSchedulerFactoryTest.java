@@ -1,17 +1,17 @@
-package org.nem.peer;
+package org.nem.peer.scheduling;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.util.*;
 
-public class ParallelSchedulerTest {
+public class ParallelSchedulerFactoryTest {
 
     @Test
     public void tasksAreExecutedOnDifferentThreads() {
         // Arrange:
         final SleepAction action = new SleepAction(5);
-        final ParallelScheduler<Integer> scheduler = new ParallelScheduler<>(2, action);
+        final Scheduler<Integer> scheduler = createScheduler(action);
 
         // Act:
         scheduler.push(Arrays.asList(1, 2));
@@ -27,7 +27,7 @@ public class ParallelSchedulerTest {
     public void tasksCanBePushedMultipleTimes() {
         // Arrange:
         final SleepAction action = new SleepAction(5);
-        final ParallelScheduler<Integer> scheduler = new ParallelScheduler<>(2, action);
+        final Scheduler<Integer> scheduler = createScheduler(action);
 
         // Act:
         scheduler.push(Arrays.asList(1, 2));
@@ -42,7 +42,7 @@ public class ParallelSchedulerTest {
     public void pushIsNonBlocking() {
         // Arrange:
         final BlockAction action = new BlockAction();
-        final ParallelScheduler<Integer> scheduler = new ParallelScheduler<>(2, action);
+        final Scheduler<Integer> scheduler = createScheduler(action);
 
         // Act:
         scheduler.push(Arrays.asList(1, 2));
@@ -60,7 +60,7 @@ public class ParallelSchedulerTest {
     public void blockBlocksUntilAllTasksAreComplete() {
         // Arrange:
         final SleepAction action = new SleepAction(100);
-        final ParallelScheduler<Integer> scheduler = new ParallelScheduler<>(2, action);
+        final Scheduler<Integer> scheduler = createScheduler(action);
 
         // Act:
         scheduler.push(Arrays.asList(1, 2));
@@ -74,7 +74,7 @@ public class ParallelSchedulerTest {
     public void pushCannotBeCalledAfterBlock() {
         // Arrange:
         final SleepAction action = new SleepAction(5);
-        final ParallelScheduler<Integer> scheduler = new ParallelScheduler<>(2, action);
+        final Scheduler<Integer> scheduler = createScheduler(action);
 
         // Act:
         scheduler.block();
@@ -84,9 +84,15 @@ public class ParallelSchedulerTest {
         Assert.assertThat(action.getThreadIds().size(), IsEqual.equalTo(2));
     }
 
+    private static Scheduler<Integer> createScheduler(final Action<Integer> action) {
+        // Arrange:
+        final SchedulerFactory<Integer> factory = new ParallelSchedulerFactory<>(2);
+        return factory.createScheduler(action);
+    }
+
     //region BlockAction
 
-    private static class BlockAction implements ParallelScheduler.Action<Integer> {
+    private static class BlockAction implements Action<Integer> {
 
         private final Object monitor;
         private final List<Long> threadIds;
@@ -127,7 +133,7 @@ public class ParallelSchedulerTest {
 
     //region SleepAction
 
-    private static class SleepAction implements ParallelScheduler.Action<Integer> {
+    private static class SleepAction implements Action<Integer> {
 
         final int sleepMillis;
         final List<Long> threadIds;
