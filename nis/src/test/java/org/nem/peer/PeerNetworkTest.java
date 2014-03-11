@@ -63,7 +63,7 @@ public class PeerNetworkTest {
     public void getLocalNodeReturnsConfigLocalNode() {
         // Act:
         final Config config = createTestConfig();
-        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector());
+        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory());
 
         // Assert:
         Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
@@ -350,7 +350,7 @@ public class PeerNetworkTest {
     //region factories
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-        return new PeerNetwork(createTestConfig(), connector);
+        return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory());
     }
 
     private static PeerNetwork createTestNetwork() {

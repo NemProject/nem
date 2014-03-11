@@ -82,7 +82,7 @@ public class PeerNetworkHostTest {
         int numRefreshCalls;
 
         public MockPeerNetwork() {
-            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector());
+            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory());
         }
 
         public int getNumRefreshCalls() { return this.numRefreshCalls; }

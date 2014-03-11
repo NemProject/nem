@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.scheduling.*;
 
 import java.util.*;
 
@@ -12,17 +13,20 @@ public class PeerNetwork {
     private final Config config;
     private NodeCollection nodes;
     private final PeerConnector connector;
+    private final SchedulerFactory<Node> schedulerFactory;
 
     /**
      * Creates a new network with the specified configuration.
      *
      * @param config The network configuration.
      * @param connector The peer connector to use.
+     * @param schedulerFactory The node scheduler factory to use.
      */
-    public PeerNetwork(final Config config, final PeerConnector connector) {
+    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
         this.config = config;
         this.nodes = new NodeCollection();
         this.connector = connector;
+        this.schedulerFactory = schedulerFactory;
 
         for (final NodeEndpoint endpoint : config.getWellKnownPeers())
             nodes.update(new Node(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
@@ -46,7 +50,7 @@ public class PeerNetwork {
      * Refreshes the network.
      */
     public void refresh() {
-        final NodeRefresher refresher = new NodeRefresher(this.nodes, this.connector);
+        final NodeRefresher refresher = new NodeRefresher(this.nodes, this.connector, this.schedulerFactory);
         refresher.refresh();
     }
 
@@ -57,8 +61,7 @@ public class PeerNetwork {
      * @param entity The entity.
      */
     public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-        // TODO: hack that needs to be cleaned up!!!
-        ParallelScheduler<Node> scheduler = new ParallelScheduler<>(10, new ParallelScheduler.Action<Node>() {
+        Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
             @Override
             public void execute(final Node element) {
                 connector.announce(element.getEndpoint(), broadcastId, entity);
@@ -72,17 +75,18 @@ public class PeerNetwork {
 	private static class NodeRefresher {
         final NodeCollection nodes;
         final PeerConnector connector;
+        final SchedulerFactory<Node> schedulerFactory;
         final Map<Node, NodeStatus> nodesToUpdate;
 
-        public NodeRefresher(final NodeCollection nodes, final PeerConnector connector) {
+        public NodeRefresher(final NodeCollection nodes, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
             this.nodes = nodes;
             this.connector = connector;
+            this.schedulerFactory = schedulerFactory;
             this.nodesToUpdate = new HashMap<>();
         }
 
         public void refresh() {
-            // TODO: hack that needs to be cleaned up!!!
-            ParallelScheduler<Node> scheduler = new ParallelScheduler<>(10, new ParallelScheduler.Action<Node>() {
+            Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
                 @Override
                 public void execute(final Node element) {
                     refreshNode(element);
