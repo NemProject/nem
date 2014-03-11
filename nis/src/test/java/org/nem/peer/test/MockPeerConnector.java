@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.core.model.Transaction;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
 import java.net.URL;
@@ -12,6 +12,7 @@ public class MockPeerConnector implements PeerConnector {
 
     private int numGetInfoCalls;
     private int numGetKnownPeerCalls;
+    private int numAnnounceCalls;
 
     private String getInfoErrorTrigger;
     private TriggerAction getInfoErrorTriggerAction;
@@ -19,7 +20,12 @@ public class MockPeerConnector implements PeerConnector {
     private String getKnownPeersErrorTrigger;
     private TriggerAction getKnownPeersErrorTriggerAction;
 
+    private NodeApiId lastAnnounceId;
+    private SerializableEntity lastAnnounceEntity;
+
     private NodeCollection knownPeers = new NodeCollection();
+
+    //region TriggerAction
 
     /**
      * Possible actions that can be triggered.
@@ -46,17 +52,42 @@ public class MockPeerConnector implements PeerConnector {
         CHANGE_ADDRESS
     }
 
+    //endregion
+
     /**
      * Gets the number of times getInfo was called.
+     *
      * @return The number of times getInfo was called.
      */
     public int getNumGetInfoCalls() { return this.numGetInfoCalls; }
 
     /**
      * Gets the number of times getKnownPeers was called.
+     *
      * @return The number of times getKnownPeers was called.
      */
     public int getNumGetKnownPeerCalls() { return this.numGetKnownPeerCalls; }
+
+    /**
+     * Gets the number of times announce was called.
+     *
+     * @return The number of times announce was called.
+     */
+    public int getNumAnnounceCalls() { return this.numAnnounceCalls; }
+
+    /**
+     * Gets the last announcement id passed to announce.
+     *
+     * @return The last announcement id passed to announce.
+     */
+    public NodeApiId getLastAnnounceId() { return this.lastAnnounceId; }
+
+    /**
+     * Gets the last entity passed to announce.
+     *
+     * @return The last entity passed to announce.
+     */
+    public SerializableEntity getLastAnnounceEntity() { return this.lastAnnounceEntity; }
 
     /**
      * Triggers a specific action in getInfo.
@@ -108,7 +139,7 @@ public class MockPeerConnector implements PeerConnector {
 
     @Override
     public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
-        ++numGetKnownPeerCalls;
+        ++this.numGetKnownPeerCalls;
 
         if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
             triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
@@ -116,10 +147,12 @@ public class MockPeerConnector implements PeerConnector {
         return this.knownPeers;
     }
 
-	@Override
-	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction) {
-		throw new RuntimeException("unhandled pushTransaction");
-	}
+    @Override
+    public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+        ++this.numAnnounceCalls;
+        this.lastAnnounceId = announceId;
+        this.lastAnnounceEntity = entity;
+    }
 
     private static boolean shouldTriggerAction(final NodeEndpoint endpoint, final String trigger) {
         return endpoint.getBaseUrl().getHost().equals(trigger);

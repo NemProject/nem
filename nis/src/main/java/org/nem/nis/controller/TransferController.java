@@ -10,8 +10,8 @@ import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
-//import org.nem.peer.v2.PeerNetwork;
 import org.nem.nis.BlockChain;
+import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,7 +95,7 @@ public class TransferController {
 			if (blockChain.processTransaction(transaction)) {
 
 				// propagate transactions
-				peerNetworkHost.getNetwork().announceTransaction(transaction);
+				peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
 			}
 
 			return Utils.jsonOk();

@@ -1,6 +1,6 @@
 package org.nem.peer;
 
-import org.nem.core.model.Transaction;
+import org.nem.core.serialization.SerializableEntity;
 
 import java.util.*;
 
@@ -50,12 +50,24 @@ public class PeerNetwork {
         refresher.refresh();
     }
 
-	//
-	public void announceTransaction(Transaction transaction) {
-		for (final Node node : nodes.getActiveNodes()) {
-			this.connector.pushTransaction(node.getEndpoint(), transaction);
-		}
-	}
+    /**
+     * Broadcasts an entity to all active nodes.
+     *
+     * @param broadcastId The type of entity.
+     * @param entity The entity.
+     */
+    public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+        // TODO: hack that needs to be cleaned up!!!
+        ParallelScheduler<Node> scheduler = new ParallelScheduler<>(10, new ParallelScheduler.Action<Node>() {
+            @Override
+            public void execute(final Node element) {
+                connector.announce(element.getEndpoint(), broadcastId, entity);
+            }
+        });
+
+        scheduler.push(this.nodes.getActiveNodes());
+        scheduler.block();
+    }
 
 	private static class NodeRefresher {
         final NodeCollection nodes;
@@ -69,16 +81,20 @@ public class PeerNetwork {
         }
 
         public void refresh() {
-            this.refresh(nodes.getActiveNodes());
-            this.refresh(nodes.getInactiveNodes());
+            // TODO: hack that needs to be cleaned up!!!
+            ParallelScheduler<Node> scheduler = new ParallelScheduler<>(10, new ParallelScheduler.Action<Node>() {
+                @Override
+                public void execute(final Node element) {
+                    refreshNode(element);
+                }
+            });
+
+            scheduler.push(this.nodes.getActiveNodes());
+            scheduler.push(this.nodes.getInactiveNodes());
+            scheduler.block();
 
             for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
                 this.nodes.update(entry.getKey(), entry.getValue());
-        }
-
-        private void refresh(final Iterable<Node> iterable) {
-            for (final Node node : iterable)
-                this.refreshNode(node);
         }
 
         private void refreshNode(final Node node) {

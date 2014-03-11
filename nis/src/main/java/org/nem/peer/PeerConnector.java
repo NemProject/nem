@@ -1,6 +1,6 @@
 package org.nem.peer;
 
-import org.nem.core.model.Transaction;
+import org.nem.core.serialization.SerializableEntity;
 
 /**
  * A interface that is used to request information from nodes.
@@ -23,8 +23,12 @@ public interface PeerConnector {
      */
     public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
 
-	/**
-	 * Not sure if this is proper place for this
-	 */
-	public void pushTransaction(final NodeEndpoint endpoint, final Transaction transaction);
+    /**
+     * Announces a new entity to the target node.
+     *
+     * @param endpoint The endpoint.
+     * @param announceId The type of announcement.
+     * @param entity The entity to announce.
+     */
+    public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
 }

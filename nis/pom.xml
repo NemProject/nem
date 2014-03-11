@@ -240,8 +240,6 @@
                     <driverClassName>org.h2.Driver</driverClassName>
                     <hibernateDialect>org.hibernate.dialect.H2Dialect</hibernateDialect>
                     <url><![CDATA[jdbc:h2:nis]]></url>
-                    <username></username>
-                    <password></password>
 				</configuration>
 			</plugin>
 

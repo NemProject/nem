@@ -2,6 +2,8 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.test.MockSerializableEntity;
 import org.nem.peer.test.*;
 
 public class PeerNetworkTest {
@@ -294,6 +296,53 @@ public class PeerNetworkTest {
             nodes,
             new String[]{ "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
             new String[]{ "10.0.0.7", "10.0.0.11" });
+    }
+
+    //endregion
+
+    //region broadcast
+
+    @Test
+    public void broadcastDoesNotCallAnnounceForAnyInactiveNode() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        // Act:
+        network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
+
+        // Assert:
+        Assert.assertThat(connector.getNumAnnounceCalls(), IsEqual.equalTo(0));
+    }
+
+    @Test
+    public void broadcastCallsAnnounceForAllActiveNodes() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+
+        // Act:
+        network.refresh(); // transition all nodes to active
+        network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
+
+        // Assert:
+        Assert.assertThat(connector.getNumAnnounceCalls(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void broadcastForwardsParametersToAnnounce() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        final SerializableEntity entity = new MockSerializableEntity();
+
+        // Act:
+        network.refresh(); // transition all nodes to active
+        network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, entity);
+
+        // Assert:
+        Assert.assertThat(connector.getLastAnnounceId(), IsEqual.equalTo(NodeApiId.REST_PUSH_TRANSACTION));
+        Assert.assertThat(connector.getLastAnnounceEntity(), IsEqual.equalTo(entity));
     }
 
     //endregion
