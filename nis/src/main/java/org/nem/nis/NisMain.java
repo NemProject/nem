@@ -69,12 +69,6 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
 
-		/** 
-		 * Thies1965, something is still wrong with my set-up
-		 * I get an SQL exception
-		 * Just for my testing purposes, I commented the next lines out
-		 */
-		
 		populateDb();
 
 		blockAnalyzer = new BlockAnalyzer();
