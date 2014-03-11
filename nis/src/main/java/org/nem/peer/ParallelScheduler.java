@@ -2,11 +2,13 @@ package org.nem.peer;
 
 import java.util.Collection;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParallelScheduler<T> {
 
     final ThreadPoolExecutor executor;
     final Action<T> action;
+    final AtomicBoolean canPush;
 
     /**
      * Creates a new parallel scheduler.
@@ -22,9 +24,13 @@ public class ParallelScheduler<T> {
             TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>());
         this.action = action;
+        this.canPush = new AtomicBoolean(true);
     }
 
     public void push(final Collection<T> elements) {
+        if (!this.canPush.get())
+            throw new IllegalStateException("Cannot call push after block");
+
         for (final T element : elements)
             this.executor.execute(new Runnable() {
                 @Override
@@ -35,7 +41,9 @@ public class ParallelScheduler<T> {
     }
 
     public void block() {
+        this.canPush.set(false);
         this.executor.shutdown();
+
         try {
             this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         }
