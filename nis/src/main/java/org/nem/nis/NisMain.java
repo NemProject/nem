@@ -45,8 +45,6 @@ public class NisMain {
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-	BlockAnalyzer blockAnalyzer;
-
 	public NisMain() {
 	}
 
@@ -55,11 +53,11 @@ public class NisMain {
 		org.nem.core.dbmodel.Block curBlock;
 		System.out.println("starting analysis...");
 		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
-			blockAnalyzer.analyze(curBlock);
 			accountAnalyzer.analyze(curBlock);
 
 			curBlockId = curBlock.getNextBlockId();
 			if (curBlockId == null) {
+				BlockChain.MAIN_CHAIN.analyzeLastBlock(curBlock);
 				break;
 			}
 		}
@@ -70,8 +68,6 @@ public class NisMain {
 		LOGGER.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
 
 		populateDb();
-
-		blockAnalyzer = new BlockAnalyzer();
 
 		analyzeBlocks();
 

@@ -23,7 +23,7 @@ public class EntityFactoryTest {
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-        Assert.assertThat(block.getHeight(), IsEqual.equalTo(12));
+        Assert.assertThat(block.getHeight(), IsEqual.equalTo(12L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
         Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(11890));
     }
