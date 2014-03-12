@@ -5,6 +5,8 @@ import org.junit.*;
 import org.nem.core.test.*;
 import org.nem.peer.test.*;
 
+import java.util.Iterator;
+
 public class NodeCollectionTest {
 
     //region basic partitioning
@@ -194,6 +196,38 @@ public class NodeCollectionTest {
         // Assert:
         NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[]{ "A", "F" }, new String[]{ "B", "C", "Z" });
         NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { (int)'A', (int)'F' }, new Integer[]{ (int)'B', (int)'C', (int)'D' });
+    }
+
+    //endregion
+
+    //region concurrency
+
+    @Test
+    public void getActiveNodesIsConcurrencySafe() {
+        // Arrange: partially iterate the set
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+        Iterator<Node> it = nodes.getActiveNodes().iterator();
+        it.next();
+
+        // Act: update the set and resume the iteration
+        nodes.update(createNode("Z"), NodeStatus.ACTIVE);
+        it.next();
+
+        // Assert: no ConcurrentModificationException is thrown
+    }
+
+    @Test
+    public void getInactiveNodesIsConcurrencySafe() {
+        // Arrange: partially iterate the set
+        final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+        Iterator<Node> it = nodes.getInactiveNodes().iterator();
+        it.next();
+
+        // Act: update the set and resume the iteration
+        nodes.update(createNode("Z"), NodeStatus.INACTIVE);
+        it.next();
+
+        // Assert: no ConcurrentModificationException is thrown
     }
 
     //endregion
