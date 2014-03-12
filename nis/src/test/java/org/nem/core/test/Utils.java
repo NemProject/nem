@@ -167,4 +167,31 @@ public class Utils {
         originalEntity.serialize(jsonSerializer);
         return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
     }
+
+    /**
+     * Waits on the specified monitor.
+     *
+     * @param monitor The monitor.
+     */
+    public static void monitorWait(final Object monitor) {
+        synchronized (monitor) {
+            try {
+                monitor.wait();
+            }
+            catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    /**
+     * Signals the specified monitor.
+     *
+     * @param monitor The monitor.
+     */
+    public static void monitorSignal(final Object monitor) {
+        synchronized (monitor) {
+            monitor.notifyAll();
+        }
+    }
 }

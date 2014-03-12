@@ -4,7 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.MockTransaction;
+import org.nem.core.test.Utils;
+import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
+
+import java.util.*;
 
 public class PeerNetworkTest {
 
@@ -63,7 +68,7 @@ public class PeerNetworkTest {
     public void getLocalNodeReturnsConfigLocalNode() {
         // Act:
         final Config config = createTestConfig();
-        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector());
+        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory());
 
         // Assert:
         Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
@@ -347,10 +352,121 @@ public class PeerNetworkTest {
 
     //endregion
 
+    //region threading
+
+    @Test
+    public void broadcastAndRefreshCanBeAccessedConcurrently() throws Exception {
+
+        class TestRunner {
+
+            final MockPeerConnector connector = new MockPeerConnector();
+
+            // configure a MockScheduler to be returned by the second (broadcast) createScheduler request
+            // (the first request is for the network call that initially makes everything active)
+            final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory(new MockScheduler(), 1);
+            final PeerNetwork network = new PeerNetwork(createTestConfig(), connector, schedulerFactory);
+            final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
+
+            // monitor that is signaled when MockScheduler.push is entered
+            final Object schedulerPartialIterationMonitor = new Object();
+
+            // monitor that is signaled when the network refresh operation is complete
+            final Object networkRefreshCompleteMonitor = new Object();
+
+            public TestRunner() {
+                // Arrange: mark all nodes as active
+                this.network.refresh();
+
+                // Arrange: configure the next network call to return new nodes (so the connector needs to be updated)
+                NodeCollection knownPeers = new NodeCollection();
+                knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
+                knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
+                connector.setKnownPeers(knownPeers);
+            }
+
+            public List<Throwable> getExceptions() { return this.exceptions; }
+
+            public void run() throws InterruptedException {
+                // Act: trigger broadcast operation on a different thread
+                Thread broadcastThread = startThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockTransaction(Utils.generateRandomAccount()));
+                    }
+                });
+
+                // Act: wait for the scheduler to partially iterate the collection
+                Utils.monitorWait(this.schedulerPartialIterationMonitor);
+
+                // Act: trigger refresh on a different thread
+                Thread refreshThread = startThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        network.refresh();
+                    }
+                });
+
+                // Act: wait for the refresh to complete
+                refreshThread.join();
+
+                // Act: signal the broadcast thread and let it complete
+                Utils.monitorSignal(this.networkRefreshCompleteMonitor);
+                broadcastThread.join();
+            }
+
+            Thread startThread(final Runnable runnable) {
+                Thread t = new Thread(runnable);
+                t.setUncaughtExceptionHandler(new UncaughtExceptionHandler());
+                t.start();
+                return t;
+            }
+
+            class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+                @Override
+                public void uncaughtException(Thread t, Throwable e) {
+                    exceptions.add(e);
+                }
+            }
+
+            class MockScheduler implements Scheduler<Node> {
+                @Override
+                public void push(final Collection<Node> elements) {
+                    // Act: Perform a partial iteration and move to the first element
+                    final Iterator<Node> it = elements.iterator();
+                    it.next();
+
+                    // Arrange: unblock the main thread since the mock scheduler has been created and used
+                    Utils.monitorSignal(schedulerPartialIterationMonitor);
+
+                    // Act:
+                    Utils.monitorWait(networkRefreshCompleteMonitor);
+
+                    // Act: move to the next element
+                    it.next();
+                }
+
+                @Override
+                public void block() {
+                }
+            }
+        }
+
+        // Arrange:
+        final TestRunner runner = new TestRunner();
+
+        // Act:
+        runner.run();
+
+        // Assert:
+        Assert.assertThat(0, IsEqual.equalTo(runner.getExceptions().size()));
+    }
+
+    //endregion
+
     //region factories
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-        return new PeerNetwork(createTestConfig(), connector);
+        return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory());
     }
 
     private static PeerNetwork createTestNetwork() {

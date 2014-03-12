@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.nem.core.serialization.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents a collection of nodes.
@@ -23,8 +24,8 @@ public class NodeCollection implements SerializableEntity {
      * Creates a node collection.
      */
     public NodeCollection() {
-        this.activeNodes = new HashSet<>();
-        this.inactiveNodes = new HashSet<>();
+        this.activeNodes = createSet();
+        this.inactiveNodes = createSet();
     }
 
     /**
@@ -33,8 +34,14 @@ public class NodeCollection implements SerializableEntity {
      * @param deserializer The deserializer.
      */
     public NodeCollection(final Deserializer deserializer) {
-        this.activeNodes = new HashSet<>(deserializer.readObjectArray("active", NODE_DESERIALIZER));
-        this.inactiveNodes = new HashSet<>(deserializer.readObjectArray("inactive", NODE_DESERIALIZER));
+        this.activeNodes = createSet();
+        this.activeNodes.addAll(deserializer.readObjectArray("active", NODE_DESERIALIZER));
+        this.inactiveNodes = createSet();
+        this.inactiveNodes.addAll(deserializer.readObjectArray("inactive", NODE_DESERIALIZER));
+    }
+
+    private static Set<Node> createSet() {
+        return Collections.newSetFromMap(new ConcurrentHashMap<Node, Boolean>());
     }
 
     /**
