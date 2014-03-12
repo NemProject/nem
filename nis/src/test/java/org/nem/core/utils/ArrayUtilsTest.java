@@ -1,12 +1,51 @@
 package org.nem.core.utils;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
 
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
 
-public class ArrayUtilsTest {
+	public class ArrayUtilsTest {
+	//region duplicate
+	@Test
+	public void duplicateIsNotReference() {
+		// Arrange:
+		byte[] src = new byte[] {1,2,3,4};
+
+		// Act:
+		byte[] result = ArrayUtils.duplicate(src);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsSame.sameInstance(src)));
+	}
+
+	@Test
+	public void duplicateIsEqual() {
+		// Arrange:
+		byte[] src1 = new byte[] {1,2,3,4};
+		byte[] src2 = new byte[] {};
+
+		// Act:
+		byte[] result1 = ArrayUtils.duplicate(src1);
+		byte[] result2 = ArrayUtils.duplicate(src2);
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(src1));
+		Assert.assertThat(result2, IsEqual.equalTo(src2));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void duplicateThrowsExceptionOnNull() {
+		// Arrange:
+		byte[] src = null;
+
+		// Act:
+		byte[] result = ArrayUtils.duplicate(src);
+	}
+	//endregion duplicate
 
     //region concat
 
