@@ -1,5 +1,7 @@
 package org.nem.peer.scheduling;
 
+import org.nem.core.utils.ExceptionUtils;
+
 import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,7 +66,7 @@ public class ParallelSchedulerFactory<T> implements SchedulerFactory<T> {
                 this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e) {
-                throw new IllegalStateException(e);
+                throw ExceptionUtils.toUnchecked(e);
             }
         }
     }
