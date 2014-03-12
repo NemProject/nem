@@ -26,6 +26,9 @@ public class AccountController {
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
+	@Autowired
+	private BlockChain blockChain;
+
 	@RequestMapping(value="/account/unlock", method = RequestMethod.POST)
 	public String accountUnlock(@RequestBody String body) {
 		JSONObject par;
@@ -42,7 +45,7 @@ public class AccountController {
 		try {
 			byte[] privatekey = deserializer.readBytes("privatekey");
 			account = new Account(new KeyPair(new BigInteger(privatekey)));
-			BlockChain.MAIN_CHAIN.addUnlockedAccount(account);
+			blockChain.addUnlockedAccount(account);
 
 		} catch (MissingResourceException |InvalidParameterException |NullPointerException e) {
 			return Utils.jsonError(1, "incorrect data");

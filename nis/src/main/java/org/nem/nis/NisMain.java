@@ -45,6 +45,9 @@ public class NisMain {
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
+	@Autowired
+	private BlockChain blockChain;
+
 	public NisMain() {
 	}
 
@@ -57,7 +60,7 @@ public class NisMain {
 
 			curBlockId = curBlock.getNextBlockId();
 			if (curBlockId == null) {
-				BlockChain.MAIN_CHAIN.analyzeLastBlock(curBlock);
+				blockChain.analyzeLastBlock(curBlock);
 				break;
 			}
 		}
@@ -73,7 +76,7 @@ public class NisMain {
 
 		PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
-		BlockChain.MAIN_CHAIN.bootup();
+		blockChain.bootup();
 	}
 
 	private void populateDb() {

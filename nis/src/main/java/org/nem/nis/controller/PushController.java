@@ -37,7 +37,8 @@ public class PushController {
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
-	private BlockChain blockChain = BlockChain.MAIN_CHAIN;
+	@Autowired
+	private BlockChain blockChain;
 
 	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
 	public String pushEntity(@RequestBody String body)

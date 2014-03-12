@@ -30,7 +30,8 @@ public class TransferController {
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
-	private BlockChain blockChain = BlockChain.MAIN_CHAIN;
+	@Autowired
+	private BlockChain blockChain;
 
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody String body) {

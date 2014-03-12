@@ -6,9 +6,11 @@ import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.utils.ArrayUtils;
 import org.nem.core.utils.HexEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -18,7 +20,9 @@ import java.util.logging.Logger;
 
 public class BlockChain {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
-	public static BlockChain MAIN_CHAIN = new BlockChain();
+
+	@Autowired
+	private AccountAnalyzer accountAnalyzer;
 
 	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
@@ -26,9 +30,11 @@ public class BlockChain {
 	// this should be somewhere else
 	private ConcurrentHashSet<Account> unlockedAccounts;
 
-	//
+	// for now it's easier to keep it like this
 	private byte[] lastBlockHash;
 	private Long lastBlockHeight;
+	private byte[] lastBlockSignature;
+	private int lastBlockTimestamp;
 
 
 	public BlockChain() {
@@ -48,8 +54,10 @@ public class BlockChain {
 	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 
-		lastBlockHash = curBlock.getBlockHash();
+		lastBlockHash = ArrayUtils.duplicate(curBlock.getBlockHash());
 		lastBlockHeight = curBlock.getHeight();
+		lastBlockSignature = ArrayUtils.duplicate(curBlock.getForgerProof());
+		lastBlockTimestamp = curBlock.getTimestamp();
 	}
 
 	/**
@@ -83,10 +91,30 @@ public class BlockChain {
 		unlockedAccounts.add(account);
 	}
 
+	public byte[] getLastBlockHash() {
+		return lastBlockHash;
+	}
+
+	public Long getLastBlockHeight() {
+		return lastBlockHeight;
+	}
+
+	public byte[] getLastBlockSignature() {
+		return lastBlockSignature;
+	}
+
+	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
+		return unconfirmedTransactions;
+	}
+
 	class BlockGenerator implements Runnable {
 
 		@Override
 		public void run() {
+			if (lastBlockHash == null) {
+				return;
+			}
+
 			if (unconfirmedTransactions.size() == 0) {
 				return;
 			}
@@ -115,9 +143,31 @@ public class BlockChain {
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
-					// TODO: add some dummy forging rule
+					// dummy forging rule
 
-					// forged = true;
+					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
+					Account realAccout = accountAnalyzer.findByAddress(forger.getAddress());
+					if (realAccout.getBalance() < 1) {
+						continue;
+					}
+
+					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlockSignature, 2, 10));
+					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp() - lastBlockTimestamp).multiply(
+							BigInteger.valueOf(realAccout.getBalance()).multiply(
+									BigInteger.valueOf(30745)
+							)
+					);
+
+					System.out.println("hit: " + hit.toString());
+					System.out.println("hit: 0x" + hit.toString(16));
+					System.out.println("hit: 0x" + target.toString(16));
+					System.out.println("hit: " + target.toString());
+
+					if (hit.compareTo(target) < 0) {
+						System.out.println(" HIT ");
+						//forged = true;
+					}
+
 				}
 
 				if (forged) {
