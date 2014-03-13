@@ -36,6 +36,18 @@ public class MockTransaction extends Transaction {
     }
 
     /**
+     * Creates a mock transaction.
+     *
+     * @param sender The transaction sender's account.
+     * @param customField The initial custom field value.
+     * @param timestamp The desired timestamp.
+     */
+    public MockTransaction(final Account sender, final int customField, final int timestamp) {
+        super(TYPE, VERSION, TIMESTAMP, sender);
+        this.customField = customField;
+    }
+
+    /**
      * Deserializes a MockTransaction.
      *
      * @param deserializer The deserializer to use.

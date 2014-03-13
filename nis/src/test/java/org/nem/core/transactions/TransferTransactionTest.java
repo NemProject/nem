@@ -157,6 +157,17 @@ public class TransferTransactionTest {
     //region Valid
 
     @Test
+    public void isValidChecksSuperValidity() {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        Transaction transaction = new TransferTransaction(-1, signer, recipient, 1, null);
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+    }
+
+    @Test
     public void transactionsWithNonNegativeAmountAreValid() {
         // Assert:
         Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));

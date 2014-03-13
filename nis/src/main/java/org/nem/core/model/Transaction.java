@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.Hashes;
 import org.nem.core.serialization.*;
 
 /**
@@ -52,22 +51,19 @@ public abstract class Transaction extends VerifiableEntity {
 	public void setFee(final long fee) { this.fee = fee; }
 
 	/**
-	 * Gets transaction deadline (in seconds since NEM EPOCH)
+	 * Gets the deadline.
 	 *
-	 * @return
+	 * @return The deadline.
 	 */
-	public int getDeadline() {
-		return deadline;
-	}
+	public int getDeadline() { return this.deadline; }
 
 	/**
-	 * Sets transaction deadline (in seconds since NEM EPOCH)
+	 * Sets the deadline.
 	 *
-	 * @param deadline
+	 * @param deadline The desired deadline.
 	 */
-	public void setDeadline(int deadline) {
-		this.deadline = deadline;
-	}
+	public void setDeadline(int deadline) { this.deadline = deadline; }
+
 	//endregion
 
 	@Override
@@ -89,7 +85,10 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-		return this.getTimeStamp() >= 0 && this.deadline > this.getTimeStamp() && (this.deadline - this.getTimeStamp()) < 24*60*60;
+		return this.getTimeStamp() >= 0
+            && this.deadline > this.getTimeStamp()
+            //&& (this.deadline - this.getTimeStamp()) < 24*60*60;
+        ;
 	}
 
 	/**
