@@ -103,6 +103,7 @@ public class NodeEndpoint implements SerializableEntity {
             nodeApiToUrlMap.put(NodeApiId.REST_ADD_PEER, new URL(this.url, "peer/new"));
             nodeApiToUrlMap.put(NodeApiId.REST_NODE_PEER_LIST, new URL(this.url, "node/peer-list"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
+			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
             nodeApiToUrlMap.put(NodeApiId.REST_CHAIN, new URL(this.url, "chain"));
             return nodeApiToUrlMap;
 

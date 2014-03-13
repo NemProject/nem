@@ -24,6 +24,11 @@ public enum NodeApiId {
 	 */
 	REST_PUSH_TRANSACTION,
 
+	/**
+	 * Block announcement.
+	 */
+	REST_PUSH_BLOCK,
+
     /**
      * The chain API.
      */

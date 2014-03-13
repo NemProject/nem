@@ -185,6 +185,9 @@ public class BlockChain {
 
 				if (bestBlock != null) {
 					unconfirmedTransactions.clear();
+
+					PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+					peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
 				}
 			}
 		}
