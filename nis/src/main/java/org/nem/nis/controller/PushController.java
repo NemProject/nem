@@ -3,12 +3,14 @@ package org.nem.nis.controller;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.VerifiableEntity;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
+import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +43,7 @@ public class PushController {
 	private BlockChain blockChain;
 
 	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
-	public String pushEntity(@RequestBody String body)
+	public String pushTransaction(@RequestBody String body)
 	{
 		JSONObject par;
 		try {
@@ -68,10 +70,9 @@ public class PushController {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
 			// add to unconfirmed transactions
-			blockChain.processTransaction(transaction);
-
-			// TODO: propagate transactions
-			//peerNetworkHost.getNetwork().announceTransaction(transaction);
+			if (blockChain.processTransaction(transaction)) {
+				peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+			}
 			return Utils.jsonOk();
 		}
 

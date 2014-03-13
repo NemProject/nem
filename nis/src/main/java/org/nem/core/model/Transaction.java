@@ -9,7 +9,6 @@ import org.nem.core.serialization.*;
 public abstract class Transaction extends VerifiableEntity {
 
 	private long fee;
-	private int timestamp;
 	private int deadline;
 
 	/**
@@ -33,7 +32,6 @@ public abstract class Transaction extends VerifiableEntity {
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
 		this.fee = deserializer.readLong("fee");
-		this.timestamp = deserializer.readInt("timestamp");
 		this.deadline = deserializer.readInt("deadline");
 	}
 
@@ -52,24 +50,6 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @param fee The desired fee.
 	 */
 	public void setFee(final long fee) { this.fee = fee; }
-
-	/**
-	 * Gets transaction timestamp
-	 *
-	 * @return transaction timestamp
-	 */
-	public int getTimestamp() {
-		return timestamp;
-	}
-
-	/**
-	 * Sets transaction timestamp (in seconds since NEM EPOCH)
-	 *
-	 * @param timestamp
-	 */
-	public void setTimestamp(int timestamp) {
-		this.timestamp = timestamp;
-	}
 
 	/**
 	 * Gets transaction deadline (in seconds since NEM EPOCH)
@@ -93,7 +73,6 @@ public abstract class Transaction extends VerifiableEntity {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeLong("fee", this.getFee());
-		serializer.writeInt("timestamp", this.getTimestamp());
 		serializer.writeInt("deadline", this.getDeadline());
 	}
 
@@ -110,7 +89,7 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-		return this.timestamp >= 0 && this.deadline > this.timestamp && (this.deadline - this.timestamp) < 24*60*60;
+		return this.getTimeStamp() >= 0 && this.deadline > this.getTimeStamp() && (this.deadline - this.getTimeStamp()) < 24*60*60;
 	}
 
 	/**

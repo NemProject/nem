@@ -73,7 +73,7 @@ public class BlockChain {
 
 		int currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		// rest is checked by isValid()
-		if (transaction.getTimestamp() > currentTime + 30) {
+		if (transaction.getTimeStamp() > currentTime + 30) {
 			return false;
 		}
 

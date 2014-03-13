@@ -194,7 +194,7 @@ public class TransferTransactionTest {
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
         transaction.setFee(fee);
-		transaction.setDeadline(transaction.getTimestamp() + 1);
+		transaction.setDeadline(transaction.getTimeStamp() + 1);
 
         // Act:
         return transaction.isValid();
@@ -221,7 +221,7 @@ public class TransferTransactionTest {
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
-		transaction.setDeadline(transaction.getTimestamp() + 1);
+		transaction.setDeadline(transaction.getTimeStamp() + 1);
 
 		// Act:
         return transaction.isValid();

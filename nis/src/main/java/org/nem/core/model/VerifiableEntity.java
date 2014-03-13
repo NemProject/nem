@@ -29,7 +29,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     private final int version;
     private final int type;
     private final Account signer;
-    private final int timestamp;
+    private int timestamp;
     private Signature signature;
 
     //region Constructors
@@ -101,7 +101,16 @@ public abstract class VerifiableEntity implements SerializableEntity {
      */
     public int getTimeStamp() { return this.timestamp; }
 
-    /**
+	/**
+	 * Sets the entity timestamp.
+	 *
+	 * @param timestamp
+	 */
+	public void setTimeStamp(int timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	/**
      * Gets the signature.
      *
      * @return The signature.
