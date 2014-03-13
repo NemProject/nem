@@ -7,7 +7,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.utils.ArrayUtils;
+import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
+import org.nem.nis.controller.Utils;
+import org.nem.peer.NodeApiId;
+import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -134,7 +138,8 @@ public class BlockChain {
 					totalFee += transaction.getFee();
 				}
 
-				boolean forged = false;
+				Block bestBlock = null;
+				long bestScore = Long.MAX_VALUE;
 				for (Account forger : unlockedAccounts) {
 					Block newBlock = new Block(forger, lastBlockHash, NisMain.TIME_PROVIDER.getCurrentTime(), lastBlockHeight + 1);
 					newBlock.setTransactions(transactionList, totalFee);
@@ -165,12 +170,20 @@ public class BlockChain {
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
-						//forged = true;
+
+						long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(newBlock.getSignature().getBytes(), 10, 14)));
+						long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(newBlock), 10, 14)));
+
+						long score = r1 + r2;
+						if (score < bestScore) {
+							bestBlock = newBlock;
+							bestScore = score;
+						}
 					}
 
 				}
 
-				if (forged) {
+				if (bestBlock != null) {
 					unconfirmedTransactions.clear();
 				}
 			}
