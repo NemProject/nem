@@ -7,27 +7,31 @@ import java.util.*;
 
 /**
  * A NEM block.
+ *
+ * The forger is an alias for the signer.
+ * The forger proof is the signature.
  */
 public class Block extends VerifiableEntity {
-	private byte[] prevBlockHash;
-	// forger == signer
-	// forgerProof = signature
-    // private byte[] generationHash; // hash(prevBlockHash || signer pubKey)
-	private long height; // unsure yet, but probably will be easier to talk on forums having that
 
-	// I think it can be worth to keep fee here, discrepancies
-	// might be one more 'input' for trust
+    private final static int BLOCK_TYPE = 1;
+    private final static int BLOCK_VERSION = 1;
+
+	private final byte[] prevBlockHash;
+	private long height; // unsure yet, but probably will be easier to talk on forums having that
 	private long totalFee;
 
-    private List<Transaction> transactions;
+    private final List<Transaction> transactions;
 
     /**
      * Creates a new block.
      *
      * @param forger The forger.
+     * @param prevBlockHash The hash of the previous block.
+     * @param timestamp The block timestamp.
+     * @param height The block height.
      */
-    public Block(final Account forger, final byte[] prevBlockHash, int timestamp, long height) {
-        super(1, 1, timestamp, forger);
+    public Block(final Account forger, final byte[] prevBlockHash, int timestamp, final long height) {
+        super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
         this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
@@ -50,19 +54,12 @@ public class Block extends VerifiableEntity {
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
     }
 
-    /**
-     * Gets the transactions associated with this block.
-     *
-     * @return The transactions associated with this block.
-     */
-    public List<Transaction> getTransactions() {
-        return this.transactions;
-    }
+    //region Getters
 
 	/**
-	 * Gets the height of this block in the blockchain.
+	 * Gets the height of this block in the block chain.
 	 *
-	 * @return height of this block in the blockchain.
+	 * @return The height of this block in the block chain.
 	 */
 	public long getHeight() {
 		return height;
@@ -71,25 +68,9 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Gets total amount of fees of all transactions stored in this block.
 	 *
-     * @return total amount of fees of all transactions stored in this block.
+     * @return The total amount of fees of all transactions stored in this block.
      */
-    public long getTotalFee() {
-//        long fee = 0;
-//        for (Transaction transaction : this.transactions)
-//            fee += transaction.getFee();
-//
-//        return fee;
-		return this.totalFee;
-    }
-
-	/**
-	 * Sets total amount of fees of all transactions stored in this block.
-	 *
-	 * @param totalFee - total amount of fees
-	 */
-	public void setTotalFee(long totalFee) {
-		this.totalFee = totalFee;
-	}
+    public long getTotalFee() { return this.totalFee; }
 
 	/**
      * Gets the hash of the previous block.
@@ -97,6 +78,16 @@ public class Block extends VerifiableEntity {
      * @return The hash of the previous block.
      */
     public byte[] getPreviousBlockHash() { return this.prevBlockHash; }
+
+
+    /**
+     * Gets the transactions associated with this block.
+     *
+     * @return The transactions associated with this block.
+     */
+    public List<Transaction> getTransactions() { return this.transactions; }
+
+    //endregion
 
     /**
      * Adds a new transaction to this block.
@@ -108,11 +99,21 @@ public class Block extends VerifiableEntity {
 		this.totalFee += transaction.getFee();
     }
 
-	public void setTransactions(final  List<Transaction> transactions, long totalFee) {
-		this.transactions = transactions;
-		this.totalFee = totalFee;
+    /**
+     * Adds new transactions to this block.
+     *
+     * @param transactions The transactions to add.
+     */
+	public void addTransactions(final List<Transaction> transactions) {
+        for (final Transaction transaction : transactions)
+            this.addTransaction(transaction);
 	}
 
+    /**
+     * Determines if this block is valid.
+     *
+     * @return true if this block is valid.
+     */
 	public boolean isValid() {
 		return this.getTimeStamp() >= 0;
 	}
@@ -120,7 +121,6 @@ public class Block extends VerifiableEntity {
     @Override
     protected void serializeImpl(Serializer serializer) {
 		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
-
 		serializer.writeLong("height", this.height);
 		serializer.writeLong("totalFee", this.totalFee);
 

@@ -5,9 +5,8 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.nis.Genesis;
 
-import java.util.List;
+import java.util.*;
 
 public class BlockTest {
 
@@ -20,16 +19,17 @@ public class BlockTest {
         final Account signer = Utils.generateRandomAccount();
 
         // Act:
-        final Block block = new Block(signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+        final Block block = createBlock(signer);
 
         // Assert:
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(7));
+
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
     }
 
@@ -49,11 +49,11 @@ public class BlockTest {
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(7));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
 
 		final List<Transaction> transactions = block.getTransactions();
         Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
@@ -103,32 +103,32 @@ public class BlockTest {
 
     private Block createBlockForRoundTripTests(boolean verifiable, final Account signer) {
         // Arrange:
-        final Block originalBlock = new Block(null == signer ? Utils.generateRandomAccount() : signer, DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-        TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
+        final Block originalBlock = createBlock(null == signer ? Utils.generateRandomAccount() : signer);
+        final TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
         originalBlock.addTransaction(transaction1);
 
-        TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
+        final TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
         originalBlock.addTransaction(transaction2);
         originalBlock.sign();
 
         // Arrange:
-        MockAccountLookup accountLookup = new MockAccountLookup();
+        final MockAccountLookup accountLookup = new MockAccountLookup();
         accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(originalBlock.getSigner()));
         accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(transaction1.getSigner()));
         accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(transaction2.getSigner()));
 
         // Act:
-        SerializableEntity entity = verifiable ? originalBlock : originalBlock.asNonVerifiable();
-        VerifiableEntity.DeserializationOptions options = verifiable
+        final SerializableEntity entity = verifiable ? originalBlock : originalBlock.asNonVerifiable();
+        final VerifiableEntity.DeserializationOptions options = verifiable
             ? VerifiableEntity.DeserializationOptions.VERIFIABLE
             : VerifiableEntity.DeserializationOptions.NON_VERIFIABLE;
 
-        Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
+        final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
         return new Block(deserializer.readInt("type"), options, deserializer);
     }
 
     private TransferTransaction createSignedTransactionWithAmount(long amount) {
-        TransferTransaction transaction = new TransferTransaction(
+        final TransferTransaction transaction = new TransferTransaction(
             0,
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
@@ -143,10 +143,10 @@ public class BlockTest {
     //region Transaction
 
     @Test
-    public void transactionsCanBeAddedToBlock() {
+    public void singleTransactionCanBeAddedToBlock() {
         // Arrange:
-        Block block = new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-        Transaction transaction = createTransactionWithFee(17);
+        final Block block = createBlock();
+        final Transaction transaction = createTransactionWithFee(17);
 
         // Act:
         block.addTransaction(transaction);
@@ -154,12 +154,24 @@ public class BlockTest {
         // Assert:
         Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(1));
         Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
-
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(17L));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(Genesis.INITIAL_TIME));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(Genesis.INITIAL_HEIGHT));
     }
 
+    @Test
+    public void multipleTransactionsCanBeAddedToBlock() {
+        // Arrange:
+        final Block block = createBlock();
+        final List<Transaction> transactions = new ArrayList<>();
+        transactions.add(createTransactionWithFee(17));
+        transactions.add(createTransactionWithFee(11));
+
+        // Act:
+        block.addTransactions(transactions);
+
+        // Assert:
+        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(2));
+        Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transactions.get(0)));
+        Assert.assertThat((block.getTransactions().get(1)), IsEqual.equalTo(transactions.get(1)));
+    }
 
     //endregion
 
@@ -168,13 +180,31 @@ public class BlockTest {
     @Test
     public void blockFeeIsSumOfTransactionFees() {
         // Arrange:
-        Block block = new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
+        final Block block = createBlock();
         block.addTransaction(createTransactionWithFee(17));
         block.addTransaction(createTransactionWithFee(11));
+        block.addTransactions(Arrays.asList(createTransactionWithFee(3), createTransactionWithFee(50)));
         block.addTransaction(createTransactionWithFee(22));
 
         // Assert:
-        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(50L));
+        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(103L));
+    }
+
+    //endregion
+
+    //region Valid
+
+    @Test
+    public void blockWithNegativeTimestampIsInvalid() {
+        // Arrange:
+        Assert.assertThat(createBlockWithTimestamp(-1).isValid(), IsEqual.equalTo(false));
+    }
+
+    @Test
+    public void blockWithNonNegativeTimestampIsValid() {
+        // Arrange:
+        Assert.assertThat(createBlockWithTimestamp(0).isValid(), IsEqual.equalTo(true));
+        Assert.assertThat(createBlockWithTimestamp(1).isValid(), IsEqual.equalTo(true));
     }
 
     //endregion
@@ -185,5 +215,20 @@ public class BlockTest {
         MockTransaction transaction = new MockTransaction(sender);
         transaction.setFee(fee);
         return transaction;
+    }
+
+    private static Block createBlock(final Account forger) {
+        // Arrange:
+        return new Block(forger, DUMMY_PREVIOUS_HASH, 7, 3);
+    }
+
+    private static Block createBlock() {
+        // Arrange:
+        return createBlock(Utils.generateRandomAccount());
+    }
+
+    private static Block createBlockWithTimestamp(final int timestamp) {
+        // Arrange:
+        return new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, timestamp, 3);
     }
 }

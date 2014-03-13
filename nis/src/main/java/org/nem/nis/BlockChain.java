@@ -130,23 +130,18 @@ public class BlockChain {
 			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 			List<Transaction> transactionList;
-			long totalFee = 0;
-
 			// because of access to unconfirmedTransactions, and lastBlock*
 			synchronized (BlockChain.class) {
 				// first prepare
 				Set<Transaction> sortedTransactions = new HashSet<>(unconfirmedTransactions.values());
 				LOGGER.warning("hello: " + Integer.toString(sortedTransactions.size()));
 				transactionList = new ArrayList<>(sortedTransactions);
-				for (Transaction transaction : transactionList) {
-					totalFee += transaction.getFee();
-				}
 
 				Block bestBlock = null;
 				long bestScore = Long.MAX_VALUE;
 				for (Account forger : unlockedAccounts) {
 					Block newBlock = new Block(forger, lastBlockHash, NisMain.TIME_PROVIDER.getCurrentTime(), lastBlockHeight + 1);
-					newBlock.setTransactions(transactionList, totalFee);
+					newBlock.addTransactions(transactionList);
 
 					newBlock.sign();
 
