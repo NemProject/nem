@@ -111,6 +111,10 @@ public class BlockChain {
 		return unconfirmedTransactions;
 	}
 
+	public boolean processBlock(Block block) {
+		return false;
+	}
+
 	class BlockGenerator implements Runnable {
 
 		@Override

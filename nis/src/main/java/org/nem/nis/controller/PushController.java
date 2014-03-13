@@ -2,6 +2,8 @@ package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.nem.core.model.Block;
+import org.nem.core.model.BlockFactory;
 import org.nem.core.model.Transaction;
 import org.nem.core.model.VerifiableEntity;
 import org.nem.core.serialization.DeserializationContext;
@@ -66,6 +68,7 @@ public class PushController {
 		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
+		// TODO: THERE'S NO CHECK FOR TIMESTAMP "LIMIT" YET
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
@@ -77,5 +80,43 @@ public class PushController {
 		}
 
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
+	}
+
+	@RequestMapping(value="/push/block", method = RequestMethod.POST)
+	public String pushBlock(@RequestBody String body)
+	{
+		JSONObject par;
+		try {
+			par = (JSONObject) JSONValue.parse(body);
+
+		} catch (ClassCastException e) {
+			return Utils.jsonError(1, "invalid json");
+		}
+		LOGGER.info(par.toString());
+
+		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(accountAnalyzer));
+		Block block;
+		try {
+			block = BlockFactory.VERIFIABLE.deserialize(deserializer);
+
+		} catch (MissingResourceException|InvalidParameterException|NullPointerException e) {
+			return Utils.jsonError(1, "incorrect data");
+		}
+
+		LOGGER.info("   signer: " + HexEncoder.getString(block.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
+
+		if (block.isValid() && block.verify()) {
+			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+
+			// validate block, add to chain
+			blockChain.processBlock(block);
+
+			// TODO: propagate block
+			//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+			return Utils.jsonOk();
+		}
+
+		return Utils.jsonError(2, "block couldn't be verified " + Boolean.toString(block.verify()));
 	}
 }

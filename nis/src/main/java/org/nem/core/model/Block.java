@@ -113,6 +113,10 @@ public class Block extends VerifiableEntity {
 		this.totalFee = totalFee;
 	}
 
+	public boolean isValid() {
+		return this.getTimeStamp() >= 0;
+	}
+
     @Override
     protected void serializeImpl(Serializer serializer) {
 		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
