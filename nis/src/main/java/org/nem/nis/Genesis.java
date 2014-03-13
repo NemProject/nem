@@ -8,14 +8,14 @@ import java.math.BigInteger;
 
 public class Genesis {
 	// ByteUtils.bytesToLong(genesisBlock.getHash())
-	final static long BLOCK_ID = 0x6C70183459B3CDB2L;
+	final public static long BLOCK_ID = 0x6C70183459B3CDB2L;
 
 	//final static String CREATOR_PASS = "Remember, remember, the fifth of November, Gunpowder Treason and Plot";
 	// final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger( Hashes.sha3(StringEncoder.getBytes(CREATOR_PASS)) );
 
 	// this will be removed later, only public key will be present in the code
 	// all signatures will be pre-generated and placed in-code
-	final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger(HexEncoder.getBytesSilent("aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04"));
+	final public static BigInteger CREATOR_PRIVATE_KEY = new BigInteger(HexEncoder.getBytesSilent("aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04"));
 
 //	Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
 //	Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
@@ -26,7 +26,7 @@ public class Genesis {
 //	Hashes.sha3(StringEncoder.getBytes("Makoto")),
 //	Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
 //	Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
-	final static String[] RECIPIENT_IDS = {
+	final public static String[] RECIPIENT_IDS = {
 			"NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
 			"NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
 			"NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
