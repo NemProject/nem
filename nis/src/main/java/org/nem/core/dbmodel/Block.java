@@ -31,7 +31,6 @@ public class Block {
     @JoinColumn(name="forgerId")
 	private Account forger;
 	private byte[] forgerProof;
-	private byte[] blockSignature;
 	
 	private Long height;
 	
@@ -67,7 +66,6 @@ public class Block {
 		this.timestamp = timestamp;
 		this.forger = forger;
 		this.forgerProof = forgerProof;
-		this.blockSignature = blockSignature;
 		this.height = height;
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
@@ -135,14 +133,6 @@ public class Block {
 
 	public void setForgerProof(byte[] forgerProof) {
 		this.forgerProof = forgerProof;
-	}
-
-	public byte[] getBlockSignature() {
-		return blockSignature;
-	}
-
-	public void setBlockSignature(byte[] blockSignature) {
-		this.blockSignature = blockSignature;
 	}
 
 	public Long getHeight() {
