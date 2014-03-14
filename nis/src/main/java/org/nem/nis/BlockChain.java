@@ -141,10 +141,77 @@ public class BlockChain {
 		return unconfirmedTransactions;
 	}
 
+
+	/**
+	 * Checks if passed block is correct, and if eligible adds it to db
+	 *
+	 * @param block - block that's going to be processed
+	 * @return false if block was known or invalid, true if ok and added to db
+	 */
 	public boolean processBlock(Block block) {
 		byte[] blockHash = HashUtils.calculateHash(block);
-		org.nem.core.dbmodel.Block b = blockDao.findByHash(blockHash);
-		throw new RuntimeException("not yet done");
+
+		// block already seen
+		if (blockDao.findByHash(blockHash) != null) {
+			return false;
+		}
+
+		// check if we know previous block
+		byte[] parentHash = block.getPreviousBlockHash();
+		org.nem.core.dbmodel.Block parent = blockDao.findByHash(parentHash);
+
+		// if we don't have parent, we can't do anything with this block
+		if (parent == null) {
+			return false;
+		}
+
+		if (block.getTimeStamp() < parent.getTimestamp()) {
+			return false;
+		}
+
+		// we have parent, check if it has child
+		if (parent.getNextBlockId() != null) {
+			org.nem.core.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
+			// TODO: compare block score, if analyzed block is better, rollback block(s) from db
+			if (child != null) {
+				return false;
+			}
+		}
+
+		// TODO: can't apply it now, cause right now we don't generate empty blocks.
+//		if (block.getTimeStamp() > parent.getTimestamp() + 20*30) {
+//			return false;
+//		}
+
+		// TODO: WARNING: as for now this method processes only blocks
+		// that have been sent directly, so we can add quite strict rule here
+		int currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		if (block.getTimeStamp() > currentTime + 30*60) {
+			return false;
+		}
+
+
+		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
+		if (forgerAccount.getBalance() < 1) {
+			return false;
+		}
+
+		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
+		BigInteger target = BigInteger.valueOf(block.getTimeStamp() - parent.getTimestamp()).multiply(
+				BigInteger.valueOf(forgerAccount.getBalance()).multiply(
+						BigInteger.valueOf(30745)
+				)
+		);
+
+		if (hit.compareTo(target) >= 0) {
+			return false;
+		}
+
+		throw new RuntimeException("not yet finished");
+
+		// 1. add block to db
+		// 2. remove transactions from unconfirmed transactions.
+		// run account analyzer?
 	}
 
 
