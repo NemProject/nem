@@ -1,6 +1,7 @@
 package org.nem.core.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -8,7 +9,10 @@ import javax.transaction.Transactional;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SelectBeforeUpdate;
 import org.nem.core.dbmodel.Block;
+import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +30,25 @@ public class BlockDaoImpl implements BlockDao
 	@Transactional
 	public void save(Block block) {
 		getCurrentSession().saveOrUpdate(block);
+	}
+
+	/*
+	 * I was trying to do that, by marking Block with:
+	 * "@DynamicUpdate" and "@SelectBeforeUpdate", and indeed,
+	 * only nextBlockId was updated, but apart from that also all associated
+	 * transfers and block_transfers table. That is unacceptable of course.
+	 *
+	 * If anyone will figure how to do that we could get rid of this.
+	 */
+	@Override
+	@Transactional
+	public void updateLastBlockId(Block block) {
+		Query updateId = getCurrentSession().createQuery("UPDATE Block " +
+				"set nextBlockId = :nextBlockId " +
+				"where id = :blockId");
+		updateId.setParameter("nextBlockId", block.getNextBlockId());
+		updateId.setParameter("blockId", block.getId());
+		updateId.executeUpdate();
 	}
 
 	@Override
@@ -46,5 +69,27 @@ public class BlockDaoImpl implements BlockDao
                 return (Block)userList.get(0);
         else
                 return null;  
+	}
+
+	/**
+	 * First try to find block using "shortId",
+	 * than find proper block in software.
+	 */
+	@Override
+	@Transactional
+	public Block findByHash(byte[] blockHash) {
+		long blockId = ByteUtils.bytesToLong(blockHash);
+		List<?> userList;
+		Query query = getCurrentSession()
+				.createQuery("from Block a where a.shortId = :id")
+				.setParameter("id", blockId);
+		userList = query.list();
+		for (int i = 0; i<userList.size(); ++i) {
+			Block block = (Block) userList.get(i);
+			if (Arrays.equals(blockHash, block.getBlockHash())) {
+				return block;
+			}
+		}
+		return null;
 	}
 }

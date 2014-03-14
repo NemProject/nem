@@ -1,13 +1,6 @@
 package org.nem.core.dbmodel;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity  
 @Table(name="transfers") 
@@ -38,7 +31,7 @@ public class Transfer {
 	private Long amount;
 	private Long referencedTransaction;
 	
-	@ManyToOne()
+	@ManyToOne(fetch= FetchType.LAZY)
     @JoinTable(name="block_transfers",
         joinColumns = {@JoinColumn(name="transfer_id", referencedColumnName="id")},  
         inverseJoinColumns = {@JoinColumn(name="block_id", referencedColumnName="id")}  

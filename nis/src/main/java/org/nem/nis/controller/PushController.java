@@ -68,7 +68,7 @@ public class PushController {
 		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
-		// TODO: THERE'S NO CHECK FOR TIMESTAMP "LIMIT" YET
+		// transaction timestamp is checked inside processTransaction
 		if (transaction.isValid() && transaction.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 

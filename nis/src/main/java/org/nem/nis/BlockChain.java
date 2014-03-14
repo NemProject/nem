@@ -2,14 +2,17 @@ package org.nem.nis;
 
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.dao.AccountDao;
+import org.nem.core.dao.BlockDao;
+import org.nem.core.dao.TransferDao;
 import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ArrayUtils;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
-import org.nem.nis.controller.Utils;
 import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +25,27 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+//
+// Initial logic is as follows:
+//   * we recieve new TX, IF it hasn't been seen,
+//     it is added to unconfirmedTransactions,
+//   * blockGeneratorExecutor periodically tries to generate a block containing
+//     unconfirmed transactions
+//   * if it succeeded, block is added to the db and propagated to the network
+//
+// fork resolution should solve the rest
+//
 public class BlockChain {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+
+	@Autowired
+	private AccountDao accountDao;
+
+	@Autowired
+	private BlockDao blockDao;
+
+	@Autowired
+	private TransferDao transactionDao;
 
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
@@ -35,11 +57,7 @@ public class BlockChain {
 	private ConcurrentHashSet<Account> unlockedAccounts;
 
 	// for now it's easier to keep it like this
-	private byte[] lastBlockHash;
-	private Long lastBlockHeight;
-	private byte[] lastBlockSignature;
-	private int lastBlockTimestamp;
-
+	org.nem.core.dbmodel.Block lastBlock;
 
 	public BlockChain() {
 		this.unconfirmedTransactions = new ConcurrentHashMap<>();
@@ -54,14 +72,23 @@ public class BlockChain {
 		LOGGER.info("booting up block generator");
 	}
 
+	private long calcDbBlockScore(org.nem.core.dbmodel.Block block) {
+		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
+		long r2 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getBlockHash(), 10, 14)));
+
+		return r1 + r2;
+	}
+
+	private long calcBlockScore(Block block) {
+		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
+		long r2 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+
+		return r1 + r2;
+	}
 
 	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-
-		lastBlockHash = ArrayUtils.duplicate(curBlock.getBlockHash());
-		lastBlockHeight = curBlock.getHeight();
-		lastBlockSignature = ArrayUtils.duplicate(curBlock.getForgerProof());
-		lastBlockTimestamp = curBlock.getTimestamp();
+		lastBlock = curBlock;
 	}
 
 	/**
@@ -80,7 +107,10 @@ public class BlockChain {
 		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
 		synchronized (BlockChain.class) {
-			// TODO: check if transaction isn't already in DB
+			Transfer tx = transactionDao.findByHash(transactionHash.get());
+			if (tx != null) {
+				return false;
+			}
 		}
 
 		Transaction swapTest = unconfirmedTransactions.putIfAbsent(transactionHash, transaction);
@@ -96,15 +126,15 @@ public class BlockChain {
 	}
 
 	public byte[] getLastBlockHash() {
-		return lastBlockHash;
+		return lastBlock.getBlockHash();
 	}
 
 	public Long getLastBlockHeight() {
-		return lastBlockHeight;
+		return lastBlock.getHeight();
 	}
 
 	public byte[] getLastBlockSignature() {
-		return lastBlockSignature;
+		return lastBlock.getForgerProof();
 	}
 
 	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
@@ -112,14 +142,82 @@ public class BlockChain {
 	}
 
 	public boolean processBlock(Block block) {
-		return false;
+		byte[] blockHash = HashUtils.calculateHash(block);
+		org.nem.core.dbmodel.Block b = blockDao.findByHash(blockHash);
+		throw new RuntimeException("not yet done");
+	}
+
+
+	// not sure where it should be
+	private boolean addBlockToDb(Block bestBlock) {
+		synchronized (BlockChain.class) {
+			org.nem.core.dbmodel.Account forager = accountDao.getAccountByPrintableAddress(bestBlock.getSigner().getAddress().getEncoded());
+
+			byte[] blockHash = HashUtils.calculateHash(bestBlock);
+			org.nem.core.dbmodel.Block dbBlock = new org.nem.core.dbmodel.Block(
+					ByteUtils.bytesToLong(blockHash),
+					bestBlock.getVersion(),
+					bestBlock.getPreviousBlockHash(),
+					blockHash,
+					bestBlock.getTimeStamp(),
+					forager,
+					bestBlock.getSignature().getBytes(),
+					bestBlock.getHeight(),
+					0L,
+					bestBlock.getTotalFee()
+			);
+
+			int i = 0;
+			List<Transfer> transactions = new ArrayList<>(bestBlock.getTransactions().size());
+
+			for (Transaction transaction : bestBlock.getTransactions()) {
+				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
+				org.nem.core.dbmodel.Account sender = accountDao.getAccountByPrintableAddress(transaction.getSigner().getAddress().getEncoded());
+				org.nem.core.dbmodel.Account recipient = accountDao.getAccountByPrintableAddress(transferTransaction.getRecipient().getAddress().getEncoded());
+				byte[] txHash = HashUtils.calculateHash(transferTransaction);
+				Transfer dbTransfer = new Transfer(
+						ByteUtils.bytesToLong(txHash),
+						txHash,
+						transferTransaction.getVersion(),
+						transferTransaction.getType(),
+						transferTransaction.getFee(),
+						transferTransaction.getTimeStamp(),
+						transferTransaction.getDeadline(),
+						sender,
+						// proof
+						transferTransaction.getSignature().getBytes(),
+						recipient,
+						i, // index
+						transferTransaction.getAmount(),
+						0L // referenced tx
+				);
+				dbTransfer.setBlock(dbBlock);
+				transactions.add(dbTransfer);
+				i++;
+			}
+
+			dbBlock.setBlockTransfers(transactions);
+
+			// hibernate will save both block AND transactions
+			// as there is cascade in Block
+			// mind that there is NO cascade in transaction
+			blockDao.save(dbBlock);
+
+			lastBlock.setNextBlockId(dbBlock.getId());
+			blockDao.updateLastBlockId(lastBlock);
+
+			lastBlock = dbBlock;
+
+		} // synchronized
+
+		return true;
 	}
 
 	class BlockGenerator implements Runnable {
 
 		@Override
 		public void run() {
-			if (lastBlockHash == null) {
+			if (lastBlock == null) {
 				return;
 			}
 
@@ -130,17 +228,18 @@ public class BlockChain {
 			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 			List<Transaction> transactionList;
+			Block bestBlock = null;
+			long bestScore = Long.MAX_VALUE;
 			// because of access to unconfirmedTransactions, and lastBlock*
 			synchronized (BlockChain.class) {
-				// first prepare
+				//
+				// TODO: the following code mut be changed to include only TXes, that have deadline < current time
+				//
 				Set<Transaction> sortedTransactions = new HashSet<>(unconfirmedTransactions.values());
-				LOGGER.warning("hello: " + Integer.toString(sortedTransactions.size()));
 				transactionList = new ArrayList<>(sortedTransactions);
 
-				Block bestBlock = null;
-				long bestScore = Long.MAX_VALUE;
 				for (Account forger : unlockedAccounts) {
-					Block newBlock = new Block(forger, lastBlockHash, NisMain.TIME_PROVIDER.getCurrentTime(), lastBlockHeight + 1);
+					Block newBlock = new Block(forger, lastBlock.getBlockHash(), NisMain.TIME_PROVIDER.getCurrentTime(), lastBlock.getHeight() + 1);
 					newBlock.addTransactions(transactionList);
 
 					newBlock.sign();
@@ -155,25 +254,21 @@ public class BlockChain {
 						continue;
 					}
 
-					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlockSignature, 2, 10));
-					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp() - lastBlockTimestamp).multiply(
+					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
+					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp() - lastBlock.getTimestamp()).multiply(
 							BigInteger.valueOf(realAccout.getBalance()).multiply(
 									BigInteger.valueOf(30745)
 							)
 					);
 
-					System.out.println("hit: " + hit.toString());
-					System.out.println("hit: 0x" + hit.toString(16));
-					System.out.println("hit: 0x" + target.toString(16));
-					System.out.println("hit: " + target.toString());
+					System.out.println("   hit: 0x" + hit.toString(16));
+					System.out.println("target: 0x" + target.toString(16));
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
 
-						long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(newBlock.getSignature().getBytes(), 10, 14)));
-						long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(newBlock), 10, 14)));
 
-						long score = r1 + r2;
+						long score = calcBlockScore(newBlock);
 						if (score < bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;
@@ -181,8 +276,17 @@ public class BlockChain {
 					}
 
 				}
+			} // synchronized
 
-				if (bestBlock != null) {
+			if (bestBlock != null) {
+				//
+				// if we're here it means unconfirmed transactions haven't been
+				// seen in any block yet, so we can add this block to local db
+				//
+				// (if at some point later we receive better block,
+				// fork resolution will handle that)
+				//
+				if (addBlockToDb(bestBlock)) {
 					unconfirmedTransactions.clear();
 
 					PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
