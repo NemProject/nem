@@ -5,10 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
-import org.nem.core.model.HashUtils;
-import org.nem.core.model.Transaction;
+import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
@@ -136,7 +133,7 @@ public class BlockChainTest {
 		b.sign();
 
 		Block dbBlock = new Block(
-				Genesis.BLOCK_ID,
+				ByteUtils.bytesToLong(GenesisBlock.GENESIS_HASH),
 				1,
 				// prev hash
 				new byte[] {

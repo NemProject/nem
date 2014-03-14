@@ -19,8 +19,19 @@ public class GenesisBlock extends Block {
     private final static int GENESIS_HEIGHT = 1;
     private final static int HASH_LENGTH = 32;
 
-    private final static Account GENESIS_ACCOUNT;
+    public final static Account GENESIS_ACCOUNT;
 
+	public final static byte[] GENESIS_HASH = HexEncoder.getBytesSilent("7486a763590b6220b3b275f06dc313bdffeea47359d98d2b1dfd9278ce8faf4b");
+
+	//	Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
+	//	Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
+	//	Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
+	//	Hashes.sha3(StringEncoder.getBytes("Thies1965")),
+	//	Hashes.sha3(StringEncoder.getBytes("borzalom")),
+	//	Hashes.sha3(StringEncoder.getBytes("gimre")),
+	//	Hashes.sha3(StringEncoder.getBytes("Makoto")),
+	//	Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
+	//	Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
     private final static String[] GENESIS_RECIPIENT_ACCOUNT_IDS = new String[] {
         "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
         "NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
@@ -38,7 +49,8 @@ public class GenesisBlock extends Block {
         GENESIS_ACCOUNT = new Account(genesisKeyPair);
     }
 
-    private final static long GENESIS_AMOUNT = 4000000000L;
+	// 40.000.000 NEMs (* 1000000 micro nems)
+    private final static long GENESIS_AMOUNT = 40000000000000L;
 
     /**
      * Creates a genesis block.
@@ -53,9 +65,10 @@ public class GenesisBlock extends Block {
         for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
             final Address address = Address.fromEncoded(id);
             final Account account = new Account(address);
-            final TransferTransaction transaction = new TransferTransaction(0, GENESIS_ACCOUNT, account, shareAmount, null);
-            transaction.sign();
+            final TransferTransaction transaction = new TransferTransaction(TransactionTypes.TRANSFER, GENESIS_ACCOUNT, account, shareAmount, null);
             transaction.setFee(0); // TODO: this won't work because of minimum fee enforcement
+
+			transaction.sign();
             this.addTransaction(transaction);
         }
 

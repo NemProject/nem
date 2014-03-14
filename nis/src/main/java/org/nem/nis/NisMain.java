@@ -52,10 +52,10 @@ public class NisMain {
 	}
 
 	private void analyzeBlocks() {
-		Long curBlockId = Genesis.BLOCK_ID;
-		org.nem.core.dbmodel.Block curBlock;
+		Long curBlockId = 0L;
 		System.out.println("starting analysis...");
-		while ((curBlock = blockDao.findByShortId(curBlockId)) != null) {
+		org.nem.core.dbmodel.Block curBlock = blockDao.findByHash(GenesisBlock.GENESIS_HASH);
+		do {
 			accountAnalyzer.analyze(curBlock);
 
 			curBlockId = curBlock.getNextBlockId();
@@ -63,7 +63,7 @@ public class NisMain {
 				blockChain.analyzeLastBlock(curBlock);
 				break;
 			}
-		}
+		} while ((curBlock = blockDao.findById(curBlockId)) != null);
 	}
 
 	@PostConstruct
@@ -80,51 +80,20 @@ public class NisMain {
 	}
 
 	private void populateDb() {
-		Account genesisAccount = getGenesisAccount();
-		org.nem.core.dbmodel.Account dbGenesisAccount = populateGenesisAccount(genesisAccount);
+		org.nem.core.dbmodel.Account dbGenesisAccount = populateGenesisAccount(GenesisBlock.GENESIS_ACCOUNT);
 
 		if (transactionDao.count() == 0) {
-			Block genesisBlock = prepareGenesisBlock(genesisAccount);
+			Block genesisBlock = prepareGenesisBlock();
+
+			LOGGER.info("genesisBlockHash: " + HexEncoder.getString(HashUtils.calculateHash(genesisBlock)));
+
 			org.nem.core.dbmodel.Block b = populateGenesisBlock(genesisBlock, dbGenesisAccount);
 			populateGenesisTxes(dbGenesisAccount, b, genesisBlock);
 		}
 	}
 
-	private Block prepareGenesisBlock(Account genesisAccount) {
-		final BigInteger genesisAmount = new BigInteger("40000000000000");
-		final BigInteger special       = new BigInteger("10000000000000");
-		final BigInteger share = genesisAmount.subtract(special).divide(BigInteger.valueOf(Genesis.RECIPIENT_IDS.length - 1));
-		final long amounts[] = {
-			special.longValue(),
-			share.longValue(), share.longValue(), share.longValue(), share.longValue(),
-			share.longValue(), share.longValue(), share.longValue(), share.longValue()
-		};
-
-		final long txIds[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-		Vector<Account> recipientsAccounts = new Vector<>(txIds.length);
-		for (int i = 0; i < txIds.length; ++i) {
-			final Address recipientAddr = Address.fromEncoded(Genesis.RECIPIENT_IDS[i]);
-			recipientsAccounts.add(new Account(recipientAddr));
-		}
-
-		byte[] previousBlockHash = new byte[32];
-
-		Block genesisBlock = new Block(genesisAccount, previousBlockHash, Genesis.INITIAL_TIME, Genesis.INITIAL_HEIGHT);
-		for (int i = 0; i < txIds.length; ++i) {
-			final TransferTransaction transferTransaction = ENTITY_FACTORY.createTransfer(
-                genesisAccount,
-                recipientsAccounts.get(i),
-                amounts[i],
-                null);
-			transferTransaction.setFee(0);
-			transferTransaction.sign();
-
-			genesisBlock.addTransaction(transferTransaction);
-		}
-
-		genesisBlock.sign();
-
-		return genesisBlock;
+	private Block prepareGenesisBlock() {
+		return new GenesisBlock(0);
 	}
 
 	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, org.nem.core.dbmodel.Block b, Block genesisBlock) {
@@ -187,12 +156,14 @@ public class NisMain {
 	private org.nem.core.dbmodel.Block populateGenesisBlock(Block genesisBlock, org.nem.core.dbmodel.Account a) {
 		org.nem.core.dbmodel.Block b = null;
         byte[] genesisBlockHash = HashUtils.calculateHash(genesisBlock);
-		System.out.println(HexEncoder.getString(genesisBlockHash));
+
+		System.out.println("aaa: " + HexEncoder.getString(genesisBlockHash));
+		System.out.println("bbb: " + HexEncoder.getString(GenesisBlock.GENESIS_HASH));
 		System.out.println(ByteUtils.bytesToLong(genesisBlockHash));
 
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
-					Genesis.BLOCK_ID,
+					ByteUtils.bytesToLong(GenesisBlock.GENESIS_HASH),
 					1,
 					// prev hash
 					new byte[] {
@@ -206,22 +177,16 @@ public class NisMain {
 					genesisBlock.getSignature().getBytes(),
 					0L, // height
 					40000000L * 1000000L,
-					(new BigInteger("0")).longValue()
+					0L
 					);
 			blockDao.save(b);
 
 		} else {
-			b = blockDao.findByShortId(Genesis.BLOCK_ID);
+			b = blockDao.findByHash(GenesisBlock.GENESIS_HASH);
 		}
 
 		LOGGER.info("block id: " + b.getId().toString());
 		return b;
-	}
-
-	private Account getGenesisAccount() {
-		final KeyPair CREATOR_KEYPAIR = new KeyPair(Genesis.CREATOR_PRIVATE_KEY);
-
-		return new Account(CREATOR_KEYPAIR);
 	}
 
 	private org.nem.core.dbmodel.Account populateGenesisAccount(Account genesisAccount) {

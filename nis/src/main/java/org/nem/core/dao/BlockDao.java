@@ -9,7 +9,7 @@ public interface BlockDao {
 	
 	public Long count();
 
-	public Block findByShortId(long shortId);
+	public Block findById(long id);
 
 	public Block findByHash(byte[] blockHash);
 }
