@@ -5,3 +5,4 @@ superlog.txt
 *.eml
 *.pyc
 *.db
+my.*.sh
