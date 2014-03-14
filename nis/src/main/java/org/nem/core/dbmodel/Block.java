@@ -54,7 +54,6 @@ public class Block {
 			Integer timestamp,	
 			Account forger,
 			byte[] forgerProof,
-			byte[] blockSignature,
 			Long height,
 			Long totalAmount,
 			Long totalFee) {

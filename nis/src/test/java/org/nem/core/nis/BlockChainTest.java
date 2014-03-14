@@ -148,13 +148,6 @@ public class BlockChainTest {
 				dbSender,
 				// proof
 				b.getSignature().getBytes(),
-				// block sig
-				new byte[] {
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
-				},
 				b.getHeight(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
 				0L

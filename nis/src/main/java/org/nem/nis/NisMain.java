@@ -204,13 +204,6 @@ public class NisMain {
 					a,
 					// proof
 					genesisBlock.getSignature().getBytes(),
-					// block sig
-					new byte[] {
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-						0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
-					},
 					0L, // height
 					40000000L * 1000000L,
 					(new BigInteger("0")).longValue()

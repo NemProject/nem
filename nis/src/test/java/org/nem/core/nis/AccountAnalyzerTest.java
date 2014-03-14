@@ -104,7 +104,7 @@ public class AccountAnalyzerTest {
 		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, 2);
 
 		Block b = new Block(
-				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], new byte[32], 1L, 8*1000000L, 0L
+				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8*1000000L, 0L
 		);
 
 		b.setBlockTransfers(Arrays.asList(t1, t2));
