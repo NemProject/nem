@@ -134,7 +134,7 @@ public class NisMain {
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
-						Genesis.INITIAL_TIME, // timestamp
+						genesisBlock.getTimeStamp(),
 						0, // deadline
 						a,
 						// proof

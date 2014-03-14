@@ -11,6 +11,7 @@ import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.model.ByteArray;
+import org.nem.core.model.GenesisBlock;
 import org.nem.core.serialization.AccountLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +45,7 @@ public class AccountAnalyzer implements AccountLookup {
 
 				// in case of genesis account we didn't knew it's //encoded address//
 				// earlier, so additionally insert it in mapByAddressId
-				if (encodedAddress.equals(Genesis.CREATOR_ACCOUNT_ID)) {
+				if (encodedAddress.equals(GenesisBlock.GENESIS_ACCOUNT.getAddress().getEncoded())) {
 					mapByAddressId.put(encodedAddress, account);
 				}
 
