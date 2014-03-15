@@ -156,4 +156,30 @@ public class SerializationUtils {
     }
 
     //endregion
+
+    //region Amount
+
+    /**
+     * Writes an amount object.
+     *
+     * @param serializer The serializer to use.
+     * @param label The optional label.
+     * @param amount The object.
+     */
+    public static void writeAmount(final Serializer serializer, String label, final Amount amount) {
+        serializer.writeLong(label, amount.getNumMicroNem());
+    }
+
+    /**
+     * Reads an amount object.
+     *
+     * @param deserializer The deserializer to use.
+     * @param label The optional label.
+     * @return The read object.
+     */
+    public static Amount readAmount(final Deserializer deserializer, final String label) {
+        return new Amount(deserializer.readLong(label));
+    }
+
+    //endregion
 }
