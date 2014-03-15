@@ -3,6 +3,7 @@ package org.nem.core.transactions;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -26,7 +27,7 @@ public class TransferTransaction extends Transaction {
 	 * @param amount The transaction amount.
 	 * @param message The transaction message.
 	 */
-	public TransferTransaction(final int timestamp, final Account sender, final Account recipient, final long amount, final Message message) {
+	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final long amount, final Message message) {
 		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;

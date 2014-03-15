@@ -9,6 +9,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.nis.BlockChain;
@@ -110,7 +111,7 @@ public class BlockChainTest {
 
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction(0, sender, recipient, amount, null);
+		return new TransferTransaction(new TimeInstant(0), sender, recipient, amount, null);
 	}
 
 	private Block createDummyDbBlock() {

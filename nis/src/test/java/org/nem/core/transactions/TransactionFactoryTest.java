@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -27,7 +28,7 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-        final Transaction originalTransaction = new TransferTransaction(0, sender, recipient, 100, null);
+        final Transaction originalTransaction = new TransferTransaction(new TimeInstant(0), sender, recipient, 100, null);
         final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
         // Act:
@@ -44,7 +45,7 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
-        final Transaction originalTransaction = new TransferTransaction(0, sender, recipient, 100, null);
+        final Transaction originalTransaction = new TransferTransaction(new TimeInstant(0), sender, recipient, 100, null);
         final Deserializer deserializer = Utils.roundtripSerializableEntity(
             originalTransaction.asNonVerifiable(),
             new MockAccountLookup());

@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 
 import java.util.*;
@@ -25,7 +26,7 @@ public class BlockTest {
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
-        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(7));
+        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
@@ -49,7 +50,7 @@ public class BlockTest {
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
-        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(7));
+        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
@@ -129,7 +130,7 @@ public class BlockTest {
 
     private TransferTransaction createSignedTransactionWithAmount(long amount) {
         final TransferTransaction transaction = new TransferTransaction(
-            0,
+            new TimeInstant(0),
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
             amount,
@@ -192,23 +193,6 @@ public class BlockTest {
 
     //endregion
 
-    //region Valid
-
-    @Test
-    public void blockWithNegativeTimestampIsInvalid() {
-        // Arrange:
-        Assert.assertThat(createBlockWithTimestamp(-1).isValid(), IsEqual.equalTo(false));
-    }
-
-    @Test
-    public void blockWithNonNegativeTimestampIsValid() {
-        // Arrange:
-        Assert.assertThat(createBlockWithTimestamp(0).isValid(), IsEqual.equalTo(true));
-        Assert.assertThat(createBlockWithTimestamp(1).isValid(), IsEqual.equalTo(true));
-    }
-
-    //endregion
-
     private static Transaction createTransactionWithFee(final long fee) {
         // Arrange:
         Account sender = Utils.generateRandomAccount();
@@ -219,16 +203,11 @@ public class BlockTest {
 
     private static Block createBlock(final Account forger) {
         // Arrange:
-        return new Block(forger, DUMMY_PREVIOUS_HASH, 7, 3);
+        return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), 3);
     }
 
     private static Block createBlock() {
         // Arrange:
         return createBlock(Utils.generateRandomAccount());
-    }
-
-    private static Block createBlockWithTimestamp(final int timestamp) {
-        // Arrange:
-        return new Block(Utils.generateRandomAccount(), DUMMY_PREVIOUS_HASH, timestamp, 3);
     }
 }

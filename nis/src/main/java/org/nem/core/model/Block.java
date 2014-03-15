@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransactionFactory;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class Block extends VerifiableEntity {
      * @param timestamp The block timestamp.
      * @param height The block height.
      */
-    public Block(final Account forger, final byte[] prevBlockHash, int timestamp, final long height) {
+    public Block(final Account forger, final byte[] prevBlockHash, final TimeInstant timestamp, final long height) {
         super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
         this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
@@ -107,15 +108,6 @@ public class Block extends VerifiableEntity {
 	public void addTransactions(final List<Transaction> transactions) {
         for (final Transaction transaction : transactions)
             this.addTransaction(transaction);
-	}
-
-    /**
-     * Determines if this block is valid.
-     *
-     * @return true if this block is valid.
-     */
-	public boolean isValid() {
-		return this.getTimeStamp() >= 0;
 	}
 
     @Override

@@ -25,14 +25,14 @@ public class SystemTimeProvider implements TimeProvider {
     }
 
     @Override
-    public int getEpochTime() {
-        return 0;
+    public TimeInstant getEpochTime() {
+        return new TimeInstant(0);
     }
 
     @Override
-    public int getCurrentTime() {
+    public TimeInstant getCurrentTime() {
         long time = System.currentTimeMillis();
-        return getTime(time);
+        return new TimeInstant(getTime(time));
     }
 
     /**
