@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 public abstract class Transaction extends VerifiableEntity {
 
 	private long fee;
-	private TimeInstant deadline = TimeInstant.ZERO; // TODO: placeholder
+	private TimeInstant deadline = TimeInstant.ZERO;
 
 	/**
 	 * Creates a new transaction.
@@ -86,12 +86,8 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-        // TODO: fix is valid
-        return true
-//		return
-//            && this.deadline > this.getTimeStamp()
-            //&& (this.deadline - this.getTimeStamp()) < 24*60*60;
-        ;
+        return this.deadline.compareTo(this.getTimeStamp()) > 0
+            && this.deadline.compareTo(this.getTimeStamp().addDays(1)) < 1;
 	}
 
 	/**

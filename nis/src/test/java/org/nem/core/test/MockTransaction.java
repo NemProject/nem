@@ -18,6 +18,13 @@ public class MockTransaction extends Transaction {
 
     /**
      * Creates a mock transaction.
+     */
+    public MockTransaction() {
+        this(Utils.generateRandomAccount());
+    }
+
+    /**
+     * Creates a mock transaction.
      *
      * @param sender The transaction sender's account.
      */
@@ -33,18 +40,6 @@ public class MockTransaction extends Transaction {
      */
     public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
-        this.customField = customField;
-    }
-
-    /**
-     * Creates a mock transaction.
-     *
-     * @param sender The transaction sender's account.
-     * @param customField The initial custom field value.
-     * @param timestamp The desired timestamp.
-     */
-    public MockTransaction(final Account sender, final int customField, final TimeInstant timestamp) {
-        super(TYPE, VERSION, timestamp, sender);
         this.customField = customField;
     }
 

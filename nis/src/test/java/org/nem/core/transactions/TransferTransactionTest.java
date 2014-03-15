@@ -157,17 +157,17 @@ public class TransferTransactionTest {
 
     //region Valid
 
-    // TODO: add this test back!!!
-//    @Test
-//    public void isValidChecksSuperValidity() {
-//        // Arrange:
-//        final Account signer = Utils.generateRandomAccount();
-//        final Account recipient = Utils.generateRandomAccount();
-//        Transaction transaction = new TransferTransaction(-1, signer, recipient, 1, null);
-//
-//        // Assert:
-//        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-//    }
+    @Test
+    public void isValidChecksSuperValidity() {
+        // Arrange:
+        final Account signer = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, 1, null);
+        transaction.setDeadline(TimeInstant.ZERO);
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+    }
 
     @Test
     public void transactionsWithNonNegativeAmountAreValid() {
