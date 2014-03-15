@@ -22,7 +22,7 @@ public class TransactionTest {
 
 		// Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
+        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
@@ -34,12 +34,12 @@ public class TransactionTest {
         final Account signer = Utils.generateRandomAccount();
         final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
         final MockTransaction originalTransaction = new MockTransaction(signer, 7);
-        originalTransaction.setFee(130);
+        originalTransaction.setFee(new Amount(130));
         final MockTransaction transaction = createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
+        Assert.assertThat(transaction.getFee(), IsEqual.equalTo(new Amount(130L)));
         Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
         Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
@@ -187,8 +187,8 @@ public class TransactionTest {
         // Act:
         final MockTransaction transaction = new MockTransaction(signer);
         transaction.setMinimumFee(minimumFee);
-        transaction.setFee(fee);
-        return transaction.getFee();
+        transaction.setFee(new Amount(fee));
+        return transaction.getFee().getNumMicroNem();
     }
 
     //endregion

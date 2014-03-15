@@ -239,7 +239,7 @@ public class BlockChain {
 					bestBlock.getSignature().getBytes(),
 					bestBlock.getHeight(),
 					0L,
-					bestBlock.getTotalFee()
+					bestBlock.getTotalFee().getNumMicroNem()
 			);
 
 			int i = 0;
@@ -255,7 +255,7 @@ public class BlockChain {
 						txHash,
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
-						transferTransaction.getFee(),
+						transferTransaction.getFee().getNumMicroNem(),
 						transferTransaction.getTimeStamp().getRawTime(),
 						transferTransaction.getDeadline().getRawTime(),
 						sender,
@@ -263,7 +263,7 @@ public class BlockChain {
 						transferTransaction.getSignature().getBytes(),
 						recipient,
 						i, // index
-						transferTransaction.getAmount(),
+						transferTransaction.getAmount().getNumMicroNem(),
 						0L // referenced tx
 				);
 				dbTransfer.setBlock(dbBlock);

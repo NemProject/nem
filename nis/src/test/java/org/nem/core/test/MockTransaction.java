@@ -52,9 +52,9 @@ public class MockTransaction extends Transaction {
      * @param timeStamp The transaction timestamp.
      * @param fee The transaction fee.
      */
-    public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final int fee) {
+    public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final long fee) {
         super(type, version, timeStamp, Utils.generateRandomAccount());
-        this.setFee(fee);
+        this.setFee(new Amount(fee));
     }
 
     /**
@@ -86,8 +86,8 @@ public class MockTransaction extends Transaction {
 	}
 
     @Override
-    protected long getMinimumFee() {
-        return this.minimumFee;
+    protected Amount getMinimumFee() {
+        return new Amount(this.minimumFee);
     }
 
     @Override

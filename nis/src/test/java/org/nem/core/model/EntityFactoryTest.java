@@ -38,12 +38,12 @@ public class EntityFactoryTest {
         final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 
         // Act:
-        TransferTransaction transaction = factory.createTransfer(signer, recipient, 123, message);
+        TransferTransaction transaction = factory.createTransfer(signer, recipient, new Amount(123), message);
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
+        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
         Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11891)));
     }

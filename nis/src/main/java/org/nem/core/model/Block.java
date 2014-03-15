@@ -19,7 +19,7 @@ public class Block extends VerifiableEntity {
 
 	private final byte[] prevBlockHash;
 	private long height; // unsure yet, but probably will be easier to talk on forums having that
-	private long totalFee;
+	private Amount totalFee = Amount.ZERO;
 
     private final List<Transaction> transactions;
 
@@ -35,8 +35,7 @@ public class Block extends VerifiableEntity {
         super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
         this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
-		this.height = height;
-		this.totalFee = 0;
+        this.height = height;
     }
 
     /**
@@ -50,7 +49,7 @@ public class Block extends VerifiableEntity {
 
 		this.prevBlockHash = deserializer.readBytes("prevBlockHash");
 		this.height = deserializer.readLong("height");
-		this.totalFee = deserializer.readLong("totalFee");
+		this.totalFee = SerializationUtils.readAmount(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
     }
@@ -71,7 +70,7 @@ public class Block extends VerifiableEntity {
 	 *
      * @return The total amount of fees of all transactions stored in this block.
      */
-    public long getTotalFee() { return this.totalFee; }
+    public Amount getTotalFee() { return this.totalFee; }
 
 	/**
      * Gets the hash of the previous block.
@@ -97,7 +96,7 @@ public class Block extends VerifiableEntity {
      */
     public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
-		this.totalFee += transaction.getFee();
+        this.totalFee = this.totalFee.add(transaction.getFee());
     }
 
     /**
@@ -111,10 +110,10 @@ public class Block extends VerifiableEntity {
 	}
 
     @Override
-    protected void serializeImpl(Serializer serializer) {
+    protected void serializeImpl(final Serializer serializer) {
 		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
 		serializer.writeLong("height", this.height);
-		serializer.writeLong("totalFee", this.totalFee);
+		SerializationUtils.writeAmount(serializer, "totalFee", this.totalFee);
 
 		serializer.writeObjectArray("transactions", this.transactions);
     }

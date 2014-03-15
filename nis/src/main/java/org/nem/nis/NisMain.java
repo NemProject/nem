@@ -147,7 +147,7 @@ public class NisMain {
 						transferTransaction.getSignature().getBytes(),
 						recipientsDbAccounts.get(i),
 						i, // index
-						transferTransaction.getAmount(),
+						transferTransaction.getAmount().getNumMicroNem(),
 						0L // referenced tx
 				);
 				t.setBlock(b);

@@ -28,7 +28,7 @@ public class BlockTest {
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L));
+        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
@@ -52,7 +52,7 @@ public class BlockTest {
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(2L));
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(2L)));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
 
@@ -60,10 +60,10 @@ public class BlockTest {
         Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
         final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
-        Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(17L));
+        Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(new Amount(17L)));
 
         final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-        Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(290L));
+        Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(new Amount(290L)));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class BlockTest {
             TimeInstant.ZERO,
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
-            amount,
+            new Amount(amount),
             null);
         transaction.sign();
         return transaction;
@@ -188,7 +188,7 @@ public class BlockTest {
         block.addTransaction(createTransactionWithFee(22));
 
         // Assert:
-        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(103L));
+        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
     }
 
     //endregion
@@ -197,7 +197,7 @@ public class BlockTest {
         // Arrange:
         Account sender = Utils.generateRandomAccount();
         MockTransaction transaction = new MockTransaction(sender);
-        transaction.setFee(fee);
+        transaction.setFee(new Amount(fee));
         return transaction;
     }
 
