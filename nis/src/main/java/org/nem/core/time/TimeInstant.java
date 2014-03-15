@@ -5,7 +5,7 @@ import java.security.InvalidParameterException;
 /**
  * Represents an instant in time.
  */
-public class TimeInstant {
+public class TimeInstant implements Comparable<TimeInstant> {
 
     private final int time;
 
@@ -82,6 +82,7 @@ public class TimeInstant {
      * @param rhs The instant to compare against.
      * @return -1, 0 or 1 as this TimeInstant is numerically less than, equal to, or greater than rhs.
      */
+    @Override
     public int compareTo(final TimeInstant rhs) {
         if (this.time == rhs.time)
             return 0;
