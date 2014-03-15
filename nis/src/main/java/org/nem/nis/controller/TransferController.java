@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 @RestController
 public class TransferController {
-	private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(TransferController.class.getName());
 
 	@Autowired
 	AccountAnalyzer accountAnalyzer;

@@ -121,7 +121,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     @Override
     public void serialize(final Serializer serializer) {
         if (null == this.signature)
-            throw new SerializationException("cannot serialize a transaction without a signature");
+            throw new SerializationException("cannot serialize a entity without a signature");
 
         this.serialize(serializer, true);
     }
