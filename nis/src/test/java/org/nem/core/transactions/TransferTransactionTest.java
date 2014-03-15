@@ -196,7 +196,7 @@ public class TransferTransactionTest {
     private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(senderBalance);
+        signer.incrementBalance(new Amount(senderBalance));
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
         transaction.setFee(new Amount(fee));
@@ -223,7 +223,7 @@ public class TransferTransactionTest {
     private boolean isMessageSizeValid(final int messageSize) {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(1000);
+        signer.incrementBalance(new Amount(1000));
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
@@ -241,7 +241,7 @@ public class TransferTransactionTest {
     public void executeTransfersAmountAndFeeFromSigner() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(1000);
+        signer.incrementBalance(new Amount(1000));
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(new Amount(10));
@@ -250,14 +250,14 @@ public class TransferTransactionTest {
         transaction.execute();
 
         // Assert:
-        Assert.assertThat(signer.getBalance(), IsEqual.equalTo(891L));
+        Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(891L)));
     }
 
     @Test
     public void executeTransfersAmountToSigner() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(1000);
+        signer.incrementBalance(new Amount(1000));
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(new Amount(10));
@@ -266,14 +266,14 @@ public class TransferTransactionTest {
         transaction.execute();
 
         // Assert:
-        Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(99L));
+        Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(99L)));
     }
 
     @Test
     public void executeDoesNotAppendEmptyMessageToAccount() {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(1000);
+        signer.incrementBalance(new Amount(1000));
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
         transaction.setFee(new Amount(10));
@@ -290,7 +290,7 @@ public class TransferTransactionTest {
         // Arrange:
         final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
         final Account signer = Utils.generateRandomAccount();
-        signer.incrementBalance(1000);
+        signer.incrementBalance(new Amount(1000));
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
         transaction.setFee(new Amount(10));

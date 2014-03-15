@@ -200,13 +200,13 @@ public class BlockChain {
 
 
 		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (forgerAccount.getBalance() < 1) {
+		if (Amount.ZERO.compareTo(forgerAccount.getBalance()) < 1) {
 			return false;
 		}
 
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
 		BigInteger target = BigInteger.valueOf(block.getTimeStamp().subtract(parentTimeStamp)).multiply(
-                BigInteger.valueOf(forgerAccount.getBalance()).multiply(
+                BigInteger.valueOf(forgerAccount.getBalance().getNumMicroNem()).multiply(
                         BigInteger.valueOf(30745)
                 )
         );
@@ -334,13 +334,13 @@ public class BlockChain {
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					Account realAccout = accountAnalyzer.findByAddress(forger.getAddress());
-					if (realAccout.getBalance() < 1) {
+					if (realAccout.getBalance().compareTo(Amount.ZERO) < 1) {
 						continue;
 					}
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
 					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
-							BigInteger.valueOf(realAccout.getBalance()).multiply(
+							BigInteger.valueOf(realAccout.getBalance().getNumMicroNem()).multiply(
 									BigInteger.valueOf(30745)
 							)
 					);

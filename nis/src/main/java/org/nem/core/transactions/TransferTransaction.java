@@ -81,8 +81,7 @@ public class TransferTransaction extends Transaction {
 	@Override
 	public boolean isValid() {
 		return super.isValid()
-            // TODO: signer balance should be Amount
-            && this.getSigner().getBalance() >= this.amount.getNumMicroNem() + this.getFee().getNumMicroNem()
+            && this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
             && this.getMessageLength() <= MAX_MESSAGE_SIZE;
     }
 
@@ -104,9 +103,8 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	public void execute() {
-        // TODO: change increment balance to take Amount
-		this.getSigner().incrementBalance(-this.amount.getNumMicroNem() - this.getFee().getNumMicroNem());
-        this.recipient.incrementBalance(this.amount.getNumMicroNem());
+		this.getSigner().decrementBalance(this.amount.add(this.getFee()));
+        this.recipient.incrementBalance(this.amount);
 
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);
