@@ -112,28 +112,62 @@ public class TransactionTest {
     //endregion
 
 	//region Comparable
+
 	@Test
-	public void transactionSameAreEven() {
+	public void compareResultIsZeroForTransactionsThatHaveAllPrimaryFieldsEqual() {
 		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction();
-		final MockTransaction transaction2 = new MockTransaction();
+		final MockTransaction transaction1 = new MockTransaction(7, 12, new TimeInstant(124), 70);
+		final MockTransaction transaction2 = new MockTransaction(7, 12, new TimeInstant(124), 70);
 
 		// Assert:
 		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+        Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void transactionWithSmallerFeeIsEarlier() {
-		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction();
-		final MockTransaction transaction2 = new MockTransaction();
+	public void compareResultIsInfluencedByType() {
+        // Arrange:
+        final MockTransaction transaction1 = new MockTransaction(7, 14, new TimeInstant(150), 90);
+        final MockTransaction transaction2 = new MockTransaction(11, 12, new TimeInstant(124), 70);
 
-		transaction1.setFee(10);
-		transaction2.setFee(5);
-
-		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(1));
+        // Assert:
+        Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
+        Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
 	}
+
+    @Test
+    public void compareResultIsInfluencedByVersion() {
+        // Arrange:
+        final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 90);
+        final MockTransaction transaction2 = new MockTransaction(11, 20, new TimeInstant(124), 70);
+
+        // Assert:
+        Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
+        Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+    }
+
+    @Test
+    public void compareResultIsInfluencedByTimeStamp() {
+        // Arrange:
+        final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 90);
+        final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 70);
+
+        // Assert:
+        Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
+        Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+    }
+
+    @Test
+    public void compareResultIsInfluencedByFee() {
+        // Arrange:
+        final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(200), 50);
+        final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 70);
+
+        // Assert:
+        Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
+        Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+    }
+
 	//endregion
 
     //region Fees

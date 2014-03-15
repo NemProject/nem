@@ -69,22 +69,19 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	@Override
 	public int compareTo(Transaction rhs) {
-		int res = this.getType() - rhs.getType();
-		if (res != 0) {
-			return res < 0 ? -1 : 1;
-		}
+        int[] comparisonResults = new int[] {
+            Integer.compare(this.getType(), rhs.getType()),
+            Integer.compare(this.getVersion(), rhs.getVersion()),
+            this.getTimeStamp().compareTo(rhs.getTimeStamp()),
+            Long.compare(this.getFee(), rhs.getFee())
+        };
 
-		res = this.getVersion() - rhs.getVersion();
-		if (res != 0) {
-			return res < 0 ? -1 : 1;
-		}
+        for (int result : comparisonResults) {
+            if (result != 0)
+                return result;
+        }
 
-		res = this.getTimeStamp().compareTo(rhs.getTimeStamp());
-		if (res != 0) {
-			return res;
-		}
-
-		return Long.valueOf(this.getFee()).compareTo( Long.valueOf(rhs.getFee()) );
+        return 0;
 	}
 
 	@Override
