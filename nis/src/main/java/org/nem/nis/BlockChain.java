@@ -2,6 +2,7 @@ package org.nem.nis;
 
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.mappers.BlockMapper;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 import org.nem.core.dao.TransferDao;
@@ -226,52 +227,8 @@ public class BlockChain {
 	// not sure where it should be
 	private boolean addBlockToDb(Block bestBlock) {
 		synchronized (BlockChain.class) {
-			org.nem.core.dbmodel.Account forager = accountDao.getAccountByPrintableAddress(bestBlock.getSigner().getAddress().getEncoded());
 
-			byte[] blockHash = HashUtils.calculateHash(bestBlock);
-			org.nem.core.dbmodel.Block dbBlock = new org.nem.core.dbmodel.Block(
-					ByteUtils.bytesToLong(blockHash),
-					bestBlock.getVersion(),
-					bestBlock.getPreviousBlockHash(),
-					blockHash,
-					bestBlock.getTimeStamp().getRawTime(),
-					forager,
-					bestBlock.getSignature().getBytes(),
-					bestBlock.getHeight(),
-					0L,
-					bestBlock.getTotalFee().getNumMicroNem()
-			);
-
-			int i = 0;
-			List<Transfer> transactions = new ArrayList<>(bestBlock.getTransactions().size());
-
-			for (Transaction transaction : bestBlock.getTransactions()) {
-				final TransferTransaction transferTransaction = (TransferTransaction)transaction;
-				org.nem.core.dbmodel.Account sender = accountDao.getAccountByPrintableAddress(transaction.getSigner().getAddress().getEncoded());
-				org.nem.core.dbmodel.Account recipient = accountDao.getAccountByPrintableAddress(transferTransaction.getRecipient().getAddress().getEncoded());
-				byte[] txHash = HashUtils.calculateHash(transferTransaction);
-				Transfer dbTransfer = new Transfer(
-						ByteUtils.bytesToLong(txHash),
-						txHash,
-						transferTransaction.getVersion(),
-						transferTransaction.getType(),
-						transferTransaction.getFee().getNumMicroNem(),
-						transferTransaction.getTimeStamp().getRawTime(),
-						transferTransaction.getDeadline().getRawTime(),
-						sender,
-						// proof
-						transferTransaction.getSignature().getBytes(),
-						recipient,
-						i, // index
-						transferTransaction.getAmount().getNumMicroNem(),
-						0L // referenced tx
-				);
-				dbTransfer.setBlock(dbBlock);
-				transactions.add(dbTransfer);
-				i++;
-			}
-
-			dbBlock.setBlockTransfers(transactions);
+            final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, this.accountDao);
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block
@@ -340,10 +297,10 @@ public class BlockChain {
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
 					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
-							BigInteger.valueOf(realAccout.getBalance().getNumMicroNem()).multiply(
-									BigInteger.valueOf(30745)
-							)
-					);
+                            BigInteger.valueOf(realAccout.getBalance().getNumMicroNem()).multiply(
+                                    BigInteger.valueOf(30745)
+                            )
+                    );
 
 					System.out.println("   hit: 0x" + hit.toString(16));
 					System.out.println("target: 0x" + target.toString(16));
