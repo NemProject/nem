@@ -10,6 +10,11 @@ public class TimeInstant {
     private final int time;
 
     /**
+     * TimeInstant representing time 0.
+     */
+    public static final TimeInstant ZERO = new TimeInstant(0);
+
+    /**
      * Creates an instant in time.
      *
      * @param time The number of seconds passed since the epoch.

@@ -57,7 +57,7 @@ public class EntityFactoryTest {
         }
 
         @Override
-        public TimeInstant getEpochTime() { return new TimeInstant(0); }
+        public TimeInstant getEpochTime() { return TimeInstant.ZERO; }
 
         @Override
         public TimeInstant getCurrentTime() { return new TimeInstant(this.currentTime); }

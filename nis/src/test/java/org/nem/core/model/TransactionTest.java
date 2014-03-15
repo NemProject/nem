@@ -24,7 +24,7 @@ public class TransactionTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(0)));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
     }
 
@@ -104,7 +104,7 @@ public class TransactionTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(0)));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
     }
 

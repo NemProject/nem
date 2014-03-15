@@ -130,7 +130,7 @@ public class BlockTest {
 
     private TransferTransaction createSignedTransactionWithAmount(long amount) {
         final TransferTransaction transaction = new TransferTransaction(
-            new TimeInstant(0),
+            TimeInstant.ZERO,
             Utils.generateRandomAccount(),
             Utils.generateRandomAccount(),
             amount,

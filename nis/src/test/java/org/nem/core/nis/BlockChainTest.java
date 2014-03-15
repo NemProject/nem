@@ -111,7 +111,7 @@ public class BlockChainTest {
 
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction(new TimeInstant(0), sender, recipient, amount, null);
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, amount, null);
 	}
 
 	private Block createDummyDbBlock() {

@@ -313,7 +313,7 @@ public class TransferTransactionTest {
     //endregion
 
     private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-        return new TransferTransaction(new TimeInstant(0), sender, recipient, amount, message);
+        return new TransferTransaction(TimeInstant.ZERO, sender, recipient, amount, message);
     }
 
     private TransferTransaction createRoundTrippedTransaction(

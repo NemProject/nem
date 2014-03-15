@@ -11,7 +11,7 @@ public class SystemTimeProviderTest {
         TimeProvider provider = new SystemTimeProvider();
 
         // Assert:
-        Assert.assertThat(provider.getEpochTime(), IsEqual.equalTo(new TimeInstant(0)));
+        Assert.assertThat(provider.getEpochTime(), IsEqual.equalTo(TimeInstant.ZERO));
     }
 
 	@Test
@@ -20,7 +20,7 @@ public class SystemTimeProviderTest {
 		TimeProvider provider = new SystemTimeProvider();
 
 		// Assert:
-		Assert.assertThat(provider.getCurrentTime().compareTo(new TimeInstant(0)), IsEqual.equalTo(1));
+		Assert.assertThat(provider.getCurrentTime().compareTo(TimeInstant.ZERO), IsEqual.equalTo(1));
 	}
 
     @Test

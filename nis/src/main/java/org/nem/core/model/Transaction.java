@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 public abstract class Transaction extends VerifiableEntity {
 
 	private long fee;
-	private TimeInstant deadline = new TimeInstant(0); // TODO: placeholder
+	private TimeInstant deadline = TimeInstant.ZERO; // TODO: placeholder
 
 	/**
 	 * Creates a new transaction.

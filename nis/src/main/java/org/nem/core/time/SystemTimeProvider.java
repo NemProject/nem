@@ -26,7 +26,7 @@ public class SystemTimeProvider implements TimeProvider {
 
     @Override
     public TimeInstant getEpochTime() {
-        return new TimeInstant(0);
+        return TimeInstant.ZERO;
     }
 
     @Override

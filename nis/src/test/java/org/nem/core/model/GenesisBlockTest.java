@@ -28,7 +28,7 @@ public class GenesisBlockTest {
     @Test
     public void genesisBlockIsVerifiable() {
         // Arrange:
-        final Block block = new GenesisBlock(new TimeInstant(0));
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
 
         // Assert:
         Assert.assertThat(block.verify(), IsEqual.equalTo(true));
@@ -37,7 +37,7 @@ public class GenesisBlockTest {
     @Test
     public void genesisTransactionsAreVerifiable() {
         // Arrange:
-        final Block block = new GenesisBlock(new TimeInstant(0));
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
 
         // Assert:
         for (final Transaction transaction : block.getTransactions())
