@@ -45,6 +45,48 @@ public class AmountTest {
 
     //endregion
 
+    //region add / subtract
+
+    @Test
+    public void twoAmountsCanBeAddedTogether() {
+        // Arrange:
+        final Amount amount1 = new Amount(65);
+        final Amount amount2 = new Amount(111);
+
+        // Act:
+        final Amount result1 = amount1.add(amount2);
+        final Amount result2 = amount2.add(amount1);
+
+        // Assert:
+        Assert.assertThat(result1, IsEqual.equalTo(new Amount(176)));
+        Assert.assertThat(result2, IsEqual.equalTo(new Amount(176)));
+    }
+
+    @Test
+    public void smallerAmountCanBeSubtractedFromLargerAmount() {
+        // Arrange:
+        final Amount amount1 = new Amount(65);
+        final Amount amount2 = new Amount(111);
+
+        // Act:
+        final Amount result = amount2.subtract(amount1);
+
+        // Assert:
+        Assert.assertThat(result, IsEqual.equalTo(new Amount(46)));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void largerAmountCannotBeSubtractedFromSmallerAmount() {
+        // Arrange:
+        final Amount amount1 = new Amount(65);
+        final Amount amount2 = new Amount(111);
+
+        // Act:
+        amount1.subtract(amount2);
+    }
+
+    //endregion
+
     //region compareTo
 
     @Test

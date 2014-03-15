@@ -27,6 +27,26 @@ public class Amount implements Comparable<Amount> {
     }
 
     /**
+     * Creates a new Amount by adding the specified amount to this amount.
+     *
+     * @param amount The specified amount.
+     * @return The new amount.
+     */
+    public Amount add(final Amount amount) {
+        return new Amount(this.getNumMicroNem() + amount.getNumMicroNem());
+    }
+
+    /**
+     * Creates a new Amount by subtracting the specified amount from this amount.
+     *
+     * @param amount The specified amount.
+     * @return The new amount.
+     */
+    public Amount subtract(final Amount amount) {
+        return new Amount(this.getNumMicroNem() - amount.getNumMicroNem());
+    }
+
+    /**
      * Compares this amount to another Amount.
      *
      * @param rhs The amount to compare against.
