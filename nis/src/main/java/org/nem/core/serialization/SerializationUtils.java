@@ -15,7 +15,7 @@ public class SerializationUtils {
      * @param label The optional label.
      * @param address The object.
      */
-    public static void writeAddress(final Serializer serializer, String label, final Address address) {
+    public static void writeAddress(final Serializer serializer, final String label, final Address address) {
         serializer.writeString(label, address.getEncoded());
     }
 
@@ -140,7 +140,7 @@ public class SerializationUtils {
      * @param label The optional label.
      * @param instant The object.
      */
-    public static void writeTimeInstant(final Serializer serializer, String label, final TimeInstant instant) {
+    public static void writeTimeInstant(final Serializer serializer, final String label, final TimeInstant instant) {
         serializer.writeInt(label, instant.getRawTime());
     }
 
@@ -166,7 +166,7 @@ public class SerializationUtils {
      * @param label The optional label.
      * @param amount The object.
      */
-    public static void writeAmount(final Serializer serializer, String label, final Amount amount) {
+    public static void writeAmount(final Serializer serializer, final String label, final Amount amount) {
         serializer.writeLong(label, amount.getNumMicroNem());
     }
 
