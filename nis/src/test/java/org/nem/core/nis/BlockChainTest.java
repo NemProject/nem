@@ -16,6 +16,7 @@ import org.nem.core.utils.ByteUtils;
 import org.nem.nis.BlockChain;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
@@ -75,6 +76,7 @@ public class BlockChainTest {
 
 	@Test
 	public void canProcessTransaction() {
+		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final BlockChain blockChain = new MockBlockChain();
@@ -92,6 +94,7 @@ public class BlockChainTest {
 
 	@Test
 	public void cannotProcessSameTransaction() {
+		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final BlockChain blockChain = new MockBlockChain();
@@ -110,9 +113,96 @@ public class BlockChainTest {
 		Assert.assertThat(result2, IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void transactionsForNewBlockHappenedBeforeBlock() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final BlockChain blockChain = new MockBlockChain();
+		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
+		final TimeInstant now = systemTimeProvider.getCurrentTime();
+
+		// Act:
+		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, 123, null);
+		transaction1.sign();
+		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, 123, null);
+		transaction2.sign();
+
+		boolean result1 = blockChain.processTransaction(transaction1);
+		boolean result2 = blockChain.processTransaction(transaction2);
+
+		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(10));
+
+		// Assert
+		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
+		Assert.assertThat(result1, IsEqual.equalTo(true));
+		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void transactionsForNewBlockAreSortedByFee() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final BlockChain blockChain = new MockBlockChain();
+		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
+		final TimeInstant now = systemTimeProvider.getCurrentTime();
+
+		// Act:
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
+		transaction1.setFee(10);
+		transaction1.sign();
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
+		transaction1.setFee(5);
+		transaction2.sign();
+
+		boolean result1 = blockChain.processTransaction(transaction1);
+		boolean result2 = blockChain.processTransaction(transaction2);
+
+		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+
+		// Assert
+		Assert.assertThat(result1, IsEqual.equalTo(true));
+		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
+		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
+	}
+
+	@Test
+	public void transactionsForNewBlockAreSortedByTime() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final BlockChain blockChain = new MockBlockChain();
+		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
+		final TimeInstant now = systemTimeProvider.getCurrentTime();
+
+		// Act:
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
+		transaction1.setFee(5);
+		transaction1.sign();
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, 123, null);
+		transaction1.setFee(5);
+		transaction2.sign();
+
+		boolean result1 = blockChain.processTransaction(transaction1);
+		boolean result2 = blockChain.processTransaction(transaction2);
+
+		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+
+		// Assert
+		Assert.assertThat(result1, IsEqual.equalTo(true));
+		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
+		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
+	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, amount, null);
+		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), sender, recipient, amount, null);
 	}
 
 	private Block createDummyDbBlock() {

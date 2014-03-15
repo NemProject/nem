@@ -111,6 +111,31 @@ public class TransactionTest {
 
     //endregion
 
+	//region Comparable
+	@Test
+	public void transactionSameAreEven() {
+		// Arrange:
+		final MockTransaction transaction1 = new MockTransaction();
+		final MockTransaction transaction2 = new MockTransaction();
+
+		// Assert:
+		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void transactionWithSmallerFeeIsEarlier() {
+		// Arrange:
+		final MockTransaction transaction1 = new MockTransaction();
+		final MockTransaction transaction2 = new MockTransaction();
+
+		transaction1.setFee(10);
+		transaction2.setFee(5);
+
+		// Assert:
+		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(1));
+	}
+	//endregion
+
     //region Fees
 
     @Test

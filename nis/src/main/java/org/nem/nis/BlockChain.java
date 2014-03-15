@@ -123,6 +123,9 @@ public class BlockChain {
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
 			return false;
 		}
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
+			return false;
+		}
 
 		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
@@ -285,6 +288,19 @@ public class BlockChain {
 		return true;
 	}
 
+
+	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTIme) {
+		Set<Transaction> sortedTransactions = new TreeSet<>();
+		synchronized (BlockChain.class) {
+			for (Transaction tx : unconfirmedTransactions.values()) {
+				if (tx.getTimeStamp().compareTo(blockTIme) < 0) {
+					sortedTransactions.add(tx);
+				}
+			}
+		}
+		return new ArrayList<>(sortedTransactions);
+	}
+
 	class BlockGenerator implements Runnable {
 
 		@Override
@@ -299,19 +315,15 @@ public class BlockChain {
 
 			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
-			List<Transaction> transactionList;
 			Block bestBlock = null;
 			long bestScore = Long.MAX_VALUE;
 			// because of access to unconfirmedTransactions, and lastBlock*
-			synchronized (BlockChain.class) {
-				//
-				// TODO: the following code mut be changed to include only TXes, that have deadline < current time
-				//
-				Set<Transaction> sortedTransactions = new HashSet<>(unconfirmedTransactions.values());
-				transactionList = new ArrayList<>(sortedTransactions);
 
+			TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
+			List<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
+			synchronized (BlockChain.class) {
 				for (Account forger : unlockedAccounts) {
-					Block newBlock = new Block(forger, lastBlock.getBlockHash(), NisMain.TIME_PROVIDER.getCurrentTime(), lastBlock.getHeight() + 1);
+					Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
 					newBlock.addTransactions(transactionList);
 
 					newBlock.sign();

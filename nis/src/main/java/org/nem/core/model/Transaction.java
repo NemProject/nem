@@ -6,7 +6,7 @@ import org.nem.core.time.TimeInstant;
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
-public abstract class Transaction extends VerifiableEntity {
+public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
 
 	private long fee;
 	private TimeInstant deadline = TimeInstant.ZERO;
@@ -66,6 +66,26 @@ public abstract class Transaction extends VerifiableEntity {
 	public void setDeadline(final TimeInstant deadline) { this.deadline = deadline; }
 
 	//endregion
+
+	@Override
+	public int compareTo(Transaction rhs) {
+		int res = this.getType() - rhs.getType();
+		if (res != 0) {
+			return res < 0 ? -1 : 1;
+		}
+
+		res = this.getVersion() - rhs.getVersion();
+		if (res != 0) {
+			return res < 0 ? -1 : 1;
+		}
+
+		res = this.getTimeStamp().compareTo(rhs.getTimeStamp());
+		if (res != 0) {
+			return res;
+		}
+
+		return Long.valueOf(this.getFee()).compareTo( Long.valueOf(rhs.getFee()) );
+	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
