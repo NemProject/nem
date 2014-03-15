@@ -55,6 +55,12 @@ public class NisMain {
 		Long curBlockId = 0L;
 		System.out.println("starting analysis...");
 		org.nem.core.dbmodel.Block curBlock = blockDao.findByHash(GenesisBlock.HASH);
+
+		if (curBlock == null) {
+			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the dba and rerun");
+			System.exit(-1);
+		}
+
 		do {
 			accountAnalyzer.analyze(curBlock);
 
