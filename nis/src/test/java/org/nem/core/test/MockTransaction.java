@@ -2,6 +2,7 @@ package org.nem.core.test;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * A mock Transaction implementation.
@@ -10,10 +11,17 @@ public class MockTransaction extends Transaction {
 
     public static final int TYPE = 124;
     public static final int VERSION = 758;
-    public static final int TIMESTAMP = 1122448;
+    public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
 
 	private int customField;
     private long minimumFee;
+
+    /**
+     * Creates a mock transaction.
+     */
+    public MockTransaction() {
+        this(Utils.generateRandomAccount());
+    }
 
     /**
      * Creates a mock transaction.
@@ -32,18 +40,6 @@ public class MockTransaction extends Transaction {
      */
     public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
-        this.customField = customField;
-    }
-
-    /**
-     * Creates a mock transaction.
-     *
-     * @param sender The transaction sender's account.
-     * @param customField The initial custom field value.
-     * @param timestamp The desired timestamp.
-     */
-    public MockTransaction(final Account sender, final int customField, final int timestamp) {
-        super(TYPE, VERSION, TIMESTAMP, sender);
         this.customField = customField;
     }
 

@@ -5,6 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -24,7 +25,7 @@ public class BlockFactoryTest {
     public void canDeserializeVerifiableBlock() {
         // Arrange:
         final Account forger = Utils.generateRandomAccount();
-        final Block originalBlock = new Block(forger, Utils.generateRandomBytes(), 0, 1);
+        final Block originalBlock = new Block(forger, Utils.generateRandomBytes(), TimeInstant.ZERO, 1);
         final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, new MockAccountLookup());
 
         // Act:
@@ -40,7 +41,7 @@ public class BlockFactoryTest {
     public void canDeserializeNonVerifiableBlock() {
         // Arrange:
         final Account forger = Utils.generateRandomAccount();
-        final Block originalBlock = new Block(forger, Utils.generateRandomBytes(), 0, 1);
+        final Block originalBlock = new Block(forger, Utils.generateRandomBytes(), TimeInstant.ZERO, 1);
         final Deserializer deserializer = Utils.roundtripSerializableEntity(
             originalBlock.asNonVerifiable(),
             new MockAccountLookup());

@@ -1,8 +1,8 @@
 package org.nem.core.serialization;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.model.Account;
 import org.nem.core.model.*;
+import org.nem.core.time.TimeInstant;
 
 public class SerializationUtils {
 
@@ -127,6 +127,32 @@ public class SerializationUtils {
     public static Signature readSignature(final Deserializer deserializer, final String label) {
         byte[] bytes = deserializer.readBytes(label);
         return new Signature(bytes);
+    }
+
+    //endregion
+
+    //region TimeInstant
+
+    /**
+     * Writes a time instant object.
+     *
+     * @param serializer The serializer to use.
+     * @param label The optional label.
+     * @param instant The object.
+     */
+    public static void writeTimeInstant(final Serializer serializer, String label, final TimeInstant instant) {
+        serializer.writeInt(label, instant.getRawTime());
+    }
+
+    /**
+     * Reads a time instant object.
+     *
+     * @param deserializer The deserializer to use.
+     * @param label The optional label.
+     * @return The read object.
+     */
+    public static TimeInstant readTimeInstant(final Deserializer deserializer, final String label) {
+        return new TimeInstant(deserializer.readInt(label));
     }
 
     //endregion

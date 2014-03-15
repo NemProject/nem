@@ -9,8 +9,8 @@ import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ArrayUtils;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.peer.NodeApiId;
@@ -98,9 +98,9 @@ public class BlockChain {
 	 */
 	public boolean processTransaction(Transaction transaction) {
 
-		int currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		// rest is checked by isValid()
-		if (transaction.getTimeStamp() > currentTime + 30) {
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
 			return false;
 		}
 
@@ -159,13 +159,14 @@ public class BlockChain {
 		// check if we know previous block
 		byte[] parentHash = block.getPreviousBlockHash();
 		org.nem.core.dbmodel.Block parent = blockDao.findByHash(parentHash);
+        final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
 
 		// if we don't have parent, we can't do anything with this block
 		if (parent == null) {
 			return false;
 		}
 
-		if (block.getTimeStamp() < parent.getTimestamp()) {
+		if (block.getTimeStamp().compareTo(parentTimeStamp) < 0) {
 			return false;
 		}
 
@@ -185,8 +186,8 @@ public class BlockChain {
 
 		// TODO: WARNING: as for now this method processes only blocks
 		// that have been sent directly, so we can add quite strict rule here
-		int currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp() > currentTime + 30*60) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		if (block.getTimeStamp().compareTo(currentTime.addMinutes(30)) > 0) {
 			return false;
 		}
 
@@ -197,11 +198,11 @@ public class BlockChain {
 		}
 
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
-		BigInteger target = BigInteger.valueOf(block.getTimeStamp() - parent.getTimestamp()).multiply(
-				BigInteger.valueOf(forgerAccount.getBalance()).multiply(
-						BigInteger.valueOf(30745)
-				)
-		);
+		BigInteger target = BigInteger.valueOf(block.getTimeStamp().subtract(parentTimeStamp)).multiply(
+                BigInteger.valueOf(forgerAccount.getBalance()).multiply(
+                        BigInteger.valueOf(30745)
+                )
+        );
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
@@ -226,7 +227,7 @@ public class BlockChain {
 					bestBlock.getVersion(),
 					bestBlock.getPreviousBlockHash(),
 					blockHash,
-					bestBlock.getTimeStamp(),
+					bestBlock.getTimeStamp().getRawTime(),
 					forager,
 					bestBlock.getSignature().getBytes(),
 					bestBlock.getHeight(),
@@ -248,8 +249,8 @@ public class BlockChain {
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						transferTransaction.getFee(),
-						transferTransaction.getTimeStamp(),
-						transferTransaction.getDeadline(),
+						transferTransaction.getTimeStamp().getRawTime(),
+						transferTransaction.getDeadline().getRawTime(),
 						sender,
 						// proof
 						transferTransaction.getSignature().getBytes(),
@@ -322,7 +323,7 @@ public class BlockChain {
 					}
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
-					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp() - lastBlock.getTimestamp()).multiply(
+					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
 							BigInteger.valueOf(realAccout.getBalance()).multiply(
 									BigInteger.valueOf(30745)
 							)

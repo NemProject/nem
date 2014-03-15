@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 
@@ -65,20 +66,15 @@ public class GenesisBlock extends Block {
      *
      * @param timestamp The block timestamp.
      */
-    public GenesisBlock(final int timestamp) {
+    public GenesisBlock(final TimeInstant timestamp) {
         super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
 
         // TODO: as a placeholder distribute amounts equally
         final long shareAmount = GENESIS_AMOUNT / GENESIS_RECIPIENT_ACCOUNT_IDS.length;
         for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
             final Address address = Address.fromEncoded(id);
-            final Account recipientAccount = new Account(address);
-            final TransferTransaction transaction = new TransferTransaction(
-                TransactionTypes.TRANSFER,
-                ACCOUNT,
-                recipientAccount,
-                shareAmount,
-                null);
+            final Account account = new Account(address);
+            final TransferTransaction transaction = new TransferTransaction(timestamp, ACCOUNT, account, shareAmount, null);
             transaction.setFee(0); // TODO: this won't work because of minimum fee enforcement
 
 			transaction.sign();

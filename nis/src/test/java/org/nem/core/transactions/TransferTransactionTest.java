@@ -6,6 +6,7 @@ import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -161,7 +162,8 @@ public class TransferTransactionTest {
         // Arrange:
         final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
-        Transaction transaction = new TransferTransaction(-1, signer, recipient, 1, null);
+        Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, 1, null);
+        transaction.setDeadline(TimeInstant.ZERO);
 
         // Assert:
         Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
@@ -205,7 +207,7 @@ public class TransferTransactionTest {
         final Account recipient = Utils.generateRandomAccount();
         TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
         transaction.setFee(fee);
-		transaction.setDeadline(transaction.getTimeStamp() + 1);
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
         // Act:
         return transaction.isValid();
@@ -232,7 +234,7 @@ public class TransferTransactionTest {
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
-		transaction.setDeadline(transaction.getTimeStamp() + 1);
+        transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Act:
         return transaction.isValid();
@@ -311,7 +313,7 @@ public class TransferTransactionTest {
     //endregion
 
     private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-        return new TransferTransaction(0, sender, recipient, amount, message);
+        return new TransferTransaction(TimeInstant.ZERO, sender, recipient, amount, message);
     }
 
     private TransferTransaction createRoundTrippedTransaction(

@@ -7,11 +7,15 @@ public interface TimeProvider {
 
     /**
      * Gets the epoch time.
+     *
+     * @return The epoch time.
      */
-    public int getEpochTime();
+    public TimeInstant getEpochTime();
 
     /**
      * Gets the current time.
+     *
+     * @return The current time.
      */
-    public int getCurrentTime();
+    public TimeInstant getCurrentTime();
 }

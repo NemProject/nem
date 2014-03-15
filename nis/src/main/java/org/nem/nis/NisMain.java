@@ -68,7 +68,7 @@ public class NisMain {
 
 	@PostConstruct
 	private void init() {
-		LOGGER.warning("context ================== current: " + Long.toHexString(TIME_PROVIDER.getCurrentTime()));
+		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
 		populateDb();
 
@@ -93,7 +93,7 @@ public class NisMain {
 	}
 
 	private Block prepareGenesisBlock() {
-		return new GenesisBlock(0);
+		return new GenesisBlock(TIME_PROVIDER.getEpochTime());
 	}
 
 	private void populateGenesisTxes(org.nem.core.dbmodel.Account a, org.nem.core.dbmodel.Block b, Block genesisBlock) {
@@ -134,7 +134,7 @@ public class NisMain {
 						transferTransaction.getVersion(),
 						transferTransaction.getType(),
 						0L, // can't use getFee here, as it does Min, transferTransaction.getFee(),
-						genesisBlock.getTimeStamp(),
+						genesisBlock.getTimeStamp().getRawTime(),
 						0, // deadline
 						a,
 						// proof

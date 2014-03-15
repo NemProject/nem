@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
@@ -8,7 +9,7 @@ import org.nem.core.serialization.*;
 public abstract class Transaction extends VerifiableEntity {
 
 	private long fee;
-	private int deadline;
+	private TimeInstant deadline = TimeInstant.ZERO;
 
 	/**
 	 * Creates a new transaction.
@@ -18,7 +19,7 @@ public abstract class Transaction extends VerifiableEntity {
      * @param timestamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final int timestamp, final Account sender) {
+	public Transaction(final int type, final int version, final TimeInstant timestamp, final Account sender) {
 		super(type, version, timestamp, sender);
 	}
 
@@ -31,7 +32,7 @@ public abstract class Transaction extends VerifiableEntity {
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
 		this.fee = deserializer.readLong("fee");
-		this.deadline = deserializer.readInt("deadline");
+		this.deadline = SerializationUtils.readTimeInstant(deserializer, "deadline");
 	}
 
 	//region Setters and Getters
@@ -55,21 +56,21 @@ public abstract class Transaction extends VerifiableEntity {
 	 *
 	 * @return The deadline.
 	 */
-	public int getDeadline() { return this.deadline; }
+	public TimeInstant getDeadline() { return this.deadline; }
 
 	/**
 	 * Sets the deadline.
 	 *
 	 * @param deadline The desired deadline.
 	 */
-	public void setDeadline(int deadline) { this.deadline = deadline; }
+	public void setDeadline(final TimeInstant deadline) { this.deadline = deadline; }
 
 	//endregion
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeLong("fee", this.getFee());
-		serializer.writeInt("deadline", this.getDeadline());
+        SerializationUtils.writeTimeInstant(serializer, "deadline", this.getDeadline());
 	}
 
 	/**
@@ -85,10 +86,8 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-		return this.getTimeStamp() >= 0
-            && this.deadline > this.getTimeStamp()
-            //&& (this.deadline - this.getTimeStamp()) < 24*60*60;
-        ;
+        return this.deadline.compareTo(this.getTimeStamp()) > 0
+            && this.deadline.compareTo(this.getTimeStamp().addDays(1)) < 1;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 public class TransactionTest {
 
@@ -23,88 +24,9 @@ public class TransactionTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(0));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
     }
-
-	@Test
-	public void transactionWithWrongDeadlineIsInvalid() {
-		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
-
-		// Act:
-		final MockTransaction transaction = new MockTransaction(signer, 6);
-
-		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
-		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void transactionWithCorrectDeadlineIsValid() {
-		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
-
-		// Act:
-		final MockTransaction transaction = new MockTransaction(signer, 6);
-		transaction.setDeadline(transaction.getTimeStamp() + 1);
-
-		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
-		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void transactionWithNegativeTimestampIsInvalid() {
-		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
-
-		// Act:
-		final MockTransaction transaction = new MockTransaction(signer, 6, -10);
-
-		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(0L));
-		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-	}
-
-    // TODO: fix this test
-//	@Test
-//	public void transactionWithTooDistantDeadlineIsInvalid() {
-//		// Arrange:
-//		final KeyPair publicPrivateKeyPair = new KeyPair();
-//		final Account signer = new Account(publicPrivateKeyPair);
-//
-//		// Act:
-//		final MockTransaction transaction = new MockTransaction(signer, 6, 5*24*60*60);
-////		transaction.setTimeStamp(5*24*60*60);
-//		transaction.setDeadline(6*24*60*60);
-//
-//		// Assert:
-//		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-//	}
-
-	@Test
-	public void transactionMaxDeadlineIsValid() {
-		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
-
-		// Act:
-		final MockTransaction transaction = new MockTransaction(signer, 6, 5*24*60*60);
-		transaction.setDeadline(6*24*60*60 - 1);
-
-		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
-	}
 
     @Test
     public void transactionCanBeRoundTripped() {
@@ -118,9 +40,73 @@ public class TransactionTest {
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
         Assert.assertThat(transaction.getFee(), IsEqual.equalTo(130L));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(0));
+        Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
+        Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
         Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
+    }
+
+    //endregion
+
+    // Deadline
+
+    @Test
+	public void transactionDeadlineCanBeSet() {
+		// Act:
+		final MockTransaction transaction = new MockTransaction();
+        transaction.setDeadline(new TimeInstant(726));
+
+		// Assert:
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
+	}
+
+	@Test
+	public void transactionWithDeadlineInRangeIsValid() {
+		// Act:
+		final MockTransaction transaction = new MockTransaction();
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+	}
+
+    @Test
+    public void transactionWithLessThanMinimumDeadlineIsInvalid() {
+        // Act:
+        final MockTransaction transaction = new MockTransaction();
+        transaction.setDeadline(transaction.getTimeStamp());
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+    }
+
+    @Test
+    public void transactionWithMinimumDeadlineIsValid() {
+        // Act:
+        final MockTransaction transaction = new MockTransaction();
+        transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void transactionWithMaximumDeadlineIsValid() {
+        // Act:
+        final MockTransaction transaction = new MockTransaction();
+        transaction.setDeadline(transaction.getTimeStamp().addDays(1));
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+    }
+
+    @Test
+    public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
+        // Act:
+        final MockTransaction transaction = new MockTransaction();
+        transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
+
+        // Assert:
+        Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
     }
 
     //endregion

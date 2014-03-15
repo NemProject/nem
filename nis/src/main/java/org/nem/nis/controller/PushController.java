@@ -106,7 +106,7 @@ public class PushController {
 		LOGGER.info("   signer: " + HexEncoder.getString(block.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
-		if (block.isValid() && block.verify()) {
+		if (block.verify()) {
 			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
 			// validate block, add to chain

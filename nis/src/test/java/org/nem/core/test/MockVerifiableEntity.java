@@ -2,6 +2,7 @@ package org.nem.core.test;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * A mock VerifiableEntity implementation.
@@ -10,7 +11,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 
     public static final int TYPE = 12;
     public static final int VERSION = 24;
-    public static final int TIMESTAMP = 127435;
+    public static final TimeInstant TIMESTAMP = new TimeInstant(127435);
 
 	private int customField;
 
