@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
@@ -105,6 +106,21 @@ public class SerializationUtilsTest {
         Assert.assertThat((String)object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
     }
 
+    @Test
+    public void canWriteTimeInstant() {
+        // Arrange:
+        final JsonSerializer serializer = new JsonSerializer();
+        final TimeInstant instant = new TimeInstant(77124);
+
+        // Act:
+        SerializationUtils.writeTimeInstant(serializer, "TimeInstant", instant);
+
+        // Assert:
+        final JSONObject object = serializer.getObject();
+        Assert.assertThat(object.size(), IsEqual.equalTo(1));
+        Assert.assertThat((Integer)object.get("TimeInstant"), IsEqual.equalTo(77124));
+    }
+
     //endregion
 
     //region Roundtrip
@@ -189,6 +205,22 @@ public class SerializationUtilsTest {
 
         // Assert:
         Assert.assertThat(signature, IsEqual.equalTo(originalSignature));
+    }
+
+    @Test
+    public void canRoundtripTimeInstant() {
+        // Arrange:
+        final JsonSerializer serializer = new JsonSerializer();
+        final TimeInstant originalInstant = new TimeInstant(77124);
+
+        // Act:
+        SerializationUtils.writeTimeInstant(serializer, "TimeInstant", originalInstant);
+
+        final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
+        final TimeInstant instant = SerializationUtils.readTimeInstant(deserializer, "TimeInstant");
+
+        // Assert:
+        Assert.assertThat(instant, IsEqual.equalTo(originalInstant));
     }
 
     //endregion
