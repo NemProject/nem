@@ -7,6 +7,7 @@ import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
+import org.nem.core.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
@@ -31,7 +32,7 @@ public class BlockChainTest {
 	public void analyzeSavesResults() {
 		// Arrange:
 		Block block = createDummyDbBlock();
-		BlockChain blockChain = new BlockChain();
+		BlockChain blockChain = new MockBlockChain();
 		blockChain.bootup();
 
 		// Act:
@@ -47,7 +48,7 @@ public class BlockChainTest {
 	public void processTransactionsSavesTransactions() throws InterruptedException {
 		// Arrange:
 		Transaction tx = dummyTransaction(recipient1, 12345);
-		BlockChain blockChain = new BlockChain();
+		BlockChain blockChain = new MockBlockChain();
 		tx.sign();
 
 		// Act:
@@ -61,7 +62,7 @@ public class BlockChainTest {
 	public void processTransactionsDoesNotSaveDuplicates() throws InterruptedException {
 		// Arrange:
 		Transaction tx = dummyTransaction(recipient1, 12345);
-		BlockChain blockChain = new BlockChain();
+		BlockChain blockChain = new MockBlockChain();
 		tx.sign();
 
 		// Act:
@@ -76,7 +77,7 @@ public class BlockChainTest {
 	public void canProcessTransaction() {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new BlockChain();
+		final BlockChain blockChain = new MockBlockChain();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
@@ -93,7 +94,7 @@ public class BlockChainTest {
 	public void cannotProcessSameTransaction() {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new BlockChain();
+		final BlockChain blockChain = new MockBlockChain();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:

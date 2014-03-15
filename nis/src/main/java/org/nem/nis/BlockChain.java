@@ -44,8 +44,7 @@ public class BlockChain {
 	@Autowired
 	private BlockDao blockDao;
 
-	@Autowired
-	private TransferDao transactionDao;
+	private TransferDao transferDao;
 
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
@@ -70,6 +69,27 @@ public class BlockChain {
 
 	public void bootup() {
 		LOGGER.info("booting up block generator");
+	}
+
+	public byte[] getLastBlockHash() {
+		return lastBlock.getBlockHash();
+	}
+
+	public Long getLastBlockHeight() {
+		return lastBlock.getHeight();
+	}
+
+	public byte[] getLastBlockSignature() {
+		return lastBlock.getForgerProof();
+	}
+
+	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
+		return unconfirmedTransactions;
+	}
+
+	@Autowired
+	public void setTransferDao(TransferDao transferDao) {
+		this.transferDao = transferDao;
 	}
 
 	private long calcDbBlockScore(org.nem.core.dbmodel.Block block) {
@@ -107,7 +127,7 @@ public class BlockChain {
 		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
 		synchronized (BlockChain.class) {
-			Transfer tx = transactionDao.findByHash(transactionHash.get());
+			Transfer tx = transferDao.findByHash(transactionHash.get());
 			if (tx != null) {
 				return false;
 			}
@@ -123,22 +143,6 @@ public class BlockChain {
 
 	public void addUnlockedAccount(Account account) {
 		unlockedAccounts.add(account);
-	}
-
-	public byte[] getLastBlockHash() {
-		return lastBlock.getBlockHash();
-	}
-
-	public Long getLastBlockHeight() {
-		return lastBlock.getHeight();
-	}
-
-	public byte[] getLastBlockSignature() {
-		return lastBlock.getForgerProof();
-	}
-
-	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
-		return unconfirmedTransactions;
 	}
 
 
