@@ -167,4 +167,17 @@ public class TimeInstantTest {
     }
 
     //endregion
+
+    //region toString
+
+    @Test
+    public void toStringReturnsRawTime() {
+        // Arrange:
+        final TimeInstant instant = new TimeInstant(22561);
+
+        // Assert:
+        Assert.assertThat(instant.toString(), IsEqual.equalTo("22561"));
+    }
+
+    //endregion
 }

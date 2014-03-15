@@ -104,4 +104,9 @@ public class TimeInstant {
         TimeInstant rhs = (TimeInstant)obj;
         return this.time == rhs.time;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d", this.time);
+    }
 }
