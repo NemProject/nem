@@ -23,7 +23,7 @@ import static org.hamcrest.core.IsSame.sameInstance;
 public class AccountAnalyzerTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
 	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;
-	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.GENESIS_ACCOUNT.getAddress().getEncoded()));
+	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static Account dbSender = new Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());

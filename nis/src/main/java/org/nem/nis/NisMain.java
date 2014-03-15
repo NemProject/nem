@@ -54,7 +54,7 @@ public class NisMain {
 	private void analyzeBlocks() {
 		Long curBlockId = 0L;
 		System.out.println("starting analysis...");
-		org.nem.core.dbmodel.Block curBlock = blockDao.findByHash(GenesisBlock.GENESIS_HASH);
+		org.nem.core.dbmodel.Block curBlock = blockDao.findByHash(GenesisBlock.HASH);
 		do {
 			accountAnalyzer.analyze(curBlock);
 
@@ -80,7 +80,7 @@ public class NisMain {
 	}
 
 	private void populateDb() {
-		org.nem.core.dbmodel.Account dbGenesisAccount = populateGenesisAccount(GenesisBlock.GENESIS_ACCOUNT);
+		org.nem.core.dbmodel.Account dbGenesisAccount = populateGenesisAccount(GenesisBlock.ACCOUNT);
 
 		if (transactionDao.count() == 0) {
 			Block genesisBlock = prepareGenesisBlock();
@@ -158,12 +158,12 @@ public class NisMain {
         byte[] genesisBlockHash = HashUtils.calculateHash(genesisBlock);
 
 		System.out.println("aaa: " + HexEncoder.getString(genesisBlockHash));
-		System.out.println("bbb: " + HexEncoder.getString(GenesisBlock.GENESIS_HASH));
+		System.out.println("bbb: " + HexEncoder.getString(GenesisBlock.HASH));
 		System.out.println(ByteUtils.bytesToLong(genesisBlockHash));
 
 		if (blockDao.count() == 0) {
 			b = new org.nem.core.dbmodel.Block(
-					ByteUtils.bytesToLong(GenesisBlock.GENESIS_HASH),
+					ByteUtils.bytesToLong(GenesisBlock.HASH),
 					1,
 					// prev hash
 					new byte[] {
@@ -182,7 +182,7 @@ public class NisMain {
 			blockDao.save(b);
 
 		} else {
-			b = blockDao.findByHash(GenesisBlock.GENESIS_HASH);
+			b = blockDao.findByHash(GenesisBlock.HASH);
 		}
 
 		LOGGER.info("block id: " + b.getId().toString());

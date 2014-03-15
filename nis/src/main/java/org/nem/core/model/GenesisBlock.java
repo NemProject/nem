@@ -11,6 +11,17 @@ import java.math.BigInteger;
  */
 public class GenesisBlock extends Block {
 
+    /**
+     * The genesis account.
+     */
+    public final static Account ACCOUNT;
+
+    /**
+     * The genesis hash.
+     */
+    public final static byte[] HASH = HexEncoder.getBytesSilent(
+        "7486a763590b6220b3b275f06dc313bdffeea47359d98d2b1dfd9278ce8faf4b");
+
     // this will be removed later, only public key will be present in the code
     // all signatures will be pre-generated and placed in-code
     private final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger(
@@ -19,9 +30,6 @@ public class GenesisBlock extends Block {
     private final static int GENESIS_HEIGHT = 1;
     private final static int HASH_LENGTH = 32;
 
-    public final static Account GENESIS_ACCOUNT;
-
-	public final static byte[] GENESIS_HASH = HexEncoder.getBytesSilent("7486a763590b6220b3b275f06dc313bdffeea47359d98d2b1dfd9278ce8faf4b");
 
 	//	Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
 	//	Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
@@ -46,7 +54,7 @@ public class GenesisBlock extends Block {
 
     static {
         final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
-        GENESIS_ACCOUNT = new Account(genesisKeyPair);
+        ACCOUNT = new Account(genesisKeyPair);
     }
 
 	// 40.000.000 NEMs (* 1000000 micro nems)
@@ -58,14 +66,19 @@ public class GenesisBlock extends Block {
      * @param timestamp The block timestamp.
      */
     public GenesisBlock(final int timestamp) {
-        super(GENESIS_ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
+        super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
 
         // TODO: as a placeholder distribute amounts equally
         final long shareAmount = GENESIS_AMOUNT / GENESIS_RECIPIENT_ACCOUNT_IDS.length;
         for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
             final Address address = Address.fromEncoded(id);
-            final Account account = new Account(address);
-            final TransferTransaction transaction = new TransferTransaction(TransactionTypes.TRANSFER, GENESIS_ACCOUNT, account, shareAmount, null);
+            final Account recipientAccount = new Account(address);
+            final TransferTransaction transaction = new TransferTransaction(
+                TransactionTypes.TRANSFER,
+                ACCOUNT,
+                recipientAccount,
+                shareAmount,
+                null);
             transaction.setFee(0); // TODO: this won't work because of minimum fee enforcement
 
 			transaction.sign();
