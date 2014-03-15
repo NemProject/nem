@@ -7,6 +7,16 @@ import java.security.InvalidParameterException;
 
 public class TimeInstantTest {
 
+    //region constants
+
+    @Test
+    public void constantsAreInitializedCorrectly() {
+        // Assert:
+        Assert.assertThat(TimeInstant.ZERO, IsEqual.equalTo(new TimeInstant(0)));
+    }
+
+    //endregion
+
     //region constructor
 
     @Test(expected = InvalidParameterException.class)
@@ -151,7 +161,7 @@ public class TimeInstantTest {
         Assert.assertThat(new TimeInstant(6), IsNot.not(IsEqual.equalTo(instant)));
         Assert.assertThat(new TimeInstant(8), IsNot.not(IsEqual.equalTo(instant)));
         Assert.assertThat(null, IsNot.not(IsEqual.equalTo(instant)));
-        Assert.assertThat(77, IsNot.not(IsEqual.equalTo((Object)instant)));
+        Assert.assertThat(7, IsNot.not(IsEqual.equalTo((Object)instant)));
     }
 
     @Test

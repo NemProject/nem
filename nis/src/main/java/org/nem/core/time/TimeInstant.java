@@ -84,10 +84,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
      */
     @Override
     public int compareTo(final TimeInstant rhs) {
-        if (this.time == rhs.time)
-            return 0;
-
-        return this.time < rhs.time ? -1 : 1;
+        return Integer.compare(this.time, rhs.time);
     }
 
     /**
