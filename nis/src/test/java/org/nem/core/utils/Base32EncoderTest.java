@@ -3,6 +3,8 @@ package org.nem.core.utils;
 import org.hamcrest.core.*;
 import org.junit.*;
 
+import java.security.InvalidParameterException;
+
 public class Base32EncoderTest {
 
     private static final byte[] ENCODED_SIGMA_BYTES = new byte[] {
@@ -25,5 +27,17 @@ public class Base32EncoderTest {
         // Assert:
         Assert.assertThat(Base32Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("KNUWO3LB"));
         Assert.assertThat(Base32Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("ETBKFYUCVQ======"));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void malformedStringCannotBeDecoded() {
+        // Act:
+        Base32Encoder.getBytes("BAD STRING)(*&^%$#@!");
+    }
+
+    @Test
+    public void stringCanContainPaddingAndWhitespace() {
+        // Assert:
+        Assert.assertThat(Base32Encoder.getBytes("  ETBKFYUCVQ======  "), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
     }
 }

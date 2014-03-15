@@ -2,6 +2,8 @@ package org.nem.core.utils;
 
 import org.apache.commons.codec.binary.Base32;
 
+import java.security.InvalidParameterException;
+
 /**
  * Static class that contains utility functions for converting Base32 strings to and from bytes.
  */
@@ -16,6 +18,9 @@ public class Base32Encoder {
     public static byte[] getBytes(final String base32String) {
         Base32 codec = new Base32();
         byte[] encodedBytes = StringEncoder.getBytes(base32String);
+        if (!codec.isInAlphabet(encodedBytes, true))
+            throw new InvalidParameterException("malformed base32 string passed to getBytes");
+
         return codec.decode(encodedBytes);
     }
 
