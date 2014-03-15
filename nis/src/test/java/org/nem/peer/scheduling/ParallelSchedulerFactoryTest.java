@@ -2,6 +2,7 @@ package org.nem.peer.scheduling;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.util.*;
 
@@ -124,7 +125,7 @@ public class ParallelSchedulerFactoryTest {
                 this.threadIds.add(Thread.currentThread().getId());
             }
             catch (InterruptedException e) {
-                throw new IllegalStateException(e);
+                throw ExceptionUtils.toUnchecked(e);
             }
         }
     }
@@ -152,7 +153,7 @@ public class ParallelSchedulerFactoryTest {
                 this.threadIds.add(Thread.currentThread().getId());
             }
             catch (InterruptedException e) {
-                throw new IllegalStateException(e);
+                throw ExceptionUtils.toUnchecked(e);
             }
         }
     }

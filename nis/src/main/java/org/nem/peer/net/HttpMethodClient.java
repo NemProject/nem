@@ -6,6 +6,7 @@ import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.*;
 import org.eclipse.jetty.http.HttpMethod;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.*;
 
 import java.io.*;
@@ -112,8 +113,11 @@ public class HttpMethodClient {
         catch (TimeoutException e) {
             throw new InactivePeerException(e);
         }
-        catch (URISyntaxException|InterruptedException|ExecutionException|IOException e) {
+        catch (URISyntaxException|ExecutionException|IOException e) {
             throw new FatalPeerException(e);
+        }
+        catch (InterruptedException e) {
+            throw ExceptionUtils.toUnchecked(e);
         }
     }
 

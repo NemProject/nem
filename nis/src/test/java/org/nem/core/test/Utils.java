@@ -3,6 +3,7 @@ package org.nem.core.test;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.security.SecureRandom;
 
@@ -174,12 +175,13 @@ public class Utils {
      * @param monitor The monitor.
      */
     public static void monitorWait(final Object monitor) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (monitor) {
             try {
                 monitor.wait();
             }
             catch (InterruptedException e) {
-                throw new IllegalStateException(e);
+                throw ExceptionUtils.toUnchecked(e);
             }
         }
     }
@@ -190,6 +192,7 @@ public class Utils {
      * @param monitor The monitor.
      */
     public static void monitorSignal(final Object monitor) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (monitor) {
             monitor.notifyAll();
         }
