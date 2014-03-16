@@ -123,6 +123,18 @@ public class TransferTransactionTest {
     }
 
     @Test
+    public void feeIsWaivedForGenesisAccount() {
+        // Assert:
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 0, 0), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 0), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12001, 0), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 0), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 1), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 199), IsEqual.equalTo(0L));
+        Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 200), IsEqual.equalTo(0L));
+    }
+
+    @Test
     public void messageFeeIsBasedOnEncodedSize() {
         // Assert:
         Assert.assertThat(calculateMessageFee(1000, 2000), IsEqual.equalTo(5L));
@@ -130,11 +142,15 @@ public class TransferTransactionTest {
     }
 
     private long calculateFee(final long amount, final int messageSize) {
+        // Act:
+        return calculateFee(Utils.generateRandomAccount(), amount, messageSize);
+    }
+
+    private long calculateFee(final Account signer, final long amount, final int messageSize) {
         // Arrange:
-        final Account signer = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final PlainMessage message = new PlainMessage(new byte[messageSize]);
-		TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, message);
+        final TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, message);
 
         // Act:
         return transaction.getFee().getNumMicroNem();

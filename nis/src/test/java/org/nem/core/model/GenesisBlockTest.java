@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.transactions.TransferTransaction;
 
 public class GenesisBlockTest {
 
@@ -22,7 +23,7 @@ public class GenesisBlockTest {
         Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(new byte[32]));
         Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
-//        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0)); TODO: verify
+        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(8));
     }
 
     @Test
@@ -44,16 +45,39 @@ public class GenesisBlockTest {
             Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
     }
 
-    // TODO: this test needs to be fixed
-//    @Test
-//    public void hashConstantIsConsistentWithGenesisBlock() {
-//        // Arrange:
-//        final Block block = new GenesisBlock(TimeInstant.ZERO);
-//
-//        // Assert:
-//        final long expectedHashCode = ByteUtils.bytesToLong(GenesisBlock.HASH);
-//        Assert.assertThat((long)block.hashCode(), IsEqual.equalTo(expectedHashCode));
-//    }
+    @Test
+    public void genesisTransactionsDoNotHaveFees() {
+        // Arrange:
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
+
+        // Assert:
+        for (final Transaction transaction : block.getTransactions())
+            Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+    }
+
+    //region constants
+
+    @Test
+    public void amountConstantIsConsistentWithGenesisBlock() {
+        // Act:
+        Amount totalAmount = Amount.ZERO;
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
+        for (final Transaction transaction : block.getTransactions())
+            totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
+
+        // Assert:
+        Assert.assertThat(totalAmount, IsEqual.equalTo(GenesisBlock.AMOUNT));
+    }
+
+    @Test
+    public void hashConstantIsConsistentWithGenesisBlock() {
+        // Act:
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
+        final byte[] hash = HashUtils.calculateHash(block);
+
+        // Assert:
+        Assert.assertThat(hash, IsEqual.equalTo(GenesisBlock.HASH));
+    }
 
     @Test
     public void accountConstantIsConsistentWithGenesisBlock() {
@@ -63,4 +87,6 @@ public class GenesisBlockTest {
         // Assert:
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(GenesisBlock.ACCOUNT));
     }
+
+    //endregion
 }

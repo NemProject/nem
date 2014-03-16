@@ -23,6 +23,11 @@ public class GenesisBlock extends Block {
     public final static byte[] HASH = HexEncoder.getBytesSilent(
         "95d6240681f15cbd32e91f9636985293e6484b61f2cf533a696724ffa155933b");
 
+    /**
+     * The amount of NEM in the genesis block.
+     */
+    public final static Amount AMOUNT = Amount.fromNem(4000000000L);
+
     // this will be removed later, only public key will be present in the code
     // all signatures will be pre-generated and placed in-code
     private final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger(
@@ -31,16 +36,6 @@ public class GenesisBlock extends Block {
     private final static int GENESIS_HEIGHT = 1;
     private final static int HASH_LENGTH = 32;
 
-
-	//	Hashes.sha3(StringEncoder.getBytes("super-duper-special")),
-	//	Hashes.sha3(StringEncoder.getBytes("Jaguar0625")),
-	//	Hashes.sha3(StringEncoder.getBytes("BloodyRookie")),
-	//	Hashes.sha3(StringEncoder.getBytes("Thies1965")),
-	//	Hashes.sha3(StringEncoder.getBytes("borzalom")),
-	//	Hashes.sha3(StringEncoder.getBytes("gimre")),
-	//	Hashes.sha3(StringEncoder.getBytes("Makoto")),
-	//	Hashes.sha3(StringEncoder.getBytes("UtopianFuture")),
-	//	Hashes.sha3(StringEncoder.getBytes("minusbalancer"))
     private final static String[] GENESIS_RECIPIENT_ACCOUNT_IDS = new String[] {
         "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
         "NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
@@ -49,17 +44,13 @@ public class GenesisBlock extends Block {
         "NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
         "NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
         "NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
-        "NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM",
-        "NBZUVLKB7THC5QH5IJUJVEF66QJZUCQLMVTIFXUC"
+        "NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
     };
 
     static {
         final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
         ACCOUNT = new Account(genesisKeyPair);
     }
-
-	// 40.000.000 NEMs (* 1000000 micro nems)
-    public final static long GENESIS_AMOUNT = 40000000000000L;
 
     /**
      * Creates a genesis block.
@@ -70,12 +61,11 @@ public class GenesisBlock extends Block {
         super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
 
         // TODO: as a placeholder distribute amounts equally
-        final Amount shareAmount = new Amount(GENESIS_AMOUNT / GENESIS_RECIPIENT_ACCOUNT_IDS.length);
+        final Amount shareAmount = new Amount(AMOUNT.getNumMicroNem() / GENESIS_RECIPIENT_ACCOUNT_IDS.length);
         for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
             final Address address = Address.fromEncoded(id);
             final Account account = new Account(address);
             final TransferTransaction transaction = new TransferTransaction(timestamp, ACCOUNT, account, shareAmount, null);
-            transaction.setFee(Amount.ZERO); // TODO: this won't work because of minimum fee enforcement
 
 			transaction.sign();
             this.addTransaction(transaction);
