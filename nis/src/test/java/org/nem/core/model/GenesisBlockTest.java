@@ -19,7 +19,7 @@ public class GenesisBlockTest {
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(12)));
 
-//        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(0L)); TODO: verify
+        Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(new byte[32]));
         Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
 //        Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0)); TODO: verify

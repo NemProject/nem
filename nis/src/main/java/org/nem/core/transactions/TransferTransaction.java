@@ -87,6 +87,9 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
+        if (GenesisBlock.ACCOUNT.equals(this.getSigner()))
+            return Amount.ZERO;
+
         // TODO: add scaling to Amount
 		long amountFee = (long)Math.ceil(this.amount.getNumMicroNem() * 0.001);
 		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
