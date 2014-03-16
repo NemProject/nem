@@ -29,7 +29,7 @@ public class AccountAnalyzer implements AccountLookup {
 		mapByAddressId = new HashMap<>();
 	}
 
-	private Account addToBalanceAndUnconfirmedBalance(org.nem.core.dbmodel.Account a, long amount) {
+	private Account addAccountToCache(org.nem.core.dbmodel.Account a) {
 		ByteArray publicKey = a.getPublicKey() != null ? new ByteArray(a.getPublicKey()) : null;
 		String encodedAddress = a.getPrintableKey();
 
@@ -52,12 +52,6 @@ public class AccountAnalyzer implements AccountLookup {
 			}
 		}
 
-        // TODO: this is ugly, need to create adapters and call execute
-        if (amount < 0)
-		    account.decrementBalance(new Amount(-1 * amount));
-        else
-            account.incrementBalance(new Amount(amount));
-
 		return account;
 	}
 
@@ -79,8 +73,14 @@ public class AccountAnalyzer implements AccountLookup {
 		for(Iterator<Transfer> i = txes.iterator(); i.hasNext(); ) {
 			Transfer tx = i.next();
 
-			addToBalanceAndUnconfirmedBalance(tx.getSender(), -(tx.getAmount() + tx.getFee()));
-			Account recipient = addToBalanceAndUnconfirmedBalance(tx.getRecipient(), tx.getAmount());
+			Account sender = addAccountToCache(tx.getSender());
+			Account recipient = addAccountToCache(tx.getRecipient());
+
+			Amount amount = new Amount(tx.getAmount());
+			Amount fee = new Amount(tx.getFee());
+			sender.decrementBalance(amount.add(fee));
+			recipient.incrementBalance(amount);
+			// TODO: message
 
 			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
