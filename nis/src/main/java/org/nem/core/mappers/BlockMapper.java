@@ -28,6 +28,7 @@ public class BlockMapper {
      */
     public static org.nem.core.dbmodel.Block toDbModel(final Block block, final AccountDao accountDao) {
         final org.nem.core.dbmodel.Account forager = getAccountDbModel(block.getSigner(), accountDao);
+		forager.setPublicKey(block.getSigner().getKeyPair().getPublicKey());
 
         final byte[] blockHash = HashUtils.calculateHash(block);
         final org.nem.core.dbmodel.Block dbBlock = new org.nem.core.dbmodel.Block(

@@ -29,6 +29,8 @@ public class TransferMapper {
         final org.nem.core.dbmodel.Account sender = getAccountDbModel(transfer.getSigner(), accountDao);
         final org.nem.core.dbmodel.Account recipient = getAccountDbModel(transfer.getRecipient(), accountDao);
 
+		sender.setPublicKey(transfer.getSigner().getKeyPair().getPublicKey());
+
         final byte[] txHash = HashUtils.calculateHash(transfer);
         return new Transfer(
             ByteUtils.bytesToLong(txHash),
