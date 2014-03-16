@@ -72,6 +72,10 @@ public class BlockChain {
 		LOGGER.info("booting up block generator");
 	}
 
+	public org.nem.core.dbmodel.Block getLastDbBlock() {
+		return lastBlock;
+	}
+
 	public byte[] getLastBlockHash() {
 		return lastBlock.getBlockHash();
 	}
@@ -82,6 +86,10 @@ public class BlockChain {
 
 	public byte[] getLastBlockSignature() {
 		return lastBlock.getForgerProof();
+	}
+
+	public long getLastBlockScore() {
+		return calcDbBlockScore(lastBlock);
 	}
 
 	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
@@ -158,16 +166,21 @@ public class BlockChain {
 	 */
 	public boolean processBlock(Block block) {
 		byte[] blockHash = HashUtils.calculateHash(block);
+		byte[] parentHash = block.getPreviousBlockHash();
+
+		org.nem.core.dbmodel.Block parent;
 
 		// block already seen
-		if (blockDao.findByHash(blockHash) != null) {
-			return false;
+		synchronized (BlockChain.class) {
+			if (blockDao.findByHash(blockHash) != null) {
+				return false;
+			}
+
+			// check if we know previous block
+			parent = blockDao.findByHash(parentHash);
 		}
 
-		// check if we know previous block
-		byte[] parentHash = block.getPreviousBlockHash();
-		org.nem.core.dbmodel.Block parent = blockDao.findByHash(parentHash);
-        final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
+		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
 
 		// if we don't have parent, we can't do anything with this block
 		if (parent == null) {
