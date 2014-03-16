@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.model.*;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
@@ -51,6 +52,48 @@ public class BlockMapperTest {
 //    @Test
 //    public void transferModelWithMessageCanBeMappedToDbModel() {
 //    }
+
+	@Test
+	public void blockModelWithoutTransactionsCanBeRoundTripped() {
+		// Arrange:
+		final Account forager = Utils.generateRandomAccount();
+		final Block model = new Block(
+				forager,
+				Utils.generateRandomBytes(),
+				new TimeInstant(721),
+				17);
+
+		model.sign();
+
+		final MockAccountDao accountDao = new MockAccountDao();
+		final org.nem.core.dbmodel.Account dbSigner = new org.nem.core.dbmodel.Account();
+		dbSigner.setPublicKey(forager.getKeyPair().getPublicKey());
+		dbSigner.setPrintableKey(forager.getAddress().getEncoded());
+		accountDao.setMapping(model.getSigner(), dbSigner);
+
+		final byte[] hash = HashUtils.calculateHash(model);
+
+		final MockAccountLookup mockAccountLookup = new MockAccountLookup();
+		mockAccountLookup.setMockAccount(forager);
+
+		// Act:
+		final org.nem.core.dbmodel.Block dbModel = BlockMapper.toDbModel(model, accountDao);
+		final Block newModel = BlockMapper.toModel(dbModel, mockAccountLookup);
+
+		// Assert:
+		Assert.assertThat(newModel.getType(), IsEqual.equalTo(model.getType()));
+		Assert.assertThat(newModel.getVersion(), IsEqual.equalTo(model.getVersion()));
+		Assert.assertThat(newModel.getPreviousBlockHash(), IsEqual.equalTo(model.getPreviousBlockHash()));
+		Assert.assertThat(HashUtils.calculateHash(newModel), IsEqual.equalTo(hash));
+		Assert.assertThat(newModel.getTimeStamp(), IsEqual.equalTo(model.getTimeStamp()));
+		Assert.assertThat(newModel.getSigner(), IsEqual.equalTo(model.getSigner()));
+		Assert.assertThat(newModel.getSignature(), IsEqual.equalTo(model.getSignature()));
+		Assert.assertThat(newModel.getHeight(), IsEqual.equalTo(model.getHeight()));
+
+		Assert.assertThat(newModel.getTotalFee(), IsEqual.equalTo(model.getTotalFee()));
+		
+		Assert.assertThat(newModel.getTransactions(), IsEqual.equalTo(model.getTransactions()));
+	}
 
     private class MockAccountDao implements AccountDao {
 

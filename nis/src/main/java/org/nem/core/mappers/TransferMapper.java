@@ -1,11 +1,15 @@
 package org.nem.core.mappers;
 
+import org.nem.core.crypto.Signature;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.AccountAnalyzer;
 
 /**
  * Static class that contains functions for converting to and from
@@ -46,4 +50,28 @@ public class TransferMapper {
     private static org.nem.core.dbmodel.Account getAccountDbModel(final Account account, final AccountDao accountDao) {
         return accountDao.getAccountByPrintableAddress(account.getAddress().getEncoded());
     }
+
+	/**
+	 * Converts Transfer db-model to a TransferTransaction model.
+	 *
+	 * @param transfer db-model transfer orm object.
+	 * @param accountAnalyzer analyzer containing information about accounts.
+	 *
+	 * @return TransterTransaction model.
+	 */
+	public static TransferTransaction toModel(final Transfer transfer, AccountLookup accountAnalyzer) {
+		org.nem.core.model.Account sender = accountAnalyzer.findByAddress(Address.fromPublicKey(transfer.getSender().getPublicKey()));
+		org.nem.core.model.Account recipient = accountAnalyzer.findByAddress(Address.fromEncoded(transfer.getRecipient().getPrintableKey()));
+		TransferTransaction transferTransaction = new TransferTransaction(
+				new TimeInstant(transfer.getTimestamp()),
+				sender,
+				recipient,
+				new Amount(transfer.getAmount()),
+				null
+		);
+		transferTransaction.setFee(new Amount(transfer.getFee()));
+		transferTransaction.setDeadline(new TimeInstant(transfer.getDeadline()));
+		transferTransaction.setSignature(new Signature(transfer.getSenderProof()));
+		return transferTransaction;
+	}
 }
