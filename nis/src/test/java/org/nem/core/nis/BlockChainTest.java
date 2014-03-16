@@ -224,7 +224,7 @@ public class BlockChainTest {
 		b.sign();
 
 		Block dbBlock = new Block(
-				ByteUtils.bytesToLong(GenesisBlock.HASH),
+				123456789L,
 				1,
 				// prev hash
 				new byte[] {

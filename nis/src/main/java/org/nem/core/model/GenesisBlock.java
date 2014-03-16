@@ -18,12 +18,6 @@ public class GenesisBlock extends Block {
     public final static Account ACCOUNT;
 
     /**
-     * The genesis hash.
-     */
-    public final static byte[] HASH = HexEncoder.getBytesSilent(
-        "95d6240681f15cbd32e91f9636985293e6484b61f2cf533a696724ffa155933b");
-
-    /**
      * The amount of NEM in the genesis block.
      */
     public final static Amount AMOUNT = Amount.fromNem(4000000000L);

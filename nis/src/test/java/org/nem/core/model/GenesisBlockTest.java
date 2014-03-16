@@ -70,16 +70,6 @@ public class GenesisBlockTest {
     }
 
     @Test
-    public void hashConstantIsConsistentWithGenesisBlock() {
-        // Act:
-        final Block block = new GenesisBlock(TimeInstant.ZERO);
-        final byte[] hash = HashUtils.calculateHash(block);
-
-        // Assert:
-        Assert.assertThat(hash, IsEqual.equalTo(GenesisBlock.HASH));
-    }
-
-    @Test
     public void accountConstantIsConsistentWithGenesisBlock() {
         // Arrange:
         final Block block = new GenesisBlock(TimeInstant.ZERO);
