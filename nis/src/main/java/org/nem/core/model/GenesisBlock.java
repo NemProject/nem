@@ -21,7 +21,7 @@ public class GenesisBlock extends Block {
      * The genesis hash.
      */
     public final static byte[] HASH = HexEncoder.getBytesSilent(
-        "48cf200080ce901f6791ec2fdc3efd06c2bf8da12846a559c4bfdcc94fd44e5c");
+        "95d6240681f15cbd32e91f9636985293e6484b61f2cf533a696724ffa155933b");
 
     // this will be removed later, only public key will be present in the code
     // all signatures will be pre-generated and placed in-code
