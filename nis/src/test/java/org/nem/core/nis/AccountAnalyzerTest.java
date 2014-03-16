@@ -1,6 +1,5 @@
 package org.nem.core.nis;
 
-import org.hamcrest.core.IsSame;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.dbmodel.Account;
@@ -13,7 +12,6 @@ import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.MockAccount;
 import org.nem.core.test.MockAccountAnalyzer;
 import org.nem.core.test.Utils;
-import org.nem.nis.AccountAnalyzer;
 
 import java.util.*;
 
@@ -22,9 +20,9 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 
 public class AccountAnalyzerTest {
-	public static final Amount SENDER_AMOUNT = Amount.fromNEMs(10);
-	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNEMs(3);
-	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNEMs(5);
+	public static final Amount SENDER_AMOUNT = Amount.fromNem(10);
+	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNem(3);
+	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNem(5);
 	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());

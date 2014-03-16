@@ -17,6 +17,28 @@ public class AmountTest {
 
     //endregion
 
+    //region factories
+
+    @Test
+    public void canCreateAmountFromNem() {
+        // Act:
+        final Amount amount = Amount.fromNem(11);
+
+        // Assert:
+        Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11000000L));
+    }
+
+    @Test
+    public void canCreateAmountFromMicroNem() {
+        // Act:
+        final Amount amount = Amount.fromMicroNem(11);
+
+        // Assert:
+        Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11L));
+    }
+
+    //endregion
+
     //region constructor
 
     @Test(expected = InvalidParameterException.class)

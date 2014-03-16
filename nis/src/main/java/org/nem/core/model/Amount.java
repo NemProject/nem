@@ -14,9 +14,25 @@ public class Amount implements Comparable<Amount> {
      */
     public static final Amount ZERO = new Amount(0);
 
-	public static Amount fromNEMs(long amountOfNems) {
-		return new Amount(amountOfNems * 1000000);
+    /**
+     * Creates a new amount given a quantity of NEM.
+     *
+     * @param amount The amount of NEM.
+     * @return The new amount.
+     */
+	public static Amount fromNem(long amount) {
+		return new Amount(amount * 1000000);
 	}
+
+    /**
+     * Creates a new amount given a quantity of micro NEM.
+     *
+     * @param amount The amount of micro NEM.
+     * @return The new amount.
+     */
+    public static Amount fromMicroNem(long amount) {
+        return new Amount(amount);
+    }
 
     /**
      * Creates a NEM amount.
