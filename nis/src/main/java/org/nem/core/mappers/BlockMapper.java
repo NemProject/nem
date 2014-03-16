@@ -8,7 +8,6 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.AccountAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,27 +58,29 @@ public class BlockMapper {
     }
 
 	/**
-	 * Converts Block db-model to Block model
+	 * Converts a Block db-model to a Block model.
 	 *
-	 * @param block db-model block orm object
-	 * @param accountAnalyzer analyzer containing information about accounts.
+	 * @param dbBlock The block db-model.
+	 * @param accountLookup The account lookup object.
 	 *
-	 * @return Block model.
+	 * @return The Block model.
 	 */
-	public static Block toModel(final org.nem.core.dbmodel.Block block, final AccountLookup accountAnalyzer) {
-		org.nem.core.model.Account forager = accountAnalyzer.findByAddress(Address.fromPublicKey(block.getForger().getPublicKey()));
-		org.nem.core.model.Block res = new org.nem.core.model.Block(
-				forager,
-				block.getPrevBlockHash(),
-				new TimeInstant(block.getTimestamp()),
-				block.getHeight()
-		);
-		res.setSignature(new Signature(block.getForgerProof()));
-		for (Transfer transfer : block.getBlockTransfers()) {
-			final TransferTransaction transferTransaction = TransferMapper.toModel(transfer, accountAnalyzer);
-			res.addTransaction(transferTransaction);
+	public static Block toModel(final org.nem.core.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
+        final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
+		final Account forager = accountLookup.findByAddress(foragerAddress);
+
+		final Block block = new org.nem.core.model.Block(
+            forager,
+            dbBlock.getPrevBlockHash(),
+            new TimeInstant(dbBlock.getTimestamp()),
+            dbBlock.getHeight());
+
+		block.setSignature(new Signature(dbBlock.getForgerProof()));
+		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
+			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
+			block.addTransaction(transfer);
 		}
 
-		return res;
+		return block;
 	}
 }

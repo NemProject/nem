@@ -2,130 +2,195 @@ package org.nem.core.mappers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.dao.AccountDao;
+import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.Utils;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
-
-import java.util.*;
 
 public class BlockMapperTest {
 
     @Test
     public void blockModelWithoutTransactionsCanBeMappedToDbModel() {
-        final Block model = new Block(
-            Utils.generateRandomAccount(),
-            Utils.generateRandomBytes(),
-            new TimeInstant(721),
-            17);
-
-        model.sign();
-
-        final MockAccountDao accountDao = new MockAccountDao();
-        final org.nem.core.dbmodel.Account dbSigner = new org.nem.core.dbmodel.Account();
-        accountDao.setMapping(model.getSigner(), dbSigner);
-
-        final byte[] hash = HashUtils.calculateHash(model);
+        // Arrange:
+        final TestContext context = new TestContext();
 
         // Act:
-        final org.nem.core.dbmodel.Block dbModel = BlockMapper.toDbModel(model, accountDao);
+        final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
 
         // Assert:
-        Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
-        Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(ByteUtils.bytesToLong(hash)));
-        Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-        Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(model.getPreviousBlockHash()));
-        Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(hash));
-        Assert.assertThat(dbModel.getTimestamp(), IsEqual.equalTo(721));
-        Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(dbSigner));
-        Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(model.getSignature().getBytes()));
-        Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
-        Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
-        Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(0L));
-        Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
+        context.assertDbModel(dbModel, 0);
         Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
     }
 
-    // TODO: finish tests
-//    @Test
-//    public void transferModelWithMessageCanBeMappedToDbModel() {
-//    }
+    @Test
+    public void blockModelWithTransactionsCanBeMappedToDbModel() {
+        // Arrange:
+        final int NUM_TRANSACTIONS = 3;
+        final TestContext context = new TestContext();
+        context.addTransactions();
+
+        // Act:
+        final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
+
+        // Assert:
+        context.assertDbModel(dbModel, NUM_TRANSACTIONS);
+        Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+        for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
+            final Transfer dbTransfer = dbModel.getBlockTransfers().get(i);
+            final Transaction transaction = context.getModel().getTransactions().get(i);
+            Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+        }
+    }
 
 	@Test
 	public void blockModelWithoutTransactionsCanBeRoundTripped() {
-		// Arrange:
-		final Account forager = Utils.generateRandomAccount();
-		final Block model = new Block(
-				forager,
-				Utils.generateRandomBytes(),
-				new TimeInstant(721),
-				17);
+        // Arrange:
+        final TestContext context = new TestContext();
+        final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
 
-		model.sign();
+        // Act:
+        final Block model = context.toModel(dbModel);
 
-		final MockAccountDao accountDao = new MockAccountDao();
-		final org.nem.core.dbmodel.Account dbSigner = new org.nem.core.dbmodel.Account();
-		dbSigner.setPublicKey(forager.getKeyPair().getPublicKey());
-		dbSigner.setPrintableKey(forager.getAddress().getEncoded());
-		accountDao.setMapping(model.getSigner(), dbSigner);
-
-		final byte[] hash = HashUtils.calculateHash(model);
-
-		final MockAccountLookup mockAccountLookup = new MockAccountLookup();
-		mockAccountLookup.setMockAccount(forager);
-
-		// Act:
-		final org.nem.core.dbmodel.Block dbModel = BlockMapper.toDbModel(model, accountDao);
-		final Block newModel = BlockMapper.toModel(dbModel, mockAccountLookup);
-
-		// Assert:
-		Assert.assertThat(newModel.getType(), IsEqual.equalTo(model.getType()));
-		Assert.assertThat(newModel.getVersion(), IsEqual.equalTo(model.getVersion()));
-		Assert.assertThat(newModel.getPreviousBlockHash(), IsEqual.equalTo(model.getPreviousBlockHash()));
-		Assert.assertThat(HashUtils.calculateHash(newModel), IsEqual.equalTo(hash));
-		Assert.assertThat(newModel.getTimeStamp(), IsEqual.equalTo(model.getTimeStamp()));
-		Assert.assertThat(newModel.getSigner(), IsEqual.equalTo(model.getSigner()));
-		Assert.assertThat(newModel.getSignature(), IsEqual.equalTo(model.getSignature()));
-		Assert.assertThat(newModel.getHeight(), IsEqual.equalTo(model.getHeight()));
-
-		Assert.assertThat(newModel.getTotalFee(), IsEqual.equalTo(model.getTotalFee()));
-		
-		Assert.assertThat(newModel.getTransactions(), IsEqual.equalTo(model.getTransactions()));
+        // Assert:
+        context.assertModel(model);
 	}
 
-    private class MockAccountDao implements AccountDao {
+    @Test
+    public void blockModelWithTransactionsCanBeRoundTripped() {
+        // Arrange:
+        final int NUM_TRANSACTIONS = 3;
+        final TestContext context = new TestContext();
+        context.addTransactions();
+        final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
 
-        private Map<String, org.nem.core.dbmodel.Account> knownAccounts = new HashMap<>();
+        // Act:
+        final Block model = context.toModel(dbModel);
 
-        public void setMapping(final Account account, final org.nem.core.dbmodel.Account dbAccount) {
-            this.knownAccounts.put(account.getAddress().getEncoded(), dbAccount);
+        // Assert:
+        context.assertModel(model);
+        Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+        for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
+            final Transaction originalTransaction = context.getModel().getTransactions().get(i);
+            final byte[] originalTransactionHash = HashUtils.calculateHash(originalTransaction);
+
+            final Transaction transaction = model.getTransactions().get(i);
+            final byte[] transactionHash = HashUtils.calculateHash(transaction);
+
+            Assert.assertThat(transactionHash, IsEqual.equalTo(originalTransactionHash));
+        }
+    }
+
+    private class TestContext {
+
+        private final Block model;
+        private final org.nem.core.dbmodel.Account dbForager;
+        private final Account account1;
+        private final org.nem.core.dbmodel.Account dbAccount1;
+        private final Account account2;
+        private final org.nem.core.dbmodel.Account dbAccount2;
+        private final Account account3;
+        private final org.nem.core.dbmodel.Account dbAccount3;
+        private final MockAccountDao accountDao;
+        private byte[] hash;
+
+        public TestContext() {
+            this.model = new Block(
+                Utils.generateRandomAccount(),
+                Utils.generateRandomBytes(),
+                new TimeInstant(721),
+                17);
+
+            this.signModel();
+
+            this.dbForager = new org.nem.core.dbmodel.Account();
+            this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+
+            this.account1 = Utils.generateRandomAccount();
+            this.dbAccount1 = createDbAccount(this.account1);
+
+            this.account2 = Utils.generateRandomAccount();
+            this.dbAccount2 = createDbAccount(this.account2);
+
+            this.account3 = Utils.generateRandomAccount();
+            this.dbAccount3 = createDbAccount(this.account3);
+
+            this.accountDao = new MockAccountDao();
+            accountDao.addMapping(this.model.getSigner(), this.dbForager);
+            accountDao.addMapping(this.account1, this.dbAccount1);
+            accountDao.addMapping(this.account2, this.dbAccount2);
+            accountDao.addMapping(this.account3, this.dbAccount3);
         }
 
-        @Override
-        public org.nem.core.dbmodel.Account getAccount(Long id) {
-            throw new UnsupportedOperationException();
+        private org.nem.core.dbmodel.Account createDbAccount(final Account account) {
+            final org.nem.core.dbmodel.Account dbAccount = new org.nem.core.dbmodel.Account();
+            dbAccount.setPublicKey(account.getKeyPair().getPublicKey());
+            dbAccount.setPrintableKey(account.getAddress().getEncoded());
+            return dbAccount;
         }
 
-        @Override
-        public org.nem.core.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
-            return this.knownAccounts.get(printableAddress);
+        public Block getModel() { return this.model; }
+
+        public org.nem.core.dbmodel.Block toDbModel() {
+            return BlockMapper.toDbModel(this.model, this.accountDao);
         }
 
-        @Override
-        public void save(org.nem.core.dbmodel.Account account) {
-            throw new UnsupportedOperationException();
+        public Block toModel(final org.nem.core.dbmodel.Block dbBlock) {
+            final MockAccountLookup mockAccountLookup = new MockAccountLookup();
+            mockAccountLookup.setMockAccount(this.model.getSigner());
+            mockAccountLookup.setMockAccount(this.account1);
+            mockAccountLookup.setMockAccount(this.account2);
+            mockAccountLookup.setMockAccount(this.account3);
+            return BlockMapper.toModel(dbBlock, mockAccountLookup);
         }
 
-        @Override
-        public Long count() {
-            throw new UnsupportedOperationException();
+        public void addTransactions() {
+            this.model.addTransaction(new TransferTransaction(
+                new TimeInstant(100), this.account1, this.account2, new Amount(7), null));
+            this.model.addTransaction(new TransferTransaction(
+                new TimeInstant(200), this.account2, this.account3, new Amount(11), null));
+            this.model.addTransaction(new TransferTransaction(
+                new TimeInstant(300), this.account3, this.account1, new Amount(4), null));
+
+            for (final Transaction transaction : this.model.getTransactions())
+                transaction.sign();
+
+            this.signModel();
         }
 
-        @Override
-        public void saveMulti(List<org.nem.core.dbmodel.Account> recipientsAccounts) {
-            throw new UnsupportedOperationException();
+        private void signModel() {
+            this.model.sign();
+            this.hash = HashUtils.calculateHash(this.model);
+        }
+
+        public void assertDbModel(final org.nem.core.dbmodel.Block dbModel, final long expectedFee) {
+            Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
+            Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(ByteUtils.bytesToLong(this.hash)));
+            Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
+            Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
+            Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
+            Assert.assertThat(dbModel.getTimestamp(), IsEqual.equalTo(721));
+            Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForager));
+            Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
+            Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
+            Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
+            Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
+            Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
+        }
+
+        public void assertModel(final Block rhs) {
+            Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(hash));
+            Assert.assertThat(rhs.getType(), IsEqual.equalTo(model.getType()));
+            Assert.assertThat(rhs.getVersion(), IsEqual.equalTo(model.getVersion()));
+            Assert.assertThat(rhs.getPreviousBlockHash(), IsEqual.equalTo(model.getPreviousBlockHash()));
+            Assert.assertThat(rhs.getTimeStamp(), IsEqual.equalTo(model.getTimeStamp()));
+            Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(model.getSigner()));
+            Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(model.getSignature()));
+            Assert.assertThat(rhs.getHeight(), IsEqual.equalTo(model.getHeight()));
+            Assert.assertThat(rhs.getTotalFee(), IsEqual.equalTo(model.getTotalFee()));
         }
     }
 }

@@ -9,7 +9,6 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.AccountAnalyzer;
 
 /**
  * Static class that contains functions for converting to and from
@@ -52,26 +51,30 @@ public class TransferMapper {
     }
 
 	/**
-	 * Converts Transfer db-model to a TransferTransaction model.
+	 * Converts a Transfer db-model to a TransferTransaction model.
 	 *
-	 * @param transfer db-model transfer orm object.
-	 * @param accountAnalyzer analyzer containing information about accounts.
+	 * @param dbTransfer The transfer db-model.
+	 * @param accountLookup The account lookup object.
 	 *
-	 * @return TransterTransaction model.
+	 * @return The TransferTransaction model.
 	 */
-	public static TransferTransaction toModel(final Transfer transfer, AccountLookup accountAnalyzer) {
-		org.nem.core.model.Account sender = accountAnalyzer.findByAddress(Address.fromPublicKey(transfer.getSender().getPublicKey()));
-		org.nem.core.model.Account recipient = accountAnalyzer.findByAddress(Address.fromEncoded(transfer.getRecipient().getPrintableKey()));
-		TransferTransaction transferTransaction = new TransferTransaction(
-				new TimeInstant(transfer.getTimestamp()),
-				sender,
-				recipient,
-				new Amount(transfer.getAmount()),
-				null
-		);
-		transferTransaction.setFee(new Amount(transfer.getFee()));
-		transferTransaction.setDeadline(new TimeInstant(transfer.getDeadline()));
-		transferTransaction.setSignature(new Signature(transfer.getSenderProof()));
-		return transferTransaction;
+	public static TransferTransaction toModel(final Transfer dbTransfer, final AccountLookup accountLookup) {
+        final Address senderAccount = Address.fromPublicKey(dbTransfer.getSender().getPublicKey());
+		final Account sender = accountLookup.findByAddress(senderAccount);
+
+        final Address recipientAccount = Address.fromEncoded(dbTransfer.getRecipient().getPrintableKey());
+		final Account recipient = accountLookup.findByAddress(recipientAccount);
+
+		TransferTransaction transfer = new TransferTransaction(
+            new TimeInstant(dbTransfer.getTimestamp()),
+            sender,
+            recipient,
+            new Amount(dbTransfer.getAmount()),
+            null);
+
+        transfer.setFee(new Amount(dbTransfer.getFee()));
+        transfer.setDeadline(new TimeInstant(dbTransfer.getDeadline()));
+        transfer.setSignature(new Signature(dbTransfer.getSenderProof()));
+		return transfer;
 	}
 }
