@@ -1,37 +1,49 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
+/**
+ * Represents an announce request.
+ */
 public class RequestAnnounce implements SerializableEntity {
 	private byte[] data;
 	private byte[] signature;
 
+    /**
+     * Creates a new request.
+     *
+     * @param data The data.
+     * @param signature The signature.
+     */
 	public RequestAnnounce(final byte[] data, final byte[] signature) {
 		this.data = data;
 		this.signature = signature;
 	}
 
-	public RequestAnnounce(Deserializer deserializer) {
+    /**
+     * Deserializes a request.
+     *
+     * @param deserializer The deserializer.
+     */
+	public RequestAnnounce(final Deserializer deserializer) {
 		this.data = deserializer.readBytes("data");
 		this.signature = deserializer.readBytes("signature");
 	}
 
-	public byte[] getData() {
-		return data;
-	}
+    /**
+     * Gets the request data.
+     *
+     * @return The request data.
+     */
+	public byte[] getData() { return this.data; }
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
-
+    /**
+     * Gets the request signature.
+     *
+     * @return The request signature.
+     */
 	public byte[] getSignature() {
-		return signature;
-	}
-
-	public void setSignature(byte[] signature) {
-		this.signature = signature;
+		return this.signature;
 	}
 
 	@Override
