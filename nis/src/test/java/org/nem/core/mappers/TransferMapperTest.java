@@ -1,6 +1,6 @@
 package org.nem.core.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.dbmodel.*;
 import org.nem.core.messages.PlainMessage;
@@ -124,6 +124,10 @@ public class TransferMapperTest {
             Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(144L));
             Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
             Assert.assertThat(dbModel.getBlock(), IsEqual.equalTo(null));
+
+            final byte[] signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+            Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
+            Assert.assertThat(dbModel.getRecipient().getPublicKey(), IsEqual.equalTo(null));
         }
 
         public void assertModel(final TransferTransaction rhs) {

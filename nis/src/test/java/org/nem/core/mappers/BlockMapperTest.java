@@ -1,6 +1,6 @@
 package org.nem.core.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
@@ -179,6 +179,9 @@ public class BlockMapperTest {
             Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
             Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
             Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
+
+            final byte[] signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+            Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
         }
 
         public void assertModel(final Block rhs) {

@@ -26,9 +26,9 @@ public class TransferMapper {
      */
     public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDao accountDao) {
         final org.nem.core.dbmodel.Account sender = getAccountDbModel(transfer.getSigner(), accountDao);
-        final org.nem.core.dbmodel.Account recipient = getAccountDbModel(transfer.getRecipient(), accountDao);
+        sender.setPublicKey(transfer.getSigner().getKeyPair().getPublicKey());
 
-		sender.setPublicKey(transfer.getSigner().getKeyPair().getPublicKey());
+        final org.nem.core.dbmodel.Account recipient = getAccountDbModel(transfer.getRecipient(), accountDao);
 
         final byte[] txHash = HashUtils.calculateHash(transfer);
         return new Transfer(
