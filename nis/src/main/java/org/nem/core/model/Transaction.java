@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
 
-	private long fee;
+	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
 
 	/**
@@ -31,7 +31,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = deserializer.readLong("fee");
+		this.fee = SerializationUtils.readAmount(deserializer, "fee");
 		this.deadline = SerializationUtils.readTimeInstant(deserializer, "deadline");
 	}
 
@@ -42,14 +42,18 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The fee.
 	 */
-	public long getFee() { return Math.max(this.getMinimumFee(), this.fee); }
+	public Amount getFee() {
+        return this.fee.compareTo(this.getMinimumFee()) < 0
+            ? this.getMinimumFee()
+            : this.fee;
+    }
 
 	/**
 	 * Sets the fee.
 	 *
 	 * @param fee The desired fee.
 	 */
-	public void setFee(final long fee) { this.fee = fee; }
+	public void setFee(final Amount fee) { this.fee = fee; }
 
 	/**
 	 * Gets the deadline.
@@ -69,27 +73,24 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	@Override
 	public int compareTo(Transaction rhs) {
-		int res = this.getType() - rhs.getType();
-		if (res != 0) {
-			return res < 0 ? -1 : 1;
-		}
+        int[] comparisonResults = new int[] {
+            Integer.compare(this.getType(), rhs.getType()),
+            Integer.compare(this.getVersion(), rhs.getVersion()),
+            this.getTimeStamp().compareTo(rhs.getTimeStamp()),
+            this.getFee().compareTo(rhs.getFee())
+        };
 
-		res = this.getVersion() - rhs.getVersion();
-		if (res != 0) {
-			return res < 0 ? -1 : 1;
-		}
+        for (int result : comparisonResults) {
+            if (result != 0)
+                return result;
+        }
 
-		res = this.getTimeStamp().compareTo(rhs.getTimeStamp());
-		if (res != 0) {
-			return res;
-		}
-
-		return Long.valueOf(this.getFee()).compareTo( Long.valueOf(rhs.getFee()) );
+        return 0;
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
-		serializer.writeLong("fee", this.getFee());
+        SerializationUtils.writeAmount(serializer, "fee", this.getFee());
         SerializationUtils.writeTimeInstant(serializer, "deadline", this.getDeadline());
 	}
 
@@ -115,5 +116,5 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The minimum fee.
 	 */
-	protected abstract long getMinimumFee();
+	protected abstract Amount getMinimumFee();
 }

@@ -7,6 +7,7 @@ import org.nem.core.dbmodel.Account;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.Address;
+import org.nem.core.model.Amount;
 import org.nem.core.model.GenesisBlock;
 import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.MockAccount;
@@ -21,8 +22,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 
 public class AccountAnalyzerTest {
-	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
-	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;
+	public static final Amount RECIPIENT1_AMOUNT = new Amount(3 * 1000000L);
+	public static final Amount RECIPIENT2_AMOUNT = new Amount(5 * 1000000L);
 	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -96,12 +97,12 @@ public class AccountAnalyzerTest {
 		// Assert:
 		Assert.assertThat(t1.getBalance(), equalTo(RECIPIENT1_AMOUNT));
 		Assert.assertThat(t2.getBalance(), equalTo(RECIPIENT2_AMOUNT));
-		Assert.assertThat(t3.getBalance(), equalTo(-RECIPIENT1_AMOUNT - RECIPIENT2_AMOUNT));
+		Assert.assertThat(t3.getBalance(), equalTo(Amount.ZERO));
 	}
 
 	private Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {
-		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT, 1);
-		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, 2);
+		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT.getNumMicroNem(), 1);
+		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT.getNumMicroNem(), 2);
 
 		Block b = new Block(
 				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8*1000000L, 0L

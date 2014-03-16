@@ -22,7 +22,7 @@ public class AccountTest {
         // Assert:
         Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
         Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-        Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
         Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
     }
@@ -36,7 +36,7 @@ public class AccountTest {
         // Assert:
         Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
         Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-        Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
         Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
         Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
     }
@@ -52,7 +52,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
         Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(0L));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -71,30 +71,49 @@ public class AccountTest {
         Assert.assertThat(account.getLabel(), IsEqual.equalTo("Beta Gamma"));
     }
 
+    //region Balance
+
     @Test
     public void balanceCanBeIncremented() {
         // Arrange:
         final Account account = Utils.generateRandomAccount();
 
         // Act:
-        account.incrementBalance(7);
-        account.incrementBalance(12);
+        account.incrementBalance(new Amount(7));
 
         // Assert:
-        Assert.assertThat(account.getBalance(), IsEqual.equalTo(19L));
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(7)));
     }
 
     @Test
-    public void balanceCanBeIncrementedMultipleTimes() {
+    public void balanceCanBeDecremented() {
         // Arrange:
         final Account account = Utils.generateRandomAccount();
 
         // Act:
-        account.incrementBalance(7);
+        account.incrementBalance(new Amount(100));
+        account.decrementBalance(new Amount(12));
 
         // Assert:
-        Assert.assertThat(account.getBalance(), IsEqual.equalTo(7L));
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(88)));
     }
+
+    @Test
+    public void balanceCanBeIncrementedAndDecrementedMultipleTimes() {
+        // Arrange:
+        final Account account = Utils.generateRandomAccount();
+
+        // Act:
+        account.incrementBalance(new Amount(100));
+        account.decrementBalance(new Amount(12));
+        account.incrementBalance(new Amount(22));
+        account.decrementBalance(new Amount(25));
+
+        // Assert:
+        Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(85)));
+    }
+
+    //endregion
 
     @Test
     public void singleMessageCanBeAdded() {

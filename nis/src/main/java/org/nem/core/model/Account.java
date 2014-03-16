@@ -11,8 +11,8 @@ public class Account {
     private final KeyPair keyPair;
     private final Address address;
     private final List<Message> messages;
-    private long balance;
     private String label;
+    private Amount balance = Amount.ZERO;
 
     /**
      * Creates an account around a key pair.
@@ -23,7 +23,6 @@ public class Account {
         this.keyPair = keyPair;
         this.address = Address.fromPublicKey(keyPair.getPublicKey());
         this.messages = new ArrayList<>();
-        this.balance = 0;
     }
 
     /**
@@ -36,7 +35,6 @@ public class Account {
 		this.keyPair = null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
 		this.address = address;
 		this.messages = new ArrayList<>();
-		this.balance = 0;
 	}
 
     /**
@@ -58,15 +56,24 @@ public class Account {
      *
      * @return The account's balance.
      */
-    public long getBalance() { return this.balance; }
+    public Amount getBalance() { return this.balance; }
 
     /**
-     * Increments the account's balance.
+     * Adds amount to the account's balance.
      *
-     * @param balance The amount by which to increment the balance.
+     * @param amount The amount by which to increment the balance.
      */
-    public void incrementBalance(final long balance) {
-        this.balance += balance;
+    public void incrementBalance(final Amount amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    /**
+     * Subtracts amount from the account's balance.
+     *
+     * @param amount The amount by which to decrement the balance.
+     */
+    public void decrementBalance(final Amount amount) {
+        this.balance = this.balance.subtract(amount);
     }
 
     /**

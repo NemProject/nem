@@ -28,7 +28,7 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, 100, null);
+        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
         final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
         // Act:
@@ -45,7 +45,7 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
-        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, 100, null);
+        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
         final Deserializer deserializer = Utils.roundtripSerializableEntity(
             originalTransaction.asNonVerifiable(),
             new MockAccountLookup());

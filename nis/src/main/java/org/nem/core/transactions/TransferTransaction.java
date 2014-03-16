@@ -14,7 +14,7 @@ import java.security.InvalidParameterException;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 1000;
 
-	private long amount;
+	private Amount amount;
 	private Message message;
 	private Account recipient;
 
@@ -27,7 +27,7 @@ public class TransferTransaction extends Transaction {
 	 * @param amount The transaction amount.
 	 * @param message The transaction message.
 	 */
-	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final long amount, final Message message) {
+	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
 		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;
@@ -45,7 +45,7 @@ public class TransferTransaction extends Transaction {
 	public TransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
-		this.amount = deserializer.readLong("amount");
+		this.amount = SerializationUtils.readAmount(deserializer, "amount");
 		this.message = deserializer.readObject("message", MessageFactory.DESERIALIZER);
 	}
 
@@ -63,7 +63,7 @@ public class TransferTransaction extends Transaction {
 	 *
 	 * @return The transaction amount.
 	 */
-	public long getAmount() { return this.amount; }
+	public Amount getAmount() { return this.amount; }
 
 	/**
 	 * Gets the transaction message.
@@ -81,30 +81,30 @@ public class TransferTransaction extends Transaction {
 	@Override
 	public boolean isValid() {
 		return super.isValid()
-			&& this.amount >= 0
-            && this.getSigner().getBalance() >= this.amount + this.getFee()
+            && this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
             && this.getMessageLength() <= MAX_MESSAGE_SIZE;
     }
 
 	@Override
-	protected long getMinimumFee() {
-		long amountFee = (long)Math.ceil(this.amount * 0.001);
+	protected Amount getMinimumFee() {
+        // TODO: add scaling to Amount
+		long amountFee = (long)Math.ceil(this.amount.getNumMicroNem() * 0.001);
 		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
-		return Math.max(1, amountFee + messageFee);
+		return new Amount(Math.max(1, amountFee + messageFee));
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		SerializationUtils.writeAccount(serializer, "recipient", this.recipient);
-		serializer.writeLong("amount", this.amount);
+		SerializationUtils.writeAmount(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.message);
 	}
 
 	@Override
 	public void execute() {
-		this.getSigner().incrementBalance(-this.amount - this.getFee());
-		this.recipient.incrementBalance(this.amount);
+		this.getSigner().decrementBalance(this.amount.add(this.getFee()));
+        this.recipient.incrementBalance(this.amount);
 
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);

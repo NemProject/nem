@@ -43,4 +43,24 @@ public class GenesisBlockTest {
         for (final Transaction transaction : block.getTransactions())
             Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
     }
+
+    // TODO: this test needs to be fixed
+//    @Test
+//    public void hashConstantIsConsistentWithGenesisBlock() {
+//        // Arrange:
+//        final Block block = new GenesisBlock(TimeInstant.ZERO);
+//
+//        // Assert:
+//        final long expectedHashCode = ByteUtils.bytesToLong(GenesisBlock.HASH);
+//        Assert.assertThat((long)block.hashCode(), IsEqual.equalTo(expectedHashCode));
+//    }
+
+    @Test
+    public void accountConstantIsConsistentWithGenesisBlock() {
+        // Arrange:
+        final Block block = new GenesisBlock(TimeInstant.ZERO);
+
+        // Assert:
+        Assert.assertThat(block.getSigner(), IsEqual.equalTo(GenesisBlock.ACCOUNT));
+    }
 }

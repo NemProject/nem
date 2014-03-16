@@ -70,12 +70,12 @@ public class GenesisBlock extends Block {
         super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
 
         // TODO: as a placeholder distribute amounts equally
-        final long shareAmount = GENESIS_AMOUNT / GENESIS_RECIPIENT_ACCOUNT_IDS.length;
+        final Amount shareAmount = new Amount(GENESIS_AMOUNT / GENESIS_RECIPIENT_ACCOUNT_IDS.length);
         for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
             final Address address = Address.fromEncoded(id);
             final Account account = new Account(address);
             final TransferTransaction transaction = new TransferTransaction(timestamp, ACCOUNT, account, shareAmount, null);
-            transaction.setFee(0); // TODO: this won't work because of minimum fee enforcement
+            transaction.setFee(Amount.ZERO); // TODO: this won't work because of minimum fee enforcement
 
 			transaction.sign();
             this.addTransaction(transaction);

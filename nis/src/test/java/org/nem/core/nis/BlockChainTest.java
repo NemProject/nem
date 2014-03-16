@@ -83,7 +83,7 @@ public class BlockChainTest {
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
 		transaction.sign();
 		boolean result = blockChain.processTransaction(transaction);
 
@@ -101,7 +101,7 @@ public class BlockChainTest {
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, 123, null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
 		transaction.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction);
@@ -123,9 +123,9 @@ public class BlockChainTest {
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, 123, null);
+		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, new Amount(123), null);
 		transaction1.sign();
-		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, 123, null);
+		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, new Amount(123), null);
 		transaction2.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction1);
@@ -151,11 +151,11 @@ public class BlockChainTest {
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
-		transaction1.setFee(10);
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
+		transaction1.setFee(new Amount(10));
 		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
-		transaction1.setFee(5);
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
+		transaction1.setFee(new Amount(5));
 		transaction2.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction1);
@@ -181,11 +181,11 @@ public class BlockChainTest {
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, 123, null);
-		transaction1.setFee(5);
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
+		transaction1.setFee(new Amount(5));
 		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, 123, null);
-		transaction1.setFee(5);
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, new Amount(123), null);
+		transaction1.setFee(new Amount(5));
 		transaction2.sign();
 
 		boolean result1 = blockChain.processTransaction(transaction1);
@@ -202,7 +202,7 @@ public class BlockChainTest {
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), sender, recipient, amount, null);
+		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), sender, recipient, new Amount(amount), null);
 	}
 
 	private Block createDummyDbBlock() {

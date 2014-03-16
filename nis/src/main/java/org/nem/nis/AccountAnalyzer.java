@@ -8,10 +8,7 @@ import org.nem.core.dao.BlockDao;
 import org.nem.core.dao.TransferDao;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
-import org.nem.core.model.ByteArray;
-import org.nem.core.model.GenesisBlock;
+import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +52,12 @@ public class AccountAnalyzer implements AccountLookup {
 			}
 		}
 
-		account.incrementBalance(amount);
+        // TODO: this is ugly, need to create adapters and call execute
+        if (amount < 0)
+		    account.decrementBalance(new Amount(-1 * amount));
+        else
+            account.incrementBalance(new Amount(amount));
+
 		return account;
 	}
 
@@ -106,7 +108,7 @@ public class AccountAnalyzer implements AccountLookup {
 			// if possible update account's public key
 			if (publicKey != null) {
 				Account account = new Account(new KeyPair(publicKey.get()));
-				long balance = oldAccount.getBalance();
+				final Amount balance = oldAccount.getBalance();
 				account.incrementBalance(balance);
 				mapByAddressId.put(encodedAddress, account);
 
