@@ -23,6 +23,8 @@ public class AccountAnalyzerTest {
 	public static final Amount SENDER_AMOUNT = Amount.fromNem(10);
 	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNem(3);
 	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNem(5);
+    public static final Amount RECIPIENT1_FEE = Amount.fromMicroNem(6000);
+    public static final Amount RECIPIENT2_FEE = Amount.fromMicroNem(10000);
 	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -33,7 +35,6 @@ public class AccountAnalyzerTest {
 	@Test
 	public void aaAnalyzeDoesntCacheDummyResults() {
 		// Arrange:
-		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
 		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
@@ -101,13 +102,15 @@ public class AccountAnalyzerTest {
 		Assert.assertThat(t1.getBalance(), equalTo(RECIPIENT1_AMOUNT));
 		Assert.assertThat(t2.getBalance(), equalTo(RECIPIENT2_AMOUNT));
 		// zero fees
-		final Amount rest = SENDER_AMOUNT.subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT2_AMOUNT);
+		final Amount rest = SENDER_AMOUNT
+            .subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT1_FEE)
+            .subtract(RECIPIENT2_AMOUNT).subtract(RECIPIENT2_FEE);
 		Assert.assertThat(t3.getBalance(), equalTo(rest));
 	}
 
 	private Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {
-		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT.getNumMicroNem(), 1);
-		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT.getNumMicroNem(), 2);
+		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT, RECIPIENT1_FEE, 0);
+		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
 
 		Block b = new Block(
 				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8*1000000L, 0L
@@ -118,15 +121,15 @@ public class AccountAnalyzerTest {
 		return b;
 	}
 
-	private Transfer prepareTransfer(Account sender, Account recipient, long amount, int idInBlock) {
+	private Transfer prepareTransfer(Account sender, Account recipient, Amount amount, Amount fee, int idInBlock) {
 		return new Transfer(1L, new byte[32], 1, TransactionTypes.TRANSFER,
-				0L, // fee
+                fee.getNumMicroNem(),
 				0, 0,
 				sender,
 				new byte[64], // sig
 				recipient,
 				idInBlock,
-				amount,
+				amount.getNumMicroNem(),
 				0L
 		);
 	}

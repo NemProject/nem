@@ -8,8 +8,10 @@ import org.nem.core.dao.BlockDao;
 import org.nem.core.dao.TransferDao;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
+import org.nem.core.mappers.TransferMapper;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.transactions.TransferTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AccountAnalyzer implements AccountLookup {
@@ -58,15 +60,6 @@ public class AccountAnalyzer implements AccountLookup {
 		return addAccountToCacheImpl(a.getPublicKey(), a.getPrintableKey());
 	}
 
-	private void executeTransfer(final Transfer tx, final Account sender, final Account recipient) {
-		Amount amount = new Amount(tx.getAmount());
-		Amount fee = new Amount(tx.getFee());
-		sender.decrementBalance(amount.add(fee));
-		recipient.incrementBalance(amount);
-		// TODO: message
-	}
-
-
 	public Account initializeGenesisAccount(Account genesisKeyPai) {
 		return addAccountToCacheImpl(genesisKeyPai.getKeyPair().getPublicKey(), genesisKeyPai.getAddress().getEncoded());
 	}
@@ -86,13 +79,12 @@ public class AccountAnalyzer implements AccountLookup {
 		// add fee's to block forger
 		//
 
-		for(Iterator<Transfer> i = txes.iterator(); i.hasNext(); ) {
-			Transfer tx = i.next();
-
-			Account sender = addAccountToCache(tx.getSender());
+		for (final Transfer tx : txes) {
+			addAccountToCache(tx.getSender());
 			Account recipient = addAccountToCache(tx.getRecipient());
 
-			executeTransfer(tx, sender, recipient);
+            TransferTransaction transaction = TransferMapper.toModel(tx, this);
+            transaction.execute();
 
 			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
