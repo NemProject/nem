@@ -3,8 +3,11 @@ package org.nem.core.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.dao.AccountDao;
-import org.nem.core.dbmodel.Transfer;
+import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.test.MockAccountAnalyzer;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
@@ -61,6 +64,57 @@ public class TransferMapperTest {
 //    @Test
 //    public void transferModelWithMessageCanBeMappedToDbModel() {
 //    }
+
+	@Test
+	public void transferModelWithoutMessageCanBeRoundTripped() {
+		// Arrange:
+		Account siger = Utils.generateRandomAccount();
+		Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction model = new TransferTransaction(
+				new TimeInstant(721),
+				siger,
+				recipient,
+				new Amount(144),
+				null);
+
+		model.setFee(new Amount(11));
+		model.setDeadline(new TimeInstant(800));
+		model.sign();
+
+		final MockAccountDao accountDao = new MockAccountDao();
+		final org.nem.core.dbmodel.Account dbSender = new org.nem.core.dbmodel.Account();
+		final org.nem.core.dbmodel.Account dbRecipient = new org.nem.core.dbmodel.Account();
+		dbSender.setPublicKey(siger.getKeyPair().getPublicKey());
+		dbSender.setPrintableKey(siger.getAddress().getEncoded());
+		dbRecipient.setPrintableKey(recipient.getAddress().getEncoded());
+		// no need for recipients PUBKEY
+
+		accountDao.setMapping(model.getSigner(), dbSender);
+		accountDao.setMapping(model.getRecipient(), dbRecipient);
+
+		final byte[] hash = HashUtils.calculateHash(model);
+
+		final MockAccountLookup mockAccountLookup = new MockAccountLookup();
+		mockAccountLookup.setMockAccount(model.getSigner());
+		mockAccountLookup.setMockAccount(model.getRecipient());
+
+		// Act:
+		final Transfer dbModel = TransferMapper.toDbModel(model, 7, accountDao);
+		final TransferTransaction resModel = TransferMapper.toModel(dbModel, mockAccountLookup);
+
+		// Assert:
+		Assert.assertThat(HashUtils.calculateHash(resModel), IsEqual.equalTo(hash));
+		Assert.assertThat(resModel.getVersion(), IsEqual.equalTo(model.getVersion()));
+		Assert.assertThat(resModel.getType(), IsEqual.equalTo(model.getType()));
+		Assert.assertThat(resModel.getFee(), IsEqual.equalTo(model.getFee()));
+		Assert.assertThat(resModel.getTimeStamp(), IsEqual.equalTo(model.getTimeStamp()));
+		Assert.assertThat(resModel.getDeadline(), IsEqual.equalTo(model.getDeadline()));
+		Assert.assertThat(resModel.getSigner(), IsEqual.equalTo(model.getSigner()));
+		Assert.assertThat(resModel.getSignature(), IsEqual.equalTo(model.getSignature()));
+		Assert.assertThat(resModel.getRecipient(), IsEqual.equalTo(model.getRecipient()));
+
+		Assert.assertThat(resModel.getAmount(), IsEqual.equalTo(model.getAmount()));
+	}
 
     private class MockAccountDao implements AccountDao {
 
