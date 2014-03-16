@@ -22,8 +22,9 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 
 public class AccountAnalyzerTest {
-	public static final Amount RECIPIENT1_AMOUNT = new Amount(3 * 1000000L);
-	public static final Amount RECIPIENT2_AMOUNT = new Amount(5 * 1000000L);
+	public static final Amount SENDER_AMOUNT = Amount.fromNEMs(10);
+	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNEMs(3);
+	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNEMs(5);
 	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -36,6 +37,7 @@ public class AccountAnalyzerTest {
 		// Arrange:
 		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
+		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
 		// Act:
 		org.nem.core.model.Account t1 = aa.findByAddress(recipient1.getAddress());
@@ -50,6 +52,7 @@ public class AccountAnalyzerTest {
 		// Arrange:
 		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
+		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
 		// Act:
 		aa.analyze(b);
@@ -70,6 +73,7 @@ public class AccountAnalyzerTest {
 		// Arrange:
 		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
+		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
 		// Act:
 		aa.analyze(b);
@@ -87,6 +91,7 @@ public class AccountAnalyzerTest {
 		// Arrange:
 		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
+		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
 		// Act:
 		aa.analyze(b);
@@ -97,7 +102,9 @@ public class AccountAnalyzerTest {
 		// Assert:
 		Assert.assertThat(t1.getBalance(), equalTo(RECIPIENT1_AMOUNT));
 		Assert.assertThat(t2.getBalance(), equalTo(RECIPIENT2_AMOUNT));
-		Assert.assertThat(t3.getBalance(), equalTo(Amount.ZERO));
+		// zero fees
+		final Amount rest = SENDER_AMOUNT.subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT2_AMOUNT);
+		Assert.assertThat(t3.getBalance(), equalTo(rest));
 	}
 
 	private Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {

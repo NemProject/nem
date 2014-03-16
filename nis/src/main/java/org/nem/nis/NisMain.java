@@ -61,6 +61,9 @@ public class NisMain {
 			System.exit(-1);
 		}
 
+		Account genesisAccount = accountAnalyzer.initializeGenesisAccount(GenesisBlock.ACCOUNT);
+		genesisAccount.incrementBalance(new Amount(GenesisBlock.GENESIS_AMOUNT));
+
 		do {
 			accountAnalyzer.analyze(curBlock);
 

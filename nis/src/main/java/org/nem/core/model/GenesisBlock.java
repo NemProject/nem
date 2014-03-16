@@ -59,7 +59,7 @@ public class GenesisBlock extends Block {
     }
 
 	// 40.000.000 NEMs (* 1000000 micro nems)
-    private final static long GENESIS_AMOUNT = 40000000000000L;
+    public final static long GENESIS_AMOUNT = 40000000000000L;
 
     /**
      * Creates a genesis block.

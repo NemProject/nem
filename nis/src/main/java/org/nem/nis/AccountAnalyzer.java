@@ -29,9 +29,8 @@ public class AccountAnalyzer implements AccountLookup {
 		mapByAddressId = new HashMap<>();
 	}
 
-	private Account addAccountToCache(org.nem.core.dbmodel.Account a) {
-		ByteArray publicKey = a.getPublicKey() != null ? new ByteArray(a.getPublicKey()) : null;
-		String encodedAddress = a.getPrintableKey();
+	private Account addAccountToCacheImpl(final byte[] publicKeyArray, final String encodedAddress) {
+		ByteArray publicKey = publicKeyArray != null ? new ByteArray(publicKeyArray) : null;
 
 		Account account = findByAddressImpl(publicKey, encodedAddress);
 		if (account == null) {
@@ -55,6 +54,23 @@ public class AccountAnalyzer implements AccountLookup {
 		return account;
 	}
 
+	private Account addAccountToCache(org.nem.core.dbmodel.Account a) {
+		return addAccountToCacheImpl(a.getPublicKey(), a.getPrintableKey());
+	}
+
+	private void executeTransfer(final Transfer tx, final Account sender, final Account recipient) {
+		Amount amount = new Amount(tx.getAmount());
+		Amount fee = new Amount(tx.getFee());
+		sender.decrementBalance(amount.add(fee));
+		recipient.incrementBalance(amount);
+		// TODO: message
+	}
+
+
+	public Account initializeGenesisAccount(Account genesisKeyPai) {
+		return addAccountToCacheImpl(genesisKeyPai.getKeyPair().getPublicKey(), genesisKeyPai.getAddress().getEncoded());
+	}
+
 	/*
 	 * analyze block from db
 	 * 
@@ -76,11 +92,7 @@ public class AccountAnalyzer implements AccountLookup {
 			Account sender = addAccountToCache(tx.getSender());
 			Account recipient = addAccountToCache(tx.getRecipient());
 
-			Amount amount = new Amount(tx.getAmount());
-			Amount fee = new Amount(tx.getFee());
-			sender.decrementBalance(amount.add(fee));
-			recipient.incrementBalance(amount);
-			// TODO: message
+			executeTransfer(tx, sender, recipient);
 
 			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
