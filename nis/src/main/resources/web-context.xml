@@ -19,6 +19,7 @@
 <mvc:resources mapping="/img/**" location="classpath:img/" />
 <mvc:resources mapping="/css/**" location="classpath:css/" />
 <mvc:resources mapping="/js/**"  location="classpath:js/" />
+<mvc:resources mapping="/errors/**"  location="classpath:errors/" />
 <mvc:resources mapping="/favicon.ico" location="classpath:img/favicon.ico" />
 
 <!-- Resolve jsp's -->
