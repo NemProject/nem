@@ -5,10 +5,10 @@ import org.nem.peer.*;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST peer controller.
+ * REST node controller.
  */
 @RestController
-public class PeerResource {
+public class NodeController {
 
     @RequestMapping(value="/node/info", method = RequestMethod.GET)
     public String getInfo()
