@@ -1,4 +1,4 @@
-package org.nem.core.nis;
+package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
