@@ -40,12 +40,11 @@ public class TransferController {
 	}
 
 	@RequestMapping(value="/transfer/announce", method = RequestMethod.POST)
-	public String transferAnnounce(@RequestBody final String body) {
+	public String transferAnnounce(@RequestBody final String body) throws Exception {
         final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
 
-		final Deserializer dataDeserializer = ControllerUtils.getDeserializer(requestAnnounce.getData(), this.accountAnalyzer);
-		final TransferTransaction transfer = deserializeTransaction(dataDeserializer);
+		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
         transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
         // TODO: move logger to controller
@@ -69,6 +68,12 @@ public class TransferController {
         // TODO: exception
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transfer.verify()));
 	}
+
+    private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
+        try (final BinaryDeserializer dataDeserializer = ControllerUtils.getDeserializer(bytes, this.accountAnalyzer)) {
+            return deserializeTransaction(dataDeserializer);
+        }
+    }
 
     private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
         return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);

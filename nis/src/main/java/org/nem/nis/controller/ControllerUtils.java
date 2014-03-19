@@ -8,10 +8,23 @@ import java.security.InvalidParameterException;
 
 public class ControllerUtils {
 
+    /**
+     * Serializes entity into a JSON string.
+     *
+     * @param entity The entity to serialize.
+     * @return The serialized JSON string.
+     */
     public static String serialize(final SerializableEntity entity) {
         return JsonSerializer.serializeToJson(entity).toString() + "\r\n";
     }
 
+    /**
+     * Creates a deserializer around a JSON string.
+     *
+     * @param jsonString The JSON string.
+     * @param accountLookup The account lookup.
+     * @return A deserializer.
+     */
     public static Deserializer getDeserializer(final String jsonString, final AccountLookup accountLookup) {
         final Object result = JSONValue.parse(jsonString);
         if (result instanceof JSONObject)
@@ -20,7 +33,14 @@ public class ControllerUtils {
         throw new InvalidParameterException(String.format("JSON Object is malformed \"%s\"", jsonString));
     }
 
-    public static Deserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
+    /**
+     * Creates a deserializer around a byte array.
+     *
+     * @param bytes The byte array.
+     * @param accountLookup The account lookup.
+     * @return A deserializer.
+     */
+    public static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
         return new BinaryDeserializer(bytes, new DeserializationContext(accountLookup));
     }
 }
