@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.transactions.TransferTransaction;
 
@@ -23,9 +24,9 @@ public class EntityFactoryTest {
         Assert.assertThat(block.getType(), IsEqual.equalTo(1));
         Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
         Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-        Assert.assertThat(block.getHeight(), IsEqual.equalTo(12));
+        Assert.assertThat(block.getHeight(), IsEqual.equalTo(12L));
         Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
-        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(11890));
+        Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11890)));
     }
 
     @Test
@@ -37,14 +38,14 @@ public class EntityFactoryTest {
         final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 
         // Act:
-        TransferTransaction transaction = factory.createTransfer(signer, recipient, 123, message);
+        TransferTransaction transaction = factory.createTransfer(signer, recipient, new Amount(123), message);
 
         // Assert:
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(123L));
+        Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
         Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
-        Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(11891));
+        Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11891)));
     }
 
     private static class MockTimeProvider implements TimeProvider {
@@ -56,9 +57,9 @@ public class EntityFactoryTest {
         }
 
         @Override
-        public int getEpochTime() { return 0; }
+        public TimeInstant getEpochTime() { return TimeInstant.ZERO; }
 
         @Override
-        public int getCurrentTime() { return this.currentTime; }
+        public TimeInstant getCurrentTime() { return new TimeInstant(this.currentTime); }
     }
 }

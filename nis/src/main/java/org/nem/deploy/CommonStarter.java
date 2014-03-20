@@ -22,7 +22,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -49,6 +51,12 @@ public class CommonStarter implements ServletContextListener {
 	public static final int NEM_PORT = 7890;
 	public static final Integer NEM_PROTOCOL = new Integer(1);
 
+
+	private static ErrorHandler createErrorHandler() {
+		ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+		errorHandler.addErrorPage(404, "/errors/404.html");
+		return errorHandler;
+	}
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");
@@ -77,7 +85,7 @@ public class CommonStarter implements ServletContextListener {
         //Special Listener to set-up the environment for Spring 
         servletContext.addEventListener(new CommonStarter());
         servletContext.addEventListener(new ContextLoaderListener());
-
+		servletContext.setErrorHandler(createErrorHandler());
         
         ContextHandlerCollection contexts = new ContextHandlerCollection();
         handlers.setHandlers(new Handler[] { contexts, servletContext , new ServletHandler(), new DefaultHandler() });

@@ -2,6 +2,7 @@ package org.nem.core.test;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * A mock Transaction implementation.
@@ -10,10 +11,17 @@ public class MockTransaction extends Transaction {
 
     public static final int TYPE = 124;
     public static final int VERSION = 758;
-    public static final int TIMESTAMP = 1122448;
+    public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
 
 	private int customField;
     private long minimumFee;
+
+    /**
+     * Creates a mock transaction.
+     */
+    public MockTransaction() {
+        this(Utils.generateRandomAccount());
+    }
 
     /**
      * Creates a mock transaction.
@@ -33,6 +41,20 @@ public class MockTransaction extends Transaction {
     public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
         this.customField = customField;
+    }
+
+    /**
+     * Creates a mock transaction.
+     * This overload is intended to be used for comparison tests.
+     *
+     * @param type The transaction type.
+     * @param version The transaction version.
+     * @param timeStamp The transaction timestamp.
+     * @param fee The transaction fee.
+     */
+    public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final long fee) {
+        super(type, version, timeStamp, Utils.generateRandomAccount());
+        this.setFee(new Amount(fee));
     }
 
     /**
@@ -64,8 +86,8 @@ public class MockTransaction extends Transaction {
 	}
 
     @Override
-    protected long getMinimumFee() {
-        return this.minimumFee;
+    protected Amount getMinimumFee() {
+        return new Amount(this.minimumFee);
     }
 
     @Override

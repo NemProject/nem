@@ -1,6 +1,8 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
+import org.nem.peer.net.HttpPeerConnector;
+import org.nem.peer.scheduling.ParallelSchedulerFactory;
 
 import java.io.InputStream;
 import java.util.concurrent.*;
@@ -12,14 +14,15 @@ import java.util.logging.Logger;
 public class PeerNetworkHost implements AutoCloseable {
 
     private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
-    private static final PeerNetworkHost DEFAULT_HOST = new PeerNetworkHost("peers-config.json");
+    private static final int NUM_CORES = Runtime.getRuntime().availableProcessors();
+    private static final PeerNetworkHost DEFAULT_HOST = new PeerNetworkHost("peers-config.json", 2*NUM_CORES);
 
     /**
      * Gets the default peer network host.
      *
      * @return The default peer network host.
      */
-    public static final PeerNetworkHost getDefaultHost() { return DEFAULT_HOST; }
+    public static PeerNetworkHost getDefaultHost() { return DEFAULT_HOST; }
 
     private final PeerNetwork network;
     private final ScheduledThreadPoolExecutor peerListRefresherExecutor;
@@ -28,9 +31,16 @@ public class PeerNetworkHost implements AutoCloseable {
      * Creates a host that hosts a specified network.
      *
      * @param configFileName The network configuration file name.
+     * @param concurrencyLevel The network concurrency level.
      */
-    public PeerNetworkHost(final String configFileName) {
-        this(new PeerNetwork(loadConfig(configFileName), new HttpPeerConnector()), 200, 10000);
+    public PeerNetworkHost(final String configFileName, final int concurrencyLevel) {
+        this(
+            new PeerNetwork(
+                loadConfig(configFileName),
+                new HttpPeerConnector(),
+                new ParallelSchedulerFactory<Node>(concurrencyLevel)),
+            200,
+            10000);
     }
 
     /**

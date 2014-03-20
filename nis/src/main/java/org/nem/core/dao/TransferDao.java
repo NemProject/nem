@@ -10,4 +10,6 @@ public interface TransferDao {
 	public Long count();
 
 	public void saveMulti(List<Transfer> transfers);
+
+	public Transfer findByHash(byte[] txHash);
 }

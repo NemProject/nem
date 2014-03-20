@@ -1,24 +1,15 @@
 package org.nem.core.dbmodel;
 
+import org.hibernate.annotations.Cascade;
+
+import javax.persistence.*;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-
-@Entity  
-@Table(name="blocks") 
+@Entity
+@Table(name="blocks")
 public class Block {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Long id;
 	private Long shortId;
 	
@@ -28,10 +19,10 @@ public class Block {
 	private Integer timestamp;
 	
 	@ManyToOne
+	@Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE})
     @JoinColumn(name="forgerId")
 	private Account forger;
 	private byte[] forgerProof;
-	private byte[] blockSignature;
 	
 	private Long height;
 	
@@ -40,9 +31,9 @@ public class Block {
 	
 	private Long nextBlockId;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="block")
+	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="block")
     @OrderBy("blkIndex")
-    private List<Transfer> blockTransfers; 
+    private List<Transfer> blockTransfers;
 	
 	public Block() {
 	}
@@ -55,7 +46,6 @@ public class Block {
 			Integer timestamp,	
 			Account forger,
 			byte[] forgerProof,
-			byte[] blockSignature,
 			Long height,
 			Long totalAmount,
 			Long totalFee) {
@@ -67,7 +57,6 @@ public class Block {
 		this.timestamp = timestamp;
 		this.forger = forger;
 		this.forgerProof = forgerProof;
-		this.blockSignature = blockSignature;
 		this.height = height;
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
@@ -135,14 +124,6 @@ public class Block {
 
 	public void setForgerProof(byte[] forgerProof) {
 		this.forgerProof = forgerProof;
-	}
-
-	public byte[] getBlockSignature() {
-		return blockSignature;
-	}
-
-	public void setBlockSignature(byte[] blockSignature) {
-		this.blockSignature = blockSignature;
 	}
 
 	public Long getHeight() {

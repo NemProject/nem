@@ -39,7 +39,7 @@ public class EntityFactory {
      * @param amount The transaction amount.
      * @return The new TransferTransaction.
      */
-    public TransferTransaction createTransfer(final Account sender, final Account recipient, final long amount, final Message message) {
+    public TransferTransaction createTransfer(final Account sender, final Account recipient, final Amount amount, final Message message) {
         return new TransferTransaction(this.timeProvider.getCurrentTime(), sender, recipient, amount, message);
     }
 }

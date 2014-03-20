@@ -7,6 +7,18 @@ import java.security.InvalidParameterException;
  * Static class that contains a handful of array helper functions.
  */
 public class ArrayUtils {
+	/**
+	 * Creates duplicate of given array
+	 *
+	 * @param src - array to duplicate
+	 *
+	 * @return copy of an array
+	 */
+	public static byte[] duplicate(final byte[] src) {
+		final byte[] result = new byte[src.length];
+		System.arraycopy(src, 0, result, 0, src.length);
+		return result;
+	}
 
     /**
      * Concatenates two arrays and returns the result.

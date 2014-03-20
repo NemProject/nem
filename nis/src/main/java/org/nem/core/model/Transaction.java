@@ -1,16 +1,15 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.Hashes;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
-public abstract class Transaction extends VerifiableEntity {
+public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
 
-	private long fee;
-	private int timestamp;
-	private int deadline;
+	private Amount fee = Amount.ZERO;
+	private TimeInstant deadline = TimeInstant.ZERO;
 
 	/**
 	 * Creates a new transaction.
@@ -20,7 +19,7 @@ public abstract class Transaction extends VerifiableEntity {
      * @param timestamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final int timestamp, final Account sender) {
+	public Transaction(final int type, final int version, final TimeInstant timestamp, final Account sender) {
 		super(type, version, timestamp, sender);
 	}
 
@@ -32,9 +31,8 @@ public abstract class Transaction extends VerifiableEntity {
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = deserializer.readLong("fee");
-		this.timestamp = deserializer.readInt("timestamp");
-		this.deadline = deserializer.readInt("deadline");
+		this.fee = SerializationUtils.readAmount(deserializer, "fee");
+		this.deadline = SerializationUtils.readTimeInstant(deserializer, "deadline");
 	}
 
 	//region Setters and Getters
@@ -44,57 +42,56 @@ public abstract class Transaction extends VerifiableEntity {
 	 *
 	 * @return The fee.
 	 */
-	public long getFee() { return Math.max(this.getMinimumFee(), this.fee); }
+	public Amount getFee() {
+        return this.fee.compareTo(this.getMinimumFee()) < 0
+            ? this.getMinimumFee()
+            : this.fee;
+    }
 
 	/**
 	 * Sets the fee.
 	 *
 	 * @param fee The desired fee.
 	 */
-	public void setFee(final long fee) { this.fee = fee; }
+	public void setFee(final Amount fee) { this.fee = fee; }
 
 	/**
-	 * Gets transaction timestamp
+	 * Gets the deadline.
 	 *
-	 * @return transaction timestamp
+	 * @return The deadline.
 	 */
-	public int getTimestamp() {
-		return timestamp;
-	}
+	public TimeInstant getDeadline() { return this.deadline; }
 
 	/**
-	 * Sets transaction timestamp (in seconds since NEM EPOCH)
+	 * Sets the deadline.
 	 *
-	 * @param timestamp
+	 * @param deadline The desired deadline.
 	 */
-	public void setTimestamp(int timestamp) {
-		this.timestamp = timestamp;
-	}
+	public void setDeadline(final TimeInstant deadline) { this.deadline = deadline; }
 
-	/**
-	 * Gets transaction deadline (in seconds since NEM EPOCH)
-	 *
-	 * @return
-	 */
-	public int getDeadline() {
-		return deadline;
-	}
-
-	/**
-	 * Sets transaction deadline (in seconds since NEM EPOCH)
-	 *
-	 * @param deadline
-	 */
-	public void setDeadline(int deadline) {
-		this.deadline = deadline;
-	}
 	//endregion
 
 	@Override
+	public int compareTo(Transaction rhs) {
+        int[] comparisonResults = new int[] {
+            Integer.compare(this.getType(), rhs.getType()),
+            Integer.compare(this.getVersion(), rhs.getVersion()),
+            this.getTimeStamp().compareTo(rhs.getTimeStamp()),
+            this.getFee().compareTo(rhs.getFee())
+        };
+
+        for (int result : comparisonResults) {
+            if (result != 0)
+                return result;
+        }
+
+        return 0;
+	}
+
+	@Override
 	protected void serializeImpl(final Serializer serializer) {
-		serializer.writeLong("fee", this.getFee());
-		serializer.writeInt("timestamp", this.getTimestamp());
-		serializer.writeInt("deadline", this.getDeadline());
+        SerializationUtils.writeAmount(serializer, "fee", this.getFee());
+        SerializationUtils.writeTimeInstant(serializer, "deadline", this.getDeadline());
 	}
 
 	/**
@@ -110,7 +107,8 @@ public abstract class Transaction extends VerifiableEntity {
 	 * @return true if this transaction is valid.
 	 */
 	public boolean isValid() {
-		return this.timestamp >= 0 && this.deadline > this.timestamp && (this.deadline - this.timestamp) < 24*60*60;
+        return this.deadline.compareTo(this.getTimeStamp()) > 0
+            && this.deadline.compareTo(this.getTimeStamp().addDays(1)) < 1;
 	}
 
 	/**
@@ -118,5 +116,5 @@ public abstract class Transaction extends VerifiableEntity {
 	 *
 	 * @return The minimum fee.
 	 */
-	protected abstract long getMinimumFee();
+	protected abstract Amount getMinimumFee();
 }

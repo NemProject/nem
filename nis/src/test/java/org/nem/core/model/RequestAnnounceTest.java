@@ -1,28 +1,40 @@
 package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.test.Utils;
 
 public class RequestAnnounceTest {
+
+    @Test
+    public void canCreateRequest() {
+        // Arrange:
+        final RequestAnnounce request = new RequestAnnounce(
+            new byte[] { 1, 3, 4, 7, 7, 8, 9 },
+            new byte[] { 4, 5, 7, 2, 3 });
+
+        // Assert:
+        Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+        Assert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
+    }
+
 	@Test
-	public void requestAnnounceCanBeRoundTripped() {
+	public void canRoundTripRequest() {
 		// Arrange:
-		byte[] data = { 1,2,3,4,5,6,7,8,9 };
-		byte[] signature = { 9,8,7,6,5,4,3,2,1 };
-		final RequestAnnounce originalRequestAnnounce = new RequestAnnounce(data, signature);
+		final RequestAnnounce originalRequest = new RequestAnnounce(
+            new byte[] { 1, 3, 4, 7, 7, 8, 9 },
+            new byte[] { 4, 5, 7, 2, 3 });
 
 		// Act:
-		final RequestAnnounce requestAnnounce = createRoundTrippedRequestAnnounce(originalRequestAnnounce);
+		final RequestAnnounce request = createRoundTrippedRequest(originalRequest);
 
 		// Assert:
-		Assert.assertThat(requestAnnounce.getData(), IsEqual.equalTo(data));
-		Assert.assertThat(requestAnnounce.getSignature(), IsEqual.equalTo(signature));
+        Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+        Assert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
 	}
 
-	private static RequestAnnounce createRoundTrippedRequestAnnounce(final RequestAnnounce originalMessage) {
+	private static RequestAnnounce createRoundTrippedRequest(final RequestAnnounce originalRequest) {
 		// Act:
-		return new RequestAnnounce(Utils.roundtripSerializableEntity(originalMessage, null));
+		return new RequestAnnounce(Utils.roundtripSerializableEntity(originalRequest, null));
 	}
 }

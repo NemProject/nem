@@ -1,12 +1,15 @@
 package org.nem.core.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.nem.core.dbmodel.Transfer;
+import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -31,6 +34,28 @@ public class TransferDaoImpl implements TransferDao
 	@Transactional
 	public Long count() {
 		return (Long) getCurrentSession().createQuery("select count (*) from Transfer").uniqueResult();
+	}
+
+	/**
+	 * First try to find block using "shortId",
+	 * than find proper block in software.
+	 */
+	@Override
+	@Transactional
+	public Transfer findByHash(byte[] txHash) {
+		long txId = ByteUtils.bytesToLong(txHash);
+		List<?> userList;
+		Query query = getCurrentSession()
+				.createQuery("from Transfer a where a.shortId = :id")
+				.setParameter("id", txId);
+		userList = query.list();
+		for (int i = 0; i<userList.size(); ++i) {
+			Transfer transfer = (Transfer) userList.get(i);
+			if (Arrays.equals(txHash, transfer.getTransferHash())) {
+				return transfer;
+			}
+		}
+		return null;
 	}
 
 	@Override

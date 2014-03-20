@@ -13,6 +13,13 @@ public class MockSerializableEntity implements SerializableEntity {
 
     /**
      * Creates a new MockSerializableEntity object.
+     */
+    public MockSerializableEntity() {
+        this(1, "a", 2);
+    }
+
+    /**
+     * Creates a new MockSerializableEntity object.
      *
      * @param intValue The int value.
      * @param stringValue The string value.

@@ -1,23 +1,15 @@
 package org.nem.nis.controller;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-import org.nem.core.model.Transaction;
-import org.nem.core.serialization.DeserializationContext;
-import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.model.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
-import org.nem.peer.PeerNetworkHost;
+import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.InvalidParameterException;
-import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 /**
@@ -32,49 +24,58 @@ import java.util.logging.Logger;
 
 @RestController
 public class PushController {
-	private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
 
 	@Autowired
 	AccountAnalyzer accountAnalyzer;
 
 	@Autowired
-	BlockChain blockChain;
+	private BlockChain blockChain;
 
 	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
-	public String pushEntity(@RequestBody String body)
-	{
-		JSONObject par;
-		try {
-			par = (JSONObject) JSONValue.parse(body);
-
-		} catch (ClassCastException e) {
-			return Utils.jsonError(1, "invalid json");
-		}
-		LOGGER.info(par.toString());
-
-		JsonDeserializer deserializer = new JsonDeserializer(par, new DeserializationContext(accountAnalyzer));
-		Transaction transaction;
-		try {
-			transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
-
-		} catch (MissingResourceException|InvalidParameterException|NullPointerException e) {
-			return Utils.jsonError(1, "incorrect data");
-		}
+	public String pushTransaction(@RequestBody String body) {
+        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
+		// transaction timestamp is checked inside processTransaction
 		if (transaction.isValid() && transaction.verify()) {
-			PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+			final PeerNetwork network = PeerNetworkHost.getDefaultHost().getNetwork();
 
 			// add to unconfirmed transactions
-			blockChain.processTransaction(transaction);
+			if (this.blockChain.processTransaction(transaction))
+                network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
 
-			// TODO: propagate transactions
-			//peerNetworkHost.getNetwork().announceTransaction(transaction);
 			return Utils.jsonOk();
 		}
 
+        // TODO: throw exception here
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
+	}
+
+	@RequestMapping(value="/push/block", method = RequestMethod.POST)
+	public String pushBlock(@RequestBody String body) {
+        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+        final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
+
+        // TODO: refactor logging
+		LOGGER.info("   signer: " + HexEncoder.getString(block.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
+
+		if (block.verify()) {
+			// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+
+			// validate block, add to chain
+			blockChain.processBlock(block);
+
+			// TODO: propagate block
+			//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+			return Utils.jsonOk();
+		}
+
+        // TODO: throw exception here
+		return Utils.jsonError(2, "block couldn't be verified " + Boolean.toString(block.verify()));
 	}
 }

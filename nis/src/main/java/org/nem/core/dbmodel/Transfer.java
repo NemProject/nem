@@ -1,12 +1,10 @@
 package org.nem.core.dbmodel;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
+
+import javax.persistence.*;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity  
@@ -23,13 +21,15 @@ public class Transfer {
 	private Long fee;
 	private Integer timestamp;
 	private Integer deadline;
-	
+
 	@ManyToOne
+	@Cascade({CascadeType.SAVE_UPDATE})
 	@JoinColumn(name="senderId")
 	private Account sender;
-	private byte[] senderProof; 
-    
+	private byte[] senderProof;
+
 	@ManyToOne
+	@Cascade({CascadeType.SAVE_UPDATE})
 	@JoinColumn(name="recipientId")
 	private Account recipient;
 	
@@ -38,7 +38,7 @@ public class Transfer {
 	private Long amount;
 	private Long referencedTransaction;
 	
-	@ManyToOne()
+	@ManyToOne(fetch= FetchType.LAZY)
     @JoinTable(name="block_transfers",
         joinColumns = {@JoinColumn(name="transfer_id", referencedColumnName="id")},  
         inverseJoinColumns = {@JoinColumn(name="block_id", referencedColumnName="id")}  

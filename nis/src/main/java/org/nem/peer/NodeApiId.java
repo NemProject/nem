@@ -20,9 +20,14 @@ public enum NodeApiId {
     REST_NODE_PEER_LIST,
 
 	/**
-	 * Transaction announcement
+	 * Transaction announcement.
 	 */
 	REST_PUSH_TRANSACTION,
+
+	/**
+	 * Block announcement.
+	 */
+	REST_PUSH_BLOCK,
 
     /**
      * The chain API.

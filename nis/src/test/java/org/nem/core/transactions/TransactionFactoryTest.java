@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -14,9 +15,9 @@ public class TransactionFactoryTest {
     @Test(expected = InvalidParameterException.class)
     public void cannotDeserializeUnknownTransaction() {
         // Arrange:
-        JSONObject object = new JSONObject();
+        final JSONObject object = new JSONObject();
         object.put("type", 7);
-        JsonDeserializer deserializer = new JsonDeserializer(object, null);
+        final JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
         // Act:
         TransactionFactory.VERIFIABLE.deserialize(deserializer);
@@ -27,11 +28,11 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-        Transaction originalTransaction = new TransferTransaction(0, sender, recipient, 100, null);
-        Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
+        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+        final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
         // Act:
-        Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
+        final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
         // Assert:
         Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
@@ -44,13 +45,13 @@ public class TransactionFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
-        Transaction originalTransaction = new TransferTransaction(0, sender, recipient, 100, null);
-        Deserializer deserializer = Utils.roundtripSerializableEntity(
+        final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+        final Deserializer deserializer = Utils.roundtripSerializableEntity(
             originalTransaction.asNonVerifiable(),
             new MockAccountLookup());
 
         // Act:
-        Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+        final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
         // Assert:
         Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));

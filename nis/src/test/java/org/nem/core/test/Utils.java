@@ -3,6 +3,7 @@ package org.nem.core.test;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.security.SecureRandom;
 
@@ -166,5 +167,34 @@ public class Utils {
         JsonSerializer jsonSerializer = new JsonSerializer(true);
         originalEntity.serialize(jsonSerializer);
         return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+    }
+
+    /**
+     * Waits on the specified monitor.
+     *
+     * @param monitor The monitor.
+     */
+    public static void monitorWait(final Object monitor) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (monitor) {
+            try {
+                monitor.wait();
+            }
+            catch (InterruptedException e) {
+                throw ExceptionUtils.toUnchecked(e);
+            }
+        }
+    }
+
+    /**
+     * Signals the specified monitor.
+     *
+     * @param monitor The monitor.
+     */
+    public static void monitorSignal(final Object monitor) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (monitor) {
+            monitor.notifyAll();
+        }
     }
 }

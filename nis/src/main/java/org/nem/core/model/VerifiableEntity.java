@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 import java.security.InvalidParameterException;
 
@@ -29,7 +30,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     private final int version;
     private final int type;
     private final Account signer;
-    private final int timestamp;
+    private final TimeInstant timestamp;
     private Signature signature;
 
     //region Constructors
@@ -42,7 +43,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
      * @param timestamp The entity timestamp.
      * @param signer The entity signer.
      */
-    public VerifiableEntity(final int type, final int version, final int timestamp, final Account signer) {
+    public VerifiableEntity(final int type, final int version, final TimeInstant timestamp, final Account signer) {
         if (null == signer.getKeyPair())
             throw new InvalidParameterException("signer key pair is required to create a verifiable entity ");
 
@@ -62,7 +63,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     public VerifiableEntity(final int type, DeserializationOptions options,  Deserializer deserializer) {
         this.type = type;
         this.version = deserializer.readInt("version");
-        this.timestamp = deserializer.readInt("timestamp");
+        this.timestamp = SerializationUtils.readTimeInstant(deserializer, "timestamp");
         this.signer = SerializationUtils.readAccount(deserializer, "signer", AccountEncoding.PUBLIC_KEY);
 
         if (DeserializationOptions.VERIFIABLE == options)
@@ -99,7 +100,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
      *
      * @return The timestamp.
      */
-    public int getTimeStamp() { return this.timestamp; }
+    public TimeInstant getTimeStamp() { return this.timestamp; }
 
     /**
      * Gets the signature.
@@ -120,7 +121,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     @Override
     public void serialize(final Serializer serializer) {
         if (null == this.signature)
-            throw new SerializationException("cannot serialize a transaction without a signature");
+            throw new SerializationException("cannot serialize a entity without a signature");
 
         this.serialize(serializer, true);
     }
@@ -134,7 +135,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
     private void serialize(final Serializer serializer, boolean includeSignature) {
         serializer.writeInt("type", this.getType());
         serializer.writeInt("version", this.getVersion());
-        serializer.writeInt("timestamp", this.getTimeStamp());
+        SerializationUtils.writeTimeInstant(serializer, "timestamp", this.getTimeStamp());
         SerializationUtils.writeAccount(serializer, "signer", this.getSigner(), AccountEncoding.PUBLIC_KEY);
 
         if (includeSignature)
