@@ -83,7 +83,8 @@ public class TransferMapperTest {
             this.model.sign();
 
             this.dbSender = new org.nem.core.dbmodel.Account();
-            this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
+			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
             this.dbRecipient = new org.nem.core.dbmodel.Account();
             this.dbRecipient.setPrintableKey(this.model.getRecipient().getAddress().getEncoded());

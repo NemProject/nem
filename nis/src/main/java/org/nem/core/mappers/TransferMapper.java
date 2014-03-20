@@ -25,10 +25,9 @@ public class TransferMapper {
      * @return The Transfer db-model.
      */
     public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDao accountDao) {
-        final org.nem.core.dbmodel.Account sender = getAccountDbModel(transfer.getSigner(), accountDao);
-        sender.setPublicKey(transfer.getSigner().getKeyPair().getPublicKey());
+        final org.nem.core.dbmodel.Account sender = AccountMapper.toDbModel(transfer.getSigner(), accountDao);
 
-        final org.nem.core.dbmodel.Account recipient = getAccountDbModel(transfer.getRecipient(), accountDao);
+        final org.nem.core.dbmodel.Account recipient = AccountMapper.toDbModel(transfer.getRecipient(), accountDao);
 
         final byte[] txHash = HashUtils.calculateHash(transfer);
         return new Transfer(
@@ -46,10 +45,6 @@ public class TransferMapper {
             blockIndex, // index
             transfer.getAmount().getNumMicroNem(),
             0L); // referenced tx
-    }
-
-    private static org.nem.core.dbmodel.Account getAccountDbModel(final Account account, final AccountDao accountDao) {
-        return accountDao.getAccountByPrintableAddress(account.getAddress().getEncoded());
     }
 
 	/**

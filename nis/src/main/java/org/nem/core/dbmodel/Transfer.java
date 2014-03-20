@@ -23,8 +23,7 @@ public class Transfer {
 	private Integer deadline;
 
 	@ManyToOne
-	// TODO: as of now this causes some problems when block is saved not sure why...
-	//@Cascade({CascadeType.SAVE_UPDATE})
+	@Cascade({CascadeType.SAVE_UPDATE})
 	@JoinColumn(name="senderId")
 	private Account sender;
 	private byte[] senderProof;

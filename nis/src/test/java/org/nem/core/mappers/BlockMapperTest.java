@@ -107,6 +107,7 @@ public class BlockMapperTest {
             this.signModel();
 
             this.dbForager = new org.nem.core.dbmodel.Account();
+			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
             this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
             this.account1 = Utils.generateRandomAccount();

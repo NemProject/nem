@@ -35,9 +35,6 @@ public class NisMain {
 	private BlockDao blockDao;
 
 	@Autowired
-	private TransferDao transactionDao;
-
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
 	@Autowired
@@ -93,7 +90,7 @@ public class NisMain {
     }
 
 	private void populateDb() {
-        if (0 != this.transactionDao.count())
+        if (0 != this.blockDao.count())
             return;
 
         this.saveBlock(GENESIS_BLOCK);
@@ -103,32 +100,12 @@ public class NisMain {
         org.nem.core.dbmodel.Block dbBlock;
 
         dbBlock = this.blockDao.findByHash(GENESIS_BLOCK_HASH);
-        if (null != dbBlock)
+        if (null != dbBlock) {
             return dbBlock;
-
-        this.saveAccount(block.getSigner());
-        for (final Transaction transaction : block.getTransactions()) {
-            final TransferTransaction transfer = (TransferTransaction)transaction;
-            this.saveAccount(transfer.getRecipient());
-        }
+		}
 
         dbBlock = BlockMapper.toDbModel(block, this.accountDao);
         this.blockDao.save(dbBlock);
-        this.transactionDao.saveMulti(dbBlock.getBlockTransfers());
         return dbBlock;
-    }
-
-    private org.nem.core.dbmodel.Account saveAccount(final Account account) {
-        org.nem.core.dbmodel.Account dbAccount;
-
-        final String encodedAddress = account.getAddress().getEncoded();
-        dbAccount = this.accountDao.getAccountByPrintableAddress(encodedAddress);
-        if (null != dbAccount)
-            return dbAccount;
-
-        final byte[] publicKey = null != account.getKeyPair() ? account.getKeyPair().getPublicKey() : null;
-        dbAccount = new org.nem.core.dbmodel.Account(encodedAddress, publicKey);
-        this.accountDao.save(dbAccount);
-        return dbAccount;
     }
 }
