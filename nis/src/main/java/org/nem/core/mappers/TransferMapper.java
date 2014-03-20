@@ -1,7 +1,6 @@
 package org.nem.core.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.dao.AccountDao;
 import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
@@ -21,13 +20,12 @@ public class TransferMapper {
      *
      * @param transfer The transfer transaction model.
      * @param blockIndex The index of the transfer within the owning block.
-     * @param accountDao The account data access object.
+     * @param accountDaoLookup The account dao lookup object.
      * @return The Transfer db-model.
      */
-    public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDao accountDao) {
-        final org.nem.core.dbmodel.Account sender = AccountMapper.toDbModel(transfer.getSigner(), accountDao);
-
-        final org.nem.core.dbmodel.Account recipient = AccountMapper.toDbModel(transfer.getRecipient(), accountDao);
+    public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
+        final org.nem.core.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
+        final org.nem.core.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 
         final byte[] txHash = HashUtils.calculateHash(transfer);
         return new Transfer(
