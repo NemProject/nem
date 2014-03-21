@@ -2,6 +2,7 @@ package org.nem.nis;
 
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.mappers.AccountDaoLookupAdapter;
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
@@ -11,7 +12,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.peer.NodeApiId;
@@ -241,7 +241,7 @@ public class BlockChain {
 	private boolean addBlockToDb(Block bestBlock) {
 		synchronized (BlockChain.class) {
 
-            final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, this.accountDao);
+            final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block

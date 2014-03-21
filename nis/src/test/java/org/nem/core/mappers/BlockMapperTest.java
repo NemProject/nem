@@ -136,7 +136,7 @@ public class BlockMapperTest {
         public Block getModel() { return this.model; }
 
         public org.nem.core.dbmodel.Block toDbModel() {
-            return BlockMapper.toDbModel(this.model, this.accountDao);
+            return BlockMapper.toDbModel(this.model, new AccountDaoLookupAdapter(this.accountDao));
         }
 
         public Block toModel(final org.nem.core.dbmodel.Block dbBlock) {

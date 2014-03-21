@@ -1,7 +1,6 @@
 package org.nem.core.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.dao.AccountDao;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
@@ -22,11 +21,11 @@ public class BlockMapper {
      * Converts a Block model to a Block db-model.
      *
      * @param block The block model.
-     * @param accountDao The account data access object.
+     * @param accountDao The account dao lookup object.
      * @return The Block db-model.
      */
-    public static org.nem.core.dbmodel.Block toDbModel(final Block block, final AccountDao accountDao) {
-        final org.nem.core.dbmodel.Account forager = AccountMapper.toDbModel(block.getSigner(), accountDao);
+    public static org.nem.core.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
+        final org.nem.core.dbmodel.Account forager = accountDao.findByAddress(block.getSigner().getAddress());
 
         final byte[] blockHash = HashUtils.calculateHash(block);
         final org.nem.core.dbmodel.Block dbBlock = new org.nem.core.dbmodel.Block(

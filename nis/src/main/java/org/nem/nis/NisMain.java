@@ -8,11 +8,10 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
 
-import org.nem.core.dao.TransferDao;
+import org.nem.core.mappers.AccountDaoLookupAdapter;
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +103,7 @@ public class NisMain {
             return dbBlock;
 		}
 
-        dbBlock = BlockMapper.toDbModel(block, this.accountDao);
+        dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
         this.blockDao.save(dbBlock);
         return dbBlock;
     }
