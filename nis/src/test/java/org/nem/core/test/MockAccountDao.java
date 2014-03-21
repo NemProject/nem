@@ -2,6 +2,7 @@ package org.nem.core.test;
 
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dbmodel.Account;
+import org.nem.core.model.Address;
 
 import java.util.*;
 
@@ -10,16 +11,36 @@ import java.util.*;
  */
 public class MockAccountDao implements AccountDao {
 
-    private Map<String, Account> knownAccounts = new HashMap<>();
+    private int numGetAccountByPrintableAddressCalls;
+    private final Map<String, Account> knownAccounts = new HashMap<>();
 
     /**
-     * Adds a mapping between a model and db-model account.
+     * Gets the number of times getAccountByPrintableAddress was called.
+     *
+     * @return The number of times getAccountByPrintableAddress was called.
+     */
+    public int getNumGetAccountByPrintableAddressCalls() {
+        return this.numGetAccountByPrintableAddressCalls;
+    }
+
+    /**
+     * Adds a mapping between a model address and a db-model account.
+     *
+     * @param address The model address
+     * @param dbAccount The db-model account.
+     */
+    public void addMapping(final Address address, final org.nem.core.dbmodel.Account dbAccount) {
+        this.knownAccounts.put(address.getEncoded(), dbAccount);
+    }
+
+    /**
+     * Adds a mapping between a model account and a db-model account.
      *
      * @param account The model account
      * @param dbAccount The db-model account.
      */
     public void addMapping(final org.nem.core.model.Account account, final org.nem.core.dbmodel.Account dbAccount) {
-        this.knownAccounts.put(account.getAddress().getEncoded(), dbAccount);
+        this.addMapping(account.getAddress(), dbAccount);
     }
 
     @Override
@@ -29,6 +50,7 @@ public class MockAccountDao implements AccountDao {
 
     @Override
     public org.nem.core.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
+        ++numGetAccountByPrintableAddressCalls;
         return this.knownAccounts.get(printableAddress);
     }
 
