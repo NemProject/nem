@@ -189,10 +189,11 @@ public class AccountTest {
     }
 
     private static Account[] createNonEquivalentAccounts(final KeyPair keyPair) {
+        final PrivateKey mutatedPrivateKey = new PrivateKey(keyPair.getPrivateKey().getRaw().add(BigInteger.ONE));
         return new Account[] {
             Utils.generateRandomAccount(),
             new Account(new KeyPair(Utils.incrementAtIndex(keyPair.getPublicKey(), 10))),
-            new Account(new KeyPair(keyPair.getPrivateKey().add(new BigInteger("1"))))
+            new Account(new KeyPair(mutatedPrivateKey))
         };
     }
 

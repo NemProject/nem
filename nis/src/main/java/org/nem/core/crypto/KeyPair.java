@@ -5,7 +5,6 @@ import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.security.SecureRandom;
 
@@ -14,7 +13,7 @@ public class KeyPair {
     private final static int COMPRESSED_KEY_SIZE = 33;
     private final static SecureRandom RANDOM = new SecureRandom();
 
-    private final BigInteger privateKey;
+    private final PrivateKey privateKey;
     private final byte[] publicKey;
 
     /**
@@ -28,7 +27,7 @@ public class KeyPair {
         AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
         ECPrivateKeyParameters privateKeyParams = (ECPrivateKeyParameters)keyPair.getPrivate();
         ECPublicKeyParameters publicKeyParams = (ECPublicKeyParameters)keyPair.getPublic();
-        this.privateKey = privateKeyParams.getD();
+        this.privateKey = new PrivateKey(privateKeyParams.getD());
 
         ECPoint point = publicKeyParams.getQ();
         this.publicKey = point.getEncoded(true);
@@ -40,7 +39,7 @@ public class KeyPair {
      *
      * @param privateKey The private key.
      */
-    public KeyPair(final BigInteger privateKey) {
+    public KeyPair(final PrivateKey privateKey) {
         this(privateKey, publicKeyFromPrivateKey(privateKey));
     }
 
@@ -54,7 +53,7 @@ public class KeyPair {
         this(null, publicKey);
     }
 
-    private KeyPair(final BigInteger privateKey, final byte[] publicKey) {
+    private KeyPair(final PrivateKey privateKey, final byte[] publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
 
@@ -62,8 +61,8 @@ public class KeyPair {
             throw new InvalidParameterException("publicKey must be in compressed form");
     }
 
-    private static byte[] publicKeyFromPrivateKey(final BigInteger privateKey) {
-        ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey);
+    private static byte[] publicKeyFromPrivateKey(final PrivateKey privateKey) {
+        ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
         return point.getEncoded(true);
     }
 
@@ -72,8 +71,7 @@ public class KeyPair {
      *
      * @return The private key.
      */
-    public BigInteger getPrivateKey() {
-
+    public PrivateKey getPrivateKey() {
         return this.privateKey;
     }
 
@@ -106,7 +104,7 @@ public class KeyPair {
      * @return The EC private key parameters.
      */
     public ECPrivateKeyParameters getPrivateKeyParameters() {
-        return new ECPrivateKeyParameters(this.getPrivateKey(), Curves.secp256k1().getParams());
+        return new ECPrivateKeyParameters(this.getPrivateKey().getRaw(), Curves.secp256k1().getParams());
     }
 
     /**
