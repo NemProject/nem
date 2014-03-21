@@ -18,7 +18,7 @@ public class ExceptionControllerAdvice {
         return Utils.jsonError(404, "invalid json"); // 404
     }
 
-    @ExceptionHandler({ InvalidParameterException.class, DecoderException.class })
+    @ExceptionHandler(InvalidParameterException.class)
     public String handleInvalidParameterException(final Exception e) {
         return Utils.jsonError(400, "invalid json"); // 400
     }

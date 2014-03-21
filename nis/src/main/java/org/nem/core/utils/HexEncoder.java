@@ -2,40 +2,29 @@ package org.nem.core.utils;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.nem.core.serialization.SerializationException;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
  */
 public class HexEncoder {
+
     /**
-     * Converts a string to a byte array.
+     * Converts a hex string to a byte array.
      *
      * @param hexString The input hex string.
      * @return The output byte array.
      */
-    public static byte[] getBytes(final String hexString) throws DecoderException {
-        Hex codec = new Hex();
-        byte[] encodedBytes = StringEncoder.getBytes(hexString);
-        return codec.decode(encodedBytes);
+    public static byte[] getBytes(final String hexString) {
+        final Hex codec = new Hex();
+        final byte[] encodedBytes = StringEncoder.getBytes(hexString);
+
+        try {
+            return codec.decode(encodedBytes);
+        } catch (DecoderException e) {
+            throw new SerializationException(e);
+        }
     }
-
-	/**
-	 * Converts a string to a byte array.
-	 * (does not throw exception, use only on OWN strings)
-	 *
-	 * @param hexString The input hex string.
-	 * @return The output byte array.
-	 */
-	public static byte[] getBytesSilent(final String hexString) {
-		Hex codec = new Hex();
-		byte[] encodedBytes = StringEncoder.getBytes(hexString);
-		try {
-			return codec.decode(encodedBytes);
-
-		} catch (DecoderException e) {
-			return null;
-		}
-	}
 
     /**
      * Converts a byte array to a hex string.
@@ -43,9 +32,9 @@ public class HexEncoder {
      * @param bytes The input byte array.
      * @return The output hex string.
      */
-    public static String getString(byte[] bytes) {
-        Hex codec = new Hex();
-        byte[] decodedBytes = codec.encode(bytes);
+    public static String getString(final byte[] bytes) {
+        final Hex codec = new Hex();
+        final byte[] decodedBytes = codec.encode(bytes);
         return StringEncoder.getString(decodedBytes);
     }
 }
