@@ -2,6 +2,7 @@ package org.nem.peer.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.*;
 
 import java.net.URL;
@@ -55,7 +56,11 @@ public class MockPeerConnector implements PeerConnector {
 
     //endregion
 
-    /**
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) {
+		//
+	}
+
+	/**
      * Gets the number of times getInfo was called.
      *
      * @return The number of times getInfo was called.

@@ -74,6 +74,7 @@ public class NisMain {
 		this.analyzeBlocks();
 
 		this.networkHost = PeerNetworkHost.getDefaultHost();
+		this.networkHost.setAccountAnalyzer(accountAnalyzer);
 
 		this.blockChain.bootup();
 	}

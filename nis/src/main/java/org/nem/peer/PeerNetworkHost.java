@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.net.HttpPeerConnector;
 import org.nem.peer.scheduling.ParallelSchedulerFactory;
 
@@ -89,4 +90,8 @@ public class PeerNetworkHost implements AutoCloseable {
             throw new FatalPeerException("Exception encountered while loading config", e);
         }
     }
+
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) {
+		this.network.getConnector().setAccountAnalyzer(accountAnalyzer);
+	}
 }

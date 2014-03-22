@@ -5,9 +5,12 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.*;
 import org.eclipse.jetty.http.HttpMethod;
+import org.nem.core.dbmodel.Account;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.*;
@@ -22,6 +25,8 @@ public class HttpMethodClient {
 
     private final int timeout;
     private final HttpClient httpClient;
+
+	private AccountAnalyzer accountAnalyzer;
 
     /**
      * Creates a new HTTP method client.
@@ -40,6 +45,10 @@ public class HttpMethodClient {
             throw new FatalPeerException("HTTP client could not be started", ex);
         }
     }
+
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) {
+		this.accountAnalyzer = accountAnalyzer;
+	}
 
     /**
      * Issues a HTTP GET response.
@@ -107,7 +116,7 @@ public class HttpMethodClient {
             try (InputStream responseStream = listener.getInputStream()) {
                 return new JsonDeserializer(
                     (JSONObject)JSONValue.parse(responseStream),
-                    new DeserializationContext(null));
+                    new DeserializationContext(accountAnalyzer));
             }
         }
         catch (TimeoutException e) {
