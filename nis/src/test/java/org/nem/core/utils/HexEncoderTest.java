@@ -2,6 +2,7 @@ package org.nem.core.utils;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.SerializationException;
 
 public class HexEncoderTest {
 
@@ -19,5 +20,11 @@ public class HexEncoderTest {
     public void byteArrayCanBeConvertedToString() {
         // Assert:
         Assert.assertThat(HexEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("4e454d465457"));
+    }
+
+    @Test(expected = SerializationException.class)
+    public void malformedStringCannotBeConvertedToByteArray() {
+        // Act:
+        HexEncoder.getBytes("4e454g465457");
     }
 }

@@ -2,6 +2,7 @@ package org.nem.core.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.dbmodel.*;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
@@ -126,9 +127,9 @@ public class TransferMapperTest {
             Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
             Assert.assertThat(dbModel.getBlock(), IsEqual.equalTo(null));
 
-            final byte[] signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+            final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
             Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
-            final byte[] recipientPublicKey = this.model.getRecipient().getKeyPair().getPublicKey();
+            final PublicKey recipientPublicKey = this.model.getRecipient().getKeyPair().getPublicKey();
             Assert.assertThat(dbModel.getRecipient().getPublicKey(), IsEqual.equalTo(recipientPublicKey));
         }
 

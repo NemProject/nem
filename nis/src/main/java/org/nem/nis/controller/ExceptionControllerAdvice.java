@@ -1,7 +1,6 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
-import org.apache.commons.codec.DecoderException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ public class ExceptionControllerAdvice {
      * @param e The exception.
      * @return The appropriate JSON indicating an error.
      */
-    @ExceptionHandler({ InvalidParameterException.class, DecoderException.class })
+    @ExceptionHandler(InvalidParameterException.class)
     public String handleInvalidParameterException(final Exception e) {
         return getErrorString(e, HttpStatus.BAD_REQUEST);
     }

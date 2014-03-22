@@ -37,7 +37,7 @@ public class PushController {
         final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
-		LOGGER.info("   signer: " + HexEncoder.getString(transaction.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
 		// transaction timestamp is checked inside processTransaction
@@ -61,7 +61,7 @@ public class PushController {
         final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
         // TODO: refactor logging
-		LOGGER.info("   signer: " + HexEncoder.getString(block.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
 		if (block.verify()) {

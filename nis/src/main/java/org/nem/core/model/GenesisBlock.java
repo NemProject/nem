@@ -1,11 +1,9 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.PrivateKey;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.HexEncoder;
-
-import java.math.BigInteger;
 
 /**
  * Represents the genesis block.
@@ -24,8 +22,8 @@ public class GenesisBlock extends Block {
 
     // this will be removed later, only public key will be present in the code
     // all signatures will be pre-generated and placed in-code
-    private final static BigInteger CREATOR_PRIVATE_KEY = new BigInteger(
-        HexEncoder.getBytesSilent("aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04"));
+    private final static PrivateKey CREATOR_PRIVATE_KEY = PrivateKey.fromHexString(
+        "aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
 
     private final static int GENESIS_HEIGHT = 1;
     private final static int HASH_LENGTH = 32;

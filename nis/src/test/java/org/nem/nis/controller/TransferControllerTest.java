@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
 import org.apache.commons.codec.DecoderException;
-import org.hamcrest.core.IsNull;
+import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.MessageTypes;
@@ -47,7 +47,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -74,7 +74,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(404));
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -155,7 +155,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -182,7 +182,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -209,6 +209,6 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.nullValue());
+        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(null));
 	}
 }

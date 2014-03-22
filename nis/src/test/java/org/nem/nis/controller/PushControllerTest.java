@@ -1,8 +1,7 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.core.IsNull;
+import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.serialization.JsonDeserializer;
@@ -24,7 +23,6 @@ public class PushControllerTest {
 		JsonDeserializer res = pc.pushTransaction(obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("error"), IsNull.notNullValue());
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
-
 }

@@ -5,17 +5,15 @@ import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.security.SecureRandom;
 
 public class KeyPair {
 
-    private final static int COMPRESSED_KEY_SIZE = 33;
     private final static SecureRandom RANDOM = new SecureRandom();
 
-    private final BigInteger privateKey;
-    private final byte[] publicKey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
     /**
      * Creates a random key pair.
@@ -28,10 +26,10 @@ public class KeyPair {
         AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
         ECPrivateKeyParameters privateKeyParams = (ECPrivateKeyParameters)keyPair.getPrivate();
         ECPublicKeyParameters publicKeyParams = (ECPublicKeyParameters)keyPair.getPublic();
-        this.privateKey = privateKeyParams.getD();
+        this.privateKey = new PrivateKey(privateKeyParams.getD());
 
         ECPoint point = publicKeyParams.getQ();
-        this.publicKey = point.getEncoded(true);
+        this.publicKey = new PublicKey(point.getEncoded(true));
     }
 
     /**
@@ -40,7 +38,7 @@ public class KeyPair {
      *
      * @param privateKey The private key.
      */
-    public KeyPair(final BigInteger privateKey) {
+    public KeyPair(final PrivateKey privateKey) {
         this(privateKey, publicKeyFromPrivateKey(privateKey));
     }
 
@@ -50,21 +48,21 @@ public class KeyPair {
      *
      * @param publicKey The public key.
      */
-    public KeyPair(final byte[] publicKey) {
+    public KeyPair(final PublicKey publicKey) {
         this(null, publicKey);
     }
 
-    private KeyPair(final BigInteger privateKey, final byte[] publicKey) {
+    private KeyPair(final PrivateKey privateKey, final PublicKey publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
 
-        if (!isPublicKeyCompressed(publicKey))
+        if (!publicKey.isCompressed())
             throw new InvalidParameterException("publicKey must be in compressed form");
     }
 
-    private static byte[] publicKeyFromPrivateKey(final BigInteger privateKey) {
-        ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey);
-        return point.getEncoded(true);
+    private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {
+        ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
+        return new PublicKey(point.getEncoded(true));
     }
 
     /**
@@ -72,8 +70,7 @@ public class KeyPair {
      *
      * @return The private key.
      */
-    public BigInteger getPrivateKey() {
-
+    public PrivateKey getPrivateKey() {
         return this.privateKey;
     }
 
@@ -82,9 +79,7 @@ public class KeyPair {
      *
      * @return the public key.
      */
-    public byte[] getPublicKey() {
-        return this.publicKey;
-    }
+    public PublicKey getPublicKey() { return this.publicKey; }
 
     /**
      * Determines if the current key pair has a private key.
@@ -106,7 +101,7 @@ public class KeyPair {
      * @return The EC private key parameters.
      */
     public ECPrivateKeyParameters getPrivateKeyParameters() {
-        return new ECPrivateKeyParameters(this.getPrivateKey(), Curves.secp256k1().getParams());
+        return new ECPrivateKeyParameters(this.getPrivateKey().getRaw(), Curves.secp256k1().getParams());
     }
 
     /**
@@ -115,20 +110,7 @@ public class KeyPair {
      * @return The EC public key parameters.
      */
     public ECPublicKeyParameters getPublicKeyParameters() {
-        ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey());
+        ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
         return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
-    }
-
-    private static boolean isPublicKeyCompressed(byte[] publicKey) {
-        if (COMPRESSED_KEY_SIZE != publicKey.length)
-            return false;
-
-        switch (publicKey[0]) {
-            case 0x02:
-            case 0x03:
-                return true;
-        }
-
-        return false;
     }
 }

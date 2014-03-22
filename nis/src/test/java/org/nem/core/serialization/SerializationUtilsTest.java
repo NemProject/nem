@@ -91,7 +91,7 @@ public class SerializationUtilsTest {
         assertCanWriteAccountWithEncoding(
             new Account(kp),
             AccountEncoding.PUBLIC_KEY,
-            Base64Encoder.getString(kp.getPublicKey()));
+            Base64Encoder.getString(kp.getPublicKey().getRaw()));
     }
     
     private static void assertCanWriteAccountWithEncoding(

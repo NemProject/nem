@@ -1,10 +1,13 @@
 package org.nem.core.test;
 
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.PrivateKey;
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
@@ -13,7 +16,20 @@ import java.security.SecureRandom;
 public class Utils {
 
     /**
+     * Generates a random public key.
+     *
+     * @return A random public key.
+     */
+    public static PublicKey generateRandomPublicKey() {
+        final byte[] bytes = Utils.generateRandomBytes(33);
+        bytes[0] = 0x02;
+        return new PublicKey(bytes);
+    }
+
+    /**
      * Generates a byte array containing random data.
+     *
+     * @return A byte array containing random data.
      */
     public static byte[] generateRandomBytes() {
         return generateRandomBytes(214);
@@ -23,6 +39,7 @@ public class Utils {
      * Generates a byte array containing random data.
      *
      * @param numBytes The number of bytes to generate.
+     * @return A byte array containing random data.
      */
     public static byte[] generateRandomBytes(int numBytes) {
         SecureRandom rand = new SecureRandom();
@@ -69,6 +86,15 @@ public class Utils {
     }
 
     /**
+     * Generates a random address with a public key.
+     *
+     * @return A random address.
+     */
+    public static Address generateRandomAddressWithPublicKey() {
+        return Address.fromPublicKey(Utils.generateRandomPublicKey());
+    }
+
+    /**
      * Increments a single character in the specified string.
      *
      * @param s The string
@@ -78,6 +104,28 @@ public class Utils {
     public static String incrementAtIndex(final String s, final int index) {
         char[] chars = s.toCharArray();
         chars[index] = (char)(chars[index] + 1);
+        return new String(chars);
+    }
+
+    /**
+     * Changes a single character in the specified base 32 string.
+     *
+     * @param s A base 32 string
+     * @param index The index of the character to change
+     * @return The resulting base 32 string
+     */
+    public static String modifyBase32AtIndex(final String s, final int index) {
+        final char[] chars = s.toCharArray();
+        final char currentChar = chars[index];
+
+        char newChar = (char)(currentChar + 1);
+        switch (currentChar) {
+            case 'Z':
+            case '7':
+                newChar = 'A';
+        }
+
+        chars[index] = newChar;
         return new String(chars);
     }
 
@@ -196,5 +244,25 @@ public class Utils {
         synchronized (monitor) {
             monitor.notifyAll();
         }
+    }
+
+    /**
+     * Mutates key into a slightly different key.
+     *
+     * @param key The original key.
+     * @return A slightly different key
+     */
+    public static PublicKey mutate(final PublicKey key) {
+        return new PublicKey(Utils.incrementAtIndex(key.getRaw(), 12));
+    }
+
+    /**
+     * Mutates key into a slightly different key.
+     *
+     * @param key The original key.
+     * @return A slightly different key
+     */
+    public static PrivateKey mutate(final PrivateKey key) {
+        return new PrivateKey(key.getRaw().add(BigInteger.ONE));
     }
 }

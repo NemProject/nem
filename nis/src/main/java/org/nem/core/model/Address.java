@@ -14,7 +14,7 @@ public class Address {
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
     private static final byte VERSION = 0x68;
     private String encoded; // base-32 encoded address
-    private byte[] publicKey;
+    private PublicKey publicKey;
 
     /**
      * Creates an Address from a public key.
@@ -22,7 +22,7 @@ public class Address {
      * @param publicKey The public key.
      * @return An address object.
      */
-    public static Address fromPublicKey(final byte[] publicKey) {
+    public static Address fromPublicKey(final PublicKey publicKey) {
         return new Address(VERSION, publicKey);
     }
 
@@ -52,8 +52,8 @@ public class Address {
      * @param version The address version.
      * @param publicKey The address public key.
      */
-    private Address(final byte version, final byte[] publicKey) {
-        this.encoded = generateEncoded(version, publicKey);
+    private Address(final byte version, final PublicKey publicKey) {
+        this.encoded = generateEncoded(version, publicKey.getRaw());
         this.publicKey = publicKey;
     }
 
@@ -99,7 +99,7 @@ public class Address {
      *
      * @return The address public key.
      */
-    public byte[] getPublicKey() { return this.publicKey; }
+    public PublicKey getPublicKey() { return this.publicKey; }
 
     /**
      * Determines if the address is valid.
