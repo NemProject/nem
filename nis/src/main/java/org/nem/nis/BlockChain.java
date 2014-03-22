@@ -123,6 +123,23 @@ public class BlockChain {
 	}
 
 	/**
+	 * Calculates "target" basing on the inputs
+	 *
+	 * @param parentTimeStamp timestamp of parent block
+	 * @param blockTimeStamp timestamp or current block
+	 * @param forgerEffectiveBallance - effective balance used to forage
+	 *
+	 * @return The target.
+	 */
+	private BigInteger calculateTarget(TimeInstant parentTimeStamp, TimeInstant blockTimeStamp, long forgerEffectiveBallance) {
+		return BigInteger.valueOf(blockTimeStamp.subtract(parentTimeStamp)).multiply(
+				BigInteger.valueOf(forgerEffectiveBallance).multiply(
+						BigInteger.valueOf(MAGIC_MULTIPLIER)
+				)
+		);
+	}
+
+	/**
 	 *
 	 * @param transaction - transaction that isValid() and verify()-ed
 	 * @return false if given transaction has already been seen, true if it has been added
@@ -221,11 +238,9 @@ public class BlockChain {
 		}
 
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
-		BigInteger target = BigInteger.valueOf(block.getTimeStamp().subtract(parentTimeStamp)).multiply(
-                BigInteger.valueOf(forgerAccount.getBalance().getNumNem()).multiply(
-                        BigInteger.valueOf(MAGIC_MULTIPLIER)
-                )
-        );
+		TimeInstant blockTimeStamp = block.getTimeStamp();
+		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
+		BigInteger target = calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
@@ -237,7 +252,6 @@ public class BlockChain {
 		// 2. remove transactions from unconfirmed transactions.
 		// run account analyzer?
 	}
-
 
 	// not sure where it should be
 	private boolean addBlockToDb(Block bestBlock) {
@@ -307,11 +321,8 @@ public class BlockChain {
 					}
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
-					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
-                            BigInteger.valueOf(realAccout.getBalance().getNumNem()).multiply(
-                                    BigInteger.valueOf(MAGIC_MULTIPLIER)
-                            )
-                    );
+					long effectiveBalance = realAccout.getBalance().getNumNem();
+					BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
 
 					System.out.println("   hit: 0x" + hit.toString(16));
 					System.out.println("target: 0x" + target.toString(16));
