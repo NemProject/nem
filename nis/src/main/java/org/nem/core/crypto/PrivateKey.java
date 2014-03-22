@@ -68,7 +68,11 @@ public class PrivateKey implements SerializableEntity {
      * @return The new private key.
      */
     public static PrivateKey fromHexString(final String hex) {
-        return fromString(hex, 16);
+        try {
+            return new PrivateKey(new BigInteger(HexEncoder.getBytes(hex)));
+        } catch (SerializationException e) {
+            throw new CryptoException(e);
+        }
     }
 
     /**
@@ -78,7 +82,11 @@ public class PrivateKey implements SerializableEntity {
      * @return The new private key.
      */
     public static PrivateKey fromDecimalString(final String decimal) {
-        return fromString(decimal, 10);
+        try {
+            return new PrivateKey(new BigInteger(decimal, 10));
+        } catch (NumberFormatException e) {
+            throw new CryptoException(e);
+        }
     }
 
     private static PrivateKey fromString(final String s, final int base) {

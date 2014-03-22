@@ -30,12 +30,30 @@ public class PrivateKeyTest {
     }
 
     @Test
+    public void canCreateFromNegativeDecimalString() {
+        // Arrange:
+        final PrivateKey key = PrivateKey.fromDecimalString("-2279");
+
+        // Assert:
+        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("-2279")));
+    }
+
+    @Test
     public void canCreateFromHexString() {
         // Arrange:
         final PrivateKey key = PrivateKey.fromHexString("227F");
 
         // Assert:
         Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("227F", 16)));
+    }
+
+    @Test
+    public void canCreateFromNegativeHexString() {
+        // Arrange:
+        final PrivateKey key = PrivateKey.fromHexString("8000");
+
+        // Assert:
+        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(new byte [] { (byte)0x80, 0x00 })));
     }
 
     @Test(expected = CryptoException.class)
