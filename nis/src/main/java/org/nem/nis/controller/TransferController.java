@@ -48,7 +48,7 @@ public class TransferController {
         transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
         // TODO: move logger to controller
-		LOGGER.info("   signer: " + HexEncoder.getString(transfer.getSigner().getKeyPair().getPublicKey()));
+		LOGGER.info("   signer: " + transfer.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 

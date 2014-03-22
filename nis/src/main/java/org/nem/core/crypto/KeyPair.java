@@ -14,7 +14,7 @@ public class KeyPair {
     private final static SecureRandom RANDOM = new SecureRandom();
 
     private final PrivateKey privateKey;
-    private final byte[] publicKey;
+    private final PublicKey publicKey;
 
     /**
      * Creates a random key pair.
@@ -30,7 +30,7 @@ public class KeyPair {
         this.privateKey = new PrivateKey(privateKeyParams.getD());
 
         ECPoint point = publicKeyParams.getQ();
-        this.publicKey = point.getEncoded(true);
+        this.publicKey = new PublicKey(point.getEncoded(true));
     }
 
     /**
@@ -49,11 +49,11 @@ public class KeyPair {
      *
      * @param publicKey The public key.
      */
-    public KeyPair(final byte[] publicKey) {
+    public KeyPair(final PublicKey publicKey) {
         this(null, publicKey);
     }
 
-    private KeyPair(final PrivateKey privateKey, final byte[] publicKey) {
+    private KeyPair(final PrivateKey privateKey, final PublicKey publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
 
@@ -61,9 +61,9 @@ public class KeyPair {
             throw new InvalidParameterException("publicKey must be in compressed form");
     }
 
-    private static byte[] publicKeyFromPrivateKey(final PrivateKey privateKey) {
+    private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {
         ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
-        return point.getEncoded(true);
+        return new PublicKey(point.getEncoded(true));
     }
 
     /**
@@ -80,9 +80,7 @@ public class KeyPair {
      *
      * @return the public key.
      */
-    public byte[] getPublicKey() {
-        return this.publicKey;
-    }
+    public PublicKey getPublicKey() { return this.publicKey; }
 
     /**
      * Determines if the current key pair has a private key.
@@ -113,15 +111,16 @@ public class KeyPair {
      * @return The EC public key parameters.
      */
     public ECPublicKeyParameters getPublicKeyParameters() {
-        ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey());
+        ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
         return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
     }
 
-    private static boolean isPublicKeyCompressed(byte[] publicKey) {
-        if (COMPRESSED_KEY_SIZE != publicKey.length)
+    // TODO: move to PublicKey class
+    private static boolean isPublicKeyCompressed(final PublicKey publicKey) {
+        if (COMPRESSED_KEY_SIZE != publicKey.getRaw().length)
             return false;
 
-        switch (publicKey[0]) {
+        switch (publicKey.getRaw()[0]) {
             case 0x02:
             case 0x03:
                 return true;

@@ -1,11 +1,9 @@
 package org.nem.core.crypto;
 
-import org.eclipse.jetty.util.ArrayUtil;
 import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
 
 public class KeyPairTest {
 
@@ -27,7 +25,7 @@ public class KeyPairTest {
         KeyPair kp = new KeyPair();
 
         // Assert:
-        Assert.assertThat(kp.getPublicKey().length, IsEqual.equalTo(33));
+        Assert.assertThat(kp.getPublicKey().getRaw().length, IsEqual.equalTo(33));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class KeyPairTest {
     @Test
     public void ctorFailsIfPublicKeyLengthIsWrong() {
         // Arrange:
-        byte[] publicKey = (new KeyPair()).getPublicKey();
+        byte[] publicKey = (new KeyPair()).getPublicKey().getRaw();
 
         byte[] shortPublicKey = new byte[publicKey.length - 1];
         System.arraycopy(publicKey, 0, shortPublicKey, 0, shortPublicKey.length);
@@ -90,7 +88,7 @@ public class KeyPairTest {
     @Test
          public void ctorFailsIfPublicKeyFirstByteIsWrong() {
         // Arrange:
-        byte[] publicKey = (new KeyPair()).getPublicKey();
+        byte[] publicKey = (new KeyPair()).getPublicKey().getRaw();
 
         byte[] smallBytePublicKey = new byte[publicKey.length];
         System.arraycopy(publicKey, 0, smallBytePublicKey, 0, publicKey.length);
@@ -108,10 +106,9 @@ public class KeyPairTest {
     private static void assertInvalidPublicKey(final byte[] publicKey) {
         try {
             // Act:
-            new KeyPair(publicKey);
+            new KeyPair(new PublicKey(publicKey));
             Assert.fail("No exception was thrown");
         } catch (InvalidParameterException ex) {
-            return;
         }
     }
 }

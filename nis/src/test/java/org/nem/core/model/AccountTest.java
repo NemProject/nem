@@ -44,7 +44,7 @@ public class AccountTest {
 	@Test
 	public void accountCanBeCreatedAroundAddressWithPublicKey() {
 		// Arrange:
-        final byte[] publicKey = new KeyPair().getPublicKey();
+        final PublicKey publicKey = new KeyPair().getPublicKey();
 		final Address expectedAccountId = Address.fromPublicKey(publicKey);
 		final Account account = new Account(expectedAccountId);
 
@@ -189,11 +189,10 @@ public class AccountTest {
     }
 
     private static Account[] createNonEquivalentAccounts(final KeyPair keyPair) {
-        final PrivateKey mutatedPrivateKey = new PrivateKey(keyPair.getPrivateKey().getRaw().add(BigInteger.ONE));
         return new Account[] {
             Utils.generateRandomAccount(),
-            new Account(new KeyPair(Utils.incrementAtIndex(keyPair.getPublicKey(), 10))),
-            new Account(new KeyPair(mutatedPrivateKey))
+            new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
+            new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
         };
     }
 

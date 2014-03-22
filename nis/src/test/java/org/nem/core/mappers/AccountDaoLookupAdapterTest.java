@@ -2,6 +2,7 @@ package org.nem.core.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.dbmodel.Account;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
@@ -13,7 +14,7 @@ public class AccountDaoLookupAdapterTest {
     @Test
     public void newObjectIsCreatedOnCacheMiss() {
         // Arrange:
-        final Address address = Utils.generateRandomAddress();
+        final Address address = Utils.generateRandomAddressWithPublicKey();
         final MockAccountDao accountDao = new MockAccountDao();
         final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
 
@@ -48,7 +49,7 @@ public class AccountDaoLookupAdapterTest {
     @Test
     public void existingObjectIsReturnedFromDaoOnCacheMiss() {
         // Arrange:
-        final Address address = Utils.generateRandomAddress();
+        final Address address = Utils.generateRandomAddressWithPublicKey();
         final MockAccountDao accountDao = new MockAccountDao();
         final Account dbAccountFromDao = new Account();
         accountDao.addMapping(address, dbAccountFromDao);
@@ -88,7 +89,7 @@ public class AccountDaoLookupAdapterTest {
     @Test
     public void cachedObjectPublicKeyCanBeUpdated() {
         // Arrange:
-        final Address addressWithPublicKey = Address.fromPublicKey(Utils.generateRandomBytes(32));
+        final Address addressWithPublicKey = Utils.generateRandomAddressWithPublicKey();
         final Address addressWithoutPublicKey = Address.fromEncoded(addressWithPublicKey.getEncoded());
         final MockAccountDao accountDao = new MockAccountDao();
         final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
@@ -111,7 +112,7 @@ public class AccountDaoLookupAdapterTest {
     public void publicKeyIsOnlyUpdatedIfItIsUnset() {
         // Arrange:
         final Address address = Utils.generateRandomAddress();
-        final byte[] originalPublicKey = Utils.generateRandomBytes(30);
+        final PublicKey originalPublicKey = Utils.generateRandomPublicKey();
         final MockAccountDao accountDao = new MockAccountDao();
         final Account dbAccountFromDao = new Account(address.getEncoded(), originalPublicKey);
         accountDao.addMapping(address, dbAccountFromDao);

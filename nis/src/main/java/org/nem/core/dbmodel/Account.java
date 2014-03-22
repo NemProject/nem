@@ -1,5 +1,7 @@
 package org.nem.core.dbmodel;
 
+import org.nem.core.crypto.PublicKey;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,16 +22,16 @@ public class Account {
 
 	public Account() {}
 	
-	public Account(String printableKey, byte[] publicKey) {
+	public Account(final String printableKey, final PublicKey publicKey) {
 		this.printableKey = printableKey;
-		this.publicKey = publicKey;
+        this.setPublicKey(publicKey);
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -37,16 +39,16 @@ public class Account {
 		return printableKey;
 	}
 
-	public void setPrintableKey(String printableKey) {
+	public void setPrintableKey(final String printableKey) {
 		this.printableKey = printableKey;
 	}
 
-	public byte[] getPublicKey() {
-		return publicKey;
+	public PublicKey getPublicKey() {
+		return null == this.publicKey ? null : new PublicKey(this.publicKey);
 	}
 
-	public void setPublicKey(byte[] publicKey) {
-		this.publicKey = publicKey;
-	}
-	
+	public void setPublicKey(final PublicKey publicKey) {
+        if (null != publicKey)
+            this.publicKey = publicKey.getRaw();
+    }
 }
