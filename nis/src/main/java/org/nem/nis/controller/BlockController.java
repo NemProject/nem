@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import net.minidev.json.JSONObject;
 import org.apache.commons.codec.DecoderException;
 import org.nem.core.dao.BlockDao;
 
@@ -19,15 +20,6 @@ public class BlockController {
 
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
-
-	@Autowired
-	private BlockChain blockChain;
-
-	@RequestMapping(value="/block/last", method = RequestMethod.GET)
-	public String blockLast() {
-		final Block lastBlock = BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountAnalyzer);
-        return ControllerUtils.serialize(lastBlock);
-	}
 
 	/**
 	 * Obtain block from the block chain.
