@@ -46,7 +46,7 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
 		this.amount = SerializationUtils.readAmount(deserializer, "amount");
-		this.message = deserializer.readObject("message", MessageFactory.DESERIALIZER);
+		this.message = deserializer.readObject("message", MessageFactory.createDeserializer(this.getSigner(), this.getRecipient()));
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class TransferTransaction extends Transaction {
 	 *
 	 * @return The transaction message.
 	 */
-	public byte[] getMessage() {
-        return null == this.message ? null : this.message.getEncodedPayload();
+	public Message getMessage() {
+        return this.message;
     }
 
     private int getMessageLength() {

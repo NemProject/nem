@@ -44,7 +44,7 @@ public class EntityFactoryTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+        Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
         Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11891)));
     }
 

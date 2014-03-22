@@ -96,17 +96,9 @@ public class SecureMessageTest {
         final SecureMessage originalMessage,
         final Account sender,
         final Account recipient) {
-        // Arrange:
-        final AccountLookup accountLookup = new AccountLookup() {
-            @Override
-            public Account findByAddress(final Address id) {
-                return sender.getAddress().equals(id) ? sender : recipient;
-            }
-        };
-
         // Act:
-        Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, accountLookup);
+        Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, null);
         deserializer.readInt("type");
-        return new SecureMessage(deserializer);
+        return new SecureMessage(sender, recipient, deserializer);
     }
 }
