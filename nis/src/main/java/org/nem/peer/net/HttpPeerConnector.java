@@ -1,5 +1,8 @@
 package org.nem.peer.net;
 
+import org.nem.core.model.Block;
+import org.nem.core.model.BlockFactory;
+import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
@@ -32,6 +35,16 @@ public class HttpPeerConnector implements PeerConnector {
         final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
         return new NodeCollection(this.httpMethodClient.get(url));
     }
+
+	@Override
+	public Block getLastBlock(final NodeEndpoint endpoint) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
+		JsonDeserializer jsonDeserializer = this.httpMethodClient.get(url);
+		if (jsonDeserializer == null) {
+			return null;
+		}
+		return BlockFactory.VERIFIABLE.deserialize(jsonDeserializer);
+	}
 
     @Override
     public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {

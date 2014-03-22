@@ -1,5 +1,6 @@
 package org.nem.peer.test;
 
+import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
@@ -119,6 +120,11 @@ public class MockPeerConnector implements PeerConnector {
     public void setKnownPeers(final NodeCollection nodes) {
         this.knownPeers = nodes;
     }
+
+	@Override
+	public Block getLastBlock(NodeEndpoint endpoint) {
+		return null;
+	}
 
     @Override
     public Node getInfo(NodeEndpoint endpoint) {

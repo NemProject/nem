@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.scheduling.*;
 
@@ -99,7 +100,17 @@ public class PeerNetwork {
 
             for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
                 this.nodes.update(entry.getKey(), entry.getValue());
-        }
+
+
+			scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
+				@Override
+				public void execute(final Node element) {
+					sychronizeNode(element);
+				}
+			});
+			scheduler.push(this.nodes.getActiveNodes());
+			scheduler.block();
+		}
 
         private void refreshNode(final Node node) {
             Node refreshedNode = node;
@@ -124,6 +135,15 @@ public class PeerNetwork {
 
             this.update(refreshedNode, updatedStatus);
         }
+
+		private void sychronizeNode(final Node node) {
+			Block lastBlock = this.connector.getLastBlock(node.getEndpoint());
+			if (lastBlock == null) {
+				return;
+			}
+
+			
+		}
 
         private static boolean areCompatible(final Node lhs, final Node rhs) {
             return lhs.equals(rhs);

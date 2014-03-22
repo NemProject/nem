@@ -32,5 +32,5 @@ public enum NodeApiId {
     /**
      * The chain API.
      */
-    REST_CHAIN
+    REST_CHAIN_LAST_BLOCK
 }

@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
 
 /**
@@ -23,12 +24,20 @@ public interface PeerConnector {
      */
     public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
 
-    /**
-     * Announces a new entity to the target node.
-     *
-     * @param endpoint The endpoint.
-     * @param announceId The type of announcement.
-     * @param entity The entity to announce.
-     */
+	/**
+	 * Request information about last block in chain from the specified node.
+	 *
+	 * @param endpoint The endpoint.
+	 * @return Last block.
+	 */
+	public Block getLastBlock(final NodeEndpoint endpoint);
+
+	/**
+	 * Announces a new entity to the target node.
+	 *
+	 * @param endpoint The endpoint.
+	 * @param announceId The type of announcement.
+	 * @param entity The entity to announce.
+	 */
     public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
 }
