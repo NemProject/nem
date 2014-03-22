@@ -38,6 +38,8 @@ import java.util.logging.Logger;
 //
 public class BlockChain {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	// 500_000_000 nems have force to generate block every minute
+	public static final long MAGIC_MULTIPLIER = 614891469L;
 
 	@Autowired
 	private AccountDao accountDao;
@@ -63,7 +65,7 @@ public class BlockChain {
 		this.unconfirmedTransactions = new ConcurrentHashMap<>();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 10, 10, TimeUnit.SECONDS);
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 1, 1, TimeUnit.SECONDS);
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 	}
@@ -220,8 +222,8 @@ public class BlockChain {
 
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
 		BigInteger target = BigInteger.valueOf(block.getTimeStamp().subtract(parentTimeStamp)).multiply(
-                BigInteger.valueOf(forgerAccount.getBalance().getNumMicroNem()).multiply(
-                        BigInteger.valueOf(30745)
+                BigInteger.valueOf(forgerAccount.getBalance().getNumNem()).multiply(
+                        BigInteger.valueOf(MAGIC_MULTIPLIER)
                 )
         );
 
@@ -279,10 +281,6 @@ public class BlockChain {
 				return;
 			}
 
-			if (unconfirmedTransactions.size() == 0) {
-				return;
-			}
-
 			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 			Block bestBlock = null;
@@ -310,8 +308,8 @@ public class BlockChain {
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
 					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
-                            BigInteger.valueOf(realAccout.getBalance().getNumMicroNem()).multiply(
-                                    BigInteger.valueOf(30745)
+                            BigInteger.valueOf(realAccout.getBalance().getNumNem()).multiply(
+                                    BigInteger.valueOf(MAGIC_MULTIPLIER)
                             )
                     );
 
@@ -341,7 +339,10 @@ public class BlockChain {
 				// fork resolution will handle that)
 				//
 				if (addBlockToDb(bestBlock)) {
-					unconfirmedTransactions.clear();
+					for (Transaction transaction : bestBlock.getTransactions()) {
+						ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+						unconfirmedTransactions.remove(transactionHash);
+					}
 
 					PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 					peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);

@@ -7,7 +7,8 @@ import java.security.InvalidParameterException;
  */
 public class Amount implements Comparable<Amount> {
 
-    private final long amount;
+	public static final int MICRONEMS_IN_NEM = 1000000;
+	private final long amount;
 
     /**
      * Amount representing 0 NEM.
@@ -21,7 +22,7 @@ public class Amount implements Comparable<Amount> {
      * @return The new amount.
      */
 	public static Amount fromNem(long amount) {
-		return new Amount(amount * 1000000);
+		return new Amount(amount * MICRONEMS_IN_NEM);
 	}
 
     /**
@@ -84,7 +85,14 @@ public class Amount implements Comparable<Amount> {
      */
     public long getNumMicroNem() { return this.amount; }
 
-    @Override
+	/**
+	 * Returns the number of NEM.
+	 *
+	 * @return The number of NEM.
+	 */
+	public long getNumNem() { return this.amount / MICRONEMS_IN_NEM; }
+
+	@Override
     public int hashCode() {
         return Long.valueOf(this.amount).intValue();
     }
