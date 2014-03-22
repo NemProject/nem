@@ -255,4 +255,27 @@ public class VectorTest {
     }
 
     //endregion
+
+    //region toString
+
+    @Test
+    public void vectorStringRepresentationIsCorrect() {
+        // Arrange:
+        final Vector vector = new Vector(6);
+        vector.setAt(0, 2.1234);
+        vector.setAt(1, 3.2345);
+        vector.setAt(2, 5.0126);
+        vector.setAt(3, 11.1234);
+        vector.setAt(4, 1);
+        vector.setAt(5, 8);
+
+        // Assert:
+        final String expectedResult = "2.123 3.234 5.013 11.123 1.000 8.000";
+
+        // Assert:
+        Assert.assertThat(vector.toString(), IsEqual.equalTo(expectedResult));
+
+    }
+
+    //endregion
 }

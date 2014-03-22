@@ -123,4 +123,30 @@ public class MatrixTest {
     }
 
     //endregion
+
+    //region toString
+
+    @Test
+    public void matrixStringRepresentationIsCorrect() {
+        // Arrange:
+        final Matrix matrix = new Matrix(3, 2);
+        matrix.setAt(0, 0, 2.1234);
+        matrix.setAt(1, 0, 3.2345);
+        matrix.setAt(2, 0, 5.0126);
+        matrix.setAt(0, 1, 11.1234);
+        matrix.setAt(1, 1, 1);
+        matrix.setAt(2, 1, 8);
+
+        // Assert:
+        final String expectedResult =
+            "2.123 11.123" + System.lineSeparator() +
+            "3.234 1.000" + System.lineSeparator() +
+            "5.013 8.000";
+
+        // Assert:
+        Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
+
+    }
+
+    //endregion
 }

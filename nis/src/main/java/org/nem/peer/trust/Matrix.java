@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import java.text.DecimalFormat;
+
 /**
  * Represents a linear algebra matrix.
  */
@@ -81,5 +83,25 @@ public class Matrix {
     public void normalizeColumns() {
         for (int i = 0; i < this.cols; ++i)
             this.columns[i].normalize();
+    }
+
+    @Override
+    public String toString() {
+        final DecimalFormat format = new DecimalFormat("#0.000");
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < this.rows; ++i) {
+            if (0 != i)
+                builder.append(System.lineSeparator());
+
+            for (int j = 0; j < this.cols; ++j ) {
+                if (0 != j)
+                    builder.append(" ");
+
+                builder.append(format.format(this.getAt(i, j)));
+            }
+        }
+
+        return builder.toString();
     }
 }

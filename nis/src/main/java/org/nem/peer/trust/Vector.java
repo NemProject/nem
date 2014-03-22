@@ -1,6 +1,7 @@
 package org.nem.peer.trust;
 
 import java.security.InvalidParameterException;
+import java.text.DecimalFormat;
 
 /**
  * Represents a linear algebra vector.
@@ -139,5 +140,20 @@ public class Vector {
         }
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final DecimalFormat format = new DecimalFormat("#0.000");
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < this.size; ++i) {
+            if (0 != i)
+                builder.append(" ");
+
+            builder.append(format.format(this.vector[i]));
+        }
+
+        return builder.toString();
     }
 }
