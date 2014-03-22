@@ -245,7 +245,7 @@ public class BlockChain {
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block
-			// mind that there is NO cascade in transaction
+			// mind that there is NO cascade in transaction (near block field)
 			blockDao.save(dbBlock);
 
 			lastBlock.setNextBlockId(dbBlock.getId());

@@ -39,10 +39,7 @@ public class AccountAnalyzer implements AccountLookup {
 				account = new Account(new KeyPair(publicKey));
 
 				mapByPublicKey.put(publicKey, account);
-
-				// in case of genesis account we didn't knew it's //encoded address//
-				// earlier, so additionally insert it in mapByAddressId
-				if (encodedAddress.equals(GenesisBlock.ACCOUNT.getAddress().getEncoded())) {
+				if (!mapByAddressId.containsKey(encodedAddress)) {
 					mapByAddressId.put(encodedAddress, account);
 				}
 
