@@ -132,7 +132,7 @@ public class AddressTest {
 
         // Act:
         final Address address = Address.fromPublicKey(publicKey);
-        final String fakeAddress = Utils.incrementAtIndex(address.getEncoded(), index);
+        final String fakeAddress = Utils.modifyBase32AtIndex(address.getEncoded(), index);
 
         // Assert:
         Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));

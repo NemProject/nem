@@ -108,6 +108,28 @@ public class Utils {
     }
 
     /**
+     * Changes a single character in the specified base 32 string.
+     *
+     * @param s A base 32 string
+     * @param index The index of the character to change
+     * @return The resulting base 32 string
+     */
+    public static String modifyBase32AtIndex(final String s, final int index) {
+        final char[] chars = s.toCharArray();
+        final char currentChar = chars[index];
+
+        char newChar = (char)(currentChar + 1);
+        switch (currentChar) {
+            case 'Z':
+            case '7':
+                newChar = 'A';
+        }
+
+        chars[index] = newChar;
+        return new String(chars);
+    }
+
+    /**
      * Increments a single byte in the specified byte array.
      *
      * @param bytes The byte array
