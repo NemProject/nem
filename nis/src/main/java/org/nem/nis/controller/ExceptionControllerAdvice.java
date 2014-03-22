@@ -15,7 +15,7 @@ import java.util.logging.*;
 @ControllerAdvice
 public class ExceptionControllerAdvice {
 
-    private static final Logger LOGGER = Logger.getLogger(NcsMainController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ExceptionControllerAdvice.class.getName());
 
     /**
      * Handler for resource-not-found exceptions.
