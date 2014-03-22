@@ -10,7 +10,6 @@ import java.security.SecureRandom;
 
 public class KeyPair {
 
-    private final static int COMPRESSED_KEY_SIZE = 33;
     private final static SecureRandom RANDOM = new SecureRandom();
 
     private final PrivateKey privateKey;
@@ -57,7 +56,7 @@ public class KeyPair {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
 
-        if (!isPublicKeyCompressed(publicKey))
+        if (!publicKey.isCompressed())
             throw new InvalidParameterException("publicKey must be in compressed form");
     }
 
@@ -113,19 +112,5 @@ public class KeyPair {
     public ECPublicKeyParameters getPublicKeyParameters() {
         ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
         return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
-    }
-
-    // TODO: move to PublicKey class
-    private static boolean isPublicKeyCompressed(final PublicKey publicKey) {
-        if (COMPRESSED_KEY_SIZE != publicKey.getRaw().length)
-            return false;
-
-        switch (publicKey.getRaw()[0]) {
-            case 0x02:
-            case 0x03:
-                return true;
-        }
-
-        return false;
     }
 }

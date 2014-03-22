@@ -10,6 +10,8 @@ import java.util.Arrays;
  */
 public class PublicKey implements SerializableEntity {
 
+    private final static int COMPRESSED_KEY_SIZE = 33;
+
     public byte[] value;
 
     /**
@@ -36,6 +38,24 @@ public class PublicKey implements SerializableEntity {
      * @return The raw public key value.
      */
     public byte[] getRaw() { return this.value; }
+
+    /**
+     * Determines if the public key is in compressed form.
+     *
+     * @return true if the public key is in compressed form.
+     */
+    public boolean isCompressed() {
+        if (COMPRESSED_KEY_SIZE != this.value.length)
+            return false;
+
+        switch (this.value[0]) {
+            case 0x02:
+            case 0x03:
+                return true;
+        }
+
+        return false;
+    }
 
     @Override
     public void serialize(final Serializer serializer) {

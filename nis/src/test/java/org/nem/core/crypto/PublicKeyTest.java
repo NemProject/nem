@@ -42,6 +42,49 @@ public class PublicKeyTest {
 
     //endregion
 
+    //region isCompressed
+
+    @Test
+    public void compressedKeyMustHaveCorrectLength() {
+        // Arrange:
+        final PublicKey publicKey = Utils.generateRandomPublicKey();
+
+        // Assert:
+        Assert.assertThat(createKeyWithLengthDelta(publicKey, -1).isCompressed(), IsEqual.equalTo(false));
+        Assert.assertThat(createKeyWithLengthDelta(publicKey, 0).isCompressed(), IsEqual.equalTo(true));
+        Assert.assertThat(createKeyWithLengthDelta(publicKey, 1).isCompressed(), IsEqual.equalTo(false));
+    }
+
+    private PublicKey createKeyWithLengthDelta(final PublicKey key, final int lengthDelta) {
+        // Arrange:
+        final byte[] modifiedPublicKey = new byte[key.getRaw().length + lengthDelta];
+        final int numBytesToCopy = Math.min(modifiedPublicKey.length, key.getRaw().length);
+        System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, numBytesToCopy);
+        return new PublicKey(modifiedPublicKey);
+    }
+
+    @Test
+    public void compressedKeyMustHaveCorrectFirstByte() {
+        // Arrange:
+        final PublicKey publicKey = Utils.generateRandomPublicKey();
+
+        // Assert:
+        Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)1).isCompressed(), IsEqual.equalTo(false));
+        Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)2).isCompressed(), IsEqual.equalTo(true));
+        Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)3).isCompressed(), IsEqual.equalTo(true));
+        Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)4).isCompressed(), IsEqual.equalTo(false));
+    }
+
+    private PublicKey createKeyWithFirstByte(final PublicKey key, final byte firstByte) {
+        // Arrange:
+        final byte[] modifiedPublicKey = new byte[key.getRaw().length];
+        System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, modifiedPublicKey.length);
+        modifiedPublicKey[0] = firstByte;
+        return new PublicKey(modifiedPublicKey);
+    }
+
+    //endregion
+
     //region equals / hashCode
 
     @Test
