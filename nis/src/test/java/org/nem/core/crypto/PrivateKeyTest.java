@@ -48,6 +48,15 @@ public class PrivateKeyTest {
     }
 
     @Test
+    public void canCreateFromOddLengthHexString() {
+        // Arrange:
+        final PrivateKey key = PrivateKey.fromHexString("ABC");
+
+        // Assert:
+        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[] { (byte)0x0A, (byte)0xBC })));
+    }
+
+    @Test
     public void canCreateFromNegativeHexString() {
         // Arrange:
         final PrivateKey key = PrivateKey.fromHexString("8000");
