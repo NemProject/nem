@@ -6,6 +6,7 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.peer.*;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -264,5 +265,15 @@ public class Utils {
      */
     public static PrivateKey mutate(final PrivateKey key) {
         return new PrivateKey(key.getRaw().add(BigInteger.ONE));
+    }
+
+    /**
+     * Creates a node with the specified port number.
+     *
+     * @param port The port number.
+     * @return The new node.
+     */
+    public static Node createNodeWithPort(final int port) {
+        return new Node(new NodeEndpoint("http", "localhost", port), "P", "A");
     }
 }

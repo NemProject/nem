@@ -1,19 +1,17 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsSame;
+import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.Utils;
 import org.nem.peer.Node;
-import org.nem.peer.NodeEndpoint;
 
 public class NodeExperiencesTest {
 
     @Test
     public void previouslyUnknownNodeExperienceCanBeRetrieved() {
         // Arrange:
-        final Node node1 = createNode(81);
-        final Node node2 = createNode(82);
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
@@ -26,8 +24,8 @@ public class NodeExperiencesTest {
     @Test
     public void sameExperienceIsReturnedForSameSourceAndPeerNode() {
         // Arrange:
-        final Node node1 = createNode(81);
-        final Node node2 = createNode(82);
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
@@ -41,8 +39,8 @@ public class NodeExperiencesTest {
     @Test
     public void experienceIsDirectional() {
         // Arrange:
-        final Node node1 = createNode(81);
-        final Node node2 = createNode(82);
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
@@ -56,9 +54,9 @@ public class NodeExperiencesTest {
     @Test
     public void transposedLocalTrustMatrixCanBeReturned() {
         // Arrange:
-        final Node node1 = createNode(81);
-        final Node node2 = createNode(82);
-        final Node node3 = createNode(83);
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
         final NodeExperiences experiences = new NodeExperiences();
 
         experiences.getNodeExperience(node1, node2).setLocalTrust(7);
@@ -83,9 +81,5 @@ public class NodeExperiencesTest {
         Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0));
         Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0));
         Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
-    }
-
-    private static Node createNode(int port) {
-        return new Node(new NodeEndpoint("http", "localhost", port), "P", "A");
     }
 }
