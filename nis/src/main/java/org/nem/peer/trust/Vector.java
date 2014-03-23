@@ -49,6 +49,16 @@ public class Vector {
     }
 
     /**
+     * Sets all the vector's elements to the specified value.
+     *
+     * @param val The value.
+     */
+    public void setAll(double val) {
+        for (int i = 0; i < this.vector.length; ++i)
+            this.vector[i] = val;
+    }
+
+    /**
      * Gets the sum of all the vector's elements.
      *
      * @return The sum of all the vectors elements.

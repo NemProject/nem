@@ -60,6 +60,24 @@ public class VectorTest {
 
     //endregion
 
+    //region setAll
+
+    @Test
+    public void setAllSetsAllVectorElementValues() {
+        // Arrange:
+        final Vector vector = new Vector(3);
+
+        // Act:
+        vector.setAll(4);
+
+        // Assert:
+        Assert.assertThat(vector.getAt(0), IsEqual.equalTo(4.0));
+        Assert.assertThat(vector.getAt(1), IsEqual.equalTo(4.0));
+        Assert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
+    }
+
+    //endregion
+
     //region sum / absSum
 
     @Test
