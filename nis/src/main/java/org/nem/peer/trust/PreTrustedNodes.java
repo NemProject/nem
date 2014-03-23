@@ -38,4 +38,24 @@ public class PreTrustedNodes {
     public boolean isPreTrusted(final Node node) {
         return this.nodes.contains(node);
     }
+
+    /**
+     * Gets a vector of pre-trust values for all specified nodes.
+     *
+     * @param nodes The nodes.
+     * @return A vector of pre-trust values.
+     */
+    public Vector getPreTrustVector(final Node[] nodes) {
+        final int numPreTrustedNodes = this.getNumPreTrustedNodes();
+        final Vector preTrustVector = new Vector(nodes.length);
+        if (0 == numPreTrustedNodes) {
+            preTrustVector.setAll(1.0 / nodes.length);
+            return preTrustVector;
+        }
+
+        for (int i = 0; i < nodes.length; i++)
+            preTrustVector.setAt(i, this.isPreTrusted(nodes[i]) ? 1.0 / numPreTrustedNodes : 0.0);
+
+        return preTrustVector;
+    }
 }

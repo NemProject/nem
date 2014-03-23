@@ -9,6 +9,8 @@ import java.util.*;
 
 public class PreTrustedNodesTest {
 
+    //region basic operations
+
     @Test
     public void numberOfPreTrustedNodesCanBeReturned() {
         // Arrange:
@@ -39,6 +41,56 @@ public class PreTrustedNodesTest {
         Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(82)), IsEqual.equalTo(false));
         Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(85)), IsEqual.equalTo(false));
     }
+
+    //endregion
+
+    //region getPreTrustVector
+
+    @Test
+    public void preTrustVectorCorrectWhenThereAreNoPreTrustedNodes() {
+        // Arrange:
+        final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
+        final Node[] nodes = new Node[] {
+            Utils.createNodeWithPort(80),
+            Utils.createNodeWithPort(83),
+            Utils.createNodeWithPort(84),
+            Utils.createNodeWithPort(85)
+        };
+
+        // Act:
+        final Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+
+        // Assert:
+        Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
+        Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.25));
+        Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.25));
+        Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.25));
+        Assert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.25));
+    }
+
+    @Test
+    public void preTrustVectorIsCorrectWhenThereArePreTrustedNodes() {
+        // Arrange:
+        final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
+        final Node[] nodes = new Node[] {
+            Utils.createNodeWithPort(80),
+            Utils.createNodeWithPort(83),
+            Utils.createNodeWithPort(84),
+            Utils.createNodeWithPort(85)
+        };
+
+        // Act:
+        final Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+
+        // Assert:
+        Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
+        Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.00));
+        Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(1.0 / 3.0));
+        Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(1.0 / 3.0));
+        Assert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.00));
+    }
+
+    //endregion
 
     public static PreTrustedNodes createTestPreTrustedNodes() {
         // Arrange:
