@@ -11,22 +11,31 @@ import java.security.InvalidParameterException;
 public class MessageFactory {
 
     /**
-     * An object deserializer that wraps this factory.
+     * Creates an object deserializer that is able to deserialize messages
+     * sent from sender to recipient.
+     *
+     * @param sender The message sender.
+     * @param recipient The message recipient.
+     * @return An object deserializer.
      */
-    public static final ObjectDeserializer<Message> DESERIALIZER = new ObjectDeserializer<Message>() {
-        @Override
-        public Message deserialize(Deserializer deserializer) {
-            return MessageFactory.deserialize(deserializer);
-        }
-    };
+    public static ObjectDeserializer<Message> createDeserializer(final Account sender, final Account recipient) {
+        return new ObjectDeserializer<Message>() {
+            @Override
+            public Message deserialize(final Deserializer deserializer) {
+                return MessageFactory.deserialize(sender, recipient, deserializer);
+            }
+        };
+    }
 
     /**
      * Deserializes a message.
      *
+     * @param sender The message sender.
+     * @param recipient The message recipient.
      * @param deserializer The deserializer.
      * @return The deserialized message.
      */
-    public static Message deserialize(Deserializer deserializer) {
+    public static Message deserialize(final Account sender, final Account recipient, final Deserializer deserializer) {
         int type = deserializer.readInt("type");
 
         switch (type) {
@@ -34,7 +43,7 @@ public class MessageFactory {
                 return new PlainMessage(deserializer);
 
             case MessageTypes.SECURE:
-                return new SecureMessage(deserializer);
+                return new SecureMessage(sender, recipient, deserializer);
         }
 
         throw new InvalidParameterException("Unknown message type: " + type);
