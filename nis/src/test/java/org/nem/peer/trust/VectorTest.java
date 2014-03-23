@@ -188,6 +188,50 @@ public class VectorTest {
 
     //endregion
 
+    //region add
+
+    @Test
+    public void distanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
+        // Arrange:
+        final Vector a = new Vector(3);
+        a.setAt(0, 7);
+        a.setAt(1, 5);
+        a.setAt(2, 11);
+
+        final Vector b = new Vector(3);
+        b.setAt(0, 2);
+        b.setAt(1, -4);
+        b.setAt(2, 1);
+
+        // Act:
+        final double distance = a.distance(b);
+
+        // Assert:
+        Assert.assertEquals(14.3527, distance, 0.0000001);
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void distanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
+        // Arrange:
+        final Vector largerVector = new Vector(8);
+        final Vector smallerVector = new Vector(7);
+
+        // Act:
+        largerVector.distance(smallerVector);
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void distanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
+        // Arrange:
+        final Vector largerVector = new Vector(8);
+        final Vector smallerVector = new Vector(7);
+
+        // Act:
+        smallerVector.distance(largerVector);
+    }
+
+    //endregion
+
     //region multiply
 
     @Test

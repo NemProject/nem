@@ -142,6 +142,25 @@ public class Vector {
         return result;
     }
 
+    /**
+     * Calculates the Euclidean distance between the specified vector and this vector.
+     *
+     * @param vector The specified vector.
+     * @return The Euclidean distance.
+     */
+    public double distance(final Vector vector) {
+        if (this.size != vector.size)
+            throw new InvalidParameterException("cannot determine the distance between vectors with different sizes");
+
+        double distance = 0;
+        for (int i = 0; i < this.size; ++i) {
+            double difference = this.vector[i] - vector.vector[i];
+            distance += difference * difference;
+        }
+
+        return Math.sqrt(distance);
+    }
+
     @Override
     public String toString() {
         final DecimalFormat format = new DecimalFormat("#0.000");
