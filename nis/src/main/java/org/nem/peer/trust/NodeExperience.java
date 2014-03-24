@@ -5,97 +5,45 @@ package org.nem.peer.trust;
  */
 public class NodeExperience {
 
-	private long successfulCalls;
-	private long failedCalls;
-	private double localTrustSum;
-	private double localTrust;
-	private double globalTrust;
-	private double feedbackCredibility = 1.0;
+	private PositiveLong successfulCalls = new PositiveLong(0);
+	private PositiveLong failedCalls = new PositiveLong(0);
+	private RealDouble localTrustSum = new RealDouble(0);
+	private RealDouble localTrust = new RealDouble(0);
+	private RealDouble feedbackCredibility = new RealDouble(1.0);
 
     /**
      * Gets the number of successful calls.
      *
      * @return The number of successful calls.
      */
-	public long getSuccessfulCalls() {
-		return this.successfulCalls;
-	}
-
-    /**
-     * Sets the number of successful calls.
-     *
-     * @param calls The number of successful calls.
-     */
-	public void setSuccessfulCalls(long calls) {
-		this.successfulCalls = Math.max(0, calls);
-	}
-
-    /**
-     * Increments the number of successful calls.
-     */
-	public void incSuccessfulCalls() {
-		++this.successfulCalls;
-	}
+	public PositiveLong successfulCalls() { return this.successfulCalls; }
 
     /**
      * Gets the number of failed calls.
      *
      * @return The number of failed calls.
      */
-	public long getFailedCalls() {
-		return this.failedCalls;
-	}
+    public PositiveLong failedCalls() { return this.failedCalls; }
 
     /**
-     * Sets the number of failed calls.
+     * Gets the local trust.
      *
-     * @param calls The number of failed calls.
+     * @return The local trust.
      */
-	public void setFailedCalls(final long calls) {
-        this.failedCalls = Math.max(0, calls);
-	}
+    public RealDouble localTrust() { return this.localTrust; }
 
     /**
-     * Increments the number of failed calls.
-     */
-	public void incFailedCalls() {
-		++this.failedCalls;
-	}
-	
-	public double getLocalTrustSum() {
-		return localTrustSum;
-	}
-	
-	public void setLocalTrustSum(double trustSum) {
-		this.localTrustSum = trustSum;
-	}	
-	
-	public double getLocalTrust() {
-		return localTrust;
-	}
-
-    /**
-     * Sets the local trust.
+     * Gets the local trust sum.
+     * TODO: consider removing this.
      *
-     * @param localTrust The local trust
+     * @return The local trust sum.
      */
-	public void setLocalTrust(final double localTrust) {
-        this.localTrust = (Double.isNaN(localTrust) || Double.isInfinite(localTrust)) ? 0.0 : localTrust;
-	}	
-	
-	public double getGlobalTrust() {
-		return globalTrust;
-	}
-	
-	public void setGlobalTrust(double globalTrust) {
-		this.globalTrust = globalTrust;
-	}	
-	
-	public double getFeedbackCredibility() {
-		return feedbackCredibility;
-	}
-	
-	public void setFeedbackCredibility(double feedbackCredibility) {
-		this.feedbackCredibility = feedbackCredibility;
-	}	
+    public RealDouble localTrustSum() { return this.localTrustSum; }
+
+    /**
+     * Gets the feedback credibility.
+     *
+     * @return The feedback credibility.
+     */
+    public RealDouble feedbackCredibility() { return this.feedbackCredibility; }
 }

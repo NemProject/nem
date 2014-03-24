@@ -21,11 +21,7 @@ public class NodeExperiences {
      * @return The experience source has with peer.
      */
     public NodeExperience getNodeExperience(final Node source, final Node peer) {
-        Map<Node, NodeExperience> localExperiences = this.nodeExperiences.get(source);
-        if (null == localExperiences) {
-            localExperiences = new ConcurrentHashMap<>();
-            this.nodeExperiences.put(source, localExperiences);
-        }
+        final Map<Node, NodeExperience> localExperiences = this.getNodeExperiences(source);
 
         NodeExperience experience = localExperiences.get(peer);
         if (null == experience) {
@@ -34,6 +30,16 @@ public class NodeExperiences {
         }
 
         return experience;
+    }
+
+    private Map<Node, NodeExperience> getNodeExperiences(final Node source) {
+        Map<Node, NodeExperience> localExperiences = this.nodeExperiences.get(source);
+        if (null == localExperiences) {
+            localExperiences = new ConcurrentHashMap<>();
+            this.nodeExperiences.put(source, localExperiences);
+        }
+
+        return localExperiences;
     }
 
     /**
@@ -49,7 +55,7 @@ public class NodeExperiences {
         for (int i = 0; i < numNodes; ++i) {
             for (int j = 0; j < numNodes; ++j) {
                 final NodeExperience experience = this.getNodeExperience(nodes[i], nodes[j]);
-                trustMatrix.setAt(j, i, experience.getLocalTrust() * experience.getFeedbackCredibility());
+                trustMatrix.setAt(j, i, experience.localTrust().get() * experience.feedbackCredibility().get());
             }
         }
 
@@ -68,7 +74,7 @@ public class NodeExperiences {
         final Vector vector = new Vector(nodes.length);
         for (int i = 0; i < nodes.length; ++i) {
             final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
-            vector.setAt(i, experience.getLocalTrust());
+            vector.setAt(i, experience.localTrust().get());
         }
 
         return vector;
@@ -87,7 +93,7 @@ public class NodeExperiences {
 
         for (int i = 0; i < nodes.length; ++i) {
             final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
-            experience.setLocalTrust(trustVector.getAt(i));
+            experience.localTrust().set(trustVector.getAt(i));
         }
     }
 

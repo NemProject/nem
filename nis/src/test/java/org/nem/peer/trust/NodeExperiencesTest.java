@@ -22,7 +22,7 @@ public class NodeExperiencesTest {
         final NodeExperience experience = experiences.getNodeExperience(node1, node2);
 
         // Assert:
-        Assert.assertThat(experience.getLocalTrust(), IsEqual.equalTo(0.0));
+        Assert.assertThat(experience.localTrust().get(), IsEqual.equalTo(0.0));
     }
 
     @Test
@@ -67,12 +67,12 @@ public class NodeExperiencesTest {
         final Node node3 = Utils.createNodeWithPort(83);
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node2).setLocalTrust(7);
-        experiences.getNodeExperience(node1, node3).setLocalTrust(2);
-        experiences.getNodeExperience(node2, node1).setLocalTrust(5);
-        experiences.getNodeExperience(node2, node3).setLocalTrust(4);
-        experiences.getNodeExperience(node3, node1).setLocalTrust(11);
-        experiences.getNodeExperience(node3, node2).setLocalTrust(6);
+        experiences.getNodeExperience(node1, node2).localTrust().set(7);
+        experiences.getNodeExperience(node1, node3).localTrust().set(2);
+        experiences.getNodeExperience(node2, node1).localTrust().set(5);
+        experiences.getNodeExperience(node2, node3).localTrust().set(4);
+        experiences.getNodeExperience(node3, node1).localTrust().set(11);
+        experiences.getNodeExperience(node3, node2).localTrust().set(6);
 
         // Act:
         final Matrix matrix = experiences.getTrustMatrix(new Node[]{ node1, node2, node3 });
@@ -98,10 +98,10 @@ public class NodeExperiencesTest {
         final Node node2 = Utils.createNodeWithPort(82);
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node2).setLocalTrust(7);
-        experiences.getNodeExperience(node1, node2).setFeedbackCredibility(0.5);
-        experiences.getNodeExperience(node2, node1).setLocalTrust(5);
-        experiences.getNodeExperience(node2, node1).setFeedbackCredibility(0.1);
+        experiences.getNodeExperience(node1, node2).localTrust().set(7);
+        experiences.getNodeExperience(node1, node2).feedbackCredibility().set(0.5);
+        experiences.getNodeExperience(node2, node1).localTrust().set(5);
+        experiences.getNodeExperience(node2, node1).feedbackCredibility().set(0.1);
 
         // Act:
         final Matrix matrix = experiences.getTrustMatrix(new Node[] { node1, node2 });
@@ -127,8 +127,8 @@ public class NodeExperiencesTest {
         final Node node3 = Utils.createNodeWithPort(83);
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node2).setLocalTrust(7);
-        experiences.getNodeExperience(node1, node3).setLocalTrust(2);
+        experiences.getNodeExperience(node1, node2).localTrust().set(7);
+        experiences.getNodeExperience(node1, node3).localTrust().set(2);
 
         // Act:
         final Vector vector = experiences.getLocalTrustVector(node1, new Node[] { node1, node2, node3 });
@@ -206,12 +206,12 @@ public class NodeExperiencesTest {
         final Node[] nodes = new Node[] { node1, node2, node3 };
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node2).setLocalTrust(7);
-        experiences.getNodeExperience(node1, node3).setLocalTrust(2);
-        experiences.getNodeExperience(node2, node1).setLocalTrust(5);
-        experiences.getNodeExperience(node2, node3).setLocalTrust(4);
-        experiences.getNodeExperience(node3, node1).setLocalTrust(11);
-        experiences.getNodeExperience(node3, node2).setLocalTrust(6);
+        experiences.getNodeExperience(node1, node2).localTrust().set(7);
+        experiences.getNodeExperience(node1, node3).localTrust().set(2);
+        experiences.getNodeExperience(node2, node1).localTrust().set(5);
+        experiences.getNodeExperience(node2, node3).localTrust().set(4);
+        experiences.getNodeExperience(node3, node1).localTrust().set(11);
+        experiences.getNodeExperience(node3, node2).localTrust().set(6);
 
         // Act:
         experiences.normalizeLocalTrust(nodes);
