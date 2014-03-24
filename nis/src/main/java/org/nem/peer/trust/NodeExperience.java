@@ -1,42 +1,65 @@
 package org.nem.peer.trust;
 
 /**
- * Helper class for collecting experience data for a node
- *
+ * Represents experience one node has with another node.
  */
 public class NodeExperience {
-	private long successfulCalls=0;
-	private long failedCalls=0;
-	private double localTrustSum=0.0;
-	private double localTrust=0.0;
-	private double globalTrust=0.0;
-	private double feedbackCredibility=0.0;
 
-	public NodeExperience() {
-	}
-	
+	private long successfulCalls;
+	private long failedCalls;
+	private double localTrustSum;
+	private double localTrust;
+	private double globalTrust;
+	private double feedbackCredibility = 1.0;
+
+    /**
+     * Gets the number of successful calls.
+     *
+     * @return The number of successful calls.
+     */
 	public long getSuccessfulCalls() {
-		return successfulCalls;
-	}
-	
-	public void setSuccessfulCalls(long calls) {
-		successfulCalls = calls;
-	}
-	
-	public void incSuccessfulCalls() {
-		successfulCalls++;
+		return this.successfulCalls;
 	}
 
+    /**
+     * Sets the number of successful calls.
+     *
+     * @param calls The number of successful calls.
+     */
+	public void setSuccessfulCalls(long calls) {
+		this.successfulCalls = Math.max(0, calls);
+	}
+
+    /**
+     * Increments the number of successful calls.
+     */
+	public void incSuccessfulCalls() {
+		++this.successfulCalls;
+	}
+
+    /**
+     * Gets the number of failed calls.
+     *
+     * @return The number of failed calls.
+     */
 	public long getFailedCalls() {
-		return failedCalls;
+		return this.failedCalls;
 	}
-	
-	public void setFailedCalls(long calls) {
-		failedCalls = calls;
+
+    /**
+     * Sets the number of failed calls.
+     *
+     * @param calls The number of failed calls.
+     */
+	public void setFailedCalls(final long calls) {
+        this.failedCalls = Math.max(0, calls);
 	}
-	
+
+    /**
+     * Increments the number of failed calls.
+     */
 	public void incFailedCalls() {
-		failedCalls++;
+		++this.failedCalls;
 	}
 	
 	public double getLocalTrustSum() {
@@ -50,9 +73,14 @@ public class NodeExperience {
 	public double getLocalTrust() {
 		return localTrust;
 	}
-	
-	public void setLocalTrust(double localTrust) {
-		this.localTrust = localTrust;
+
+    /**
+     * Sets the local trust.
+     *
+     * @param localTrust The local trust
+     */
+	public void setLocalTrust(final double localTrust) {
+        this.localTrust = (Double.isNaN(localTrust) || Double.isInfinite(localTrust)) ? 0.0 : localTrust;
 	}	
 	
 	public double getGlobalTrust() {

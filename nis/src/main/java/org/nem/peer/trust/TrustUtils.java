@@ -12,7 +12,7 @@ public class TrustUtils {
      *
      * @param nodes The nodes.
      * @param localNode The local node.
-     * @return An array containing all nodes in the network.
+     * @return An array containing all in the NodeCollection and the local node.
      */
     public static Node[] toNodeArray(final NodeCollection nodes, final Node localNode) {
         final int numNodes = nodes.getActiveNodes().size() + nodes.getInactiveNodes().size() + 1;
