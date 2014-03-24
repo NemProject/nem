@@ -1,13 +1,9 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.nem.core.test.Utils;
-import org.nem.peer.Node;
-import org.nem.peer.NodeCollection;
-import org.nem.peer.NodeStatus;
+import org.nem.peer.*;
 import org.nem.peer.test.NodeCollectionAssert;
 
 import java.util.HashSet;
@@ -25,7 +21,7 @@ public class TrustContextTest {
         final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
 
         // Act:
-        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes);
+        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes, new UniformTrustProvider());
 
         // Assert:
         Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(nodeExperiences));
@@ -40,7 +36,7 @@ public class TrustContextTest {
         final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
 
         // Act:
-        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes);
+        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes, new UniformTrustProvider());
 
         // Assert:
         Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
@@ -62,7 +58,7 @@ public class TrustContextTest {
         final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
 
         // Act:
-        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes);
+        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes, new UniformTrustProvider());
 
         // Assert:
         NodeCollectionAssert.arePortsEquivalent(context.getNodes(), new Integer[]{ 81, 82, 84, 86, 87, 90 });

@@ -29,22 +29,29 @@ public class TrustContext {
     private final Node localNode;
     private final NodeExperiences nodeExperiences;
     private final PreTrustedNodes preTrustedNodes;
+    private final TrustProvider trustProvider;
 
     /**
      * Creates a new trust context.
      *
-     *
+     * @param nodes The known nodes.
+     * @param localNode The local nodes
+     * @param nodeExperiences Node experiences information.
+     * @param preTrustedNodes Pre-trusted node information.
+     * @param trustProvider The trust provider to use.
      */
     public TrustContext(
         final NodeCollection nodes,
         final Node localNode,
         final NodeExperiences nodeExperiences,
-        final PreTrustedNodes preTrustedNodes) {
+        final PreTrustedNodes preTrustedNodes,
+        final TrustProvider trustProvider) {
 
         this.nodes = TrustUtils.toNodeArray(nodes, localNode);
         this.localNode = localNode;
         this.nodeExperiences = nodeExperiences;
         this.preTrustedNodes = preTrustedNodes;
+        this.trustProvider = trustProvider;
     }
 
     /**
@@ -90,23 +97,26 @@ public class TrustContext {
     }
 
     public Vector compute() {
-        // TODO: (1) compute the trust we have in other nodes due to our own experience
-        //computeLocalTrust(peers[peers.length-1]);
+        // (1) compute the trust we have in other nodes due to our own experience
+        this.updateLocalTrust();
 
         // (2) normalize each node's local trust values
         this.nodeExperiences.normalizeLocalTrust(this.nodes);
 
-        // TODO: ETPP
+        // TODO: (3) compute the feedback credibility
         // computeFeedbackCredibility(peers[peers.length-1], peers);
 
-        // Compute pre-trust vector
-        final Vector preTrustVector = this.getPreTrustVector();
-
-        // Set up the transpose of the trust matrix
-        final Matrix trustMatrix = this.getTrustMatrix();
-
-        // Calculate global trust
+        // (4) Update the global trust
         return computeGlobalTrust();
+    }
+
+    private void updateLocalTrust() {
+        TrustUtils.updateLocalTrust(
+            this.localNode,
+            this.nodes,
+            this.nodeExperiences,
+            this.preTrustedNodes,
+            this.trustProvider);
     }
 
     private Vector computeGlobalTrust() {
