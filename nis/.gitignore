@@ -6,3 +6,4 @@ superlog.txt
 *.pyc
 *.db
 my.*.sh
+.DS_Store
