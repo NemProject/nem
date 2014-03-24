@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.AccountAnalyzer;
 
 /**
  * A interface that is used to request information from nodes.
@@ -40,4 +41,6 @@ public interface PeerConnector {
 	 * @param entity The entity to announce.
 	 */
     public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
+
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer);
 }

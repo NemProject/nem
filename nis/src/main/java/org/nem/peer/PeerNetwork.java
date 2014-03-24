@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.scheduling.*;
 
 import java.util.*;
@@ -73,6 +74,10 @@ public class PeerNetwork {
         scheduler.block();
     }
 
+	public PeerConnector getConnector() {
+		return this.connector;
+	}
+
 	private static class NodeRefresher {
         final NodeCollection nodes;
         final PeerConnector connector;
@@ -142,7 +147,7 @@ public class PeerNetwork {
 				return;
 			}
 
-			
+
 		}
 
         private static boolean areCompatible(final Node lhs, final Node rhs) {

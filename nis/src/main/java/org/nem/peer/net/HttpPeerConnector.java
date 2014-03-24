@@ -4,8 +4,8 @@ import org.nem.core.model.Block;
 import org.nem.core.model.BlockFactory;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.*;
-
 import java.net.*;
 
 /**
@@ -15,7 +15,7 @@ public class HttpPeerConnector implements PeerConnector {
 
     private static final int DEFAULT_TIMEOUT = 30;
 
-    private final HttpMethodClient httpMethodClient;
+	private final HttpMethodClient httpMethodClient;
 
     /**
      * Creates a new HTTP peer connector.
@@ -23,6 +23,11 @@ public class HttpPeerConnector implements PeerConnector {
     public HttpPeerConnector() {
         this.httpMethodClient = new HttpMethodClient(DEFAULT_TIMEOUT);
     }
+
+	@Override
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) {
+		this.httpMethodClient.setAccountAnalyzer(accountAnalyzer);
+	}
 
     @Override
     public Node getInfo(final NodeEndpoint endpoint) {
