@@ -91,7 +91,7 @@ public class Vector {
         if (0.0 == this.vector[0])
             throw new InvalidParameterException("cannot align a vector that has a first element of 0");
 
-        this.scale(this.vector[this.vector.length - 1]);
+        this.scale(this.vector[0]);
     }
 
     /**
