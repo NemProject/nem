@@ -82,7 +82,7 @@ public class AddressTest {
     }
 
     @Test
-    public void generatedAddressBeginsWithN() {
+    public void generatedAddressBeginsWithNOrT() {
         // Arrange:
         final PublicKey publicKey = Utils.generateRandomPublicKey();
 
@@ -90,7 +90,11 @@ public class AddressTest {
         final Address address = Address.fromPublicKey(publicKey);
 
         // Assert:
-        Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo('N'));
+		if (Address.IS_TESTNET) {
+        	Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo('T'));
+		} else {
+			Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo('N'));
+		}
     }
 
     @Test

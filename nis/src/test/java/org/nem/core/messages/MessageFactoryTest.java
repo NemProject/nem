@@ -14,26 +14,27 @@ public class MessageFactoryTest {
     @Test(expected = InvalidParameterException.class)
     public void cannotDeserializeUnknownMessage() {
         // Arrange:
-        JSONObject object = new JSONObject();
+        final JSONObject object = new JSONObject();
         object.put("type", 7);
-        JsonDeserializer deserializer = new JsonDeserializer(object, null);
+        final JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
         // Act:
-        MessageFactory.deserialize(deserializer);
+        MessageFactory.deserialize(null, null, deserializer);
     }
 
     @Test
     public void canDeserializePlainMessage() {
         // Arrange:
-        PlainMessage originalMessage = new PlainMessage(new byte[] { });
-        Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
+        final PlainMessage originalMessage = new PlainMessage(new byte[] { 1, 2, 4 });
+        final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
 
         // Act:
-        Message message = MessageFactory.deserialize(deserializer);
+        final Message message = MessageFactory.deserialize(null, null, deserializer);
 
         // Assert:
         Assert.assertThat(message, IsInstanceOf.instanceOf(PlainMessage.class));
         Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
+        Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
     }
 
     @Test
@@ -41,14 +42,15 @@ public class MessageFactoryTest {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
-        SecureMessage originalMessage = new SecureMessage(sender, recipient, new byte[] { });
-        Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
+        final SecureMessage originalMessage = new SecureMessage(sender, recipient, new byte[] { 1, 2, 4 });
+        final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
 
         // Act:
-        Message message = MessageFactory.deserialize(deserializer);
+        final Message message = MessageFactory.deserialize(sender, recipient, deserializer);
 
         // Assert:
         Assert.assertThat(message, IsInstanceOf.instanceOf(SecureMessage.class));
         Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+        Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
     }
 }
