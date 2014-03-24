@@ -1,4 +1,4 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.simulation;
 
 /**
  * Behavior of a node when running simulations
