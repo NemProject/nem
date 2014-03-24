@@ -52,11 +52,9 @@ public class EigenTrustPowerIterator {
         int numIterations = 0;
         Vector vector1;
         Vector vector2 = this.step(this.preTrustVector);
-        vector2.normalize();
         do {
             vector1 = vector2;
             vector2 = this.step(vector1);
-            vector2.normalize();
             ++numIterations;
         } while (maxIterations > numIterations && !this.hasConverged(vector1, vector2));
 
@@ -69,13 +67,8 @@ public class EigenTrustPowerIterator {
         trustVector = trustVector.multiply(1 - this.alpha);
 
         final Vector result = trustVector.add(this.weightedPreTrustVector);
-
-        // TODO: move to vector
-//        final double lastVectorValue = result.getAt(result.getSize() - 1);
-//        if (0.0 == lastVectorValue)
-//            return result;
-//
-//        return result.multiply(1.0 / lastVectorValue);
+        result.align();
+        result.normalize();
         return result;
     }
 

@@ -85,6 +85,16 @@ public class Vector {
     }
 
     /**
+     * Scales this vector so that v[0] is equal to 1.
+     */
+    public void align() {
+        if (0.0 == this.vector[0])
+            throw new InvalidParameterException("cannot align a vector that has a first element of 0");
+
+        this.scale(this.vector[this.vector.length - 1]);
+    }
+
+    /**
      * Normalizes this vector's elements so that the absolute value of all
      * elements sums to 1.0.
      */
@@ -93,8 +103,12 @@ public class Vector {
         if (0.0 == sum)
             return;
 
+        this.scale(sum);
+    }
+
+    private void scale(final double scale) {
         for (int i = 0; i < this.size; ++i)
-            this.vector[i] /= sum;
+            this.vector[i] /= scale;
     }
 
     /**

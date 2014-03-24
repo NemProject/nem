@@ -28,12 +28,12 @@ public class EigenTrustPowerIteratorTest {
         // Assert:
         Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
         Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-//        Assert.assertEquals(1.00, result.getAt(0) + result.getAt(1), 0.1);
+        Assert.assertEquals(1.00, result.absSum(), 0.1);
         Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.1);
     }
 
     @Test
-    public void iteratorStopsAfterEpsilonChange() {
+    public void iteratorStopsAfterIterationChangeLessThanEpsilon() {
         // Arrange:
         final EigenTrustPowerIterator iterator = createTestIterator(1000, 0, 0.0001);
 
@@ -42,9 +42,9 @@ public class EigenTrustPowerIteratorTest {
         final Vector result = iterator.getResult();
 
         // Assert:
-//        Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
+        Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
         Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-//        Assert.assertEquals(1.00, result.getAt(0) + result.getAt(1), 0.001);
+        Assert.assertEquals(1.00, result.absSum(), 0.001);
         Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.001);
     }
 
@@ -60,31 +60,31 @@ public class EigenTrustPowerIteratorTest {
         // Assert:
         Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
         Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-//        Assert.assertEquals(1.00, result.getAt(0) + result.getAt(1), 0.001);
+        Assert.assertEquals(1.00, result.absSum(), 0.001);
         Assert.assertEquals(0.50, result.getAt(0) / result.getAt(1), 0.001);
     }
 
     @Test
     public void alphaValueBetweenZeroAndOneInfluencesResult() {
         // Arrange:
-        final EigenTrustPowerIterator iterator = createTestIterator(1000, 0.25, 0.0001);
+        final EigenTrustPowerIterator iterator = createTestIterator(1000, 0.01, 0.00001);
 
         // Act:
         iterator.run();
         final Vector result = iterator.getResult();
 
         // Assert:
-//        Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
+        Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
         Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-//        Assert.assertEquals(1.00, result.getAt(0) + result.getAt(1), 0.001);
-        Assert.assertEquals(1.50, result.getAt(0) / result.getAt(1), 0.001);
+        Assert.assertEquals(1.00, result.absSum(), 0.001);
+        Assert.assertEquals(3.0764, result.getAt(0) / result.getAt(1), 0.001);
     }
 
     private static EigenTrustPowerIterator createTestIterator(int maxIterations, double alpha, double epsilon) {
-        // Arrange: (EigenVector for test matrix is [3, 1]
+        // Arrange: (EigenVector for test matrix is [3, 1])
         final Vector vector = new Vector(2);
-        vector.setAt(0, 1);
-        vector.setAt(1, 2);
+        vector.setAt(0, 1.0 / 3);
+        vector.setAt(1, 2.0 / 3);
 
         final Matrix matrix = new Matrix(2, 2);
         matrix.setAt(0, 0, 2);
