@@ -9,10 +9,10 @@ import org.nem.core.utils.*;
  * A NEM address.
  */
 public class Address {
-
+	public static final boolean IS_TESTNET = true;
     private static final int NUM_CHECKSUM_BYTES = 4;
     private static final int NUM_ENCODED_BYTES_LENGTH = 25;
-    private static final byte VERSION = 0x68;
+    private static final byte VERSION = (byte)(0x68 + (IS_TESTNET ? 0x30 : 0));
     private String encoded; // base-32 encoded address
     private PublicKey publicKey;
 
