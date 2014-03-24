@@ -2,6 +2,7 @@ package org.nem.peer.trust;
 
 import org.nem.peer.Node;
 
+import java.security.InvalidParameterException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,22 +37,70 @@ public class NodeExperiences {
     }
 
     /**
-     * Gets a transposed matrix of local trust values for all specified nodes.
+     * Gets a transposed matrix of local trust values weighted with credibility for all specified nodes.
      * Matrix(r, c) contains the local experience that c has with r.
      *
      * @param nodes The nodes.
      * @return A transposed matrix of local trust values.
      */
-    public Matrix getTransposedLocalTrustMatrix(final Node[] nodes) {
+    public Matrix getTrustMatrix(final Node[] nodes) {
         final int numNodes = nodes.length;
         final Matrix trustMatrix = new Matrix(numNodes, numNodes);
         for (int i = 0; i < numNodes; ++i) {
             for (int j = 0; j < numNodes; ++j) {
                 final NodeExperience experience = this.getNodeExperience(nodes[i], nodes[j]);
-                trustMatrix.setAt(j, i, experience.getLocalTrust());
+                trustMatrix.setAt(j, i, experience.getLocalTrust() * experience.getFeedbackCredibility());
             }
         }
 
         return trustMatrix;
+    }
+
+    /**
+     * Gets a local trust vector that contains the local trust node has with
+     * each node in nodes.
+     *
+     * @param node The node.
+     * @param nodes The other nodes.
+     * @return A local trust vector.
+     */
+    public Vector getLocalTrustVector(final Node node, final Node[] nodes) {
+        final Vector vector = new Vector(nodes.length);
+        for (int i = 0; i < nodes.length; ++i) {
+            final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
+            vector.setAt(i, experience.getLocalTrust());
+        }
+
+        return vector;
+    }
+
+    /**
+     * Sets the local trust that node has with each node in nodes using the specified vector.
+     *
+     * @param node The node.
+     * @param nodes The other nodes.
+     * @param trustVector The trust values.
+     */
+    public void setLocalTrustVector(final Node node, final Node[] nodes, final Vector trustVector) {
+        if (nodes.length != trustVector.getSize())
+            throw new InvalidParameterException("nodes and trustVector must be same size");
+
+        for (int i = 0; i < nodes.length; ++i) {
+            final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
+            experience.setLocalTrust(trustVector.getAt(i));
+        }
+    }
+
+    /**
+     * Normalizes the local trust values so that the sum of a node's local trust experiences is 1.
+     *
+     * @param nodes The nodes that should have their trust values normalized.
+     */
+    public void normalizeLocalTrust(final Node[] nodes) {
+        for (final Node node : nodes) {
+            final Vector vector = this.getLocalTrustVector(node, nodes);
+            vector.normalize();
+            this.setLocalTrustVector(node, nodes, vector);
+        }
     }
 }
