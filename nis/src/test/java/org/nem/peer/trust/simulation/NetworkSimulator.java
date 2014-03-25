@@ -3,14 +3,11 @@ package org.nem.peer.trust.simulation;
 import java.io.*;
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
-import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.nem.peer.Node;
-import org.nem.peer.PeerNetwork;
-import org.nem.peer.trust.NodeExperience;
-import org.nem.peer.trust.Trust;
+import org.nem.peer.trust.*;
+import org.nem.peer.trust.Vector;
 
 public class NetworkSimulator {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulator.class.getName());
@@ -20,47 +17,62 @@ public class NetworkSimulator {
 	 * node A picks node B as communication partner with a chance of 30%.
 	 * Thus new nodes get a chance to participate in the network communication.
 	 */
-	private final int MIN_COMMUNICATION = 10;
+	private static final int MIN_COMMUNICATION = 10;
 
 	/**
 	 * Number of communications a node has in each round.
 	 */
-	private final int COMMUNICATION_PARTNERS = 5;
-
-	private long successfulCalls=0;
-	private long failedCalls=0;
+	private static final int COMMUNICATION_PARTNERS = 5;
 
 	/**
 	 * Minimum trust we always have in a node.
 	 * The higher the value the higher the chance that nodes with low trust value will
 	 * will get picked as communication partner.
 	 */
-	private final double minTrust = 0.01;
+	private static final double MIN_TRUST = 0.01;
 
 	/**
-	 * The trust model used when running the simulation
+	 * The trust context used when running the simulation.
 	 */
-	private final Trust trustModel;
+	private final TrustContext trustContext;
 
+    /**
+     * The simulation configuration.
+     */
     private final Config config;
 
-    private final HashMap<Node, HashMap<Node, NodeExperience>> nodeExperiences;
+    /**
+     * The last set of global trust values.
+     */
+    private Vector globalTrustVector;
+
+    private long successfulCalls;
+    private long failedCalls;
 
 	/**
      * Creates a new network simulation.
      *
      * @param config The simulator configuration.
-	 * @param trustModel The trust model to use.
+	 * @param trustProvider The trust provider to use.
 	 * @param minTrust The minimum trust we have in every node.
 	 */
-	public NetworkSimulator(final Config config, final Trust trustModel, final double minTrust) {
+	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
         if (minTrust <= 0.0 || minTrust > 1.0)
             throw new InvalidParameterException("min trust must be in the range (0, 1]");
 
         this.config = config;
-		this.trustModel = trustModel;
-        this.nodeExperiences = new HashMap<>();
+		this.trustContext = new TrustContext(
+            config.getNodes(),
+            config.getLocalNode(),
+            new NodeExperiences(),
+            new PreTrustedNodes(config.getPreTrustedNodes()),
+            trustProvider);
 	}
+
+    public double getFailedPercentage() {
+        final long totalCalls = this.successfulCalls + this.failedCalls;
+        return 0 == totalCalls ? 0.0 : (double)this.failedCalls*100/totalCalls;
+    }
 
 	/**
 	 * Runs the network simulation.
@@ -74,22 +86,18 @@ public class NetworkSimulator {
 		try {
 			File file = new File(outputFile);
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			trustModel.analyze(this.config.getNodes(), this.nodeExperiences);
+            this.globalTrustVector = this.trustContext.compute();
 			writeTrustValues(out, 0);
 
 			successfulCalls = 0;
 			failedCalls = 0;
 			// We convert the peers in the network to an array since having a special node like localNode
 			// sucks when it comes to simulations.
-			Node[] peers = this.getNodes();
-//			peers[peers.length-1] = network.getLocalNode();
+			final Node[] peers = this.trustContext.getNodes();
 			for (int i=0; i<numIterations; i++) {
 				doCommunications(peers);
-				for (Node node : peers) {
-					trustModel.computeLocalTrust(node, null /* TODO: network.getInitialPeerAddr()*/);
-					trustModel.computeFeedbackCredibility(node, peers);
-				}
-				trustModel.analyze(this.config.getNodes(), this.nodeExperiences);
+                this.trustContext.simulate();
+				this.globalTrustVector = this.trustContext.compute();
 				if (i % 100 == 9) {
 					writeTrustValues(out, i+1);
 				}
@@ -128,7 +136,7 @@ public class NetworkSimulator {
                     final NodeBehavior partnerBehavior = this.getNodeBehavior(partner);
 					if (nodeBehavior.isCollusive() && partnerBehavior.isCollusive()) {
 						// Communication between collusive evil nodes
-                        experience.incSuccessfulCalls();
+                        experience.successfulCalls().increment();
 					}
 					else {
 						// Nodes might fake data and feedback. Depending on the probability to give honest/dishonest feedback,
@@ -142,10 +150,10 @@ public class NetworkSimulator {
 								failedCalls++;
 						}
 						if ((honestData && honestFeedback) || (!honestData && !honestFeedback)) {
-                            experience.incSuccessfulCalls();
+                            experience.successfulCalls().increment();
 						}
 						else {
-                            experience.incFailedCalls();
+                            experience.failedCalls().increment();
 						}
 					}
 				}
@@ -166,32 +174,7 @@ public class NetworkSimulator {
     }
 
     private NodeExperience getNodeExperience(final Node a, final Node b) {
-        HashMap<Node, NodeExperience> localExperiences = this.nodeExperiences.get(a);
-        if (null == localExperiences) {
-            localExperiences = new HashMap<>();
-            this.nodeExperiences.put(a, localExperiences);
-        }
-
-        NodeExperience experience = localExperiences.get(b);
-        if (null == experience) {
-            experience = new NodeExperience();
-            localExperiences.put(b, experience);
-        }
-
-        return experience;
-    }
-
-    private int getNumNodes() {
-        return this.config.getNodes().getActiveNodes().size();
-    }
-
-    private Node[] getNodes() {
-        final Collection<Node> activeNodes = this.config.getNodes().getActiveNodes();
-//        final Collection<Node> inactiveNodes = this.config.getNodes().getInactiveNodes();
-//        final int size = activeNodes.size() + inactiveNodes.size();
-        final int size = activeNodes.size();
-
-        return this.config.getNodes().getActiveNodes().toArray(new Node[size]);
+        return this.trustContext.getNodeExperiences().getNodeExperience(a, b);
     }
 
 	/**
@@ -210,30 +193,28 @@ public class NetworkSimulator {
 		double min = Double.MAX_VALUE;
 		Node partner=null;
 
+
+        int index = 0;
 		for (Node tmpNode : peers) {
+            double globalTrust = this.globalTrustVector.getAt(index++);
 			if (tmpNode == node) {
 				continue;
 			}
 
             final NodeExperience experience = getNodeExperience(node, tmpNode);
-			long numCalls = experience.getSuccessfulCalls() + experience.getFailedCalls();
+			long numCalls = experience.successfulCalls().get() + experience.failedCalls().get();
 			if (numCalls < MIN_COMMUNICATION) {
 				// Since we have only very little experience with this node, we give him a 30% chance
 				if (Math.random() > 0.3) {
 					partner = tmpNode;
 					break;
 				}
-				else {
-					continue;
-				}
 			}
 			else {
 				// You can play with different pattern to choose a node here
 				//double value = Math.random()/Math.log(1+10*node.getNodeExperience(tmpNode.getAddress()).getTrust());
 				//double value = Math.random()/Math.exp(minTrust/network.getAllPeers().size()+10*node.getNodeExperience(tmpNode.getAddress()).getTrust());
-
-                final NodeExperience localExperience = getNodeExperience(this.config.getLocalNode(), tmpNode);
-				double value = Math.random()/(minTrust/this.getNumNodes() + localExperience.getGlobalTrust());
+				double value = Math.random()/(MIN_TRUST/this.trustContext.getNodes().length + globalTrust);
 				if (value < min) {
 					partner = tmpNode;
 					min = value;
@@ -254,21 +235,23 @@ public class NetworkSimulator {
 	 */
 	private void writeTrustValues(final BufferedWriter out, final int round) throws IOException {
 
-		DecimalFormat f = new DecimalFormat("#0.00000");
+        int index = 0;
+		final DecimalFormat f = new DecimalFormat("#0.00000");
+        final Node localNode = this.trustContext.getLocalNode();
 		out.write("Local node's experience with other nodes after round " + round + ":");
 		out.newLine();
-		for (final Node node : this.getNodes()) {
-			if (node.equals(this.config.getLocalNode()))
+		for (final Node node : this.trustContext.getNodes()) {
+			if (node.equals(localNode))
 				continue;
 
-            final NodeExperience experience = this.getNodeExperience(this.config.getLocalNode(), node);
+            final NodeExperience experience = this.getNodeExperience(localNode, node);
 			out.write("Node " + node + ": ");
-			out.write("Successful calls = " + experience.getSuccessfulCalls());
-			out.write(", Failed calls = " + experience.getFailedCalls());
-			out.write(", Global trust = " + f.format(experience.getGlobalTrust()));
+			out.write("Successful calls = " + experience.successfulCalls().get());
+			out.write(", Failed calls = " + experience.failedCalls().get());
+			out.write(", Global trust = " + f.format(this.globalTrustVector.getAt(index++)));
 			out.newLine();
 		}
-		out.write("Percentage failed calls = " + (successfulCalls+failedCalls == 0? 0 : ((failedCalls*100)/(successfulCalls+failedCalls))) + "%");
+		out.write("Percentage failed calls = " + this.getFailedPercentage() + "%");
 		out.newLine();
 		out.newLine();
 	}

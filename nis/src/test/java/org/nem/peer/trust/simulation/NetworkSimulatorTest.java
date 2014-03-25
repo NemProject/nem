@@ -1,48 +1,84 @@
 package org.nem.peer.trust.simulation;
 
-import static org.junit.Assert.*;
-
 import java.net.URL;
+import java.security.InvalidParameterException;
+import java.util.*;
+import java.util.logging.*;
 
-import org.junit.Test;
-import org.nem.peer.trust.EigenTrust;
-import org.nem.peer.trust.EigenTrustPlusPlus;
-import org.nem.peer.trust.SimpleTrust;
-
-// address;evil;pretrusted;honest data probability;honest feedback probability;leech;collusive
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.peer.trust.*;
 
 public class NetworkSimulatorTest {
-
-//    @Test
-//    public void testPeerNetworkNULL() {
-//        try {
-//            EigenTrust eigenTrust = new EigenTrust();
-//            eigenTrust.analyze(null);
-//            fail("Analyze with NULL parameter possible.");
-//        } catch (IllegalArgumentException ex) {
-//            // As expected
-//        }
-//    }
+    private static final Logger LOGGER = Logger.getLogger(NetworkSimulatorTest.class.getName());
 
     @Test
-    public void testNetworkSimulator() throws Exception {
-            URL url = NetworkSimulator.class.getClassLoader().getResource("");
-//            if (null == )
+    public void simulateUniformTrust() {
+        // Act:
+        runTest(new UniformTrustProvider());
+    }
 
-            // SimpleTrust
-            final Config config = Config.loadFromFile("/Users/pjlongo/gits/nem-infrastructure-server/src/test/java/org/nem/peer/trust/simulation/Nodes.txt");
-            final NetworkSimulator simulator = new NetworkSimulator(config, new SimpleTrust(), 0.1);
-//            assertTrue(simulator.initialize(url.getFile() + "trust/Nodes.txt"));
-            assertTrue(simulator.run(url.getFile() + "SimpleTrust.txt", 1000));
+    @Test
+    public void simulateEigenTrust() {
+        // Act:
+        runTest(new EigenTrustProvider());
+    }
 
-//            // EigenTrust
-//            simulator = new NetworkSimulator(new EigenTrust(), 0.1);
-//            assertTrue(simulator.initialize(url.getFile() + "trust/Nodes.txt"));
-//            assertTrue(simulator.run(url.getFile() + "trust/" + simulator.getTrustModelName() + ".txt", 1000));
-//
-//            // EigenTrustPlusPlus
-//            simulator = new NetworkSimulator(new EigenTrustPlusPlus(), 0.1);
-//            assertTrue(simulator.initialize(url.getFile() + "trust/Nodes.txt"));
-//            assertTrue(simulator.run(url.getFile() + "trust/" + simulator.getTrustModelName() + ".txt", 1000));
+    @Test
+    public void simulateEigenPlusPlusTrust() {
+        // Act:
+        runTest(new EigenTrustPlusPlusProvider());
+    }
+
+    private static void runTest(final TrustProvider trustProvider) {
+        final URL url = NetworkSimulator.class.getClassLoader().getResource("");
+        if (null == url || null == url.getFile())
+            throw new InvalidParameterException("could not find output file");
+
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 10; ++i) {
+            final Config config = getConfig(i * 0.10);
+            final NetworkSimulator simulator = new NetworkSimulator(config, trustProvider, 0.1);
+
+            final String outputFileName = url.getFile() + String.format("%s_%d.txt", trustProvider.getClass().getSimpleName(), i);
+            boolean result = simulator.run(outputFileName, 1000);
+
+            Assert.assertThat(result, IsEqual.equalTo(true));
+            builder.append(System.lineSeparator());
+            builder.append(String.format("Honest: %02d%% --> %06.3f%% failed ", i * 10, simulator.getFailedPercentage()));
+        }
+
+        LOGGER.log(Level.INFO, builder.toString());
+    }
+
+    private static Config getConfig(double evilNodeHonestDataProbability) {
+        // address;evil;pre-trusted;honest data probability;honest feedback probability;leech;collusive
+
+        final List<Config.Entry> entries = new ArrayList<>();
+        // pre-trusted
+        entries.add(new Config.Entry("110.110.110.001", false, true, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.002", false, true, 1.0, 1.0, false, false));
+
+        // good
+        entries.add(new Config.Entry("110.110.110.001", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.002", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.003", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.004", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.005", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.006", false, false, 1.0, 1.0, false, false));
+        entries.add(new Config.Entry("110.110.110.007", false, false, 1.0, 1.0, false, false));
+
+        // evil
+        entries.add(new Config.Entry("210.110.110.001", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.002", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.003", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.004", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.005", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.006", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.007", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.008", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.009", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        entries.add(new Config.Entry("210.110.110.010", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+        return new Config(entries);
     }
 }

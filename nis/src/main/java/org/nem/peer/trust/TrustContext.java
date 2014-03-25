@@ -62,6 +62,13 @@ public class TrustContext {
     public Node[] getNodes() { return this.nodes; }
 
     /**
+     * Gets the local node
+     *
+     * @return The local noe.
+     */
+    public Node getLocalNode() { return this.localNode; }
+
+    /**
      * Gets all node experience information from the trust context.
      *
      * @return Node experience information.
@@ -96,27 +103,49 @@ public class TrustContext {
         return matrix;
     }
 
+    /**
+     * Computes the global trust values based on the current information.
+     *
+     * @return The global trust values based on the current information.
+     */
     public Vector compute() {
         // (1) compute the trust we have in other nodes due to our own experience
-        this.updateLocalTrust();
+        this.updateLocalTrust(this.localNode);
 
         // (2) normalize each node's local trust values
         this.nodeExperiences.normalizeLocalTrust(this.nodes);
 
-        // TODO: (3) compute the feedback credibility
-        // computeFeedbackCredibility(peers[peers.length-1], peers);
+        // (3) compute the feedback credibility
+        this.updateFeedbackCredibility(this.localNode);
 
         // (4) Update the global trust
         return computeGlobalTrust();
     }
 
-    private void updateLocalTrust() {
+    /**
+     * Simulates a step by all non-local nodes in the system.
+     */
+    public void simulate() {
+        for (final Node node : this.nodes) {
+            if (node.equals(this.localNode))
+                continue;
+
+            this.updateLocalTrust(node);
+            this.updateFeedbackCredibility(node);
+        }
+    }
+
+    private void updateLocalTrust(final Node node) {
         TrustUtils.updateLocalTrust(
-            this.localNode,
+            node,
             this.nodes,
             this.nodeExperiences,
             this.preTrustedNodes,
             this.trustProvider);
+    }
+
+    private void updateFeedbackCredibility(final Node node) {
+        // TODO: implement this!!!
     }
 
     private Vector computeGlobalTrust() {

@@ -26,7 +26,10 @@ public class Config {
 
     public Config(final List<Entry> entries) {
         this.entries = entries;
-        this.localNode = this.entries.get(this.entries.size() - 1).getNode();
+        final Entry localNodeEntry = new Entry("127.0.0.1", false, false, 1.0, 1.0, false, false);
+        entries.add(localNodeEntry);
+
+        this.localNode = localNodeEntry.getNode();
 
         int numPreTrustedNodes = 0;
         for (final Entry entry : this.entries)
@@ -44,6 +47,16 @@ public class Config {
     public NodeCollection getNodes() { return this.nodes; }
 
     public Node getLocalNode() { return this.localNode; }
+
+    public Set<Node> getPreTrustedNodes() {
+        final Set<Node> preTrustedNodes = new HashSet<>();
+        for (final Entry entry : this.entries) {
+            if (entry.isPreTrusted())
+                preTrustedNodes.add(entry.getNode());
+        }
+
+        return preTrustedNodes;
+    }
 
     /**
      * Loads configuration from a file.
@@ -74,8 +87,6 @@ public class Config {
             }
         }
 
-        final Entry localNodeEntry = new Entry("127.0.0.1;0;0;1;1;0;0");
-        entries.add(localNodeEntry);
         return new Config(entries);
     }
 
@@ -84,6 +95,28 @@ public class Config {
         final boolean isPreTrusted;
         final NodeBehavior behavior;
         final Node node;
+
+        public Entry(
+            final String address,
+            final boolean isEvil,
+            final boolean isPreTrusted,
+            final double honestDataProbability,
+            final double honestFeedbackProbability,
+            final boolean isLeech,
+            final boolean isCollusive) {
+
+            this.isPreTrusted = isPreTrusted;
+
+            this.behavior = new NodeBehavior(
+                isEvil,
+                honestDataProbability,
+                honestFeedbackProbability,
+                isLeech,
+                isCollusive);
+
+            NodeEndpoint endpoint = new NodeEndpoint("http", address, 8000);
+            this.node = new Node(endpoint, "PC", "NEM SIMULATOR");
+        }
 
         public Entry(final String line) {
             final String[] nodeAttributes = line.split(";");
