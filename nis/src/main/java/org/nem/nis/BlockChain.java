@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class BlockChain {
+public class BlockChain implements AutoCloseable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	// 500_000_000 nems have force to generate block every minute
 	public static final long MAGIC_MULTIPLIER = 614891469L;
@@ -55,11 +55,11 @@ public class BlockChain {
     @Autowired
     private NisPeerNetworkHost host;
 
-	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
+	private final ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
 	// this should be somewhere else
-	private ConcurrentHashSet<Account> unlockedAccounts;
+	private final ConcurrentHashSet<Account> unlockedAccounts;
 
 	// for now it's easier to keep it like this
 	org.nem.core.dbmodel.Block lastBlock;
@@ -68,7 +68,7 @@ public class BlockChain {
 		this.unconfirmedTransactions = new ConcurrentHashMap<>();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 1, 1, TimeUnit.SECONDS);
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 5, 3, TimeUnit.SECONDS);
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 	}
@@ -99,6 +99,11 @@ public class BlockChain {
 
 	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
 		return unconfirmedTransactions;
+	}
+
+	@Override
+	public void close() {
+		this.blockGeneratorExecutor.shutdownNow();
 	}
 
 	@Autowired

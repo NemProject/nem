@@ -73,6 +73,26 @@ public class PeerNetwork {
         scheduler.block();
     }
 
+	private void sychronizeNode(final Node node) {
+		Block lastBlock = this.connector.getLastBlock(node.getEndpoint());
+		if (lastBlock == null) {
+			return;
+		}
+
+
+	}
+
+	public void synchronize() {
+		Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
+			@Override
+			public void execute(final Node element) {
+				sychronizeNode(element);
+			}
+		});
+		scheduler.push(this.nodes.getActiveNodes());
+		scheduler.block();
+	}
+
 	private static class NodeRefresher {
         final NodeCollection nodes;
         final PeerConnector connector;
@@ -101,18 +121,9 @@ public class PeerNetwork {
             for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
                 this.nodes.update(entry.getKey(), entry.getValue());
 
-
-			scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
-				@Override
-				public void execute(final Node element) {
-					sychronizeNode(element);
-				}
-			});
-			scheduler.push(this.nodes.getActiveNodes());
-			scheduler.block();
 		}
 
-        private void refreshNode(final Node node) {
+		private void refreshNode(final Node node) {
             Node refreshedNode = node;
             NodeStatus updatedStatus = NodeStatus.ACTIVE;
             try {
@@ -135,15 +146,6 @@ public class PeerNetwork {
 
             this.update(refreshedNode, updatedStatus);
         }
-
-		private void sychronizeNode(final Node node) {
-			Block lastBlock = this.connector.getLastBlock(node.getEndpoint());
-			if (lastBlock == null) {
-				return;
-			}
-
-			
-		}
 
         private static boolean areCompatible(final Node lhs, final Node rhs) {
             return lhs.equals(rhs);
@@ -171,5 +173,5 @@ public class PeerNetwork {
                 this.update(node, status);
             }
         }
-    }
+	}
 }
