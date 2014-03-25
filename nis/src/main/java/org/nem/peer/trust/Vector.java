@@ -86,12 +86,17 @@ public class Vector {
 
     /**
      * Scales this vector so that v[0] is equal to 1.
+     * This can help PowerIteration converge faster.
+     * Alignment will fail if the vector's first element is 0.
+     *
+     * @return true if the alignment was successful; false otherwise.
      */
-    public void align() {
+    public boolean align() {
         if (0.0 == this.vector[0])
-            throw new InvalidParameterException("cannot align a vector that has a first element of 0");
+            return false;
 
         this.scale(this.vector[0]);
+        return true;
     }
 
     /**

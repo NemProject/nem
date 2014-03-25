@@ -108,7 +108,7 @@ public class VectorTest {
 
     //region align
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     public void cannotAlignVectorWithNonZeroInFirstPosition() {
         // Arrange:
         final Vector vector = new Vector(3);
@@ -117,7 +117,13 @@ public class VectorTest {
         vector.setAt(2, 14);
 
         // Act:
-        vector.align();
+        boolean result = vector.align();
+
+        // Assert:
+        Assert.assertThat(result, IsEqual.equalTo(false));
+        Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
+        Assert.assertThat(vector.getAt(1), IsEqual.equalTo(-6.0));
+        Assert.assertThat(vector.getAt(2), IsEqual.equalTo(14.0));
     }
 
     @Test
@@ -129,9 +135,10 @@ public class VectorTest {
         vector.setAt(2, 14);
 
         // Act:
-        vector.align();
+        boolean result = vector.align();
 
         // Assert:
+        Assert.assertThat(result, IsEqual.equalTo(true));
         Assert.assertThat(vector.getAt(0), IsEqual.equalTo(1.0));
         Assert.assertThat(vector.getAt(1), IsEqual.equalTo(1.5));
         Assert.assertThat(vector.getAt(2), IsEqual.equalTo(-3.5));
