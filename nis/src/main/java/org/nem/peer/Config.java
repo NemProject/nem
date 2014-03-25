@@ -3,6 +3,7 @@ package org.nem.peer;
 import net.minidev.json.*;
 import org.nem.core.serialization.*;
 
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -24,7 +25,21 @@ public class Config {
         this.wellKnownPeers = parseWellKnownPeers(deserializer);
     }
 
-    /**
+	public static Config loadConfig(final String configFileName) {
+		try {
+			try (final InputStream fin = Config.class.getClassLoader().getResourceAsStream(configFileName)) {
+				if (null == fin)
+					throw new FatalConfigExeception(String.format("Configuration file <%s> not available", configFileName));
+
+				return new Config((JSONObject)JSONValue.parse(fin));
+			}
+		}
+		catch (Exception e) {
+			throw new FatalConfigExeception("Exception encountered while loading config", e);
+		}
+	}
+
+	/**
      * Gets the network name.
      *
      * @return The network name.
@@ -53,4 +68,35 @@ public class Config {
         final List<NodeEndpoint> wellKnownPeers = deserializer.readObjectArray("knownPeers", NodeEndpoint.DESERIALIZER);
         return Collections.unmodifiableSet(new HashSet<>(wellKnownPeers));
     }
+
+	static class FatalConfigExeception extends RuntimeException {
+		/**
+		 * Creates a new config exception.
+		 *
+		 * @param message The exception message.
+		 */
+		public FatalConfigExeception(final String message) {
+			super(message);
+		}
+
+		/**
+		 * Creates a new config exception.
+		 *
+		 * @param cause The exception message.
+		 */
+		public FatalConfigExeception(Throwable cause) {
+			super(cause);
+		}
+
+		/**
+		 * Creates a new config exception.
+		 *
+		 * @param message The exception message.
+		 * @param cause The original exception.
+		 */
+		public FatalConfigExeception(final String message, Throwable cause) {
+			super(message, cause);
+		}
+
+	}
 }

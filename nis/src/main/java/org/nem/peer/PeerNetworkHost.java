@@ -36,7 +36,7 @@ public class PeerNetworkHost implements AutoCloseable {
     public PeerNetworkHost(final String configFileName, final int concurrencyLevel) {
         this(
             new PeerNetwork(
-                loadConfig(configFileName),
+                Config.loadConfig(configFileName),
                 new HttpPeerConnector(),
                 new ParallelSchedulerFactory<Node>(concurrencyLevel)),
             200,
@@ -74,19 +74,5 @@ public class PeerNetworkHost implements AutoCloseable {
     public void close() {
         LOGGER.info("Stopping network refresh thread");
         this.peerListRefresherExecutor.shutdownNow();
-    }
-
-    private static Config loadConfig(final String configFileName) {
-        try {
-            try (final InputStream fin = PeerNetwork.class.getClassLoader().getResourceAsStream(configFileName)) {
-                if (null == fin)
-                    throw new FatalPeerException(String.format("Configuration file <%s> not available", configFileName));
-
-                return new Config((JSONObject)JSONValue.parse(fin));
-            }
-        }
-        catch (Exception e) {
-            throw new FatalPeerException("Exception encountered while loading config", e);
-        }
     }
 }
