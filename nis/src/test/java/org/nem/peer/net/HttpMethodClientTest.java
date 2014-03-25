@@ -19,7 +19,7 @@ public class HttpMethodClientTest {
     @Test
     public void getReturnsJsonDeserializerOnSuccess() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
+        final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
         // Act:
         JsonDeserializer deserializer = client.get(new URL(GOOD_URL));
@@ -33,7 +33,7 @@ public class HttpMethodClientTest {
     @Test(expected = InactivePeerException.class)
     public void getThrowsInactivePeerExceptionOnTimeout() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(0);
+        final HttpMethodClient client = new HttpMethodClient(null, 0);
 
         // Act:
         client.get(new URL(GOOD_URL));
@@ -42,7 +42,7 @@ public class HttpMethodClientTest {
     @Test(expected = FatalPeerException.class)
     public void getThrowsFatalPeerExceptionOnOtherError() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
+        final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
         // Act:
         client.get(new URL(MALFORMED_URI));
@@ -55,7 +55,7 @@ public class HttpMethodClientTest {
     @Test
     public void postReturnsJsonDeserializerOnSuccess() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
+        final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
         // Act:
         JsonDeserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity());
@@ -69,7 +69,7 @@ public class HttpMethodClientTest {
     @Test(expected = InactivePeerException.class)
     public void postThrowsInactivePeerExceptionOnTimeout() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(0);
+        final HttpMethodClient client = new HttpMethodClient(null, 0);
 
         // Act:
         client.post(new URL(GOOD_URL), new MockSerializableEntity());
@@ -78,7 +78,7 @@ public class HttpMethodClientTest {
     @Test(expected = FatalPeerException.class)
     public void postThrowsFatalPeerExceptionOnOtherError() throws Exception {
         // Arrange:
-        final HttpMethodClient client = new HttpMethodClient(GOOD_TIMEOUT);
+        final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
         // Act:
         client.post(new URL(MALFORMED_URI), new MockSerializableEntity());

@@ -50,6 +50,9 @@ public class BlockChain {
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
+    @Autowired
+    private NisPeerNetworkHost host;
+
 	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
@@ -343,8 +346,7 @@ public class BlockChain {
 				if (addBlockToDb(bestBlock)) {
 					unconfirmedTransactions.clear();
 
-					PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
-					peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
+					host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
 				}
 			}
 		}

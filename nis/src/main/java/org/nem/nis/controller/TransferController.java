@@ -5,12 +5,11 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
+import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.PeerNetworkHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +24,9 @@ public class TransferController {
 
 	@Autowired
 	private BlockChain blockChain;
+
+    @Autowired
+    private NisPeerNetworkHost host;
 
 	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody final String body) {
@@ -53,7 +55,7 @@ public class TransferController {
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
 		if (transfer.isValid() && transfer.verify()) {
-            final PeerNetwork network = PeerNetworkHost.getDefaultHost().getNetwork();
+            final PeerNetwork network = this.host.getNetwork();
 
 			// add to unconfirmed transactions
 			if (blockChain.processTransaction(transfer)) {

@@ -1,6 +1,6 @@
 package org.nem.peer.net;
 
-import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.*;
 import org.nem.peer.*;
 
 import java.net.*;
@@ -16,9 +16,11 @@ public class HttpPeerConnector implements PeerConnector {
 
     /**
      * Creates a new HTTP peer connector.
+     *
+     * @param context The deserialization context to use when deserializing responses.
      */
-    public HttpPeerConnector() {
-        this.httpMethodClient = new HttpMethodClient(DEFAULT_TIMEOUT);
+    public HttpPeerConnector(final DeserializationContext context) {
+        this.httpMethodClient = new HttpMethodClient(context, DEFAULT_TIMEOUT);
     }
 
     @Override

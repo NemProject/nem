@@ -20,15 +20,18 @@ public class HttpMethodClient {
 
     private static final int HTTP_STATUS_OK = 200;
 
+    private final DeserializationContext context;
     private final int timeout;
     private final HttpClient httpClient;
 
     /**
      * Creates a new HTTP method client.
      *
+     * @param context The deserialization context to use when deserializing responses.
      * @param timeout The timeout (in seconds) that should be used.
      */
-    public HttpMethodClient(final int timeout) {
+    public HttpMethodClient(final DeserializationContext context, final int timeout) {
+        this.context = context;
         this.timeout = timeout;
 
         try {
@@ -107,7 +110,7 @@ public class HttpMethodClient {
             try (InputStream responseStream = listener.getInputStream()) {
                 return new JsonDeserializer(
                     (JSONObject)JSONValue.parse(responseStream),
-                    new DeserializationContext(null));
+                    this.context);
             }
         }
         catch (TimeoutException e) {
