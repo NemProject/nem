@@ -3,9 +3,9 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.transactions.TransactionFactory;
-import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
+import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +32,9 @@ public class PushController {
 	@Autowired
 	private BlockChain blockChain;
 
+    @Autowired
+    private NisPeerNetworkHost host;
+
 	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
 	public String pushTransaction(@RequestBody String body) {
         final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
@@ -42,7 +45,7 @@ public class PushController {
 
 		// transaction timestamp is checked inside processTransaction
 		if (transaction.isValid() && transaction.verify()) {
-			final PeerNetwork network = PeerNetworkHost.getDefaultHost().getNetwork();
+			final PeerNetwork network = this.host.getNetwork();
 
 			// add to unconfirmed transactions
 			if (this.blockChain.processTransaction(transaction))
