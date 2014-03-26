@@ -7,15 +7,7 @@ import org.nem.core.transactions.TransferTransaction;
 
 public class GenesisBlockTest {
 
-    private final static String GENESIS_ACCOUNT;
-
-	static {
-		if (! Address.IS_TESTNET) {
-			GENESIS_ACCOUNT = "NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
-		} else {
-			GENESIS_ACCOUNT = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
-		}
-	}
+    private final static String GENESIS_ACCOUNT = NetworkInfo.getDefault().getGenesisAccountId();
 
     @Test
     public void genesisBlockCanBeCreated() {
