@@ -2,7 +2,7 @@ package org.nem.core.transactions;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.messages.PlainMessage;
+import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -38,7 +38,7 @@ public class TransferTransactionTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+        Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TransferTransactionTest {
         Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
         Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
         Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-        Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+        Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
     }
 
     @Test
@@ -317,6 +317,51 @@ public class TransferTransactionTest {
         // Assert:
         Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
         Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
+    }
+
+    //endregion
+
+    //region Secure Message Consistency
+
+    @Test
+    public void consistentSecureMessageCanBeDecoded() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
+        final Account recipient = Utils.generateRandomAccount();
+        final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
+        final Message message = new SecureMessage(sender, recipientPublicKeyOnly, new byte[] { 1, 2, 3 });
+        final TransferTransaction originalTransaction = createTransferTransaction(sender, recipientPublicKeyOnly, 1L, message);
+
+        final MockAccountLookup accountLookup = new MockAccountLookup();
+        accountLookup.setMockAccount(senderPublicKeyOnly);
+        accountLookup.setMockAccount(recipient);
+
+        // Act:
+        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
+
+        // Assert:
+        Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+    }
+
+    @Test
+    public void inconsistentSecureMessageCannotBeDecoded() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final Account messageSender = Utils.generateRandomAccount();
+        final Message message = new SecureMessage(messageSender, recipient, new byte[] { 1, 2, 3 });
+        final TransferTransaction originalTransaction = createTransferTransaction(sender, recipient, 1L, message);
+
+        final MockAccountLookup accountLookup = new MockAccountLookup();
+        accountLookup.setMockAccount(sender);
+        accountLookup.setMockAccount(recipient);
+
+        // Act:
+        final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
+
+        // Assert:
+        Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(null));
     }
 
     //endregion

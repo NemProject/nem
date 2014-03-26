@@ -37,12 +37,14 @@ public class SecureMessage extends Message {
     /**
      * Deserializes a secure message.
      *
+     * @param sender The message sender.
+     * @param recipient The message recipient.
      * @param deserializer The deserializer.
      */
-    public SecureMessage(final Deserializer deserializer) {
+    public SecureMessage(final Account sender, final Account recipient, final Deserializer deserializer) {
         super(MessageTypes.SECURE);
-        this.sender = SerializationUtils.readAccount(deserializer, "sender");
-        this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
+        this.sender = sender;
+        this.recipient = recipient;
         this.payload = deserializer.readBytes("payload");
     }
 
@@ -68,8 +70,6 @@ public class SecureMessage extends Message {
     @Override
     public void serialize(final Serializer serializer) {
         super.serialize(serializer);
-        SerializationUtils.writeAccount(serializer, "sender", this.sender);
-        SerializationUtils.writeAccount(serializer, "recipient", this.recipient);
         serializer.writeBytes("payload", this.payload);
     }
 }
