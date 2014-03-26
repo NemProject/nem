@@ -28,35 +28,9 @@ public class GenesisBlock extends Block {
     private final static int GENESIS_HEIGHT = 1;
     private final static int HASH_LENGTH = 32;
 
-    private final static String[] GENESIS_RECIPIENT_ACCOUNT_IDS;
-
     static {
         final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
         ACCOUNT = new Account(genesisKeyPair);
-
-		if (! Address.IS_TESTNET) {
-			GENESIS_RECIPIENT_ACCOUNT_IDS = new String[] {
-					"NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
-					"NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
-					"NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
-					"NAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL5KYTTX7",
-					"NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
-					"NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
-					"NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
-					"NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
-			};
-		} else {
-			GENESIS_RECIPIENT_ACCOUNT_IDS = new String[] {
-					"TD5GLM7NLGFYRMIUAIU4O3FV4QOUI6F4SUNMTN6O",
-					"TC5O4X6OHKK2WPOTKMPPY7DQ4QBQUT42UX4EKAR2",
-					"TAKDTWAV3I5L2ITBQOAGSY3MK2YOUBNZUULHXC7M",
-					"TDEX5Q3KTHSIYOLKI7CW4KAHB5Y6PKLQH2WHNBYH",
-					"TCB4ZDGWESOB2TU67ZQ2MEGSX5NICRO4IEIA3CKY",
-					"TCC4K7HBANSNSFJISAGM6JE42AF3BWZOPS2DYJJD",
-					"TANDDGHUKUBMLZTMRK5YZLC4W5PDLI3PPMJM7N3T",
-					"TA3FTBRG6HP3GYLSBSUHC5HZM3E3GERF7Y6QBJAU"
-			};
-		}
     }
 
     /**
@@ -68,8 +42,9 @@ public class GenesisBlock extends Block {
         super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
 
         // TODO: as a placeholder distribute amounts equally
-        final Amount shareAmount = new Amount(AMOUNT.getNumMicroNem() / GENESIS_RECIPIENT_ACCOUNT_IDS.length);
-        for (final String id : GENESIS_RECIPIENT_ACCOUNT_IDS) {
+        final String[] recipientIds = NetworkInfo.getDefault().getGenesisRecipientAccountIds();
+        final Amount shareAmount = new Amount(AMOUNT.getNumMicroNem() / recipientIds.length);
+        for (final String id : recipientIds) {
             final Address address = Address.fromEncoded(id);
             final Account account = new Account(address);
             final TransferTransaction transaction = new TransferTransaction(timestamp, ACCOUNT, account, shareAmount, null);
