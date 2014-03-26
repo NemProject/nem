@@ -355,4 +355,158 @@ public class NodeExperiencesTest {
     }
 
     //endregion
+
+    //region feedback credibility vector
+
+    @Test
+    public void nodeIsCompletelyCredibleToItself() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        // Act:
+        final Vector vector = experiences.calculateFeedbackCredibilityVector(node2, nodes, new MockTrustProvider());
+
+        // Assert:
+        Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+        Assert.assertThat(vector.getAt(1), IsEqual.equalTo(1.0));
+    }
+
+    @Test
+    public void nodesWithoutSharedPartnersHaveNoCredibility() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        // Act:
+        final Vector vector = experiences.calculateFeedbackCredibilityVector(node2, nodes, new MockTrustProvider());
+
+        // Assert:
+        Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+        Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
+        Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+    }
+
+    @Test
+    public void nodesWithSharedPartnersHaveCredibilityCorrelatedWithProviderScore() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node node4 = Utils.createNodeWithPort(84);
+        final Node[] nodes = new Node[] { node1, node2, node3, node4 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        experiences.getNodeExperience(node2, node1).successfulCalls().set(10);
+        experiences.getNodeExperience(node4, node1).successfulCalls().set(2);
+        experiences.getNodeExperience(node2, node3).successfulCalls().set(11);
+        experiences.getNodeExperience(node4, node3).successfulCalls().set(3);
+
+        // Act:
+        final Vector vector = experiences.calculateFeedbackCredibilityVector(node2, nodes, new MockTrustProvider());
+
+        // Assert:
+        Assert.assertThat(vector.getSize(), IsEqual.equalTo(4));
+        Assert.assertEquals(21002.73, vector.getAt(3), 0.1);
+    }
+
+    private static class MockTrustProvider implements TrustProvider {
+
+        @Override
+        public double calculateTrustScore(NodeExperience experience) {
+            return 0;
+        }
+
+        @Override
+        public double calculateCredibilityScore(NodeExperience experience1, NodeExperience experience2) {
+            long numSuccessfulCalls = experience1.successfulCalls().get() + experience2.successfulCalls().get();
+            return 0 == numSuccessfulCalls ? 100 : numSuccessfulCalls;
+        }
+    }
+
+    //endregion
+
+    //region credibility vector
+
+    @Test
+    public void credibilityVectorCanBeRetrieved() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final NodeExperiences experiences = new NodeExperiences();
+
+        experiences.getNodeExperience(node1, node2).feedbackCredibility().set(7);
+        experiences.getNodeExperience(node1, node3).feedbackCredibility().set(2);
+
+        // Act:
+        final Vector vector = experiences.getFeedbackCredibilityVector(node1, new Node[] { node1, node2, node3 });
+
+        // Assert:
+        Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+        Assert.assertThat(vector.getAt(0), IsEqual.equalTo(1.0));
+        Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
+        Assert.assertThat(vector.getAt(2), IsEqual.equalTo(2.0));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void smallerCredibilityVectorCannotBeSet() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final NodeExperiences experiences = new NodeExperiences();
+
+        final Vector vector = new Vector(2);
+
+        // Act:
+        experiences.setFeedbackCredibilityVector(node1, new Node[]{ node1, node2, node3 }, vector);
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void largerCredibilityVectorCannotBeSet() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final NodeExperiences experiences = new NodeExperiences();
+
+        final Vector vector = new Vector(4);
+
+        // Act:
+        experiences.setFeedbackCredibilityVector(node1, new Node[]{ node1, node2, node3 }, vector);
+    }
+
+    @Test
+    public void credibilityVectorCanBeSet() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        final Vector credibilityVector = new Vector(3);
+        credibilityVector.setAt(0, 3.0);
+        credibilityVector.setAt(1, 7.0);
+        credibilityVector.setAt(2, 4.0);
+
+        // Act:
+        experiences.setFeedbackCredibilityVector(node2, nodes, credibilityVector);
+        final Vector vector = experiences.getFeedbackCredibilityVector(node2, nodes);
+
+        // Assert:
+        Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+        Assert.assertThat(vector.getAt(0), IsEqual.equalTo(3.0));
+        Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
+        Assert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
+    }
+
+    //endregion
 }

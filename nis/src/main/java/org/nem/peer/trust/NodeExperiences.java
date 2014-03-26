@@ -138,4 +138,87 @@ public class NodeExperiences {
 
         return matrix;
     }
+
+    /**
+     * Calculates a feedback credibility vector.
+     *
+     * @param node The node.
+     * @param nodes The other nodes.
+     * @param trustProvider The trust provider.
+     * @return The feedback credibility vector.
+     */
+    public Vector calculateFeedbackCredibilityVector(final Node node, final Node[] nodes, final TrustProvider trustProvider) {
+
+        Matrix sharedExperiencesMatrix = this.getSharedExperienceMatrix(node, nodes);
+
+        final Vector vector = new Vector(nodes.length);
+        for (int i = 0; i < nodes.length; ++i) {
+            if (node.equals(nodes[i])) {
+                // the node should completely trust itself
+                vector.setAt(i, 1);
+                continue;
+            }
+
+            double sum = 0.0;
+            int numCommonPartners = 0;
+            for (int j = 0; j < nodes.length; ++j) {
+                if (0 == sharedExperiencesMatrix.getAt(i, j))
+                    continue;
+
+                final NodeExperience experience1 = this.getNodeExperience(node, nodes[j]);
+                final NodeExperience experience2 = this.getNodeExperience(nodes[i], nodes[j]);
+                double score = trustProvider.calculateCredibilityScore(experience1, experience2);
+                sum += score * score;
+                ++numCommonPartners;
+            }
+
+            if (0 == numCommonPartners)
+                continue;
+
+            // Original paper suggests sim = 1 - Math.sqrt(sum).
+            // This leads to values of around 0.5 for evil nodes and almost 1 for honest nodes.
+            // We get better results by taking a power of that value since (0.5)^n quickly converges to 0 for increasing n.
+            // The value n=4 is just an example which works well.
+            sum /= numCommonPartners;
+            vector.setAt(i, Math.pow(1 - Math.sqrt(sum), 4));
+        }
+
+        return vector;
+    }
+
+
+    /**
+     * Gets a feedback credibility vector that contains the feedback credibility node has with
+     * each node in nodes.
+     *
+     * @param node The node.
+     * @param nodes The other nodes.
+     * @return A local trust vector.
+     */
+    public Vector getFeedbackCredibilityVector(final Node node, final Node[] nodes) {
+        final Vector vector = new Vector(nodes.length);
+        for (int i = 0; i < nodes.length; ++i) {
+            final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
+            vector.setAt(i, experience.feedbackCredibility().get());
+        }
+
+        return vector;
+    }
+
+    /**
+     * Sets the feedback credibility that node has with each node in nodes using the specified vector.
+     *
+     * @param node The node.
+     * @param nodes The other nodes.
+     * @param feedbackCredibilityVector The credibility values.
+     */
+    public void setFeedbackCredibilityVector(final Node node, final Node[] nodes, final Vector feedbackCredibilityVector) {
+        if (nodes.length != feedbackCredibilityVector.getSize())
+            throw new InvalidParameterException("nodes and trustVector must be same size");
+
+        for (int i = 0; i < nodes.length; ++i) {
+            final NodeExperience experience = this.getNodeExperience(node, nodes[i]);
+            experience.feedbackCredibility().set(feedbackCredibilityVector.getAt(i));
+        }
+    }
 }
