@@ -116,8 +116,15 @@ public class TrustUtilsTest {
                 this.preTrustedNodes,
                 new TrustProvider() {
                     @Override
-                    public double calculateScore(long numSuccessfulCalls, long numFailedCalls) {
+                    public double calculateTrustScore(final NodeExperience experience) {
+                        long numSuccessfulCalls = experience.successfulCalls().get();
+                        long numFailedCalls = experience.failedCalls().get();
                         return (numFailedCalls * numSuccessfulCalls) * (numSuccessfulCalls + numFailedCalls);
+                    }
+
+                    @Override
+                    public double calculateCredibilityScore(NodeExperience experience1, NodeExperience experience2) {
+                        return 0;
                     }
                 });
         }

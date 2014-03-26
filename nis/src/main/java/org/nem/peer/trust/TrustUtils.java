@@ -56,7 +56,7 @@ public class TrustUtils {
 
             double score;
             if (totalCalls > 0)
-                score = trustProvider.calculateScore(successfulCalls, failedCalls)/totalCalls;
+                score = trustProvider.calculateTrustScore(experience)/totalCalls;
             else
                 score = preTrustedNodes.isPreTrusted(otherNode) || node.equals(otherNode) ? 1.0 : 0.0;
 

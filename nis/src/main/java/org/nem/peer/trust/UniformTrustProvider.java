@@ -6,7 +6,12 @@ package org.nem.peer.trust;
 public class UniformTrustProvider implements TrustProvider {
 
     @Override
-    public double calculateScore(final long numSuccessfulCalls, final long numFailedCalls) {
+    public double calculateTrustScore(final NodeExperience experience) {
         return 1;
+    }
+
+    @Override
+    public double calculateCredibilityScore(final NodeExperience experience1, final NodeExperience experience2) {
+        return 0;
     }
 }

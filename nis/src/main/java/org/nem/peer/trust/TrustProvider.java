@@ -6,11 +6,19 @@ package org.nem.peer.trust;
 public interface TrustProvider {
 
     /**
-     * Calculates a trust score given a number of successful calls and a number of failed calls.
+     * Calculates a trust score given a NodeExperience.
      *
-     * @param numSuccessfulCalls The number of successful calls.
-     * @param numFailedCalls The number of failed calls.
-     * @return The score.
+     * @param experience The node experience.
+     * @return The trust score.
      */
-    public double calculateScore(final long numSuccessfulCalls, final long numFailedCalls);
+    public double calculateTrustScore(final NodeExperience experience);
+
+    /**
+     * Calculates a credibility score given two NodeExperiences.
+     *
+     * @param experience1 One NodeExperience.
+     * @param experience2 The other NodeExperience.
+     * @return The mutual credibility score.
+     */
+    public double calculateCredibilityScore(final NodeExperience experience1, final NodeExperience experience2);
 }

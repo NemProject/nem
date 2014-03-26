@@ -6,7 +6,12 @@ package org.nem.peer.trust;
 public class EigenTrustProvider implements TrustProvider {
 
     @Override
-    public double calculateScore(final long numSuccessfulCalls, final long numFailedCalls) {
-        return Math.max(numSuccessfulCalls - numFailedCalls, 0.0);
+    public double calculateTrustScore(final NodeExperience experience) {
+        return Math.max(experience.successfulCalls().get() - experience.failedCalls().get(), 0.0);
+    }
+
+    @Override
+    public double calculateCredibilityScore(final NodeExperience experience1, final NodeExperience experience2) {
+        return 0;
     }
 }
