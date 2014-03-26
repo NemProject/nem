@@ -7,6 +7,7 @@ import org.nem.peer.NodeCollection;
  * Contains contextual information that can be used to influence the trust computation.
  *
  * TODO: the intent is for this class to contain the trusting procedure which is configurable by other classes.
+ * TODO: test this class (maybe)
  */
 public class TrustContext {
 
@@ -136,16 +137,19 @@ public class TrustContext {
     }
 
     private void updateLocalTrust(final Node node) {
-        TrustUtils.updateLocalTrust(
+        double localTrustSum = TrustUtils.updateLocalTrust(
             node,
             this.nodes,
             this.nodeExperiences,
             this.preTrustedNodes,
             this.trustProvider);
+
+        this.nodeExperiences.getNodeExperience(node, node).localTrustSum().set(localTrustSum);
     }
 
     private void updateFeedbackCredibility(final Node node) {
-        // TODO: implement this!!!
+        final Vector vector = this.nodeExperiences.calculateFeedbackCredibilityVector(node, this.nodes, this.trustProvider);
+        this.nodeExperiences.setFeedbackCredibilityVector(node, this.nodes, vector);
     }
 
     private Vector computeGlobalTrust() {
