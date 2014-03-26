@@ -85,6 +85,19 @@ public class Matrix {
             this.columns[i].normalize();
     }
 
+    /**
+     * Gets the sum of the absolute value of all the matrix's elements.
+     *
+     * @return The sum of the absolute value of all the matrix's elements.
+     */
+    public double absSum() {
+        double sum = 0.0;
+        for (int i = 0; i < this.cols; ++i)
+            sum += this.columns[i].absSum();
+
+        return sum;
+    }
+
     @Override
     public String toString() {
         final DecimalFormat format = new DecimalFormat("#0.000");

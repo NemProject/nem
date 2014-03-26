@@ -232,4 +232,127 @@ public class NodeExperiencesTest {
     }
 
     //endregion
+
+    //region shared experiences matrix
+
+    @Test
+    public void sharedExperiencesMatrixHasZeroRowForLocalNode() {
+        // Act:
+        final Matrix matrix = createTotalSharedExperienceMatrix();
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
+    }
+
+    @Test
+    public void sharedExperiencesMatrixHasZeroDiagonal() {
+        // Act:
+        final Matrix matrix = createTotalSharedExperienceMatrix();
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+    }
+
+    @Test
+    public void sharedExperiencesCanHaveOneInOtherCells() {
+        // Act:
+        final Matrix matrix = createTotalSharedExperienceMatrix();
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.absSum(), IsEqual.equalTo(4.0));
+        Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
+        Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
+        Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(1.0));
+        Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(1.0));
+    }
+
+    private static Matrix createTotalSharedExperienceMatrix() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        for (final Node nodeI : nodes)
+            for (final Node nodeJ : nodes)
+                experiences.getNodeExperience(nodeI, nodeJ).successfulCalls().set(1);
+
+        // Act:
+        return experiences.getSharedExperienceMatrix(node2, nodes);
+    }
+
+    @Test
+    public void sharedExperiencesMatrixHasZeroForLocalOnlyInteraction() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final NodeExperiences experiences = new NodeExperiences();
+
+        for (final Node nodeI : nodes)
+            experiences.getNodeExperience(node2, nodeI).successfulCalls().set(1);
+
+        // Act:
+        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
+    }
+
+    @Test
+    public void sharedExperiencesMatrixHasZeroForExternalOnlyInteraction() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final NodeExperiences experiences = new NodeExperiences();
+
+        experiences.getNodeExperience(node1, node3).successfulCalls().set(7);
+        experiences.getNodeExperience(node3, node1).failedCalls().set(7);
+
+        // Act:
+        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
+    }
+
+    @Test
+    public void sharedExperiencesMatrixHasOneForLocalAndExternalInteraction() {
+        // Arrange:
+        final Node node1 = Utils.createNodeWithPort(81);
+        final Node node2 = Utils.createNodeWithPort(82);
+        final Node node3 = Utils.createNodeWithPort(83);
+        final NodeExperiences experiences = new NodeExperiences();
+
+        experiences.getNodeExperience(node1, node3).successfulCalls().set(2);
+        experiences.getNodeExperience(node2, node3).failedCalls().set(8);
+
+        // Act:
+        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.absSum(), IsEqual.equalTo(1.0));
+        Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
+    }
+
+    //endregion
 }

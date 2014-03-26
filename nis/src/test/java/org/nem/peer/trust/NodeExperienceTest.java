@@ -16,5 +16,19 @@ public class NodeExperienceTest {
         Assert.assertThat(experience.localTrust().get(), IsEqual.equalTo(0.0));
         Assert.assertThat(experience.localTrustSum().get(), IsEqual.equalTo(0.0));
         Assert.assertThat(experience.feedbackCredibility().get(), IsEqual.equalTo(1.0));
+        Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
+    }
+
+    @Test
+    public void totalCallsReturnsTheSumOfSuccessfulAndFailedCalls() {
+        // Arrange:
+        final NodeExperience experience = new NodeExperience();
+
+        // Act:
+        experience.successfulCalls().set(4);
+        experience.failedCalls().set(7);
+
+        // Assert:
+        Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(11L));
     }
 }

@@ -26,6 +26,13 @@ public class NodeExperience {
     public PositiveLong failedCalls() { return this.failedCalls; }
 
     /**
+     * Gets the total number of calls.
+     *
+     * @return The total number of calls.
+     */
+    public long totalCalls() { return this.successfulCalls.get() + this.failedCalls().get(); }
+
+    /**
      * Gets the local trust.
      *
      * @return The local trust.

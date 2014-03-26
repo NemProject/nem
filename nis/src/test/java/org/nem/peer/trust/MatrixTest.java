@@ -97,7 +97,7 @@ public class MatrixTest {
 
     //endregion
 
-    // normalizeColumns
+    //region normalizeColumns
 
     @Test
     public void allMatrixColumnsCanBeNormalized() {
@@ -120,6 +120,25 @@ public class MatrixTest {
         Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.55));
         Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.05));
         Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(0.4));
+    }
+
+    //endregion
+
+    //region absSum
+
+    @Test
+    public void matrixAbsSumCanBeCalculated() {
+        // Arrange:
+        final Matrix matrix = new Matrix(3, 2);
+        matrix.setAt(0, 0, 2);
+        matrix.setAt(1, 0, -3);
+        matrix.setAt(2, 0, -5);
+        matrix.setAt(0, 1, 11);
+        matrix.setAt(1, 1, -1);
+        matrix.setAt(2, 1, 8);
+
+        // Assert:
+        Assert.assertThat(matrix.absSum(), IsEqual.equalTo(30.0));
     }
 
     //endregion
