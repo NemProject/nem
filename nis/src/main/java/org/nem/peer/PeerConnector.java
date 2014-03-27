@@ -3,6 +3,8 @@ package org.nem.peer;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.SerializableEntity;
 
+import java.util.List;
+
 /**
  * A interface that is used to request information from nodes.
  */
@@ -35,10 +37,22 @@ public interface PeerConnector {
 	/**
 	 * Request information dbout block at specified height.
 	 *
+	 * @param endpoint
 	 * @param height
 	 * @return Block at specified height
 	 */
 	public Block getBlockAt(final NodeEndpoint endpoint, long height);
+
+	/**
+	 * Request blocks after specified height.
+	 *
+	 *
+	 * @param endpoint
+	 * @param height
+	 *
+	 * @return chain of blocks
+	 */
+	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
 
 	/**
 	 * Announces a new entity to the target node.

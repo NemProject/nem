@@ -37,5 +37,10 @@ public enum NodeApiId {
 	/**
 	 * The chain API - block at height
 	 */
-	REST_CHAIN_BLOCK_AT
+	REST_CHAIN_BLOCK_AT,
+
+	/**
+	 * get blocks after
+	 */
+	REST_CHAIN_BLOCKS_AFTER
 }

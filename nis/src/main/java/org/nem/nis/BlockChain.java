@@ -39,6 +39,8 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	// 500_000_000 nems have force to generate block every minute
 	public static final long MAGIC_MULTIPLIER = 614891469L;
+	//
+	public static final long ESTIMATED_BLOCKS_PER_DAY = 1440;
 
 	@Autowired
 	private AccountDao accountDao;
@@ -127,21 +129,49 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
+
+		Block block = BlockMapper.toModel(lastBlock, accountAnalyzer);
 	}
 
 
-	public boolean synchronizeRejectIfSame(Block peerLastBlock) {
-		if (peerLastBlock.getHeight() == this.getLastBlockHeight()) {
-			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), this.getLastBlockHash())) {
-				return true;
+	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.core.dbmodel.Block dbBlock) {
+		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
+			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), dbBlock.getBlockHash())) {
+				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	public void sychronizeCompareAt(Block commonBlock, long lowerHeight) {
+	public enum SynchronizeCompareStatus {
+		EVIL_NODE,
+		EQUAL_BLOCKS,
+		OUR_CHAIN_IS_BETTER,
+		PEER_CHAIN_IS_BETTER,
 	}
 
+	public SynchronizeCompareStatus sychronizeCompareAt(Block peerBlock, long lowerHeight) {
+		if (! peerBlock.verify()) {
+			// TODO: penalty for node
+			return SynchronizeCompareStatus.EVIL_NODE;
+		}
+
+		org.nem.core.dbmodel.Block ourBlock = blockDao.findByHeight(lowerHeight);
+
+		if (synchronizeCompareBlocks(peerBlock, ourBlock)) {
+			return SynchronizeCompareStatus.EQUAL_BLOCKS;
+		}
+
+		long peerScore = calcBlockScore(peerBlock);
+		long ourScore = calcDbBlockScore(ourBlock);
+		if (peerScore < ourScore) {
+			return SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER;
+		}
+
+		return SynchronizeCompareStatus.OUR_CHAIN_IS_BETTER;
+	}
 
 	@Override
 	public void synchronizeNode(PeerConnector connector, Node node) {
@@ -150,19 +180,62 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 			return;
 		}
 
-		if (this.synchronizeRejectIfSame(peerLastBlock)) {
+		if (this.synchronizeCompareBlocks(peerLastBlock, lastBlock)) {
 			return;
 		}
 
 		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
 		long lowerHeight = Math.min(peerLastBlock.getHeight(), this.getLastBlockHeight());
 
+		// if node is far behind, reject it, not to allow too deep
+		// rewrites of blockchain...
+		if (val < -(ESTIMATED_BLOCKS_PER_DAY / 2)) {
+			return;
+		}
+
 		Block commonBlock = peerLastBlock;
 		if (val > 0) {
 			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
+			// no point no continue
+			if (commonBlock == null) {
+				return;
+			}
 		}
 
-		this.sychronizeCompareAt(commonBlock, lowerHeight);
+		SynchronizeCompareStatus status = this.sychronizeCompareAt(commonBlock, lowerHeight);
+
+		if (status == SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER) {
+			// TODO: find common block
+			// remember to check it height diff < halfday
+			// update val
+			// update commonBlock
+			LOGGER.severe("finding common block not handled yet");
+			System.exit(-1);
+		}
+
+		switch (status) {
+			case EVIL_NODE:
+				// TODO: penalty for a node
+				return;
+			case OUR_CHAIN_IS_BETTER:
+				// perfect nothing to do
+				return;
+			default:
+				break;
+		}
+
+		if (status == SynchronizeCompareStatus.EQUAL_BLOCKS) {
+			long peerHeight = commonBlock.getHeight();
+
+			if (this.getLastBlockHeight() > peerHeight) {
+				// TODO: create duplicate of account analyzer
+				// revert transactions "on the copy"
+				LOGGER.severe("virtual chain not handled yet");
+				System.exit(-1);
+			}
+
+			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
+		}
 	}
 
 	/**
@@ -218,7 +291,6 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	public void addUnlockedAccount(Account account) {
 		unlockedAccounts.add(account);
 	}
-
 
 	/**
 	 * Checks if passed block is correct, and if eligible adds it to db

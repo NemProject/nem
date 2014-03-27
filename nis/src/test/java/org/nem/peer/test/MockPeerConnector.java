@@ -5,6 +5,7 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * A mock PeerConnector implementation.
@@ -128,6 +129,11 @@ public class MockPeerConnector implements PeerConnector {
 
 	@Override
 	public Block getBlockAt(NodeEndpoint endpoint, long height) {
+		return null;
+	}
+
+	@Override
+	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
 		return null;
 	}
 

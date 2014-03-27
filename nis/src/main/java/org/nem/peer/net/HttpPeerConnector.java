@@ -7,6 +7,7 @@ import org.nem.core.serialization.*;
 import org.nem.peer.*;
 
 import java.net.*;
+import java.util.List;
 
 /**
  * An HTTP-based PeerConnector implementation.
@@ -58,6 +59,18 @@ public class HttpPeerConnector implements PeerConnector {
 			return null;
 		}
 		return BlockFactory.VERIFIABLE.deserialize(jsonDeserializer);
+	}
+
+	@Override
+	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
+		JSONObject obj = new JSONObject();
+		obj.put("height", height);
+		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
+		if (jsonDeserializer == null) {
+			return null;
+		}
+		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
