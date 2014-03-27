@@ -71,12 +71,11 @@ public class NisMain {
 
 		this.populateDb();
 
+		this.blockChain.bootup();
+
 		this.analyzeBlocks();
 
-        // TODO: I'm not sure if you want to delay the boot until NisMain init or not
         this.networkHost.boot();
-
-		this.blockChain.bootup();
 	}
 
     private static void logGenesisInformation() {

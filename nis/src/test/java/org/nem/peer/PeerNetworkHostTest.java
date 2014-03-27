@@ -97,7 +97,7 @@ public class PeerNetworkHostTest {
         }
 
         public MockPeerNetwork(final Object refreshMonitor) {
-            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory());
+            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
             this.refreshMonitor = refreshMonitor;
         }
 

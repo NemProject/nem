@@ -1,8 +1,11 @@
 package org.nem.peer;
 
 import org.nem.core.model.Block;
+import org.nem.core.model.HashUtils;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.BlockChain;
 import org.nem.peer.scheduling.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -12,22 +15,24 @@ import java.util.*;
 public class PeerNetwork {
 
     private final Config config;
-    private NodeCollection nodes;
+	private NodeCollection nodes;
     private final PeerConnector connector;
     private final SchedulerFactory<Node> schedulerFactory;
+	private final BlockSynchronizer blockSynchronizer;
 
-    /**
+	/**
      * Creates a new network with the specified configuration.
      *
      * @param config The network configuration.
      * @param connector The peer connector to use.
      * @param schedulerFactory The node scheduler factory to use.
      */
-    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
+    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory, final BlockSynchronizer blockSynchronizer) {
         this.config = config;
         this.nodes = new NodeCollection();
         this.connector = connector;
         this.schedulerFactory = schedulerFactory;
+		this.blockSynchronizer = blockSynchronizer;
 
         for (final NodeEndpoint endpoint : config.getWellKnownPeers())
             nodes.update(new Node(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
@@ -73,20 +78,11 @@ public class PeerNetwork {
         scheduler.block();
     }
 
-	private void sychronizeNode(final Node node) {
-		Block lastBlock = this.connector.getLastBlock(node.getEndpoint());
-		if (lastBlock == null) {
-			return;
-		}
-
-
-	}
-
 	public void synchronize() {
 		Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
 			@Override
 			public void execute(final Node element) {
-				sychronizeNode(element);
+				blockSynchronizer.synchronizeNode(connector, element);
 			}
 		});
 		scheduler.push(this.nodes.getActiveNodes());

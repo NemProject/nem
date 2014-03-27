@@ -33,6 +33,14 @@ public interface PeerConnector {
 	public Block getLastBlock(final NodeEndpoint endpoint);
 
 	/**
+	 * Request information dbout block at specified height.
+	 *
+	 * @param height
+	 * @return Block at specified height
+	 */
+	public Block getBlockAt(final NodeEndpoint endpoint, long height);
+
+	/**
 	 * Announces a new entity to the target node.
 	 *
 	 * @param endpoint The endpoint.

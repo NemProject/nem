@@ -126,7 +126,12 @@ public class MockPeerConnector implements PeerConnector {
 		return null;
 	}
 
-    @Override
+	@Override
+	public Block getBlockAt(NodeEndpoint endpoint, long height) {
+		return null;
+	}
+
+	@Override
     public Node getInfo(NodeEndpoint endpoint) {
         ++this.numGetInfoCalls;
 

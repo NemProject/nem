@@ -6,6 +6,7 @@ import org.nem.core.dao.BlockDao;
 
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.model.Block;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
@@ -38,4 +39,16 @@ public class BlockController {
         return ControllerUtils.serialize(block);
 	}
 
+	@RequestMapping(value="/block/at", method = RequestMethod.POST)
+	public String blockAt(@RequestBody final String body) throws DecoderException {
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		Long blockHeight = deserializer.readLong("height");
+
+		final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
+		if (null == dbBlock)
+			return Utils.jsonError(2, "block not found in the db");
+
+		final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer);
+		return ControllerUtils.serialize(block);
+	}
 }

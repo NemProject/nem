@@ -70,6 +70,20 @@ public class BlockDaoImpl implements BlockDao
                 return null;  
 	}
 
+
+	@Override
+	@Transactional
+	public Block findByHeight(Long blockHeight) {
+		Query query = getCurrentSession()
+				.createQuery("from Block a where a.height = :height")
+				.setParameter("height", blockHeight);
+		List<?> userList = query.list();
+		if (userList.size() > 0)
+			return (Block)userList.get(0);
+		else
+			return null;
+	}
+
 	/**
 	 * First try to find block using "shortId",
 	 * than find proper block in software.

@@ -21,6 +21,9 @@ public class NisPeerNetworkHost {
     @Autowired
     private AccountAnalyzer accountAnalyzer;
 
+	@Autowired
+	private BlockChain blockChain;
+
     private PeerNetworkHost host;
 
     /**
@@ -31,7 +34,8 @@ public class NisPeerNetworkHost {
             new  PeerNetwork(
                 loadConfig("peers-config.json"),
                 new HttpPeerConnector(new DeserializationContext(this.accountAnalyzer)),
-                new ParallelSchedulerFactory<Node>(2*NUM_CORES)),
+                new ParallelSchedulerFactory<Node>(2*NUM_CORES),
+				blockChain),
             REFRESH_INITIAL_DELAY,
             REFRESH_INTERVAL);
     }

@@ -105,6 +105,7 @@ public class NodeEndpoint implements SerializableEntity {
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
             nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, new URL(this.url, "chain/last-block"));
+			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_BLOCK_AT, new URL(this.url, "block/at"));
             return nodeApiToUrlMap;
 
         } catch (MalformedURLException e) {

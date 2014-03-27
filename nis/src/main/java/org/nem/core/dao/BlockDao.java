@@ -12,4 +12,6 @@ public interface BlockDao {
 	public Block findById(long id);
 
 	public Block findByHash(byte[] blockHash);
+
+	public Block findByHeight(Long blockHeight);
 }

@@ -14,8 +14,7 @@ import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
-import org.nem.peer.NodeApiId;
-import org.nem.peer.PeerNetworkHost;
+import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -36,7 +35,7 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class BlockChain implements AutoCloseable {
+public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	// 500_000_000 nems have force to generate block every minute
 	public static final long MAGIC_MULTIPLIER = 614891469L;
@@ -128,6 +127,42 @@ public class BlockChain implements AutoCloseable {
 	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
+	}
+
+
+	public boolean synchronizeRejectIfSame(Block peerLastBlock) {
+		if (peerLastBlock.getHeight() == this.getLastBlockHeight()) {
+			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), this.getLastBlockHash())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void sychronizeCompareAt(Block commonBlock, long lowerHeight) {
+	}
+
+
+	@Override
+	public void synchronizeNode(PeerConnector connector, Node node) {
+		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
+		if (peerLastBlock == null) {
+			return;
+		}
+
+		if (this.synchronizeRejectIfSame(peerLastBlock)) {
+			return;
+		}
+
+		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
+		long lowerHeight = Math.min(peerLastBlock.getHeight(), this.getLastBlockHeight());
+
+		Block commonBlock = peerLastBlock;
+		if (val > 0) {
+			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
+		}
+
+		this.sychronizeCompareAt(commonBlock, lowerHeight);
 	}
 
 	/**
