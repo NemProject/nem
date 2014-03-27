@@ -173,6 +173,28 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		return SynchronizeCompareStatus.OUR_CHAIN_IS_BETTER;
 	}
 
+	private boolean validateBlock(Block block, Block parentBlock, AccountAnalyzer contemporaryAccountAnalyzer) {
+		if (block.getTimeStamp().compareTo(parentBlock.getTimeStamp()) < 0) {
+			return false;
+		}
+
+		Account forgerAccount = contemporaryAccountAnalyzer.findByAddress(block.getSigner().getAddress());
+		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
+			return false;
+		}
+
+		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parentBlock.getSignature().getBytes(), 2, 10));
+		TimeInstant blockTimeStamp = block.getTimeStamp();
+		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
+		BigInteger target = calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
+
+		if (hit.compareTo(target) >= 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 	@Override
 	public void synchronizeNode(PeerConnector connector, Node node) {
 		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
@@ -215,7 +237,7 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 
 		switch (status) {
 			case EVIL_NODE:
-				// TODO: penalty for a node
+				// TODO: PENALTY for node
 				return;
 			case OUR_CHAIN_IS_BETTER:
 				// perfect nothing to do
@@ -227,6 +249,18 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		if (status == SynchronizeCompareStatus.EQUAL_BLOCKS) {
 			long peerHeight = commonBlock.getHeight();
 
+			// if 'common' block is peer's last one it simply means we have longer chain
+			if (peerHeight == peerLastBlock.getHeight()) {
+				return;
+			}
+
+			org.nem.core.dbmodel.Block ourDbBlock = blockDao.findByHeight(peerHeight);
+			if (ourDbBlock == null) {
+				// probably would be strange if that would happen
+				return;
+			}
+
+			AccountAnalyzer contemporaryAccountAnalyzer = accountAnalyzer;
 			if (this.getLastBlockHeight() > peerHeight) {
 				// TODO: create duplicate of account analyzer
 				// revert transactions "on the copy"
@@ -235,6 +269,34 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 			}
 
 			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
+			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY/2)) {
+				// TODO: PENALTY for node
+				return;
+			}
+
+			// do not trust peer, take block from our db and convert it
+			Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+
+			long wantedHeight = peerHeight + 1;
+			for (Block block : peerChain) {
+				if (block.getHeight() != wantedHeight) {
+					// TODO: PENALTY for node
+					break;
+				}
+				// TODO: there is some issue probably with mappers
+				if (! block.verify()) {
+					// TODO: PENALTY for node
+					break;
+				}
+				if (! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
+					// TODO: PENALTY for node
+					break;
+				}
+
+				parentBlock = block;
+
+				wantedHeight += 1;
+			}
 		}
 	}
 
@@ -314,12 +376,12 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 			parent = blockDao.findByHash(parentHash);
 		}
 
-		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
-
 		// if we don't have parent, we can't do anything with this block
 		if (parent == null) {
 			return false;
 		}
+
+		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
 
 		if (block.getTimeStamp().compareTo(parentTimeStamp) < 0) {
 			return false;
@@ -346,9 +408,8 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 			return false;
 		}
 
-
 		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (Amount.ZERO.compareTo(forgerAccount.getBalance()) < 1) {
+		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
 			return false;
 		}
 
@@ -444,7 +505,6 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
-
 
 						long score = calcBlockScore(newBlock);
 						if (score < bestScore) {
