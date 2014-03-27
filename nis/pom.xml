@@ -214,6 +214,27 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>nem-commons</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classifier>lib</classifier>
+							<includes>
+								<include>org/nem/core/crypto/*</include>
+								<include>org/nem/core/messages/*</include>
+								<include>org/nem/core/model/*</include>
+								<include>org/nem/core/serialization/*</include>
+								<include>org/nem/core/time/*</include>
+								<include>org/nem/core/transactions/*</include>
+								<include>org/nem/core/utils/*</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
@@ -268,6 +289,7 @@
 					<removeExistingSignatures>true</removeExistingSignatures>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>
