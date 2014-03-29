@@ -134,6 +134,24 @@ public class Vector {
     }
 
     /**
+     * Creates a new Vector by multiplying this vector element-wise with
+     * another vector.
+     *
+     * @param vector The vector.
+     * @return The new vector.
+     */
+    public Vector multiplyElementWise(final Vector vector) {
+        if (this.size != vector.size)
+            throw new InvalidParameterException("vector sizes must be equal");
+
+        final Vector result = new Vector(this.size);
+        for (int i = 0; i < this.size; ++i)
+            result.vector[i] = this.vector[i] * vector.vector[i];
+
+        return result;
+    }
+
+    /**
      * Creates a new Vector by multiplying this vector by a scalar.
      *
      * @param scalar The scalar.

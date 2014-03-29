@@ -358,6 +358,55 @@ public class VectorTest {
 
     //endregion
 
+    //region multiplyElementWise
+
+    @Test
+    public void vectorCanBeMultipliedByVectorElementWise() {
+        // Arrange:
+        final Vector v1 = new Vector(3);
+        v1.setAt(0, 3);
+        v1.setAt(1, 7);
+        v1.setAt(2, 2);
+
+        final Vector v2 = new Vector(3);
+        v2.setAt(0, 1);
+        v2.setAt(1, 5);
+        v2.setAt(2, 3);
+
+        // Act:
+        final Vector result = v1.multiplyElementWise(v2);
+
+        // Assert:
+        Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v1)));
+        Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v2)));
+        Assert.assertThat(result.getSize(), IsEqual.equalTo(3));
+        Assert.assertThat(result.getAt(0), IsEqual.equalTo(3.0));
+        Assert.assertThat(result.getAt(1), IsEqual.equalTo(35.0));
+        Assert.assertThat(result.getAt(2), IsEqual.equalTo(6.0));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void vectorCannotBeMultipliedByVectorWithFewerColumns() {
+        // Arrange:
+        final Vector v1 = new Vector(2);
+        final Vector v2 = new Vector(3);
+
+        // Act:
+        v1.multiplyElementWise(v2);
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void vectorCannotBeMultipliedByVectorWithMoreColumns() {
+        // Arrange:
+        final Vector v1 = new Vector(3);
+        final Vector v2 = new Vector(2);
+
+        // Act:
+        v1.multiplyElementWise(v2);
+    }
+
+    //endregion
+
     //region toString
 
     @Test
