@@ -4,6 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.peer.Node;
+import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.trust.score.NodeExperiences;
 
 import java.security.InvalidParameterException;
 

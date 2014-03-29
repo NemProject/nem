@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.peer.trust.score.NodeExperience;
+
 /**
  * Naive trust provider that returns a uniform trust score for all inputs.
  */

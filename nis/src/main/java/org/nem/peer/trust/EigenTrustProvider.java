@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.peer.trust.score.NodeExperience;
+
 /**
  * Trust provider based on the EigenTrust algorithm.
  */

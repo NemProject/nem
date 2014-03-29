@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 import org.nem.peer.Node;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.Vector;
+import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.trust.score.NodeExperiences;
 
 public class NetworkSimulator {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulator.class.getName());

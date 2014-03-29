@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.peer.*;
 import org.nem.peer.test.NodeCollectionAssert;
+import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.HashSet;
 

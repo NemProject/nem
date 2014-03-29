@@ -2,6 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.peer.trust.score.NodeExperience;
 
 public class NodeExperienceTest {
 

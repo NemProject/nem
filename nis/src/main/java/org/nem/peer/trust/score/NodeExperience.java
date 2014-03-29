@@ -1,4 +1,7 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
+
+import org.nem.peer.trust.PositiveLong;
+import org.nem.peer.trust.RealDouble;
 
 /**
  * Represents experience one node has with another node.

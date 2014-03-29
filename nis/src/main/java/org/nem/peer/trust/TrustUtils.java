@@ -1,6 +1,8 @@
 package org.nem.peer.trust;
 
 import org.nem.peer.*;
+import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.trust.score.NodeExperiences;
 
 /**
  * Static class containing trust utility functions.

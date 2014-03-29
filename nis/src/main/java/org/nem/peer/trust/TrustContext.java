@@ -2,6 +2,7 @@ package org.nem.peer.trust;
 
 import org.nem.peer.Node;
 import org.nem.peer.NodeCollection;
+import org.nem.peer.trust.score.NodeExperiences;
 
 /**
  * Contains contextual information that can be used to influence the trust computation.
