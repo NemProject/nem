@@ -7,7 +7,39 @@ import org.nem.peer.Node;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
 
+import static org.nem.peer.test.ScoreProviderTestUtils.*;
+
 public class EigenTrustPlusPlusTest {
+
+    //region score provider
+
+    @Test
+    public void scoreProviderProviderReturnsNumberOfSuccessfulCallsAsTrustScore() {
+        // Arrange:
+        final ScoreProvider provider = new EigenTrustPlusPlus.ScoreProvider();
+
+        // Assert:
+        Assert.assertThat(calculateTrustScore(provider, 1000, 1), IsEqual.equalTo(1000.0));
+        Assert.assertThat(calculateTrustScore(provider, 1, 1000), IsEqual.equalTo(1.0));
+        Assert.assertThat(calculateTrustScore(provider, 1000, 980), IsEqual.equalTo(1000.0));
+        Assert.assertThat(calculateTrustScore(provider, 21, 1), IsEqual.equalTo(21.0));
+    }
+
+    @Test
+    public void scoreProviderReturnsDifferentCredibilityScoreForAllInputs() {
+        // Arrange:
+        final TrustScores scores = new TrustScores();
+        final EigenTrustPlusPlus.ScoreProvider provider = new EigenTrustPlusPlus.ScoreProvider();
+        provider.setTrustScores(scores);
+
+        // Assert:
+        Assert.assertThat(calculateCredibilityScore(provider, scores, 1, 2, 4, 5), IsEqual.equalTo(-18.0));
+        Assert.assertThat(calculateCredibilityScore(provider, scores, 4, 5, 2, 1), IsEqual.equalTo(18.0));
+        Assert.assertThat(calculateCredibilityScore(provider, scores, 1, 1, 1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(calculateCredibilityScore(provider, scores, 1, 2, 1, 1), IsEqual.equalTo(1.0));
+    }
+
+    //endregion
 
     //region feedback credibility vector
 
@@ -47,7 +79,7 @@ public class EigenTrustPlusPlusTest {
         // Arrange:
         final Node[] nodes = Utils.createNodeArray(4);
         final NodeExperiences experiences = new NodeExperiences();
-        final EigenTrustPlusPlus trust = new MockEigenTrustPlusPlus();
+        final EigenTrustPlusPlus trust = new EigenTrustPlusPlus(new MockScoreProvider(experiences));
 
         experiences.getNodeExperience(nodes[1], nodes[0]).successfulCalls().set(10);
         experiences.getNodeExperience(nodes[3], nodes[0]).successfulCalls().set(2);
@@ -94,10 +126,23 @@ public class EigenTrustPlusPlusTest {
 
     //endregion
 
-    private static class MockEigenTrustPlusPlus extends EigenTrustPlusPlus {
+    private static class MockScoreProvider implements ScoreProvider {
+
+        private final NodeExperiences nodeExperiences;
+
+        public MockScoreProvider(final NodeExperiences nodeExperiences) {
+            this.nodeExperiences = nodeExperiences;
+        }
 
         @Override
-        public double calculateCredibilityScore(NodeExperience experience1, NodeExperience experience2) {
+        public double calculateTrustScore(NodeExperience experience) {
+            return 0;
+        }
+
+        @Override
+        public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3) {
+            final NodeExperience experience1 = nodeExperiences.getNodeExperience(node1, node3);
+            final NodeExperience experience2 = nodeExperiences.getNodeExperience(node2, node3);
             long numSuccessfulCalls = experience1.successfulCalls().get() + experience2.successfulCalls().get();
             return 0 == numSuccessfulCalls ? 100 : numSuccessfulCalls;
         }

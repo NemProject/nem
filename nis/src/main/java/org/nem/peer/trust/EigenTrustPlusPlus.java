@@ -4,21 +4,36 @@ import org.nem.peer.Node;
 import org.nem.peer.trust.score.*;
 
 /**
- * Trust provider based on the EigenTrust algorithm.
+ * EigenTrust++ algorithm implementation.
  */
 public class EigenTrustPlusPlus extends EigenTrust {
 
     private final CredibilityScores credibilityScores = new CredibilityScores();
 
-    @Override
-    public double calculateTrustScore(final NodeExperience experience) {
-        return experience.successfulCalls().get();
+    /**
+     * Creates a new eigen trust plus plus object using the default score provider.
+     */
+    public EigenTrustPlusPlus() {
+        this(new ScoreProvider());
     }
 
-    @Override
-    public double calculateCredibilityScore(final NodeExperience experience1, final NodeExperience experience2) {
-        return 1; // TODO: this needs to be fixed
-//        return experience1.localTrust().get() * experience1.localTrustSum().get() - experience2.localTrust().get() * experience2.localTrustSum().get();
+    /**
+     * Creates a new eigen trust plus plus object using a custom score provider.
+     *
+     * @param scoreProvider The score provider to use.
+     */
+    public EigenTrustPlusPlus(final org.nem.peer.trust.ScoreProvider scoreProvider) {
+        super(scoreProvider);
+    }
+
+    /**
+     * Creates a new eigen trust plus plus object using a custom score provider.
+     *
+     * @param scoreProvider The score provider to use.
+     */
+    private EigenTrustPlusPlus(final ScoreProvider scoreProvider) {
+        super(scoreProvider);
+        scoreProvider.setTrustScores(this.getTrustScores());
     }
 
     /**
@@ -28,7 +43,6 @@ public class EigenTrustPlusPlus extends EigenTrust {
      */
     public CredibilityScores getCredibilityScores() { return this.credibilityScores; }
 
-    // TODO: test
     @Override
     public Matrix getTrustMatrix(final Node[] nodes) {
         final Matrix trustMatrix = this.getTrustScores().getScoreMatrix(nodes);
@@ -63,9 +77,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
                 if (0 == sharedExperiencesMatrix.getAt(i, j))
                     continue;
 
-                final NodeExperience experience1 = nodeExperiences.getNodeExperience(node, nodes[j]);
-                final NodeExperience experience2 = nodeExperiences.getNodeExperience(nodes[i], nodes[j]);
-                double score = this.calculateCredibilityScore(experience1, experience2);
+                double score = this.getScoreProvider().calculateCredibilityScore(node, nodes[i], nodes[j]);
                 sum += score * score;
                 ++numCommonPartners;
             }
@@ -82,5 +94,37 @@ public class EigenTrustPlusPlus extends EigenTrust {
         }
 
         return vector;
+    }
+
+    /**
+     * An EigenTrust score provider implementation.
+     */
+    public static class ScoreProvider implements org.nem.peer.trust.ScoreProvider {
+
+        private TrustScores scores;
+
+        /**
+         * Sets the trust scores associated with this provider.
+         *
+         * @param scores The trust scores associated with this provider.
+         */
+        public void setTrustScores(final TrustScores scores) {
+            this.scores = scores;
+        }
+
+        @Override
+        public double calculateTrustScore(final NodeExperience experience) {
+            return experience.successfulCalls().get();
+        }
+
+        @Override
+        public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3) {
+            final TrustScores scores = this.scores;
+            final double localSum1 = scores.getScoreWeight(node1).get();
+            final double localScore1 = scores.getScore(node1, node3).score().get();
+            final double localSum2 = scores.getScoreWeight(node2).get();
+            final double localScore2 = scores.getScore(node2, node3).score().get();
+            return localScore1 * localSum1 - localScore2 * localSum2;
+        }
     }
 }

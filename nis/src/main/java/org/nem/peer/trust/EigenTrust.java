@@ -5,20 +5,37 @@ import org.nem.peer.trust.score.NodeExperience;
 import org.nem.peer.trust.score.TrustScores;
 
 /**
- * Trust provider based on the EigenTrust algorithm.
+ * EigenTrust algorithm implementation.
  */
-public class EigenTrust implements TrustProvider {
+public class EigenTrust {
 
-    private final TrustScores trustScores = new TrustScores();
+    private final TrustScores trustScores;
+    private final org.nem.peer.trust.ScoreProvider scoreProvider;
 
-    @Override
-    public double calculateTrustScore(final NodeExperience experience) {
-        return Math.max(experience.successfulCalls().get() - experience.failedCalls().get(), 0.0);
+    /**
+     * Creates a new eigen trust object using the default score provider.
+     */
+    public EigenTrust() {
+        this(new ScoreProvider());
     }
 
-    @Override
-    public double calculateCredibilityScore(final NodeExperience experience1, final NodeExperience experience2) {
-        return 0;
+    /**
+     * Creates a new eigen trust object using a custom score provider.
+     *
+     * @param scoreProvider The score provider to use.
+     */
+    public EigenTrust(final org.nem.peer.trust.ScoreProvider scoreProvider) {
+        this.trustScores = new TrustScores();
+        this.scoreProvider = scoreProvider;
+    }
+
+    /**
+     * Gets the score provider.
+     *
+     * @return the score provider.
+     */
+    protected org.nem.peer.trust.ScoreProvider getScoreProvider() {
+        return this.scoreProvider;
     }
 
     /**
@@ -58,7 +75,7 @@ public class EigenTrust implements TrustProvider {
 
             double score;
             if (totalCalls > 0)
-                score = this.calculateTrustScore(experience)/totalCalls;
+                score = this.scoreProvider.calculateTrustScore(experience)/totalCalls;
             else
                 score = context.getPreTrustedNodes().isPreTrusted(otherNode) || node.equals(otherNode) ? 1.0 : 0.0;
 
@@ -69,5 +86,21 @@ public class EigenTrust implements TrustProvider {
         scoreVector.normalize();
         this.trustScores.setScoreVector(node, nodes, scoreVector);
         this.trustScores.getScoreWeight(node).set(scoreWeight);
+    }
+
+    /**
+     * An EigenTrust score provider implementation.
+     */
+    public static class ScoreProvider implements org.nem.peer.trust.ScoreProvider {
+
+        @Override
+        public double calculateTrustScore(final NodeExperience experience) {
+            return Math.max(experience.successfulCalls().get() - experience.failedCalls().get(), 0.0);
+        }
+
+        @Override
+        public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3) {
+            return 0;
+        }
     }
 }

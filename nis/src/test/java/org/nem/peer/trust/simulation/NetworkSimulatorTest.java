@@ -12,52 +12,52 @@ import org.nem.peer.trust.*;
 public class NetworkSimulatorTest {
     private static final Logger LOGGER = Logger.getLogger(NetworkSimulatorTest.class.getName());
 
-    @Test
-    public void simulateUniformTrust() {
-        // Act:
-        runTest(new UniformTrustProvider());
-    }
+//    @Test
+//    public void simulateUniformTrust() {
+//        // Act:
+//        runTest(new UniformTrustProvider());
+//    }
 
-    @Test
-    public void simulateEigenTrust() {
-        // Act:
-        runTest(new EigenTrust());
-    }
-
-    @Test
-    public void simulateEigenPlusPlusTrust() {
-        // Act:
-        runTest(new EigenTrustPlusPlus());
-    }
-
-    private static void runTest(final TrustProvider trustProvider) {
-        final URL url = NetworkSimulator.class.getClassLoader().getResource("");
-        if (null == url || null == url.getFile())
-            throw new InvalidParameterException("could not find output file");
-
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 10; ++i) {
-            final Config config = getConfig(i * 0.10);
-            final NetworkSimulator simulator = new NetworkSimulator(config, trustProvider, 0.1);
-
-            final String outputFileName = url.getFile() + String.format("%s_%d.txt", trustProvider.getClass().getSimpleName(), i);
-            final long startTime = System.currentTimeMillis();
-            boolean result = simulator.run(outputFileName, 1000);
-            final long stopTime = System.currentTimeMillis();
-
-            Assert.assertThat(result, IsEqual.equalTo(true));
-            builder.append(System.lineSeparator());
-            builder.append(
-                String.format(
-                    "Honest: %02d%% --> %06.3f%% failed; %06.3f%% converged; %04d ms",
-                    i * 10,
-                    simulator.getFailedPercentage(),
-                    simulator.getConvergencePercentage(),
-                    stopTime - startTime));
-        }
-
-        LOGGER.log(Level.INFO, builder.toString());
-    }
+//    @Test
+//    public void simulateEigenTrust() {
+//        // Act:
+//        runTest(new EigenTrust());
+//    }
+//
+//    @Test
+//    public void simulateEigenPlusPlusTrust() {
+//        // Act:
+//        runTest(new EigenTrustPlusPlus());
+//    }
+//
+//    private static void runTest(final EigenTrust trust) {
+//        final URL url = NetworkSimulator.class.getClassLoader().getResource("");
+//        if (null == url || null == url.getFile())
+//            throw new InvalidParameterException("could not find output file");
+//
+//        final StringBuilder builder = new StringBuilder();
+//        for (int i = 0; i < 10; ++i) {
+//            final Config config = getConfig(i * 0.10);
+//            final NetworkSimulator simulator = new NetworkSimulator(config, trustProvider, 0.1);
+//
+//            final String outputFileName = url.getFile() + String.format("%s_%d.txt", trustProvider.getClass().getSimpleName(), i);
+//            final long startTime = System.currentTimeMillis();
+//            boolean result = simulator.run(outputFileName, 1000);
+//            final long stopTime = System.currentTimeMillis();
+//
+//            Assert.assertThat(result, IsEqual.equalTo(true));
+//            builder.append(System.lineSeparator());
+//            builder.append(
+//                String.format(
+//                    "Honest: %02d%% --> %06.3f%% failed; %06.3f%% converged; %04d ms",
+//                    i * 10,
+//                    simulator.getFailedPercentage(),
+//                    simulator.getConvergencePercentage(),
+//                    stopTime - startTime));
+//        }
+//
+//        LOGGER.log(Level.INFO, builder.toString());
+//    }
 
     private static Config getConfig(double evilNodeHonestDataProbability) {
         // address;evil;pre-trusted;honest data probability;honest feedback probability;leech;collusive

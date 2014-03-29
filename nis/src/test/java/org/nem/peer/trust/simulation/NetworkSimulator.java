@@ -58,7 +58,7 @@ public class NetworkSimulator {
 	 * @param trustProvider The trust provider to use.
 	 * @param minTrust The minimum trust we have in every node.
 	 */
-	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
+	public NetworkSimulator(final Config config, final ScoreProvider trustProvider, final double minTrust) {
         if (minTrust <= 0.0 || minTrust > 1.0)
             throw new InvalidParameterException("min trust must be in the range (0, 1]");
 

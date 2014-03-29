@@ -6,7 +6,37 @@ import org.nem.peer.Node;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
 
+import static org.nem.peer.test.ScoreProviderTestUtils.*;
+
 public class EigenTrustTest {
+
+    //region score provider
+
+    @Test
+    public void scoreProviderReturnsDifferenceOfSuccessfulAndFailureCallsAsTrustScore() {
+        // Arrange:
+        final ScoreProvider provider = new EigenTrust.ScoreProvider();
+
+        // Assert:
+        Assert.assertThat(calculateTrustScore(provider, 1000, 1), IsEqual.equalTo(999.0));
+        Assert.assertThat(calculateTrustScore(provider, 1, 1000), IsEqual.equalTo(0.0));
+        Assert.assertThat(calculateTrustScore(provider, 1000, 980), IsEqual.equalTo(20.0));
+        Assert.assertThat(calculateTrustScore(provider, 21, 1), IsEqual.equalTo(20.0));
+    }
+
+    @Test
+    public void scoreProviderReturnsSameCredibilityScoreForAllInputs() {
+        // Arrange:
+        final ScoreProvider provider = new EigenTrust.ScoreProvider();
+
+        // Assert:
+        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 2, 4, 5), IsEqual.equalTo(0.0));
+        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 4, 5, 2, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 1, 1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 2, 1, 1), IsEqual.equalTo(0.0));
+    }
+
+    //endregion
 
     //region updateLocalTrust
 
@@ -39,7 +69,7 @@ public class EigenTrustTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrust trust = new MockEigenTrust();
+        final EigenTrust trust = new EigenTrust(new MockScoreProvider());
         final TrustScores trustScores = trust.getTrustScores();
         final Node localNode = context.getLocalNode();
 
@@ -72,7 +102,7 @@ public class EigenTrustTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrust trust = new MockEigenTrust();
+        final EigenTrust trust = new EigenTrust(new MockScoreProvider());
         final Node localNode = context.getLocalNode();
 
         testContext.setCallCounts(0, 1, 2); // 2
@@ -97,13 +127,17 @@ public class EigenTrustTest {
 
     //endregion
 
-    private static class MockEigenTrust extends EigenTrust {
-
+    private static class MockScoreProvider implements ScoreProvider {
         @Override
-        public double calculateTrustScore(final NodeExperience experience) {
+        public double calculateTrustScore(NodeExperience experience) {
             long numSuccessfulCalls = experience.successfulCalls().get();
             long numFailedCalls = experience.failedCalls().get();
             return (numFailedCalls * numSuccessfulCalls) * (numSuccessfulCalls + numFailedCalls);
+        }
+
+        @Override
+        public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3) {
+            return 0;
         }
     }
 }
