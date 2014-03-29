@@ -3,10 +3,9 @@ package org.nem.peer.trust;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.Node;
+import org.nem.peer.test.ScoreProviderTestContext;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
-
-import static org.nem.peer.test.ScoreProviderTestUtils.*;
 
 public class EigenTrustTest {
 
@@ -16,24 +15,27 @@ public class EigenTrustTest {
     public void scoreProviderReturnsDifferenceOfSuccessfulAndFailureCallsAsTrustScore() {
         // Arrange:
         final ScoreProvider provider = new EigenTrust.ScoreProvider();
+        final ScoreProviderTestContext context = new ScoreProviderTestContext(provider);
 
         // Assert:
-        Assert.assertThat(calculateTrustScore(provider, 1000, 1), IsEqual.equalTo(999.0));
-        Assert.assertThat(calculateTrustScore(provider, 1, 1000), IsEqual.equalTo(0.0));
-        Assert.assertThat(calculateTrustScore(provider, 1000, 980), IsEqual.equalTo(20.0));
-        Assert.assertThat(calculateTrustScore(provider, 21, 1), IsEqual.equalTo(20.0));
+        Assert.assertThat(context.calculateTrustScore(1000, 1), IsEqual.equalTo(999.0));
+        Assert.assertThat(context.calculateTrustScore(1, 1000), IsEqual.equalTo(0.0));
+        Assert.assertThat(context.calculateTrustScore(1000, 980), IsEqual.equalTo(20.0));
+        Assert.assertThat(context.calculateTrustScore(21, 1), IsEqual.equalTo(20.0));
     }
 
     @Test
     public void scoreProviderReturnsSameCredibilityScoreForAllInputs() {
         // Arrange:
+        final TrustScores scores = new TrustScores();
         final ScoreProvider provider = new EigenTrust.ScoreProvider();
+        final ScoreProviderTestContext context = new ScoreProviderTestContext(provider, scores);
 
         // Assert:
-        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 2, 4, 5), IsEqual.equalTo(0.0));
-        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 4, 5, 2, 1), IsEqual.equalTo(0.0));
-        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 1, 1, 1), IsEqual.equalTo(0.0));
-        Assert.assertThat(calculateCredibilityScore(provider, new TrustScores(), 1, 2, 1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(context.calculateCredibilityScore(1, 2, 4, 5), IsEqual.equalTo(0.0));
+        Assert.assertThat(context.calculateCredibilityScore(4, 5, 2, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(context.calculateCredibilityScore(1, 1, 1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(context.calculateCredibilityScore(1, 2, 1, 1), IsEqual.equalTo(0.0));
     }
 
     //endregion
