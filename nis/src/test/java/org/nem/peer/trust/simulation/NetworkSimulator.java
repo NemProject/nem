@@ -64,16 +64,15 @@ public class NetworkSimulator {
 
         this.config = config;
 		this.trustContext = new TrustContext(
-            config.getNodes(),
+            new Node[2],// TODO: config.getNodes(),
             config.getLocalNode(),
             new NodeExperiences(),
-            new PreTrustedNodes(config.getPreTrustedNodes()),
-            trustProvider);
+            new PreTrustedNodes(config.getPreTrustedNodes()));
 	}
 
     public double getConvergencePercentage() {
-        final long numConvergences = this.trustContext.getNumGlobalTrustConvergences();
-        final long numAttempts = this.trustContext.getNumGlobalTrustCalculations();
+        final long numConvergences = 0;//TODO:this.trustContext.getNumGlobalTrustConvergences();
+        final long numAttempts = 0;//TODO:this.trustContext.getNumGlobalTrustCalculations();
         return numConvergences * 100.0 / numAttempts;
     }
 
@@ -94,7 +93,7 @@ public class NetworkSimulator {
 		try {
 			File file = new File(outputFile);
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-            this.globalTrustVector = this.trustContext.compute();
+//   TODO:         this.globalTrustVector = this.trustContext.compute();
 			writeTrustValues(out, 0);
 
 			successfulCalls = 0;
@@ -104,8 +103,8 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i=0; i<numIterations; i++) {
 				doCommunications(peers);
-                this.trustContext.simulate();
-				this.globalTrustVector = this.trustContext.compute();
+//      TODO:          this.trustContext.simulate();
+//		TODO:		this.globalTrustVector = this.trustContext.compute();
 				if (i % 100 == 9) {
 					writeTrustValues(out, i+1);
 				}

@@ -1,7 +1,6 @@
 package org.nem.peer.trust.score;
 
 import org.nem.peer.trust.PositiveLong;
-import org.nem.peer.trust.RealDouble;
 
 /**
  * Represents experience one node has with another node.
@@ -10,9 +9,6 @@ public class NodeExperience {
 
 	private PositiveLong successfulCalls = new PositiveLong(0);
 	private PositiveLong failedCalls = new PositiveLong(0);
-	private RealDouble localTrustSum = new RealDouble(0);
-	private RealDouble localTrust = new RealDouble(0);
-	private RealDouble feedbackCredibility = new RealDouble(1.0);
 
     /**
      * Gets the number of successful calls.
@@ -34,26 +30,4 @@ public class NodeExperience {
      * @return The total number of calls.
      */
     public long totalCalls() { return this.successfulCalls.get() + this.failedCalls().get(); }
-
-    /**
-     * Gets the local trust.
-     *
-     * @return The local trust.
-     */
-    public RealDouble localTrust() { return this.localTrust; }
-
-    /**
-     * Gets the local trust sum.
-     * TODO: consider removing this.
-     *
-     * @return The local trust sum.
-     */
-    public RealDouble localTrustSum() { return this.localTrustSum; }
-
-    /**
-     * Gets the feedback credibility.
-     *
-     * @return The feedback credibility.
-     */
-    public RealDouble feedbackCredibility() { return this.feedbackCredibility; }
 }

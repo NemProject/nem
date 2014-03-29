@@ -276,4 +276,18 @@ public class Utils {
     public static Node createNodeWithPort(final int port) {
         return new Node(new NodeEndpoint("http", "localhost", port), "P", "A");
     }
+
+    /**
+     * Creates a node array of the specified size.
+     *
+     * @param size The size.
+     * @return The array.
+     */
+    public static Node[] createNodeArray(int size) {
+        final Node[] nodes = new Node[size];
+        for (int i = 0; i < size; ++i)
+            nodes[i] = org.nem.core.test.Utils.createNodeWithPort(80 + i);
+
+        return nodes;
+    }
 }

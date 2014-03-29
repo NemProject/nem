@@ -14,9 +14,6 @@ public class NodeExperienceTest {
         // Assert:
         Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
         Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-        Assert.assertThat(experience.localTrust().get(), IsEqual.equalTo(0.0));
-        Assert.assertThat(experience.localTrustSum().get(), IsEqual.equalTo(0.0));
-        Assert.assertThat(experience.feedbackCredibility().get(), IsEqual.equalTo(1.0));
         Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
     }
 
