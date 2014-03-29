@@ -14,12 +14,11 @@ public class NodeExperiencesTest {
     @Test
     public void previouslyUnknownNodeExperienceCanBeRetrieved() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
+        final Node[] nodes = Utils.createNodeArray(2);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
-        final NodeExperience experience = experiences.getNodeExperience(node1, node2);
+        final NodeExperience experience = experiences.getNodeExperience(nodes[0], nodes[1]);
 
         // Assert:
         Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -28,13 +27,12 @@ public class NodeExperiencesTest {
     @Test
     public void sameExperienceIsReturnedForSameSourceAndPeerNode() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
+        final Node[] nodes = Utils.createNodeArray(2);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
-        final NodeExperience experience1 = experiences.getNodeExperience(node1, node2);
-        final NodeExperience experience2 = experiences.getNodeExperience(node1, node2);
+        final NodeExperience experience1 = experiences.getNodeExperience(nodes[0], nodes[1]);
+        final NodeExperience experience2 = experiences.getNodeExperience(nodes[0], nodes[1]);
 
         // Assert:
         Assert.assertThat(experience2, IsSame.sameInstance(experience1));
@@ -43,13 +41,12 @@ public class NodeExperiencesTest {
     @Test
     public void experienceIsDirectional() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
+        final Node[] nodes = Utils.createNodeArray(2);
         final NodeExperiences experiences = new NodeExperiences();
 
         // Act:
-        final NodeExperience experience1 = experiences.getNodeExperience(node1, node2);
-        final NodeExperience experience2 = experiences.getNodeExperience(node2, node1);
+        final NodeExperience experience1 = experiences.getNodeExperience(nodes[0], nodes[1]);
+        final NodeExperience experience2 = experiences.getNodeExperience(nodes[1], nodes[0]);
 
         // Assert:
         Assert.assertThat(experience2, IsNot.not(IsSame.sameInstance(experience1)));
@@ -131,10 +128,7 @@ public class NodeExperiencesTest {
 
     private static Matrix createTotalSharedExperienceMatrix() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
-        final Node node3 = Utils.createNodeWithPort(83);
-        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
 
         for (final Node nodeI : nodes)
@@ -142,23 +136,20 @@ public class NodeExperiencesTest {
                 experiences.getNodeExperience(nodeI, nodeJ).successfulCalls().set(1);
 
         // Act:
-        return experiences.getSharedExperienceMatrix(node2, nodes);
+        return experiences.getSharedExperienceMatrix(nodes[1], nodes);
     }
 
     @Test
     public void sharedExperiencesMatrixHasZeroForLocalOnlyInteraction() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
-        final Node node3 = Utils.createNodeWithPort(83);
-        final Node[] nodes = new Node[] { node1, node2, node3 };
+        final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
 
         for (final Node nodeI : nodes)
-            experiences.getNodeExperience(node2, nodeI).successfulCalls().set(1);
+            experiences.getNodeExperience(nodes[1], nodeI).successfulCalls().set(1);
 
         // Act:
-        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+        final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
@@ -169,16 +160,14 @@ public class NodeExperiencesTest {
     @Test
     public void sharedExperiencesMatrixHasZeroForExternalOnlyInteraction() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
-        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node3).successfulCalls().set(7);
-        experiences.getNodeExperience(node3, node1).failedCalls().set(7);
+        experiences.getNodeExperience(nodes[0], nodes[2]).successfulCalls().set(7);
+        experiences.getNodeExperience(nodes[2], nodes[0]).failedCalls().set(7);
 
         // Act:
-        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+        final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
@@ -189,16 +178,14 @@ public class NodeExperiencesTest {
     @Test
     public void sharedExperiencesMatrixHasOneForLocalAndExternalInteraction() {
         // Arrange:
-        final Node node1 = Utils.createNodeWithPort(81);
-        final Node node2 = Utils.createNodeWithPort(82);
-        final Node node3 = Utils.createNodeWithPort(83);
+        final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
 
-        experiences.getNodeExperience(node1, node3).successfulCalls().set(2);
-        experiences.getNodeExperience(node2, node3).failedCalls().set(8);
+        experiences.getNodeExperience(nodes[0], nodes[2]).successfulCalls().set(2);
+        experiences.getNodeExperience(nodes[1], nodes[2]).failedCalls().set(8);
 
         // Act:
-        final Matrix matrix = experiences.getSharedExperienceMatrix(node2, new Node[]{ node1, node2, node3 });
+        final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
