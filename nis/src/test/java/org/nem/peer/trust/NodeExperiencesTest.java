@@ -54,35 +54,6 @@ public class NodeExperiencesTest {
 
     //endregion
 
-    //region trust matrix
-
-// TODO: the trust matrix needs to be adjusted!!!
-//    @Test
-//    public void trustMatrixCanBeCalculatedWithCustomCredibility() {
-//        // Arrange:
-//        final Node node1 = Utils.createNodeWithPort(81);
-//        final Node node2 = Utils.createNodeWithPort(82);
-//        final NodeExperiences experiences = new NodeExperiences();
-//
-//        experiences.getNodeExperience(node1, node2).localTrust().set(7);
-//        experiences.getNodeExperience(node1, node2).feedbackCredibility().set(0.5);
-//        experiences.getNodeExperience(node2, node1).localTrust().set(5);
-//        experiences.getNodeExperience(node2, node1).feedbackCredibility().set(0.1);
-//
-//        // Act:
-//        final Matrix matrix = experiences.getTrustMatrix(new Node[] { node1, node2 });
-//
-//        // Assert:
-//        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
-//        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(2));
-//        Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-//        Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.5));
-//        Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(3.5));
-//        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-//    }
-
-    //endregion
-
     //region shared experiences matrix
 
     @Test

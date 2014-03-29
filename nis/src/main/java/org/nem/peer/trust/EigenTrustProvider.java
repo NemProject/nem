@@ -34,7 +34,7 @@ public class EigenTrustProvider implements TrustProvider {
     }
 
     /**
-     * Returns the trust scores.
+     * Gets the trust scores.
      *
      * @return The trust scores.
      */

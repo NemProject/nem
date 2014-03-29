@@ -2,11 +2,9 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.Utils;
 import org.nem.peer.Node;
+import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
-
-import java.util.*;
 
 public class EigenTrustProviderTest {
 
@@ -98,45 +96,6 @@ public class EigenTrustProviderTest {
     }
 
     //endregion
-
-    private static class TestTrustContext {
-        private final Node localNode;
-        private final Node[] nodes;
-        private final NodeExperiences nodeExperiences;
-        private final PreTrustedNodes preTrustedNodes;
-
-        public TestTrustContext() {
-            this.localNode = Utils.createNodeWithPort(80);
-            this.nodes = new Node[] {
-                Utils.createNodeWithPort(81),
-                Utils.createNodeWithPort(87),
-                Utils.createNodeWithPort(86),
-                Utils.createNodeWithPort(89),
-                localNode
-            };
-
-            this.nodeExperiences = new NodeExperiences();
-
-            Set<Node> preTrustedNodeSet = new HashSet<>();
-            preTrustedNodeSet.add(this.nodes[0]);
-            preTrustedNodeSet.add(this.nodes[3]);
-            this.preTrustedNodes = new PreTrustedNodes(preTrustedNodeSet);
-        }
-
-        public TrustContext getContext() {
-            return new TrustContext(
-                this.nodes,
-                this.localNode,
-                this.nodeExperiences,
-                this.preTrustedNodes);
-        }
-
-        public void setCallCounts(final int nodeIndex, final int numSuccessfulCalls, final int numFailedCalls) {
-            final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, this.nodes[nodeIndex]);
-            experience.successfulCalls().set(numSuccessfulCalls);
-            experience.failedCalls().set(numFailedCalls);
-        }
-    }
 
     private static class MockEigenTrustProvider extends EigenTrustProvider {
 

@@ -21,6 +21,13 @@ public class EigenTrustPlusPlusProvider extends EigenTrustProvider {
 //        return experience1.localTrust().get() * experience1.localTrustSum().get() - experience2.localTrust().get() * experience2.localTrustSum().get();
     }
 
+    /**
+     * Gets the credibility scores.
+     *
+     * @return The credibility scores.
+     */
+    public CredibilityScores getCredibilityScores() { return this.credibilityScores; }
+
     // TODO: test
     @Override
     public Matrix getTrustMatrix(final Node[] nodes) {
