@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 
 /**
@@ -96,6 +97,47 @@ public class Matrix {
             sum += this.columns[i].absSum();
 
         return sum;
+    }
+
+    /**
+     * Gets the sum of all the matrix's elements.
+     *
+     * @return The sum of all the matrix's elements.
+     */
+    public double sum() {
+        double sum = 0.0;
+        for (int i = 0; i < this.cols; ++i)
+            sum += this.columns[i].sum();
+
+        return sum;
+    }
+
+    /**
+     * Creates a new Matrix by multiplying this matrix element-wise with
+     * another matrix.
+     *
+     * @param matrix The other matrix.
+     * @return The new matrix.
+     */
+    public Matrix multiplyElementWise(final Matrix matrix) {
+        if (!this.isSameSize(matrix))
+            throw new InvalidParameterException("matrix sizes must be equal");
+
+        final Matrix result = new Matrix(this.rows, this.cols);
+        for (int i = 0; i < this.cols; ++i)
+            result.columns[i] = this.columns[i].multiplyElementWise(matrix.columns[i]);
+
+        return result;
+    }
+
+    /**
+     * Determines if two this matrix and another matrix have the same dimensions.
+     *
+     * @param matrix The other matrix.
+     * @return true this matrix and the other matrix have the same dimensions.
+     */
+    public boolean isSameSize(final Matrix matrix) {
+        return this.rows == matrix.rows && this.cols == matrix.cols;
     }
 
     @Override
