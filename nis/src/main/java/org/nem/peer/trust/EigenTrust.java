@@ -7,7 +7,7 @@ import org.nem.peer.trust.score.TrustScores;
 /**
  * Trust provider based on the EigenTrust algorithm.
  */
-public class EigenTrustProvider implements TrustProvider {
+public class EigenTrust implements TrustProvider {
 
     private final TrustScores trustScores = new TrustScores();
 

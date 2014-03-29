@@ -6,7 +6,7 @@ import org.nem.peer.Node;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
 
-public class EigenTrustProviderTest {
+public class EigenTrustTest {
 
     //region updateLocalTrust
 
@@ -15,12 +15,12 @@ public class EigenTrustProviderTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrustProvider provider = new EigenTrustProvider();
-        final TrustScores trustScores = provider.getTrustScores();
+        final EigenTrust trust = new EigenTrust();
+        final TrustScores trustScores = trust.getTrustScores();
         final Node localNode = context.getLocalNode();
 
         // Act:
-        provider.updateLocalTrust(localNode, context);
+        trust.updateLocalTrust(localNode, context);
         final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
         final RealDouble sum = trustScores.getScoreWeight(localNode);
 
@@ -39,8 +39,8 @@ public class EigenTrustProviderTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrustProvider provider = new MockEigenTrustProvider();
-        final TrustScores trustScores = provider.getTrustScores();
+        final EigenTrust trust = new MockEigenTrust();
+        final TrustScores trustScores = trust.getTrustScores();
         final Node localNode = context.getLocalNode();
 
         testContext.setCallCounts(0, 1, 2); // 2
@@ -49,7 +49,7 @@ public class EigenTrustProviderTest {
         testContext.setCallCounts(3, 4, 4); // 16
 
         // Act:
-        provider.updateLocalTrust(localNode, context);
+        trust.updateLocalTrust(localNode, context);
         final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
         final RealDouble sum = trustScores.getScoreWeight(localNode);
 
@@ -72,7 +72,7 @@ public class EigenTrustProviderTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrustProvider provider = new MockEigenTrustProvider();
+        final EigenTrust trust = new MockEigenTrust();
         final Node localNode = context.getLocalNode();
 
         testContext.setCallCounts(0, 1, 2); // 2
@@ -81,8 +81,8 @@ public class EigenTrustProviderTest {
         testContext.setCallCounts(3, 4, 4); // 16
 
         // Act:
-        provider.updateLocalTrust(localNode, context);
-        final Matrix matrix = provider.getTrustMatrix(context.getNodes());
+        trust.updateLocalTrust(localNode, context);
+        final Matrix matrix = trust.getTrustMatrix(context.getNodes());
 
         // Assert:
         Assert.assertThat(matrix.sum(), IsEqual.equalTo(1.0));
@@ -97,7 +97,7 @@ public class EigenTrustProviderTest {
 
     //endregion
 
-    private static class MockEigenTrustProvider extends EigenTrustProvider {
+    private static class MockEigenTrust extends EigenTrust {
 
         @Override
         public double calculateTrustScore(final NodeExperience experience) {

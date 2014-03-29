@@ -33,7 +33,7 @@ public class TrustProviderTest {
     @Test
     public void eigenTrustProviderProviderReturnsDifferenceOfSuccessfulAndFailureCallsAsTrustScore() {
         // Arrange:
-        final TrustProvider provider = new EigenTrustProvider();
+        final TrustProvider provider = new EigenTrust();
 
         // Assert:
         Assert.assertThat(calculateTrustScore(provider, 1000, 1), IsEqual.equalTo(999.0));
@@ -45,7 +45,7 @@ public class TrustProviderTest {
     @Test
     public void eigenTrustProviderReturnsSameCredibilityScoreForAllInputs() {
         // Arrange:
-        final TrustProvider provider = new EigenTrustProvider();
+        final TrustProvider provider = new EigenTrust();
 
         // Assert:
         Assert.assertThat(calculateCredibilityScore(provider, 1, 2, 4, 5), IsEqual.equalTo(0.0));
@@ -57,7 +57,7 @@ public class TrustProviderTest {
     @Test
     public void eigenTrustPlusPlusProviderProviderReturnsNumberOfSuccessfulCallsAsTrustScore() {
         // Arrange:
-        final TrustProvider provider = new EigenTrustPlusPlusProvider();
+        final TrustProvider provider = new EigenTrustPlusPlus();
 
         // Assert:
         Assert.assertThat(calculateTrustScore(provider, 1000, 1), IsEqual.equalTo(1000.0));
@@ -69,7 +69,7 @@ public class TrustProviderTest {
     @Test
     public void eigenTrustProviderReturnsDifferentCredibilityScoreForAllInputs() {
         // Arrange:
-        final TrustProvider provider = new EigenTrustPlusPlusProvider();
+        final TrustProvider provider = new EigenTrustPlusPlus();
 
         // Assert:
         Assert.assertThat(calculateCredibilityScore(provider, 1, 2, 4, 5), IsEqual.equalTo(-18.0));

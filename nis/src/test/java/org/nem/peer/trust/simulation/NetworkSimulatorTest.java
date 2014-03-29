@@ -21,13 +21,13 @@ public class NetworkSimulatorTest {
     @Test
     public void simulateEigenTrust() {
         // Act:
-        runTest(new EigenTrustProvider());
+        runTest(new EigenTrust());
     }
 
     @Test
     public void simulateEigenPlusPlusTrust() {
         // Act:
-        runTest(new EigenTrustPlusPlusProvider());
+        runTest(new EigenTrustPlusPlus());
     }
 
     private static void runTest(final TrustProvider trustProvider) {

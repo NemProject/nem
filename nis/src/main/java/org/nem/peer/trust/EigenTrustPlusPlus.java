@@ -6,7 +6,7 @@ import org.nem.peer.trust.score.*;
 /**
  * Trust provider based on the EigenTrust algorithm.
  */
-public class EigenTrustPlusPlusProvider extends EigenTrustProvider {
+public class EigenTrustPlusPlus extends EigenTrust {
 
     private final CredibilityScores credibilityScores = new CredibilityScores();
 

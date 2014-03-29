@@ -7,7 +7,7 @@ import org.nem.peer.Node;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
 
-public class EigenTrustPlusPlusProviderTest {
+public class EigenTrustPlusPlusTest {
 
     //region feedback credibility vector
 
@@ -16,10 +16,10 @@ public class EigenTrustPlusPlusProviderTest {
         // Arrange:
         final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
-        final EigenTrustPlusPlusProvider provider = new EigenTrustPlusPlusProvider();
+        final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
         // Act:
-        final Vector vector = provider.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -31,10 +31,10 @@ public class EigenTrustPlusPlusProviderTest {
         // Arrange:
         final Node[] nodes = Utils.createNodeArray(3);
         final NodeExperiences experiences = new NodeExperiences();
-        final EigenTrustPlusPlusProvider provider = new EigenTrustPlusPlusProvider();
+        final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
         // Act:
-        final Vector vector = provider.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -47,7 +47,7 @@ public class EigenTrustPlusPlusProviderTest {
         // Arrange:
         final Node[] nodes = Utils.createNodeArray(4);
         final NodeExperiences experiences = new NodeExperiences();
-        final EigenTrustPlusPlusProvider provider = new MockEigenTrustPlusPlusProvider();
+        final EigenTrustPlusPlus trust = new MockEigenTrustPlusPlus();
 
         experiences.getNodeExperience(nodes[1], nodes[0]).successfulCalls().set(10);
         experiences.getNodeExperience(nodes[3], nodes[0]).successfulCalls().set(2);
@@ -55,7 +55,7 @@ public class EigenTrustPlusPlusProviderTest {
         experiences.getNodeExperience(nodes[3], nodes[2]).successfulCalls().set(3);
 
         // Act:
-        final Vector vector = provider.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(4));
@@ -71,18 +71,18 @@ public class EigenTrustPlusPlusProviderTest {
         // Arrange:
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
-        final EigenTrustPlusPlusProvider provider = new EigenTrustPlusPlusProvider();
+        final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
         final Node[] nodes = context.getNodes();
 
-        provider.getTrustScores().getScore(nodes[0], nodes[1]).score().set(7);
-        provider.getCredibilityScores().getScore(nodes[0], nodes[1]).score().set(0.5);
-        provider.getTrustScores().getScore(nodes[0], nodes[2]).score().set(3.5);
-        provider.getCredibilityScores().getScore(nodes[0], nodes[2]).score().set(0.25);
-        provider.getTrustScores().getScore(nodes[1], nodes[0]).score().set(5);
-        provider.getCredibilityScores().getScore(nodes[1], nodes[0]).score().set(0.1);
+        trust.getTrustScores().getScore(nodes[0], nodes[1]).score().set(7);
+        trust.getCredibilityScores().getScore(nodes[0], nodes[1]).score().set(0.5);
+        trust.getTrustScores().getScore(nodes[0], nodes[2]).score().set(3.5);
+        trust.getCredibilityScores().getScore(nodes[0], nodes[2]).score().set(0.25);
+        trust.getTrustScores().getScore(nodes[1], nodes[0]).score().set(5);
+        trust.getCredibilityScores().getScore(nodes[1], nodes[0]).score().set(0.1);
 
         // Act:
-        final Matrix matrix = provider.getTrustMatrix(nodes);
+        final Matrix matrix = trust.getTrustMatrix(nodes);
 
         // Assert:
         Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(5));
@@ -94,7 +94,7 @@ public class EigenTrustPlusPlusProviderTest {
 
     //endregion
 
-    private static class MockEigenTrustPlusPlusProvider extends EigenTrustPlusPlusProvider {
+    private static class MockEigenTrustPlusPlus extends EigenTrustPlusPlus {
 
         @Override
         public double calculateCredibilityScore(NodeExperience experience1, NodeExperience experience2) {
