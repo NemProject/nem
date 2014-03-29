@@ -41,11 +41,19 @@ public class NetworkSimulatorTest {
             final NetworkSimulator simulator = new NetworkSimulator(config, trustProvider, 0.1);
 
             final String outputFileName = url.getFile() + String.format("%s_%d.txt", trustProvider.getClass().getSimpleName(), i);
+            final long startTime = System.currentTimeMillis();
             boolean result = simulator.run(outputFileName, 1000);
+            final long stopTime = System.currentTimeMillis();
 
             Assert.assertThat(result, IsEqual.equalTo(true));
             builder.append(System.lineSeparator());
-            builder.append(String.format("Honest: %02d%% --> %06.3f%% failed ", i * 10, simulator.getFailedPercentage()));
+            builder.append(
+                String.format(
+                    "Honest: %02d%% --> %06.3f%% failed; %06.3f%% converged; %04d ms",
+                    i * 10,
+                    simulator.getFailedPercentage(),
+                    simulator.getConvergencePercentage(),
+                    stopTime - startTime));
         }
 
         LOGGER.log(Level.INFO, builder.toString());

@@ -33,6 +33,9 @@ public class TrustContext {
     private final PreTrustedNodes preTrustedNodes;
     private final TrustProvider trustProvider;
 
+    private int numGlobalTrustCalculations;
+    private int numGlobalTrustConvergences;
+
     /**
      * Creates a new trust context.
      *
@@ -83,6 +86,20 @@ public class TrustContext {
      * @return Pre-trusted node information.
      */
     public PreTrustedNodes getPreTrustedNodes() { return this.preTrustedNodes; }
+
+    /**
+     * Gets the number of global trust calculations.
+     *
+     * @return The number of global trust calculations.
+     */
+    public int getNumGlobalTrustCalculations() { return this.numGlobalTrustCalculations; }
+
+    /**
+     * Gets the number of global trust convergences.
+     *
+     * @return The number of global trust convergences.
+     */
+    public int getNumGlobalTrustConvergences() { return this.numGlobalTrustConvergences; }
 
     /**
      * Gets a vector of pre-trust values for all nodes.
@@ -161,6 +178,11 @@ public class TrustContext {
             ALPHA,
             EPSILON);
         iterator.run();
+
+        ++numGlobalTrustCalculations;
+        if (iterator.hasConverged())
+            ++numGlobalTrustConvergences;
+
         return iterator.getResult();
     }
 }

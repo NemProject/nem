@@ -71,9 +71,15 @@ public class NetworkSimulator {
             trustProvider);
 	}
 
+    public double getConvergencePercentage() {
+        final long numConvergences = this.trustContext.getNumGlobalTrustConvergences();
+        final long numAttempts = this.trustContext.getNumGlobalTrustCalculations();
+        return numConvergences * 100.0 / numAttempts;
+    }
+
     public double getFailedPercentage() {
         final long totalCalls = this.successfulCalls + this.failedCalls;
-        return 0 == totalCalls ? 0.0 : (double)this.failedCalls*100/totalCalls;
+        return 0 == totalCalls ? 0.0 : this.failedCalls * 100.0 / totalCalls;
     }
 
 	/**
