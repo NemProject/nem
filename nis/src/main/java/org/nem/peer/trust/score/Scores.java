@@ -1,6 +1,7 @@
 package org.nem.peer.trust.score;
 
 import org.nem.peer.Node;
+import org.nem.peer.trust.Matrix;
 import org.nem.peer.trust.Vector;
 
 import java.security.InvalidParameterException;
@@ -78,6 +79,39 @@ public abstract class Scores<T extends Score>  {
         for (int i = 0; i < nodes.length; ++i) {
             final T score = this.getScore(node, nodes[i]);
             score.score().set(scoreVector.getAt(i));
+        }
+    }
+
+    /**
+     * Gets a transposed matrix of score values for all specified nodes.
+     * Matrix(r, c) contains the score that c has with respect to r.
+     *
+     * @param nodes The nodes.
+     * @return A transposed matrix of local score values.
+     */
+    public Matrix getScoreMatrix(final Node[] nodes) {
+        final int numNodes = nodes.length;
+        final Matrix trustMatrix = new Matrix(numNodes, numNodes);
+        for (int i = 0; i < numNodes; ++i) {
+            for (int j = 0; j < numNodes; ++j) {
+                final Score score = this.getScore(nodes[i], nodes[j]);
+                trustMatrix.setAt(j, i, score.score().get());
+            }
+        }
+
+        return trustMatrix;
+    }
+
+    /**
+     * Normalizes the score values so that the sum of a node's scores is 1.
+     *
+     * @param nodes The nodes that should have their scores normalized.
+     */
+    public void normalize(final Node[] nodes) {
+        for (final Node node : nodes) {
+            final Vector vector = this.getScoreVector(node, nodes);
+            vector.normalize();
+            this.setScoreVector(node, nodes, vector);
         }
     }
 }

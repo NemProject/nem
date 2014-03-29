@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.peer.Node;
 import org.nem.peer.test.*;
+import org.nem.peer.trust.Matrix;
 import org.nem.peer.trust.Vector;
 
 import java.security.InvalidParameterException;
@@ -119,13 +120,84 @@ public class ScoresTest {
 
     //endregion
 
+    //region score matrix
+
+    @Test
+    public void scoreMatrixCanBeCalculated() {
+        // Arrange:
+        final TestContext context = new TestContext(3, new MockScores(0));
+
+        context.scores.getScore(context.nodes[0], context.nodes[1]).score().set(7);
+        context.scores.getScore(context.nodes[0], context.nodes[2]).score().set(2);
+        context.scores.getScore(context.nodes[1], context.nodes[0]).score().set(5);
+        context.scores.getScore(context.nodes[1], context.nodes[2]).score().set(4);
+        context.scores.getScore(context.nodes[2], context.nodes[0]).score().set(11);
+        context.scores.getScore(context.nodes[2], context.nodes[1]).score().set(6);
+
+        // Act:
+        final Matrix matrix = context.scores.getScoreMatrix(context.nodes);
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0));
+        Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0));
+        Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0));
+        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0));
+        Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0));
+        Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0));
+        Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+    }
+
+    //endregion
+
+    //region normalizeLocalTrust
+
+    @Test
+    public void localTrustValuesCanBeNormalized() {
+        // Arrange:
+        final TestContext context = new TestContext(3, new MockScores(0));
+
+        context.scores.getScore(context.nodes[0], context.nodes[1]).score().set(7);
+        context.scores.getScore(context.nodes[0], context.nodes[2]).score().set(2);
+        context.scores.getScore(context.nodes[1], context.nodes[0]).score().set(5);
+        context.scores.getScore(context.nodes[1], context.nodes[2]).score().set(4);
+        context.scores.getScore(context.nodes[2], context.nodes[0]).score().set(11);
+        context.scores.getScore(context.nodes[2], context.nodes[1]).score().set(6);
+
+        // Act:
+        context.scores.normalize(context.nodes);
+        final Matrix matrix = context.scores.getScoreMatrix(context.nodes);
+
+        // Assert:
+        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0 / 9));
+        Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0 / 17));
+        Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0 / 9));
+        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+        Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0 / 17));
+        Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0 / 9));
+        Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0 / 9));
+        Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+    }
+
+    //endregion
+
     private static class TestContext {
 
         public final MockScores scores;
         public final Node[] nodes;
 
         public TestContext(final int numNodes) {
-            this.scores = new MockScores();
+            this(numNodes, new MockScores());
+        }
+
+        public TestContext(final int numNodes, final MockScores scores) {
+            this.scores = scores;
 
             this.nodes = new Node[numNodes];
             for (int i = 0; i < numNodes; ++i)
