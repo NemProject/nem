@@ -1,9 +1,9 @@
 package org.nem.peer.trust;
 
 import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.peer.Node;
+import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.NodeExperience;
 
@@ -32,9 +32,6 @@ public class BasicNodeSelectorTest {
         final TestTrustContext testContext = new TestTrustContext();
         final TrustContext context = testContext.getContext();
 
-        for (int i = 0; i < context.getNodes().length; ++i)
-                testContext.setCallCounts(i, 100, 0);
-
         final Vector vector = new Vector(context.getNodes().length);
         vector.setAt(2, value);
 
@@ -49,20 +46,5 @@ public class BasicNodeSelectorTest {
         // Assert:
         Assert.assertThat(info.getNode(), IsSame.sameInstance(otherNode));
         Assert.assertThat(info.getExperience(), IsSame.sameInstance(experience));
-    }
-
-
-    private static class MockTrustProvider implements TrustProvider {
-
-        private final Vector trustVector;
-
-        public MockTrustProvider(final Vector trustVector) {
-            this.trustVector = trustVector;
-        }
-
-        @Override
-        public Vector computeTrust(TrustContext context) {
-            return this.trustVector;
-        }
     }
 }

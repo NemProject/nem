@@ -6,6 +6,9 @@ import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 import org.nem.peer.Node;
+import org.nem.peer.NodeCollection;
+import org.nem.peer.NodeStatus;
+import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.Vector;
 import org.nem.peer.trust.score.NodeExperience;
@@ -194,39 +197,23 @@ public class NetworkSimulator {
 	 * @return            chosen node or null if none was chosen
 	 */
 	private Node getCommunicationPartner(final Node node, final Node[] peers) {
-		// Pick a partner according to the trust in that node and luck
-		double min = Double.MAX_VALUE;
-		Node partner=null;
 
-        int index = 0;
-		for (Node tmpNode : peers) {
-            double globalTrust = this.globalTrustVector.getAt(index++);
-			if (tmpNode == node) {
-				continue;
-			}
+        final NodeCollection nodeCollection = new NodeCollection();
+        for (final Node peer : peers)
+            nodeCollection.update(peer, NodeStatus.ACTIVE);
 
-            final NodeExperience experience = getNodeExperience(node, tmpNode);
-			long numCalls = experience.successfulCalls().get() + experience.failedCalls().get();
-			if (numCalls < MIN_COMMUNICATION) {
-				// Since we have only very little experience with this node, we give him a 30% chance
-				if (Math.random() > 0.3) {
-					partner = tmpNode;
-					break;
-				}
-			}
-			else {
-				// You can play with different pattern to choose a node here
-				//double value = Math.random()/Math.log(1+10*node.getNodeExperience(tmpNode.getAddress()).getTrust());
-				//double value = Math.random()/Math.exp(minTrust/network.getAllPeers().size()+10*node.getNodeExperience(tmpNode.getAddress()).getTrust());
-				double value = Math.random()/(MIN_TRUST/this.trustContext.getNodes().length + globalTrust);
-				if (value < min) {
-					partner = tmpNode;
-					min = value;
-				}
-			}
-		}
+        final TrustContext trustContext = new TrustContext(
+            peers,
+            node,
+            this.trustContext.getNodeExperiences(),
+            this.trustContext.getPreTrustedNodes());
 
-		return partner;
+        final NodeSelector basicNodeSelector = new BasicNodeSelector(
+            new ActiveNodeTrustProvider(
+                new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
+                nodeCollection));
+
+        return basicNodeSelector.selectNode(trustContext).getNode();
 	}
 
 	/**
