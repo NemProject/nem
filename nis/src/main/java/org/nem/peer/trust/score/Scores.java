@@ -38,7 +38,7 @@ public abstract class Scores<T extends Score>  {
         return score;
     }
 
-    private Map<Node, T> getScores(final Node source) {
+    protected Map<Node, T> getScores(final Node source) {
         Map<Node, T> localExperiences = this.scores.get(source);
         if (null == localExperiences) {
             localExperiences = new ConcurrentHashMap<>();

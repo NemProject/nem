@@ -5,6 +5,7 @@ import org.nem.peer.trust.score.NodeExperience;
 
 /**
  * A Node and NodeExperience pair.
+ * TODO: rename to NodeExperiencePair
  */
 public class NodeInfo {
 
