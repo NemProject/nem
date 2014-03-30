@@ -100,7 +100,7 @@ public class NodeEndpoint implements SerializableEntity {
         try {
             Dictionary<NodeApiId, URL> nodeApiToUrlMap = new Hashtable<>();
             nodeApiToUrlMap.put(NodeApiId.REST_NODE_INFO, new URL(this.url, "node/info"));
-            nodeApiToUrlMap.put(NodeApiId.REST_ADD_PEER, new URL(this.url, "peer/new"));
+            nodeApiToUrlMap.put(NodeApiId.REST_NODE_PING, new URL(this.url, "node/ping"));
             nodeApiToUrlMap.put(NodeApiId.REST_NODE_PEER_LIST, new URL(this.url, "node/peer-list"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));

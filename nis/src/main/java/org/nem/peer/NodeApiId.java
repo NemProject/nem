@@ -10,9 +10,9 @@ public enum NodeApiId {
     REST_NODE_INFO,
 
     /**
-     * The peer/new API.
+     * The node/ping API.
      */
-    REST_ADD_PEER,
+    REST_NODE_PING,
 
     /**
      * The node/peer-list API.

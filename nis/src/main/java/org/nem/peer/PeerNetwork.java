@@ -59,19 +59,21 @@ public class PeerNetwork {
      * @return A communication partner node.
      */
     public NodeInfo getPartnerNode() {
-        final Node localNode = this.getLocalNode();
-
         // create a new trust context each iteration in order to allow
         // nodes to change in-between iterations.
         final TrustContext context = new TrustContext(
-            TrustUtils.toNodeArray(this.nodes, localNode),
-            localNode,
+            this.getNodeArray(),
+            this.getLocalNode(),
             this.nodeExperiences,
             this.config.getPreTrustedNodes(),
             this.config.getTrustParameters());
 
         final NodeSelector basicNodeSelector = getNodeSelector();
         return basicNodeSelector.selectNode(context);
+    }
+
+    private Node[] getNodeArray() {
+        return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
     }
 
     private NodeSelector getNodeSelector() {
