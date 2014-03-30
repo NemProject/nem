@@ -37,6 +37,9 @@ public class Transfer {
 	
 	private Long amount;
 	private Long referencedTransaction;
+
+	private Integer messageType;
+	private byte[] messagePayload;
 	
 	@ManyToOne(fetch= FetchType.LAZY)
     @JoinTable(name="block_transfers",
@@ -197,5 +200,21 @@ public class Transfer {
 
 	public void setBlock(Block block) {
 		this.block = block;
+	}
+
+	public Integer getMessageType() {
+		return messageType;
+	}
+
+	public void setMessageType(Integer messageType) {
+		this.messageType = messageType;
+	}
+
+	public byte[] getMessagePayload() {
+		return messagePayload;
+	}
+
+	public void setMessagePayload(byte[] messagePayload) {
+		this.messagePayload = messagePayload;
 	}
 }

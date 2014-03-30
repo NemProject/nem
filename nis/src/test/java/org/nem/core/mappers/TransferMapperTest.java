@@ -134,8 +134,7 @@ public class TransferMapperTest {
         }
 
         public void assertModel(final TransferTransaction rhs) {
-            // TODO this is disabled until messages are stored in database
-            // TODO Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
+            Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
             Assert.assertThat(rhs.getVersion(), IsEqual.equalTo(this.model.getVersion()));
             Assert.assertThat(rhs.getType(), IsEqual.equalTo(this.model.getType()));
             Assert.assertThat(rhs.getFee(), IsEqual.equalTo(this.model.getFee()));
@@ -145,7 +144,7 @@ public class TransferMapperTest {
             Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
             Assert.assertThat(rhs.getRecipient(), IsEqual.equalTo(this.model.getRecipient()));
             Assert.assertThat(rhs.getAmount(), IsEqual.equalTo(this.model.getAmount()));
-            Assert.assertThat(rhs.getMessage(), IsEqual.equalTo(null));
+            Assert.assertThat(rhs.getMessage(), IsEqual.equalTo(this.model.getMessage()));
         }
     }
 }
