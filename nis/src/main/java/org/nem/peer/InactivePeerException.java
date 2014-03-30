@@ -6,7 +6,7 @@ package org.nem.peer;
 public class InactivePeerException extends RuntimeException {
 
     /**
-     * Creates a new crypto exception.
+     * Creates a new exception.
      *
      * @param message The exception message.
      */
@@ -15,7 +15,7 @@ public class InactivePeerException extends RuntimeException {
     }
 
     /**
-     * Creates a new crypto exception.
+     * Creates a new exception.
      *
      * @param cause The exception message.
      */
@@ -24,7 +24,7 @@ public class InactivePeerException extends RuntimeException {
     }
 
     /**
-     * Creates a new crypto exception.
+     * Creates a new exception.
      *
      * @param message The exception message.
      * @param cause The original exception.

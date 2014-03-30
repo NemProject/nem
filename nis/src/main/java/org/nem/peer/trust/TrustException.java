@@ -1,16 +1,16 @@
-package org.nem.peer;
+package org.nem.peer.trust;
 
 /**
- * A fatal (non-recoverable) peer exception.
+ * A peer trust exception.
  */
-public class FatalPeerException extends RuntimeException {
+public class TrustException extends RuntimeException {
 
     /**
      * Creates a new exception.
      *
      * @param message The exception message.
      */
-    public FatalPeerException(final String message) {
+    public TrustException(final String message) {
         super(message);
     }
 
@@ -19,7 +19,7 @@ public class FatalPeerException extends RuntimeException {
      *
      * @param cause The exception message.
      */
-    public FatalPeerException(Throwable cause) {
+    public TrustException(Throwable cause) {
         super(cause);
     }
 
@@ -29,7 +29,7 @@ public class FatalPeerException extends RuntimeException {
      * @param message The exception message.
      * @param cause The original exception.
      */
-    public FatalPeerException(final String message, Throwable cause) {
+    public TrustException(final String message, Throwable cause) {
         super(message, cause);
     }
 }
