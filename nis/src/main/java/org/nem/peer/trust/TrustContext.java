@@ -12,6 +12,7 @@ public class TrustContext {
     private final Node localNode;
     private final NodeExperiences nodeExperiences;
     private final PreTrustedNodes preTrustedNodes;
+    private final TrustParameters params;
 
     /**
      * Creates a new trust context.
@@ -31,6 +32,7 @@ public class TrustContext {
         this.localNode = localNode;
         this.nodeExperiences = nodeExperiences;
         this.preTrustedNodes = preTrustedNodes;
+        this.params = new TrustParameters();
     }
 
     /**
@@ -60,4 +62,11 @@ public class TrustContext {
      * @return Pre-trusted node information.
      */
     public PreTrustedNodes getPreTrustedNodes() { return this.preTrustedNodes; }
+
+    /**
+     * Gets additional parameters associated with the trust context.
+     *
+     * @return Additional parameters associated with the trust context.
+     */
+    public TrustParameters getParams() { return this.params; }
 }

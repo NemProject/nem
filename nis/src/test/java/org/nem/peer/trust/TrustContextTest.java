@@ -26,5 +26,6 @@ public class TrustContextTest {
         Assert.assertThat(context.getLocalNode(), IsSame.sameInstance(localNode));
         Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(nodeExperiences));
         Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
+        Assert.assertThat(context.getParams(), IsNot.not(IsEqual.equalTo(null)));
     }
 }

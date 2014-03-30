@@ -125,14 +125,13 @@ public class EigenTrust implements TrustProvider {
         return computeGlobalTrust(context);
     }
 
-    // TODO: clean this up!
     protected Vector computeGlobalTrust(final TrustContext context) {
         final EigenTrustPowerIterator iterator = new EigenTrustPowerIterator(
             context.getPreTrustedNodes().getPreTrustVector(context.getNodes()),
-            getTrustMatrix(context.getNodes()),
-            10,//Integer.parseInt(context.getParam("MAX_ITERATIONS")),
-            0.05, //Double.parseDouble(context.getParam("ALPHA")),
-            0.0001);//Double.parseDouble(context.getParam("EPSILON")));
+            this.getTrustMatrix(context.getNodes()),
+            context.getParams().getAsInteger("MAX_ITERATIONS", 10),
+            context.getParams().getAsDouble("ALPHA", 0.05),
+            context.getParams().getAsDouble("EPSILON", 0.001));
         iterator.run();
 
         ++this.numComputations;
