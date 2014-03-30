@@ -8,6 +8,7 @@ import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
+import org.nem.peer.trust.NodeInfo;
 
 import java.util.*;
 
@@ -75,8 +76,6 @@ public class PeerNetworkTest {
     }
 
     //endregion
-
-    //region refresh
 
     //region getInfo
 
@@ -301,6 +300,27 @@ public class PeerNetworkTest {
             nodes,
             new String[]{ "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
             new String[]{ "10.0.0.7", "10.0.0.11" });
+    }
+
+    //endregion
+
+    //region getPartnerNode
+
+    @Test
+    public void getPartnerNodeReturnsActiveNode() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.1", MockPeerConnector.TriggerAction.INACTIVE);
+        connector.setGetInfoError("10.0.0.3", MockPeerConnector.TriggerAction.FATAL);
+
+        network.refresh();
+
+        // Act:
+        final NodeInfo info = network.getPartnerNode();
+
+        // Assert:
+        Assert.assertThat(info.getNode().getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("10.0.0.2"));
     }
 
     //endregion

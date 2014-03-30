@@ -54,6 +54,7 @@ public class PeerNetwork {
 
     /**
      * Gets a communication partner node.
+     * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested
      *
      * @return A communication partner node.
      */
@@ -69,12 +70,14 @@ public class PeerNetwork {
             this.config.getPreTrustedNodes(),
             this.config.getTrustParameters());
 
-        final NodeSelector basicNodeSelector = null;
-//        new BasicNodeSelector(
-//            new ActiveNodeTrustProvider(
-//                    new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
-//                    nodeCollection));
+        final NodeSelector basicNodeSelector = getNodeSelector();
         return basicNodeSelector.selectNode(context);
+    }
+
+    private NodeSelector getNodeSelector() {
+        // wrap the configured trust provider in an ActiveNodeTrustProvider to ensure that
+        // only active nodes are returned as communication partners
+        return new BasicNodeSelector(new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes));
     }
 
     /**

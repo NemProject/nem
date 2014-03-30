@@ -4,6 +4,7 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
 import java.net.URL;
+import java.util.*;
 
 /**
  * A mock PeerConnector implementation.
@@ -14,8 +15,7 @@ public class MockPeerConnector implements PeerConnector {
     private int numGetKnownPeerCalls;
     private int numAnnounceCalls;
 
-    private String getInfoErrorTrigger;
-    private TriggerAction getInfoErrorTriggerAction;
+    private Map<String, TriggerAction> getInfoTriggers = new HashMap<>();
 
     private String getKnownPeersErrorTrigger;
     private TriggerAction getKnownPeersErrorTriggerAction;
@@ -96,8 +96,7 @@ public class MockPeerConnector implements PeerConnector {
      * @param action The action.
      */
     public void setGetInfoError(final String trigger, final TriggerAction action) {
-        this.getInfoErrorTrigger = trigger;
-        this.getInfoErrorTriggerAction = action;
+        this.getInfoTriggers.put(trigger, action);
     }
 
     /**
@@ -124,9 +123,10 @@ public class MockPeerConnector implements PeerConnector {
     public Node getInfo(NodeEndpoint endpoint) {
         ++this.numGetInfoCalls;
 
-        if (shouldTriggerAction(endpoint, this.getInfoErrorTrigger)) {
-            triggerGeneralAction(this.getInfoErrorTriggerAction);
-            switch (this.getInfoErrorTriggerAction) {
+        final TriggerAction action = this.getInfoTriggers.get(endpoint.getBaseUrl().getHost());
+        if (null != action) {
+            triggerGeneralAction(action);
+            switch (action) {
                 case CHANGE_ADDRESS:
                     URL url = endpoint.getBaseUrl();
                     endpoint = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() + 1);

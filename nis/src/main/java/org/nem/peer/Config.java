@@ -17,6 +17,7 @@ public class Config {
     private final Node localNode;
     private final PreTrustedNodes preTrustedNodes;
     private final TrustParameters trustParameters;
+    private final TrustProvider trustProvider;
 
     /**
      * Creates a new configuration object from a JSON configuration object.
@@ -28,6 +29,7 @@ public class Config {
         this.localNode = parseLocalNode(deserializer);
         this.preTrustedNodes = parseWellKnownPeers(deserializer);
         this.trustParameters = getDefaultTrustParameters();
+        this.trustProvider = getDefaultTrustProvider();
     }
 
     /**
@@ -58,6 +60,13 @@ public class Config {
      */
     public TrustParameters getTrustParameters() { return this.trustParameters; }
 
+    /**
+     * Gets the trust provider.
+     *
+     * @return The trust provider.
+     */
+    public TrustProvider getTrustProvider() { return this.trustProvider; }
+
     private static Node parseLocalNode(final Deserializer deserializer) {
         return new Node(deserializer);
     }
@@ -78,5 +87,9 @@ public class Config {
         params.set("ALPHA", "0.05");
         params.set("EPSILON", "0.001");
         return params;
+    }
+
+    private static TrustProvider getDefaultTrustProvider() {
+        return new LowComTrustProvider(new EigenTrust(), 30);
     }
 }

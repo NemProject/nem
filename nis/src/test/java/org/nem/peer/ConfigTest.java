@@ -83,6 +83,18 @@ public class ConfigTest {
         Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.001));
     }
 
+    @Test
+    public void trustProviderIsInitialized() {
+        // Arrange:
+        final Config config = createTestConfig();
+
+        // Act:
+        final TrustProvider provider = config.getTrustProvider();
+
+        // Assert:
+        Assert.assertThat(provider, IsNot.not(IsEqual.equalTo(null)));
+    }
+
     //region Factories
 
     private static Node createConfigNode(final String host) {
