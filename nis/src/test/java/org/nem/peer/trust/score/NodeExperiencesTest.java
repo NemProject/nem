@@ -1,11 +1,11 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.peer.Node;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.Matrix;
+import org.nem.peer.trust.NodeExperiencePair;
 
 import java.util.*;
 
