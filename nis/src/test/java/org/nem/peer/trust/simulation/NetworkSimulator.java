@@ -103,8 +103,8 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i=0; i<numIterations; i++) {
 				doCommunications(peers);
-                this.trustProvider.computeTrust(this.trustContext);
-				if (i % 100 == 9) {
+                this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
+				if (i % 100 == 99) {
 					writeTrustValues(out, i+1);
 				}
 			}
@@ -197,7 +197,6 @@ public class NetworkSimulator {
 		// Pick a partner according to the trust in that node and luck
 		double min = Double.MAX_VALUE;
 		Node partner=null;
-
 
         int index = 0;
 		for (Node tmpNode : peers) {
