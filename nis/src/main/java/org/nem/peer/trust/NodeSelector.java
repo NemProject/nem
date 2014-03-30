@@ -8,7 +8,8 @@ public interface NodeSelector {
     /**
      * Selects a node.
      *
+     * @param context The trust context.
      * @return Information about the selected node.
      */
-    public NodeInfo selectNode();
+    public NodeInfo selectNode(final TrustContext context);
 }
