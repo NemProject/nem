@@ -2,6 +2,8 @@ package org.nem.peer;
 
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.scheduling.*;
+import org.nem.peer.trust.TrustContext;
+import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.*;
 
@@ -14,6 +16,9 @@ public class PeerNetwork {
     private NodeCollection nodes;
     private final PeerConnector connector;
     private final SchedulerFactory<Node> schedulerFactory;
+
+    private final NodeExperiences nodeExperiences;
+    private final TrustContext trustContext;
 
     /**
      * Creates a new network with the specified configuration.
@@ -28,8 +33,20 @@ public class PeerNetwork {
         this.connector = connector;
         this.schedulerFactory = schedulerFactory;
 
-        for (final NodeEndpoint endpoint : config.getWellKnownPeers())
-            nodes.update(new Node(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
+        this.nodeExperiences = new NodeExperiences();
+
+        // TODO: additional integration necessary
+        this.trustContext = null;
+//        new TrustContext(
+//
+//        );
+//        final Node[] nodes,
+//        final Node localNode,
+//        final NodeExperiences nodeExperiences,
+//        final PreTrustedNodes preTrustedNodes
+
+        for (final Node node : config.getPreTrustedNodes().getNodes())
+            nodes.update(node, NodeStatus.INACTIVE);
     }
 
     /**

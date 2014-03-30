@@ -25,8 +25,17 @@ public class PreTrustedNodes {
      *
      * @return The number of pre-trusted nodes.
      */
-    public int getNumPreTrustedNodes() {
+    public int getSize() {
         return this.nodes.size();
+    }
+
+    /**
+     * Gets the pre-trusted nodes.
+     *
+     * @return The pre-trusted nodes.
+     */
+    public Set<Node> getNodes() {
+        return this.nodes;
     }
 
     /**
@@ -46,7 +55,7 @@ public class PreTrustedNodes {
      * @return A vector of pre-trust values.
      */
     public Vector getPreTrustVector(final Node[] nodes) {
-        final int numPreTrustedNodes = this.getNumPreTrustedNodes();
+        final int numPreTrustedNodes = this.getSize();
         final Vector preTrustVector = new Vector(nodes.length);
         if (0 == numPreTrustedNodes) {
             preTrustVector.setAll(1.0 / nodes.length);

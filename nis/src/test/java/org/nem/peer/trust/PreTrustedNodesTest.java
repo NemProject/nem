@@ -2,6 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.IsEquivalent;
 import org.nem.core.test.Utils;
 import org.nem.peer.Node;
 
@@ -17,7 +18,21 @@ public class PreTrustedNodesTest {
         final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
         // Assert:
-        Assert.assertThat(preTrustedNodes.getNumPreTrustedNodes(), IsEqual.equalTo(3));
+        Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void allPreTrustedNodesCanBeReturned() {
+        // Arrange:
+        final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
+
+        // Assert:
+        final Node[] expectedPreTrustedNodes = new Node[] {
+            Utils.createNodeWithPort(81),
+            Utils.createNodeWithPort(83),
+            Utils.createNodeWithPort(84)
+        };
+        Assert.assertThat(preTrustedNodes.getNodes(), IsEquivalent.equivalentTo(expectedPreTrustedNodes));
     }
 
     @Test
