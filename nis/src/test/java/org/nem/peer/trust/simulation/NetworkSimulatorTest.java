@@ -35,9 +35,14 @@ public class NetworkSimulatorTest {
             final NetworkSimulator simulator = new NetworkSimulator(config, trust, 0.1);
 
             final String outputFileName = url.getFile() + String.format("%s_%d.txt", trust.getClass().getSimpleName(), i);
+
+            final long startNumComputations = trust.getNumComputations();
+            final long startNumConvergences = trust.getNumConvergences();
             final long startTime = System.currentTimeMillis();
-            boolean result = simulator.run(outputFileName, 1000);
+            boolean result = simulator.run(outputFileName, 200);
             final long stopTime = System.currentTimeMillis();
+            final long stopNumConvergences = trust.getNumConvergences();
+            final long stopNumComputations = trust.getNumComputations();
 
             Assert.assertThat(result, IsEqual.equalTo(true));
             builder.append(System.lineSeparator());
@@ -46,7 +51,7 @@ public class NetworkSimulatorTest {
                     "Honest: %02d%% --> %06.3f%% failed; %06.3f%% converged; %04d ms",
                     i * 10,
                     simulator.getFailedPercentage(),
-                    simulator.getConvergencePercentage(),
+                    (stopNumConvergences - startNumConvergences) * 100.0 / (stopNumComputations - startNumComputations),
                     stopTime - startTime));
         }
 

@@ -26,20 +26,20 @@ public class Config {
 
     public Config(final List<Entry> entries) {
         this.entries = entries;
-        final Entry localNodeEntry = new Entry("127.0.0.1", false, false, 1.0, 1.0, false, false);
-        entries.add(localNodeEntry);
-
-        this.localNode = localNodeEntry.getNode();
 
         int numPreTrustedNodes = 0;
         for (final Entry entry : this.entries)
             numPreTrustedNodes += entry.isPreTrusted() ? 1 : 0;
 
-        LOGGER.info(String.format("Found %d nodes (%d pre-trusted)", this.entries.size(), numPreTrustedNodes));
-
         this.nodes = new NodeCollection();
         for (final Entry entry : this.entries)
             this.nodes.update(entry.getNode(), NodeStatus.ACTIVE);
+
+        final Entry localNodeEntry = new Entry("127.0.0.1", false, false, 1.0, 1.0, false, false);
+        this.entries.add(localNodeEntry);
+        this.localNode = localNodeEntry.getNode();
+
+        LOGGER.info(String.format("Found %d nodes (%d pre-trusted)", this.entries.size(), numPreTrustedNodes));
     }
 
     public List<Entry> getEntries() { return this.entries; }

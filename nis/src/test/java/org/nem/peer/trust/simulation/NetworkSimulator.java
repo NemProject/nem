@@ -44,10 +44,9 @@ public class NetworkSimulator {
     private final Config config;
 
     /**
-     * The trust provider (node that this is only EigenTrust
-     * for additional diagnostics).
+     * The trust provider.
      */
-    private final EigenTrust trustProvider;
+    private final TrustProvider trustProvider;
 
     /**
      * The last set of global trust values.
@@ -64,7 +63,7 @@ public class NetworkSimulator {
 	 * @param trustProvider The trust provider to use.
 	 * @param minTrust The minimum trust we have in every node.
 	 */
-	public NetworkSimulator(final Config config, final EigenTrust trustProvider, final double minTrust) {
+	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
         if (minTrust <= 0.0 || minTrust > 1.0)
             throw new InvalidParameterException("min trust must be in the range (0, 1]");
 
@@ -76,12 +75,6 @@ public class NetworkSimulator {
             new NodeExperiences(),
             new PreTrustedNodes(config.getPreTrustedNodes()));
 	}
-
-    public double getConvergencePercentage() {
-        final long numConvergences = trustProvider.getNumConvergences();
-        final long numAttempts = trustProvider.getNumComputations();
-        return numConvergences * 100.0 / numAttempts;
-    }
 
     public double getFailedPercentage() {
         final long totalCalls = this.successfulCalls + this.failedCalls;
