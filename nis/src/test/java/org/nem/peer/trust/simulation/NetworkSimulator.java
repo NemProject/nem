@@ -76,7 +76,8 @@ public class NetworkSimulator {
             TrustUtils.toNodeArray(config.getNodes(), config.getLocalNode()),
             config.getLocalNode(),
             new NodeExperiences(),
-            new PreTrustedNodes(config.getPreTrustedNodes()));
+            new PreTrustedNodes(config.getPreTrustedNodes()),
+            new TrustParameters());
 	}
 
     public double getFailedPercentage() {
@@ -206,7 +207,8 @@ public class NetworkSimulator {
             peers,
             node,
             this.trustContext.getNodeExperiences(),
-            this.trustContext.getPreTrustedNodes());
+            this.trustContext.getPreTrustedNodes(),
+            this.trustContext.getParams());
 
         final NodeSelector basicNodeSelector = new BasicNodeSelector(
             new ActiveNodeTrustProvider(

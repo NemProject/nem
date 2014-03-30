@@ -17,15 +17,21 @@ public class TrustContextTest {
         final Node[] nodes = new Node[] { localNode };
         final NodeExperiences nodeExperiences = new NodeExperiences();
         final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
+        final TrustParameters params = new TrustParameters();
 
         // Act:
-        final TrustContext context = new TrustContext(nodes, localNode, nodeExperiences, preTrustedNodes);
+        final TrustContext context = new TrustContext(
+            nodes,
+            localNode,
+            nodeExperiences,
+            preTrustedNodes,
+            params);
 
         // Assert:
         Assert.assertThat(context.getNodes(), IsSame.sameInstance(nodes));
         Assert.assertThat(context.getLocalNode(), IsSame.sameInstance(localNode));
         Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(nodeExperiences));
         Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
-        Assert.assertThat(context.getParams(), IsNot.not(IsEqual.equalTo(null)));
+        Assert.assertThat(context.getParams(), IsSame.sameInstance(params));
     }
 }

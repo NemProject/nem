@@ -2,7 +2,7 @@ package org.nem.peer;
 
 import net.minidev.json.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.trust.PreTrustedNodes;
+import org.nem.peer.trust.*;
 
 import java.util.*;
 
@@ -16,6 +16,7 @@ public class Config {
 
     private final Node localNode;
     private final PreTrustedNodes preTrustedNodes;
+    private final TrustParameters trustParameters;
 
     /**
      * Creates a new configuration object from a JSON configuration object.
@@ -26,6 +27,7 @@ public class Config {
         final JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
         this.localNode = parseLocalNode(deserializer);
         this.preTrustedNodes = parseWellKnownPeers(deserializer);
+        this.trustParameters = getDefaultTrustParameters();
     }
 
     /**
@@ -49,6 +51,13 @@ public class Config {
      */
     public PreTrustedNodes getPreTrustedNodes() { return this.preTrustedNodes; }
 
+    /**
+     * Gets the trust parameters.
+     *
+     * @return The trust parameters.
+     */
+    public TrustParameters getTrustParameters() { return this.trustParameters; }
+
     private static Node parseLocalNode(final Deserializer deserializer) {
         return new Node(deserializer);
     }
@@ -61,5 +70,13 @@ public class Config {
             wellKnownNodes.add(new Node(endpoint, DEFAULT_PLATFORM, DEFAULT_APPLICATION));
 
         return new PreTrustedNodes(wellKnownNodes);
+    }
+
+    private static TrustParameters getDefaultTrustParameters() {
+        final TrustParameters params = new TrustParameters();
+        params.set("MAX_ITERATIONS", "10");
+        params.set("ALPHA", "0.05");
+        params.set("EPSILON", "0.001");
+        return params;
     }
 }

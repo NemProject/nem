@@ -4,7 +4,7 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.PreTrustedNodes;
+import org.nem.peer.trust.*;
 
 import java.net.URL;
 import java.util.*;
@@ -67,6 +67,20 @@ public class ConfigTest {
         // Assert:
         Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(0));
         Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(0));
+    }
+
+    @Test
+    public void trustParametersAreInitializedWithDefaultValues() {
+        // Arrange:
+        final Config config = createTestConfig();
+
+        // Act:
+        final TrustParameters params = config.getTrustParameters();
+
+        // Assert:
+        Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(10));
+        Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.05));
+        Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.001));
     }
 
     //region Factories

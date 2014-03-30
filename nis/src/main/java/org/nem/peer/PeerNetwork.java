@@ -2,7 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.scheduling.*;
-import org.nem.peer.trust.TrustContext;
+import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.*;
@@ -18,7 +18,6 @@ public class PeerNetwork {
     private final SchedulerFactory<Node> schedulerFactory;
 
     private final NodeExperiences nodeExperiences;
-    private final TrustContext trustContext;
 
     /**
      * Creates a new network with the specified configuration.
@@ -34,16 +33,6 @@ public class PeerNetwork {
         this.schedulerFactory = schedulerFactory;
 
         this.nodeExperiences = new NodeExperiences();
-
-        // TODO: additional integration necessary
-        this.trustContext = null;
-//        new TrustContext(
-//
-//        );
-//        final Node[] nodes,
-//        final Node localNode,
-//        final NodeExperiences nodeExperiences,
-//        final PreTrustedNodes preTrustedNodes
 
         for (final Node node : config.getPreTrustedNodes().getNodes())
             nodes.update(node, NodeStatus.INACTIVE);
@@ -62,6 +51,31 @@ public class PeerNetwork {
      * @return All nodes known to the network.
      */
     public NodeCollection getNodes() { return this.nodes; }
+
+    /**
+     * Gets a communication partner node.
+     *
+     * @return A communication partner node.
+     */
+    public NodeInfo getPartnerNode() {
+        final Node localNode = this.getLocalNode();
+
+        // create a new trust context each iteration in order to allow
+        // nodes to change in-between iterations.
+        final TrustContext context = new TrustContext(
+            TrustUtils.toNodeArray(this.nodes, localNode),
+            localNode,
+            this.nodeExperiences,
+            this.config.getPreTrustedNodes(),
+            this.config.getTrustParameters());
+
+        final NodeSelector basicNodeSelector = null;
+//        new BasicNodeSelector(
+//            new ActiveNodeTrustProvider(
+//                    new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
+//                    nodeCollection));
+        return basicNodeSelector.selectNode(context);
+    }
 
     /**
      * Refreshes the network.

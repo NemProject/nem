@@ -21,18 +21,20 @@ public class TrustContext {
      * @param localNode The local node.
      * @param nodeExperiences Node experiences information.
      * @param preTrustedNodes Pre-trusted node information.
+     * @param params Additional parameters associated with the trust context.
      */
     public TrustContext(
         final Node[] nodes,
         final Node localNode,
         final NodeExperiences nodeExperiences,
-        final PreTrustedNodes preTrustedNodes) {
+        final PreTrustedNodes preTrustedNodes,
+        final TrustParameters params) {
 
         this.nodes = nodes;
         this.localNode = localNode;
         this.nodeExperiences = nodeExperiences;
         this.preTrustedNodes = preTrustedNodes;
-        this.params = new TrustParameters();
+        this.params = params;
     }
 
     /**
