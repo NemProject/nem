@@ -44,6 +44,12 @@ public class NetworkSimulator {
     private final Config config;
 
     /**
+     * The trust provider (node that this is only EigenTrust
+     * for additional diagnostics).
+     */
+    private final EigenTrust trustProvider;
+
+    /**
      * The last set of global trust values.
      */
     private Vector globalTrustVector;
@@ -58,21 +64,22 @@ public class NetworkSimulator {
 	 * @param trustProvider The trust provider to use.
 	 * @param minTrust The minimum trust we have in every node.
 	 */
-	public NetworkSimulator(final Config config, final ScoreProvider trustProvider, final double minTrust) {
+	public NetworkSimulator(final Config config, final EigenTrust trustProvider, final double minTrust) {
         if (minTrust <= 0.0 || minTrust > 1.0)
             throw new InvalidParameterException("min trust must be in the range (0, 1]");
 
         this.config = config;
+        this.trustProvider = trustProvider;
 		this.trustContext = new TrustContext(
-            new Node[2],// TODO: config.getNodes(),
+            TrustUtils.toNodeArray(config.getNodes(), config.getLocalNode()),
             config.getLocalNode(),
             new NodeExperiences(),
             new PreTrustedNodes(config.getPreTrustedNodes()));
 	}
 
     public double getConvergencePercentage() {
-        final long numConvergences = 0;//TODO:this.trustContext.getNumGlobalTrustConvergences();
-        final long numAttempts = 0;//TODO:this.trustContext.getNumGlobalTrustCalculations();
+        final long numConvergences = trustProvider.getNumConvergences();
+        final long numAttempts = trustProvider.getNumComputations();
         return numConvergences * 100.0 / numAttempts;
     }
 
@@ -93,7 +100,7 @@ public class NetworkSimulator {
 		try {
 			File file = new File(outputFile);
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-//   TODO:         this.globalTrustVector = this.trustContext.compute();
+            this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
 			writeTrustValues(out, 0);
 
 			successfulCalls = 0;
@@ -103,8 +110,7 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i=0; i<numIterations; i++) {
 				doCommunications(peers);
-//      TODO:          this.trustContext.simulate();
-//		TODO:		this.globalTrustVector = this.trustContext.compute();
+                this.trustProvider.computeTrust(this.trustContext);
 				if (i % 100 == 9) {
 					writeTrustValues(out, i+1);
 				}
@@ -171,7 +177,6 @@ public class NetworkSimulator {
 	}
 
     private NodeBehavior getNodeBehavior(final Node node) {
-        // TODO: not efficient, but ok for the simulation
         for (final Config.Entry entry : this.config.getEntries()) {
             if (node.equals(entry.getNode()))
                 return entry.getBehavior();

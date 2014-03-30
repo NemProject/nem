@@ -7,10 +7,13 @@ import org.nem.peer.trust.score.TrustScores;
 /**
  * EigenTrust algorithm implementation.
  */
-public class EigenTrust {
+public class EigenTrust implements TrustProvider {
 
     private final TrustScores trustScores;
     private final org.nem.peer.trust.ScoreProvider scoreProvider;
+
+    private int numComputations;
+    private int numConvergences;
 
     /**
      * Creates a new eigen trust object using the default score provider.
@@ -58,12 +61,26 @@ public class EigenTrust {
     public TrustScores getTrustScores() { return this.trustScores; }
 
     /**
+     * Gets the number of computations.
+     *
+     * @return The number of computations.
+     */
+    public int getNumComputations() { return this.numComputations; }
+
+    /**
+     * Gets the number of computations that converged.
+     *
+     * @return The number of computations that converged.
+     */
+    public int getNumConvergences() { return this.numConvergences; }
+
+    /**
      * Updates the local trust values for the specified node using the specified context.
      *
      * @param node The node.
      * @param context The trust context.
      */
-    public void updateLocalTrust(final Node node, final TrustContext context) {
+    public void updateTrust(final Node node, final TrustContext context) {
         int index = 0;
         final Node[] nodes = context.getNodes();
         final Vector scoreVector = new Vector(nodes.length);
@@ -86,6 +103,43 @@ public class EigenTrust {
         scoreVector.normalize();
         this.trustScores.setScoreVector(node, nodes, scoreVector);
         this.trustScores.getScoreWeight(node).set(scoreWeight);
+    }
+
+    protected final void updateTrust(final TrustContext context) {
+        for (final Node node : context.getNodes())
+            this.updateTrust(node, context);
+    }
+
+    /**
+     * Calculates a trust score given a trust context.
+     *
+     * @param context The trust context.
+     * @return The global trust vector.
+     */
+    @Override
+    public Vector computeTrust(final TrustContext context) {
+        // (1) Compute the local trust values
+        this.updateTrust(context);
+
+        // (2) Compute the global trust
+        return computeGlobalTrust(context);
+    }
+
+    // TODO: clean this up!
+    protected Vector computeGlobalTrust(final TrustContext context) {
+        final EigenTrustPowerIterator iterator = new EigenTrustPowerIterator(
+            context.getPreTrustedNodes().getPreTrustVector(context.getNodes()),
+            getTrustMatrix(context.getNodes()),
+            10,//Integer.parseInt(context.getParam("MAX_ITERATIONS")),
+            0.05, //Double.parseDouble(context.getParam("ALPHA")),
+            0.0001);//Double.parseDouble(context.getParam("EPSILON")));
+        iterator.run();
+
+        ++this.numComputations;
+        if (iterator.hasConverged())
+            ++this.numConvergences;
+
+        return iterator.getResult();
     }
 
     /**

@@ -52,7 +52,8 @@ public class EigenTrustPlusPlusTest {
         final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
         // Act:
-        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        trust.updateFeedback(nodes[1], nodes, experiences);
+        final Vector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -67,7 +68,8 @@ public class EigenTrustPlusPlusTest {
         final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
         // Act:
-        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        trust.updateFeedback(nodes[1], nodes, experiences);
+        final Vector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -88,7 +90,8 @@ public class EigenTrustPlusPlusTest {
         experiences.getNodeExperience(nodes[3], nodes[2]).successfulCalls().set(3);
 
         // Act:
-        final Vector vector = trust.calculateFeedbackCredibilityVector(nodes[1], nodes, experiences);
+        trust.updateFeedback(nodes[1], nodes, experiences);
+        final Vector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
         // Assert:
         Assert.assertThat(vector.getSize(), IsEqual.equalTo(4));

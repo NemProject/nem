@@ -52,7 +52,7 @@ public class EigenTrustTest {
         final Node localNode = context.getLocalNode();
 
         // Act:
-        trust.updateLocalTrust(localNode, context);
+        trust.updateTrust(localNode, context);
         final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
         final RealDouble sum = trustScores.getScoreWeight(localNode);
 
@@ -81,7 +81,7 @@ public class EigenTrustTest {
         testContext.setCallCounts(3, 4, 4); // 16
 
         // Act:
-        trust.updateLocalTrust(localNode, context);
+        trust.updateTrust(localNode, context);
         final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
         final RealDouble sum = trustScores.getScoreWeight(localNode);
 
@@ -113,7 +113,7 @@ public class EigenTrustTest {
         testContext.setCallCounts(3, 4, 4); // 16
 
         // Act:
-        trust.updateLocalTrust(localNode, context);
+        trust.updateTrust(localNode, context);
         final Matrix matrix = trust.getTrustMatrix(context.getNodes());
 
         // Assert:

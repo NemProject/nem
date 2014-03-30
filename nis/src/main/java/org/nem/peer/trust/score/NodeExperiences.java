@@ -2,8 +2,6 @@ package org.nem.peer.trust.score;
 
 import org.nem.peer.Node;
 import org.nem.peer.trust.Matrix;
-import org.nem.peer.trust.TrustProvider;
-import org.nem.peer.trust.Vector;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

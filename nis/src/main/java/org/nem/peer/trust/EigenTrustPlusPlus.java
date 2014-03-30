@@ -53,14 +53,14 @@ public class EigenTrustPlusPlus extends EigenTrust {
     }
 
     /**
-     * Calculates a feedback credibility vector.
+     * Updates the feedback credibility values for the specified node given the specified nodes
+     * and experiences.
      *
      * @param node The node.
-     * @param nodes The other nodes.
+     * @param nodes The nodes.
      * @param nodeExperiences The node experiences.
-     * @return The feedback credibility vector.
      */
-    public Vector calculateFeedbackCredibilityVector(final Node node, final Node[] nodes, final NodeExperiences nodeExperiences) {
+    public void updateFeedback(final Node node, final Node[] nodes, final NodeExperiences nodeExperiences) {
         final Matrix sharedExperiencesMatrix = nodeExperiences.getSharedExperienceMatrix(node, nodes);
 
         final Vector vector = new Vector(nodes.length);
@@ -93,7 +93,24 @@ public class EigenTrustPlusPlus extends EigenTrust {
             vector.setAt(i, Math.pow(1 - Math.sqrt(sum), 4));
         }
 
-        return vector;
+        this.credibilityScores.setScoreVector(node, nodes, vector);
+    }
+
+    private void updateFeedback(final TrustContext context) {
+        for (final Node node : context.getNodes())
+            this.updateFeedback(node, context.getNodes(), context.getNodeExperiences());
+    }
+
+    @Override
+    public Vector computeTrust(final TrustContext context) {
+        // (1) Compute the local trust values
+        this.updateTrust(context);
+
+        // (2) Compute the local feedback credibility values
+        this.updateFeedback(context);
+
+        // (3) Compute the global trust
+        return computeGlobalTrust(context);
     }
 
     /**
