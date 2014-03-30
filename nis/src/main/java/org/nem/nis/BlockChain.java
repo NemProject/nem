@@ -12,6 +12,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
@@ -218,7 +219,7 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		Block commonBlock = peerLastBlock;
 		if (val > 0) {
 			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
-			// no point no continue
+			// no point to continue
 			if (commonBlock == null) {
 				return;
 			}
@@ -260,7 +261,7 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 				return;
 			}
 
-			AccountAnalyzer contemporaryAccountAnalyzer = accountAnalyzer;
+			AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 			if (this.getLastBlockHeight() > peerHeight) {
 				// TODO: create duplicate of account analyzer
 				// revert transactions "on the copy"
@@ -279,17 +280,22 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 
 			long wantedHeight = peerHeight + 1;
 			for (Block block : peerChain) {
-				if (block.getHeight() != wantedHeight) {
+				if (block.getHeight() != wantedHeight ||
+						! block.verify() ||
+						! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
 					// TODO: PENALTY for node
-					break;
+					return;
 				}
-				if (! block.verify()) {
-					// TODO: PENALTY for node
-					break;
-				}
-				if (! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
-					// TODO: PENALTY for node
-					break;
+
+				for (Transaction transaction : block.getTransactions()) {
+					if (! transaction.isValid()) {
+						// TODO: PENALTY for node
+						return;
+					}
+					if (! transaction.verify()) {
+						// TODO: PENALTY for node
+						return;
+					}
 				}
 
 				parentBlock = block;

@@ -32,6 +32,19 @@ public class AccountAnalyzer implements AccountLookup {
 		mapByAddressId = new HashMap<>();
 	}
 
+	public AccountAnalyzer(AccountAnalyzer rhs) {
+		mapByPublicKey = new HashMap<>();
+		mapByAddressId = new HashMap<>();
+
+		for (Map.Entry<String, Account> pair : rhs.mapByAddressId.entrySet()) {
+			mapByAddressId.put(pair.getKey(), new Account(pair.getValue()));
+		}
+
+		for (Map.Entry<PublicKey, Account> pair : rhs.mapByPublicKey.entrySet()) {
+			mapByPublicKey.put(pair.getKey(), new Account(pair.getValue()));
+		}
+	}
+
 	private Account addAccountToCacheImpl(final PublicKey publicKey, final String encodedAddress) {
 		Account account = findByAddressImpl(publicKey, encodedAddress);
 		if (account == null) {
