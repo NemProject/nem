@@ -283,7 +283,6 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 					// TODO: PENALTY for node
 					break;
 				}
-				// TODO: there is some issue probably with mappers
 				if (! block.verify()) {
 					// TODO: PENALTY for node
 					break;
@@ -482,7 +481,9 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 			synchronized (BlockChain.class) {
 				for (Account forger : unlockedAccounts) {
 					Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
-					newBlock.addTransactions(transactionList);
+					if (transactionList.size() > 0) {
+						newBlock.addTransactions(transactionList);
+					}
 
 					newBlock.sign();
 
