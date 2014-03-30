@@ -182,14 +182,14 @@ public class NodeExperiencesTest {
         experiences.getNodeExperience(nodes[0], nodes[1]).successfulCalls().set(7);
 
         // Act:
-        final List<NodeInfo> nodeInfoList = experiences.getNodeExperiences(nodes[0]);
+        final List<NodeExperiencePair> pairs = experiences.getNodeExperiences(nodes[0]);
 
         // Assert:
-        Assert.assertThat(nodeInfoList.size(), IsEqual.equalTo(2));
-        NodeInfo pair1 = nodeInfoList.get(0);
-        NodeInfo pair2 = nodeInfoList.get(1);
+        Assert.assertThat(pairs.size(), IsEqual.equalTo(2));
+        NodeExperiencePair pair1 = pairs.get(0);
+        NodeExperiencePair pair2 = pairs.get(1);
         if (pair1.getNode().equals(nodes[3])) {
-            final NodeInfo temp = pair1;
+            final NodeExperiencePair temp = pair1;
             pair1 = pair2;
             pair2 = temp;
         }
@@ -209,12 +209,12 @@ public class NodeExperiencesTest {
 
         experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().set(6);
 
-        final List<NodeInfo> nodeInfoList = new ArrayList<>();
-        nodeInfoList.add(new NodeInfo(nodes[3], createNodeExperience(2)));
-        nodeInfoList.add(new NodeInfo(nodes[1], createNodeExperience(11)));
+        final List<NodeExperiencePair> pairs = new ArrayList<>();
+        pairs.add(new NodeExperiencePair(nodes[3], createNodeExperience(2)));
+        pairs.add(new NodeExperiencePair(nodes[1], createNodeExperience(11)));
 
         // Act:
-        experiences.setNodeExperiences(nodes[0], nodeInfoList);
+        experiences.setNodeExperiences(nodes[0], pairs);
 
         // Assert:
         Assert.assertThat(

@@ -41,10 +41,10 @@ public class BasicNodeSelectorTest {
         final NodeSelector selector = new BasicNodeSelector(new MockTrustProvider(vector));
 
         // Act:
-        final NodeInfo info = selector.selectNode(context);
+        final NodeExperiencePair pair = selector.selectNode(context);
 
         // Assert:
-        Assert.assertThat(info.getNode(), IsSame.sameInstance(otherNode));
-        Assert.assertThat(info.getExperience(), IsSame.sameInstance(experience));
+        Assert.assertThat(pair.getNode(), IsSame.sameInstance(otherNode));
+        Assert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
     }
 }

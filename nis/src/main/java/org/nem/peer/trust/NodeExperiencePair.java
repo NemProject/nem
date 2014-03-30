@@ -5,9 +5,8 @@ import org.nem.peer.trust.score.NodeExperience;
 
 /**
  * A Node and NodeExperience pair.
- * TODO: rename to NodeExperiencePair
  */
-public class NodeInfo {
+public class NodeExperiencePair {
 
     private final Node node;
     private final NodeExperience experience;
@@ -18,7 +17,7 @@ public class NodeInfo {
      * @param node The node.
      * @param experience The node experience.
      */
-    public NodeInfo(final Node node, final NodeExperience experience) {
+    public NodeExperiencePair(final Node node, final NodeExperience experience) {
         this.node = node;
         this.experience = experience;
     }

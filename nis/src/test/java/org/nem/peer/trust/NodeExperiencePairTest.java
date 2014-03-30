@@ -6,7 +6,7 @@ import org.nem.core.test.Utils;
 import org.nem.peer.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
-public class NodeInfoTest {
+public class NodeExperiencePairTest {
 
     @Test
     public void nodeInfoCanBeCreated() {
@@ -15,10 +15,10 @@ public class NodeInfoTest {
         final NodeExperience experience = new NodeExperience();
 
         // Act:
-        final NodeInfo info = new NodeInfo(node, experience);
+        final NodeExperiencePair pair = new NodeExperiencePair(node, experience);
 
         // Assert:
-        Assert.assertThat(info.getNode(), IsSame.sameInstance(node));
-        Assert.assertThat(info.getExperience(), IsSame.sameInstance(experience));
+        Assert.assertThat(pair.getNode(), IsSame.sameInstance(node));
+        Assert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
     }
 }

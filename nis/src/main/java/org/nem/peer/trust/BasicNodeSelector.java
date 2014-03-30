@@ -20,7 +20,7 @@ public class BasicNodeSelector implements NodeSelector {
     }
 
     @Override
-    public NodeInfo selectNode(final TrustContext context) {
+    public NodeExperiencePair selectNode(final TrustContext context) {
         final Vector trustVector = this.trustProvider.computeTrust(context);
         trustVector.normalize();
 
@@ -35,7 +35,7 @@ public class BasicNodeSelector implements NodeSelector {
                 continue;
 
             final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-            return new NodeInfo(nodes[i], experience);
+            return new NodeExperiencePair(nodes[i], experience);
         }
 
         throw new TrustException("No available peers found");

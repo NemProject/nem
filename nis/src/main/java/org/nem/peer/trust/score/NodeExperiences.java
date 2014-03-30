@@ -1,8 +1,7 @@
 package org.nem.peer.trust.score;
 
 import org.nem.peer.Node;
-import org.nem.peer.trust.Matrix;
-import org.nem.peer.trust.NodeInfo;
+import org.nem.peer.trust.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,24 +79,24 @@ public class NodeExperiences {
      * @param node The node for which to get experience information.
      * @return All experience information for node.
      */
-    public List<NodeInfo> getNodeExperiences(final Node node) {
-        final List<NodeInfo> nodeInfoList = new ArrayList<>();
+    public List<NodeExperiencePair> getNodeExperiences(final Node node) {
+        final List<NodeExperiencePair> pairs = new ArrayList<>();
         final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(node);
         for (final Map.Entry<Node, NodeExperience> entry : experiences.entrySet())
-            nodeInfoList.add(new NodeInfo(entry.getKey(), entry.getValue()));
+            pairs.add(new NodeExperiencePair(entry.getKey(), entry.getValue()));
 
-        return nodeInfoList;
+        return pairs;
     }
 
     /**
      * Sets experience information for node.
      *
      * @param node The node for which to set experience information.
-     * @param nodeInfoList The experience information for node.
+     * @param pairs The experience information for node.
      */
-    public void setNodeExperiences(final Node node, final List<NodeInfo> nodeInfoList) {
+    public void setNodeExperiences(final Node node, final List<NodeExperiencePair> pairs) {
         final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(node);
-        for (final NodeInfo info : nodeInfoList)
-            experiences.put(info.getNode(), info.getExperience());
+        for (final NodeExperiencePair pair : pairs)
+            experiences.put(pair.getNode(), pair.getExperience());
     }
 }

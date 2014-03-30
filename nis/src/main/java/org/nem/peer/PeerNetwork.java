@@ -58,7 +58,7 @@ public class PeerNetwork {
      *
      * @return A communication partner node.
      */
-    public NodeInfo getPartnerNode() {
+    public NodeExperiencePair getPartnerNode() {
         // create a new trust context each iteration in order to allow
         // nodes to change in-between iterations.
         final TrustContext context = new TrustContext(

@@ -8,7 +8,7 @@ import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.NodeInfo;
+import org.nem.peer.trust.NodeExperiencePair;
 
 import java.util.*;
 
@@ -317,10 +317,10 @@ public class PeerNetworkTest {
         network.refresh();
 
         // Act:
-        final NodeInfo info = network.getPartnerNode();
+        final NodeExperiencePair pair = network.getPartnerNode();
 
         // Assert:
-        Assert.assertThat(info.getNode().getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("10.0.0.2"));
+        Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("10.0.0.2"));
     }
 
     //endregion

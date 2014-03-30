@@ -11,5 +11,5 @@ public interface NodeSelector {
      * @param context The trust context.
      * @return Information about the selected node.
      */
-    public NodeInfo selectNode(final TrustContext context);
+    public NodeExperiencePair selectNode(final TrustContext context);
 }
