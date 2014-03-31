@@ -210,8 +210,8 @@ public class NodeExperiencesTest {
         experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().set(6);
 
         final List<NodeExperiencePair> pairs = new ArrayList<>();
-        pairs.add(new NodeExperiencePair(nodes[3], createNodeExperience(2)));
-        pairs.add(new NodeExperiencePair(nodes[1], createNodeExperience(11)));
+        pairs.add(new NodeExperiencePair(nodes[3], Utils.createNodeExperience(2)));
+        pairs.add(new NodeExperiencePair(nodes[1], Utils.createNodeExperience(11)));
 
         // Act:
         experiences.setNodeExperiences(nodes[0], pairs);
@@ -223,12 +223,6 @@ public class NodeExperiencesTest {
         Assert.assertThat(
             experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().get(),
             IsEqual.equalTo(2L));
-    }
-
-    private static NodeExperience createNodeExperience(final long numSuccessfulCalls) {
-        final NodeExperience experience = new NodeExperience();
-        experience.successfulCalls().set(numSuccessfulCalls);
-        return experience;
     }
 
     //endregion

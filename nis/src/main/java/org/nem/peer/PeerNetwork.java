@@ -5,6 +5,7 @@ import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -25,17 +26,33 @@ public class PeerNetwork {
      * @param config The network configuration.
      * @param connector The peer connector to use.
      * @param schedulerFactory The node scheduler factory to use.
+     * @param nodeExperiences The node experiences to use.
      */
-    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
+    public PeerNetwork(
+        final Config config,
+        final PeerConnector connector,
+        final SchedulerFactory<Node> schedulerFactory,
+        final NodeExperiences nodeExperiences) {
+
         this.config = config;
         this.nodes = new NodeCollection();
         this.connector = connector;
         this.schedulerFactory = schedulerFactory;
-
-        this.nodeExperiences = new NodeExperiences();
+        this.nodeExperiences = nodeExperiences;
 
         for (final Node node : config.getPreTrustedNodes().getNodes())
             nodes.update(node, NodeStatus.INACTIVE);
+    }
+
+    /**
+     * Creates a new network with the specified configuration.
+     *
+     * @param config The network configuration.
+     * @param connector The peer connector to use.
+     * @param schedulerFactory The node scheduler factory to use.
+     */
+    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
+        this(config, connector, schedulerFactory, new NodeExperiences());
     }
 
     /**
@@ -51,6 +68,30 @@ public class PeerNetwork {
      * @return All nodes known to the network.
      */
     public NodeCollection getNodes() { return this.nodes; }
+
+    /**
+     * Gets the local node and information about its current experiences.
+     *
+     * @return The local node and information about its current experiences.
+     */
+    public NodeExperiencesPair getLocalNodeAndExperiences() {
+        final Node localNode = this.getLocalNode();
+        return new NodeExperiencesPair(
+            localNode,
+            this.nodeExperiences.getNodeExperiences(localNode));
+    }
+
+    /**
+     * Sets the experiences for the specified remote node.
+     *
+     * @param pair A node and experiences pair for a remote node.
+     */
+    public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
+        if (this.getLocalNode().equals(pair.getNode()))
+            throw new InvalidParameterException("cannot set local node experiences");
+
+        this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
+    }
 
     /**
      * Gets a communication partner node.

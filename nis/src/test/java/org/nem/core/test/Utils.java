@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.*;
+import org.nem.peer.trust.score.NodeExperience;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -289,5 +290,17 @@ public class Utils {
             nodes[i] = org.nem.core.test.Utils.createNodeWithPort(80 + i);
 
         return nodes;
+    }
+
+    /**
+     * Creates a new node experience with the specified number of calls.
+     *
+     * @param numSuccessfulCalls The number of successful calls.
+     * @return The node experience.
+     */
+    public static NodeExperience createNodeExperience(final long numSuccessfulCalls) {
+        final NodeExperience experience = new NodeExperience();
+        experience.successfulCalls().set(numSuccessfulCalls);
+        return experience;
     }
 }

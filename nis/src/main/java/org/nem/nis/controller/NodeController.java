@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.serialization.Deserializer;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.*;
+import org.nem.peer.trust.NodeExperiencesPair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +47,11 @@ public class NodeController {
     @RequestMapping(value="/node/ping", method = RequestMethod.POST)
     public String ping(@RequestBody String body) {
         final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-        final Node node = new Node(deserializer);
-        getNetwork().getNodes().update(node, NodeStatus.ACTIVE);
+        final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);
+
+        final PeerNetwork network = getNetwork();
+        network.getNodes().update(pair.getNode(), NodeStatus.ACTIVE);
+        network.setRemoteNodeExperiences(pair);
         return Utils.jsonOk();
     }
 
