@@ -26,6 +26,7 @@ public class AmountTest {
 
         // Assert:
         Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11000000L));
+        Assert.assertThat(amount.getNumNem(), IsEqual.equalTo(11L));
     }
 
     @Test
@@ -35,6 +36,7 @@ public class AmountTest {
 
         // Assert:
         Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11L));
+        Assert.assertThat(amount.getNumNem(), IsEqual.equalTo(0L));
     }
 
     //endregion
@@ -63,6 +65,18 @@ public class AmountTest {
 
         // Assert:
         Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(1L));
+    }
+
+    //endregion
+
+    //region
+
+    @Test
+    public void getNumNemRoundsDownToTheNearestWholeNem() {
+        // Assert:
+        Assert.assertThat(Amount.fromMicroNem(11000000L).getNumNem(), IsEqual.equalTo(11L));
+        Assert.assertThat(Amount.fromMicroNem(11000001L).getNumNem(), IsEqual.equalTo(11L));
+        Assert.assertThat(Amount.fromMicroNem(11999999L).getNumNem(), IsEqual.equalTo(11L));
     }
 
     //endregion

@@ -86,7 +86,7 @@ public class Amount implements Comparable<Amount> {
     public long getNumMicroNem() { return this.amount; }
 
 	/**
-	 * Returns the number of NEM.
+	 * Returns the number of NEM (rounded down to the nearest NEM).
 	 *
 	 * @return The number of NEM.
 	 */
