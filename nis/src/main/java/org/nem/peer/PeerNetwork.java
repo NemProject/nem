@@ -1,6 +1,9 @@
 package org.nem.peer;
 
+import org.nem.core.model.Block;
+import org.nem.core.model.HashUtils;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.nis.BlockChain;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
@@ -14,13 +17,14 @@ import java.util.*;
 public class PeerNetwork {
 
     private final Config config;
-    private NodeCollection nodes;
+	private NodeCollection nodes;
     private final PeerConnector connector;
     private final SchedulerFactory<Node> schedulerFactory;
+	private final BlockSynchronizer blockSynchronizer;
 
     private final NodeExperiences nodeExperiences;
 
-    /**
+	/**
      * Creates a new network with the specified configuration.
      *
      * @param config The network configuration.
@@ -38,6 +42,7 @@ public class PeerNetwork {
         this.nodes = new NodeCollection();
         this.connector = connector;
         this.schedulerFactory = schedulerFactory;
+		this.blockSynchronizer = blockSynchronizer;
         this.nodeExperiences = nodeExperiences;
 
         for (final Node node : config.getPreTrustedNodes().getNodes())
@@ -149,6 +154,17 @@ public class PeerNetwork {
         scheduler.block();
     }
 
+	public void synchronize() {
+		Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
+			@Override
+			public void execute(final Node element) {
+				blockSynchronizer.synchronizeNode(connector, element);
+			}
+		});
+		scheduler.push(this.nodes.getActiveNodes());
+		scheduler.block();
+	}
+
 	private static class NodeRefresher {
         final NodeCollection nodes;
         final PeerConnector connector;
@@ -176,9 +192,10 @@ public class PeerNetwork {
 
             for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
                 this.nodes.update(entry.getKey(), entry.getValue());
-        }
 
-        private void refreshNode(final Node node) {
+		}
+
+		private void refreshNode(final Node node) {
             Node refreshedNode = node;
             NodeStatus updatedStatus = NodeStatus.ACTIVE;
             try {
@@ -228,5 +245,5 @@ public class PeerNetwork {
                 this.update(node, status);
             }
         }
-    }
+	}
 }

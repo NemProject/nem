@@ -13,7 +13,6 @@ import org.nem.core.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.HexEncoder;
-import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -24,8 +23,6 @@ public class NisMain {
 
     private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
     private static byte[] GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
-
-    private PeerNetworkHost networkHost;
 
 	@Autowired
 	private AccountDao accountDao;
@@ -38,6 +35,9 @@ public class NisMain {
 
 	@Autowired
 	private BlockChain blockChain;
+
+    @Autowired
+    private NisPeerNetworkHost networkHost;
 
 	private void analyzeBlocks() {
 		Long curBlockId;
@@ -71,11 +71,11 @@ public class NisMain {
 
 		this.populateDb();
 
+		this.blockChain.bootup();
+
 		this.analyzeBlocks();
 
-		this.networkHost = PeerNetworkHost.getDefaultHost();
-
-		this.blockChain.bootup();
+        this.networkHost.boot();
 	}
 
     private static void logGenesisInformation() {

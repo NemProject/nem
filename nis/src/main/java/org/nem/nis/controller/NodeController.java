@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.serialization.Deserializer;
+import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.peer.*;
 import org.nem.peer.trust.NodeExperiencesPair;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 public class NodeController {
 
     @Autowired
+    private NisPeerNetworkHost host;
+    
+    @Autowired
     private AccountAnalyzer accountAnalyzer;
 
     /**
@@ -23,7 +27,7 @@ public class NodeController {
      */
     @RequestMapping(value="/node/info", method = RequestMethod.GET)
     public String getInfo() {
-    	final Node node = getNetwork().getLocalNode();
+    	final Node node = this.host.getNetwork().getLocalNode();
         return ControllerUtils.serialize(node);
     }
 
@@ -34,7 +38,7 @@ public class NodeController {
      */
     @RequestMapping(value="/node/peer-list", method = RequestMethod.GET)
     public String getPeerList() {
-    	final NodeCollection nodes = getNetwork().getNodes();
+    	final NodeCollection nodes = this.host.getNetwork().getNodes();
         return ControllerUtils.serialize(nodes);
     }
 
@@ -53,9 +57,5 @@ public class NodeController {
         network.getNodes().update(pair.getNode(), NodeStatus.ACTIVE);
         network.setRemoteNodeExperiences(pair);
         return Utils.jsonOk();
-    }
-
-    private static PeerNetwork getNetwork() {
-        return PeerNetworkHost.getDefaultHost().getNetwork();
     }
 }

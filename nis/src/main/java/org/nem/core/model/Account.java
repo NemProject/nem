@@ -37,7 +37,17 @@ public class Account {
 		this.messages = new ArrayList<>();
 	}
 
-    /**
+	public Account(Account account) {
+		this.keyPair = null == account.keyPair ? null : (account.getKeyPair().getPrivateKey() != null ? new KeyPair(account.getKeyPair().getPrivateKey()) : new KeyPair(account.getKeyPair().getPublicKey()));
+		this.address = account.getAddress();
+		// TODO: for now do not clone messages...
+		this.messages = new ArrayList<>();
+
+		this.label = null == account.getLabel() ? null : new String(account.getLabel());
+		this.balance = new Amount(account.getBalance().getNumMicroNem());
+	}
+
+	/**
      * Gets the account's key pair.
      *
      * @return The account's key pair.

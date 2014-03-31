@@ -10,15 +10,6 @@ import org.nem.peer.trust.NodeExperiencesPair;
 public class PeerNetworkHostTest {
 
     @Test
-    public void defaultHostCanBeCreated() {
-        // Arrange:
-        final PeerNetworkHost host = PeerNetworkHost.getDefaultHost();
-
-        // Assert:
-        Assert.assertThat(host, IsNot.not(IsEqual.equalTo(null)));
-    }
-
-    @Test
     public void hostCanBeCreatedAroundCustomNetwork() throws Exception {
         // Arrange:
         final PeerNetwork network = new MockPeerNetwork();
@@ -127,7 +118,7 @@ public class PeerNetworkHostTest {
         }
 
         public MockPeerNetwork(final Object refreshMonitor) {
-            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory());
+            super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
             this.refreshMonitor = refreshMonitor;
         }
 

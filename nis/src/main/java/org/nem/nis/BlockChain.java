@@ -12,10 +12,10 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
-import org.nem.peer.NodeApiId;
-import org.nem.peer.PeerNetworkHost;
+import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -36,8 +36,12 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class BlockChain {
+public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	// 500_000_000 nems have force to generate block every minute
+	public static final long MAGIC_MULTIPLIER = 614891469L;
+	//
+	public static final long ESTIMATED_BLOCKS_PER_DAY = 1440;
 
 	@Autowired
 	private AccountDao accountDao;
@@ -50,11 +54,14 @@ public class BlockChain {
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-	private ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
+    @Autowired
+    private NisPeerNetworkHost host;
+
+	private final ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
 	// this should be somewhere else
-	private ConcurrentHashSet<Account> unlockedAccounts;
+	private final ConcurrentHashSet<Account> unlockedAccounts;
 
 	// for now it's easier to keep it like this
 	org.nem.core.dbmodel.Block lastBlock;
@@ -63,7 +70,7 @@ public class BlockChain {
 		this.unconfirmedTransactions = new ConcurrentHashMap<>();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 10, 10, TimeUnit.SECONDS);
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 5, 3, TimeUnit.SECONDS);
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 	}
@@ -96,6 +103,11 @@ public class BlockChain {
 		return unconfirmedTransactions;
 	}
 
+	@Override
+	public void close() {
+		this.blockGeneratorExecutor.shutdownNow();
+	}
+
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) {
 		this.transferDao = transferDao;
@@ -118,6 +130,196 @@ public class BlockChain {
 	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
+
+		Block block = BlockMapper.toModel(lastBlock, accountAnalyzer);
+	}
+
+
+	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.core.dbmodel.Block dbBlock) {
+		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
+			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), dbBlock.getBlockHash())) {
+				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public enum SynchronizeCompareStatus {
+		EVIL_NODE,
+		EQUAL_BLOCKS,
+		OUR_CHAIN_IS_BETTER,
+		PEER_CHAIN_IS_BETTER,
+	}
+
+	public SynchronizeCompareStatus sychronizeCompareAt(Block peerBlock, long lowerHeight) {
+		if (! peerBlock.verify()) {
+			// TODO: penalty for node
+			return SynchronizeCompareStatus.EVIL_NODE;
+		}
+
+		org.nem.core.dbmodel.Block ourBlock = blockDao.findByHeight(lowerHeight);
+
+		if (synchronizeCompareBlocks(peerBlock, ourBlock)) {
+			return SynchronizeCompareStatus.EQUAL_BLOCKS;
+		}
+
+		long peerScore = calcBlockScore(peerBlock);
+		long ourScore = calcDbBlockScore(ourBlock);
+		if (peerScore < ourScore) {
+			return SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER;
+		}
+
+		return SynchronizeCompareStatus.OUR_CHAIN_IS_BETTER;
+	}
+
+	private boolean validateBlock(Block block, Block parentBlock, AccountAnalyzer contemporaryAccountAnalyzer) {
+		if (block.getTimeStamp().compareTo(parentBlock.getTimeStamp()) < 0) {
+			return false;
+		}
+
+		Account forgerAccount = contemporaryAccountAnalyzer.findByAddress(block.getSigner().getAddress());
+		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
+			return false;
+		}
+
+		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parentBlock.getSignature().getBytes(), 2, 10));
+		TimeInstant blockTimeStamp = block.getTimeStamp();
+		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
+		BigInteger target = calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
+
+		if (hit.compareTo(target) >= 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public void synchronizeNode(PeerConnector connector, Node node) {
+		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
+		if (peerLastBlock == null) {
+			return;
+		}
+
+		if (this.synchronizeCompareBlocks(peerLastBlock, lastBlock)) {
+			return;
+		}
+
+		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
+		long lowerHeight = Math.min(peerLastBlock.getHeight(), this.getLastBlockHeight());
+
+		// if node is far behind, reject it, not to allow too deep
+		// rewrites of blockchain...
+		if (val < -(ESTIMATED_BLOCKS_PER_DAY / 2)) {
+			return;
+		}
+
+		Block commonBlock = peerLastBlock;
+		if (val > 0) {
+			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
+			// no point to continue
+			if (commonBlock == null) {
+				return;
+			}
+		}
+
+		SynchronizeCompareStatus status = this.sychronizeCompareAt(commonBlock, lowerHeight);
+
+		if (status == SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER) {
+			// TODO: find common block
+			// remember to check it height diff < halfday
+			// update val
+			// update commonBlock
+			LOGGER.severe("finding common block not handled yet");
+			System.exit(-1);
+		}
+
+		switch (status) {
+			case EVIL_NODE:
+				// TODO: PENALTY for node
+				return;
+			case OUR_CHAIN_IS_BETTER:
+				// perfect nothing to do
+				return;
+			default:
+				break;
+		}
+
+		if (status == SynchronizeCompareStatus.EQUAL_BLOCKS) {
+			long peerHeight = commonBlock.getHeight();
+
+			// if 'common' block is peer's last one it simply means we have longer chain
+			if (peerHeight == peerLastBlock.getHeight()) {
+				return;
+			}
+
+			org.nem.core.dbmodel.Block ourDbBlock = blockDao.findByHeight(peerHeight);
+			if (ourDbBlock == null) {
+				// probably would be strange if that would happen
+				return;
+			}
+
+			AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+			if (this.getLastBlockHeight() > peerHeight) {
+				// TODO: create duplicate of account analyzer
+				// revert transactions "on the copy"
+				LOGGER.severe("virtual chain not handled yet");
+				System.exit(-1);
+			}
+
+			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
+			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY/2)) {
+				// TODO: PENALTY for node
+				return;
+			}
+
+			// do not trust peer, take block from our db and convert it
+			Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+
+			long wantedHeight = peerHeight + 1;
+			for (Block block : peerChain) {
+				if (block.getHeight() != wantedHeight ||
+						! block.verify() ||
+						! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
+					// TODO: PENALTY for node
+					return;
+				}
+
+				for (Transaction transaction : block.getTransactions()) {
+					if (! transaction.isValid()) {
+						// TODO: PENALTY for node
+						return;
+					}
+					if (! transaction.verify()) {
+						// TODO: PENALTY for node
+						return;
+					}
+				}
+
+				parentBlock = block;
+
+				wantedHeight += 1;
+			}
+		}
+	}
+
+	/**
+	 * Calculates "target" basing on the inputs
+	 *
+	 * @param parentTimeStamp timestamp of parent block
+	 * @param blockTimeStamp timestamp or current block
+	 * @param forgerEffectiveBallance - effective balance used to forage
+	 *
+	 * @return The target.
+	 */
+	private BigInteger calculateTarget(TimeInstant parentTimeStamp, TimeInstant blockTimeStamp, long forgerEffectiveBallance) {
+		return BigInteger.valueOf(blockTimeStamp.subtract(parentTimeStamp)).multiply(
+				BigInteger.valueOf(forgerEffectiveBallance).multiply(
+						BigInteger.valueOf(MAGIC_MULTIPLIER)
+				)
+		);
 	}
 
 	/**
@@ -157,7 +359,6 @@ public class BlockChain {
 		unlockedAccounts.add(account);
 	}
 
-
 	/**
 	 * Checks if passed block is correct, and if eligible adds it to db
 	 *
@@ -180,12 +381,12 @@ public class BlockChain {
 			parent = blockDao.findByHash(parentHash);
 		}
 
-		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
-
 		// if we don't have parent, we can't do anything with this block
 		if (parent == null) {
 			return false;
 		}
+
+		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
 
 		if (block.getTimeStamp().compareTo(parentTimeStamp) < 0) {
 			return false;
@@ -212,18 +413,15 @@ public class BlockChain {
 			return false;
 		}
 
-
 		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (Amount.ZERO.compareTo(forgerAccount.getBalance()) < 1) {
+		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
 			return false;
 		}
 
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
-		BigInteger target = BigInteger.valueOf(block.getTimeStamp().subtract(parentTimeStamp)).multiply(
-                BigInteger.valueOf(forgerAccount.getBalance().getNumMicroNem()).multiply(
-                        BigInteger.valueOf(30745)
-                )
-        );
+		TimeInstant blockTimeStamp = block.getTimeStamp();
+		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
+		BigInteger target = calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
@@ -235,7 +433,6 @@ public class BlockChain {
 		// 2. remove transactions from unconfirmed transactions.
 		// run account analyzer?
 	}
-
 
 	// not sure where it should be
 	private boolean addBlockToDb(Block bestBlock) {
@@ -279,10 +476,6 @@ public class BlockChain {
 				return;
 			}
 
-			if (unconfirmedTransactions.size() == 0) {
-				return;
-			}
-
 			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 			Block bestBlock = null;
@@ -294,7 +487,9 @@ public class BlockChain {
 			synchronized (BlockChain.class) {
 				for (Account forger : unlockedAccounts) {
 					Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
-					newBlock.addTransactions(transactionList);
+					if (transactionList.size() > 0) {
+						newBlock.addTransactions(transactionList);
+					}
 
 					newBlock.sign();
 
@@ -309,18 +504,14 @@ public class BlockChain {
 					}
 
 					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
-					BigInteger target = BigInteger.valueOf(newBlock.getTimeStamp().subtract(new TimeInstant(lastBlock.getTimestamp()))).multiply(
-                            BigInteger.valueOf(realAccout.getBalance().getNumMicroNem()).multiply(
-                                    BigInteger.valueOf(30745)
-                            )
-                    );
+					long effectiveBalance = realAccout.getBalance().getNumNem();
+					BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
 
 					System.out.println("   hit: 0x" + hit.toString(16));
 					System.out.println("target: 0x" + target.toString(16));
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
-
 
 						long score = calcBlockScore(newBlock);
 						if (score < bestScore) {
@@ -341,10 +532,12 @@ public class BlockChain {
 				// fork resolution will handle that)
 				//
 				if (addBlockToDb(bestBlock)) {
-					unconfirmedTransactions.clear();
+					for (Transaction transaction : bestBlock.getTransactions()) {
+						ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+						unconfirmedTransactions.remove(transactionHash);
+					}
 
-					PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
-					peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
+					host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
 				}
 			}
 		}

@@ -71,7 +71,7 @@ public class PeerNetworkTest {
     public void getLocalNodeReturnsConfigLocalNode() {
         // Act:
         final Config config = createTestConfig();
-        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory());
+        final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
 
         // Assert:
         Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
@@ -386,7 +386,7 @@ public class PeerNetworkTest {
             // configure a MockScheduler to be returned by the second (broadcast) createScheduler request
             // (the first request is for the network call that initially makes everything active)
             final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory(new MockScheduler(), 1);
-            final PeerNetwork network = new PeerNetwork(createTestConfig(), connector, schedulerFactory);
+            final PeerNetwork network = new PeerNetwork(createTestConfig(), connector, schedulerFactory, new MockBlockSynchronizer());
             final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
 
             // monitor that is signaled when MockScheduler.push is entered
@@ -569,7 +569,7 @@ public class PeerNetworkTest {
     //region factories
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-        return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory());
+        return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
     }
 
     private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {

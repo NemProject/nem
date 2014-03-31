@@ -30,7 +30,17 @@ public enum NodeApiId {
 	REST_PUSH_BLOCK,
 
     /**
-     * The chain API.
+     * The chain API - last block.
      */
-    REST_CHAIN
+    REST_CHAIN_LAST_BLOCK,
+
+	/**
+	 * The chain API - block at height
+	 */
+	REST_CHAIN_BLOCK_AT,
+
+	/**
+	 * get blocks after
+	 */
+	REST_CHAIN_BLOCKS_AFTER
 }

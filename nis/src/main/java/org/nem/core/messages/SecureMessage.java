@@ -72,5 +72,28 @@ public class SecureMessage extends Message {
         super.serialize(serializer);
         serializer.writeBytes("payload", this.payload);
     }
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof SecureMessage)) {
+			return false;
+		}
+
+		SecureMessage rhs = (SecureMessage)obj;
+		if (this.sender != rhs.sender) {
+			return false;
+		}
+
+		if (this.recipient != rhs.recipient) {
+			return false;
+		}
+		return this.payload.equals(rhs.payload);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.payload.hashCode();
+	}
 }
 
