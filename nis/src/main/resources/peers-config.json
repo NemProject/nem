@@ -11,7 +11,8 @@
 	"platform": "ZX Spectrum",
 
 	"knownPeers": [
-        { "protocol": "http", "host": "37.187.70.29", "port" : 7890 }
+        { "protocol": "http", "host": "37.187.70.29", "port" : 7890 },
+        { "protocol": "http", "host": "178.254.43.15", "port" : 7890 }
     ],
 
 	"_end": "end"
