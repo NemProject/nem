@@ -347,9 +347,9 @@ public class PeerNetworkTest {
         // Arrange:
         final MockPeerConnector connector = new MockPeerConnector();
         final PeerNetwork network = createTestNetwork(connector);
+        network.refresh(); // transition all nodes to active
 
         // Act:
-        network.refresh(); // transition all nodes to active
         network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
 
         // Assert:
@@ -362,14 +362,59 @@ public class PeerNetworkTest {
         final MockPeerConnector connector = new MockPeerConnector();
         final PeerNetwork network = createTestNetwork(connector);
         final SerializableEntity entity = new MockSerializableEntity();
+        network.refresh(); // transition all nodes to active
 
         // Act:
-        network.refresh(); // transition all nodes to active
         network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, entity);
 
         // Assert:
         Assert.assertThat(connector.getLastAnnounceId(), IsEqual.equalTo(NodeApiId.REST_PUSH_TRANSACTION));
         Assert.assertThat(connector.getLastAnnounceEntity(), IsEqual.equalTo(entity));
+    }
+
+    //endregion
+
+    //region synchronize
+
+    @Test
+    public void synchronizeDoesNotCallSynchronizeNodeForAnyInactiveNode() {
+        // Arrange:
+        final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
+        final PeerNetwork network = createTestNetwork(synchronizer);
+
+        // Act:
+        network.synchronize();
+
+        // Assert:
+        Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(0));
+    }
+
+    @Test
+    public void synchronizeCallsSynchronizeNodeForAllActiveNodes() {
+        // Arrange:
+        final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
+        final PeerNetwork network = createTestNetwork(synchronizer);
+        network.refresh(); // transition all nodes to active
+
+        // Act:
+        network.synchronize();
+
+        // Assert:
+        Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(3));
+    }
+
+    @Test
+    public void synchronizeForwardsValidParametersToSynchronizeNode() {
+        // Arrange:
+        final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
+        final PeerNetwork network = createTestNetwork(synchronizer);
+        network.refresh(); // transition all nodes to active
+
+        // Act:
+        network.synchronize();
+
+        // Assert:
+        Assert.assertThat(synchronizer.getLastConnector(), IsNot.not(IsEqual.equalTo(null)));
     }
 
     //endregion
@@ -568,12 +613,29 @@ public class PeerNetworkTest {
 
     //region factories
 
+    private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
+        return new PeerNetwork(
+            createTestConfig(),
+            new MockPeerConnector(),
+            new MockNodeSchedulerFactory(),
+            synchronizer);
+    }
+
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-        return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
+        return new PeerNetwork(
+            createTestConfig(),
+            connector,
+            new MockNodeSchedulerFactory(),
+            new MockBlockSynchronizer());
     }
 
     private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
-        return new PeerNetwork(createTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer(), nodeExperiences);
+        return new PeerNetwork(
+            createTestConfig(),
+            new MockPeerConnector(),
+            new MockNodeSchedulerFactory(),
+            new MockBlockSynchronizer(),
+            nodeExperiences);
     }
 
     private static PeerNetwork createTestNetwork() {
