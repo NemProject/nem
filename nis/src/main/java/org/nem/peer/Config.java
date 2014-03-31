@@ -33,17 +33,23 @@ public class Config {
         this.trustProvider = getDefaultTrustProvider();
     }
 
-	public static Config loadConfig(final String configFileName) {
+    /**
+     * Loads configuration from a file.
+     *
+     * @param configFileName The configuration file name.
+     * @return The configuration.
+     */
+	public static Config fromFile(final String configFileName) {
 		try {
 			try (final InputStream fin = Config.class.getClassLoader().getResourceAsStream(configFileName)) {
 				if (null == fin)
-					throw new FatalConfigExeception(String.format("Configuration file <%s> not available", configFileName));
+					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
 
 				return new Config((JSONObject)JSONValue.parse(fin));
 			}
 		}
 		catch (Exception e) {
-			throw new FatalConfigExeception("Exception encountered while loading config", e);
+			throw new FatalConfigException("Exception encountered while loading config", e);
 		}
 	}
 
@@ -108,23 +114,17 @@ public class Config {
         return new LowComTrustProvider(new EigenTrust(), 30);
     }
 
-	static class FatalConfigExeception extends RuntimeException {
+    /**
+     * A fatal configuration exception.
+     */
+	private static class FatalConfigException extends RuntimeException {
 		/**
 		 * Creates a new config exception.
 		 *
 		 * @param message The exception message.
 		 */
-		public FatalConfigExeception(final String message) {
+		public FatalConfigException(final String message) {
 			super(message);
-		}
-
-		/**
-		 * Creates a new config exception.
-		 *
-		 * @param cause The exception message.
-		 */
-		public FatalConfigExeception(Throwable cause) {
-			super(cause);
 		}
 
 		/**
@@ -133,9 +133,8 @@ public class Config {
 		 * @param message The exception message.
 		 * @param cause The original exception.
 		 */
-		public FatalConfigExeception(final String message, Throwable cause) {
+		public FatalConfigException(final String message, Throwable cause) {
 			super(message, cause);
 		}
-
 	}
 }
