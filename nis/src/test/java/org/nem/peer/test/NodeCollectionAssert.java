@@ -5,9 +5,7 @@ import org.nem.core.test.IsEquivalent;
 import org.nem.peer.Node;
 import org.nem.peer.NodeCollection;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Static class containing asserts that are used to validate NodeCollection objects.
@@ -41,16 +39,33 @@ public class NodeCollectionAssert {
      * Asserts that nodes have matching active and inactive ports.
      *
      * @param nodes The nodes.
-     * @param expectedActiveHosts The expected active ports.
-     * @param expectedInactiveHosts The expected inactive ports.
+     * @param expectedActivePorts The expected active ports.
+     * @param expectedInactivePorts The expected inactive ports.
      */
     public static void arePortsEquivalent(
         final NodeCollection nodes,
-        final Integer[] expectedActiveHosts,
-        final Integer[] expectedInactiveHosts) {
+        final Integer[] expectedActivePorts,
+        final Integer[] expectedInactivePorts) {
         // Assert:
-        Assert.assertThat(getPorts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
-        Assert.assertThat(getPorts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
+        Assert.assertThat(getPorts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePorts));
+        Assert.assertThat(getPorts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePorts));
+    }
+
+    /**
+     * Asserts that nodes have matching ports.
+     *
+     * @param nodes The nodes.
+     * @param expectedPorts The expected ports.
+     */
+    public static void arePortsEquivalent(
+        final Node[] nodes,
+        final Integer[] expectedPorts) {
+        // Arrange:
+        final List<Node> nodesList = new ArrayList<>();
+        Collections.addAll(nodesList, nodes);
+
+        // Assert:
+        Assert.assertThat(getPorts(nodesList), IsEquivalent.equivalentTo(expectedPorts));
     }
 
     private static List<Integer> getPorts(final Collection<Node> nodes) {

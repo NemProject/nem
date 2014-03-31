@@ -2,8 +2,10 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.Utils;
 import org.nem.peer.test.*;
+import org.nem.peer.trust.NodeExperiencesPair;
 
 public class PeerNetworkHostTest {
 
@@ -96,10 +98,29 @@ public class PeerNetworkHostTest {
         }
     }
 
+    @Test
+    public void refreshCallsBroadcastWithLocalNode() throws Exception {
+        // Arrange:
+        final MockPeerNetwork network = new MockPeerNetwork();
+        try (final PeerNetworkHost ignored = new PeerNetworkHost(network, 10, 100)) {
+            // Arrange:
+            Thread.sleep(25);
+            final NodeExperiencesPair broadcastEntity = (NodeExperiencesPair)network.getLastBroadcastEntity();
+
+            // Assert:
+            Assert.assertThat(network.getNumBroadcastCalls(), IsEqual.equalTo(1));
+            Assert.assertThat(network.getLastBroadcastId(), IsEqual.equalTo(NodeApiId.REST_NODE_PING));
+            Assert.assertThat(broadcastEntity.getNode(), IsSame.sameInstance(network.getLocalNode()));
+        }
+    }
+
     private static class MockPeerNetwork extends PeerNetwork {
 
-        final Object refreshMonitor;
-        int numRefreshCalls;
+        private final Object refreshMonitor;
+        private int numRefreshCalls;
+        private int numBroadcastCalls;
+        private NodeApiId lastBroadcastId;
+        private SerializableEntity lastBroadcastEntity;
 
         public MockPeerNetwork() {
             this(null);
@@ -110,15 +131,24 @@ public class PeerNetworkHostTest {
             this.refreshMonitor = refreshMonitor;
         }
 
-        public int getNumRefreshCalls() { return this.numRefreshCalls; }
+        public int getNumRefreshCalls() { return this.numRefreshCalls; } 
+        public int getNumBroadcastCalls() { return this.numBroadcastCalls; }
+        public NodeApiId getLastBroadcastId() { return this.lastBroadcastId; }
+        public SerializableEntity getLastBroadcastEntity() { return this.lastBroadcastEntity; }
 
         @Override
         public void refresh() {
             if (null != this.refreshMonitor)
                 Utils.monitorWait(this.refreshMonitor);
 
-            ++numRefreshCalls;
-            super.refresh();
+            ++this.numRefreshCalls;
+        }
+
+        @Override
+        public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+            ++this.numBroadcastCalls;
+            this.lastBroadcastId = broadcastId;
+            this.lastBroadcastEntity = entity;
         }
     }
 }

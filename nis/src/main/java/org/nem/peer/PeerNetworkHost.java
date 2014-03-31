@@ -59,6 +59,7 @@ public class PeerNetworkHost implements AutoCloseable {
             public void run() {
                 LOGGER.info("Refreshing network");
                 network.refresh();
+                network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences());
             }
         }, refreshInitialDelay, refreshInterval, TimeUnit.MILLISECONDS);
     }

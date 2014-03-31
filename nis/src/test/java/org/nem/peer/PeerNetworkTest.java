@@ -8,7 +8,10 @@ import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
+import org.nem.peer.trust.*;
+import org.nem.peer.trust.score.*;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 
 public class PeerNetworkTest {
@@ -75,8 +78,6 @@ public class PeerNetworkTest {
     }
 
     //endregion
-
-    //region refresh
 
     //region getInfo
 
@@ -305,6 +306,27 @@ public class PeerNetworkTest {
 
     //endregion
 
+    //region getPartnerNode
+
+    @Test
+    public void getPartnerNodeReturnsActiveNode() {
+        // Arrange:
+        final MockPeerConnector connector = new MockPeerConnector();
+        final PeerNetwork network = createTestNetwork(connector);
+        connector.setGetInfoError("10.0.0.1", MockPeerConnector.TriggerAction.INACTIVE);
+        connector.setGetInfoError("10.0.0.3", MockPeerConnector.TriggerAction.FATAL);
+
+        network.refresh();
+
+        // Act:
+        final NodeExperiencePair pair = network.getPartnerNode();
+
+        // Assert:
+        Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("10.0.0.2"));
+    }
+
+    //endregion
+
     //region broadcast
 
     @Test
@@ -463,10 +485,95 @@ public class PeerNetworkTest {
 
     //endregion
 
+    //region getLocalNodeAndExperiences / setRemoteNodeExperiences
+
+    @Test
+    public void getLocalNodeAndExperiencesIncludesLocalNode() {
+        // Arrange:
+        final PeerNetwork network = createTestNetwork();
+
+        // Act:
+        final NodeExperiencesPair pair = network.getLocalNodeAndExperiences();
+
+        // Assert:
+        Assert.assertThat(pair.getNode(), IsSame.sameInstance(network.getLocalNode()));
+    }
+
+    @Test
+    public void getLocalNodeAndExperiencesIncludesLocalNodeExperiences() {
+        // Arrange:
+        final NodeExperiences experiences = new NodeExperiences();
+        final PeerNetwork network = createTestNetwork(experiences);
+        final Node localNode = network.getLocalNode();
+        final Node otherNode1 = Utils.createNodeWithPort(91);
+        final Node otherNode2 = Utils.createNodeWithPort(97);
+
+        experiences.getNodeExperience(localNode, otherNode1).successfulCalls().set(14);
+        experiences.getNodeExperience(localNode, otherNode2).successfulCalls().set(7);
+
+        // Act:
+        final List<NodeExperiencePair> localNodeExperiences = network.getLocalNodeAndExperiences().getExperiences();
+
+        NodeExperiencePair pair1 = localNodeExperiences.get(0);
+        NodeExperiencePair pair2 = localNodeExperiences.get(1);
+        if (pair1.getNode().equals(otherNode2)) {
+            final NodeExperiencePair temp = pair1;
+            pair1 = pair2;
+            pair2 = temp;
+        }
+
+        // Assert:
+        Assert.assertThat(pair1.getNode(), IsEqual.equalTo(otherNode1));
+        Assert.assertThat(pair1.getExperience().successfulCalls().get(), IsEqual.equalTo(14L));
+        Assert.assertThat(pair2.getNode(), IsEqual.equalTo(otherNode2));
+        Assert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void cannotBatchSetLocalExperiences() {
+        // Arrange:
+        final NodeExperiences experiences = new NodeExperiences();
+        final PeerNetwork network = createTestNetwork(experiences);
+        final List<NodeExperiencePair> pairs = new ArrayList<>();
+        pairs.add(new NodeExperiencePair(Utils.createNodeWithPort(81), Utils.createNodeExperience(14)));
+        pairs.add(new NodeExperiencePair(Utils.createNodeWithPort(83), Utils.createNodeExperience(44)));
+
+        // Act:
+        network.setRemoteNodeExperiences(new NodeExperiencesPair(network.getLocalNode(), pairs));
+    }
+
+    @Test
+    public void canBatchSetRemoteExperiences() {
+        // Arrange:
+        final NodeExperiences experiences = new NodeExperiences();
+        final PeerNetwork network = createTestNetwork(experiences);
+
+        final Node remoteNode = Utils.createNodeWithPort(1);
+        final Node otherNode1 = Utils.createNodeWithPort(81);
+        final Node otherNode2 = Utils.createNodeWithPort(83);
+
+        final List<NodeExperiencePair> pairs = new ArrayList<>();
+        pairs.add(new NodeExperiencePair(otherNode1, Utils.createNodeExperience(14)));
+        pairs.add(new NodeExperiencePair(otherNode2, Utils.createNodeExperience(44)));
+
+        // Act:
+        network.setRemoteNodeExperiences(new NodeExperiencesPair(remoteNode, pairs));
+        final NodeExperience experience1 = experiences.getNodeExperience(remoteNode, otherNode1);
+        final NodeExperience experience2 = experiences.getNodeExperience(remoteNode, otherNode2);
+
+        // Assert:
+        Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
+        Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
+    }
+
     //region factories
 
     private static PeerNetwork createTestNetwork(final PeerConnector connector) {
         return new PeerNetwork(createTestConfig(), connector, new MockNodeSchedulerFactory());
+    }
+
+    private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
+        return new PeerNetwork(createTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), nodeExperiences);
     }
 
     private static PeerNetwork createTestNetwork() {

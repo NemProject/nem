@@ -2,7 +2,10 @@ package org.nem.peer;
 
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.scheduling.*;
+import org.nem.peer.trust.*;
+import org.nem.peer.trust.score.NodeExperiences;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -15,6 +18,32 @@ public class PeerNetwork {
     private final PeerConnector connector;
     private final SchedulerFactory<Node> schedulerFactory;
 
+    private final NodeExperiences nodeExperiences;
+
+    /**
+     * Creates a new network with the specified configuration.
+     *
+     * @param config The network configuration.
+     * @param connector The peer connector to use.
+     * @param schedulerFactory The node scheduler factory to use.
+     * @param nodeExperiences The node experiences to use.
+     */
+    public PeerNetwork(
+        final Config config,
+        final PeerConnector connector,
+        final SchedulerFactory<Node> schedulerFactory,
+        final NodeExperiences nodeExperiences) {
+
+        this.config = config;
+        this.nodes = new NodeCollection();
+        this.connector = connector;
+        this.schedulerFactory = schedulerFactory;
+        this.nodeExperiences = nodeExperiences;
+
+        for (final Node node : config.getPreTrustedNodes().getNodes())
+            nodes.update(node, NodeStatus.INACTIVE);
+    }
+
     /**
      * Creates a new network with the specified configuration.
      *
@@ -23,13 +52,7 @@ public class PeerNetwork {
      * @param schedulerFactory The node scheduler factory to use.
      */
     public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
-        this.config = config;
-        this.nodes = new NodeCollection();
-        this.connector = connector;
-        this.schedulerFactory = schedulerFactory;
-
-        for (final NodeEndpoint endpoint : config.getWellKnownPeers())
-            nodes.update(new Node(endpoint, "Unknown", "Unknown"), NodeStatus.INACTIVE);
+        this(config, connector, schedulerFactory, new NodeExperiences());
     }
 
     /**
@@ -45,6 +68,60 @@ public class PeerNetwork {
      * @return All nodes known to the network.
      */
     public NodeCollection getNodes() { return this.nodes; }
+
+    /**
+     * Gets the local node and information about its current experiences.
+     *
+     * @return The local node and information about its current experiences.
+     */
+    public NodeExperiencesPair getLocalNodeAndExperiences() {
+        final Node localNode = this.getLocalNode();
+        return new NodeExperiencesPair(
+            localNode,
+            this.nodeExperiences.getNodeExperiences(localNode));
+    }
+
+    /**
+     * Sets the experiences for the specified remote node.
+     *
+     * @param pair A node and experiences pair for a remote node.
+     */
+    public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
+        if (this.getLocalNode().equals(pair.getNode()))
+            throw new InvalidParameterException("cannot set local node experiences");
+
+        this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
+    }
+
+    /**
+     * Gets a communication partner node.
+     * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested
+     *
+     * @return A communication partner node.
+     */
+    public NodeExperiencePair getPartnerNode() {
+        // create a new trust context each iteration in order to allow
+        // nodes to change in-between iterations.
+        final TrustContext context = new TrustContext(
+            this.getNodeArray(),
+            this.getLocalNode(),
+            this.nodeExperiences,
+            this.config.getPreTrustedNodes(),
+            this.config.getTrustParameters());
+
+        final NodeSelector basicNodeSelector = getNodeSelector();
+        return basicNodeSelector.selectNode(context);
+    }
+
+    private Node[] getNodeArray() {
+        return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
+    }
+
+    private NodeSelector getNodeSelector() {
+        // wrap the configured trust provider in an ActiveNodeTrustProvider to ensure that
+        // only active nodes are returned as communication partners
+        return new BasicNodeSelector(new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes));
+    }
 
     /**
      * Refreshes the network.
