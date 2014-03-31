@@ -53,7 +53,7 @@ public class NodeController {
         final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
         final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);
 
-        final PeerNetwork network = getNetwork();
+        final PeerNetwork network = this.host.getNetwork();
         network.getNodes().update(pair.getNode(), NodeStatus.ACTIVE);
         network.setRemoteNodeExperiences(pair);
         return Utils.jsonOk();

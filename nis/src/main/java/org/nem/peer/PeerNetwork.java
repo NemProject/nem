@@ -36,6 +36,7 @@ public class PeerNetwork {
         final Config config,
         final PeerConnector connector,
         final SchedulerFactory<Node> schedulerFactory,
+		final BlockSynchronizer blockSynchronizer,
         final NodeExperiences nodeExperiences) {
 
         this.config = config;
@@ -56,8 +57,8 @@ public class PeerNetwork {
      * @param connector The peer connector to use.
      * @param schedulerFactory The node scheduler factory to use.
      */
-    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
-        this(config, connector, schedulerFactory, new NodeExperiences());
+    public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory, final BlockSynchronizer blockSynchronizer) {
+        this(config, connector, schedulerFactory,blockSynchronizer, new NodeExperiences());
     }
 
     /**

@@ -573,7 +573,7 @@ public class PeerNetworkTest {
     }
 
     private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
-        return new PeerNetwork(createTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), nodeExperiences);
+        return new PeerNetwork(createTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer(), nodeExperiences);
     }
 
     private static PeerNetwork createTestNetwork() {
