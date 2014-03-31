@@ -62,6 +62,7 @@
     </bean>
 
     <bean class="org.nem.nis.BlockChain" />
+    <bean class="org.nem.nis.Foraging" />
     <bean class="org.nem.nis.AccountAnalyzer" />
     <bean class="org.nem.nis.NisMain" />
     <bean class="org.nem.nis.NisPeerNetworkHost" />

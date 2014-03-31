@@ -13,7 +13,6 @@ import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.BlockChain;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,12 +20,12 @@ import java.util.List;
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
 	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;
-	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
-	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.dbmodel.Account dbSender = new org.nem.core.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-	private static org.nem.core.dbmodel.Account dbRecipient1 = new org.nem.core.dbmodel.Account(recipient1.getAddress().getEncoded(), null);
-	private static org.nem.core.dbmodel.Account dbRecipient2 = new org.nem.core.dbmodel.Account(recipient2.getAddress().getEncoded(), null);
+	private static org.nem.core.model.Account SENDER = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
+	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static org.nem.core.dbmodel.Account DB_SENDER = new org.nem.core.dbmodel.Account(SENDER.getAddress().getEncoded(), SENDER.getKeyPair().getPublicKey());
+	private static org.nem.core.dbmodel.Account DB_RECIPIENT1 = new org.nem.core.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
+	private static org.nem.core.dbmodel.Account DB_RECIPIENT2 = new org.nem.core.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
 
 	@Test
@@ -45,174 +44,18 @@ public class BlockChainTest {
 		Assert.assertThat(blockChain.getLastBlockSignature(), IsEqual.equalTo(block.getForgerProof()));
 	}
 
-	@Test
-	public void processTransactionsSavesTransactions() throws InterruptedException {
-		// Arrange:
-		Transaction tx = dummyTransaction(recipient1, 12345);
-		BlockChain blockChain = new MockBlockChain();
-		tx.sign();
-
-		// Act:
-		blockChain.processTransaction(tx);
-
-		// Assert:
-		Assert.assertThat(blockChain.getUnconfirmedTransactions().size(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void processTransactionsDoesNotSaveDuplicates() throws InterruptedException {
-		// Arrange:
-		Transaction tx = dummyTransaction(recipient1, 12345);
-		BlockChain blockChain = new MockBlockChain();
-		tx.sign();
-
-		// Act:
-		blockChain.processTransaction(tx);
-		blockChain.processTransaction(tx);
-
-		// Assert:
-		Assert.assertThat(blockChain.getUnconfirmedTransactions().size(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void canProcessTransaction() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new MockBlockChain();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-
-		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
-		transaction.sign();
-		boolean result = blockChain.processTransaction(transaction);
-
-		// Assert:
-		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result, IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void cannotProcessSameTransaction() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new MockBlockChain();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-
-		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
-		transaction.sign();
-
-		boolean result1 = blockChain.processTransaction(transaction);
-		boolean result2 = blockChain.processTransaction(transaction);
-
-		// Assert:
-		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void transactionsForNewBlockHappenedBeforeBlock() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new MockBlockChain();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
-
-		// Act:
-		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, new Amount(123), null);
-		transaction1.sign();
-		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, new Amount(123), null);
-		transaction2.sign();
-
-		boolean result1 = blockChain.processTransaction(transaction1);
-		boolean result2 = blockChain.processTransaction(transaction2);
-
-		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(10));
-
-		// Assert
-		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
-		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void transactionsForNewBlockAreSortedByFee() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new MockBlockChain();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
-
-		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(10));
-		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
-		transaction2.sign();
-
-		boolean result1 = blockChain.processTransaction(transaction1);
-		boolean result2 = blockChain.processTransaction(transaction2);
-
-		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
-
-		// Assert
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
-		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
-		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
-	}
-
-	@Test
-	public void transactionsForNewBlockAreSortedByTime() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final BlockChain blockChain = new MockBlockChain();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
-
-		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
-		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
-		transaction2.sign();
-
-		boolean result1 = blockChain.processTransaction(transaction1);
-		boolean result2 = blockChain.processTransaction(transaction2);
-
-		List<Transaction> transactionsList = blockChain.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
-
-		// Assert
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
-		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
-		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
-	}
-
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), sender, recipient, new Amount(amount), null);
+		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), SENDER, recipient, new Amount(amount), null);
 	}
 
 	private Block createDummyDbBlock() {
-		Transaction tx1 = dummyTransaction(recipient1, RECIPIENT1_AMOUNT);
-		Transaction tx2 = dummyTransaction(recipient2, RECIPIENT2_AMOUNT);
+		Transaction tx1 = dummyTransaction(RECIPIENT1, RECIPIENT1_AMOUNT);
+		Transaction tx2 = dummyTransaction(RECIPIENT2, RECIPIENT2_AMOUNT);
 		tx1.sign();
 		tx2.sign();
 
 		org.nem.core.model.Block b = new org.nem.core.model.Block(
-				sender,
+				SENDER,
 				new byte[32],
 				time.getCurrentTime(),
 				1L
@@ -233,7 +76,7 @@ public class BlockChainTest {
 				},
 				HashUtils.calculateHash(b),
 				0, // timestamp
-				dbSender,
+				DB_SENDER,
 				// proof
 				b.getSignature().getBytes(),
 				b.getHeight(), // height
@@ -249,10 +92,10 @@ public class BlockChainTest {
 				0L,
 				0, // timestamp
 				0, // deadline
-				dbSender,
+				DB_SENDER,
 				// proof
 				tx1.getSignature().getBytes(),
-				dbRecipient1,
+				DB_RECIPIENT1,
 				0, // index
 				RECIPIENT1_AMOUNT,
 				0L // referenced tx
@@ -266,10 +109,10 @@ public class BlockChainTest {
 				0L,
 				0, // timestamp
 				0, // deadline
-				dbSender,
+				DB_SENDER,
 				// proof
 				tx1.getSignature().getBytes(),
-				dbRecipient2,
+				DB_RECIPIENT2,
 				0, // index
 				RECIPIENT2_AMOUNT,
 				0L // referenced tx

@@ -6,7 +6,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.BlockChain;
+import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetwork;
@@ -23,7 +23,7 @@ public class TransferController {
 	AccountAnalyzer accountAnalyzer;
 
 	@Autowired
-	private BlockChain blockChain;
+	private Foraging foraging;
 
     @Autowired
     private NisPeerNetworkHost host;
@@ -58,7 +58,7 @@ public class TransferController {
             final PeerNetwork network = this.host.getNetwork();
 
 			// add to unconfirmed transactions
-			if (blockChain.processTransaction(transfer)) {
+			if (foraging.processTransaction(transfer)) {
 
 				// propagate transactions
 				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);

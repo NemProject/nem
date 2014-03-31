@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class BlockChain implements AutoCloseable, BlockSynchronizer {
+public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	// 500_000_000 nems have force to generate block every minute
 	public static final long MAGIC_MULTIPLIER = 614891469L;
@@ -49,30 +49,16 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 	@Autowired
 	private BlockDao blockDao;
 
-	private TransferDao transferDao;
-
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
     @Autowired
     private NisPeerNetworkHost host;
 
-	private final ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
-	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
-
-	// this should be somewhere else
-	private final ConcurrentHashSet<Account> unlockedAccounts;
-
 	// for now it's easier to keep it like this
 	org.nem.core.dbmodel.Block lastBlock;
 
 	public BlockChain() {
-		this.unconfirmedTransactions = new ConcurrentHashMap<>();
-
-		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(new BlockGenerator(), 5, 3, TimeUnit.SECONDS);
-
-		this.unlockedAccounts = new ConcurrentHashSet<>();
 	}
 
 	public void bootup() {
@@ -95,23 +81,14 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		return lastBlock.getForgerProof();
 	}
 
+	public int getLastBlockTimestamp() {
+		return lastBlock.getTimestamp();
+	}
+
 	public long getLastBlockScore() {
 		return calcDbBlockScore(lastBlock);
 	}
 
-	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
-		return unconfirmedTransactions;
-	}
-
-	@Override
-	public void close() {
-		this.blockGeneratorExecutor.shutdownNow();
-	}
-
-	@Autowired
-	public void setTransferDao(TransferDao transferDao) {
-		this.transferDao = transferDao;
-	}
 
 	private long calcDbBlockScore(org.nem.core.dbmodel.Block block) {
 		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
@@ -187,7 +164,7 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parentBlock.getSignature().getBytes(), 2, 10));
 		TimeInstant blockTimeStamp = block.getTimeStamp();
 		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
+		BigInteger target = Foraging.calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
@@ -305,59 +282,6 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		}
 	}
 
-	/**
-	 * Calculates "target" basing on the inputs
-	 *
-	 * @param parentTimeStamp timestamp of parent block
-	 * @param blockTimeStamp timestamp or current block
-	 * @param forgerEffectiveBallance - effective balance used to forage
-	 *
-	 * @return The target.
-	 */
-	private BigInteger calculateTarget(TimeInstant parentTimeStamp, TimeInstant blockTimeStamp, long forgerEffectiveBallance) {
-		return BigInteger.valueOf(blockTimeStamp.subtract(parentTimeStamp)).multiply(
-				BigInteger.valueOf(forgerEffectiveBallance).multiply(
-						BigInteger.valueOf(MAGIC_MULTIPLIER)
-				)
-		);
-	}
-
-	/**
-	 *
-	 * @param transaction - transaction that isValid() and verify()-ed
-	 * @return false if given transaction has already been seen, true if it has been added
-	 */
-	public boolean processTransaction(Transaction transaction) {
-
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		// rest is checked by isValid()
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
-			return false;
-		}
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
-			return false;
-		}
-
-		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
-
-		synchronized (BlockChain.class) {
-			Transfer tx = transferDao.findByHash(transactionHash.get());
-			if (tx != null) {
-				return false;
-			}
-		}
-
-		Transaction swapTest = unconfirmedTransactions.putIfAbsent(transactionHash, transaction);
-		if (swapTest != null) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public void addUnlockedAccount(Account account) {
-		unlockedAccounts.add(account);
-	}
 
 	/**
 	 * Checks if passed block is correct, and if eligible adds it to db
@@ -421,7 +345,7 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
 		TimeInstant blockTimeStamp = block.getTimeStamp();
 		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
+		BigInteger target = Foraging.calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
@@ -434,11 +358,10 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		// run account analyzer?
 	}
 
-	// not sure where it should be
-	private boolean addBlockToDb(Block bestBlock) {
+	public boolean addBlockToDb(Block bestBlock) {
 		synchronized (BlockChain.class) {
 
-            final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
+			final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block
@@ -453,93 +376,5 @@ public class BlockChain implements AutoCloseable, BlockSynchronizer {
 		} // synchronized
 
 		return true;
-	}
-
-
-	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTIme) {
-		Set<Transaction> sortedTransactions = new TreeSet<>();
-		synchronized (BlockChain.class) {
-			for (Transaction tx : unconfirmedTransactions.values()) {
-				if (tx.getTimeStamp().compareTo(blockTIme) < 0) {
-					sortedTransactions.add(tx);
-				}
-			}
-		}
-		return new ArrayList<>(sortedTransactions);
-	}
-
-	class BlockGenerator implements Runnable {
-
-		@Override
-		public void run() {
-			if (lastBlock == null) {
-				return;
-			}
-
-			LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
-
-			Block bestBlock = null;
-			long bestScore = Long.MAX_VALUE;
-			// because of access to unconfirmedTransactions, and lastBlock*
-
-			TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
-			List<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
-			synchronized (BlockChain.class) {
-				for (Account forger : unlockedAccounts) {
-					Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
-					if (transactionList.size() > 0) {
-						newBlock.addTransactions(transactionList);
-					}
-
-					newBlock.sign();
-
-					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
-
-					// dummy forging rule
-
-					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					Account realAccout = accountAnalyzer.findByAddress(forger.getAddress());
-					if (realAccout.getBalance().compareTo(Amount.ZERO) < 1) {
-						continue;
-					}
-
-					BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
-					long effectiveBalance = realAccout.getBalance().getNumNem();
-					BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
-
-					System.out.println("   hit: 0x" + hit.toString(16));
-					System.out.println("target: 0x" + target.toString(16));
-
-					if (hit.compareTo(target) < 0) {
-						System.out.println(" HIT ");
-
-						long score = calcBlockScore(newBlock);
-						if (score < bestScore) {
-							bestBlock = newBlock;
-							bestScore = score;
-						}
-					}
-
-				}
-			} // synchronized
-
-			if (bestBlock != null) {
-				//
-				// if we're here it means unconfirmed transactions haven't been
-				// seen in any block yet, so we can add this block to local db
-				//
-				// (if at some point later we receive better block,
-				// fork resolution will handle that)
-				//
-				if (addBlockToDb(bestBlock)) {
-					for (Transaction transaction : bestBlock.getTransactions()) {
-						ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
-						unconfirmedTransactions.remove(transactionHash);
-					}
-
-					host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-				}
-			}
-		}
 	}
 }

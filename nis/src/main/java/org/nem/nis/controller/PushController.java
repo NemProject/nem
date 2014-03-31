@@ -5,6 +5,7 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.transactions.TransactionFactory;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
+import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class PushController {
 	AccountAnalyzer accountAnalyzer;
 
 	@Autowired
+	private Foraging foraging;
+
+	@Autowired
 	private BlockChain blockChain;
 
     @Autowired
@@ -48,7 +52,7 @@ public class PushController {
 			final PeerNetwork network = this.host.getNetwork();
 
 			// add to unconfirmed transactions
-			if (this.blockChain.processTransaction(transaction))
+			if (this.foraging.processTransaction(transaction))
                 network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
 
 			return Utils.jsonOk();
@@ -71,7 +75,7 @@ public class PushController {
 			// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
 			// validate block, add to chain
-			blockChain.processBlock(block);
+			this.blockChain.processBlock(block);
 
 			// TODO: propagate block
 			//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
