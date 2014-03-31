@@ -9,6 +9,16 @@ import javax.persistence.Table;
 
 import javax.persistence.GenerationType;
 
+/**
+ * Db Account entity.
+ *
+ * Probably it should be called Address, as it's main purpose is to associate
+ * printableKey with publicKey.
+ *
+ * In future it should probably also two 'heights' of an Account,
+ * marking at what blockchain height has network 'learned' about
+ * Account NEM address (printableKey) and public key respectively.
+ */
 @Entity  
 @Table(name="accounts") 
 public class Account {

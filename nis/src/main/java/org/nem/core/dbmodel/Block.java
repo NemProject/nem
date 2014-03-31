@@ -5,6 +5,14 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Db Block entity.
+ *
+ * Holds all the important information related to block data.
+ *
+ * Associated forger and transactions are obtained automatically (by BlockDao)
+ * thanks to @Cascade annotations.
+ */
 @Entity
 @Table(name="blocks")
 public class Block {
