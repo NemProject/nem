@@ -330,7 +330,7 @@ public class TransferTransactionTest {
         final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
         final Account recipient = Utils.generateRandomAccount();
         final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
-        final Message message = new SecureMessage(sender, recipientPublicKeyOnly, new byte[] { 1, 2, 3 });
+        final Message message = SecureMessage.fromDecodedPayload(sender, recipientPublicKeyOnly, new byte[] { 1, 2, 3 });
         final TransferTransaction originalTransaction = createTransferTransaction(sender, recipientPublicKeyOnly, 1L, message);
 
         final MockAccountLookup accountLookup = new MockAccountLookup();
@@ -350,7 +350,7 @@ public class TransferTransactionTest {
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final Account messageSender = Utils.generateRandomAccount();
-        final Message message = new SecureMessage(messageSender, recipient, new byte[] { 1, 2, 3 });
+        final Message message = SecureMessage.fromDecodedPayload(messageSender, recipient, new byte[] { 1, 2, 3 });
         final TransferTransaction originalTransaction = createTransferTransaction(sender, recipient, 1L, message);
 
         final MockAccountLookup accountLookup = new MockAccountLookup();
