@@ -11,51 +11,51 @@ import java.math.BigInteger;
  */
 public class Curves {
 
-    static final Curve SECP256K1;
+	static final Curve SECP256K1;
 
-    static {
-        X9ECParameters params = SECNamedCurves.getByName("secp256k1");
-        ECDomainParameters ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
-        SECP256K1 = new Curve(ecParams, ecParams.getN().shiftRight(1));
-    }
+	static {
+		X9ECParameters params = SECNamedCurves.getByName("secp256k1");
+		ECDomainParameters ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
+		SECP256K1 = new Curve(ecParams, ecParams.getN().shiftRight(1));
+	}
 
-    /**
-     * Describes a curve.
-     */
-    public static class Curve {
-        final ECDomainParameters params;
-        final BigInteger halfCurveOrder;
+	/**
+	 * Describes a curve.
+	 */
+	public static class Curve {
+		final ECDomainParameters params;
+		final BigInteger halfCurveOrder;
 
-        private Curve(final ECDomainParameters params, final BigInteger halfCurveOrder) {
-            this.params = params;
-            this.halfCurveOrder = halfCurveOrder;
-        }
+		private Curve(final ECDomainParameters params, final BigInteger halfCurveOrder) {
+			this.params = params;
+			this.halfCurveOrder = halfCurveOrder;
+		}
 
-        /**
-         * Gets the curve parameters.
-         *
-         * @return The curve parameters.
-         */
-        public ECDomainParameters getParams() {
-            return this.params;
-        }
+		/**
+		 * Gets the curve parameters.
+		 *
+		 * @return The curve parameters.
+		 */
+		public ECDomainParameters getParams() {
+			return this.params;
+		}
 
-        /**
-         * Gets the curve half order.
-         *
-         * @return The curve half order.
-         */
-        public BigInteger getHalfCurveOrder() {
-            return this.halfCurveOrder;
-        }
-    }
+		/**
+		 * Gets the curve half order.
+		 *
+		 * @return The curve half order.
+		 */
+		public BigInteger getHalfCurveOrder() {
+			return this.halfCurveOrder;
+		}
+	}
 
-    /**
-     * Returns information about the secp256k1 curve.
-     *
-     * @return Information about the secp256k1 curve.
-     */
-    public static Curve secp256k1() {
-        return SECP256K1;
-    }
+	/**
+	 * Returns information about the secp256k1 curve.
+	 *
+	 * @return Information about the secp256k1 curve.
+	 */
+	public static Curve secp256k1() {
+		return SECP256K1;
+	}
 }

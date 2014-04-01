@@ -14,15 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BlockDaoImpl implements BlockDao
-{
+public class BlockDaoImpl implements BlockDao {
 	@Autowired
-    private SessionFactory sessionFactory;
-    
-    private Session getCurrentSession() {
-    	return sessionFactory.getCurrentSession();
-    }
-    
+	private SessionFactory sessionFactory;
+
+	private Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	@Override
 	@Transactional
 	public void save(Block block) {
@@ -51,16 +50,16 @@ public class BlockDaoImpl implements BlockDao
 	@Override
 	@Transactional
 	public Long count() {
-		return (Long) getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
+		return (Long)getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
 	@Override
 	@Transactional
 	public Block findById(long id) {
-        Query query = getCurrentSession()
-       		 .createQuery("from Block a where a.id = :id")
-       		 .setParameter("id", id);
-        return executeSingleBlockQuery(query);
+		Query query = getCurrentSession()
+				.createQuery("from Block a where a.id = :id")
+				.setParameter("id", id);
+		return executeSingleBlockQuery(query);
 	}
 
 	@Override
@@ -72,10 +71,10 @@ public class BlockDaoImpl implements BlockDao
 		return executeSingleBlockQuery(query);
 	}
 
-    private Block executeSingleBlockQuery(final Query query) {
-        final List<?> blockList = query.list();
-        return blockList.size() > 0 ? (Block)blockList.get(0) : null;
-    }
+	private Block executeSingleBlockQuery(final Query query) {
+		final List<?> blockList = query.list();
+		return blockList.size() > 0 ? (Block)blockList.get(0) : null;
+	}
 
 	/**
 	 * First try to find block using "shortId",
@@ -84,17 +83,17 @@ public class BlockDaoImpl implements BlockDao
 	@Override
 	@Transactional
 	public Block findByHash(byte[] blockHash) {
-        long blockId = ByteUtils.bytesToLong(blockHash);
-        Query query = getCurrentSession()
-                .createQuery("from Block a where a.shortId = :id")
-                .setParameter("id", blockId);
-        final List<?> blockList = query.list();
-        for (int i = 0; i< blockList.size(); ++i) {
-            Block block = (Block) blockList.get(i);
-            if (Arrays.equals(blockHash, block.getBlockHash())) {
-                return block;
-            }
-        }
-        return null;
+		long blockId = ByteUtils.bytesToLong(blockHash);
+		Query query = getCurrentSession()
+				.createQuery("from Block a where a.shortId = :id")
+				.setParameter("id", blockId);
+		final List<?> blockList = query.list();
+		for (int i = 0; i < blockList.size(); ++i) {
+			Block block = (Block)blockList.get(i);
+			if (Arrays.equals(blockHash, block.getBlockHash())) {
+				return block;
+			}
+		}
+		return null;
 	}
 }

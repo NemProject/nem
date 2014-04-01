@@ -6,10 +6,10 @@ package org.nem.peer.trust.score;
  */
 public class CredibilityScore extends Score {
 
-    /**
-     * Creates a new credibility score.
-     */
-    public CredibilityScore() {
-        super(1.0);
-    }
+	/**
+	 * Creates a new credibility score.
+	 */
+	public CredibilityScore() {
+		super(1.0);
+	}
 }

@@ -24,20 +24,21 @@ public class BlockController {
 	 * Obtain block from the block chain.
 	 *
 	 * @param blockHashString hash of a block
+	 *
 	 * @return block along with associated elements.
 	 */
-	@RequestMapping(value="/block/get", method = RequestMethod.GET)
+	@RequestMapping(value = "/block/get", method = RequestMethod.GET)
 	public String blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
 		final byte[] blockHash = HexEncoder.getBytes(blockHashString);
-        final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
+		final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
 		if (null == dbBlock)
 			return Utils.jsonError(2, "hash not found in the db");
 
 		final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer);
-        return ControllerUtils.serialize(block);
+		return ControllerUtils.serialize(block);
 	}
 
-	@RequestMapping(value="/block/at", method = RequestMethod.POST)
+	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
 	public String blockAt(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");

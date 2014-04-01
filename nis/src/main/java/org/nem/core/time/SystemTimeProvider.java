@@ -7,50 +7,51 @@ import java.util.*;
  */
 public class SystemTimeProvider implements TimeProvider {
 
-    private static final long EPOCH_TIME;
-    private static final long EPOCH_TIME_PLUS_ROUNDING;
+	private static final long EPOCH_TIME;
+	private static final long EPOCH_TIME_PLUS_ROUNDING;
 
-    static {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+	static {
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, GregorianCalendar.AD);
-        calendar.set(Calendar.YEAR, 2014);
-        calendar.set(Calendar.MONTH, Calendar.MARCH);
-        calendar.set(Calendar.DAY_OF_MONTH, 16);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        EPOCH_TIME = calendar.getTimeInMillis();
-        EPOCH_TIME_PLUS_ROUNDING = EPOCH_TIME - 500L;
-    }
+		calendar.set(Calendar.YEAR, 2014);
+		calendar.set(Calendar.MONTH, Calendar.MARCH);
+		calendar.set(Calendar.DAY_OF_MONTH, 16);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		EPOCH_TIME = calendar.getTimeInMillis();
+		EPOCH_TIME_PLUS_ROUNDING = EPOCH_TIME - 500L;
+	}
 
-    @Override
-    public TimeInstant getEpochTime() {
-        return TimeInstant.ZERO;
-    }
+	@Override
+	public TimeInstant getEpochTime() {
+		return TimeInstant.ZERO;
+	}
 
-    @Override
-    public TimeInstant getCurrentTime() {
-        long time = System.currentTimeMillis();
-        return new TimeInstant(getTime(time));
-    }
+	@Override
+	public TimeInstant getCurrentTime() {
+		long time = System.currentTimeMillis();
+		return new TimeInstant(getTime(time));
+	}
 
-    /**
-     * Returns the epoch time in milliseconds.
-     *
-     * @return The epoch time in milliseconds.
-     */
-    public static long getEpochTimeMillis() {
-        return EPOCH_TIME;
-    }
+	/**
+	 * Returns the epoch time in milliseconds.
+	 *
+	 * @return The epoch time in milliseconds.
+	 */
+	public static long getEpochTimeMillis() {
+		return EPOCH_TIME;
+	}
 
-    /**
-     * Returns the normalized time for the specified time.
-     *
-     * @param millis The system time in milliseconds.
-     * @return The normalized time.
-     */
-    public static int getTime(long millis) {
-        return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);
-    }
+	/**
+	 * Returns the normalized time for the specified time.
+	 *
+	 * @param millis The system time in milliseconds.
+	 *
+	 * @return The normalized time.
+	 */
+	public static int getTime(long millis) {
+		return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);
+	}
 }

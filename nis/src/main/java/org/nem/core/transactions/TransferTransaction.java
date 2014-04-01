@@ -21,11 +21,11 @@ public class TransferTransaction extends Transaction {
 	/**
 	 * Creates a transfer transaction.
 	 *
-     * @param timestamp The transaction timestamp.
-	 * @param sender The transaction sender.
+	 * @param timestamp The transaction timestamp.
+	 * @param sender    The transaction sender.
 	 * @param recipient The transaction recipient.
-	 * @param amount The transaction amount.
-	 * @param message The transaction message.
+	 * @param amount    The transaction amount.
+	 * @param message   The transaction message.
 	 */
 	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
 		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
@@ -63,7 +63,9 @@ public class TransferTransaction extends Transaction {
 	 *
 	 * @return The transaction amount.
 	 */
-	public Amount getAmount() { return this.amount; }
+	public Amount getAmount() {
+		return this.amount;
+	}
 
 	/**
 	 * Gets the transaction message.
@@ -71,26 +73,26 @@ public class TransferTransaction extends Transaction {
 	 * @return The transaction message.
 	 */
 	public Message getMessage() {
-        return this.message;
-    }
+		return this.message;
+	}
 
-    private int getMessageLength() {
-        return null == this.message ? 0 : this.message.getEncodedPayload().length;
-    }
+	private int getMessageLength() {
+		return null == this.message ? 0 : this.message.getEncodedPayload().length;
+	}
 
 	@Override
 	public boolean isValid() {
 		return super.isValid()
-            && this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
-            && this.getMessageLength() <= MAX_MESSAGE_SIZE;
-    }
+				&& this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
+				&& this.getMessageLength() <= MAX_MESSAGE_SIZE;
+	}
 
 	@Override
 	protected Amount getMinimumFee() {
-        if (GenesisBlock.ACCOUNT.equals(this.getSigner()))
-            return Amount.ZERO;
+		if (GenesisBlock.ACCOUNT.equals(this.getSigner()))
+			return Amount.ZERO;
 
-        // TODO: add scaling to Amount
+		// TODO: add scaling to Amount
 		long amountFee = (long)Math.ceil(this.amount.getNumMicroNem() * 0.001);
 		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
 		return new Amount(Math.max(1, amountFee + messageFee));
@@ -107,7 +109,7 @@ public class TransferTransaction extends Transaction {
 	@Override
 	public void execute() {
 		this.getSigner().decrementBalance(this.amount.add(this.getFee()));
-        this.recipient.incrementBalance(this.amount);
+		this.recipient.incrementBalance(this.amount);
 
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);

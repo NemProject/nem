@@ -5,11 +5,11 @@ package org.nem.peer;
  */
 public interface BlockSynchronizer {
 
-    /**
-     * Synchronizes the running node's block chain with node's block chains.
-     *
-     * @param connector The connector.
-     * @param node The other node.
-     */
+	/**
+	 * Synchronizes the running node's block chain with node's block chains.
+	 *
+	 * @param connector The connector.
+	 * @param node      The other node.
+	 */
 	public void synchronizeNode(final PeerConnector connector, final Node node);
 }

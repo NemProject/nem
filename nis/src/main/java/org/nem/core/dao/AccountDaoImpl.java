@@ -14,36 +14,36 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AccountDaoImpl implements AccountDao {
 	@Autowired
-    private SessionFactory sessionFactory;
-    
-    private Session getCurrentSession() {
-    	return sessionFactory.getCurrentSession();
-    }
-    
+	private SessionFactory sessionFactory;
+
+	private Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	@Override
 	@Transactional
 	public Account getAccount(Long id) {
-		 Query query = getCurrentSession()
-        		 .createQuery("from Account a where a.id = :id")
-        		 .setParameter("id", id);
-        List<?> userList = query.list();
-         if (userList.size() > 0)
-                 return (Account)userList.get(0);
-         else
-                 return null;    
+		Query query = getCurrentSession()
+				.createQuery("from Account a where a.id = :id")
+				.setParameter("id", id);
+		List<?> userList = query.list();
+		if (userList.size() > 0)
+			return (Account)userList.get(0);
+		else
+			return null;
 	}
-	
+
 	@Override
 	@Transactional
 	public Account getAccountByPrintableAddress(String printableAddress) {
-         Query query = getCurrentSession()
-        		 .createQuery("from Account a where a.printableKey = :key")
-        		 .setParameter("key", printableAddress);
-         List<?> userList = query.list();
-         if (userList.size() > 0)
-                 return (Account)userList.get(0);
-         else
-                 return null;    
+		Query query = getCurrentSession()
+				.createQuery("from Account a where a.printableKey = :key")
+				.setParameter("key", printableAddress);
+		List<?> userList = query.list();
+		if (userList.size() > 0)
+			return (Account)userList.get(0);
+		else
+			return null;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class AccountDaoImpl implements AccountDao {
 //				.createCriteria("Account")
 //				.setProjection(Projections.rowCount())
 //				.uniqueResult();
-		return (Long) getCurrentSession().createQuery("select count (*) from Account").uniqueResult();
+		return (Long)getCurrentSession().createQuery("select count (*) from Account").uniqueResult();
 	}
 
 	@Override
@@ -72,14 +72,14 @@ public class AccountDaoImpl implements AccountDao {
 				sess.saveOrUpdate(a);
 			}
 			tx.commit();
-			
+
 		} catch (RuntimeException e) {
 			if (tx != null) tx.rollback();
 			e.printStackTrace();
-			
+
 		} finally {
 			sess.close();
 		}
 	}
-	
+
 }

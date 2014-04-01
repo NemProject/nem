@@ -18,114 +18,114 @@ import java.util.concurrent.*;
  */
 public class HttpMethodClient {
 
-    private static final int HTTP_STATUS_OK = 200;
+	private static final int HTTP_STATUS_OK = 200;
 
-    private final DeserializationContext context;
-    private final int timeout;
-    private final HttpClient httpClient;
+	private final DeserializationContext context;
+	private final int timeout;
+	private final HttpClient httpClient;
 
-    /**
-     * Creates a new HTTP method client.
-     *
-     * @param context The deserialization context to use when deserializing responses.
-     * @param timeout The timeout (in seconds) that should be used.
-     */
-    public HttpMethodClient(final DeserializationContext context, final int timeout) {
-        this.context = context;
-        this.timeout = timeout;
+	/**
+	 * Creates a new HTTP method client.
+	 *
+	 * @param context The deserialization context to use when deserializing responses.
+	 * @param timeout The timeout (in seconds) that should be used.
+	 */
+	public HttpMethodClient(final DeserializationContext context, final int timeout) {
+		this.context = context;
+		this.timeout = timeout;
 
-        try {
-            this.httpClient = new HttpClient();
-            this.httpClient.setFollowRedirects(false);
-            this.httpClient.start();
-        }
-        catch (Exception ex) {
-            throw new FatalPeerException("HTTP client could not be started", ex);
-        }
-    }
+		try {
+			this.httpClient = new HttpClient();
+			this.httpClient.setFollowRedirects(false);
+			this.httpClient.start();
+		} catch (Exception ex) {
+			throw new FatalPeerException("HTTP client could not be started", ex);
+		}
+	}
 
-    /**
-     * Issues a HTTP GET response.
-     *
-     * @param url The url.
-     * @return The response from the server.
-     */
-    public JsonDeserializer get(final URL url) {
-        return sendRequest(url, new RequestFactory() {
-            @Override
-            public Request createRequest(final HttpClient httpClient, final URI uri) {
-                return httpClient.newRequest(uri);
-            }
-        });
-    }
+	/**
+	 * Issues a HTTP GET response.
+	 *
+	 * @param url The url.
+	 *
+	 * @return The response from the server.
+	 */
+	public JsonDeserializer get(final URL url) {
+		return sendRequest(url, new RequestFactory() {
+			@Override
+			public Request createRequest(final HttpClient httpClient, final URI uri) {
+				return httpClient.newRequest(uri);
+			}
+		});
+	}
 
-    /**
-     * Issues a HTTP POST response.
-     *
-     * @param url The url.
-     * @param entity The request data.
-     * @return The response from the server.
-     */
-    public JsonDeserializer post(final URL url, final SerializableEntity entity) {
-        return this.post(url, JsonSerializer.serializeToJson(entity));
-    }
+	/**
+	 * Issues a HTTP POST response.
+	 *
+	 * @param url    The url.
+	 * @param entity The request data.
+	 *
+	 * @return The response from the server.
+	 */
+	public JsonDeserializer post(final URL url, final SerializableEntity entity) {
+		return this.post(url, JsonSerializer.serializeToJson(entity));
+	}
 
-    /**
-     * Issues a HTTP POST response.
-     *
-     * @param url The url.
-     * @param requestData The request data.
-     * @return The response from the server.
-     */
-    public JsonDeserializer post(final URL url, final JSONObject requestData) {
-        return sendRequest(url, new RequestFactory() {
-            @Override
-            public Request createRequest(final HttpClient httpClient, final URI uri) {
-                Request req = httpClient.newRequest(uri);
-                req.method(HttpMethod.POST);
-                req.content(new BytesContentProvider(requestData.toString().getBytes()), "text/plain");
-                return req;
-            }
-        });
-    }
+	/**
+	 * Issues a HTTP POST response.
+	 *
+	 * @param url         The url.
+	 * @param requestData The request data.
+	 *
+	 * @return The response from the server.
+	 */
+	public JsonDeserializer post(final URL url, final JSONObject requestData) {
+		return sendRequest(url, new RequestFactory() {
+			@Override
+			public Request createRequest(final HttpClient httpClient, final URI uri) {
+				Request req = httpClient.newRequest(uri);
+				req.method(HttpMethod.POST);
+				req.content(new BytesContentProvider(requestData.toString().getBytes()), "text/plain");
+				return req;
+			}
+		});
+	}
 
-    /**
-     * Sends an HTTP request.
-     *
-     * @param requestFactory The factory that creates the specified request.
-     * @return The response from the server.
-     */
-    private JsonDeserializer sendRequest(final URL url, final RequestFactory requestFactory) {
-        try {
-            final URI uri = url.toURI();
-            final InputStreamResponseListener listener = new InputStreamResponseListener();
+	/**
+	 * Sends an HTTP request.
+	 *
+	 * @param requestFactory The factory that creates the specified request.
+	 *
+	 * @return The response from the server.
+	 */
+	private JsonDeserializer sendRequest(final URL url, final RequestFactory requestFactory) {
+		try {
+			final URI uri = url.toURI();
+			final InputStreamResponseListener listener = new InputStreamResponseListener();
 
-            final Request req = requestFactory.createRequest(this.httpClient, uri);
-            req.send(listener);
+			final Request req = requestFactory.createRequest(this.httpClient, uri);
+			req.send(listener);
 
-            Response res = listener.get(this.timeout, TimeUnit.SECONDS);
-            if (res.getStatus() != HTTP_STATUS_OK)
-                return null;
+			Response res = listener.get(this.timeout, TimeUnit.SECONDS);
+			if (res.getStatus() != HTTP_STATUS_OK)
+				return null;
 
-            try (InputStream responseStream = listener.getInputStream()) {
-                return new JsonDeserializer(
-                    (JSONObject)JSONValue.parse(responseStream),
-                    this.context);
-            }
-        }
-        catch (TimeoutException e) {
-            throw new InactivePeerException(e);
-        }
-        catch (URISyntaxException|ExecutionException|IOException e) {
-            throw new FatalPeerException(e);
-        }
-        catch (InterruptedException e) {
-            throw ExceptionUtils.toUnchecked(e);
-        }
-    }
+			try (InputStream responseStream = listener.getInputStream()) {
+				return new JsonDeserializer(
+						(JSONObject)JSONValue.parse(responseStream),
+						this.context);
+			}
+		} catch (TimeoutException e) {
+			throw new InactivePeerException(e);
+		} catch (URISyntaxException | ExecutionException | IOException e) {
+			throw new FatalPeerException(e);
+		} catch (InterruptedException e) {
+			throw ExceptionUtils.toUnchecked(e);
+		}
+	}
 
-    private static interface RequestFactory {
+	private static interface RequestFactory {
 
-        public Request createRequest(final HttpClient httpClient, final URI uri);
-    }
+		public Request createRequest(final HttpClient httpClient, final URI uri);
+	}
 }

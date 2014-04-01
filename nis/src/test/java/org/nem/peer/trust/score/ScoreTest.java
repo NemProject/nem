@@ -6,24 +6,24 @@ import org.nem.peer.test.MockScore;
 
 public class ScoreTest {
 
-    @Test
-    public void derivedScoreProvidesInitialValue() {
-        // Arrange:
-        final Score score = new MockScore();
+	@Test
+	public void derivedScoreProvidesInitialValue() {
+		// Arrange:
+		final Score score = new MockScore();
 
-        // Assert:
-        Assert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
-    }
+		// Assert:
+		Assert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
+	}
 
-    @Test
-    public void rawScoreCanBeChanged() {
-        // Arrange:
-        final Score score = new MockScore();
+	@Test
+	public void rawScoreCanBeChanged() {
+		// Arrange:
+		final Score score = new MockScore();
 
-        // Act:
-        score.score().set(5.2);
+		// Act:
+		score.score().set(5.2);
 
-        // Assert:
-        Assert.assertThat(score.score().get(), IsEqual.equalTo(5.2));
-    }
+		// Assert:
+		Assert.assertThat(score.score().get(), IsEqual.equalTo(5.2));
+	}
 }

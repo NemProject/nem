@@ -20,7 +20,7 @@ public class AccountAnalyzer implements AccountLookup {
 
 	@Autowired
 	private BlockDao blockDao;
-	
+
 	@Autowired
 	private TransferDao transferDao;
 
@@ -92,8 +92,8 @@ public class AccountAnalyzer implements AccountLookup {
 			addAccountToCache(tx.getSender());
 			Account recipient = addAccountToCache(tx.getRecipient());
 
-            TransferTransaction transaction = TransferMapper.toModel(tx, this);
-            transaction.execute();
+			TransferTransaction transaction = TransferMapper.toModel(tx, this);
+			transaction.execute();
 
 			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
@@ -102,8 +102,9 @@ public class AccountAnalyzer implements AccountLookup {
 	/**
 	 * Finds an account, updating it's public key if there's a need.
 	 *
-	 * @param publicKey - public key of an account, might be null
+	 * @param publicKey      - public key of an account, might be null
 	 * @param encodedAddress - encoded address of an account
+	 *
 	 * @return null if account is unknown or Account associated with an address
 	 */
 	protected Account findByAddressImpl(PublicKey publicKey, String encodedAddress) {
@@ -146,7 +147,7 @@ public class AccountAnalyzer implements AccountLookup {
 	public Account findByAddress(Address id) {
 		LOGGER.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
 
-		if (! id.isValid()) {
+		if (!id.isValid()) {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());
 		}
 

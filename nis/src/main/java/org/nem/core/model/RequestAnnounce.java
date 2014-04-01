@@ -9,39 +9,41 @@ public class RequestAnnounce implements SerializableEntity {
 	private byte[] data;
 	private byte[] signature;
 
-    /**
-     * Creates a new request.
-     *
-     * @param data The data.
-     * @param signature The signature.
-     */
+	/**
+	 * Creates a new request.
+	 *
+	 * @param data      The data.
+	 * @param signature The signature.
+	 */
 	public RequestAnnounce(final byte[] data, final byte[] signature) {
 		this.data = data;
 		this.signature = signature;
 	}
 
-    /**
-     * Deserializes a request.
-     *
-     * @param deserializer The deserializer.
-     */
+	/**
+	 * Deserializes a request.
+	 *
+	 * @param deserializer The deserializer.
+	 */
 	public RequestAnnounce(final Deserializer deserializer) {
 		this.data = deserializer.readBytes("data");
 		this.signature = deserializer.readBytes("signature");
 	}
 
-    /**
-     * Gets the request data.
-     *
-     * @return The request data.
-     */
-	public byte[] getData() { return this.data; }
+	/**
+	 * Gets the request data.
+	 *
+	 * @return The request data.
+	 */
+	public byte[] getData() {
+		return this.data;
+	}
 
-    /**
-     * Gets the request signature.
-     *
-     * @return The request signature.
-     */
+	/**
+	 * Gets the request signature.
+	 *
+	 * @return The request signature.
+	 */
 	public byte[] getSignature() {
 		return this.signature;
 	}

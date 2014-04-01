@@ -15,16 +15,15 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class TransferDaoImpl implements TransferDao
-{    
+public class TransferDaoImpl implements TransferDao {
 	@Autowired
 	private SessionFactory sessionFactory;
-    
-    private Session getCurrentSession() {
-    	return sessionFactory.getCurrentSession();
-    }
-    
-    @Override
+
+	private Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
+	@Override
 	@Transactional
 	public void save(Transfer transaction) {
 		getCurrentSession().saveOrUpdate(transaction);
@@ -33,7 +32,7 @@ public class TransferDaoImpl implements TransferDao
 	@Override
 	@Transactional
 	public Long count() {
-		return (Long) getCurrentSession().createQuery("select count (*) from Transfer").uniqueResult();
+		return (Long)getCurrentSession().createQuery("select count (*) from Transfer").uniqueResult();
 	}
 
 	/**
@@ -49,8 +48,8 @@ public class TransferDaoImpl implements TransferDao
 				.createQuery("from Transfer a where a.shortId = :id")
 				.setParameter("id", txId);
 		userList = query.list();
-		for (int i = 0; i<userList.size(); ++i) {
-			Transfer transfer = (Transfer) userList.get(i);
+		for (int i = 0; i < userList.size(); ++i) {
+			Transfer transfer = (Transfer)userList.get(i);
 			if (Arrays.equals(txHash, transfer.getTransferHash())) {
 				return transfer;
 			}
@@ -67,7 +66,7 @@ public class TransferDaoImpl implements TransferDao
 			int i = 0;
 			for (Transfer t : transfers) {
 				sess.saveOrUpdate(t);
-				
+
 				i++;
 				if (i == 20) {
 					sess.flush();
@@ -78,11 +77,11 @@ public class TransferDaoImpl implements TransferDao
 			System.out.println("saving...");
 			tx.commit();
 			System.out.println("done...");
-			
+
 		} catch (RuntimeException e) {
 			if (tx != null) tx.rollback();
 			e.printStackTrace();
-			
+
 		} finally {
 			sess.close();
 		}

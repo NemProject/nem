@@ -7,21 +7,23 @@ import org.nem.peer.trust.RealDouble;
  */
 public abstract class Score {
 
-    private final RealDouble score;
+	private final RealDouble score;
 
-    /**
-     * Creates a new score
-     *
-     * @param initialScore The initial score value.
-     */
-    public Score(double initialScore) {
-        this.score = new RealDouble(initialScore);
-    }
+	/**
+	 * Creates a new score
+	 *
+	 * @param initialScore The initial score value.
+	 */
+	public Score(double initialScore) {
+		this.score = new RealDouble(initialScore);
+	}
 
-    /**
-     * Gets the raw score.
-     *
-     * @return The raw score.
-     */
-    public RealDouble score() { return this.score; }
+	/**
+	 * Gets the raw score.
+	 *
+	 * @return The raw score.
+	 */
+	public RealDouble score() {
+		return this.score;
+	}
 }

@@ -15,12 +15,12 @@ import java.util.logging.Logger;
 
 /**
  * This controller will handle data propagation:
- *  * /push/transaction - for what is now model.Transaction
- *  * /push/block - for model.Block
- *
- *  It would probably fit better in TransferController, but this is
- *  part of p2p API, so I think it should be kept separated.
- *  (I think it might pay off in future, if we'd like to add restrictions to client APIs)
+ * * /push/transaction - for what is now model.Transaction
+ * * /push/block - for model.Block
+ * <p/>
+ * It would probably fit better in TransferController, but this is
+ * part of p2p API, so I think it should be kept separated.
+ * (I think it might pay off in future, if we'd like to add restrictions to client APIs)
  */
 
 @RestController
@@ -36,12 +36,12 @@ public class PushController {
 	@Autowired
 	private BlockChain blockChain;
 
-    @Autowired
-    private NisPeerNetworkHost host;
+	@Autowired
+	private NisPeerNetworkHost host;
 
-	@RequestMapping(value="/push/transaction", method = RequestMethod.POST)
+	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	public String pushTransaction(@RequestBody String body) {
-        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
@@ -53,21 +53,21 @@ public class PushController {
 
 			// add to unconfirmed transactions
 			if (this.foraging.processTransaction(transaction))
-                network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
 
 			return Utils.jsonOk();
 		}
 
-        // TODO: throw exception here
+		// TODO: throw exception here
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
 	}
 
-	@RequestMapping(value="/push/block", method = RequestMethod.POST)
+	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	public String pushBlock(@RequestBody String body) {
-        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-        final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
-        // TODO: refactor logging
+		// TODO: refactor logging
 		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
@@ -82,7 +82,7 @@ public class PushController {
 			return Utils.jsonOk();
 		}
 
-        // TODO: throw exception here
+		// TODO: throw exception here
 		return Utils.jsonError(2, "block couldn't be verified " + Boolean.toString(block.verify()));
 	}
 }

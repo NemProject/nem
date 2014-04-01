@@ -30,7 +30,7 @@ public class ChainController {
 	@Autowired
 	private BlockChain blockChain;
 
-	@RequestMapping(value="/chain/last-block", method = RequestMethod.GET)
+	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	public String blockLast() {
 		final Block lastBlock = BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountAnalyzer);
 		return ControllerUtils.serialize(lastBlock);
@@ -46,7 +46,7 @@ public class ChainController {
 			return Utils.jsonError(2, "block not found in the db");
 
 		List<Block> blockList = new LinkedList<Block>();
-		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY/2; ++i) {
+		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY / 2; ++i) {
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				break;

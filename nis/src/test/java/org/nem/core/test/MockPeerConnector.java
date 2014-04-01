@@ -13,24 +13,24 @@ import java.net.URL;
 public class MockPeerConnector {
 	private URL baseURL;
 
-    private final HttpMethodClient httpMethodClient;
+	private final HttpMethodClient httpMethodClient;
 
 	public MockPeerConnector() throws MalformedURLException {
 		super();
 
 		this.baseURL = new URL("http", "127.0.0.1", 7890, "/");
-        this.httpMethodClient = new HttpMethodClient(null, 30);
+		this.httpMethodClient = new HttpMethodClient(null, 30);
 	}
 
 	public JsonDeserializer transferPrepare(final JSONObject transferPrepareData) throws MalformedURLException {
-        return this.post("transfer/prepare", transferPrepareData);
+		return this.post("transfer/prepare", transferPrepareData);
 	}
 
 	public JsonDeserializer pushTransaction(final JSONObject transferData) throws MalformedURLException {
 		return this.post("push/transaction", transferData);
 	}
 
-    private JsonDeserializer post(final String path, final JSONObject requestData) throws MalformedURLException {
-        return this.httpMethodClient.post(new URL(this.baseURL, path), requestData);
-    }
+	private JsonDeserializer post(final String path, final JSONObject requestData) throws MalformedURLException {
+		return this.httpMethodClient.post(new URL(this.baseURL, path), requestData);
+	}
 }

@@ -7,7 +7,7 @@ import java.security.InvalidParameterException;
 
 /**
  * similar to transaction factory, but for the blocks
- *
+ * <p/>
  * I doubt there is need for this now or in future, but let's have similar API
  * for both transactions and blocks
  */
@@ -33,8 +33,9 @@ public class BlockFactory {
 	/**
 	 * Deserializes a block.
 	 *
-	 * @param options The deserialization options.
+	 * @param options      The deserialization options.
 	 * @param deserializer The deserializer.
+	 *
 	 * @return The deserialized block.
 	 */
 	private static Block deserialize(final VerifiableEntity.DeserializationOptions options, final Deserializer deserializer) {

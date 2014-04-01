@@ -9,59 +9,59 @@ import java.util.List;
  */
 public interface Serializer {
 
-    /**
-     * Writes a 32-bit integer value.
-     *
-     * @param label The optional name of the value.
-     * @param i The value.
-     */
-    public void writeInt(final String label, final int i);
+	/**
+	 * Writes a 32-bit integer value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param i     The value.
+	 */
+	public void writeInt(final String label, final int i);
 
-    /**
-     * Writes a 64-bit long value.
-     *
-     * @param label The optional name of the value.
-     * @param l The value.
-     */
-    public void writeLong(final String label, final long l);
+	/**
+	 * Writes a 64-bit long value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param l     The value.
+	 */
+	public void writeLong(final String label, final long l);
 
-    /**
-     * Writes a BigInteger value.
-     *
-     * @param label The optional name of the value.
-     * @param i The value.
-     */
-    public void writeBigInteger(final String label, final BigInteger i);
+	/**
+	 * Writes a BigInteger value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param i     The value.
+	 */
+	public void writeBigInteger(final String label, final BigInteger i);
 
-    /**
-     * Writes a byte array value.
-     *
-     * @param label The optional name of the value.
-     * @param bytes The value.
-     */
-    public void writeBytes(final String label, final byte[] bytes);
+	/**
+	 * Writes a byte array value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param bytes The value.
+	 */
+	public void writeBytes(final String label, final byte[] bytes);
 
-    /**
-     * Writes a String value.
-     *
-     * @param label The optional name of the value.
-     * @param s The value.
-     */
-    public void writeString(final String label, final String s);
+	/**
+	 * Writes a String value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param s     The value.
+	 */
+	public void writeString(final String label, final String s);
 
-    /**
-     * Writes an object value.
-     *
-     * @param label The optional name of the value.
-     * @param object The value.
-     */
-    public void writeObject(final String label, final SerializableEntity object);
+	/**
+	 * Writes an object value.
+	 *
+	 * @param label  The optional name of the value.
+	 * @param object The value.
+	 */
+	public void writeObject(final String label, final SerializableEntity object);
 
-    /**
-     * Writes an array of object values.
-     *
-     * @param label The optional name of the value.
-     * @param objects The array.
-     */
-    public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects);
+	/**
+	 * Writes an array of object values.
+	 *
+	 * @param label   The optional name of the value.
+	 * @param objects The array.
+	 */
+	public void writeObjectArray(final String label, final List<? extends SerializableEntity> objects);
 }

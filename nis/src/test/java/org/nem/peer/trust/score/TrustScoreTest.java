@@ -5,12 +5,12 @@ import org.junit.*;
 
 public class TrustScoreTest {
 
-    @Test
-    public void scoreHasCorrectInitialValue() {
-        // Arrange:
-        final Score score = new TrustScore();
+	@Test
+	public void scoreHasCorrectInitialValue() {
+		// Arrange:
+		final Score score = new TrustScore();
 
-        // Assert:
-        Assert.assertThat(score.score().get(), IsEqual.equalTo(0.0));
-    }
+		// Assert:
+		Assert.assertThat(score.score().get(), IsEqual.equalTo(0.0));
+	}
 }

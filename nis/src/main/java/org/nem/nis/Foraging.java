@@ -73,8 +73,8 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	/**
-	 *
 	 * @param transaction - transaction that isValid() and verify()-ed
+	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
 	public boolean processTransaction(Transaction transaction) {
@@ -124,8 +124,8 @@ public class Foraging implements AutoCloseable, Runnable {
 	/**
 	 * Calculates "target" basing on the inputs
 	 *
-	 * @param parentTimeStamp timestamp of parent block
-	 * @param blockTimeStamp timestamp or current block
+	 * @param parentTimeStamp         timestamp of parent block
+	 * @param blockTimeStamp          timestamp or current block
 	 * @param forgerEffectiveBallance - effective balance used to forage
 	 *
 	 * @return The target.
@@ -146,8 +146,8 @@ public class Foraging implements AutoCloseable, Runnable {
 	 * @return score of a block.
 	 */
 	private long calcBlockScore(Block block) {
-		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
 
 		return r1 + r2;
 	}

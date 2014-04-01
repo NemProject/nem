@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
-    public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
-    public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
+	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+	public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
-    private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
-    private static byte[] GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
+	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
+	private static byte[] GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -36,14 +36,14 @@ public class NisMain {
 	@Autowired
 	private BlockChain blockChain;
 
-    @Autowired
-    private NisPeerNetworkHost networkHost;
+	@Autowired
+	private NisPeerNetworkHost networkHost;
 
 	private void analyzeBlocks() {
 		Long curBlockId;
 		System.out.println("starting analysis...");
 
-        org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
+		org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
 		if (null == dbBlock) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the dba and rerun");
 			System.exit(-1);
@@ -67,7 +67,7 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-        logGenesisInformation();
+		logGenesisInformation();
 
 		this.populateDb();
 
@@ -75,36 +75,36 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
-        this.networkHost.boot();
+		this.networkHost.boot();
 	}
 
-    private static void logGenesisInformation() {
-        LOGGER.info("genesis block hash:" + HexEncoder.getString(GENESIS_BLOCK_HASH));
+	private static void logGenesisInformation() {
+		LOGGER.info("genesis block hash:" + HexEncoder.getString(GENESIS_BLOCK_HASH));
 
-        final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
-        final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();
-        LOGGER.info("genesis account private key: " + genesisKeyPair.getPrivateKey());
-        LOGGER.info("genesis account            public key: " + genesisKeyPair.getPublicKey());
-        LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
-    }
+		final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
+		final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();
+		LOGGER.info("genesis account private key: " + genesisKeyPair.getPrivateKey());
+		LOGGER.info("genesis account            public key: " + genesisKeyPair.getPublicKey());
+		LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
+	}
 
 	private void populateDb() {
-        if (0 != this.blockDao.count())
-            return;
+		if (0 != this.blockDao.count())
+			return;
 
-        this.saveBlock(GENESIS_BLOCK);
+		this.saveBlock(GENESIS_BLOCK);
 	}
 
-    private org.nem.core.dbmodel.Block saveBlock(final Block block) {
-        org.nem.core.dbmodel.Block dbBlock;
+	private org.nem.core.dbmodel.Block saveBlock(final Block block) {
+		org.nem.core.dbmodel.Block dbBlock;
 
-        dbBlock = this.blockDao.findByHash(GENESIS_BLOCK_HASH);
-        if (null != dbBlock) {
-            return dbBlock;
+		dbBlock = this.blockDao.findByHash(GENESIS_BLOCK_HASH);
+		if (null != dbBlock) {
+			return dbBlock;
 		}
 
-        dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-        this.blockDao.save(dbBlock);
-        return dbBlock;
-    }
+		dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		this.blockDao.save(dbBlock);
+		return dbBlock;
+	}
 }

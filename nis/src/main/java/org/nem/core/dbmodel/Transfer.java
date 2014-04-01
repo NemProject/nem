@@ -9,21 +9,21 @@ import javax.persistence.Table;
 
 /**
  * Transfer Db entity.
- *
+ * <p/>
  * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE
- *
+ * <p/>
  * Associated sender and recipient are obtained automatically (by TransferDao)
  * thanks to @Cascade annotations.
  */
-@Entity  
-@Table(name="transfers") 
+@Entity
+@Table(name = "transfers")
 public class Transfer {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Long shortId;
 	private byte[] transferHash;
-	
+
 	private Integer version;
 	private Integer type;
 	private Long fee;
@@ -31,34 +31,34 @@ public class Transfer {
 	private Integer deadline;
 
 	@ManyToOne
-	@Cascade({CascadeType.SAVE_UPDATE})
-	@JoinColumn(name="senderId")
+	@Cascade({ CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "senderId")
 	private Account sender;
 	private byte[] senderProof;
 
 	@ManyToOne
-	@Cascade({CascadeType.SAVE_UPDATE})
-	@JoinColumn(name="recipientId")
+	@Cascade({ CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "recipientId")
 	private Account recipient;
-	
+
 	private Integer blkIndex; // blkIndex inside block
-	
+
 	private Long amount;
 	private Long referencedTransaction;
 
 	private Integer messageType;
 	private byte[] messagePayload;
-	
-	@ManyToOne(fetch= FetchType.LAZY)
-    @JoinTable(name="block_transfers",
-        joinColumns = {@JoinColumn(name="transfer_id", referencedColumnName="id")},  
-        inverseJoinColumns = {@JoinColumn(name="block_id", referencedColumnName="id")}  
-    )
-    private Block block;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinTable(name = "block_transfers",
+			joinColumns = { @JoinColumn(name = "transfer_id", referencedColumnName = "id") },
+			inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
+	)
+	private Block block;
+
 	public Transfer() {
 	}
-	
+
 	public Transfer(
 			Long shortId,
 			byte[] transferHash,
@@ -68,13 +68,12 @@ public class Transfer {
 			Integer timestamp,
 			Integer deadline,
 			Account sender,
-			byte[] senderProof, 
+			byte[] senderProof,
 			Account recipient,
 			Integer blkIndex,
 			Long amount,
 			Long referencedTransaction
-			)
-	{
+	) {
 		this.shortId = shortId;
 		this.transferHash = transferHash;
 		this.version = version;
@@ -89,7 +88,7 @@ public class Transfer {
 		this.amount = amount;
 		this.referencedTransaction = referencedTransaction;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}

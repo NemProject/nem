@@ -25,37 +25,37 @@ public class TransferController {
 	@Autowired
 	private Foraging foraging;
 
-    @Autowired
-    private NisPeerNetworkHost host;
+	@Autowired
+	private NisPeerNetworkHost host;
 
-	@RequestMapping(value="/transfer/prepare", method = RequestMethod.POST)
+	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
 	public String transferPrepare(@RequestBody final String body) {
-        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-        final TransferTransaction transfer = deserializeTransaction(deserializer);
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
-        // TODO: exception
+		// TODO: exception
 		if (!transfer.isValid())
 			return Utils.jsonError(1, "incorrect data");
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
-        return ControllerUtils.serialize(new RequestPrepare(transferData));
+		return ControllerUtils.serialize(new RequestPrepare(transferData));
 	}
 
-	@RequestMapping(value="/transfer/announce", method = RequestMethod.POST)
+	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	public String transferAnnounce(@RequestBody final String body) throws Exception {
-        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
 
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
-        transfer.setSignature(new Signature(requestAnnounce.getSignature()));
+		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
-        // TODO: move logger to controller
+		// TODO: move logger to controller
 		LOGGER.info("   signer: " + transfer.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
 		if (transfer.isValid() && transfer.verify()) {
-            final PeerNetwork network = this.host.getNetwork();
+			final PeerNetwork network = this.host.getNetwork();
 
 			// add to unconfirmed transactions
 			if (foraging.processTransaction(transfer)) {
@@ -67,17 +67,17 @@ public class TransferController {
 			return Utils.jsonOk();
 		}
 
-        // TODO: exception
+		// TODO: exception
 		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transfer.verify()));
 	}
 
-    private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
-        try (final BinaryDeserializer dataDeserializer = ControllerUtils.getDeserializer(bytes, this.accountAnalyzer)) {
-            return deserializeTransaction(dataDeserializer);
-        }
-    }
+	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
+		try (final BinaryDeserializer dataDeserializer = ControllerUtils.getDeserializer(bytes, this.accountAnalyzer)) {
+			return deserializeTransaction(dataDeserializer);
+		}
+	}
 
-    private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
-        return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
-    }
+	private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
+		return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+	}
 }

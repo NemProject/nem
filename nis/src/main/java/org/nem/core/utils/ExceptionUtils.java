@@ -5,14 +5,15 @@ package org.nem.core.utils;
  */
 public class ExceptionUtils {
 
-    /**
-     * Wraps a checked InterruptedException in an unchecked exception.
-     *
-     * @param e The checked exception.
-     * @return An unchecked exception.
-     */
-    public static RuntimeException toUnchecked(final InterruptedException e) {
-        Thread.currentThread().interrupt();
-        return new IllegalStateException(e);
-    }
+	/**
+	 * Wraps a checked InterruptedException in an unchecked exception.
+	 *
+	 * @param e The checked exception.
+	 *
+	 * @return An unchecked exception.
+	 */
+	public static RuntimeException toUnchecked(final InterruptedException e) {
+		Thread.currentThread().interrupt();
+		return new IllegalStateException(e);
+	}
 }

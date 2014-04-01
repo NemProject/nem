@@ -72,11 +72,11 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(404));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(404));
 	}
 
 	@Test
-	 public void transferIncorrectAmount() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
+	public void transferIncorrectAmount() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -99,11 +99,11 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
-	 public void transferIncorrectMessageType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
+	public void transferIncorrectMessageType() throws MalformedURLException, InterruptedException, ExecutionException, TimeoutException, URISyntaxException, DecoderException {
 		// Arrange:
 		MockPeerConnector pc = new MockPeerConnector();
 
@@ -126,7 +126,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
 	}
 
 	@Test
@@ -207,10 +207,10 @@ public class TransferControllerTest {
 		JsonDeserializer res = pc.transferPrepare(obj);
 
 		// Assert:
-        Assert.assertThat(res.readInt("status"), IsEqual.equalTo(null));
+		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(null));
 	}
 
-    private static String getRecipientAccountId() {
-        return NetworkInfo.getDefault().getGenesisRecipientAccountIds()[2];
-    }
+	private static String getRecipientAccountId() {
+		return NetworkInfo.getDefault().getGenesisRecipientAccountIds()[2];
+	}
 }

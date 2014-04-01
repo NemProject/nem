@@ -5,17 +5,17 @@ package org.nem.core.time;
  */
 public interface TimeProvider {
 
-    /**
-     * Gets the epoch time.
-     *
-     * @return The epoch time.
-     */
-    public TimeInstant getEpochTime();
+	/**
+	 * Gets the epoch time.
+	 *
+	 * @return The epoch time.
+	 */
+	public TimeInstant getEpochTime();
 
-    /**
-     * Gets the current time.
-     *
-     * @return The current time.
-     */
-    public TimeInstant getCurrentTime();
+	/**
+	 * Gets the current time.
+	 *
+	 * @return The current time.
+	 */
+	public TimeInstant getCurrentTime();
 }

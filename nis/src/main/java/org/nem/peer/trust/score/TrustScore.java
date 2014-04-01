@@ -6,10 +6,10 @@ package org.nem.peer.trust.score;
  */
 public class TrustScore extends Score {
 
-    /**
-     * Creates a new trust score.
-     */
-    public TrustScore() {
-        super(0.0);
-    }
+	/**
+	 * Creates a new trust score.
+	 */
+	public TrustScore() {
+		super(0.0);
+	}
 }

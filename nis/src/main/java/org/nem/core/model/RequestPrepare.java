@@ -10,29 +10,29 @@ import org.nem.core.serialization.Serializer;
 public class RequestPrepare implements SerializableEntity {
 	private byte[] data;
 
-    /**
-     * Creates a new request.
-     *
-     * @param data The data.
-     */
+	/**
+	 * Creates a new request.
+	 *
+	 * @param data The data.
+	 */
 	public RequestPrepare(final byte[] data) {
 		this.data = data;
 	}
 
-    /**
-     * Deserializes a request.
-     *
-     * @param deserializer The deserializer.
-     */
+	/**
+	 * Deserializes a request.
+	 *
+	 * @param deserializer The deserializer.
+	 */
 	public RequestPrepare(Deserializer deserializer) {
 		this.data = deserializer.readBytes("data");
 	}
 
-    /**
-     * Gets the request data.
-     *
-     * @return The request data.
-     */
+	/**
+	 * Gets the request data.
+	 *
+	 * @return The request data.
+	 */
 	public byte[] getData() {
 		return data;
 	}

@@ -35,17 +35,16 @@ import org.springframework.web.context.ContextLoaderListener;
  * Did not find a better way of launching Jetty in combination with WebStart. The
  * physical location of the downloaded files is not pre-known, so passing a WAR
  * file to the Jetty runner does not work.
- * 
+ * <p/>
  * I had to switch to the Servlet API 3.x with programmatic configuration.
- * 
+ *
  * @author Thies1965
- * 
  */
 
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
-	
+
 	public static final String VERSION = "0.1.0";
 	public static final String APP_NAME = "NIS";
 	public static final int NEM_PORT = 7890;
@@ -66,37 +65,37 @@ public class CommonStarter implements ServletContextListener {
 
 		//Taken from Jetty doc 
 		QueuedThreadPool threadPool = new QueuedThreadPool();
-        threadPool.setMaxThreads(500);
-        Server server = new Server(threadPool);
-        server.addBean(new ScheduledExecutorScheduler());
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setSecureScheme("https");
-        //PORT
-        http_config.setSecurePort(7891);
-        http_config.setOutputBufferSize(32768);
-        http_config.setRequestHeaderSize(8192);
-        http_config.setResponseHeaderSize(8192);
-        http_config.setSendServerVersion(true);
-        http_config.setSendDateHeader(false);
-        
-        HandlerCollection handlers = new HandlerCollection();
-        ServletContextHandler servletContext = new ServletContextHandler();
-        
-        //Special Listener to set-up the environment for Spring 
-        servletContext.addEventListener(new CommonStarter());
-        servletContext.addEventListener(new ContextLoaderListener());
+		threadPool.setMaxThreads(500);
+		Server server = new Server(threadPool);
+		server.addBean(new ScheduledExecutorScheduler());
+		HttpConfiguration http_config = new HttpConfiguration();
+		http_config.setSecureScheme("https");
+		//PORT
+		http_config.setSecurePort(7891);
+		http_config.setOutputBufferSize(32768);
+		http_config.setRequestHeaderSize(8192);
+		http_config.setResponseHeaderSize(8192);
+		http_config.setSendServerVersion(true);
+		http_config.setSendDateHeader(false);
+
+		HandlerCollection handlers = new HandlerCollection();
+		ServletContextHandler servletContext = new ServletContextHandler();
+
+		//Special Listener to set-up the environment for Spring
+		servletContext.addEventListener(new CommonStarter());
+		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(createErrorHandler());
-        
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
-        handlers.setHandlers(new Handler[] { contexts, servletContext , new ServletHandler(), new DefaultHandler() });
-        server.setHandler(handlers);
-        server.setDumpAfterStart(false);
-        server.setDumpBeforeStop(false);
-        server.setStopAtShutdown(true);
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-        http.setPort(7890);
-        http.setIdleTimeout(30000);
-        server.addConnector(http);
+
+		ContextHandlerCollection contexts = new ContextHandlerCollection();
+		handlers.setHandlers(new Handler[] { contexts, servletContext, new ServletHandler(), new DefaultHandler() });
+		server.setHandler(handlers);
+		server.setDumpAfterStart(false);
+		server.setDumpBeforeStop(false);
+		server.setStopAtShutdown(true);
+		ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
+		http.setPort(7890);
+		http.setIdleTimeout(30000);
+		server.addConnector(http);
 
 		LOGGER.info("Calling start().");
 		server.start();
@@ -114,17 +113,17 @@ public class CommonStarter implements ServletContextListener {
 		try {
 			jnlpServiceManager = Class.forName("javax.jnlp.ServiceManager");
 			jnlpBasicService = Class.forName("javax.jnlp.BasicService");
-			
-			Method lookup = jnlpServiceManager.getMethod("lookup", new Class[] {String.class});
-			Method showDocument = jnlpBasicService.getMethod("showDocument", new Class[] {URL.class});
+
+			Method lookup = jnlpServiceManager.getMethod("lookup", new Class[] { String.class });
+			Method showDocument = jnlpBasicService.getMethod("showDocument", new Class[] { URL.class });
 
 			Object basicService = lookup.invoke(jnlpServiceManager, "javax.jnlp.BasicService");
 			URL homeURL = new URL("http://127.0.0.1:7890/peer");
 			showDocument.invoke(basicService, homeURL);
-			
+
 			result = true;
 		} catch (ClassNotFoundException | NoClassDefFoundError ex) {
-		  // handle exception case
+			// handle exception case
 			LOGGER.info("JNLP not available, not started via WebStart. Assuming headless run.");
 		} catch (NoSuchMethodException e) {
 			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
@@ -135,7 +134,7 @@ public class CommonStarter implements ServletContextListener {
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			LOGGER.log(Level.SEVERE, "home URL incorrect", e);
-		} 
+		}
 
 		return result;
 	}

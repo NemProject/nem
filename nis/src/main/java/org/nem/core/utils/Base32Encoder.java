@@ -9,30 +9,32 @@ import java.security.InvalidParameterException;
  */
 public class Base32Encoder {
 
-    /**
-     * Converts a string to a byte array.
-     *
-     * @param base32String The input Base32 string.
-     * @return The output byte array.
-     */
-    public static byte[] getBytes(final String base32String) {
-        Base32 codec = new Base32();
-        byte[] encodedBytes = StringEncoder.getBytes(base32String);
-        if (!codec.isInAlphabet(encodedBytes, true))
-            throw new InvalidParameterException("malformed base32 string passed to getBytes");
+	/**
+	 * Converts a string to a byte array.
+	 *
+	 * @param base32String The input Base32 string.
+	 *
+	 * @return The output byte array.
+	 */
+	public static byte[] getBytes(final String base32String) {
+		Base32 codec = new Base32();
+		byte[] encodedBytes = StringEncoder.getBytes(base32String);
+		if (!codec.isInAlphabet(encodedBytes, true))
+			throw new InvalidParameterException("malformed base32 string passed to getBytes");
 
-        return codec.decode(encodedBytes);
-    }
+		return codec.decode(encodedBytes);
+	}
 
-    /**
-     * Converts a byte array to a Base32 string.
-     *
-     * @param bytes The input byte array.
-     * @return The output Base32 string.
-     */
-    public static String getString(byte[] bytes) {
-        Base32 codec = new Base32();
-        byte[] decodedBytes = codec.encode(bytes);
-        return StringEncoder.getString(decodedBytes);
-    }
+	/**
+	 * Converts a byte array to a Base32 string.
+	 *
+	 * @param bytes The input byte array.
+	 *
+	 * @return The output Base32 string.
+	 */
+	public static String getString(byte[] bytes) {
+		Base32 codec = new Base32();
+		byte[] decodedBytes = codec.encode(bytes);
+		return StringEncoder.getString(decodedBytes);
+	}
 }

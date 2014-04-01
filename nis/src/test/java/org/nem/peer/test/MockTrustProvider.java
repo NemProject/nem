@@ -7,19 +7,19 @@ import org.nem.peer.trust.*;
  */
 public class MockTrustProvider implements TrustProvider {
 
-    private final Vector trustVector;
+	private final Vector trustVector;
 
-    /**
-     * Creates a new mock trust provider.
-     *
-     * @param trustVector The trust vector that should be returned.
-     */
-    public MockTrustProvider(final Vector trustVector) {
-        this.trustVector = trustVector;
-    }
+	/**
+	 * Creates a new mock trust provider.
+	 *
+	 * @param trustVector The trust vector that should be returned.
+	 */
+	public MockTrustProvider(final Vector trustVector) {
+		this.trustVector = trustVector;
+	}
 
-    @Override
-    public Vector computeTrust(final TrustContext context) {
-        return this.trustVector;
-    }
+	@Override
+	public Vector computeTrust(final TrustContext context) {
+		return this.trustVector;
+	}
 }

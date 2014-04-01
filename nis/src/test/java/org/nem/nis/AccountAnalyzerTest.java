@@ -23,8 +23,8 @@ public class AccountAnalyzerTest {
 	public static final Amount SENDER_AMOUNT = Amount.fromNem(10);
 	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNem(3);
 	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNem(5);
-    public static final Amount RECIPIENT1_FEE = Amount.fromMicroNem(6000);
-    public static final Amount RECIPIENT2_FEE = Amount.fromMicroNem(10000);
+	public static final Amount RECIPIENT1_FEE = Amount.fromMicroNem(6000);
+	public static final Amount RECIPIENT2_FEE = Amount.fromMicroNem(10000);
 	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -103,8 +103,8 @@ public class AccountAnalyzerTest {
 		Assert.assertThat(t2.getBalance(), equalTo(RECIPIENT2_AMOUNT));
 		// zero fees
 		final Amount rest = SENDER_AMOUNT
-            .subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT1_FEE)
-            .subtract(RECIPIENT2_AMOUNT).subtract(RECIPIENT2_FEE);
+				.subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT1_FEE)
+				.subtract(RECIPIENT2_AMOUNT).subtract(RECIPIENT2_FEE);
 		Assert.assertThat(t3.getBalance(), equalTo(rest));
 	}
 
@@ -113,7 +113,7 @@ public class AccountAnalyzerTest {
 		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
 
 		Block b = new Block(
-				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8*1000000L, 0L
+				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8 * 1000000L, 0L
 		);
 
 		b.setBlockTransfers(Arrays.asList(t1, t2));
@@ -123,7 +123,7 @@ public class AccountAnalyzerTest {
 
 	private Transfer prepareTransfer(Account sender, Account recipient, Amount amount, Amount fee, int idInBlock) {
 		return new Transfer(1L, new byte[32], 1, TransactionTypes.TRANSFER,
-                fee.getNumMicroNem(),
+				fee.getNumMicroNem(),
 				0, 0,
 				sender,
 				new byte[64], // sig

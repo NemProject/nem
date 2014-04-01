@@ -10,26 +10,29 @@ import java.util.List;
  */
 public interface PeerConnector {
 
-    /**
-     * Gets information about the specified node.
-     *
-     * @param endpoint The endpoint.
-     * @return Information about the specified node.
-     */
-    public Node getInfo(final NodeEndpoint endpoint);
+	/**
+	 * Gets information about the specified node.
+	 *
+	 * @param endpoint The endpoint.
+	 *
+	 * @return Information about the specified node.
+	 */
+	public Node getInfo(final NodeEndpoint endpoint);
 
-    /**
-     * Requests information about all known peers from the specified node.
-     *
-     * @param endpoint The endpoint.
-     * @return A collection of all known peers.
-     */
-    public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
+	/**
+	 * Requests information about all known peers from the specified node.
+	 *
+	 * @param endpoint The endpoint.
+	 *
+	 * @return A collection of all known peers.
+	 */
+	public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
 
 	/**
 	 * Request information about last block in chain from the specified node.
 	 *
 	 * @param endpoint The endpoint.
+	 *
 	 * @return Last block.
 	 */
 	public Block getLastBlock(final NodeEndpoint endpoint);
@@ -39,13 +42,13 @@ public interface PeerConnector {
 	 *
 	 * @param endpoint
 	 * @param height
+	 *
 	 * @return Block at specified height
 	 */
 	public Block getBlockAt(final NodeEndpoint endpoint, long height);
 
 	/**
 	 * Request blocks after specified height.
-	 *
 	 *
 	 * @param endpoint
 	 * @param height
@@ -57,9 +60,9 @@ public interface PeerConnector {
 	/**
 	 * Announces a new entity to the target node.
 	 *
-	 * @param endpoint The endpoint.
+	 * @param endpoint   The endpoint.
 	 * @param announceId The type of announcement.
-	 * @param entity The entity to announce.
+	 * @param entity     The entity to announce.
 	 */
-    public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
+	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
 }

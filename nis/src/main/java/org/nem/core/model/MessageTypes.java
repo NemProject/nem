@@ -5,13 +5,13 @@ package org.nem.core.model;
  */
 public class MessageTypes {
 
-    /**
-     * A plain message.
-     */
-    public static final int PLAIN = 0x0001;
+	/**
+	 * A plain message.
+	 */
+	public static final int PLAIN = 0x0001;
 
-    /**
-     * A secure message.
-     */
-    public static final int SECURE = 0x0002;
+	/**
+	 * A secure message.
+	 */
+	public static final int SECURE = 0x0002;
 }

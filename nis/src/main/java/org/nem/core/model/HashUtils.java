@@ -8,14 +8,15 @@ import org.nem.core.serialization.BinarySerializer;
  */
 public class HashUtils {
 
-    /**
-     * Calculates the hash of the specified entity, excluding its signature.
-     *
-     * @param entity The entity.
-     * @return The calculated hash.
-     */
-    public static byte[] calculateHash(final VerifiableEntity entity) {
-        byte[] data = BinarySerializer.serializeToBytes(entity.asNonVerifiable());
-        return Hashes.sha3(data);
-    }
+	/**
+	 * Calculates the hash of the specified entity, excluding its signature.
+	 *
+	 * @param entity The entity.
+	 *
+	 * @return The calculated hash.
+	 */
+	public static byte[] calculateHash(final VerifiableEntity entity) {
+		byte[] data = BinarySerializer.serializeToBytes(entity.asNonVerifiable());
+		return Hashes.sha3(data);
+	}
 }

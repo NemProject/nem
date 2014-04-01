@@ -19,258 +19,258 @@ import java.math.BigInteger;
  */
 public class SerializationUtilsTest {
 
-    //region Address
+	//region Address
 
-    @Test
-    public void canWriteAddress() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Address address = Address.fromEncoded("MockAcc");
+	@Test
+	public void canWriteAddress() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
 
-        // Act:
-        SerializationUtils.writeAddress(serializer, "Address", address);
+		// Act:
+		SerializationUtils.writeAddress(serializer, "Address", address);
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((String)object.get("Address"), IsEqual.equalTo(address.getEncoded()));
-    }
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Address"), IsEqual.equalTo(address.getEncoded()));
+	}
 
-    @Test
-    public void canRoundtripAddress() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
+	@Test
+	public void canRoundtripAddress() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
 
-        // Act:
-        SerializationUtils.writeAddress(serializer, "Address", Address.fromEncoded("MockAcc"));
+		// Act:
+		SerializationUtils.writeAddress(serializer, "Address", Address.fromEncoded("MockAcc"));
 
-        final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
-        final Address address = SerializationUtils.readAddress(deserializer, "Address");
+		final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
+		final Address address = SerializationUtils.readAddress(deserializer, "Address");
 
-        // Assert:
-        Assert.assertThat(address, IsEqual.equalTo(address));
-    }
+		// Assert:
+		Assert.assertThat(address, IsEqual.equalTo(address));
+	}
 
-    //endregion
+	//endregion
 
-    //region Account
+	//region Account
 
-    @Test
-    public void canWriteAccount() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Address address = Address.fromEncoded("MockAcc");
+	@Test
+	public void canWriteAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
 
-        // Act:
-        SerializationUtils.writeAccount(serializer, "Account", new MockAccount(address));
+		// Act:
+		SerializationUtils.writeAccount(serializer, "Account", new MockAccount(address));
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
-    }
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
+	}
 
-    @Test
-    public void canWriteAccountWithAddressEncoding() {
-        // Arrange:
-        final Address address = Address.fromEncoded("MockAcc");
+	@Test
+	public void canWriteAccountWithAddressEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("MockAcc");
 
-        // Assert:
-        assertCanWriteAccountWithEncoding(
-            new MockAccount(address),
-            AccountEncoding.ADDRESS,
-            address.getEncoded());
-    }
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new MockAccount(address),
+				AccountEncoding.ADDRESS,
+				address.getEncoded());
+	}
 
-    @Test
-    public void canWriteAccountWithPublicKeyEncoding() {
-        // Arrange:
-        final KeyPair kp = new KeyPair();
+	@Test
+	public void canWriteAccountWithPublicKeyEncoding() {
+		// Arrange:
+		final KeyPair kp = new KeyPair();
 
-        // Assert:
-        assertCanWriteAccountWithEncoding(
-            new Account(kp),
-            AccountEncoding.PUBLIC_KEY,
-            Base64Encoder.getString(kp.getPublicKey().getRaw()));
-    }
-    
-    private static void assertCanWriteAccountWithEncoding(
-        final Account account,
-        final AccountEncoding encoding,
-        final String expectedSerializedString) {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(kp),
+				AccountEncoding.PUBLIC_KEY,
+				Base64Encoder.getString(kp.getPublicKey().getRaw()));
+	}
 
-        // Act:
-        SerializationUtils.writeAccount(serializer, "Account", account, encoding);
+	private static void assertCanWriteAccountWithEncoding(
+			final Account account,
+			final AccountEncoding encoding,
+			final String expectedSerializedString) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(expectedSerializedString));
-    }
+		// Act:
+		SerializationUtils.writeAccount(serializer, "Account", account, encoding);
 
-    @Test
-    public void canRoundtripAccount() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Address address = Address.fromEncoded("MockAcc");
-        final MockAccountLookup accountLookup = new MockAccountLookup();
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(expectedSerializedString));
+	}
 
-        // Act:
-        SerializationUtils.writeAccount(serializer, "Account", new MockAccount(address));
+	@Test
+	public void canRoundtripAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+		final MockAccountLookup accountLookup = new MockAccountLookup();
 
-        final JsonDeserializer deserializer = new JsonDeserializer(
-            serializer.getObject(),
-            new DeserializationContext(accountLookup));
-        final Account account = SerializationUtils.readAccount(deserializer, "Account");
+		// Act:
+		SerializationUtils.writeAccount(serializer, "Account", new MockAccount(address));
 
-        // Assert:
-        Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
-        Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-    }
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = SerializationUtils.readAccount(deserializer, "Account");
 
-    @Test
-    public void canRoundtripAccountWithAddressEncoding() {
-        // Assert:
-        assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
-    }
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+	}
 
-    @Test
-    public void canRoundtripAccountWithPublicKeyEncoding() {
-        // Assert:
-        assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
-    }
+	@Test
+	public void canRoundtripAccountWithAddressEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
+	}
 
-    private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
-        final MockAccountLookup accountLookup = new MockAccountLookup();
+	@Test
+	public void canRoundtripAccountWithPublicKeyEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
+	}
 
-        // Act:
-        SerializationUtils.writeAccount(serializer, "Account", originalAccount, encoding);
+	private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
+		final MockAccountLookup accountLookup = new MockAccountLookup();
 
-        final JsonDeserializer deserializer = new JsonDeserializer(
-            serializer.getObject(),
-            new DeserializationContext(accountLookup));
-        final Account account = SerializationUtils.readAccount(deserializer, "Account", encoding);
+		// Act:
+		SerializationUtils.writeAccount(serializer, "Account", originalAccount, encoding);
 
-        // Assert:
-        Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
-        Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-    }
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = SerializationUtils.readAccount(deserializer, "Account", encoding);
 
-    //endregion
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+	}
 
-    //region Signature
+	//endregion
 
-    @Test
-    public void canWriteSignature() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Signature signature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
+	//region Signature
 
-        // Act:
-        SerializationUtils.writeSignature(serializer, "Signature", signature);
+	@Test
+	public void canWriteSignature() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Signature signature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((String)object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
-    }
+		// Act:
+		SerializationUtils.writeSignature(serializer, "Signature", signature);
 
-    @Test
-    public void canRoundtripSignature() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Signature originalSignature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
+	}
 
-        // Act:
-        SerializationUtils.writeSignature(serializer, "Signature", originalSignature);
+	@Test
+	public void canRoundtripSignature() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Signature originalSignature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
 
-        final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
-        final Signature signature = SerializationUtils.readSignature(deserializer, "Signature");
+		// Act:
+		SerializationUtils.writeSignature(serializer, "Signature", originalSignature);
 
-        // Assert:
-        Assert.assertThat(signature, IsEqual.equalTo(originalSignature));
-    }
+		final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
+		final Signature signature = SerializationUtils.readSignature(deserializer, "Signature");
 
-    //endregion
+		// Assert:
+		Assert.assertThat(signature, IsEqual.equalTo(originalSignature));
+	}
 
-    //region TimeInstant
+	//endregion
 
-    @Test
-    public void canWriteTimeInstant() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final TimeInstant instant = new TimeInstant(77124);
+	//region TimeInstant
 
-        // Act:
-        SerializationUtils.writeTimeInstant(serializer, "TimeInstant", instant);
+	@Test
+	public void canWriteTimeInstant() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final TimeInstant instant = new TimeInstant(77124);
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((Integer)object.get("TimeInstant"), IsEqual.equalTo(77124));
-    }
+		// Act:
+		SerializationUtils.writeTimeInstant(serializer, "TimeInstant", instant);
 
-    @Test
-    public void canRoundtripTimeInstant() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final TimeInstant originalInstant = new TimeInstant(77124);
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Integer)object.get("TimeInstant"), IsEqual.equalTo(77124));
+	}
 
-        // Act:
-        SerializationUtils.writeTimeInstant(serializer, "TimeInstant", originalInstant);
+	@Test
+	public void canRoundtripTimeInstant() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final TimeInstant originalInstant = new TimeInstant(77124);
 
-        final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
-        final TimeInstant instant = SerializationUtils.readTimeInstant(deserializer, "TimeInstant");
+		// Act:
+		SerializationUtils.writeTimeInstant(serializer, "TimeInstant", originalInstant);
 
-        // Assert:
-        Assert.assertThat(instant, IsEqual.equalTo(originalInstant));
-    }
+		final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
+		final TimeInstant instant = SerializationUtils.readTimeInstant(deserializer, "TimeInstant");
 
-    //endregion
+		// Assert:
+		Assert.assertThat(instant, IsEqual.equalTo(originalInstant));
+	}
 
-    //region Amount
+	//endregion
 
-    @Test
-    public void canWriteAmount() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Amount amount = new Amount(0x7712411223456L);
+	//region Amount
 
-        // Act:
-        SerializationUtils.writeAmount(serializer, "Amount", amount);
+	@Test
+	public void canWriteAmount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount amount = new Amount(0x7712411223456L);
 
-        // Assert:
-        final JSONObject object = serializer.getObject();
-        Assert.assertThat(object.size(), IsEqual.equalTo(1));
-        Assert.assertThat((Long)object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
-    }
+		// Act:
+		SerializationUtils.writeAmount(serializer, "Amount", amount);
 
-    @Test
-    public void canRoundtripAmount() {
-        // Arrange:
-        final JsonSerializer serializer = new JsonSerializer();
-        final Amount originalAmount = new Amount(0x7712411223456L);
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Long)object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
+	}
 
-        // Act:
-        SerializationUtils.writeAmount(serializer, "Amount", originalAmount);
+	@Test
+	public void canRoundtripAmount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount originalAmount = new Amount(0x7712411223456L);
 
-        final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
-        final Amount amount = SerializationUtils.readAmount(deserializer, "Amount");
+		// Act:
+		SerializationUtils.writeAmount(serializer, "Amount", originalAmount);
 
-        // Assert:
-        Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
-    }
+		final JsonDeserializer deserializer = createDeserializer(serializer.getObject());
+		final Amount amount = SerializationUtils.readAmount(deserializer, "Amount");
 
-    //endregion
+		// Assert:
+		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
+	}
 
-    private JsonDeserializer createDeserializer(final JSONObject object) {
-        return new JsonDeserializer(
-            object,
-            new DeserializationContext(new MockAccountLookup()));
-    }
+	//endregion
+
+	private JsonDeserializer createDeserializer(final JSONObject object) {
+		return new JsonDeserializer(
+				object,
+				new DeserializationContext(new MockAccountLookup()));
+	}
 }

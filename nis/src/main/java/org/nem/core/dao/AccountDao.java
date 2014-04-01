@@ -21,13 +21,13 @@ public interface AccountDao {
 	 * Retrieves Account from db given it's printable (encoded) address.
 	 *
 	 * @param printableAddress NEM address
+	 *
 	 * @return Account associated with given printableAddress or null.
 	 */
 	public Account getAccountByPrintableAddress(String printableAddress);
 
 	/**
 	 * Saves an account in the database.
-	 *
 	 * Note: if id wasn't set, it'll be filled after save()
 	 *
 	 * @param account Account that's going to be saved.

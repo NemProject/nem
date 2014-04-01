@@ -71,8 +71,8 @@ public class BlockChainTest {
 				1,
 				// prev hash
 				new byte[] {
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 				},
 				HashUtils.calculateHash(b),
 				0, // timestamp

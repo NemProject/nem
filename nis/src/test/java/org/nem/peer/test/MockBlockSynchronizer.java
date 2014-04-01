@@ -9,26 +9,30 @@ import org.nem.peer.PeerConnector;
  */
 public class MockBlockSynchronizer implements BlockSynchronizer {
 
-    private int numSynchronizeNodeCalls;
-    private PeerConnector lastConnector;
+	private int numSynchronizeNodeCalls;
+	private PeerConnector lastConnector;
 
-    /**
-     * Gets the number of times synchronizeNode was called.
-     *
-     * @return The number of times synchronizeNode was called.
-     */
-    public int getNumSynchronizeNodeCalls() { return this.numSynchronizeNodeCalls; }
+	/**
+	 * Gets the number of times synchronizeNode was called.
+	 *
+	 * @return The number of times synchronizeNode was called.
+	 */
+	public int getNumSynchronizeNodeCalls() {
+		return this.numSynchronizeNodeCalls;
+	}
 
-    /**
-     * Gets the last PeerConnector passed to synchronizeNode.
-     *
-     * @return The last PeerConnector passed to synchronizeNode.
-     */
-    public PeerConnector getLastConnector() { return this.lastConnector; }
+	/**
+	 * Gets the last PeerConnector passed to synchronizeNode.
+	 *
+	 * @return The last PeerConnector passed to synchronizeNode.
+	 */
+	public PeerConnector getLastConnector() {
+		return this.lastConnector;
+	}
 
 	@Override
 	public void synchronizeNode(final PeerConnector connector, final Node node) {
 		++this.numSynchronizeNodeCalls;
-        this.lastConnector = connector;
+		this.lastConnector = connector;
 	}
 }

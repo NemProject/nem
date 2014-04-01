@@ -8,36 +8,36 @@ import org.nem.peer.trust.score.NodeExperience;
  */
 public class BasicNodeSelector implements NodeSelector {
 
-    private final TrustProvider trustProvider;
+	private final TrustProvider trustProvider;
 
-    /**
-     * Creates a new basic node selector.
-     *
-     * @param trustProvider The trust provider.
-     */
-    public BasicNodeSelector(final TrustProvider trustProvider) {
-        this.trustProvider = trustProvider;
-    }
+	/**
+	 * Creates a new basic node selector.
+	 *
+	 * @param trustProvider The trust provider.
+	 */
+	public BasicNodeSelector(final TrustProvider trustProvider) {
+		this.trustProvider = trustProvider;
+	}
 
-    @Override
-    public NodeExperiencePair selectNode(final TrustContext context) {
-        final Vector trustVector = this.trustProvider.computeTrust(context);
-        trustVector.normalize();
+	@Override
+	public NodeExperiencePair selectNode(final TrustContext context) {
+		final Vector trustVector = this.trustProvider.computeTrust(context);
+		trustVector.normalize();
 
-        double sum = 0;
-        double rand = Math.random();
+		double sum = 0;
+		double rand = Math.random();
 
-        final Node localNode = context.getLocalNode();
-        final Node[] nodes = context.getNodes();
-        for (int i = 0; i < nodes.length; ++i) {
-            sum += trustVector.getAt(i);
-            if (sum < rand)
-                continue;
+		final Node localNode = context.getLocalNode();
+		final Node[] nodes = context.getNodes();
+		for (int i = 0; i < nodes.length; ++i) {
+			sum += trustVector.getAt(i);
+			if (sum < rand)
+				continue;
 
-            final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-            return new NodeExperiencePair(nodes[i], experience);
-        }
+			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
+			return new NodeExperiencePair(nodes[i], experience);
+		}
 
-        throw new TrustException("No available peers found");
-    }
+		throw new TrustException("No available peers found");
+	}
 }

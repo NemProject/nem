@@ -9,47 +9,47 @@ import org.nem.peer.trust.score.NodeExperience;
  */
 public class LowComTrustProvider implements TrustProvider {
 
-    private static final int MIN_COMMUNICATION = 10;
+	private static final int MIN_COMMUNICATION = 10;
 
-    private final int weight;
-    private final TrustProvider trustProvider;
+	private final int weight;
+	private final TrustProvider trustProvider;
 
-    /**
-     * Creates a new low communication trust provider.
-     *
-     * @param trustProvider The trust provider.
-     * @param weight The desired percentage boost for choosing a low communication node.
-     */
-    public LowComTrustProvider(final TrustProvider trustProvider, final int weight) {
-        this.trustProvider = trustProvider;
-        this.weight = weight;
-    }
+	/**
+	 * Creates a new low communication trust provider.
+	 *
+	 * @param trustProvider The trust provider.
+	 * @param weight        The desired percentage boost for choosing a low communication node.
+	 */
+	public LowComTrustProvider(final TrustProvider trustProvider, final int weight) {
+		this.trustProvider = trustProvider;
+		this.weight = weight;
+	}
 
-    @Override
-    public Vector computeTrust(final TrustContext context) {
-        final Vector trustVector = this.trustProvider.computeTrust(context);
-        trustVector.normalize();
+	@Override
+	public Vector computeTrust(final TrustContext context) {
+		final Vector trustVector = this.trustProvider.computeTrust(context);
+		trustVector.normalize();
 
-        final Vector lowComVector = computeLowComVector(context);
-        double lowComVectorSum = lowComVector.sum();
-        return 0 == lowComVectorSum
-            ? trustVector
-            : trustVector.add(lowComVector.multiply(1.0 / lowComVectorSum * weight / 100.0));
-    }
+		final Vector lowComVector = computeLowComVector(context);
+		double lowComVectorSum = lowComVector.sum();
+		return 0 == lowComVectorSum
+				? trustVector
+				: trustVector.add(lowComVector.multiply(1.0 / lowComVectorSum * weight / 100.0));
+	}
 
-    private static Vector computeLowComVector(final TrustContext context) {
-        final Node localNode = context.getLocalNode();
-        final Node[] nodes = context.getNodes();
+	private static Vector computeLowComVector(final TrustContext context) {
+		final Node localNode = context.getLocalNode();
+		final Node[] nodes = context.getNodes();
 
-        final Vector lowComVector = new Vector(nodes.length);
-        for (int i = 0; i < nodes.length; ++i) {
-            final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-            if (experience.totalCalls() >= MIN_COMMUNICATION)
-                continue;
+		final Vector lowComVector = new Vector(nodes.length);
+		for (int i = 0; i < nodes.length; ++i) {
+			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
+			if (experience.totalCalls() >= MIN_COMMUNICATION)
+				continue;
 
-            lowComVector.setAt(i, 1);
-        }
+			lowComVector.setAt(i, 1);
+		}
 
-        return lowComVector;
-    }
+		return lowComVector;
+	}
 }

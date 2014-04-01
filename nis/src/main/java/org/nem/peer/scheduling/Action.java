@@ -5,10 +5,10 @@ package org.nem.peer.scheduling;
  */
 public interface Action<T> {
 
-    /**
-     * Executes the action.
-     *
-     * @param element The element.
-     */
-    void execute(final T element);
+	/**
+	 * Executes the action.
+	 *
+	 * @param element The element.
+	 */
+	void execute(final T element);
 }

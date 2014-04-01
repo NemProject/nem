@@ -37,8 +37,8 @@ public class BlockChain implements BlockSynchronizer {
 	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-    @Autowired
-    private NisPeerNetworkHost host;
+	@Autowired
+	private NisPeerNetworkHost host;
 
 	// for now it's easier to keep it like this
 	org.nem.core.dbmodel.Block lastBlock;
@@ -76,15 +76,15 @@ public class BlockChain implements BlockSynchronizer {
 
 
 	private long calcDbBlockScore(org.nem.core.dbmodel.Block block) {
-		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
-		long r2 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getBlockHash(), 10, 14)));
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getBlockHash(), 10, 14)));
 
 		return r1 + r2;
 	}
 
 	private long calcBlockScore(Block block) {
-		long r1 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long) ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
 
 		return r1 + r2;
 	}
@@ -116,7 +116,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	public SynchronizeCompareStatus sychronizeCompareAt(Block peerBlock, long lowerHeight) {
-		if (! peerBlock.verify()) {
+		if (!peerBlock.verify()) {
 			// TODO: penalty for node
 			return SynchronizeCompareStatus.EVIL_NODE;
 		}
@@ -236,7 +236,7 @@ public class BlockChain implements BlockSynchronizer {
 			}
 
 			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
-			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY/2)) {
+			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY / 2)) {
 				penalize(node);
 				return;
 			}
@@ -247,18 +247,18 @@ public class BlockChain implements BlockSynchronizer {
 			long wantedHeight = peerHeight + 1;
 			for (Block block : peerChain) {
 				if (block.getHeight() != wantedHeight ||
-						! block.verify() ||
-						! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
+						!block.verify() ||
+						!validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
 					penalize(node);
 					return;
 				}
 
 				for (Transaction transaction : block.getTransactions()) {
-					if (! transaction.isValid()) {
+					if (!transaction.isValid()) {
 						penalize(node);
 						return;
 					}
-					if (! transaction.verify()) {
+					if (!transaction.verify()) {
 						penalize(node);
 						return;
 					}
@@ -276,6 +276,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * Checks if passed block is correct, and if eligible adds it to db
 	 *
 	 * @param block - block that's going to be processed
+	 *
 	 * @return false if block was known or invalid, true if ok and added to db
 	 */
 	public boolean processBlock(Block block) {

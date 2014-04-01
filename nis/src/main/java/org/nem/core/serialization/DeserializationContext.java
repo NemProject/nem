@@ -7,24 +7,25 @@ import org.nem.core.model.*;
  */
 public class DeserializationContext {
 
-    private final AccountLookup accountLookup;
+	private final AccountLookup accountLookup;
 
-    /**
-     * Creates a new DeserializationContext around the specified parameters.
-     *
-     * @param accountLookup The account lookup policy.
-     */
-    public DeserializationContext(final AccountLookup accountLookup) {
-        this.accountLookup = accountLookup;
-    }
+	/**
+	 * Creates a new DeserializationContext around the specified parameters.
+	 *
+	 * @param accountLookup The account lookup policy.
+	 */
+	public DeserializationContext(final AccountLookup accountLookup) {
+		this.accountLookup = accountLookup;
+	}
 
-    /**
-     * Looks up an account by its id.
-     *
-     * @param id The account id.
-     * @return The account with the specified id.
-     */
-    public Account findAccountByAddress(final Address id) {
-        return this.accountLookup.findByAddress(id);
-    }
+	/**
+	 * Looks up an account by its id.
+	 *
+	 * @param id The account id.
+	 *
+	 * @return The account with the specified id.
+	 */
+	public Account findAccountByAddress(final Address id) {
+		return this.accountLookup.findByAddress(id);
+	}
 }

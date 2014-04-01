@@ -18,11 +18,11 @@ public class AccountController {
 	@Autowired
 	private Foraging foraging;
 
-	@RequestMapping(value="/account/unlock", method = RequestMethod.POST)
+	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	public String accountUnlock(@RequestBody final String body) {
-        final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-        final Account account = new Account(new KeyPair(new PrivateKey(deserializer)));
-        this.foraging.addUnlockedAccount(account);
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		final Account account = new Account(new KeyPair(new PrivateKey(deserializer)));
+		this.foraging.addUnlockedAccount(account);
 		return Utils.jsonOk();
 	}
 }

@@ -5,30 +5,32 @@ package org.nem.peer.trust;
  */
 public class RealDouble {
 
-    private double value;
+	private double value;
 
-    /**
-     * Creates a new real double.
-     *
-     * @param value The double value.
-     */
-    public RealDouble(final double value) {
-        this.set(value);
-    }
+	/**
+	 * Creates a new real double.
+	 *
+	 * @param value The double value.
+	 */
+	public RealDouble(final double value) {
+		this.set(value);
+	}
 
-    /**
-     * Gets the double value.
-     *
-     * @return The double value
-     */
-    public double get() { return this.value; }
+	/**
+	 * Gets the double value.
+	 *
+	 * @return The double value
+	 */
+	public double get() {
+		return this.value;
+	}
 
-    /**
-     * Sets the double value.
-     *
-     * @param value The double value
-     */
-    public void set(final double value) {
-        this.value = (Double.isNaN(value) || Double.isInfinite(value)) ? 0.0 : value;
-    }
+	/**
+	 * Sets the double value.
+	 *
+	 * @param value The double value
+	 */
+	public void set(final double value) {
+		this.value = (Double.isNaN(value) || Double.isInfinite(value)) ? 0.0 : value;
+	}
 }

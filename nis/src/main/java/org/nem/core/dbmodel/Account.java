@@ -11,30 +11,31 @@ import javax.persistence.GenerationType;
 
 /**
  * Db Account entity.
- *
+ * <p/>
  * Probably it should be called Address, as it's main purpose is to associate
  * printableKey with publicKey.
- *
+ * <p/>
  * In future it should probably also two 'heights' of an Account,
  * marking at what blockchain height has network 'learned' about
  * Account NEM address (printableKey) and public key respectively.
  */
-@Entity  
-@Table(name="accounts") 
+@Entity
+@Table(name = "accounts")
 public class Account {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-    // base32 public key encoded with org.nem.core.model.Address
+	// base32 public key encoded with org.nem.core.model.Address
 	private String printableKey;
-    // public key, might be null
+	// public key, might be null
 	private byte[] publicKey;
 
-	public Account() {}
-	
+	public Account() {
+	}
+
 	public Account(final String printableKey, final PublicKey publicKey) {
 		this.printableKey = printableKey;
-        this.setPublicKey(publicKey);
+		this.setPublicKey(publicKey);
 	}
 
 	public Long getId() {
@@ -58,7 +59,7 @@ public class Account {
 	}
 
 	public void setPublicKey(final PublicKey publicKey) {
-        if (null != publicKey)
-            this.publicKey = publicKey.getRaw();
-    }
+		if (null != publicKey)
+			this.publicKey = publicKey.getRaw();
+	}
 }

@@ -7,15 +7,15 @@ import org.nem.peer.trust.score.Score;
  */
 public class MockScore extends Score {
 
-    /**
-     * The initial raw value of a MockScore.
-     */
-    public static final double INITIAL_SCORE = 1.4;
+	/**
+	 * The initial raw value of a MockScore.
+	 */
+	public static final double INITIAL_SCORE = 1.4;
 
-    /**
-     * Creates a new mock Score.
-     */
-    public MockScore() {
-        super(INITIAL_SCORE);
-    }
+	/**
+	 * Creates a new mock Score.
+	 */
+	public MockScore() {
+		super(INITIAL_SCORE);
+	}
 }

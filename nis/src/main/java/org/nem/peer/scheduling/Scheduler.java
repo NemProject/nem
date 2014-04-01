@@ -9,15 +9,15 @@ import java.util.Collection;
  */
 public interface Scheduler<T> {
 
-    /**
-     * Adds each element in elements to the work queue.
-     *
-     * @param elements Elements that should be added to the work queue.
-     */
-    public void push(final Collection<T> elements);
+	/**
+	 * Adds each element in elements to the work queue.
+	 *
+	 * @param elements Elements that should be added to the work queue.
+	 */
+	public void push(final Collection<T> elements);
 
-    /**
-     * Blocks until all pending work is complete.
-     */
-    public void block();
+	/**
+	 * Blocks until all pending work is complete.
+	 */
+	public void block();
 }

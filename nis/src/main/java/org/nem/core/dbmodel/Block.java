@@ -7,57 +7,57 @@ import java.util.List;
 
 /**
  * Db Block entity.
- *
+ * <p/>
  * Holds all the important information related to block data.
- *
+ * <p/>
  * Associated forger and transactions are obtained automatically (by BlockDao)
  * thanks to @Cascade annotations.
  */
 @Entity
-@Table(name="blocks")
+@Table(name = "blocks")
 public class Block {
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Long shortId;
-	
+
 	private Integer version;
 	private byte[] prevBlockHash;
 	private byte[] blockHash;
 	private Integer timestamp;
-	
+
 	@ManyToOne
-	@Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE})
-    @JoinColumn(name="forgerId")
+	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "forgerId")
 	private Account forger;
 	private byte[] forgerProof;
-	
+
 	private Long height;
-	
+
 	private Long totalAmount;
 	private Long totalFee;
-	
+
 	private Long nextBlockId;
-	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="block")
-    @OrderBy("blkIndex")
-    private List<Transfer> blockTransfers;
-	
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "block")
+	@OrderBy("blkIndex")
+	private List<Transfer> blockTransfers;
+
 	public Block() {
 	}
-	
+
 	public Block(
-			Long shortId,		
+			Long shortId,
 			Integer version,
 			byte[] prevBlockHash,
 			byte[] blockHash,
-			Integer timestamp,	
+			Integer timestamp,
 			Account forger,
 			byte[] forgerProof,
 			Long height,
 			Long totalAmount,
 			Long totalFee) {
-		
+
 		this.shortId = shortId;
 		this.version = version;
 		this.prevBlockHash = prevBlockHash;
@@ -69,7 +69,7 @@ public class Block {
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}

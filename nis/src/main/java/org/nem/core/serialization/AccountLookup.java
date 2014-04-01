@@ -8,11 +8,12 @@ import org.nem.core.model.Account;
  */
 public interface AccountLookup {
 
-    /**
-     * Looks up an account by its id.
-     *
-     * @param id The account id.
-     * @return The account with the specified id.
-     */
-    public Account findByAddress(final Address id);
+	/**
+	 * Looks up an account by its id.
+	 *
+	 * @param id The account id.
+	 *
+	 * @return The account with the specified id.
+	 */
+	public Account findByAddress(final Address id);
 }

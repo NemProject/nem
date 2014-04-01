@@ -4,12 +4,12 @@ import org.junit.*;
 
 public class NisPeerNetworkHostTest {
 
-    @Test
-    public void defaultHostCanBeBooted() {
-        // Arrange:
-        final NisPeerNetworkHost host = new NisPeerNetworkHost();
+	@Test
+	public void defaultHostCanBeBooted() {
+		// Arrange:
+		final NisPeerNetworkHost host = new NisPeerNetworkHost();
 
-        // Act:
-        host.boot();
-    }
+		// Act:
+		host.boot();
+	}
 }

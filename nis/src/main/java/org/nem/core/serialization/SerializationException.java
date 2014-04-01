@@ -5,31 +5,31 @@ package org.nem.core.serialization;
  */
 public class SerializationException extends RuntimeException {
 
-    /**
-     * Creates a new serialization exception.
-     *
-     * @param message The exception message.
-     */
-    public SerializationException(final String message) {
-        super(message);
-    }
+	/**
+	 * Creates a new serialization exception.
+	 *
+	 * @param message The exception message.
+	 */
+	public SerializationException(final String message) {
+		super(message);
+	}
 
-    /**
-     * Creates a new serialization exception.
-     *
-     * @param cause The exception message.
-     */
-    public SerializationException(Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * Creates a new serialization exception.
+	 *
+	 * @param cause The exception message.
+	 */
+	public SerializationException(Throwable cause) {
+		super(cause);
+	}
 
-    /**
-     * Creates a new serialization exception.
-     *
-     * @param message The exception message.
-     * @param cause The original exception.
-     */
-    public SerializationException(final String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Creates a new serialization exception.
+	 *
+	 * @param message The exception message.
+	 * @param cause   The original exception.
+	 */
+	public SerializationException(final String message, Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -17,7 +17,7 @@ public interface TransferDao {
 
 	/**
 	 * Returns number of transfers in the database.
-	 *
+	 * <p/>
 	 * Note: this  will return number of transactions of Transfer type only.
 	 *
 	 * @return number of transfers in the database.
