@@ -18,6 +18,16 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+//
+// Initial logic is as follows:
+//   * we recieve new TX, IF it hasn't been seen,
+//     it is added to unconfirmedTransactions,
+//   * blockGeneratorExecutor periodically tries to generate a block containing
+//     unconfirmed transactions
+//   * if it succeeded, block is added to the db and propagated to the network
+//
+// fork resolution should solve the rest
+//
 public class Foraging implements AutoCloseable, Runnable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	public static final long MAGIC_MULTIPLIER = 614891469L;
