@@ -14,6 +14,7 @@ import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
+import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -162,14 +163,35 @@ public class BlockChain implements BlockSynchronizer {
 
 	}
 
-	@Override
-	public void synchronizeNode(PeerConnector connector, Node node) {
+	/**
+	 * Retrieves last block from another peer and checks if it's different than ours.
+	 *
+	 * @param connector
+	 * @param node
+	 *
+	 * @return peer's last block or null
+	 */
+	private Block checkLastBlock(PeerConnector connector, Node node) {
 		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
 		if (peerLastBlock == null) {
-			return;
+			return null;
 		}
 
 		if (this.synchronizeCompareBlocks(peerLastBlock, lastBlock)) {
+			return null;
+		}
+
+		if (! peerLastBlock.verify()) {
+			penalize(node);
+			return null;
+		}
+		return peerLastBlock;
+	}
+
+	@Override
+	public void synchronizeNode(PeerConnector connector, Node node) {
+		Block peerLastBlock = checkLastBlock(connector, node);
+		if (peerLastBlock == null) {
 			return;
 		}
 
@@ -182,93 +204,99 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
-		Block commonBlock = peerLastBlock;
-		if (val > 0) {
-			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
-			// no point to continue
-			if (commonBlock == null) {
-				return;
-			}
+		long startingPoint = Math.max(1, this.getLastBlockHeight() - (ESTIMATED_BLOCKS_PER_DAY / 2));
+		List<ByteArray> hashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
+
+		for(ByteArray ba : hashes) {
+			System.out.println("h: " + HexEncoder.getString(ba.get()));
 		}
 
-		SynchronizeCompareStatus status = this.sychronizeCompareAt(commonBlock, lowerHeight);
-
-		if (status == SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER) {
-			// TODO: find common block
-			// remember to check it height diff < halfday
-			// update val
-			// update commonBlock
-			LOGGER.severe("finding common block not handled yet");
-			System.exit(-1);
-		}
-
-		switch (status) {
-			case EVIL_NODE:
-				penalize(node);
-				return;
-			case OUR_CHAIN_IS_BETTER:
-				// perfect nothing to do
-				return;
-			default:
-				break;
-		}
-
-		if (status == SynchronizeCompareStatus.EQUAL_BLOCKS) {
-			long peerHeight = commonBlock.getHeight();
-
-			// if 'common' block is peer's last one it simply means we have longer chain
-			if (peerHeight == peerLastBlock.getHeight()) {
-				return;
-			}
-
-			org.nem.core.dbmodel.Block ourDbBlock = blockDao.findByHeight(peerHeight);
-			if (ourDbBlock == null) {
-				// probably would be strange if that would happen
-				return;
-			}
-
-			AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
-			if (this.getLastBlockHeight() > peerHeight) {
-				// TODO: create duplicate of account analyzer
-				// revert transactions "on the copy"
-				LOGGER.severe("virtual chain not handled yet");
-				System.exit(-1);
-			}
-
-			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
-			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY / 2)) {
-				penalize(node);
-				return;
-			}
-
-			// do not trust peer, take first block from our db and convert it
-			Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-
-			long wantedHeight = peerHeight + 1;
-			for (Block block : peerChain) {
-				if (block.getHeight() != wantedHeight ||
-						!block.verify() ||
-						!validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
-					penalize(node);
-					return;
-				}
-
-				for (Transaction transaction : block.getTransactions()) {
-					if (!transaction.isValid()) {
-						penalize(node);
-						return;
-					}
-					if (!transaction.verify()) {
-						penalize(node);
-						return;
-					}
-				}
-
-				parentBlock = block;
-
-				wantedHeight += 1;
-			}
-		}
+//		Block commonBlock = peerLastBlock;
+//		if (val > 0) {
+//			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
+//			// no point to continue
+//			if (commonBlock == null) {
+//				return;
+//			}
+//		}
+//
+//		SynchronizeCompareStatus status = this.sychronizeCompareAt(commonBlock, lowerHeight);
+//		switch (status) {
+//			case EVIL_NODE:
+//				penalize(node);
+//				return;
+//			case OUR_CHAIN_IS_BETTER:
+//				// perfect nothing to do
+//				return;
+//			default:
+//				break;
+//		}
+//
+//		AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+//		if (status == SynchronizeCompareStatus.PEER_CHAIN_IS_BETTER) {
+//			// TODO: find common block
+//			// remember to check it height diff < halfday
+//			// update val
+//			// update commonBlock
+//			LOGGER.severe("finding common block not handled yet");
+//			System.exit(-1);
+//		}
+//
+//		if (status == SynchronizeCompareStatus.EQUAL_BLOCKS) {
+//			long peerHeight = commonBlock.getHeight();
+//
+//			// if 'common' block is peer's last one it simply means we have longer chain
+//			if (peerHeight == peerLastBlock.getHeight()) {
+//				return;
+//			}
+//
+//			org.nem.core.dbmodel.Block ourDbBlock = blockDao.findByHeight(peerHeight);
+//			if (ourDbBlock == null) {
+//				// probably would be strange if that would happen
+//				return;
+//			}
+//
+//			if (this.getLastBlockHeight() > peerHeight) {
+//				// TODO: create duplicate of account analyzer
+//				// revert transactions "on the copy"
+//				LOGGER.severe("virtual chain not handled yet");
+//				System.exit(-1);
+//			}
+//
+//			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
+//			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY / 2)) {
+//				penalize(node);
+//				return;
+//			}
+//
+//			// do not trust peer, take first block from our db and convert it
+//			Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+//
+//			long wantedHeight = peerHeight + 1;
+//			for (Block block : peerChain) {
+//				if (block.getHeight() != wantedHeight ||
+//						!block.verify() ||
+//						!validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
+//					penalize(node);
+//					return;
+//				}
+//
+//				for (Transaction transaction : block.getTransactions()) {
+//					if (!transaction.isValid()) {
+//						penalize(node);
+//						return;
+//					}
+//					if (!transaction.verify()) {
+//						penalize(node);
+//						return;
+//					}
+//				}
+//
+//				parentBlock = block;
+//
+//				wantedHeight += 1;
+//			}
+//		}
 	}
 
 

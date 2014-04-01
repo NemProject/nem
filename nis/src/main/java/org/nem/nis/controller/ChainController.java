@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.nem.core.dao.BlockDao;
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.model.Block;
+import org.nem.core.model.ByteArray;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.utils.HexEncoder;
@@ -60,6 +61,34 @@ public class ChainController {
 
 		JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObjectArray("blocks", blockList);
+		return serializer.getObject().toString() + "\r\n";
+	}
+
+	@RequestMapping(value = "/chain/hashes-after")
+	public String hashesAfter(@RequestBody final String body) {
+		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+		Long blockHeight = deserializer.readLong("height");
+
+		org.nem.core.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
+		if (null == dbBlock) {
+			return Utils.jsonError(2, "block not found in the db");
+		}
+
+		List<ByteArray> blockList = new LinkedList<>();
+		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY; ++i) {
+			Long curBlockId = dbBlock.getNextBlockId();
+			if (null == curBlockId) {
+				break;
+			}
+			dbBlock = this.blockDao.findById(curBlockId);
+			blockList.add(new ByteArray(dbBlock.getBlockHash()));
+		}
+
+		if (0 == blockList.size())
+			return Utils.jsonError(3, "invalid call");
+
+		JsonSerializer serializer = new JsonSerializer();
+		serializer.writeObjectArray("hashes", blockList);
 		return serializer.getObject().toString() + "\r\n";
 	}
 }

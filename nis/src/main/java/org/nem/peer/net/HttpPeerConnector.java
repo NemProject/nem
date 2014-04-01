@@ -3,6 +3,8 @@ package org.nem.peer.net;
 import net.minidev.json.JSONObject;
 import org.nem.core.model.Block;
 import org.nem.core.model.BlockFactory;
+import org.nem.core.model.ByteArray;
+import org.nem.core.model.ByteArrayFactory;
 import org.nem.core.serialization.*;
 import org.nem.peer.*;
 
@@ -71,6 +73,18 @@ public class HttpPeerConnector implements PeerConnector {
 			return null;
 		}
 		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
+	}
+
+	@Override
+	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long height) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_AFTER);
+		JSONObject obj = new JSONObject();
+		obj.put("height", height);
+		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
+		if (jsonDeserializer == null) {
+			return null;
+		}
+		return jsonDeserializer.readObjectArray("hashes", ByteArrayFactory.deserializer);
 	}
 
 	@Override

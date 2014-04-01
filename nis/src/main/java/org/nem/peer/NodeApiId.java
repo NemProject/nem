@@ -42,5 +42,10 @@ public enum NodeApiId {
 	/**
 	 * get blocks after
 	 */
-	REST_CHAIN_BLOCKS_AFTER
+	REST_CHAIN_BLOCKS_AFTER,
+
+	/**
+	 * get hashes of blocks after given height
+	 */
+	REST_CHAIN_HASHES_AFTER,
 }

@@ -1,15 +1,35 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.SerializationUtils;
+import org.nem.core.serialization.Serializer;
 import org.nem.core.utils.ByteUtils;
 
 import java.util.Arrays;
 
-// or we could just use List<> instead...
-public class ByteArray {
+/**
+ * Wrapper for array of bytes
+ */
+public class ByteArray implements SerializableEntity {
 	private byte[] data;
 
+	/**
+	 * Creates new ByteArray object
+	 *
+	 * @param data data that will be held.
+	 */
 	public ByteArray(byte[] data) {
 		this.data = data;
+	}
+
+	/**
+	 * Deserializes byte array object
+	 *
+	 * @param deserializer The deserializer to use.
+	 */
+	public ByteArray(Deserializer deserializer) {
+		this.data = deserializer.readBytes("data");
 	}
 
 	/**
@@ -21,6 +41,10 @@ public class ByteArray {
 		return data;
 	}
 
+	@Override
+	public void serialize(Serializer serializer) {
+		serializer.writeBytes("data", this.get());
+	}
 
 	@Override
 	public int hashCode() {

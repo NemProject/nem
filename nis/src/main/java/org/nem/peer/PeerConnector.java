@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import org.nem.core.model.Block;
+import org.nem.core.model.ByteArray;
 import org.nem.core.serialization.SerializableEntity;
 
 import java.util.List;
@@ -56,6 +57,11 @@ public interface PeerConnector {
 	 * @return chain of blocks
 	 */
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
+
+	/**
+	 *
+	 */
+	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long startingPoint);
 
 	/**
 	 * Announces a new entity to the target node.
