@@ -1,6 +1,5 @@
 package org.nem.nis.controller;
 
-import net.minidev.json.JSONObject;
 import org.apache.commons.codec.DecoderException;
 import org.nem.core.dao.BlockDao;
 
@@ -9,7 +8,6 @@ import org.nem.core.model.Block;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.BlockChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +38,7 @@ public class BlockController {
 	}
 
 	@RequestMapping(value="/block/at", method = RequestMethod.POST)
-	public String blockAt(@RequestBody final String body) throws DecoderException {
+	public String blockAt(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 

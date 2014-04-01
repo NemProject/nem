@@ -1,13 +1,10 @@
 package org.nem.nis;
 
-import net.minidev.json.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.peer.*;
 import org.nem.peer.net.HttpPeerConnector;
 import org.nem.peer.scheduling.ParallelSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.InputStream;
 
 /**
  * NIS PeerNetworkHost
@@ -32,7 +29,7 @@ public class NisPeerNetworkHost {
     public void boot() {
         this.host = new PeerNetworkHost(
             new  PeerNetwork(
-                loadConfig("peers-config.json"),
+                Config.fromFile("peers-config.json"),
                 new HttpPeerConnector(new DeserializationContext(this.accountAnalyzer)),
                 new ParallelSchedulerFactory<Node>(2*NUM_CORES),
 				blockChain),
@@ -46,18 +43,4 @@ public class NisPeerNetworkHost {
      * @return The hosted network.
      */
     public PeerNetwork getNetwork() { return this.host.getNetwork(); }
-
-    private static Config loadConfig(final String configFileName) {
-        try {
-            try (final InputStream fin = PeerNetwork.class.getClassLoader().getResourceAsStream(configFileName)) {
-                if (null == fin)
-                    throw new FatalPeerException(String.format("Configuration file <%s> not available", configFileName));
-
-                return new Config((JSONObject) JSONValue.parse(fin));
-            }
-        }
-        catch (Exception e) {
-            throw new FatalPeerException("Exception encountered while loading config", e);
-        }
-    }
 }

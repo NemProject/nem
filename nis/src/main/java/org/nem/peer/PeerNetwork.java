@@ -1,9 +1,6 @@
 package org.nem.peer;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashUtils;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.nis.BlockChain;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
@@ -58,7 +55,7 @@ public class PeerNetwork {
      * @param schedulerFactory The node scheduler factory to use.
      */
     public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory, final BlockSynchronizer blockSynchronizer) {
-        this(config, connector, schedulerFactory,blockSynchronizer, new NodeExperiences());
+        this(config, connector, schedulerFactory, blockSynchronizer, new NodeExperiences());
     }
 
     /**
@@ -144,27 +141,28 @@ public class PeerNetwork {
      * @param entity The entity.
      */
     public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-        Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
+        this.forAllActiveNodes(new Action<Node>() {
             @Override
             public void execute(final Node element) {
                 connector.announce(element.getEndpoint(), broadcastId, entity);
             }
         });
-
-        scheduler.push(this.nodes.getActiveNodes());
-        scheduler.block();
     }
 
 	public void synchronize() {
-		Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
-			@Override
-			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(connector, element);
-			}
-		});
-		scheduler.push(this.nodes.getActiveNodes());
-		scheduler.block();
+		this.forAllActiveNodes(new Action<Node>() {
+            @Override
+            public void execute(final Node element) {
+                blockSynchronizer.synchronizeNode(connector, element);
+            }
+        });
 	}
+    
+    private void forAllActiveNodes(final Action<Node> action) {
+        final Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(action);
+        scheduler.push(this.nodes.getActiveNodes());
+        scheduler.block();
+    }
 
 	private static class NodeRefresher {
         final NodeCollection nodes;

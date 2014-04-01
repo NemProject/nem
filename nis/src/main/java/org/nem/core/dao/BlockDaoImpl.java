@@ -1,6 +1,5 @@
 package org.nem.core.dao;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,8 +8,6 @@ import javax.transaction.Transactional;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +60,8 @@ public class BlockDaoImpl implements BlockDao
         Query query = getCurrentSession()
        		 .createQuery("from Block a where a.id = :id")
        		 .setParameter("id", id);
-		List<?> userList = query.list();
-        if (userList.size() > 0)
-                return (Block)userList.get(0);
-        else
-                return null;  
+        return executeSingleBlockQuery(query);
 	}
-
 
 	@Override
 	@Transactional
@@ -77,12 +69,13 @@ public class BlockDaoImpl implements BlockDao
 		Query query = getCurrentSession()
 				.createQuery("from Block a where a.height = :height")
 				.setParameter("height", blockHeight);
-		List<?> userList = query.list();
-		if (userList.size() > 0)
-			return (Block)userList.get(0);
-		else
-			return null;
+		return executeSingleBlockQuery(query);
 	}
+
+    private Block executeSingleBlockQuery(final Query query) {
+        final List<?> blockList = query.list();
+        return blockList.size() > 0 ? (Block)blockList.get(0) : null;
+    }
 
 	/**
 	 * First try to find block using "shortId",
@@ -91,18 +84,17 @@ public class BlockDaoImpl implements BlockDao
 	@Override
 	@Transactional
 	public Block findByHash(byte[] blockHash) {
-		long blockId = ByteUtils.bytesToLong(blockHash);
-		List<?> userList;
-		Query query = getCurrentSession()
-				.createQuery("from Block a where a.shortId = :id")
-				.setParameter("id", blockId);
-		userList = query.list();
-		for (int i = 0; i<userList.size(); ++i) {
-			Block block = (Block) userList.get(i);
-			if (Arrays.equals(blockHash, block.getBlockHash())) {
-				return block;
-			}
-		}
-		return null;
+        long blockId = ByteUtils.bytesToLong(blockHash);
+        Query query = getCurrentSession()
+                .createQuery("from Block a where a.shortId = :id")
+                .setParameter("id", blockId);
+        final List<?> blockList = query.list();
+        for (int i = 0; i< blockList.size(); ++i) {
+            Block block = (Block) blockList.get(i);
+            if (Arrays.equals(blockHash, block.getBlockHash())) {
+                return block;
+            }
+        }
+        return null;
 	}
 }

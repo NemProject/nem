@@ -105,11 +105,25 @@ public class PeerNetworkHostTest {
         }
     }
 
+    @Test
+    public void refreshCallsSynchronize() throws Exception {
+        // Arrange:
+        final MockPeerNetwork network = new MockPeerNetwork();
+        try (final PeerNetworkHost ignored = new PeerNetworkHost(network, 10, 100)) {
+            // Arrange:
+            Thread.sleep(25);
+
+            // Assert:
+            Assert.assertThat(network.getNumSynchronizeCalls(), IsEqual.equalTo(1));
+        }
+    }
+
     private static class MockPeerNetwork extends PeerNetwork {
 
         private final Object refreshMonitor;
         private int numRefreshCalls;
         private int numBroadcastCalls;
+        private int numSynchronizeCalls;
         private NodeApiId lastBroadcastId;
         private SerializableEntity lastBroadcastEntity;
 
@@ -122,10 +136,13 @@ public class PeerNetworkHostTest {
             this.refreshMonitor = refreshMonitor;
         }
 
-        public int getNumRefreshCalls() { return this.numRefreshCalls; } 
+        public int getNumRefreshCalls() { return this.numRefreshCalls; }
+
         public int getNumBroadcastCalls() { return this.numBroadcastCalls; }
         public NodeApiId getLastBroadcastId() { return this.lastBroadcastId; }
         public SerializableEntity getLastBroadcastEntity() { return this.lastBroadcastEntity; }
+
+        public int getNumSynchronizeCalls() { return this.numSynchronizeCalls; }
 
         @Override
         public void refresh() {
@@ -140,6 +157,11 @@ public class PeerNetworkHostTest {
             ++this.numBroadcastCalls;
             this.lastBroadcastId = broadcastId;
             this.lastBroadcastEntity = entity;
+        }
+
+        @Override
+        public void synchronize() {
+            ++this.numSynchronizeCalls;
         }
     }
 }

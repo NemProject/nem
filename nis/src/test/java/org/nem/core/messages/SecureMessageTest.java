@@ -2,6 +2,7 @@ package org.nem.core.messages;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
@@ -11,12 +12,12 @@ import java.security.InvalidParameterException;
 public class SecureMessageTest {
 
     @Test
-    public void ctorCanCreateMessage() {
+    public void canCreateMessageAroundDecodedPayload() {
         // Act:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-        final SecureMessage message = new SecureMessage(sender, recipient, input);
+        final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
         // Assert:
         Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
@@ -26,12 +27,30 @@ public class SecureMessageTest {
     }
 
     @Test
+    public void canCreateMessageAroundEncodedPayload() {
+        // Act:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final byte[] decodedBytes = new byte[] { 12, 46, 7, 43, 22, 15 };
+        final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
+        final byte[] encodedBytes = cipher.encrypt(decodedBytes);
+
+        final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, encodedBytes);
+
+        // Assert:
+        Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+        Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+        Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
+        Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
+    }
+
+    @Test
     public void messageCanBeRoundTripped() {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-        final SecureMessage originalMessage = new SecureMessage(sender, recipient, input);
+        final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
         // Act:
         final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipient);
@@ -49,7 +68,7 @@ public class SecureMessageTest {
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-        final SecureMessage originalMessage = new SecureMessage(sender, recipient, input);
+        final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
         JsonSerializer serializer = new JsonSerializer();
         originalMessage.serialize(serializer);
@@ -63,7 +82,7 @@ public class SecureMessageTest {
     }
 
     @Test(expected = InvalidParameterException.class)
-    public void secureMessageCannotBeCreatedWithoutSenderPrivateKey() {
+    public void secureMessageCannotBeCreatedAroundDecodedPayloadWithoutSenderPrivateKey() {
         // Arrange:
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
@@ -71,7 +90,22 @@ public class SecureMessageTest {
 
         // Act:
         final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
-        new SecureMessage(senderPublicKeyOnly, recipient, input);
+        SecureMessage.fromDecodedPayload(senderPublicKeyOnly, recipient, input);
+    }
+
+    @Test
+    public void secureMessageCanBeCreatedAroundEncodedPayloadWithoutSenderPrivateKey() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+
+        // Act:
+        final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
+        final Message message = SecureMessage.fromEncodedPayload(senderPublicKeyOnly, recipient, input);
+
+        // Assert:
+        Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
     }
 
     @Test
@@ -80,7 +114,7 @@ public class SecureMessageTest {
         final Account sender = Utils.generateRandomAccount();
         final Account recipient = Utils.generateRandomAccount();
         final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-        final SecureMessage originalMessage = new SecureMessage(sender, recipient, input);
+        final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
         // Act:
         final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);

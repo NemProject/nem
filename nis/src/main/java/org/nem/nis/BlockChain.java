@@ -14,28 +14,13 @@ import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
-import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-//
-// Initial logic is as follows:
-//   * we recieve new TX, IF it hasn't been seen,
-//     it is added to unconfirmedTransactions,
-//   * blockGeneratorExecutor periodically tries to generate a block containing
-//     unconfirmed transactions
-//   * if it succeeded, block is added to the db and propagated to the network
-//
-// fork resolution should solve the rest
-//
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	// 500_000_000 nems have force to generate block every minute
@@ -173,6 +158,10 @@ public class BlockChain implements BlockSynchronizer {
 		return true;
 	}
 
+	private void penalize(Node node) {
+
+	}
+
 	@Override
 	public void synchronizeNode(PeerConnector connector, Node node) {
 		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
@@ -215,7 +204,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		switch (status) {
 			case EVIL_NODE:
-				// TODO: PENALTY for node
+				penalize(node);
 				return;
 			case OUR_CHAIN_IS_BETTER:
 				// perfect nothing to do
@@ -248,11 +237,11 @@ public class BlockChain implements BlockSynchronizer {
 
 			List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), peerHeight);
 			if (peerChain.size() > (ESTIMATED_BLOCKS_PER_DAY/2)) {
-				// TODO: PENALTY for node
+				penalize(node);
 				return;
 			}
 
-			// do not trust peer, take block from our db and convert it
+			// do not trust peer, take first block from our db and convert it
 			Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
 
 			long wantedHeight = peerHeight + 1;
@@ -260,17 +249,17 @@ public class BlockChain implements BlockSynchronizer {
 				if (block.getHeight() != wantedHeight ||
 						! block.verify() ||
 						! validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
-					// TODO: PENALTY for node
+					penalize(node);
 					return;
 				}
 
 				for (Transaction transaction : block.getTransactions()) {
 					if (! transaction.isValid()) {
-						// TODO: PENALTY for node
+						penalize(node);
 						return;
 					}
 					if (! transaction.verify()) {
-						// TODO: PENALTY for node
+						penalize(node);
 						return;
 					}
 				}

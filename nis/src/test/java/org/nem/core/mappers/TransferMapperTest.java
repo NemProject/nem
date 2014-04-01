@@ -4,12 +4,15 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.dbmodel.*;
-import org.nem.core.messages.PlainMessage;
+import org.nem.core.messages.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
+
+import java.security.InvalidParameterException;
 
 public class TransferMapperTest {
 
@@ -26,9 +29,26 @@ public class TransferMapperTest {
     }
 
     @Test
-    public void transferModelWithMessageCanBeMappedToDbModel() {
+    public void transferModelWithPlainMessageCanBeMappedToDbModel() {
         // Arrange:
         final TestContext context = new TestContext(new PlainMessage(new byte[] { 12, 45, 16 }));
+
+        // Act:
+        final Transfer dbModel = context.toDbModel(7);
+
+        // Assert:
+        context.assertDbModel(dbModel, 7);
+    }
+
+    @Test
+    public void transferModelWithSecureMessageCanBeMappedToDbModel() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final TestContext context = new TestContext(
+            SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 12, 45, 16 }),
+            sender,
+            recipient);
 
         // Act:
         final Transfer dbModel = context.toDbModel(7);
@@ -51,7 +71,7 @@ public class TransferMapperTest {
     }
 
     @Test
-    public void transferModelWithMessageCanBeRoundTripped() {
+    public void transferModelWithPlainMessageCanBeRoundTripped() {
         // Arrange:
         final TestContext context = new TestContext(new PlainMessage(new byte[] { 12, 45, 16 }));
         final Transfer dbModel = context.toDbModel(7);
@@ -63,6 +83,35 @@ public class TransferMapperTest {
         context.assertModel(model);
     }
 
+    @Test
+    public void transferModelWithSecureMessageCanBeRoundTripped() {
+        // Arrange:
+        final Account sender = Utils.generateRandomAccount();
+        final Account recipient = Utils.generateRandomAccount();
+        final TestContext context = new TestContext(
+            SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 12, 45, 16 }),
+            sender,
+            recipient);
+        final Transfer dbModel = context.toDbModel(7);
+
+        // Act:
+        final TransferTransaction model = context.toModel(dbModel);
+
+        // Assert:
+        context.assertModel(model);
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void transferDbModelWithUnknownMessageTypeCannotBeMappedToModel() {
+        // Arrange:
+        final TestContext context = new TestContext(new PlainMessage(new byte[] { 12, 45, 16 }));
+        final Transfer dbModel = context.toDbModel(7);
+        dbModel.setMessageType(-1);
+
+        // Act:
+        context.toModel(dbModel);
+    }
+
     private class TestContext {
 
         private final TransferTransaction model;
@@ -71,11 +120,11 @@ public class TransferMapperTest {
         private final MockAccountDao accountDao;
         private final byte[] hash;
 
-        public TestContext(final Message message) {
+        public TestContext(final Message message, final Account sender, final Account recipient) {
             this.model = new TransferTransaction(
                 new TimeInstant(721),
-                Utils.generateRandomAccount(),
-                Utils.generateRandomAccount(),
+                sender,
+                recipient,
                 new Amount(144),
                 message);
 
@@ -84,8 +133,8 @@ public class TransferMapperTest {
             this.model.sign();
 
             this.dbSender = new org.nem.core.dbmodel.Account();
-			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+            this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
+            this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
             this.dbRecipient = new org.nem.core.dbmodel.Account();
             this.dbRecipient.setPrintableKey(this.model.getRecipient().getAddress().getEncoded());
@@ -95,6 +144,10 @@ public class TransferMapperTest {
             this.accountDao.addMapping(this.model.getRecipient(), this.dbRecipient);
 
             this.hash = HashUtils.calculateHash(this.model);
+        }
+
+        public TestContext(final Message message) {
+            this(message, Utils.generateRandomAccount(), Utils.generateRandomAccount());
         }
 
         public TransferTransaction getModel() { return this.model; }
@@ -144,7 +197,17 @@ public class TransferMapperTest {
             Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
             Assert.assertThat(rhs.getRecipient(), IsEqual.equalTo(this.model.getRecipient()));
             Assert.assertThat(rhs.getAmount(), IsEqual.equalTo(this.model.getAmount()));
-            Assert.assertThat(rhs.getMessage(), IsEqual.equalTo(this.model.getMessage()));
+            assertAreEqual(this.model.getMessage(), rhs.getMessage());
+        }
+
+        private void assertAreEqual(final Message lhs, final Message rhs) {
+            if (null == lhs || null == rhs) {
+                Assert.assertThat(rhs, IsEqual.equalTo(lhs));
+                return;
+            }
+
+            Assert.assertThat(rhs.getType(), IsEqual.equalTo(lhs.getType()));
+            Assert.assertThat(rhs.getEncodedPayload(), IsEqual.equalTo(lhs.getEncodedPayload()));
         }
     }
 }

@@ -44,19 +44,4 @@ public class PlainMessage extends Message {
         super.serialize(serializer);
         serializer.writeBytes("payload", this.payload);
     }
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PlainMessage)) {
-			return false;
-		}
-
-		PlainMessage rhs = (PlainMessage)obj;
-		return this.payload.equals(rhs.payload);
-	}
-
-	@Override
-	public int hashCode() {
-		return this.payload.hashCode();
-	}
 }

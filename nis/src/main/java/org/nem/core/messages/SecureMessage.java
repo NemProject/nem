@@ -15,23 +15,38 @@ public class SecureMessage extends Message {
     final Account recipient;
     final byte[] payload;
 
+    private SecureMessage(final Account sender, final Account recipient, final byte[] payload) {
+        super(MessageTypes.SECURE);
+        this.sender = sender;
+        this.recipient = recipient;
+        this.payload = payload;
+    }
+
     /**
-     * Creates a new secure message.
+     * Creates a new secure message around a decoded payload that should be encrypted.
      *
      * @param sender The message sender.
      * @param recipient The message recipient.
      * @param payload The unencrypted payload.
      */
-    public SecureMessage(final Account sender, final Account recipient, final byte[] payload) {
-        super(MessageTypes.SECURE);
-        this.sender = sender;
-        this.recipient = recipient;
+    public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
 
         if (!sender.getKeyPair().hasPrivateKey())
             throw new InvalidParameterException("sender private key is required for creating secure message");
 
-        final Cipher cipher = new Cipher(this.sender.getKeyPair(), this.recipient.getKeyPair());
-        this.payload = cipher.encrypt(payload);
+        final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
+        return new SecureMessage(sender, recipient, cipher.encrypt(payload));
+    }
+
+    /**
+     * Creates a new secure message around an encoded payload that is already encrypted.
+     *
+     * @param sender The message sender.
+     * @param recipient The message recipient.
+     * @param payload The encrypted payload.
+     */
+    public static SecureMessage fromEncodedPayload(final Account sender, final Account recipient, final byte[] payload) {
+        return new SecureMessage(sender, recipient, payload);
     }
 
     /**
@@ -72,28 +87,5 @@ public class SecureMessage extends Message {
         super.serialize(serializer);
         serializer.writeBytes("payload", this.payload);
     }
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof SecureMessage)) {
-			return false;
-		}
-
-		SecureMessage rhs = (SecureMessage)obj;
-		if (this.sender != rhs.sender) {
-			return false;
-		}
-
-		if (this.recipient != rhs.recipient) {
-			return false;
-		}
-		return this.payload.equals(rhs.payload);
-	}
-
-	@Override
-	public int hashCode() {
-		return this.payload.hashCode();
-	}
 }
 
