@@ -29,6 +29,7 @@ public class TransferController {
 	private NisPeerNetworkHost host;
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
+	@P2PApi
 	public String transferPrepare(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
@@ -42,6 +43,7 @@ public class TransferController {
 	}
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
+	@P2PApi
 	public String transferAnnounce(@RequestBody final String body) throws Exception {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);

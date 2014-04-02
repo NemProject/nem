@@ -33,12 +33,15 @@ public class ChainController {
 	private BlockChain blockChain;
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
 	public String blockLast() {
 		final Block lastBlock = BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountAnalyzer);
 		return ControllerUtils.serialize(lastBlock);
 	}
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
+	@P2PApi
 	public String blocksAfter(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
@@ -66,6 +69,7 @@ public class ChainController {
 	}
 
 	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)
+	@P2PApi
 	public String hashesFrom(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
