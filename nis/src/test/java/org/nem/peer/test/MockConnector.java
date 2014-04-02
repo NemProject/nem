@@ -8,9 +8,9 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * A mock PeerConnector implementation.
+ * A mock PeerConnector and SyncConnector implementation.
  */
-public class MockPeerConnector implements PeerConnector {
+public class MockConnector implements PeerConnector, SyncConnector {
 
 	private int numGetInfoCalls;
 	private int numGetKnownPeerCalls;
