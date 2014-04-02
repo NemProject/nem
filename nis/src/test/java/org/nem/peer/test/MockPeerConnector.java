@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A mock PeerConnector implementation.
  */
-public class MockPeerConnector implements PeerConnector {
+public class MockPeerConnector implements PeerConnector, SyncConnector {
 
 	private int numGetInfoCalls;
 	private int numGetKnownPeerCalls;

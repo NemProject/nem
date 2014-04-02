@@ -29,35 +29,6 @@ public interface PeerConnector {
 	public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
 
 	/**
-	 * Request information about last block in chain from the specified node.
-	 *
-	 * @param endpoint The endpoint.
-	 *
-	 * @return Last block.
-	 */
-	public Block getLastBlock(final NodeEndpoint endpoint);
-
-	/**
-	 * Request information dbout block at specified height.
-	 *
-	 * @param endpoint
-	 * @param height
-	 *
-	 * @return Block at specified height
-	 */
-	public Block getBlockAt(final NodeEndpoint endpoint, long height);
-
-	/**
-	 * Request blocks after specified height.
-	 *
-	 * @param endpoint
-	 * @param height
-	 *
-	 * @return chain of blocks
-	 */
-	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
-
-	/**
 	 * Announces a new entity to the target node.
 	 *
 	 * @param endpoint   The endpoint.

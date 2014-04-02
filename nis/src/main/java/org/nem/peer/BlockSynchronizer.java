@@ -11,5 +11,5 @@ public interface BlockSynchronizer {
 	 * @param connector The connector.
 	 * @param node      The other node.
 	 */
-	public void synchronizeNode(final PeerConnector connector, final Node node);
+	public void synchronizeNode(final SyncConnector connector, final Node node);
 }

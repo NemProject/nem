@@ -163,7 +163,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	@Override
-	public void synchronizeNode(PeerConnector connector, Node node) {
+	public void synchronizeNode(final SyncConnector connector, final Node node) {
 		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
 		if (peerLastBlock == null) {
 			return;

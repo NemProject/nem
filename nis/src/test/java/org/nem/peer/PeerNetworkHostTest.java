@@ -132,7 +132,7 @@ public class PeerNetworkHostTest {
 		}
 
 		public MockPeerNetwork(final Object refreshMonitor) {
-			super(ConfigFactory.createDefaultTestConfig(), new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
+			super(ConfigFactory.createDefaultTestConfig(), createMockPeerNetworkServices());
 			this.refreshMonitor = refreshMonitor;
 		}
 
@@ -174,6 +174,14 @@ public class PeerNetworkHostTest {
 		@Override
 		public void synchronize() {
 			++this.numSynchronizeCalls;
+		}
+
+		private static PeerNetworkServices createMockPeerNetworkServices() {
+			return new PeerNetworkServices(
+					new MockPeerConnector(),
+					new MockPeerConnector(),
+					new MockNodeSchedulerFactory(),
+					new MockBlockSynchronizer());
 		}
 	}
 }

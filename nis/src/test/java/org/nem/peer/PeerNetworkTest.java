@@ -71,7 +71,7 @@ public class PeerNetworkTest {
 	public void getLocalNodeReturnsConfigLocalNode() {
 		// Act:
 		final Config config = createTestConfig();
-		final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
+		final PeerNetwork network = new PeerNetwork(config, createMockPeerNetworkServices());
 
 		// Assert:
 		Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
@@ -431,7 +431,13 @@ public class PeerNetworkTest {
 			// configure a MockScheduler to be returned by the second (broadcast) createScheduler request
 			// (the first request is for the network call that initially makes everything active)
 			final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory(new MockScheduler(), 1);
-			final PeerNetwork network = new PeerNetwork(createTestConfig(), connector, schedulerFactory, new MockBlockSynchronizer());
+			final PeerNetwork network = new PeerNetwork(
+					createTestConfig(),
+					new PeerNetworkServices(
+							this.connector,
+							this.connector,
+							this.schedulerFactory,
+							new MockBlockSynchronizer()));
 			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
 
 			// monitor that is signaled when MockScheduler.push is entered
@@ -615,28 +621,42 @@ public class PeerNetworkTest {
 
 	//region factories
 
-	private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
-		return new PeerNetwork(
-				createTestConfig(),
+	private static PeerNetworkServices createMockPeerNetworkServices() {
+		return new PeerNetworkServices(
 				new MockPeerConnector(),
-				new MockNodeSchedulerFactory(),
-				synchronizer);
-	}
-
-	private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-		return new PeerNetwork(
-				createTestConfig(),
-				connector,
+				new MockPeerConnector(),
 				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
 
+	private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
+		return new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						new MockPeerConnector(),
+						new MockPeerConnector(),
+						new MockNodeSchedulerFactory(),
+						synchronizer));
+	}
+
+	private static PeerNetwork createTestNetwork(final MockPeerConnector connector) {
+		return new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						connector,
+						connector,
+						new MockNodeSchedulerFactory(),
+						new MockBlockSynchronizer()));
+	}
+
 	private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
 		return new PeerNetwork(
-				createTestConfig(),
-				new MockPeerConnector(),
-				new MockNodeSchedulerFactory(),
-				new MockBlockSynchronizer(),
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						new MockPeerConnector(),
+						new MockPeerConnector(),
+						new MockNodeSchedulerFactory(),
+						new MockBlockSynchronizer()),
 				nodeExperiences);
 	}
 

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * An HTTP-based PeerConnector implementation.
  */
-public class HttpPeerConnector implements PeerConnector {
+public class HttpPeerConnector implements PeerConnector, SyncConnector {
 
 	private static final int DEFAULT_TIMEOUT = 30;
 
@@ -39,6 +39,7 @@ public class HttpPeerConnector implements PeerConnector {
 		return new NodeCollection(this.httpMethodClient.get(url));
 	}
 
+    // TODO: review these
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
