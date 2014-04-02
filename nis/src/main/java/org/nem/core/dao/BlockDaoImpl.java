@@ -80,7 +80,7 @@ public class BlockDaoImpl implements BlockDao {
     public List<byte[]> getHashesFrom(long blockHeight, int limit) {
         Criteria criteria = getCurrentSession().createCriteria(Block.class)
                 .setMaxResults(limit)
-                .add(Restrictions.eq("height", blockHeight))
+                .add(Restrictions.ge("height", blockHeight)) // >=
                 .setProjection(Projections.property("blockHash"));
         final List<byte[]> blockList = criteria.list();
         return blockList;

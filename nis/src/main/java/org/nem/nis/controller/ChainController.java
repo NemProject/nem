@@ -85,7 +85,7 @@ public class ChainController {
 
         List<ByteArray> byteArrayList = new ArrayList<>(hashesList.size());
         for (int i = 0; i < hashesList.size(); ++i) {
-            byteArrayList.set(i, new ByteArray(hashesList.get(i)));
+            byteArrayList.add(new ByteArray(hashesList.get(i)));
         }
 
 		JsonSerializer serializer = new JsonSerializer();
