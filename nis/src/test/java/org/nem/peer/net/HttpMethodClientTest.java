@@ -12,6 +12,7 @@ public class HttpMethodClientTest {
 
 	private final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
 	private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
+	private final String HTTP_ERROR_URL = "http://httpstat.us/500";
 	private final int GOOD_TIMEOUT = 5;
 
 	//region get
@@ -28,6 +29,15 @@ public class HttpMethodClientTest {
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
 		Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 		Assert.assertThat(deserializer.readString("key"), IsEqual.equalTo("value"));
+	}
+
+	@Test(expected = InactivePeerException.class)
+	public void getThrowsInactivePeerExceptionOnHttpError() throws Exception {
+		// Arrange:
+		final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
+
+		// Act:
+		client.get(new URL(HTTP_ERROR_URL));
 	}
 
 	@Test(expected = InactivePeerException.class)
@@ -64,6 +74,15 @@ public class HttpMethodClientTest {
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
 		Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 		Assert.assertThat(deserializer.readString("key"), IsEqual.equalTo("value"));
+	}
+
+	@Test(expected = InactivePeerException.class)
+	public void postThrowsInactivePeerExceptionOnHttpError() throws Exception {
+		// Arrange:
+		final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
+
+		// Act:
+		client.post(new URL(HTTP_ERROR_URL), new MockSerializableEntity());
 	}
 
 	@Test(expected = InactivePeerException.class)

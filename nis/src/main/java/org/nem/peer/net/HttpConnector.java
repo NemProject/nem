@@ -54,36 +54,29 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
-		JsonDeserializer jsonDeserializer = this.httpMethodClient.get(url);
-		if (jsonDeserializer == null) {
-			return null;
-		}
-		return BlockFactory.VERIFIABLE.deserialize(jsonDeserializer);
+		return BlockFactory.VERIFIABLE.deserialize(this.httpMethodClient.get(url));
 	}
 
 	@Override
 	public Block getBlockAt(final NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT);
-		JSONObject obj = new JSONObject();
-		obj.put("height", height);
-		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
-		if (jsonDeserializer == null) {
-			return null;
-		}
-		return BlockFactory.VERIFIABLE.deserialize(jsonDeserializer);
+		final JSONObject obj = getJsonObjectWithHeight(height);
+		return BlockFactory.VERIFIABLE.deserialize(this.httpMethodClient.post(url, obj));
 	}
 
 	@Override
 	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
-		JSONObject obj = new JSONObject();
-		obj.put("height", height);
-		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
-		if (jsonDeserializer == null) {
-			return null;
-		}
+		final JSONObject obj = getJsonObjectWithHeight(height);
+		final JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
 		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
 	//endregion
+
+	private static JSONObject getJsonObjectWithHeight(long height) {
+		final JSONObject obj = new JSONObject();
+		obj.put("height", height);
+		return obj;
+	}
 }

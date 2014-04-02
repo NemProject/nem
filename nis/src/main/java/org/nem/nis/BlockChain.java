@@ -1,18 +1,13 @@
 package org.nem.nis;
 
-
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.mappers.AccountDaoLookupAdapter;
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
-import org.nem.core.dao.TransferDao;
-import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,11 +159,15 @@ public class BlockChain implements BlockSynchronizer {
 
 	@Override
 	public void synchronizeNode(final SyncConnector connector, final Node node) {
-		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
-		if (peerLastBlock == null) {
-			return;
+		try {
+			this.synchronizeNodeInternal(connector, node);
+		} catch (InactivePeerException|FatalPeerException ex) {
+			penalize(node);
 		}
+	}
 
+	public void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
 		if (this.synchronizeCompareBlocks(peerLastBlock, lastBlock)) {
 			return;
 		}
@@ -185,10 +184,6 @@ public class BlockChain implements BlockSynchronizer {
 		Block commonBlock = peerLastBlock;
 		if (val > 0) {
 			commonBlock = connector.getBlockAt(node.getEndpoint(), lowerHeight);
-			// no point to continue
-			if (commonBlock == null) {
-				return;
-			}
 		}
 
 		SynchronizeCompareStatus status = this.sychronizeCompareAt(commonBlock, lowerHeight);
