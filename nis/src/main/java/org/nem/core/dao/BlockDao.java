@@ -2,6 +2,8 @@ package org.nem.core.dao;
 
 import org.nem.core.dbmodel.Block;
 
+import java.util.List;
+
 /**
  * DAO for accessing db Block objects.
  */
@@ -36,7 +38,7 @@ public interface BlockDao {
 	 */
 	public Block findById(long id);
 
-	/**
+    /**
 	 * Retrieves Block from db given it's hash.
 	 *
 	 * @param blockHash hash of a block to retrieve.
@@ -46,11 +48,20 @@ public interface BlockDao {
 	public Block findByHash(byte[] blockHash);
 
 	/**
-	 * Retrives Block from db at given height.
+	 * Retrieves Block from db at given height.
 	 *
 	 * @param blockHeight height of a block to retrieve.
 	 *
 	 * @return Block at given height or null.
 	 */
-	public Block findByHeight(Long blockHeight);
+	public Block findByHeight(long blockHeight);
+
+    /**
+     * Retrieves list of hashes for blocks starting at given height.
+     * This should be used, not to pull whole block from the db.
+     *
+     * @return list of block hashes.
+     */
+    public List<byte[]> getHashesFrom(long blockHeight, int limit);
+
 }

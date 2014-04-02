@@ -5,9 +5,13 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.apache.maven.artifact.versioning.Restriction;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,21 +63,32 @@ public class BlockDaoImpl implements BlockDao {
 		Query query = getCurrentSession()
 				.createQuery("from Block a where a.id = :id")
 				.setParameter("id", id);
-		return executeSingleBlockQuery(query);
+		return executeSingleQuery(query);
 	}
 
 	@Override
 	@Transactional
-	public Block findByHeight(Long blockHeight) {
+	public Block findByHeight(long blockHeight) {
 		Query query = getCurrentSession()
 				.createQuery("from Block a where a.height = :height")
 				.setParameter("height", blockHeight);
-		return executeSingleBlockQuery(query);
+		return executeSingleQuery(query);
 	}
 
-	private Block executeSingleBlockQuery(final Query query) {
+    @Override
+    @Transactional
+    public List<byte[]> getHashesFrom(long blockHeight, int limit) {
+        Criteria criteria = getCurrentSession().createCriteria(Block.class)
+                .setMaxResults(limit)
+                .add(Restrictions.eq("height", blockHeight))
+                .setProjection(Projections.property("blockHash"));
+        final List<byte[]> blockList = criteria.list();
+        return blockList;
+    }
+
+    private <T> T executeSingleQuery(final Query query) {
 		final List<?> blockList = query.list();
-		return blockList.size() > 0 ? (Block)blockList.get(0) : null;
+		return blockList.size() > 0 ? (T)blockList.get(0) : null;
 	}
 
 	/**

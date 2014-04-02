@@ -11,6 +11,7 @@ import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
@@ -27,7 +28,11 @@ public class BlockChain implements BlockSynchronizer {
 	// 500_000_000 nems have force to generate block every minute
 	public static final long MAGIC_MULTIPLIER = 614891469L;
 	//
-	public static final long ESTIMATED_BLOCKS_PER_DAY = 1440;
+	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
+
+    public static final int BLOCKS_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
+
+    public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -200,15 +205,26 @@ public class BlockChain implements BlockSynchronizer {
 
 		// if node is far behind, reject it, not to allow too deep
 		// rewrites of blockchain...
-		if (val < -(ESTIMATED_BLOCKS_PER_DAY / 2)) {
+		if (val < -REWRITE_LIMIT) {
 			return;
 		}
 
-		long startingPoint = Math.max(1, this.getLastBlockHeight() - (ESTIMATED_BLOCKS_PER_DAY / 2));
+		long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
 		List<ByteArray> hashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
 
+        if (hashes.size() > BLOCKS_LIMIT) {
+            penalize(node);
+            return;
+        }
+
+        List<byte[]> ourHashes = blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT);
+        int i = 0;
 		for(ByteArray ba : hashes) {
 			System.out.println("h: " + HexEncoder.getString(ba.get()));
+            if (i < ourHashes.size()) {
+                System.out.println("o: " + HexEncoder.getString(ourHashes.get(i)));
+                i++;
+            }
 		}
 
 //		Block commonBlock = peerLastBlock;

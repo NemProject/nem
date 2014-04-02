@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,27 +70,22 @@ public class ChainController {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
-        // TODO: add DAO method to do this instead
 		org.nem.core.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		if (null == dbBlock) {
 			return Utils.jsonError(2, "block not found in the db");
 		}
 
-		List<ByteArray> blockList = new LinkedList<>();
-		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY; ++i) {
-            blockList.add(new ByteArray(dbBlock.getBlockHash()));
-			Long curBlockId = dbBlock.getNextBlockId();
-			if (null == curBlockId) {
-				break;
-			}
-			dbBlock = this.blockDao.findById(curBlockId);
-		}
-
-		if (0 == blockList.size())
+		List<byte[]> hashesList = this.blockDao.getHashesFrom(blockHeight, BlockChain.BLOCKS_LIMIT);
+		if (0 == hashesList.size())
 			return Utils.jsonError(3, "invalid call");
 
+        List<ByteArray> byteArrayList = new ArrayList<>(hashesList.size());
+        for (int i = 0; i < hashesList.size(); ++i) {
+            byteArrayList.set(i, new ByteArray(hashesList.get(i)));
+        }
+
 		JsonSerializer serializer = new JsonSerializer();
-		serializer.writeObjectArray("hashes", blockList);
+		serializer.writeObjectArray("hashes", byteArrayList);
 		return serializer.getObject().toString() + "\r\n";
 	}
 }
