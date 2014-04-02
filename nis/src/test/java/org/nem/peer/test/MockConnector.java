@@ -1,6 +1,7 @@
 package org.nem.peer.test;
 
 import org.nem.core.model.Block;
+import org.nem.core.model.ByteArray;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
@@ -142,6 +143,11 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	@Override
 	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
+		return null;
+	}
+
+	@Override
+	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long startingPoint) {
 		return null;
 	}
 
