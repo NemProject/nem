@@ -10,9 +10,9 @@ import java.net.*;
 import java.util.List;
 
 /**
- * An HTTP-based PeerConnector implementation.
+ * An HTTP-based PeerConnector and SyncConnector implementation.
  */
-public class HttpPeerConnector implements PeerConnector, SyncConnector {
+public class HttpConnector implements PeerConnector, SyncConnector {
 
 	private static final int DEFAULT_TIMEOUT = 30;
 
@@ -23,9 +23,11 @@ public class HttpPeerConnector implements PeerConnector, SyncConnector {
 	 *
 	 * @param context The deserialization context to use when deserializing responses.
 	 */
-	public HttpPeerConnector(final DeserializationContext context) {
+	public HttpConnector(final DeserializationContext context) {
 		this.httpMethodClient = new HttpMethodClient(context, DEFAULT_TIMEOUT);
 	}
+
+	//region PeerConnector
 
 	@Override
 	public Node getInfo(final NodeEndpoint endpoint) {
@@ -39,7 +41,16 @@ public class HttpPeerConnector implements PeerConnector, SyncConnector {
 		return new NodeCollection(this.httpMethodClient.get(url));
 	}
 
-    // TODO: review these
+	@Override
+	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+		final URL url = endpoint.getApiUrl(announceId);
+		this.httpMethodClient.post(url, entity);
+	}
+
+	//endregion
+
+    // region SyncConnector
+
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
@@ -74,9 +85,5 @@ public class HttpPeerConnector implements PeerConnector, SyncConnector {
 		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
-	@Override
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
-		final URL url = endpoint.getApiUrl(announceId);
-		this.httpMethodClient.post(url, entity);
-	}
+	//endregion
 }

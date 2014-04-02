@@ -178,8 +178,8 @@ public class PeerNetworkHostTest {
 
 		private static PeerNetworkServices createMockPeerNetworkServices() {
 			return new PeerNetworkServices(
-					new MockPeerConnector(),
-					new MockPeerConnector(),
+					new MockConnector(),
+					new MockConnector(),
 					new MockNodeSchedulerFactory(),
 					new MockBlockSynchronizer());
 		}

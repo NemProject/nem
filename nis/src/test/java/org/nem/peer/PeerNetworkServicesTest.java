@@ -10,8 +10,8 @@ public class PeerNetworkServicesTest {
 	@Test
 	public void peerNetworkServicesExposesAllConstructorParameters() {
 		// Arrange:
-		final PeerConnector peerConnector = new MockPeerConnector();
-		final SyncConnector syncConnector = new MockPeerConnector();
+		final PeerConnector peerConnector = new MockConnector();
+		final SyncConnector syncConnector = new MockConnector();
 		final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory();
 		final BlockSynchronizer blockSynchronizer = new MockBlockSynchronizer();
 
