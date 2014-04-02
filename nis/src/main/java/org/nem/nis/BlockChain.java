@@ -258,7 +258,7 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region step 3
-		long commonBlockHeight = startingPoint + i;
+		long commonBlockHeight = startingPoint + i - 1;
 		AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		if (ourHashes.size() > i) {
 			// not to waste our time, first try to get first block that differs
@@ -306,6 +306,9 @@ public class BlockChain implements BlockSynchronizer {
 					return;
 				}
 			}
+
+			// TODO: need too apply transactions here (on contemporaryAccountAnalyzer),
+			// to have proper data for next iteration
 
 			parentBlock = block;
 
