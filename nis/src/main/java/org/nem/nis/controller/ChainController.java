@@ -64,11 +64,12 @@ public class ChainController {
 		return serializer.getObject().toString() + "\r\n";
 	}
 
-	@RequestMapping(value = "/chain/hashes-after")
+	@RequestMapping(value = "/chain/hashes-from")
 	public String hashesAfter(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
+        // TODO: add DAO method to do this instead
 		org.nem.core.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		if (null == dbBlock) {
 			return Utils.jsonError(2, "block not found in the db");
@@ -76,12 +77,12 @@ public class ChainController {
 
 		List<ByteArray> blockList = new LinkedList<>();
 		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY; ++i) {
+            blockList.add(new ByteArray(dbBlock.getBlockHash()));
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				break;
 			}
 			dbBlock = this.blockDao.findById(curBlockId);
-			blockList.add(new ByteArray(dbBlock.getBlockHash()));
 		}
 
 		if (0 == blockList.size())

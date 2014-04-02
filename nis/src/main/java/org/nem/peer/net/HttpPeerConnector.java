@@ -77,7 +77,7 @@ public class HttpPeerConnector implements PeerConnector {
 
 	@Override
 	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_AFTER);
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
 		JSONObject obj = new JSONObject();
 		obj.put("height", height);
 		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
