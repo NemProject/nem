@@ -1,19 +1,14 @@
 package org.nem.nis;
 
-
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.mappers.AccountDaoLookupAdapter;
 import org.nem.core.mappers.BlockMapper;
 import org.nem.core.dao.AccountDao;
 import org.nem.core.dao.BlockDao;
-import org.nem.core.dao.TransferDao;
-import org.nem.core.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
@@ -176,7 +171,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return peer's last block or null
 	 */
-	private Block checkLastBlock(PeerConnector connector, Node node) {
+	private Block checkLastBlock(SyncConnector connector, Node node) {
 		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
 		if (peerLastBlock == null) {
 			return null;
@@ -194,12 +189,19 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	@Override
-	public void synchronizeNode(PeerConnector connector, Node node) {
+	public void synchronizeNode(final SyncConnector connector, final Node node) {
+		try {
+			this.synchronizeNodeInternal(connector, node);
+		} catch (InactivePeerException|FatalPeerException ex) {
+			penalize(node);
+		}
+	}
+
+	public void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
 		Block peerLastBlock = checkLastBlock(connector, node);
 		if (peerLastBlock == null) {
 			return;
 		}
-
 		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
 		long lowerHeight = Math.min(peerLastBlock.getHeight(), this.getLastBlockHeight());
 
