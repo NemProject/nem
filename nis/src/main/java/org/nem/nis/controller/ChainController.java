@@ -38,7 +38,7 @@ public class ChainController {
 		return ControllerUtils.serialize(lastBlock);
 	}
 
-	@RequestMapping(value = "/chain/blocks-after")
+	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	public String blocksAfter(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
@@ -65,8 +65,8 @@ public class ChainController {
 		return serializer.getObject().toString() + "\r\n";
 	}
 
-	@RequestMapping(value = "/chain/hashes-from")
-	public String hashesAfter(@RequestBody final String body) {
+	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)
+	public String hashesFrom(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
