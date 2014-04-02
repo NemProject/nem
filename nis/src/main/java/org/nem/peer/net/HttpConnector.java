@@ -77,12 +77,8 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		JSONObject obj = new JSONObject();
-		obj.put("height", height);
+		final JSONObject obj = getJsonObjectWithHeight(height);
 		JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
-		if (jsonDeserializer == null) {
-			return null;
-		}
 		return jsonDeserializer.readObjectArray("hashes", ByteArrayFactory.deserializer);
 	}
 
