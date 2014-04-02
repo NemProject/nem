@@ -15,7 +15,8 @@ public class PeerNetwork {
 
 	private final Config config;
 	private NodeCollection nodes;
-	private final PeerConnector connector;
+	private final PeerConnector peerConnector;
+	private final SyncConnector syncConnector;
 	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
@@ -24,23 +25,21 @@ public class PeerNetwork {
 	/**
 	 * Creates a new network with the specified configuration.
 	 *
-	 * @param config           The network configuration.
-	 * @param connector        The peer connector to use.
-	 * @param schedulerFactory The node scheduler factory to use.
-	 * @param nodeExperiences  The node experiences to use.
+	 * @param config          The network configuration.
+	 * @param services        The services to use.
+	 * @param nodeExperiences The node experiences to use.
 	 */
 	public PeerNetwork(
 			final Config config,
-			final PeerConnector connector,
-			final SchedulerFactory<Node> schedulerFactory,
-			final BlockSynchronizer blockSynchronizer,
+			final PeerNetworkServices services,
 			final NodeExperiences nodeExperiences) {
 
 		this.config = config;
 		this.nodes = new NodeCollection();
-		this.connector = connector;
-		this.schedulerFactory = schedulerFactory;
-		this.blockSynchronizer = blockSynchronizer;
+		this.peerConnector = services.getPeerConnector();
+		this.syncConnector = services.getSyncConnector();
+		this.schedulerFactory = services.getSchedulerFactory();
+		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
 
 		for (final Node node : config.getPreTrustedNodes().getNodes())
@@ -50,12 +49,11 @@ public class PeerNetwork {
 	/**
 	 * Creates a new network with the specified configuration.
 	 *
-	 * @param config           The network configuration.
-	 * @param connector        The peer connector to use.
-	 * @param schedulerFactory The node scheduler factory to use.
+	 * @param config   The network configuration.
+	 * @param services The services to use.
 	 */
-	public PeerNetwork(final Config config, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory, final BlockSynchronizer blockSynchronizer) {
-		this(config, connector, schedulerFactory, blockSynchronizer, new NodeExperiences());
+	public PeerNetwork(final Config config, final PeerNetworkServices services) {
+		this(config, services, new NodeExperiences());
 	}
 
 	/**
@@ -134,7 +132,7 @@ public class PeerNetwork {
 	 * Refreshes the network.
 	 */
 	public void refresh() {
-		final NodeRefresher refresher = new NodeRefresher(this.nodes, this.connector, this.schedulerFactory);
+		final NodeRefresher refresher = new NodeRefresher(this.nodes, this.peerConnector, this.schedulerFactory);
 		refresher.refresh();
 	}
 
@@ -148,7 +146,7 @@ public class PeerNetwork {
 		this.forAllActiveNodes(new Action<Node>() {
 			@Override
 			public void execute(final Node element) {
-				connector.announce(element.getEndpoint(), broadcastId, entity);
+				peerConnector.announce(element.getEndpoint(), broadcastId, entity);
 			}
 		});
 	}
@@ -157,7 +155,7 @@ public class PeerNetwork {
 		this.forAllActiveNodes(new Action<Node>() {
 			@Override
 			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(connector, element);
+				blockSynchronizer.synchronizeNode(syncConnector, element);
 			}
 		});
 	}

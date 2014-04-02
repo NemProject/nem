@@ -106,9 +106,9 @@ public class HttpMethodClient {
 			final Request req = requestFactory.createRequest(this.httpClient, uri);
 			req.send(listener);
 
-			Response res = listener.get(this.timeout, TimeUnit.SECONDS);
+			final Response res = listener.get(this.timeout, TimeUnit.SECONDS);
 			if (res.getStatus() != HTTP_STATUS_OK)
-				return null;
+				throw new InactivePeerException(String.format("Peer returned: %d", res.getStatus()));
 
 			try (InputStream responseStream = listener.getInputStream()) {
 				return new JsonDeserializer(

@@ -31,7 +31,7 @@ public class PeerNetworkTest {
 	@Test
 	public void ctorDoesNotTriggerConnectorCalls() {
 		// Act:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		createTestNetwork(connector);
 
 		// Assert:
@@ -71,7 +71,7 @@ public class PeerNetworkTest {
 	public void getLocalNodeReturnsConfigLocalNode() {
 		// Act:
 		final Config config = createTestConfig();
-		final PeerNetwork network = new PeerNetwork(config, new MockPeerConnector(), new MockNodeSchedulerFactory(), new MockBlockSynchronizer());
+		final PeerNetwork network = new PeerNetwork(config, createMockPeerNetworkServices());
 
 		// Assert:
 		Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
@@ -84,7 +84,7 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshCallsGetInfoForEveryInactiveNode() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
@@ -97,7 +97,7 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshCallsGetInfoForEveryActiveNode() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
@@ -111,9 +111,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshSuccessMovesNodesToActive() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.NONE);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.NONE);
 
 		// Act:
 		network.refresh();
@@ -126,9 +126,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshGetInfoTransientFailureMovesNodesToInactive() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
 		network.refresh();
@@ -141,9 +141,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshGetInfoFatalFailureRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
 		network.refresh();
@@ -156,9 +156,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshNodeChangeAddressRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.CHANGE_ADDRESS);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
 		network.refresh();
@@ -175,7 +175,7 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshCallsGetKnownPeersForActiveNodes() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
@@ -188,9 +188,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshDoesNotCallGetKnownPeersForInactiveNodes() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
 		network.refresh();
@@ -202,9 +202,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshDoesNotCallGetKnownPeersForFatalFailureNodes() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
 		network.refresh();
@@ -216,9 +216,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshDoesNotCallGetKnownPeersForChangeAddressNodes() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.CHANGE_ADDRESS);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
 		network.refresh();
@@ -230,9 +230,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshGetKnownPeersTransientFailureMovesNodesToInactive() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetKnownPeersError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
 		network.refresh();
@@ -245,9 +245,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshGetKnownPeersFatalFailureRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetKnownPeersError("10.0.0.2", MockPeerConnector.TriggerAction.FATAL);
+		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
 		network.refresh();
@@ -260,9 +260,9 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshMergesInKnownPeers() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockPeerConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Arrange: set up a node peers list that indicates the reverse of direct communication
 		// (i.e. 10.0.0.2 is active and all other nodes are inactive)
@@ -283,7 +283,7 @@ public class PeerNetworkTest {
 	@Test
 	public void refreshGivesPrecedenceToFirstHandExperience() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
 		NodeCollection knownPeers = new NodeCollection();
@@ -311,10 +311,10 @@ public class PeerNetworkTest {
 	@Test
 	public void getPartnerNodeReturnsActiveNode() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.1", MockPeerConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.3", MockPeerConnector.TriggerAction.FATAL);
+		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
 
 		network.refresh();
 
@@ -332,7 +332,7 @@ public class PeerNetworkTest {
 	@Test
 	public void broadcastDoesNotCallAnnounceForAnyInactiveNode() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
@@ -345,7 +345,7 @@ public class PeerNetworkTest {
 	@Test
 	public void broadcastCallsAnnounceForAllActiveNodes() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		network.refresh(); // transition all nodes to active
 
@@ -359,7 +359,7 @@ public class PeerNetworkTest {
 	@Test
 	public void broadcastForwardsParametersToAnnounce() {
 		// Arrange:
-		final MockPeerConnector connector = new MockPeerConnector();
+		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		final SerializableEntity entity = new MockSerializableEntity();
 		network.refresh(); // transition all nodes to active
@@ -426,12 +426,18 @@ public class PeerNetworkTest {
 
 		class TestRunner {
 
-			final MockPeerConnector connector = new MockPeerConnector();
+			final MockConnector connector = new MockConnector();
 
 			// configure a MockScheduler to be returned by the second (broadcast) createScheduler request
 			// (the first request is for the network call that initially makes everything active)
 			final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory(new MockScheduler(), 1);
-			final PeerNetwork network = new PeerNetwork(createTestConfig(), connector, schedulerFactory, new MockBlockSynchronizer());
+			final PeerNetwork network = new PeerNetwork(
+					createTestConfig(),
+					new PeerNetworkServices(
+							this.connector,
+							this.connector,
+							this.schedulerFactory,
+							new MockBlockSynchronizer()));
 			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
 
 			// monitor that is signaled when MockScheduler.push is entered
@@ -615,33 +621,47 @@ public class PeerNetworkTest {
 
 	//region factories
 
-	private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
-		return new PeerNetwork(
-				createTestConfig(),
-				new MockPeerConnector(),
-				new MockNodeSchedulerFactory(),
-				synchronizer);
-	}
-
-	private static PeerNetwork createTestNetwork(final PeerConnector connector) {
-		return new PeerNetwork(
-				createTestConfig(),
-				connector,
+	private static PeerNetworkServices createMockPeerNetworkServices() {
+		return new PeerNetworkServices(
+				new MockConnector(),
+				new MockConnector(),
 				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
 
+	private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
+		return new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						new MockConnector(),
+						new MockConnector(),
+						new MockNodeSchedulerFactory(),
+						synchronizer));
+	}
+
+	private static PeerNetwork createTestNetwork(final MockConnector connector) {
+		return new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						connector,
+						connector,
+						new MockNodeSchedulerFactory(),
+						new MockBlockSynchronizer()));
+	}
+
 	private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
 		return new PeerNetwork(
-				createTestConfig(),
-				new MockPeerConnector(),
-				new MockNodeSchedulerFactory(),
-				new MockBlockSynchronizer(),
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						new MockConnector(),
+						new MockConnector(),
+						new MockNodeSchedulerFactory(),
+						new MockBlockSynchronizer()),
 				nodeExperiences);
 	}
 
 	private static PeerNetwork createTestNetwork() {
-		return createTestNetwork(new MockPeerConnector());
+		return createTestNetwork(new MockConnector());
 	}
 
 	private static Config createTestConfig() {
