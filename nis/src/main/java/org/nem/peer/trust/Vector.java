@@ -1,9 +1,9 @@
 package org.nem.peer.trust;
 
+import org.nem.core.utils.FormatUtils;
+
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 /**
  * Represents a linear algebra vector.
@@ -220,10 +220,7 @@ public class Vector {
 
 	@Override
 	public String toString() {
-		final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
-		decimalFormatSymbols.setDecimalSeparator('.');
-		final DecimalFormat format = new DecimalFormat("#0.000", decimalFormatSymbols);
-		format.setGroupingUsed(false);
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < this.size; ++i) {

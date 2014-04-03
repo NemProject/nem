@@ -230,18 +230,17 @@ public class MatrixTest {
 	public void matrixStringRepresentationIsCorrect() {
 		// Arrange:
 		final Matrix matrix = createThreeByTwoMatrix(new double[] {
-				2.1234, 3.2345, 5.0126, 11.1234, 1, 8
+				2.1234, 3.2345, 5012.0126, 11.1234, 1, 8
 		});
 
 		// Assert:
 		final String expectedResult =
 				"2.123 11.123" + System.lineSeparator() +
 						"3.234 1.000" + System.lineSeparator() +
-						"5.013 8.000";
+						"5012.013 8.000";
 
 		// Assert:
 		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
-
 	}
 
 	//endregion
