@@ -1,8 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.dbmodel.Block;
 import org.nem.core.dbmodel.Transfer;
 import org.nem.core.model.*;
@@ -10,12 +9,10 @@ import org.nem.core.test.MockAccount;
 import org.nem.core.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
@@ -28,6 +25,7 @@ public class BlockChainTest {
 	private static org.nem.core.dbmodel.Account DB_RECIPIENT2 = new org.nem.core.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
 
+	@Ignore
 	@Test
 	public void analyzeSavesResults() {
 		// Arrange:
