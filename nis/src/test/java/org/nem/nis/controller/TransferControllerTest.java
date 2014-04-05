@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.*;
 import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.test.MockPeerConnector;
+import org.nem.nis.test.MockPeerConnector;
 import org.nem.core.utils.*;
 
 import java.net.MalformedURLException;

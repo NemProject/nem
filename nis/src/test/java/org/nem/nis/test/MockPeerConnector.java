@@ -1,4 +1,4 @@
-package org.nem.core.test;
+package org.nem.nis.test;
 
 import net.minidev.json.JSONObject;
 import org.nem.core.serialization.JsonDeserializer;

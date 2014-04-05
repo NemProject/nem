@@ -6,7 +6,7 @@ import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
-import org.nem.core.test.MockBlockChain;
+import org.nem.nis.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.transactions.TransferTransaction;

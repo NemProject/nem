@@ -5,7 +5,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.test.MockPeerConnector;
+import org.nem.nis.test.MockPeerConnector;
 
 import java.net.MalformedURLException;
 
