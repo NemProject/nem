@@ -11,6 +11,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.test.MockAccountDao;
 
 public class BlockMapperTest {
 

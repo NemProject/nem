@@ -2,7 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.peer.test.Utils;
 import org.nem.peer.Node;
 import org.nem.peer.test.ScoreProviderTestContext;
 import org.nem.peer.test.TestTrustContext;

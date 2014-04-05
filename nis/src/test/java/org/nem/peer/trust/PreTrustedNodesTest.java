@@ -3,7 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.core.test.Utils;
+import org.nem.peer.test.Utils;
 import org.nem.peer.Node;
 
 import java.util.*;

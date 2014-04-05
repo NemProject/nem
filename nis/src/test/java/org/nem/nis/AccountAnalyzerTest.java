@@ -10,7 +10,7 @@ import org.nem.core.model.Amount;
 import org.nem.core.model.GenesisBlock;
 import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.MockAccount;
-import org.nem.core.test.MockAccountAnalyzer;
+import org.nem.nis.test.MockAccountAnalyzer;
 import org.nem.core.test.Utils;
 
 import java.util.*;

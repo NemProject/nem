@@ -1,7 +1,7 @@
 package org.nem.peer.trust;
 
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.peer.test.Utils;
 import org.nem.peer.*;
 import org.nem.peer.test.NodeCollectionAssert;
 

@@ -2,7 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.peer.test.Utils;
 import org.nem.peer.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
@@ -34,7 +34,7 @@ public class NodeExperiencesPairTest {
 		final NodeExperiencesPair originalPair = new NodeExperiencesPair(node, experiences);
 
 		// Act:
-		final NodeExperiencesPair pair = new NodeExperiencesPair(Utils.roundtripSerializableEntity(originalPair, null));
+		final NodeExperiencesPair pair = new NodeExperiencesPair(org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
 		Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getPort(), IsEqual.equalTo(81));

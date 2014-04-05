@@ -6,8 +6,6 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.peer.*;
-import org.nem.peer.trust.score.NodeExperience;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -276,44 +274,5 @@ public class Utils {
 	 */
 	public static PrivateKey mutate(final PrivateKey key) {
 		return new PrivateKey(key.getRaw().add(BigInteger.ONE));
-	}
-
-	/**
-	 * Creates a node with the specified port number.
-	 *
-	 * @param port The port number.
-	 *
-	 * @return The new node.
-	 */
-	public static Node createNodeWithPort(final int port) {
-		return new Node(new NodeEndpoint("http", "localhost", port), "P", "A");
-	}
-
-	/**
-	 * Creates a node array of the specified size.
-	 *
-	 * @param size The size.
-	 *
-	 * @return The array.
-	 */
-	public static Node[] createNodeArray(int size) {
-		final Node[] nodes = new Node[size];
-		for (int i = 0; i < size; ++i)
-			nodes[i] = org.nem.core.test.Utils.createNodeWithPort(80 + i);
-
-		return nodes;
-	}
-
-	/**
-	 * Creates a new node experience with the specified number of calls.
-	 *
-	 * @param numSuccessfulCalls The number of successful calls.
-	 *
-	 * @return The node experience.
-	 */
-	public static NodeExperience createNodeExperience(final long numSuccessfulCalls) {
-		final NodeExperience experience = new NodeExperience();
-		experience.successfulCalls().set(numSuccessfulCalls);
-		return experience;
 	}
 }

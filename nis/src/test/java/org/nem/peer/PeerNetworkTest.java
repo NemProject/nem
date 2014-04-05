@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.test.MockTransaction;
-import org.nem.core.test.Utils;
+import org.nem.peer.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
@@ -466,12 +466,12 @@ public class PeerNetworkTest {
 				Thread broadcastThread = startThread(new Runnable() {
 					@Override
 					public void run() {
-						network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockTransaction(Utils.generateRandomAccount()));
+						network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockTransaction(org.nem.core.test.Utils.generateRandomAccount()));
 					}
 				});
 
 				// Act: wait for the scheduler to partially iterate the collection
-				Utils.monitorWait(this.schedulerPartialIterationMonitor);
+				org.nem.core.test.Utils.monitorWait(this.schedulerPartialIterationMonitor);
 
 				// Act: trigger refresh on a different thread
 				Thread refreshThread = startThread(new Runnable() {
@@ -485,7 +485,7 @@ public class PeerNetworkTest {
 				refreshThread.join();
 
 				// Act: signal the broadcast thread and let it complete
-				Utils.monitorSignal(this.networkRefreshCompleteMonitor);
+				org.nem.core.test.Utils.monitorSignal(this.networkRefreshCompleteMonitor);
 				broadcastThread.join();
 			}
 
@@ -511,10 +511,10 @@ public class PeerNetworkTest {
 					it.next();
 
 					// Arrange: unblock the main thread since the mock scheduler has been created and used
-					Utils.monitorSignal(schedulerPartialIterationMonitor);
+					org.nem.core.test.Utils.monitorSignal(schedulerPartialIterationMonitor);
 
 					// Act:
-					Utils.monitorWait(networkRefreshCompleteMonitor);
+					org.nem.core.test.Utils.monitorWait(networkRefreshCompleteMonitor);
 
 					// Act: move to the next element
 					it.next();

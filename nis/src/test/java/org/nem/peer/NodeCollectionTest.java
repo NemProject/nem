@@ -2,7 +2,6 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
 import org.nem.peer.test.*;
 
 import java.util.Iterator;
@@ -30,7 +29,7 @@ public class NodeCollectionTest {
 		final NodeCollection originalNodes = createNodeCollectionWithMultipleNodes();
 
 		// Assert:
-		final NodeCollection nodes = new NodeCollection(Utils.roundtripSerializableEntity(originalNodes, null));
+		final NodeCollection nodes = new NodeCollection(org.nem.core.test.Utils.roundtripSerializableEntity(originalNodes, null));
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
