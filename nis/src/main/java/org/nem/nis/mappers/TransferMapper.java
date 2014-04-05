@@ -1,7 +1,7 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.dbmodel.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
@@ -28,8 +28,8 @@ public class TransferMapper {
 	 * @return The Transfer db-model.
 	 */
 	public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
-		final org.nem.core.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
-		final org.nem.core.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
+		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
+		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 
 		final byte[] txHash = HashUtils.calculateHash(transfer);
 		final Transfer dbTransfer = new Transfer(

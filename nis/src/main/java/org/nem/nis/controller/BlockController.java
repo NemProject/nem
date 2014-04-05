@@ -1,9 +1,9 @@
 package org.nem.nis.controller;
 
 import org.apache.commons.codec.DecoderException;
-import org.nem.core.dao.BlockDao;
+import org.nem.nis.dao.BlockDao;
 
-import org.nem.core.mappers.BlockMapper;
+import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.HexEncoder;
@@ -32,7 +32,7 @@ public class BlockController {
 	@PublicApi
 	public String blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
 		final byte[] blockHash = HexEncoder.getBytes(blockHashString);
-		final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
+		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
 		if (null == dbBlock)
 			return Utils.jsonError(2, "hash not found in the db");
 
@@ -46,7 +46,7 @@ public class BlockController {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
-		final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
+		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		if (null == dbBlock)
 			return Utils.jsonError(2, "block not found in the db");
 

@@ -12,7 +12,7 @@
 
     <tx:annotation-driven />
 
-    <context:component-scan base-package="org.nem.core">
+    <context:component-scan base-package="org.nem.nis">
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.stereotype.Controller" />
     </context:component-scan>
@@ -41,9 +41,9 @@
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses">
             <list>
-                <value>org.nem.core.dbmodel.Account</value>
-                <value>org.nem.core.dbmodel.Block</value>
-                <value>org.nem.core.dbmodel.Transfer</value>
+                <value>org.nem.nis.dbmodel.Account</value>
+                <value>org.nem.nis.dbmodel.Block</value>
+                <value>org.nem.nis.dbmodel.Transfer</value>
             </list>
         </property>
         <property name="hibernateProperties">

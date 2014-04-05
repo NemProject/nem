@@ -1,4 +1,4 @@
-package org.nem.core.dbmodel;
+package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;

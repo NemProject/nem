@@ -1,7 +1,7 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.dbmodel.Transfer;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
@@ -25,11 +25,11 @@ public class BlockMapper {
 	 *
 	 * @return The Block db-model.
 	 */
-	public static org.nem.core.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
-		final org.nem.core.dbmodel.Account forager = accountDao.findByAddress(block.getSigner().getAddress());
+	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
+		final org.nem.nis.dbmodel.Account forager = accountDao.findByAddress(block.getSigner().getAddress());
 
 		final byte[] blockHash = HashUtils.calculateHash(block);
-		final org.nem.core.dbmodel.Block dbBlock = new org.nem.core.dbmodel.Block(
+		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
 				ByteUtils.bytesToLong(blockHash),
 				block.getVersion(),
 				block.getPreviousBlockHash(),
@@ -61,7 +61,7 @@ public class BlockMapper {
 	 *
 	 * @return The Block model.
 	 */
-	public static Block toModel(final org.nem.core.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
+	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
 		final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
 

@@ -1,9 +1,9 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.dbmodel.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
@@ -115,8 +115,8 @@ public class TransferMapperTest {
 	private class TestContext {
 
 		private final TransferTransaction model;
-		private final org.nem.core.dbmodel.Account dbSender;
-		private final org.nem.core.dbmodel.Account dbRecipient;
+		private final org.nem.nis.dbmodel.Account dbSender;
+		private final org.nem.nis.dbmodel.Account dbRecipient;
 		private final MockAccountDao accountDao;
 		private final byte[] hash;
 
@@ -132,11 +132,11 @@ public class TransferMapperTest {
 			this.model.setDeadline(new TimeInstant(800));
 			this.model.sign();
 
-			this.dbSender = new org.nem.core.dbmodel.Account();
+			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
-			this.dbRecipient = new org.nem.core.dbmodel.Account();
+			this.dbRecipient = new org.nem.nis.dbmodel.Account();
 			this.dbRecipient.setPrintableKey(this.model.getRecipient().getAddress().getEncoded());
 
 			this.accountDao = new MockAccountDao();

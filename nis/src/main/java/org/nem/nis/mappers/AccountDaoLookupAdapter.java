@@ -1,7 +1,7 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
-import org.nem.core.dao.AccountDao;
-import org.nem.core.dbmodel.Account;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.Account;
 import org.nem.core.model.Address;
 
 import java.util.*;

@@ -1,7 +1,7 @@
 package org.nem.core.test;
 
-import org.nem.core.dao.TransferDao;
-import org.nem.core.dbmodel.Transfer;
+import org.nem.nis.dao.TransferDao;
+import org.nem.nis.dbmodel.Transfer;
 
 import java.util.List;
 

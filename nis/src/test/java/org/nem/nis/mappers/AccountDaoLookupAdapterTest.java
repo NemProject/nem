@@ -1,9 +1,9 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.dbmodel.Account;
+import org.nem.nis.dbmodel.Account;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
 

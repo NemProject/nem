@@ -5,11 +5,11 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.dao.AccountDao;
-import org.nem.core.dao.BlockDao;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dao.BlockDao;
 
-import org.nem.core.mappers.AccountDaoLookupAdapter;
-import org.nem.core.mappers.BlockMapper;
+import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.HexEncoder;
@@ -43,7 +43,7 @@ public class NisMain {
 		Long curBlockId;
 		System.out.println("starting analysis...");
 
-		org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
+		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
 		if (null == dbBlock) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the dba and rerun");
 			System.exit(-1);
@@ -95,8 +95,8 @@ public class NisMain {
 		this.saveBlock(GENESIS_BLOCK);
 	}
 
-	private org.nem.core.dbmodel.Block saveBlock(final Block block) {
-		org.nem.core.dbmodel.Block dbBlock;
+	private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
+		org.nem.nis.dbmodel.Block dbBlock;
 
 		dbBlock = this.blockDao.findByHash(GENESIS_BLOCK_HASH);
 		if (null != dbBlock) {

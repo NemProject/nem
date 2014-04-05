@@ -1,8 +1,8 @@
-package org.nem.core.dao;
+package org.nem.nis.dao;
 
 import java.util.List;
 
-import org.nem.core.dbmodel.Transfer;
+import org.nem.nis.dbmodel.Transfer;
 
 /**
  * DAO for accessing db Transfer objects (transaction transfer)

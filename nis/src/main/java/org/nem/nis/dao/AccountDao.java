@@ -1,8 +1,8 @@
-package org.nem.core.dao;
+package org.nem.nis.dao;
 
 import java.util.List;
 
-import org.nem.core.dbmodel.Account;
+import org.nem.nis.dbmodel.Account;
 
 /**
  * DAO for accessing db Account objects

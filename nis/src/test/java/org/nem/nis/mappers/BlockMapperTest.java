@@ -1,9 +1,9 @@
-package org.nem.core.mappers;
+package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.dbmodel.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
@@ -20,7 +20,7 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
@@ -35,7 +35,7 @@ public class BlockMapperTest {
 		context.addTransactions();
 
 		// Act:
-		final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
@@ -51,7 +51,7 @@ public class BlockMapperTest {
 	public void blockModelWithoutTransactionsCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -66,7 +66,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 3;
 		final TestContext context = new TestContext();
 		context.addTransactions();
-		final org.nem.core.dbmodel.Block dbModel = context.toDbModel();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -88,13 +88,13 @@ public class BlockMapperTest {
 	private class TestContext {
 
 		private final Block model;
-		private final org.nem.core.dbmodel.Account dbForager;
+		private final org.nem.nis.dbmodel.Account dbForager;
 		private final Account account1;
-		private final org.nem.core.dbmodel.Account dbAccount1;
+		private final org.nem.nis.dbmodel.Account dbAccount1;
 		private final Account account2;
-		private final org.nem.core.dbmodel.Account dbAccount2;
+		private final org.nem.nis.dbmodel.Account dbAccount2;
 		private final Account account3;
-		private final org.nem.core.dbmodel.Account dbAccount3;
+		private final org.nem.nis.dbmodel.Account dbAccount3;
 		private final MockAccountDao accountDao;
 		private byte[] hash;
 
@@ -107,7 +107,7 @@ public class BlockMapperTest {
 
 			this.signModel();
 
-			this.dbForager = new org.nem.core.dbmodel.Account();
+			this.dbForager = new org.nem.nis.dbmodel.Account();
 			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
@@ -127,8 +127,8 @@ public class BlockMapperTest {
 			accountDao.addMapping(this.account3, this.dbAccount3);
 		}
 
-		private org.nem.core.dbmodel.Account createDbAccount(final Account account) {
-			final org.nem.core.dbmodel.Account dbAccount = new org.nem.core.dbmodel.Account();
+		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
+			final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account();
 			dbAccount.setPublicKey(account.getKeyPair().getPublicKey());
 			dbAccount.setPrintableKey(account.getAddress().getEncoded());
 			return dbAccount;
@@ -138,11 +138,11 @@ public class BlockMapperTest {
 			return this.model;
 		}
 
-		public org.nem.core.dbmodel.Block toDbModel() {
+		public org.nem.nis.dbmodel.Block toDbModel() {
 			return BlockMapper.toDbModel(this.model, new AccountDaoLookupAdapter(this.accountDao));
 		}
 
-		public Block toModel(final org.nem.core.dbmodel.Block dbBlock) {
+		public Block toModel(final org.nem.nis.dbmodel.Block dbBlock) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
 			mockAccountLookup.setMockAccount(this.account1);
@@ -170,7 +170,7 @@ public class BlockMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
-		public void assertDbModel(final org.nem.core.dbmodel.Block dbModel, final long expectedFee) {
+		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(ByteUtils.bytesToLong(this.hash)));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));

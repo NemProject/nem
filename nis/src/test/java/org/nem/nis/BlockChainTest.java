@@ -2,8 +2,8 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.dbmodel.Block;
-import org.nem.core.dbmodel.Transfer;
+import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
 import org.nem.core.test.MockBlockChain;
@@ -20,9 +20,9 @@ public class BlockChainTest {
 	private static org.nem.core.model.Account SENDER = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.dbmodel.Account DB_SENDER = new org.nem.core.dbmodel.Account(SENDER.getAddress().getEncoded(), SENDER.getKeyPair().getPublicKey());
-	private static org.nem.core.dbmodel.Account DB_RECIPIENT1 = new org.nem.core.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
-	private static org.nem.core.dbmodel.Account DB_RECIPIENT2 = new org.nem.core.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
+	private static org.nem.nis.dbmodel.Account DB_SENDER = new org.nem.nis.dbmodel.Account(SENDER.getAddress().getEncoded(), SENDER.getKeyPair().getPublicKey());
+	private static org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
+	private static org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
 
 	@Ignore

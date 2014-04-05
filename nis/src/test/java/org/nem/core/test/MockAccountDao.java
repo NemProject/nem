@@ -1,7 +1,7 @@
 package org.nem.core.test;
 
-import org.nem.core.dao.AccountDao;
-import org.nem.core.dbmodel.Account;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.Account;
 import org.nem.core.model.Address;
 
 import java.util.*;
@@ -29,7 +29,7 @@ public class MockAccountDao implements AccountDao {
 	 * @param address   The model address
 	 * @param dbAccount The db-model account.
 	 */
-	public void addMapping(final Address address, final org.nem.core.dbmodel.Account dbAccount) {
+	public void addMapping(final Address address, final org.nem.nis.dbmodel.Account dbAccount) {
 		this.knownAccounts.put(address.getEncoded(), dbAccount);
 	}
 
@@ -39,23 +39,23 @@ public class MockAccountDao implements AccountDao {
 	 * @param account   The model account
 	 * @param dbAccount The db-model account.
 	 */
-	public void addMapping(final org.nem.core.model.Account account, final org.nem.core.dbmodel.Account dbAccount) {
+	public void addMapping(final org.nem.core.model.Account account, final org.nem.nis.dbmodel.Account dbAccount) {
 		this.addMapping(account.getAddress(), dbAccount);
 	}
 
 	@Override
-	public org.nem.core.dbmodel.Account getAccount(Long id) {
+	public org.nem.nis.dbmodel.Account getAccount(Long id) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public org.nem.core.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
+	public org.nem.nis.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
 		++numGetAccountByPrintableAddressCalls;
 		return this.knownAccounts.get(printableAddress);
 	}
 
 	@Override
-	public void save(org.nem.core.dbmodel.Account account) {
+	public void save(org.nem.nis.dbmodel.Account account) {
 		throw new UnsupportedOperationException();
 	}
 

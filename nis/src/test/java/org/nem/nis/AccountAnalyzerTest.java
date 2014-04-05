@@ -2,9 +2,9 @@ package org.nem.nis;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.core.dbmodel.Account;
-import org.nem.core.dbmodel.Block;
-import org.nem.core.dbmodel.Transfer;
+import org.nem.nis.dbmodel.Account;
+import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.Address;
 import org.nem.core.model.Amount;
 import org.nem.core.model.GenesisBlock;

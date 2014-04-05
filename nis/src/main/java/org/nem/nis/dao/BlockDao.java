@@ -1,6 +1,6 @@
-package org.nem.core.dao;
+package org.nem.nis.dao;
 
-import org.nem.core.dbmodel.Block;
+import org.nem.nis.dbmodel.Block;
 
 import java.util.List;
 

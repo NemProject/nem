@@ -1,18 +1,17 @@
-package org.nem.core.dao;
+package org.nem.nis.dao;
 
 import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.apache.maven.artifact.versioning.Restriction;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.nem.core.dbmodel.Block;
+import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

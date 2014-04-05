@@ -1,4 +1,4 @@
-package org.nem.core.dbmodel;
+package org.nem.nis.dbmodel;
 
 import org.nem.core.crypto.PublicKey;
 

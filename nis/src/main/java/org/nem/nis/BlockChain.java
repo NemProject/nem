@@ -1,16 +1,14 @@
 package org.nem.nis;
 
-import org.nem.core.mappers.AccountDaoLookupAdapter;
-import org.nem.core.mappers.BlockMapper;
-import org.nem.core.dao.AccountDao;
-import org.nem.core.dao.BlockDao;
+import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
-import org.nem.core.utils.HexEncoder;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +40,7 @@ public class BlockChain implements BlockSynchronizer {
 	private NisPeerNetworkHost host;
 
 	// for now it's easier to keep it like this
-	org.nem.core.dbmodel.Block lastBlock;
+	org.nem.nis.dbmodel.Block lastBlock;
 
 	public BlockChain() {
 	}
@@ -51,7 +49,7 @@ public class BlockChain implements BlockSynchronizer {
 		LOGGER.info("booting up block generator");
 	}
 
-	public org.nem.core.dbmodel.Block getLastDbBlock() {
+	public org.nem.nis.dbmodel.Block getLastDbBlock() {
 		return lastBlock;
 	}
 
@@ -76,7 +74,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 
-	private long calcDbBlockScore(org.nem.core.dbmodel.Block block) {
+	private long calcDbBlockScore(org.nem.nis.dbmodel.Block block) {
 		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
 		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getBlockHash(), 10, 14)));
 
@@ -90,7 +88,7 @@ public class BlockChain implements BlockSynchronizer {
 		return r1 + r2;
 	}
 
-	public void analyzeLastBlock(org.nem.core.dbmodel.Block curBlock) {
+	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
 
@@ -98,7 +96,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 
-	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.core.dbmodel.Block dbBlock) {
+	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
 		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
 			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), dbBlock.getBlockHash())) {
 				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
@@ -123,7 +121,7 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		org.nem.core.dbmodel.Block ourBlock = blockDao.findByHeight(height);
+		org.nem.nis.dbmodel.Block ourBlock = blockDao.findByHeight(height);
 
 		if (synchronizeCompareBlocks(peerBlock, ourBlock)) {
 			return false;
@@ -276,7 +274,7 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region step 4
-		org.nem.core.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
+		org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		if (peerChain.size() > BLOCKS_LIMIT) {
@@ -329,7 +327,7 @@ public class BlockChain implements BlockSynchronizer {
 		byte[] blockHash = HashUtils.calculateHash(block);
 		byte[] parentHash = block.getPreviousBlockHash();
 
-		org.nem.core.dbmodel.Block parent;
+		org.nem.nis.dbmodel.Block parent;
 
 		// block already seen
 		synchronized (BlockChain.class) {
@@ -354,7 +352,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
-			org.nem.core.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
+			org.nem.nis.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
 			// TODO: compare block score, if analyzed block is better, rollback block(s) from db
 			if (child != null) {
 				return false;
@@ -397,7 +395,7 @@ public class BlockChain implements BlockSynchronizer {
 	public boolean addBlockToDb(Block bestBlock) {
 		synchronized (BlockChain.class) {
 
-			final org.nem.core.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
+			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block

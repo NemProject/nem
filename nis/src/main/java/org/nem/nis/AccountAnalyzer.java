@@ -5,11 +5,11 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.dao.BlockDao;
-import org.nem.core.dao.TransferDao;
-import org.nem.core.dbmodel.Block;
-import org.nem.core.dbmodel.Transfer;
-import org.nem.core.mappers.TransferMapper;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dao.TransferDao;
+import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.mappers.TransferMapper;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.transactions.TransferTransaction;
@@ -65,7 +65,7 @@ public class AccountAnalyzer implements AccountLookup {
 		return account;
 	}
 
-	private Account addAccountToCache(org.nem.core.dbmodel.Account a) {
+	private Account addAccountToCache(org.nem.nis.dbmodel.Account a) {
 		return addAccountToCacheImpl(a.getPublicKey(), a.getPrintableKey());
 	}
 
