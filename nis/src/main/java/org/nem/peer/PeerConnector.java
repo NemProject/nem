@@ -1,6 +1,9 @@
 package org.nem.peer;
 
+import org.nem.core.model.ByteArray;
 import org.nem.core.serialization.SerializableEntity;
+
+import java.util.List;
 
 /**
  * A interface that is used to request information from nodes.

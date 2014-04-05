@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import org.nem.core.model.Block;
+import org.nem.core.model.ByteArray;
 
 import java.util.List;
 
@@ -35,4 +36,8 @@ public interface SyncConnector {
 	 * @return All blocks in the chain after the specified height.
 	 */
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
+
+
+	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long startingPoint);
+
 }

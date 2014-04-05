@@ -19,6 +19,7 @@ public class AccountController {
 	private Foraging foraging;
 
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
+	@ClientApi
 	public String accountUnlock(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final Account account = new Account(new KeyPair(new PrivateKey(deserializer)));

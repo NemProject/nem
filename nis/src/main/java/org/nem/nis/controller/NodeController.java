@@ -26,6 +26,8 @@ public class NodeController {
 	 * @return Information about the running node.
 	 */
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
 	public String getInfo() {
 		final Node node = this.host.getNetwork().getLocalNode();
 		return ControllerUtils.serialize(node);
@@ -37,6 +39,8 @@ public class NodeController {
 	 * @return A list of the active and inactive nodes currently known  by the running node.
 	 */
 	@RequestMapping(value = "/node/peer-list", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
 	public String getPeerList() {
 		final NodeCollection nodes = this.host.getNetwork().getNodes();
 		return ControllerUtils.serialize(nodes);
@@ -50,6 +54,7 @@ public class NodeController {
 	 * @return OK json on success.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
+	@P2PApi
 	public String ping(@RequestBody String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);

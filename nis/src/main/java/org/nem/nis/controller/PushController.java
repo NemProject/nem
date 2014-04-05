@@ -40,6 +40,7 @@ public class PushController {
 	private NisPeerNetworkHost host;
 
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
+	@P2PApi
 	public String pushTransaction(@RequestBody String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
@@ -63,6 +64,7 @@ public class PushController {
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
+	@P2PApi
 	public String pushBlock(@RequestBody String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);

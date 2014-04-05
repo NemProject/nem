@@ -28,6 +28,8 @@ public class BlockController {
 	 * @return block along with associated elements.
 	 */
 	@RequestMapping(value = "/block/get", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
 	public String blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
 		final byte[] blockHash = HexEncoder.getBytes(blockHashString);
 		final org.nem.core.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
@@ -39,6 +41,7 @@ public class BlockController {
 	}
 
 	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
+	@P2PApi
 	public String blockAt(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");

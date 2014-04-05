@@ -45,6 +45,7 @@ public class NodeEndpointTest {
 		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_PUSH_BLOCK), IsEqual.equalTo(new URL(url, "push/block")));
 		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK), IsEqual.equalTo(new URL(url, "chain/last-block")));
 		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER), IsEqual.equalTo(new URL(url, "chain/blocks-after")));
+		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM), IsEqual.equalTo(new URL(url, "chain/hashes-from")));
 		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT), IsEqual.equalTo(new URL(url, "block/at")));
 	}
 
