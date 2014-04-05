@@ -19,7 +19,7 @@
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-            <value>classpath:dbh2.properties</value>
+            <value>classpath:db.properties</value>
         </property>
     </bean>
     <bean id="dataSource"
