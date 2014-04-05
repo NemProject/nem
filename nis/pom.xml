@@ -4,7 +4,7 @@
 	<groupId>org.nem.nis</groupId>
 	<artifactId>nem-infrastructure-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>NEM Community Server</name>
+	<name>NEM Infrastructure Server</name>
 
 	<repositories>
 		<repository>
