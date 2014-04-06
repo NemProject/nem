@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.test.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -177,4 +179,25 @@ public class HashChainTest {
 		Assert.assertThat(i, IsEqual.equalTo(3));
 	}
 	// endregion
+
+	@Test
+	public void hashchainCanBeRoundTripped() {
+		// Arrange:
+		final HashChain hashChain1 = new HashChain(dummyList);
+		final HashChain hashChain2 = createRoundTrippedHashChain(hashChain1);
+
+		// Act:
+		int i = hashChain1.findFirstDifferen(hashChain2);
+
+		// Assert:
+		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(dummyList.size()));
+		Assert.assertThat(hashChain2.size(), IsEqual.equalTo(dummyList.size()));
+		Assert.assertThat(i, IsEqual.equalTo(dummyList.size()));
+	}
+
+	private HashChain createRoundTrippedHashChain(HashChain originalTransaction) {
+		// Act:
+		Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction, null);
+		return new HashChain(deserializer);
+	}
 }

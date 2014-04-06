@@ -42,7 +42,7 @@ public class HashChain implements SerializableEntity {
 	 * @param deserializer The deserializer to use.
 	 */
 	public HashChain(Deserializer deserializer) {
-		deserializer.readObjectArray("data", ByteArrayFactory.deserializer);
+		hashChainList = deserializer.readObjectArray("data", ByteArrayFactory.deserializer);
 	}
 
 	@Override
