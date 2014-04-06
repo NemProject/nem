@@ -23,7 +23,12 @@
 <mvc:resources mapping="/favicon.ico" location="classpath:img/favicon.ico" />
 
 <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
-	
-<context:component-scan base-package="org.nem.nis"/>
+
+<!-- restrict to .nis.controller package, (otherwise @Repository will be picked in wrong context
+    alternative is to use filter
+    <context:include-filter expression="org.springframework.stereotype.Controller"type="annotation"/>
+-->
+<context:component-scan base-package="org.nem.nis.controller"/>
+
 
 </beans>
