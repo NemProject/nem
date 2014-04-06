@@ -1,17 +1,27 @@
 package org.nem.nis.balances;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
-import org.nem.core.model.Amount;
+import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dbmodel.Block;
+import org.nem.core.transactions.TransferTransaction;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dbmodel.Transfer;
 
 import java.util.Iterator;
 
 public class Balance {
-	public static void apply(final AccountLookup accountLookup, final Block block) {
+	public static void apply(final AccountAnalyzer accountLookup, final Block block) {
+		// assuming AccountAnalyzer used to create block is the same as
+		// the one passed in accountLookup
+
+		for (Transaction transaction : block.getTransactions()) {
+			transaction.execute();
+		}
+
+		block.getSigner().incrementBalance(block.getTotalFee());
+	}
+
+	public static void apply(final AccountLookup accountLookup, final org.nem.nis.dbmodel.Block block) {
 		for (Transfer transfer : block.getBlockTransfers()) {
 			final Address senderAccount = Address.fromPublicKey(transfer.getSender().getPublicKey());
 			final Account sender = accountLookup.findByAddress(senderAccount);
@@ -28,7 +38,7 @@ public class Balance {
 		forager.incrementBalance(Amount.fromMicroNem(block.getTotalFee()));
 	}
 
-	public static void unapply(final AccountLookup accountLookup, final Block block) {
+	public static void unapply(final AccountLookup accountLookup, final org.nem.nis.dbmodel.Block block) {
 		final Address foragerAddress = Address.fromPublicKey(block.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
 		forager.decrementBalance(Amount.fromMicroNem(block.getTotalFee()));

@@ -311,11 +311,9 @@ public class BlockChain implements BlockSynchronizer {
 				}
 			}
 
-			// TODO: need too apply transactions here (on contemporaryAccountAnalyzer),
-			// to have proper data for next iteration
+			Balance.apply(contemporaryAccountAnalyzer, block);
 
 			parentBlock = block;
-
 			wantedHeight += 1;
 		}
 		//endregion
