@@ -1,9 +1,6 @@
 package org.nem.nis;
 
-import org.apache.commons.collections4.iterators.ReverseListIterator;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.balances.Balance;
-import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -13,7 +10,6 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.mappers.TransferMapper;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,21 +70,16 @@ public class BlockChain implements BlockSynchronizer {
 		return lastBlock.getTimestamp();
 	}
 
-	public long getLastBlockScore() {
-		return calcDbBlockScore(lastBlock);
-	}
-
-
-	private long calcDbBlockScore(org.nem.nis.dbmodel.Block block) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForgerProof(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getBlockHash(), 10, 14)));
+	private long calcDbBlockScore(byte[] parentHash, org.nem.nis.dbmodel.Block block) {
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForger().getPublicKey().getRaw(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash, 10, 14)));
 
 		return r1 + r2;
 	}
 
-	private long calcBlockScore(Block block) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+	private long calcBlockScore(byte[] parentHash, Block block) {
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSigner().getKeyPair().getPublicKey().getRaw(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash, 10, 14)));
 
 		return r1 + r2;
 	}
@@ -120,20 +111,22 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param height height at which we do comparison
 	 * @return true in peer's block has better score, false otherwise
 	 */
-	public boolean sychronizeCompareAt(Node node, Block peerBlock, long height) {
+	public boolean sychronizeCompareAt(Node node, Block peerBlock, long commonHeight) {
 		if (!peerBlock.verify()) {
 			penalize(node);
 			return false;
 		}
 
-		org.nem.nis.dbmodel.Block ourBlock = blockDao.findByHeight(height);
+		org.nem.nis.dbmodel.Block commonBlock = blockDao.findByHeight(commonHeight);
+
+		org.nem.nis.dbmodel.Block ourBlock = blockDao.findByHeight(commonHeight + 1);
 
 		if (synchronizeCompareBlocks(peerBlock, ourBlock)) {
 			return false;
 		}
 
-		long peerScore = calcBlockScore(peerBlock);
-		long ourScore = calcDbBlockScore(ourBlock);
+		long peerScore = calcBlockScore(commonBlock.getBlockHash(), peerBlock);
+		long ourScore = calcDbBlockScore(commonBlock.getBlockHash(), ourBlock);
 		if (peerScore < ourScore) {
 			return true;
 		}
@@ -198,6 +191,7 @@ public class BlockChain implements BlockSynchronizer {
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
 			Balance.unapply(contemporaryAccountAnalyzer, block);
+			currentHeight--;
 		}
 	}
 
@@ -268,14 +262,13 @@ public class BlockChain implements BlockSynchronizer {
 		AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		if (ourHashes.size() > i) {
 			// not to waste our time, first try to get first block that differs
-			long diffBlockHeight = commonBlockHeight + 1;
-			Block commonBlock = connector.getBlockAt(node.getEndpoint(), diffBlockHeight);
+			Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
 
-			if (! this.sychronizeCompareAt(node, commonBlock, diffBlockHeight)) {
+			if (! this.sychronizeCompareAt(node, differBlock, commonBlockHeight)) {
 				return;
 			}
 
-			revertChain(diffBlockHeight + 1, contemporaryAccountAnalyzer);
+			revertChain(commonBlockHeight, contemporaryAccountAnalyzer);
 		}
 		//endregion
 
