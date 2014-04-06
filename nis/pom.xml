@@ -124,11 +124,11 @@
 			<version>1.9</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -151,19 +151,14 @@
 			<scope>test</scope>
 		</dependency>
 
-       <!--
-       actually we don't need flyway-maven, flyway-core will be enough
-       <dependency>
-           <groupId>com.googlecode.flyway</groupId>
-           <artifactId>flyway-maven-plugin</artifactId>
-           <version>2.3</version>
-       </dependency>
-       -->
-        <dependency>
-            <groupId>com.googlecode.flyway</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>2.3.1</version>
-        </dependency>
+		<!-- actually we don't need flyway-maven, flyway-core will be enough <dependency> 
+			<groupId>com.googlecode.flyway</groupId> <artifactId>flyway-maven-plugin</artifactId> 
+			<version>2.3</version> </dependency> -->
+		<dependency>
+			<groupId>com.googlecode.flyway</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>2.3.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -188,40 +183,33 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
 				<executions>
 					<execution>
-						<id>nem-core</id>
-						<phase>package</phase>
 						<goals>
-							<goal>jar</goal>
+							<goal>java</goal>
 						</goals>
-						<configuration>
-							<classifier>lib</classifier>
-							<includes>
-								<include>org/nem/core/crypto/*</include>
-								<include>org/nem/core/messages/*</include>
-								<include>org/nem/core/model/*</include>
-								<include>org/nem/core/serialization/*</include>
-								<include>org/nem/core/time/*</include>
-								<include>org/nem/core/transactions/*</include>
-								<include>org/nem/core/utils/*</include>
-							</includes>
-						</configuration>
 					</execution>
 				</executions>
 				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.nem.deploy.CommonStarter</mainClass>
-						</manifest>
-					</archive>
+					<mainClass>org.nem.deploy.CommonStarter</mainClass>
+					<arguments>
+					</arguments>
 				</configuration>
 			</plugin>
 
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 
+				<version>2.4</version> <executions> <execution> <id>nem-core</id> <phase>package</phase> 
+				<goals> <goal>jar</goal> </goals> <configuration> <classifier>lib</classifier> 
+				<includes> <include>org/nem/core/crypto/*</include> <include>org/nem/core/messages/*</include> 
+				<include>org/nem/core/model/*</include> <include>org/nem/core/serialization/*</include> 
+				<include>org/nem/core/time/*</include> <include>org/nem/core/transactions/*</include> 
+				<include>org/nem/core/utils/*</include> </includes> </configuration> </execution> 
+				</executions> <configuration> <archive> <manifest> <addClasspath>true</addClasspath> 
+				<mainClass>org.nem.deploy.CommonStarter</mainClass> </manifest> </archive> 
+				</configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>

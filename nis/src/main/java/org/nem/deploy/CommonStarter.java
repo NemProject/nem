@@ -104,6 +104,7 @@ public class CommonStarter implements ServletContextListener {
 		server.join();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static boolean openStartPage() {
 		boolean result = false;
 		// Let the show start without binding statically to JNLP
