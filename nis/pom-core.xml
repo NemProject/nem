@@ -63,10 +63,10 @@
 					<source>1.7</source>
 					<target>1.7</target>
 					<includes>
-						<include>**/org/nem/core/**/*.java</include>
+						<include>org/nem/core/**/*.java</include>
 					</includes>
 					<testIncludes>
-						<include>**/org/nem/core/**/*.java</include>
+						<include>org/nem/core/**/*.java</include>
 					</testIncludes>
 				</configuration>
 			</plugin>

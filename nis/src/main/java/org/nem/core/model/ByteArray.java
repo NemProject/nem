@@ -2,7 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializationUtils;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.utils.ByteUtils;
 
