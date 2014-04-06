@@ -39,7 +39,7 @@ public class Block {
 
 	private Long nextBlockId;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "block")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "block", orphanRemoval=true)
 	@OrderBy("blkIndex")
 	private List<Transfer> blockTransfers;
 

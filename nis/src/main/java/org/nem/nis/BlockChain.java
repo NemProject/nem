@@ -87,8 +87,6 @@ public class BlockChain implements BlockSynchronizer {
 	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
-
-		Block block = BlockMapper.toModel(lastBlock, accountAnalyzer);
 	}
 
 
@@ -195,6 +193,11 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
+
+	private void dropDbBlocksAfter(long height) {
+		blockDao.deleteBlocksAfterHeight(height);
+	}
+
 	/**
 	 * Synch algorithm:
 	 *  1. Get peer's last block compare with ours, assuming it's ok
@@ -220,21 +223,21 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
-		//region step 1
+		//region compare last block
 		Block peerLastBlock = checkLastBlock(connector, node);
 		if (peerLastBlock == null) {
 			return;
 		}
 		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
 
-		// if node is far behind, reject it, not to allow too deep
-		// rewrites of blockchain...
+		/* if node is far behind, reject it, not to allow too deep
+		   rewrites of blockchain... */
 		if (val <= -REWRITE_LIMIT) {
 			return;
 		}
 		//endregion
 
-		//region step 2
+		//region compare hash chains
 		long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
 		HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
         if (peerHashes.size() > BLOCKS_LIMIT) {
@@ -257,7 +260,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 		//endregion
 
-		//region step 3
+		//region revert TXes inside contemporaryAccountAnalyzer
 		long commonBlockHeight = startingPoint + i - 1;
 		AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		if (ourHashes.size() > i) {
@@ -272,7 +275,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 		//endregion
 
-		//region step 4
+		//region verify peer's chain
 		org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
@@ -310,8 +313,24 @@ public class BlockChain implements BlockSynchronizer {
 			wantedHeight += 1;
 		}
 		//endregion
-	}
 
+		//region update our chain
+
+		//accountAnalyzer.
+
+		/* commented out for now until replacing data
+		   in accountAnalyzer will be ready
+
+		synchronized (BlockChain.class) {
+			dropDbBlocksAfter(commonBlockHeight);
+		}
+
+		for (Block peerBlock : peerChain) {
+			addBlockToDb(peerBlock);
+		}
+		*/
+		//endregion
+	}
 
 	/**
 	 * Checks if passed block is correct, and if eligible adds it to db

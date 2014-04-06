@@ -13,6 +13,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -85,7 +86,34 @@ public class BlockDaoImpl implements BlockDao {
         return blockList;
     }
 
-    private <T> T executeSingleQuery(final Query query) {
+	@Override
+	@Transactional
+	public void deleteBlocksAfterHeight(long height) {
+		// apparently delete on blocks is not enough, as
+		// delete is not cascaded :/
+		//
+		// "A delete operation only applies to entities of the specified class and its subclasses.
+		//  It does not cascade to related entities."
+
+		Query getTxes = getCurrentSession()
+				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
+				.setParameter("height", height);
+		List<Long> txToDelete = getTxes.list();
+
+		Query query = getCurrentSession()
+				.createQuery("delete from Block a where a.height > :height")
+				.setParameter("height", height);
+		query.executeUpdate();
+
+		if (! txToDelete.isEmpty()) {
+			Query dropTxes = getCurrentSession()
+					.createQuery("delete from Transfer t where t.id in (:ids)")
+					.setParameterList("ids", txToDelete);
+			dropTxes.executeUpdate();
+		}
+	}
+
+	private <T> T executeSingleQuery(final Query query) {
 		final List<?> blockList = query.list();
 		return blockList.size() > 0 ? (T)blockList.get(0) : null;
 	}

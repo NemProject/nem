@@ -64,4 +64,10 @@ public interface BlockDao {
      */
     public List<byte[]> getHashesFrom(long blockHeight, int limit);
 
+	/**
+	 * Deletes blocks after given block
+	 *
+	 * @param height
+	 */
+	public void deleteBlocksAfterHeight(long height);
 }
