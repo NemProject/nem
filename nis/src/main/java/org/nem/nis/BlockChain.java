@@ -228,21 +228,15 @@ public class BlockChain implements BlockSynchronizer {
 
 		//region step 2
 		long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
-		List<ByteArray> peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
-
+		HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
         if (peerHashes.size() > BLOCKS_LIMIT) {
             penalize(node);
             return;
         }
 
-        List<byte[]> ourHashes = blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT);
-		int limit = Math.min(ourHashes.size(), peerHashes.size());
-		int i;
-		for (i = 0; i < limit; ++i) {
-			if (!Arrays.equals(peerHashes.get(i).get(), ourHashes.get(i))) {
-				break;
-			}
-		}
+        HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
+		int i = ourHashes.findFirstDifferen(peerHashes);
+
 		// at least first compared block should be the same, if not, he's a lier or on a fork
 		if (i == 0) {
 			penalize(node);

@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.ByteArray;
+import org.nem.core.model.HashChain;
 
 import java.util.List;
 
@@ -38,6 +39,6 @@ public interface SyncConnector {
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
 
 
-	public List<ByteArray> getHashesFrom(NodeEndpoint endpoint, long startingPoint);
+	public HashChain getHashesFrom(NodeEndpoint endpoint, long startingPoint);
 
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.model.HashChain;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
@@ -81,13 +82,13 @@ public class ChainController {
 		if (0 == hashesList.size())
 			return Utils.jsonError(3, "invalid call");
 
-        List<ByteArray> byteArrayList = new ArrayList<>(hashesList.size());
+		HashChain hashChain = new HashChain(hashesList.size());
         for (int i = 0; i < hashesList.size(); ++i) {
-            byteArrayList.add(new ByteArray(hashesList.get(i)));
+			hashChain.add(hashesList.get(i));
         }
 
 		JsonSerializer serializer = new JsonSerializer();
-		serializer.writeObjectArray("hashes", byteArrayList);
+		serializer.writeObject("hashchain", hashChain);
 		return serializer.getObject().toString() + "\r\n";
 	}
 }
