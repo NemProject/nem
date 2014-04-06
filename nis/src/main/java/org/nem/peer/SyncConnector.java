@@ -1,7 +1,6 @@
 package org.nem.peer;
 
 import org.nem.core.model.Block;
-import org.nem.core.model.ByteArray;
 import org.nem.core.model.HashChain;
 
 import java.util.List;

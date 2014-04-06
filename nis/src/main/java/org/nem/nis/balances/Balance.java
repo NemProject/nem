@@ -3,7 +3,6 @@ package org.nem.nis.balances;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dbmodel.Transfer;
 

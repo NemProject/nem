@@ -1,14 +1,13 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.nis.dbmodel.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.dbmodel.Transfer;
 
 import java.security.InvalidParameterException;
 
