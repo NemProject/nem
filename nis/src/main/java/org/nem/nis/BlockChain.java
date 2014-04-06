@@ -187,15 +187,6 @@ public class BlockChain implements BlockSynchronizer {
 		return peerLastBlock;
 	}
 
-	@Override
-	public void synchronizeNode(final SyncConnector connector, final Node node) {
-		try {
-			this.synchronizeNodeInternal(connector, node);
-		} catch (InactivePeerException|FatalPeerException ex) {
-			penalize(node);
-		}
-	}
-
 	/**
 	 * Synch algorithm:
 	 *  1. Get peer's last block compare with ours, assuming it's ok
@@ -211,7 +202,16 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param connector
 	 * @param node
 	 */
-	public void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+	@Override
+	public void synchronizeNode(final SyncConnector connector, final Node node) {
+		try {
+			this.synchronizeNodeInternal(connector, node);
+		} catch (InactivePeerException|FatalPeerException ex) {
+			penalize(node);
+		}
+	}
+
+	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
 		//region step 1
 		Block peerLastBlock = checkLastBlock(connector, node);
 		if (peerLastBlock == null) {
