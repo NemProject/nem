@@ -1,7 +1,6 @@
 package org.nem.core.crypto;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;

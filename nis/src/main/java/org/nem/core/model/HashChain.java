@@ -3,8 +3,6 @@ package org.nem.core.model;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
-import org.nem.core.utils.HexEncoder;
-import org.nem.nis.BlockChain;
 
 import java.util.ArrayList;
 import java.util.List;

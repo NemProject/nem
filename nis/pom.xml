@@ -193,7 +193,7 @@
 				<version>2.4</version>
 				<executions>
 					<execution>
-						<id>nem-commons</id>
+						<id>nem-core</id>
 						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>

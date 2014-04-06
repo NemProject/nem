@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 
 public class ByteUtilsTest {
