@@ -5,14 +5,13 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
+import org.nem.nis.balances.Balance;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.mappers.TransferMapper;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.transactions.TransferTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AccountAnalyzer implements AccountLookup {
@@ -81,20 +80,20 @@ public class AccountAnalyzer implements AccountLookup {
 	 *
 	 * Currently it analyzes ONLY "transfers"
 	 */
-	public void analyze(Block curBlock) {
+	public void analyze(final Block curBlock) {
 		List<Transfer> txes = curBlock.getBlockTransfers();
 		LOGGER.info("analyzing block: " + Long.toString(curBlock.getShortId()) + ", #tx " + Integer.toString(txes.size()));
 
-		// add fee's to block forger
-		//
-
+		addAccountToCache(curBlock.getForger());
 		for (final Transfer tx : txes) {
 			addAccountToCache(tx.getSender());
+			addAccountToCache(tx.getRecipient());
+		}
+
+		Balance.apply(this, curBlock);
+
+		for (final Transfer tx : txes) {
 			Account recipient = addAccountToCache(tx.getRecipient());
-
-			TransferTransaction transaction = TransferMapper.toModel(tx, this);
-			transaction.execute();
-
 			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
 		}
 	}

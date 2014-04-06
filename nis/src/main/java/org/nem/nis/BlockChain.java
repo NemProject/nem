@@ -1,5 +1,9 @@
 package org.nem.nis;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
+import org.nem.core.transactions.TransferTransaction;
+import org.nem.nis.balances.Balance;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -9,6 +13,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.mappers.TransferMapper;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +28,7 @@ public class BlockChain implements BlockSynchronizer {
 	//
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
-    public static final int BLOCKS_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
+    public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
 
     public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
 
@@ -187,6 +192,15 @@ public class BlockChain implements BlockSynchronizer {
 		return peerLastBlock;
 	}
 
+	private void revertChain(final long wantedHeight, final AccountAnalyzer contemporaryAccountAnalyzer) {
+		long currentHeight = getLastBlockHeight();
+
+		while (currentHeight != wantedHeight) {
+			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
+			Balance.unapply(contemporaryAccountAnalyzer, block);
+		}
+	}
+
 	/**
 	 * Synch algorithm:
 	 *  1. Get peer's last block compare with ours, assuming it's ok
@@ -221,7 +235,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		// if node is far behind, reject it, not to allow too deep
 		// rewrites of blockchain...
-		if (val < -REWRITE_LIMIT) {
+		if (val <= -REWRITE_LIMIT) {
 			return;
 		}
 		//endregion
@@ -261,9 +275,7 @@ public class BlockChain implements BlockSynchronizer {
 				return;
 			}
 
-			// TODO: revert transactions (balances) "in" contemporaryAccountAnalyzer
-			LOGGER.severe("virtual chain not handled yet");
-			System.exit(-1);
+			revertChain(diffBlockHeight + 1, contemporaryAccountAnalyzer);
 		}
 		//endregion
 
