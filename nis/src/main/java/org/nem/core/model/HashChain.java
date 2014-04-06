@@ -78,7 +78,7 @@ public class HashChain implements SerializableEntity {
 	 *
 	 * @return index of different element.
 	 */
-	public int findFirstDifferen(HashChain other) {
+	public int findFirstDifferent(HashChain other) {
 		int limit = Math.min(this.size(), other.size());
 		int i;
 		for (i = 0; i < limit; ++i) {

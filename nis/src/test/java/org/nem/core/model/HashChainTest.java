@@ -65,7 +65,7 @@ public class HashChainTest {
 		final HashChain hashChain2 = new HashChain(20);
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(i, IsEqual.equalTo(0));
@@ -77,7 +77,7 @@ public class HashChainTest {
 		final HashChain hashChain = new HashChain(dummyList);
 
 		// Act:
-		int i = hashChain.findFirstDifferen(hashChain);
+		int i = hashChain.findFirstDifferent(hashChain);
 
 		// Assert:
 		Assert.assertThat(hashChain.size(), IsEqual.equalTo(dummyList.size()));
@@ -93,7 +93,7 @@ public class HashChainTest {
 		}
 
 		// Act:
-		int i = hashChain.findFirstDifferen(hashChain);
+		int i = hashChain.findFirstDifferent(hashChain);
 
 		// Assert:
 		Assert.assertThat(hashChain.size(), IsEqual.equalTo(dummyList.size()));
@@ -115,7 +115,7 @@ public class HashChainTest {
 		}
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(dummyList.size()));
@@ -134,7 +134,7 @@ public class HashChainTest {
 		hashChain2.add(new byte[]{5,6,7,8});
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(dummyList.size()));
@@ -154,7 +154,7 @@ public class HashChainTest {
 		hashChain2.add(new byte[]{1,2,3});
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(2));
@@ -171,7 +171,7 @@ public class HashChainTest {
 		hashChain2.add(new byte[]{2,1});
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(dummyList.size() + 1));
@@ -187,7 +187,7 @@ public class HashChainTest {
 		final HashChain hashChain2 = createRoundTrippedHashChain(hashChain1);
 
 		// Act:
-		int i = hashChain1.findFirstDifferen(hashChain2);
+		int i = hashChain1.findFirstDifferent(hashChain2);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(dummyList.size()));

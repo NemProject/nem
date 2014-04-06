@@ -249,7 +249,7 @@ public class BlockChain implements BlockSynchronizer {
         }
 
         HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
-		int i = ourHashes.findFirstDifferen(peerHashes);
+		int i = ourHashes.findFirstDifferent(peerHashes);
 
 		// at least first compared block should be the same, if not, he's a lier or on a fork
 		if (i == 0) {
