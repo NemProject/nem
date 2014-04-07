@@ -5,12 +5,12 @@ import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.NodeCollection;
 import org.nem.peer.NodeStatus;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
-import org.nem.core.math.Vector;
 import org.nem.peer.trust.score.NodeExperience;
 import org.nem.peer.trust.score.NodeExperiences;
 
@@ -54,7 +54,7 @@ public class NetworkSimulator {
 	/**
 	 * The last set of global trust values.
 	 */
-	private Vector globalTrustVector;
+	private ColumnVector globalTrustVector;
 
 	private long successfulCalls;
 	private long failedCalls;

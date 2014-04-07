@@ -5,14 +5,14 @@ import org.junit.*;
 
 import java.security.InvalidParameterException;
 
-public class VectorTest {
+public class ColumnVectorTest {
 
 	//region constructor / getAt / setAt
 
 	@Test
 	public void vectorIsInitializedToZero() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 
 		// Assert:
 		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -24,7 +24,7 @@ public class VectorTest {
 	@Test
 	public void vectorValuesCanBeSet() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 
 		// Act:
 		vector.setAt(0, 7);
@@ -47,7 +47,7 @@ public class VectorTest {
 	private static void assertOutOfBounds(final int size, final int index) {
 		try {
 			// Arrange:
-			final Vector vector = new Vector(size);
+			final ColumnVector vector = new ColumnVector(size);
 
 			// Act:
 			vector.getAt(index);
@@ -65,7 +65,7 @@ public class VectorTest {
 	@Test
 	public void setAllSetsAllVectorElementValues() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 
 		// Act:
 		vector.setAll(4);
@@ -83,7 +83,7 @@ public class VectorTest {
 	@Test
 	public void vectorSumCanBeCalculated() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, 7);
 		vector.setAt(1, -3);
 		vector.setAt(2, 5);
@@ -95,7 +95,7 @@ public class VectorTest {
 	@Test
 	public void vectorAbsSumCanBeCalculated() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, 7);
 		vector.setAt(1, -3);
 		vector.setAt(2, 5);
@@ -111,7 +111,7 @@ public class VectorTest {
 	@Test
 	public void cannotAlignVectorWithNonZeroInFirstPosition() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, 0);
 		vector.setAt(1, -6);
 		vector.setAt(2, 14);
@@ -129,7 +129,7 @@ public class VectorTest {
 	@Test
 	public void canAlignVectorWithNonZeroValueInFirstPosition() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, -4);
 		vector.setAt(1, -6);
 		vector.setAt(2, 14);
@@ -151,7 +151,7 @@ public class VectorTest {
 	@Test
 	public void vectorWithNonZeroSumCanBeNormalized() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, 3);
 		vector.setAt(1, 5);
 		vector.setAt(2, 2);
@@ -168,7 +168,7 @@ public class VectorTest {
 	@Test
 	public void vectorWithNegativeValuesCanBeNormalized() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 		vector.setAt(0, 3);
 		vector.setAt(1, -5);
 		vector.setAt(2, 2);
@@ -185,7 +185,7 @@ public class VectorTest {
 	@Test
 	public void zeroVectorCanBeNormalized() {
 		// Arrange:
-		final Vector vector = new Vector(3);
+		final ColumnVector vector = new ColumnVector(3);
 
 		// Act:
 		vector.normalize();
@@ -203,18 +203,18 @@ public class VectorTest {
 	@Test
 	public void twoVectorsOfSameSizeCanBeAddedTogether() {
 		// Arrange:
-		final Vector a = new Vector(3);
+		final ColumnVector a = new ColumnVector(3);
 		a.setAt(0, 7);
 		a.setAt(1, 5);
 		a.setAt(2, 11);
 
-		final Vector b = new Vector(3);
+		final ColumnVector b = new ColumnVector(3);
 		b.setAt(0, 2);
 		b.setAt(1, -4);
 		b.setAt(2, 1);
 
 		// Act:
-		final Vector result = a.add(b);
+		final ColumnVector result = a.add(b);
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
@@ -227,8 +227,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void smallerVectorCannotBeAddedToLargerVector() {
 		// Arrange:
-		final Vector largerVector = new Vector(8);
-		final Vector smallerVector = new Vector(7);
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
 		largerVector.add(smallerVector);
@@ -237,8 +237,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void largerVectorCannotBeAddedToSmallerVector() {
 		// Arrange:
-		final Vector largerVector = new Vector(8);
-		final Vector smallerVector = new Vector(7);
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
 		smallerVector.add(largerVector);
@@ -251,12 +251,12 @@ public class VectorTest {
 	@Test
 	public void distanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
 		// Arrange:
-		final Vector a = new Vector(3);
+		final ColumnVector a = new ColumnVector(3);
 		a.setAt(0, 7);
 		a.setAt(1, 5);
 		a.setAt(2, 11);
 
-		final Vector b = new Vector(3);
+		final ColumnVector b = new ColumnVector(3);
 		b.setAt(0, 2);
 		b.setAt(1, -4);
 		b.setAt(2, 1);
@@ -271,8 +271,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void distanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
 		// Arrange:
-		final Vector largerVector = new Vector(8);
-		final Vector smallerVector = new Vector(7);
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
 		largerVector.distance(smallerVector);
@@ -281,8 +281,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void distanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
 		// Arrange:
-		final Vector largerVector = new Vector(8);
-		final Vector smallerVector = new Vector(7);
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
 		smallerVector.distance(largerVector);
@@ -295,13 +295,13 @@ public class VectorTest {
 	@Test
 	public void vectorCanBeMultipliedByScalar() {
 		// Arrange:
-		final Vector a = new Vector(3);
+		final ColumnVector a = new ColumnVector(3);
 		a.setAt(0, 2);
 		a.setAt(1, -4);
 		a.setAt(2, 1);
 
 		// Act:
-		final Vector result = a.multiply(8);
+		final ColumnVector result = a.multiply(8);
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
@@ -313,7 +313,7 @@ public class VectorTest {
 	@Test
 	public void vectorCanBeMultipliedByMatrix() {
 		// Arrange:
-		final Vector v = new Vector(2);
+		final ColumnVector v = new ColumnVector(2);
 		v.setAt(0, 3);
 		v.setAt(1, 2);
 
@@ -326,7 +326,7 @@ public class VectorTest {
 		matrix.setAt(2, 1, 8);
 
 		// Act:
-		final Vector result = v.multiply(matrix);
+		final ColumnVector result = v.multiply(matrix);
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v)));
@@ -339,7 +339,7 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void vectorCannotBeMultipliedByMatrixWithFewerColumns() {
 		// Arrange:
-		final Vector v = new Vector(2);
+		final ColumnVector v = new ColumnVector(2);
 		final Matrix m = new Matrix(2, 1);
 
 		// Act:
@@ -349,7 +349,7 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void vectorCannotBeMultipliedByMatrixWithMoreColumns() {
 		// Arrange:
-		final Vector v = new Vector(2);
+		final ColumnVector v = new ColumnVector(2);
 		final Matrix m = new Matrix(2, 3);
 
 		// Act:
@@ -363,18 +363,18 @@ public class VectorTest {
 	@Test
 	public void vectorCanBeMultipliedByVectorElementWise() {
 		// Arrange:
-		final Vector v1 = new Vector(3);
+		final ColumnVector v1 = new ColumnVector(3);
 		v1.setAt(0, 3);
 		v1.setAt(1, 7);
 		v1.setAt(2, 2);
 
-		final Vector v2 = new Vector(3);
+		final ColumnVector v2 = new ColumnVector(3);
 		v2.setAt(0, 1);
 		v2.setAt(1, 5);
 		v2.setAt(2, 3);
 
 		// Act:
-		final Vector result = v1.multiplyElementWise(v2);
+		final ColumnVector result = v1.multiplyElementWise(v2);
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v1)));
@@ -388,8 +388,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void vectorCannotBeMultipliedByVectorWithFewerColumns() {
 		// Arrange:
-		final Vector v1 = new Vector(2);
-		final Vector v2 = new Vector(3);
+		final ColumnVector v1 = new ColumnVector(2);
+		final ColumnVector v2 = new ColumnVector(3);
 
 		// Act:
 		v1.multiplyElementWise(v2);
@@ -398,8 +398,8 @@ public class VectorTest {
 	@Test(expected = InvalidParameterException.class)
 	public void vectorCannotBeMultipliedByVectorWithMoreColumns() {
 		// Arrange:
-		final Vector v1 = new Vector(3);
-		final Vector v2 = new Vector(2);
+		final ColumnVector v1 = new ColumnVector(3);
+		final ColumnVector v2 = new ColumnVector(2);
 
 		// Act:
 		v1.multiplyElementWise(v2);
@@ -412,7 +412,7 @@ public class VectorTest {
 	@Test
 	public void vectorStringRepresentationIsCorrect() {
 		// Arrange:
-		final Vector vector = new Vector(6);
+		final ColumnVector vector = new ColumnVector(6);
 		vector.setAt(0, 2.1234);
 		vector.setAt(1, 3.2345);
 		vector.setAt(2, 5012.0126);

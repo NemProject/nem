@@ -10,7 +10,7 @@ public class EigenTrustPowerIteratorTest {
 	public void iteratorInitiallyHasNoResult() {
 		// Act:
 		final EigenTrustPowerIterator iterator = createTestIterator(10, 0, 0.1);
-		final Vector result = iterator.getResult();
+		final ColumnVector result = iterator.getResult();
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(null));
@@ -24,7 +24,7 @@ public class EigenTrustPowerIteratorTest {
 
 		// Act:
 		iterator.run();
-		final Vector result = iterator.getResult();
+		final ColumnVector result = iterator.getResult();
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
@@ -40,7 +40,7 @@ public class EigenTrustPowerIteratorTest {
 
 		// Act:
 		iterator.run();
-		final Vector result = iterator.getResult();
+		final ColumnVector result = iterator.getResult();
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
@@ -56,7 +56,7 @@ public class EigenTrustPowerIteratorTest {
 
 		// Act:
 		iterator.run();
-		final Vector result = iterator.getResult();
+		final ColumnVector result = iterator.getResult();
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
@@ -72,7 +72,7 @@ public class EigenTrustPowerIteratorTest {
 
 		// Act:
 		iterator.run();
-		final Vector result = iterator.getResult();
+		final ColumnVector result = iterator.getResult();
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
@@ -83,7 +83,7 @@ public class EigenTrustPowerIteratorTest {
 
 	private static EigenTrustPowerIterator createTestIterator(int maxIterations, double alpha, double epsilon) {
 		// Arrange: (EigenVector for test matrix is [3, 1])
-		final Vector vector = new Vector(2);
+		final ColumnVector vector = new ColumnVector(2);
 		vector.setAt(0, 1.0 / 3);
 		vector.setAt(1, 2.0 / 3);
 

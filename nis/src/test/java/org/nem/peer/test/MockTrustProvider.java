@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.trust.*;
 
 /**
@@ -8,19 +8,19 @@ import org.nem.peer.trust.*;
  */
 public class MockTrustProvider implements TrustProvider {
 
-	private final Vector trustVector;
+	private final ColumnVector trustVector;
 
 	/**
 	 * Creates a new mock trust provider.
 	 *
 	 * @param trustVector The trust vector that should be returned.
 	 */
-	public MockTrustProvider(final Vector trustVector) {
+	public MockTrustProvider(final ColumnVector trustVector) {
 		this.trustVector = trustVector;
 	}
 
 	@Override
-	public Vector computeTrust(final TrustContext context) {
+	public ColumnVector computeTrust(final TrustContext context) {
 		return this.trustVector;
 	}
 }

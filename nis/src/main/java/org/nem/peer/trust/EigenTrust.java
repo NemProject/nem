@@ -91,7 +91,7 @@ public class EigenTrust implements TrustProvider {
 	public void updateTrust(final Node node, final TrustContext context) {
 		int index = 0;
 		final Node[] nodes = context.getNodes();
-		final Vector scoreVector = new Vector(nodes.length);
+		final ColumnVector scoreVector = new ColumnVector(nodes.length);
 		for (final Node otherNode : nodes) {
 			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(node, otherNode);
 			final long successfulCalls = experience.successfulCalls().get();
@@ -126,7 +126,7 @@ public class EigenTrust implements TrustProvider {
 	 * @return The global trust vector.
 	 */
 	@Override
-	public Vector computeTrust(final TrustContext context) {
+	public ColumnVector computeTrust(final TrustContext context) {
 		// (1) Compute the local trust values
 		this.updateTrust(context);
 
@@ -134,7 +134,7 @@ public class EigenTrust implements TrustProvider {
 		return computeGlobalTrust(context);
 	}
 
-	protected Vector computeGlobalTrust(final TrustContext context) {
+	protected ColumnVector computeGlobalTrust(final TrustContext context) {
 		final EigenTrustPowerIterator iterator = new EigenTrustPowerIterator(
 				context.getPreTrustedNodes().getPreTrustVector(context.getNodes()),
 				this.getTrustMatrix(context.getNodes()),

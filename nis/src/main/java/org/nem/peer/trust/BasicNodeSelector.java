@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
@@ -22,7 +22,7 @@ public class BasicNodeSelector implements NodeSelector {
 
 	@Override
 	public NodeExperiencePair selectNode(final TrustContext context) {
-		final Vector trustVector = this.trustProvider.computeTrust(context);
+		final ColumnVector trustVector = this.trustProvider.computeTrust(context);
 		trustVector.normalize();
 
 		double sum = 0;

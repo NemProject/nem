@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
@@ -27,22 +27,22 @@ public class LowComTrustProvider implements TrustProvider {
 	}
 
 	@Override
-	public Vector computeTrust(final TrustContext context) {
-		final Vector trustVector = this.trustProvider.computeTrust(context);
+	public ColumnVector computeTrust(final TrustContext context) {
+		final ColumnVector trustVector = this.trustProvider.computeTrust(context);
 		trustVector.normalize();
 
-		final Vector lowComVector = computeLowComVector(context);
+		final ColumnVector lowComVector = computeLowComVector(context);
 		double lowComVectorSum = lowComVector.sum();
 		return 0 == lowComVectorSum
 				? trustVector
 				: trustVector.add(lowComVector.multiply(1.0 / lowComVectorSum * weight / 100.0));
 	}
 
-	private static Vector computeLowComVector(final TrustContext context) {
+	private static ColumnVector computeLowComVector(final TrustContext context) {
 		final Node localNode = context.getLocalNode();
 		final Node[] nodes = context.getNodes();
 
-		final Vector lowComVector = new Vector(nodes.length);
+		final ColumnVector lowComVector = new ColumnVector(nodes.length);
 		for (int i = 0; i < nodes.length; ++i) {
 			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
 			if (experience.totalCalls() >= MIN_COMMUNICATION)

@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 /**
  * Represents a linear algebra vector.
  */
-public class Vector {
+public class ColumnVector {
 
 	final int size;
 	final double[] vector;
@@ -18,7 +18,7 @@ public class Vector {
 	 *
 	 * @param size The desired size.
 	 */
-	public Vector(final int size) {
+	public ColumnVector(final int size) {
 		this.size = size;
 		this.vector = new double[this.size];
 	}
@@ -122,17 +122,17 @@ public class Vector {
 	}
 
 	/**
-	 * Creates a new Vector by adding the specified vector to this vector.
+	 * Creates a new ColumnVector by adding the specified vector to this vector.
 	 *
 	 * @param vector The specified vector.
 	 *
 	 * @return The new vector.
 	 */
-	public Vector add(final Vector vector) {
+	public ColumnVector add(final ColumnVector vector) {
 		if (this.size != vector.size)
 			throw new InvalidParameterException("cannot add vectors with different sizes");
 
-		final Vector result = new Vector(this.size);
+		final ColumnVector result = new ColumnVector(this.size);
 		for (int i = 0; i < this.size; ++i)
 			result.vector[i] = this.vector[i] + vector.vector[i];
 
@@ -140,18 +140,18 @@ public class Vector {
 	}
 
 	/**
-	 * Creates a new Vector by multiplying this vector element-wise with
+	 * Creates a new ColumnVector by multiplying this vector element-wise with
 	 * another vector.
 	 *
 	 * @param vector The vector.
 	 *
 	 * @return The new vector.
 	 */
-	public Vector multiplyElementWise(final Vector vector) {
+	public ColumnVector multiplyElementWise(final ColumnVector vector) {
 		if (this.size != vector.size)
 			throw new InvalidParameterException("vector sizes must be equal");
 
-		final Vector result = new Vector(this.size);
+		final ColumnVector result = new ColumnVector(this.size);
 		for (int i = 0; i < this.size; ++i)
 			result.vector[i] = this.vector[i] * vector.vector[i];
 
@@ -159,14 +159,14 @@ public class Vector {
 	}
 
 	/**
-	 * Creates a new Vector by multiplying this vector by a scalar.
+	 * Creates a new ColumnVector by multiplying this vector by a scalar.
 	 *
 	 * @param scalar The scalar.
 	 *
 	 * @return The new vector.
 	 */
-	public Vector multiply(final double scalar) {
-		final Vector result = new Vector(this.size);
+	public ColumnVector multiply(final double scalar) {
+		final ColumnVector result = new ColumnVector(this.size);
 		for (int i = 0; i < this.size; ++i)
 			result.vector[i] = this.vector[i] * scalar;
 
@@ -174,19 +174,19 @@ public class Vector {
 	}
 
 	/**
-	 * Creates a new Vector by multiplying this vector by a matrix.
+	 * Creates a new ColumnVector by multiplying this vector by a matrix.
 	 *
 	 * @param matrix The matrix.
 	 *
 	 * @return The new vector.
 	 */
-	public Vector multiply(final Matrix matrix) {
+	public ColumnVector multiply(final Matrix matrix) {
 		final int columnCount = matrix.getColumnCount();
 		if (this.size != columnCount)
 			throw new InvalidParameterException("vector size and matrix column count must be equal");
 
 		final int rowCount = matrix.getRowCount();
-		final Vector result = new Vector(rowCount);
+		final ColumnVector result = new ColumnVector(rowCount);
 		for (int i = 0; i < rowCount; ++i) {
 			double sumProduct = 0.0;
 			for (int j = 0; j < columnCount; ++j)
@@ -205,7 +205,7 @@ public class Vector {
 	 *
 	 * @return The Euclidean distance.
 	 */
-	public double distance(final Vector vector) {
+	public double distance(final ColumnVector vector) {
 		if (this.size != vector.size)
 			throw new InvalidParameterException("cannot determine the distance between vectors with different sizes");
 

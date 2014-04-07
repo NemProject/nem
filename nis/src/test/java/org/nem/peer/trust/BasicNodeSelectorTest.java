@@ -2,7 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.IsSame;
 import org.junit.*;
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.test.TestTrustContext;
@@ -33,7 +33,7 @@ public class BasicNodeSelectorTest {
 		final TestTrustContext testContext = new TestTrustContext();
 		final TrustContext context = testContext.getContext();
 
-		final Vector vector = new Vector(context.getNodes().length);
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
 		vector.setAt(2, value);
 
 		final Node localNode = context.getLocalNode();

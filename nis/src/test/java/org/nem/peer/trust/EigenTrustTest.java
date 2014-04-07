@@ -54,7 +54,7 @@ public class EigenTrustTest {
 
 		// Act:
 		trust.updateTrust(localNode, context);
-		final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
+		final ColumnVector vector = trustScores.getScoreVector(localNode, context.getNodes());
 		final RealDouble sum = trustScores.getScoreWeight(localNode);
 
 		// Assert:
@@ -83,7 +83,7 @@ public class EigenTrustTest {
 
 		// Act:
 		trust.updateTrust(localNode, context);
-		final Vector vector = trustScores.getScoreVector(localNode, context.getNodes());
+		final ColumnVector vector = trustScores.getScoreVector(localNode, context.getNodes());
 		final RealDouble sum = trustScores.getScoreWeight(localNode);
 
 		// Assert:

@@ -56,8 +56,8 @@ public abstract class Scores<T extends Score> {
 	 *
 	 * @return The score vector.
 	 */
-	public Vector getScoreVector(final Node node, final Node[] nodes) {
-		final Vector vector = new Vector(nodes.length);
+	public ColumnVector getScoreVector(final Node node, final Node[] nodes) {
+		final ColumnVector vector = new ColumnVector(nodes.length);
 		for (int i = 0; i < nodes.length; ++i) {
 			final T score = this.getScore(node, nodes[i]);
 			vector.setAt(i, score.score().get());
@@ -73,7 +73,7 @@ public abstract class Scores<T extends Score> {
 	 * @param nodes       The other nodes.
 	 * @param scoreVector The score values.
 	 */
-	public void setScoreVector(final Node node, final Node[] nodes, final Vector scoreVector) {
+	public void setScoreVector(final Node node, final Node[] nodes, final ColumnVector scoreVector) {
 		if (nodes.length != scoreVector.getSize())
 			throw new InvalidParameterException("nodes and scoreVector must be same size");
 
@@ -111,7 +111,7 @@ public abstract class Scores<T extends Score> {
 	 */
 	public void normalize(final Node[] nodes) {
 		for (final Node node : nodes) {
-			final Vector vector = this.getScoreVector(node, nodes);
+			final ColumnVector vector = this.getScoreVector(node, nodes);
 			vector.normalize();
 			this.setScoreVector(node, nodes, vector);
 		}

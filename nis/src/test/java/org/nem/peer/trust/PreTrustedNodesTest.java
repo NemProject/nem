@@ -2,6 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.test.IsEquivalent;
 import org.nem.peer.test.Utils;
 import org.nem.peer.Node;
@@ -73,7 +74,7 @@ public class PreTrustedNodesTest {
 		};
 
 		// Act:
-		final org.nem.core.math.Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
 		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
@@ -95,7 +96,7 @@ public class PreTrustedNodesTest {
 		};
 
 		// Act:
-		final org.nem.core.math.Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
 		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));

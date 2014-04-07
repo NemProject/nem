@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 
 /**
  * A trust provider that includes functionality for calculating trust values.
@@ -14,5 +14,5 @@ public interface TrustProvider {
 	 *
 	 * @return The trust vector.
 	 */
-	public Vector computeTrust(final TrustContext context);
+	public ColumnVector computeTrust(final TrustContext context);
 }

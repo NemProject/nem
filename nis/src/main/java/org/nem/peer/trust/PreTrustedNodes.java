@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 
 import java.util.Set;
@@ -57,9 +57,9 @@ public class PreTrustedNodes {
 	 *
 	 * @return A vector of pre-trust values.
 	 */
-	public Vector getPreTrustVector(final Node[] nodes) {
+	public ColumnVector getPreTrustVector(final Node[] nodes) {
 		final int numPreTrustedNodes = this.getSize();
-		final Vector preTrustVector = new Vector(nodes.length);
+		final ColumnVector preTrustVector = new ColumnVector(nodes.length);
 		if (0 == numPreTrustedNodes) {
 			preTrustVector.setAll(1.0 / nodes.length);
 			return preTrustVector;

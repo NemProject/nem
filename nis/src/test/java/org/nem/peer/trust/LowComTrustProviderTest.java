@@ -2,7 +2,7 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.test.*;
 
@@ -13,7 +13,7 @@ public class LowComTrustProviderTest {
 	@Test
 	public void zeroWeightDoesNotBiasLowComNodes() {
 		// Act:
-		final Vector vector = getAdjustedTrustVector(0, 0, 0);
+		final ColumnVector vector = getAdjustedTrustVector(0, 0, 0);
 
 		// Assert:
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
@@ -26,7 +26,7 @@ public class LowComTrustProviderTest {
 	@Test
 	public void nonZeroWeightBiasesInFavorOfLowComNodes() {
 		// Act:
-		final Vector vector = getAdjustedTrustVector(0, 5, 40);
+		final ColumnVector vector = getAdjustedTrustVector(0, 5, 40);
 
 		// Assert:
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
@@ -39,7 +39,7 @@ public class LowComTrustProviderTest {
 	@Test
 	public void nodeWithLessThanMinComIsLowComNode() {
 		// Act:
-		final Vector vector = getAdjustedTrustVector(9, 100, 10);
+		final ColumnVector vector = getAdjustedTrustVector(9, 100, 10);
 
 		// Assert:
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
@@ -52,7 +52,7 @@ public class LowComTrustProviderTest {
 	@Test
 	public void nodeWithMinComIsNotLowComNode() {
 		// Act:
-		final Vector vector = getAdjustedTrustVector(10, 100, 10);
+		final ColumnVector vector = getAdjustedTrustVector(10, 100, 10);
 
 		// Assert:
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
@@ -65,7 +65,7 @@ public class LowComTrustProviderTest {
 	@Test
 	public void nodeWithGreaterThanMinComIsNotLowComNode() {
 		// Act:
-		final Vector vector = getAdjustedTrustVector(11, 100, 10);
+		final ColumnVector vector = getAdjustedTrustVector(11, 100, 10);
 
 		// Assert:
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
@@ -75,11 +75,11 @@ public class LowComTrustProviderTest {
 		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
 	}
 
-	private static Vector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {
+	private static ColumnVector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {
 		// Arrange:
 		final TestTrustContext testContext = new TestTrustContext();
 		final TrustContext context = testContext.getContext();
-		final Vector vector = new Vector(context.getNodes().length);
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
 		vector.setAll(1);
 
 		final Node localNode = context.getLocalNode();

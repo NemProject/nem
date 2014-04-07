@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.Vector;
+import org.nem.core.math.ColumnVector;
 import org.nem.peer.Node;
 import org.nem.peer.NodeCollection;
 import org.nem.peer.NodeStatus;
@@ -25,8 +25,8 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 	}
 
 	@Override
-	public Vector computeTrust(final TrustContext context) {
-		final Vector vector = this.trustProvider.computeTrust(context);
+	public ColumnVector computeTrust(final TrustContext context) {
+		final ColumnVector vector = this.trustProvider.computeTrust(context);
 		final Node[] nodes = context.getNodes();
 		for (int i = 0; i < nodes.length; ++i) {
 			final NodeStatus status = this.nodeCollection.getNodeStatus(nodes[i]);

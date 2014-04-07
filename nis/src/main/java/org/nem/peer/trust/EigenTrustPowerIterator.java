@@ -7,15 +7,15 @@ import org.nem.core.math.*;
  */
 public class EigenTrustPowerIterator {
 
-	private final Vector preTrustVector;
+	private final ColumnVector preTrustVector;
 	private final Matrix trustMatrix;
 	private final int maxIterations;
 	private final double alpha;
 	private final double epsilon;
 
-	private final Vector weightedPreTrustVector;
+	private final ColumnVector weightedPreTrustVector;
 	private boolean hasConverged;
-	private Vector result;
+	private ColumnVector result;
 
 	/**
 	 * Creates a new eigen trust power iterator.
@@ -27,7 +27,7 @@ public class EigenTrustPowerIterator {
 	 * @param epsilon        The convergence epsilon value.
 	 */
 	public EigenTrustPowerIterator(
-			final Vector preTrustVector,
+			final ColumnVector preTrustVector,
 			final Matrix trustMatrix,
 			int maxIterations,
 			double alpha,
@@ -46,7 +46,7 @@ public class EigenTrustPowerIterator {
 		return this.hasConverged;
 	}
 
-	public Vector getResult() {
+	public ColumnVector getResult() {
 		return this.result;
 	}
 
@@ -56,8 +56,8 @@ public class EigenTrustPowerIterator {
 	 */
 	public void run() {
 		int numIterations = 0;
-		Vector vector1;
-		Vector vector2 = this.step(this.preTrustVector);
+		ColumnVector vector1;
+		ColumnVector vector2 = this.step(this.preTrustVector);
 		do {
 			vector1 = vector2;
 			vector2 = this.step(vector1);
@@ -68,17 +68,17 @@ public class EigenTrustPowerIterator {
 		this.hasConverged = this.hasConverged(vector1, vector2);
 	}
 
-	private Vector step(final Vector vector) {
-		Vector trustVector = vector.multiply(this.trustMatrix);
+	private ColumnVector step(final ColumnVector vector) {
+		ColumnVector trustVector = vector.multiply(this.trustMatrix);
 		trustVector = trustVector.multiply(1 - this.alpha);
 
-		final Vector result = trustVector.add(this.weightedPreTrustVector);
+		final ColumnVector result = trustVector.add(this.weightedPreTrustVector);
 		result.align();
 		result.normalize();
 		return result;
 	}
 
-	private boolean hasConverged(final Vector vector1, final Vector vector2) {
+	private boolean hasConverged(final ColumnVector vector1, final ColumnVector vector2) {
 		return vector1.distance(vector2) <= this.epsilon;
 	}
 }

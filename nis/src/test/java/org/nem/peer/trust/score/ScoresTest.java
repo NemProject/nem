@@ -65,7 +65,7 @@ public class ScoresTest {
 		context.scores.getScore(context.nodes[0], context.nodes[2]).score().set(2);
 
 		// Act:
-		final Vector vector = context.scores.getScoreVector(context.nodes[0], context.nodes);
+		final ColumnVector vector = context.scores.getScoreVector(context.nodes[0], context.nodes);
 
 		// Assert:
 		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
@@ -79,7 +79,7 @@ public class ScoresTest {
 		// Arrange:
 		final TestContext context = new TestContext(3);
 
-		final Vector vector = new Vector(2);
+		final ColumnVector vector = new ColumnVector(2);
 
 		// Act:
 		context.scores.setScoreVector(context.nodes[0], context.nodes, vector);
@@ -90,7 +90,7 @@ public class ScoresTest {
 		// Arrange:
 		final TestContext context = new TestContext(3);
 
-		final Vector vector = new Vector(4);
+		final ColumnVector vector = new ColumnVector(4);
 
 		// Act:
 		context.scores.setScoreVector(context.nodes[0], context.nodes, vector);
@@ -101,14 +101,14 @@ public class ScoresTest {
 		// Arrange:
 		final TestContext context = new TestContext(3);
 
-		final Vector trustVector = new Vector(3);
+		final ColumnVector trustVector = new ColumnVector(3);
 		trustVector.setAt(0, 3.0);
 		trustVector.setAt(1, 7.0);
 		trustVector.setAt(2, 4.0);
 
 		// Act:
 		context.scores.setScoreVector(context.nodes[1], context.nodes, trustVector);
-		final Vector vector = context.scores.getScoreVector(context.nodes[1], context.nodes);
+		final ColumnVector vector = context.scores.getScoreVector(context.nodes[1], context.nodes);
 
 		// Assert:
 		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));

@@ -66,7 +66,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	public void updateFeedback(final Node node, final Node[] nodes, final NodeExperiences nodeExperiences) {
 		final Matrix sharedExperiencesMatrix = nodeExperiences.getSharedExperienceMatrix(node, nodes);
 
-		final Vector vector = new Vector(nodes.length);
+		final ColumnVector vector = new ColumnVector(nodes.length);
 		for (int i = 0; i < nodes.length; ++i) {
 			if (node.equals(nodes[i])) {
 				// the node should completely trust itself
@@ -105,7 +105,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	}
 
 	@Override
-	public Vector computeTrust(final TrustContext context) {
+	public ColumnVector computeTrust(final TrustContext context) {
 		// (1) Compute the local trust values
 		this.updateTrust(context);
 

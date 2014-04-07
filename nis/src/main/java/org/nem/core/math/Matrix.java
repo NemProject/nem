@@ -12,7 +12,7 @@ public class Matrix {
 
 	final int rows;
 	final int cols;
-	final Vector[] columns;
+	final ColumnVector[] columns;
 
 	/**
 	 * Creates a new matrix of the specified size.
@@ -23,9 +23,9 @@ public class Matrix {
 	public Matrix(final int rows, final int cols) {
 		this.rows = rows;
 		this.cols = cols;
-		this.columns = new Vector[this.cols];
+		this.columns = new ColumnVector[this.cols];
 		for (int i = 0; i < this.cols; ++i)
-			this.columns[i] = new Vector(this.rows);
+			this.columns[i] = new ColumnVector(this.rows);
 	}
 
 	/**
