@@ -23,8 +23,8 @@ public class AccountAnalyzer implements AccountLookup {
 	@Autowired
 	private TransferDao transferDao;
 
-	Map<PublicKey, Account> mapByPublicKey;
-	Map<String, Account> mapByAddressId;
+	private Map<PublicKey, Account> mapByPublicKey;
+	private Map<String, Account> mapByAddressId;
 
 	public AccountAnalyzer() {
 		mapByPublicKey = new HashMap<>();

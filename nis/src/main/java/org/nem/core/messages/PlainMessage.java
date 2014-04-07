@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
  */
 public class PlainMessage extends Message {
 
-	final byte[] payload;
+	private final byte[] payload;
 
 	/**
 	 * Creates a new plain message.

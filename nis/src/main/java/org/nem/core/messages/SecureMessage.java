@@ -11,9 +11,9 @@ import java.security.InvalidParameterException;
  */
 public class SecureMessage extends Message {
 
-	final Account sender;
-	final Account recipient;
-	final byte[] payload;
+	private final Account sender;
+	private final Account recipient;
+	private final byte[] payload;
 
 	private SecureMessage(final Account sender, final Account recipient, final byte[] payload) {
 		super(MessageTypes.SECURE);
