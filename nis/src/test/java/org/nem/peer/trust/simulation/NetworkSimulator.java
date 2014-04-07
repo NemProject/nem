@@ -10,7 +10,7 @@ import org.nem.peer.NodeCollection;
 import org.nem.peer.NodeStatus;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.Vector;
+import org.nem.core.math.Vector;
 import org.nem.peer.trust.score.NodeExperience;
 import org.nem.peer.trust.score.NodeExperiences;
 

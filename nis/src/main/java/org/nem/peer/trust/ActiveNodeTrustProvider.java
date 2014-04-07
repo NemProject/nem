@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.nem.core.math.Vector;
 import org.nem.peer.Node;
 import org.nem.peer.NodeCollection;
 import org.nem.peer.NodeStatus;

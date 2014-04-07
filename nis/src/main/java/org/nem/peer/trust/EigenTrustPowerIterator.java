@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.core.math.*;
+
 /**
  * An implementation of power iteration for the Eigen Trust algorithm.
  */

@@ -73,7 +73,7 @@ public class PreTrustedNodesTest {
 		};
 
 		// Act:
-		final Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+		final org.nem.core.math.Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
 		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
@@ -95,7 +95,7 @@ public class PreTrustedNodesTest {
 		};
 
 		// Act:
-		final Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
+		final org.nem.core.math.Vector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
 		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));

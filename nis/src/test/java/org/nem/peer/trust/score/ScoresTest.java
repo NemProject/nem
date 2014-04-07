@@ -6,8 +6,7 @@ import org.junit.*;
 import org.nem.peer.test.Utils;
 import org.nem.peer.Node;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.Matrix;
-import org.nem.peer.trust.Vector;
+import org.nem.core.math.*;
 
 import java.security.InvalidParameterException;
 

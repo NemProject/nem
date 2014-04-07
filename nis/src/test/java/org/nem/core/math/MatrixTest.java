@@ -1,4 +1,4 @@
-package org.nem.peer.trust;
+package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;

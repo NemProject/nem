@@ -1,5 +1,6 @@
 package org.nem.peer.test;
 
+import org.nem.core.math.Vector;
 import org.nem.peer.trust.*;
 
 /**

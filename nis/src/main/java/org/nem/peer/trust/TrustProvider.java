@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.core.math.Vector;
+
 /**
  * A trust provider that includes functionality for calculating trust values.
  */

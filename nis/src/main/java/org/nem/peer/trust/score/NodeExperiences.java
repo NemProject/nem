@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.nem.core.math.Matrix;
 import org.nem.peer.Node;
 import org.nem.peer.trust.*;
 
