@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
@@ -37,9 +37,7 @@ public class BlockChainTest {
 		blockChain.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(blockChain.getLastBlockHeight(), IsEqual.equalTo(1L));
-		Assert.assertThat(blockChain.getLastBlockHash(), IsEqual.equalTo(block.getBlockHash()));
-		Assert.assertThat(blockChain.getLastBlockSignature(), IsEqual.equalTo(block.getForgerProof()));
+		Assert.assertThat(blockChain.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {

@@ -59,20 +59,8 @@ public class BlockChain implements BlockSynchronizer {
 		return lastBlock;
 	}
 
-	public byte[] getLastBlockHash() {
-		return lastBlock.getBlockHash();
-	}
-
-	public Long getLastBlockHeight() {
+	private Long getLastBlockHeight() {
 		return lastBlock.getHeight();
-	}
-
-	public byte[] getLastBlockSignature() {
-		return lastBlock.getForgerProof();
-	}
-
-	public int getLastBlockTimestamp() {
-		return lastBlock.getTimestamp();
 	}
 
 	private long calcDbBlockScore(byte[] parentHash, org.nem.nis.dbmodel.Block block) {

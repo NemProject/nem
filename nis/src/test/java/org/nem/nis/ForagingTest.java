@@ -28,7 +28,7 @@ public class ForagingTest {
 		foraging.processTransaction(tx);
 
 		// Assert:
-		Assert.assertThat(foraging.getUnconfirmedTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(foraging.getNumUnconfirmedTransactions(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class ForagingTest {
 		foraging.processTransaction(tx);
 
 		// Assert:
-		Assert.assertThat(foraging.getUnconfirmedTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(foraging.getNumUnconfirmedTransactions(), IsEqual.equalTo(1));
 	}
 
 	@Test
