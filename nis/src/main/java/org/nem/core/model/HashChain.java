@@ -11,7 +11,7 @@ import java.util.List;
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
  */
 public class HashChain implements SerializableEntity {
-	List<ByteArray> hashChainList;
+	private List<ByteArray> hashChainList;
 
 	/**
 	 * Creates new empty HashChain with specified capacity.

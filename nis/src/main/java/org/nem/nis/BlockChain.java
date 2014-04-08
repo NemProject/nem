@@ -41,7 +41,7 @@ public class BlockChain implements BlockSynchronizer {
 	private NisPeerNetworkHost host;
 
 	// for now it's easier to keep it like this
-	org.nem.nis.dbmodel.Block lastBlock;
+	private org.nem.nis.dbmodel.Block lastBlock;
 
 	public BlockChain() {
 	}

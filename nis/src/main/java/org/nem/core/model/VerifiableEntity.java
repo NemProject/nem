@@ -208,7 +208,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 */
 	public static class NonVerifiableSerializationAdapter implements SerializableEntity {
 
-		final VerifiableEntity entity;
+		private final VerifiableEntity entity;
 
 		/**
 		 * Creates a non-verifiable serialization adapter for entity.

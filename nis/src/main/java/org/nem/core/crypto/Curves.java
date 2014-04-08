@@ -11,7 +11,7 @@ import java.math.BigInteger;
  */
 public class Curves {
 
-	static final Curve SECP256K1;
+	private static final Curve SECP256K1;
 
 	static {
 		X9ECParameters params = SECNamedCurves.getByName("secp256k1");
@@ -23,8 +23,8 @@ public class Curves {
 	 * Describes a curve.
 	 */
 	public static class Curve {
-		final ECDomainParameters params;
-		final BigInteger halfCurveOrder;
+		private final ECDomainParameters params;
+		private final BigInteger halfCurveOrder;
 
 		private Curve(final ECDomainParameters params, final BigInteger halfCurveOrder) {
 			this.params = params;
