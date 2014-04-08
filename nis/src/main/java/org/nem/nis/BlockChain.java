@@ -344,7 +344,7 @@ public class BlockChain implements BlockSynchronizer {
 			addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
 		}
 
-		synchronized (BlockChain.class) {
+		synchronized (this) {
 			dropDbBlocksAfter(commonBlockHeight);
 		}
 
@@ -370,7 +370,7 @@ public class BlockChain implements BlockSynchronizer {
 		org.nem.nis.dbmodel.Block parent;
 
 		// block already seen
-		synchronized (BlockChain.class) {
+		synchronized (this) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}
@@ -433,7 +433,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	public boolean addBlockToDb(Block bestBlock) {
-		synchronized (BlockChain.class) {
+		synchronized (this) {
 
 			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
 

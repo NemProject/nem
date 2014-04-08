@@ -93,7 +93,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
 		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
-		synchronized (BlockChain.class) {
+		synchronized (blockChain) {
 			Transfer tx = transferDao.findByHash(transactionHash.get());
 			if (tx != null) {
 				return false;
@@ -148,7 +148,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTIme) {
 		Set<Transaction> sortedTransactions = new TreeSet<>();
-		synchronized (BlockChain.class) {
+		synchronized (blockChain) {
 			for (Transaction tx : unconfirmedTransactions.values()) {
 				if (tx.getTimeStamp().compareTo(blockTIme) < 0) {
 					sortedTransactions.add(tx);
@@ -203,7 +203,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		List<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
-		synchronized (BlockChain.class) {
+		synchronized (blockChain) {
 			for (Account forger : unlockedAccounts) {
 				Block newBlock = new Block(forger, blockChain.getLastBlockHash(), blockTime, blockChain.getLastBlockHeight() + 1);
 				if (transactionList.size() > 0) {
