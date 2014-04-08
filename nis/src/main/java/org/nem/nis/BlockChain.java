@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.nem.nis.balances.Balance;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -10,6 +11,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.mappers.TransferMapper;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +41,9 @@ public class BlockChain implements BlockSynchronizer {
 
 	@Autowired
 	private NisPeerNetworkHost host;
+
+	@Autowired
+	private Foraging foraging;
 
 	// for now it's easier to keep it like this
 	private org.nem.nis.dbmodel.Block lastBlock;
@@ -106,7 +111,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @param node current peer.
 	 * @param peerBlock block to compare
-	 * @param height height at which we do comparison
+	 * @param commonHeight height at which we do comparison
 	 * @return true in peer's block has better score, false otherwise
 	 */
 	public boolean sychronizeCompareAt(Node node, Block peerBlock, long commonHeight) {
@@ -193,6 +198,22 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
+	private void addRevertedTransactionsAsUnconfirmed(final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
+		long currentHeight = getLastBlockHeight();
+
+		while (currentHeight != wantedHeight) {
+			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
+
+			// if the transaction is in DB it means at some point
+			// isValid and verify had to be called on it, so we can safely add it
+			// as unconfirmed
+			for (Transfer transfer : block.getBlockTransfers()) {
+				// block is still in db
+				foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(transfer, accountAnalyzer));
+			}
+			currentHeight--;
+		}
+	}
 
 	private void dropDbBlocksAfter(long height) {
 		blockDao.deleteBlocksAfterHeight(height);
@@ -224,11 +245,11 @@ public class BlockChain implements BlockSynchronizer {
 
 	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
 		//region compare last block
-		Block peerLastBlock = checkLastBlock(connector, node);
+		final Block peerLastBlock = checkLastBlock(connector, node);
 		if (peerLastBlock == null) {
 			return;
 		}
-		long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
+		final long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
 
 		/* if node is far behind, reject it, not to allow too deep
 		   rewrites of blockchain... */
@@ -238,14 +259,14 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region compare hash chains
-		long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
-		HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
+		final long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
+		final HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
         if (peerHashes.size() > BLOCKS_LIMIT) {
             penalize(node);
             return;
         }
 
-        HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
+        final HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
 		int i = ourHashes.findFirstDifferent(peerHashes);
 
 		// at least first compared block should be the same, if not, he's a lier or on a fork
@@ -261,11 +282,12 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region revert TXes inside contemporaryAccountAnalyzer
-		long commonBlockHeight = startingPoint + i - 1;
-		AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
-		if (ourHashes.size() > i) {
+		final long commonBlockHeight = startingPoint + i - 1;
+		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+		final boolean hasOwnChain = (ourHashes.size() > i);
+		if (hasOwnChain) {
 			// not to waste our time, first try to get first block that differs
-			Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
+			final Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
 
 			if (! this.sychronizeCompareAt(node, differBlock, commonBlockHeight)) {
 				return;
@@ -315,20 +337,22 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region update our chain
+		accountAnalyzer.replace(contemporaryAccountAnalyzer);
 
-		//accountAnalyzer.
-
-		/* commented out for now until replacing data
-		   in accountAnalyzer will be ready
+		if (hasOwnChain) {
+			// mind that we're using "new" (replaced) accountAnalyzer
+			addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
+		}
 
 		synchronized (BlockChain.class) {
 			dropDbBlocksAfter(commonBlockHeight);
 		}
 
 		for (Block peerBlock : peerChain) {
-			addBlockToDb(peerBlock);
+			if (addBlockToDb(peerBlock)) {
+				foraging.removeFromUnconfirmedTransactions(peerBlock);
+			}
 		}
-		*/
 		//endregion
 	}
 

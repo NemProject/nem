@@ -17,12 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AccountAnalyzer implements AccountLookup {
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
-	@Autowired
-	private BlockDao blockDao;
-
-	@Autowired
-	private TransferDao transferDao;
-
 	private Map<PublicKey, Account> mapByPublicKey;
 	private Map<String, Account> mapByAddressId;
 
@@ -41,6 +35,13 @@ public class AccountAnalyzer implements AccountLookup {
 
 		for (Map.Entry<PublicKey, Account> pair : rhs.mapByPublicKey.entrySet()) {
 			mapByPublicKey.put(pair.getKey(), new Account(pair.getValue()));
+		}
+	}
+
+	public void replace(AccountAnalyzer other) {
+		synchronized (this) {
+			this.mapByAddressId = other.mapByAddressId;
+			this.mapByPublicKey = other.mapByPublicKey;
 		}
 	}
 

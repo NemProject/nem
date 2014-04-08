@@ -73,20 +73,24 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	/**
-	 * @param transaction - transaction that isValid() and verify()-ed
+	 * Adds transaction to list of unconfirmed transactions.
+	 *
+	 * @param transaction transaction that isValid() and verify()-ed
 	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
-	public boolean processTransaction(Transaction transaction) {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		// rest is checked by isValid()
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
-			return false;
-		}
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
+	public boolean addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
+		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+
+		Transaction swapTest = unconfirmedTransactions.putIfAbsent(transactionHash, transaction);
+		if (swapTest != null) {
 			return false;
 		}
 
+		return true;
+	}
+
+	private boolean addUnconfirmedTransaction(Transaction transaction) {
 		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
 
 		synchronized (BlockChain.class) {
@@ -102,6 +106,39 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Removes all block's transactions from list of unconfirmed transactions
+	 *
+	 * @param block
+	 */
+	public void removeFromUnconfirmedTransactions(Block block) {
+		for (Transaction transaction : block.getTransactions()) {
+			ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+			unconfirmedTransactions.remove(transactionHash);
+		}
+	}
+
+	/**
+	 * Checks if transaction fits in time limit window, if so add it to
+	 * list of unconfirmed transactions.
+	 *
+	 * @param transaction - transaction that isValid() and verify()-ed
+	 *
+	 * @return false if given transaction has already been seen, true if it has been added
+	 */
+	public boolean processTransaction(Transaction transaction) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		// rest is checked by isValid()
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
+			return false;
+		}
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
+			return false;
+		}
+
+		return addUnconfirmedTransaction(transaction);
 	}
 
 
@@ -206,22 +243,23 @@ public class Foraging implements AutoCloseable, Runnable {
 		} // synchronized
 
 		if (bestBlock != null) {
-			//
-			// if we're here it means unconfirmed transactions haven't been
-			// seen in any block yet, so we can add this block to local db
-			//
-			// (if at some point later we receive better block,
-			// fork resolution will handle that)
-			//
-			if (blockChain.addBlockToDb(bestBlock)) {
-				for (Transaction transaction : bestBlock.getTransactions()) {
-					ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
-					unconfirmedTransactions.remove(transactionHash);
-				}
+			addForagedBlock(bestBlock);
+		}
+	}
 
-				// TODO: should this be called by Foraging? or maybe somewhere in blockchain
-				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-			}
+	private void addForagedBlock(Block bestBlock) {
+		//
+		// if we're here it means unconfirmed transactions haven't been
+		// seen in any block yet, so we can add this block to local db
+		//
+		// (if at some point later we receive better block,
+		// fork resolution will handle that)
+		//
+		if (blockChain.addBlockToDb(bestBlock)) {
+			removeFromUnconfirmedTransactions(bestBlock);
+
+			// TODO: should this be called by Foraging? or maybe somewhere in blockchain
+			host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
 		}
 	}
 }
