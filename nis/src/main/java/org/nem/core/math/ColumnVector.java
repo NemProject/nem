@@ -116,9 +116,24 @@ public class ColumnVector {
 		this.scale(sum);
 	}
 
-	private void scale(final double scale) {
+	/**
+	 * Scales this vector by dividing all of its elements by the specified factor.
+	 *
+	 * @param scale The scale factor.
+	 */
+	public void scale(final double scale) {
 		for (int i = 0; i < this.size; ++i)
 			this.vector[i] /= scale;
+	}
+
+	/**
+	 * Gets the magnitude of this vector.
+	 *
+	 * @return The magnitude of this vector.
+	 */
+	public double getMagnitude() {
+		final ColumnVector nullVector = new ColumnVector(this.size);
+		return this.distance(nullVector);
 	}
 
 	/**

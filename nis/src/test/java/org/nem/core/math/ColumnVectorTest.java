@@ -146,6 +146,27 @@ public class ColumnVectorTest {
 
 	//endregion
 
+	//region scale
+
+	@Test
+	public void vectorCanBeScaledByArbitraryFactor() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(3);
+		vector.setAt(0, 2);
+		vector.setAt(1, -4);
+		vector.setAt(2, 1);
+
+		// Act:
+		vector.scale(8);
+
+		// Assert:
+		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.25));
+		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(-0.50));
+		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.125));
+	}
+
+	//endregion
+
 	//region normalize
 
 	@Test
@@ -246,7 +267,7 @@ public class ColumnVectorTest {
 
 	//endregion
 
-	//region add
+	//region distance / getMagnitude
 
 	@Test
 	public void distanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
@@ -286,6 +307,21 @@ public class ColumnVectorTest {
 
 		// Act:
 		smallerVector.distance(largerVector);
+	}
+
+	@Test
+	public void magnitudeCanBeCalculatedForVector() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(3);
+		vector.setAt(0, 7);
+		vector.setAt(1, 5);
+		vector.setAt(2, 11);
+
+		// Act:
+		final double magnitude = vector.getMagnitude();
+
+		// Assert:
+		Assert.assertEquals(13.96424, magnitude, 0.0000001);
 	}
 
 	//endregion
