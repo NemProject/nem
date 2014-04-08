@@ -4,84 +4,52 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
 
-public class EigenTrustPowerIteratorTest {
+public class EigenTrustConvergencePolicyTest {
 
 	@Test
 	public void iteratorInitiallyHasNoResult() {
 		// Act:
-		final EigenTrustPowerIterator iterator = createTestIterator(10, 0, 0.1);
-		final ColumnVector result = iterator.getResult();
+		final EigenTrustConvergencePolicy policy = createTestPolicy(10, 0.1);
+		final ColumnVector result = policy.getResult();
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(null));
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
+		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void iteratorStopsAfterMaxIterations() {
 		// Act:
-		final EigenTrustPowerIterator iterator = createTestIterator(2, 0, 0.0001);
+		final EigenTrustConvergencePolicy policy = createTestPolicy(2, 0.0001);
 
 		// Act:
-		iterator.run();
-		final ColumnVector result = iterator.getResult();
+		policy.converge();
+		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
+		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
 		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.1);
-		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.1);
+		Assert.assertEquals(4.00, result.getAt(0) / result.getAt(1), 0.1);
 	}
 
 	@Test
-	public void iteratorStopsAfterIterationChangeLessThanEpsilon() {
+	public void iteratorStopsAfterIterationChangeIsLessThanThanEpsilon() {
 		// Arrange:
-		final EigenTrustPowerIterator iterator = createTestIterator(1000, 0, 0.0001);
+		final EigenTrustConvergencePolicy policy = createTestPolicy(1000, 0.0001);
 
 		// Act:
-		iterator.run();
-		final ColumnVector result = iterator.getResult();
+		policy.converge();
+		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
+		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
 		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
-		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.001);
+		Assert.assertEquals(1.907, result.getAt(0) / result.getAt(1), 0.001);
 	}
 
-	@Test
-	public void alphaValueOfOneResultsInPreTrustVector() {
-		// Arrange:
-		final EigenTrustPowerIterator iterator = createTestIterator(1000, 1, 0.0001);
-
-		// Act:
-		iterator.run();
-		final ColumnVector result = iterator.getResult();
-
-		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-		Assert.assertEquals(1.00, result.absSum(), 0.001);
-		Assert.assertEquals(0.50, result.getAt(0) / result.getAt(1), 0.001);
-	}
-
-	@Test
-	public void alphaValueBetweenZeroAndOneInfluencesResult() {
-		// Arrange:
-		final EigenTrustPowerIterator iterator = createTestIterator(1000, 0.01, 0.00001);
-
-		// Act:
-		iterator.run();
-		final ColumnVector result = iterator.getResult();
-
-		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
-		Assert.assertEquals(1.00, result.absSum(), 0.001);
-		Assert.assertEquals(3.0764, result.getAt(0) / result.getAt(1), 0.001);
-	}
-
-	private static EigenTrustPowerIterator createTestIterator(int maxIterations, double alpha, double epsilon) {
+	private static EigenTrustConvergencePolicy createTestPolicy(int maxIterations, double epsilon) {
 		// Arrange: (EigenVector for test matrix is [3, 1])
 		final ColumnVector vector = new ColumnVector(2);
 		vector.setAt(0, 1.0 / 3);
@@ -93,6 +61,6 @@ public class EigenTrustPowerIteratorTest {
 		matrix.setAt(1, 0, 1);
 		matrix.setAt(1, 1, -5);
 
-		return new EigenTrustPowerIterator(vector, matrix, maxIterations, alpha, epsilon);
+		return new EigenTrustConvergencePolicy(vector, matrix, maxIterations, epsilon);
 	}
 }

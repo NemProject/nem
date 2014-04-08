@@ -3,17 +3,20 @@ package org.nem.peer.trust;
 import org.nem.core.math.*;
 
 /**
- * An implementation of power iteration for the Eigen Trust algorithm.
+ * A convergence policy for the Eigen Trust algorithm based on the Taylor Series.
+ *
+ * Although the original papers use PowerIteration for convergence,
+ * PowerIteration converges slowly because the alpha value is large.
+ *
+ * Taylor Series seems to work better and faster than PowerIteration.
  */
-public class EigenTrustPowerIterator {
+public class EigenTrustConvergencePolicy {
 
 	private final ColumnVector preTrustVector;
 	private final Matrix trustMatrix;
 	private final int maxIterations;
-	private final double alpha;
 	private final double epsilon;
 
-	private final ColumnVector weightedPreTrustVector;
 	private boolean hasConverged;
 	private ColumnVector result;
 
@@ -23,22 +26,18 @@ public class EigenTrustPowerIterator {
 	 * @param preTrustVector The pre-trust vector.
 	 * @param trustMatrix    The trust matrix.
 	 * @param maxIterations  The maximum number of iterations.
-	 * @param alpha          The alpha value.
 	 * @param epsilon        The convergence epsilon value.
 	 */
-	public EigenTrustPowerIterator(
+	public EigenTrustConvergencePolicy(
 			final ColumnVector preTrustVector,
 			final Matrix trustMatrix,
 			int maxIterations,
-			double alpha,
 			double epsilon) {
 		this.preTrustVector = preTrustVector;
 		this.trustMatrix = trustMatrix;
 		this.maxIterations = maxIterations;
-		this.alpha = alpha;
 		this.epsilon = epsilon;
 
-		this.weightedPreTrustVector = this.preTrustVector.multiply(this.alpha);
 		this.hasConverged = false;
 	}
 
@@ -51,34 +50,31 @@ public class EigenTrustPowerIterator {
 	}
 
 	/**
-	 * Runs the power iteration algorithm until convergence is reached
+	 * Runs the convergence algorithm until convergence is reached
 	 * or the maximum number of iterations have occurred.
 	 */
-	public void run() {
+	public void converge() {
+		final int numDimensions = this.preTrustVector.getSize();
 		int numIterations = 0;
-		ColumnVector vector1;
-		ColumnVector vector2 = this.step(this.preTrustVector);
+		double scale = 1.0;
+		ColumnVector sumVector = new ColumnVector(numDimensions);
+		ColumnVector lastTermVector = this.preTrustVector.multiply(this.trustMatrix);
 		do {
-			vector1 = vector2;
-			vector2 = this.step(vector1);
+			sumVector = sumVector.add(lastTermVector);
+
+			lastTermVector = lastTermVector.multiply(this.trustMatrix);
+			scale += 1.0;
+			lastTermVector.scale(scale);
+
 			++numIterations;
-		} while (maxIterations > numIterations && !this.hasConverged(vector1, vector2));
+		} while (this.maxIterations > numIterations && !this.hasConverged(lastTermVector));
 
-		this.result = vector2;
-		this.hasConverged = this.hasConverged(vector1, vector2);
+		this.hasConverged = this.hasConverged(lastTermVector);
+		this.result = sumVector;
+		this.result.normalize();
 	}
 
-	private ColumnVector step(final ColumnVector vector) {
-		ColumnVector trustVector = vector.multiply(this.trustMatrix);
-		trustVector = trustVector.multiply(1 - this.alpha);
-
-		final ColumnVector result = trustVector.add(this.weightedPreTrustVector);
-		result.align();
-		result.normalize();
-		return result;
-	}
-
-	private boolean hasConverged(final ColumnVector vector1, final ColumnVector vector2) {
-		return vector1.distance(vector2) <= this.epsilon;
+	private boolean hasConverged(final ColumnVector vector) {
+		return vector.getMagnitude() <= this.epsilon;
 	}
 }
