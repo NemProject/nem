@@ -93,7 +93,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 
 		synchronized (blockChain) {
 			Transfer tx = transferDao.findByHash(transactionHash.getRaw());
@@ -165,7 +165,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	 */
 	private long calcBlockScore(Block block) {
 		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block).getRaw(), 10, 14)));
 
 		return r1 + r2;
 	}

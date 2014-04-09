@@ -29,7 +29,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction) {
-		final Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 
 		// TODO: add this back
 //		synchronized (blockChain) {
@@ -50,7 +50,7 @@ public class UnconfirmedTransactions {
 	 */
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
-			final Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
 			this.transactions.remove(transactionHash);
 		}
 	}

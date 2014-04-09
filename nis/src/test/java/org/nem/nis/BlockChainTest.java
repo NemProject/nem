@@ -63,14 +63,13 @@ public class BlockChainTest {
 		b.sign();
 
 		Block dbBlock = new Block(
-				123456789L,
+				HashUtils.calculateHash(b),
 				1,
 				// prev hash
 				new byte[] {
 						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 				},
-				HashUtils.calculateHash(b),
 				0, // timestamp
 				DB_SENDER,
 				// proof
@@ -81,7 +80,6 @@ public class BlockChainTest {
 		);
 
 		Transfer dbTransaction1 = new Transfer(
-				ByteUtils.bytesToLong(HashUtils.calculateHash(tx1)),
 				HashUtils.calculateHash(tx1),
 				tx1.getVersion(),
 				tx1.getType(),
@@ -98,7 +96,6 @@ public class BlockChainTest {
 		);
 
 		Transfer dbTransaction2 = new Transfer(
-				ByteUtils.bytesToLong(HashUtils.calculateHash(tx2)),
 				HashUtils.calculateHash(tx2),
 				tx2.getVersion(),
 				tx2.getType(),

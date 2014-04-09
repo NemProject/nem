@@ -28,12 +28,11 @@ public class BlockMapper {
 	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
 		final org.nem.nis.dbmodel.Account forager = accountDao.findByAddress(block.getSigner().getAddress());
 
-		final byte[] blockHash = HashUtils.calculateHash(block);
+		final Hash blockHash = HashUtils.calculateHash(block);
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
-				ByteUtils.bytesToLong(blockHash),
+				blockHash,
 				block.getVersion(),
 				block.getPreviousBlockHash(),
-				blockHash,
 				block.getTimeStamp().getRawTime(),
 				forager,
 				block.getSignature().getBytes(),

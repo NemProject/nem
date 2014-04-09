@@ -1,14 +1,10 @@
 package org.nem.nis;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
+import org.nem.core.model.*;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.core.model.Address;
-import org.nem.core.model.Amount;
-import org.nem.core.model.GenesisBlock;
-import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.MockAccount;
 import org.nem.nis.test.MockAccountAnalyzer;
 import org.nem.core.test.Utils;
@@ -113,7 +109,7 @@ public class AccountAnalyzerTest {
 		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
 
 		Block b = new Block(
-				1L, 1, new byte[32], new byte[32], 0, sender, new byte[64], 1L, 8 * 1000000L, 0L
+				Hash.ZERO, 1, new byte[32], 0, sender, new byte[64], 1L, 8 * 1000000L, 0L
 		);
 
 		b.setBlockTransfers(Arrays.asList(t1, t2));
@@ -122,7 +118,7 @@ public class AccountAnalyzerTest {
 	}
 
 	private Transfer prepareTransfer(Account sender, Account recipient, Amount amount, Amount fee, int idInBlock) {
-		return new Transfer(1L, new byte[32], 1, TransactionTypes.TRANSFER,
+		return new Transfer(Hash.ZERO, 1, TransactionTypes.TRANSFER,
 				fee.getNumMicroNem(),
 				0, 0,
 				sender,

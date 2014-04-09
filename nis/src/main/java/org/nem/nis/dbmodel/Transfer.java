@@ -2,6 +2,7 @@ package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
+import org.nem.core.model.Hash;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -60,8 +61,7 @@ public class Transfer {
 	}
 
 	public Transfer(
-			Long shortId,
-			byte[] transferHash,
+			Hash hash,
 			Integer version,
 			Integer type,
 			Long fee,
@@ -74,8 +74,8 @@ public class Transfer {
 			Long amount,
 			Long referencedTransaction
 	) {
-		this.shortId = shortId;
-		this.transferHash = transferHash;
+		this.shortId = hash.getShortId();
+		this.transferHash = hash.getRaw();
 		this.version = version;
 		this.type = type;
 		this.fee = fee;

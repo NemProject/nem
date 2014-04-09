@@ -15,8 +15,8 @@ public class HashUtilsTest {
 		final MockVerifiableEntity entity2 = new MockVerifiableEntity(signer, 7);
 
 		// Act:
-		byte[] hash1 = HashUtils.calculateHash(entity1);
-		byte[] hash2 = HashUtils.calculateHash(entity2);
+		final Hash hash1 = HashUtils.calculateHash(entity1);
+		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
 		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
@@ -30,8 +30,8 @@ public class HashUtilsTest {
 		final MockVerifiableEntity entity2 = new MockVerifiableEntity(signer, 8);
 
 		// Act:
-		byte[] hash1 = HashUtils.calculateHash(entity1);
-		byte[] hash2 = HashUtils.calculateHash(entity2);
+		final Hash hash1 = HashUtils.calculateHash(entity1);
+		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
 		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
@@ -46,8 +46,8 @@ public class HashUtilsTest {
 		entity2.sign();
 
 		// Act:
-		byte[] hash1 = HashUtils.calculateHash(entity1);
-		byte[] hash2 = HashUtils.calculateHash(entity2);
+		final Hash hash1 = HashUtils.calculateHash(entity1);
+		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
 		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
@@ -59,11 +59,11 @@ public class HashUtilsTest {
 		final Account signer = Utils.generateRandomAccount();
 		final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
 
-		byte[] hash1 = HashUtils.calculateHash(entity);
+		final Hash hash1 = HashUtils.calculateHash(entity);
 
 		// Act:
 		entity.setCustomField(6);
-		byte[] hash2 = HashUtils.calculateHash(entity);
+		final Hash hash2 = HashUtils.calculateHash(entity);
 
 		// Assert:
 		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));

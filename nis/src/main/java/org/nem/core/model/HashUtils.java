@@ -6,7 +6,7 @@ import org.nem.core.serialization.BinarySerializer;
 /**
  * Static class that provides hashing utilities.
  */
-public class HashUtils {
+public abstract class HashUtils {
 
 	/**
 	 * Calculates the hash of the specified entity, excluding its signature.
@@ -15,8 +15,8 @@ public class HashUtils {
 	 *
 	 * @return The calculated hash.
 	 */
-	public static byte[] calculateHash(final VerifiableEntity entity) {
+	public static Hash calculateHash(final VerifiableEntity entity) {
 		byte[] data = BinarySerializer.serializeToBytes(entity.asNonVerifiable());
-		return Hashes.sha3(data);
+		return new Hash(Hashes.sha3(data));
 	}
 }

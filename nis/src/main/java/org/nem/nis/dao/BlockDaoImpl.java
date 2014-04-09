@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.nem.core.model.Hash;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,15 +124,16 @@ public class BlockDaoImpl implements BlockDao {
 	 */
 	@Override
 	@Transactional
-	public Block findByHash(byte[] blockHash) {
-		long blockId = ByteUtils.bytesToLong(blockHash);
+	public Block findByHash(final Hash blockHash) {
+		final byte[] blockHashBytes = blockHash.getRaw();
+		long blockId = ByteUtils.bytesToLong(blockHashBytes);
 		Query query = getCurrentSession()
 				.createQuery("from Block a where a.shortId = :id")
 				.setParameter("id", blockId);
 		final List<?> blockList = query.list();
 		for (int i = 0; i < blockList.size(); ++i) {
 			Block block = (Block)blockList.get(i);
-			if (Arrays.equals(blockHash, block.getBlockHash())) {
+			if (Arrays.equals(blockHashBytes, block.getBlockHash())) {
 				return block;
 			}
 		}

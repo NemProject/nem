@@ -85,7 +85,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
 		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
-			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), dbBlock.getBlockHash())) {
+			if (HashUtils.calculateHash(peerLastBlock).equals(new Hash(dbBlock.getBlockHash()))) {
 				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
 					return true;
 				}
@@ -352,8 +352,8 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return false if block was known or invalid, true if ok and added to db
 	 */
 	public boolean processBlock(Block block) {
-		byte[] blockHash = HashUtils.calculateHash(block);
-		byte[] parentHash = block.getPreviousBlockHash();
+		final Hash blockHash = HashUtils.calculateHash(block);
+		final Hash parentHash = new Hash(block.getPreviousBlockHash());
 
 		org.nem.nis.dbmodel.Block parent;
 

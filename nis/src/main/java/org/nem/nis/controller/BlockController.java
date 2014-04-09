@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.apache.commons.codec.DecoderException;
+import org.nem.core.model.Hash;
 import org.nem.nis.dao.BlockDao;
 
 import org.nem.nis.mappers.BlockMapper;
@@ -31,7 +32,7 @@ public class BlockController {
 	@P2PApi
 	@PublicApi
 	public String blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
-		final byte[] blockHash = HexEncoder.getBytes(blockHashString);
+		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
 		if (null == dbBlock)
 			return Utils.jsonError(2, "hash not found in the db");
