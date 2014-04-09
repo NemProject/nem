@@ -102,8 +102,8 @@ public class Block {
 		this.prevBlockHash = prevBlockHash;
 	}
 
-	public byte[] getBlockHash() {
-		return blockHash;
+	public Hash getBlockHash() {
+		return new Hash(this.blockHash);
 	}
 
 	public void setBlockHash(byte[] blockHash) {

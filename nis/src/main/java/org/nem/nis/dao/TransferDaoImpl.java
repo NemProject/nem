@@ -50,7 +50,7 @@ public class TransferDaoImpl implements TransferDao {
 		userList = query.list();
 		for (int i = 0; i < userList.size(); ++i) {
 			Transfer transfer = (Transfer)userList.get(i);
-			if (Arrays.equals(txHash, transfer.getTransferHash())) {
+			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {
 				return transfer;
 			}
 		}

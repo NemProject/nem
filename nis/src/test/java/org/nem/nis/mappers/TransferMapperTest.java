@@ -168,7 +168,7 @@ public class TransferMapperTest {
 		public void assertDbModel(final Transfer dbModel, final int blockIndex) {
 			Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
-			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash.getRaw()));
+			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
 			Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(11L));

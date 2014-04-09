@@ -187,7 +187,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		synchronized (blockChain) {
 			org.nem.nis.dbmodel.Block lastBlock = blockChain.getLastDbBlock();
 			for (Account forger : unlockedAccounts) {
-				Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
+				Block newBlock = new Block(forger, lastBlock.getBlockHash().getRaw(), blockTime, lastBlock.getHeight() + 1);
 				if (!transactionList.isEmpty()) {
 					newBlock.addTransactions(transactionList);
 				}

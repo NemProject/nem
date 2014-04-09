@@ -133,7 +133,7 @@ public class BlockDaoImpl implements BlockDao {
 		final List<?> blockList = query.list();
 		for (int i = 0; i < blockList.size(); ++i) {
 			Block block = (Block)blockList.get(i);
-			if (Arrays.equals(blockHashBytes, block.getBlockHash())) {
+			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
 				return block;
 			}
 		}

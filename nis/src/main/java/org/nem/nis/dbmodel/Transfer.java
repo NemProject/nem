@@ -105,8 +105,8 @@ public class Transfer {
 		this.shortId = shortId;
 	}
 
-	public byte[] getTransferHash() {
-		return transferHash;
+	public Hash getTransferHash() {
+		return new Hash(this.transferHash);
 	}
 
 	public void setTransferHash(byte[] transferHash) {

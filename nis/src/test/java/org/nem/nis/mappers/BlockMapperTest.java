@@ -43,7 +43,7 @@ public class BlockMapperTest {
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
 			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
-			Assert.assertThat(new Hash(dbTransfer.getTransferHash()), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 	}
 
@@ -175,7 +175,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
-			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash.getRaw()));
+			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getTimestamp(), IsEqual.equalTo(721));
 			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForager));
 			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
