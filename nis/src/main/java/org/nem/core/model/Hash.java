@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
 
 import java.util.Arrays;
@@ -10,7 +11,10 @@ import java.util.Arrays;
  */
 public class Hash implements SerializableEntity {
 
-	private byte[] data;
+	/**
+	 * An empty hash.
+	 */
+	public static final Hash ZERO = new Hash(new byte[32]);
 
 	/**
 	 * An object deserializer that can be used to deserialize hashes.
@@ -22,30 +26,39 @@ public class Hash implements SerializableEntity {
 		}
 	};
 
+	private final byte[] data;
+
 	/**
 	 * Creates new Hash object.
 	 *
-	 * @param data The raw hash code.
+	 * @param data The raw hash.
 	 */
 	public Hash(byte[] data) {
 		this.data = data;
 	}
 
 	/**
-	 * Deserializes a hash code object.
+	 * Deserializes a Hash object.
 	 *
 	 * @param deserializer The deserializer to use.
 	 */
-	public Hash(Deserializer deserializer) {
+	public Hash(final Deserializer deserializer) {
 		this.data = deserializer.readBytes("data");
 	}
 
 	/**
-	 * Gets the raw hash code.
+	 * Gets the raw hash.
 	 *
-	 * @return The raw hash code.
+	 * @return The raw hash.
 	 */
 	public byte[] getRaw() { return this.data; }
+
+	/**
+	 * Gets the short id of this hash.
+	 *
+	 * @return The short id.
+	 */
+	public long getShortId() { return ByteUtils.bytesToLong(this.data); }
 
 	@Override
 	public void serialize(Serializer serializer) {

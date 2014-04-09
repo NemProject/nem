@@ -10,6 +10,16 @@ public class HashTest {
 	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
 	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
 
+	//region constants
+
+	@Test
+	public void zeroHashIsInitializedCorrectly() {
+		// Assert:
+		Assert.assertThat(Hash.ZERO, IsEqual.equalTo(new Hash(new byte[32])));
+	}
+
+	//endregion
+
 	//region constructors / factories
 
 	@Test
@@ -65,6 +75,19 @@ public class HashTest {
 		// Assert:
 		Assert.assertThat(new Hash(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(new Hash(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
+
+	//region getShortId
+
+	@Test
+	public void shortIdIsCalculatedCorrectly() {
+		// Arrange:
+		final Hash hash = new Hash(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 });
+
+		// Assert:
+		Assert.assertThat(hash.getShortId(), IsEqual.equalTo(0x0001020304050607L));
 	}
 
 	//endregion
