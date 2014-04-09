@@ -231,49 +231,76 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+	private Block synchronize1CompareLastBlock(final SyncConnector connector, final Node node) {
 		//region compare last block
 		final Block peerLastBlock = checkLastBlock(connector, node);
 		if (peerLastBlock == null) {
-			return;
+			return null;
 		}
 		final long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
 
 		/* if node is far behind, reject it, not to allow too deep
 		   rewrites of blockchain... */
 		if (val <= -REWRITE_LIMIT) {
-			return;
+			return null;
 		}
-		//endregion
 
+		return peerLastBlock;
+		//endregion
+	}
+
+	class SynchronizeContext {
+		public long commonBlockHeight;
+		public boolean hasOwnChain;
+
+		SynchronizeContext(long commonBlockHeight, boolean hasOwnChain) {
+			this.commonBlockHeight = commonBlockHeight;
+			this.hasOwnChain = hasOwnChain;
+		}
+	}
+
+	private SynchronizeContext synchronize2FindCommonBlock(SyncConnector connector, Node node) {
 		//region compare hash chains
 		final long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
 		final HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
-        if (peerHashes.size() > BLOCKS_LIMIT) {
-            penalize(node);
-            return;
-        }
+		if (peerHashes.size() > BLOCKS_LIMIT) {
+			penalize(node);
+			return null;
+		}
 
-        final HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
+		final HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
 		int i = ourHashes.findFirstDifferent(peerHashes);
 
 		// at least first compared block should be the same, if not, he's a lier or on a fork
 		if (i == 0) {
 			penalize(node);
-			return;
+			return null;
 		}
 
 		// nothing to do, we have all of peers blocks
 		if (i == peerHashes.size()) {
+			return null;
+		}
+		SynchronizeContext synchronizeContext = new SynchronizeContext(startingPoint + i - 1,  ourHashes.size() > i);
+		return synchronizeContext;
+		//endregion
+	}
+
+	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+		Block peerLastBlock = synchronize1CompareLastBlock(connector, node);
+		if (peerLastBlock == null) {
 			return;
 		}
-		//endregion
+
+		SynchronizeContext synchronizeContext = synchronize2FindCommonBlock(connector, node);
+		if (synchronizeContext == null) {
+			return;
+		}
+		final long commonBlockHeight = synchronizeContext.commonBlockHeight;
 
 		//region revert TXes inside contemporaryAccountAnalyzer
-		final long commonBlockHeight = startingPoint + i - 1;
 		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
-		final boolean hasOwnChain = (ourHashes.size() > i);
-		if (hasOwnChain) {
+		if (synchronizeContext.hasOwnChain) {
 			// not to waste our time, first try to get first block that differs
 			final Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
 
@@ -284,6 +311,7 @@ public class BlockChain implements BlockSynchronizer {
 			revertChain(commonBlockHeight, contemporaryAccountAnalyzer);
 		}
 		//endregion
+
 
 		//region verify peer's chain
 		org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
@@ -327,7 +355,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region update our chain
 		accountAnalyzer.replace(contemporaryAccountAnalyzer);
 
-		if (hasOwnChain) {
+		if (synchronizeContext.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer
 			addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
 		}
