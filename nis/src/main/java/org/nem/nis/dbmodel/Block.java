@@ -1,6 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.Cascade;
+import org.nem.core.model.Hash;
 
 import javax.persistence.*;
 import java.util.List;
@@ -47,10 +48,9 @@ public class Block {
 	}
 
 	public Block(
-			Long shortId,
+			Hash hash,
 			Integer version,
-			byte[] prevBlockHash,
-			byte[] blockHash,
+			Hash prevBlockHash,
 			Integer timestamp,
 			Account forger,
 			byte[] forgerProof,
@@ -58,10 +58,10 @@ public class Block {
 			Long totalAmount,
 			Long totalFee) {
 
-		this.shortId = shortId;
+		this.shortId = hash.getShortId();
 		this.version = version;
-		this.prevBlockHash = prevBlockHash;
-		this.blockHash = blockHash;
+		this.prevBlockHash = prevBlockHash.getRaw();
+		this.blockHash = hash.getRaw();
 		this.timestamp = timestamp;
 		this.forger = forger;
 		this.forgerProof = forgerProof;
@@ -94,16 +94,16 @@ public class Block {
 		this.version = version;
 	}
 
-	public byte[] getPrevBlockHash() {
-		return prevBlockHash;
+	public Hash getPrevBlockHash() {
+		return new Hash(this.prevBlockHash);
 	}
 
 	public void setPrevBlockHash(byte[] prevBlockHash) {
 		this.prevBlockHash = prevBlockHash;
 	}
 
-	public byte[] getBlockHash() {
-		return blockHash;
+	public Hash getBlockHash() {
+		return new Hash(this.blockHash);
 	}
 
 	public void setBlockHash(byte[] blockHash) {

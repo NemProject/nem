@@ -59,32 +59,20 @@ public class BlockChain implements BlockSynchronizer {
 		return lastBlock;
 	}
 
-	public byte[] getLastBlockHash() {
-		return lastBlock.getBlockHash();
-	}
-
-	public Long getLastBlockHeight() {
+	private Long getLastBlockHeight() {
 		return lastBlock.getHeight();
 	}
 
-	public byte[] getLastBlockSignature() {
-		return lastBlock.getForgerProof();
-	}
-
-	public int getLastBlockTimestamp() {
-		return lastBlock.getTimestamp();
-	}
-
-	private long calcDbBlockScore(byte[] parentHash, org.nem.nis.dbmodel.Block block) {
+	private long calcDbBlockScore(Hash parentHash, org.nem.nis.dbmodel.Block block) {
 		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForger().getPublicKey().getRaw(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash, 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash.getRaw(), 10, 14)));
 
 		return r1 + r2;
 	}
 
-	private long calcBlockScore(byte[] parentHash, Block block) {
+	private long calcBlockScore(Hash parentHash, Block block) {
 		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSigner().getKeyPair().getPublicKey().getRaw(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash, 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash.getRaw(), 10, 14)));
 
 		return r1 + r2;
 	}
@@ -97,7 +85,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
 		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
-			if (Arrays.equals(HashUtils.calculateHash(peerLastBlock), dbBlock.getBlockHash())) {
+			if (HashUtils.calculateHash(peerLastBlock).equals(dbBlock.getBlockHash())) {
 				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
 					return true;
 				}
@@ -364,8 +352,8 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return false if block was known or invalid, true if ok and added to db
 	 */
 	public boolean processBlock(Block block) {
-		byte[] blockHash = HashUtils.calculateHash(block);
-		byte[] parentHash = block.getPreviousBlockHash();
+		final Hash blockHash = HashUtils.calculateHash(block);
+		final Hash parentHash = block.getPreviousBlockHash();
 
 		org.nem.nis.dbmodel.Block parent;
 

@@ -22,7 +22,7 @@ public class NisMain {
 	public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
-	private static byte[] GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
+	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -79,7 +79,7 @@ public class NisMain {
 	}
 
 	private static void logGenesisInformation() {
-		LOGGER.info("genesis block hash:" + HexEncoder.getString(GENESIS_BLOCK_HASH));
+		LOGGER.info("genesis block hash:" + GENESIS_BLOCK_HASH);
 
 		final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
 		final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();

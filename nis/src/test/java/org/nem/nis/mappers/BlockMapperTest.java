@@ -10,7 +10,6 @@ import org.nem.core.model.Block;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.test.MockAccountDao;
 
 public class BlockMapperTest {
@@ -77,10 +76,10 @@ public class BlockMapperTest {
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
 			final Transaction originalTransaction = context.getModel().getTransactions().get(i);
-			final byte[] originalTransactionHash = HashUtils.calculateHash(originalTransaction);
+			final Hash originalTransactionHash = HashUtils.calculateHash(originalTransaction);
 
 			final Transaction transaction = model.getTransactions().get(i);
-			final byte[] transactionHash = HashUtils.calculateHash(transaction);
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
 
 			Assert.assertThat(transactionHash, IsEqual.equalTo(originalTransactionHash));
 		}
@@ -97,12 +96,12 @@ public class BlockMapperTest {
 		private final Account account3;
 		private final org.nem.nis.dbmodel.Account dbAccount3;
 		private final MockAccountDao accountDao;
-		private byte[] hash;
+		private Hash hash;
 
 		public TestContext() {
 			this.model = new Block(
 					Utils.generateRandomAccount(),
-					Utils.generateRandomBytes(),
+					new Hash(Utils.generateRandomBytes()),
 					new TimeInstant(721),
 					17);
 
@@ -173,7 +172,7 @@ public class BlockMapperTest {
 
 		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
-			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(ByteUtils.bytesToLong(this.hash)));
+			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));

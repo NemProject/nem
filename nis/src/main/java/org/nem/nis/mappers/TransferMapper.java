@@ -6,7 +6,6 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dbmodel.Transfer;
 
 import java.security.InvalidParameterException;
@@ -30,9 +29,8 @@ public class TransferMapper {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 
-		final byte[] txHash = HashUtils.calculateHash(transfer);
+		final Hash txHash = HashUtils.calculateHash(transfer);
 		final Transfer dbTransfer = new Transfer(
-				ByteUtils.bytesToLong(txHash),
 				txHash,
 				transfer.getVersion(),
 				transfer.getType(),

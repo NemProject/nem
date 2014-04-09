@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
@@ -37,9 +37,7 @@ public class BlockChainTest {
 		blockChain.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(blockChain.getLastBlockHeight(), IsEqual.equalTo(1L));
-		Assert.assertThat(blockChain.getLastBlockHash(), IsEqual.equalTo(block.getBlockHash()));
-		Assert.assertThat(blockChain.getLastBlockSignature(), IsEqual.equalTo(block.getForgerProof()));
+		Assert.assertThat(blockChain.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
@@ -54,7 +52,7 @@ public class BlockChainTest {
 
 		org.nem.core.model.Block b = new org.nem.core.model.Block(
 				SENDER,
-				new byte[32],
+				Hash.ZERO,
 				time.getCurrentTime(),
 				1L
 		);
@@ -65,14 +63,10 @@ public class BlockChainTest {
 		b.sign();
 
 		Block dbBlock = new Block(
-				123456789L,
+				HashUtils.calculateHash(b),
 				1,
 				// prev hash
-				new byte[] {
-						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-				},
-				HashUtils.calculateHash(b),
+				Hash.ZERO,
 				0, // timestamp
 				DB_SENDER,
 				// proof
@@ -83,7 +77,6 @@ public class BlockChainTest {
 		);
 
 		Transfer dbTransaction1 = new Transfer(
-				ByteUtils.bytesToLong(HashUtils.calculateHash(tx1)),
 				HashUtils.calculateHash(tx1),
 				tx1.getVersion(),
 				tx1.getType(),
@@ -100,7 +93,6 @@ public class BlockChainTest {
 		);
 
 		Transfer dbTransaction2 = new Transfer(
-				ByteUtils.bytesToLong(HashUtils.calculateHash(tx2)),
 				HashUtils.calculateHash(tx2),
 				tx2.getVersion(),
 				tx2.getType(),

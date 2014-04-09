@@ -34,7 +34,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 
-	private final ConcurrentMap<ByteArray, Transaction> unconfirmedTransactions;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
@@ -56,7 +56,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new ConcurrentHashMap<>();
+		this.unconfirmedTransactions = new UnconfirmedTransactions();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
@@ -73,6 +73,15 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	/**
+	 * Gets the number of unconfirmed transactions.
+	 *
+	 * @return The number of unconfirmed transactions.
+	 */
+	public int getNumUnconfirmedTransactions() {
+		return this.unconfirmedTransactions.size();
+	}
+
+	/**
 	 * Adds transaction to list of unconfirmed transactions.
 	 *
 	 * @param transaction transaction that isValid() and verify()-ed
@@ -80,32 +89,20 @@ public class Foraging implements AutoCloseable, Runnable {
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
 	public boolean addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
-		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
-
-		Transaction swapTest = unconfirmedTransactions.putIfAbsent(transactionHash, transaction);
-		if (swapTest != null) {
-			return false;
-		}
-
-		return true;
+		return this.unconfirmedTransactions.add(transaction);
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 
 		synchronized (blockChain) {
-			Transfer tx = transferDao.findByHash(transactionHash.get());
+			Transfer tx = transferDao.findByHash(transactionHash.getRaw());
 			if (tx != null) {
 				return false;
 			}
 		}
 
-		Transaction swapTest = unconfirmedTransactions.putIfAbsent(transactionHash, transaction);
-		if (swapTest != null) {
-			return false;
-		}
-
-		return true;
+		return this.addUnconfirmedTransactionWithoutDbCheck(transaction);
 	}
 
 	/**
@@ -114,10 +111,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	 * @param block
 	 */
 	public void removeFromUnconfirmedTransactions(Block block) {
-		for (Transaction transaction : block.getTransactions()) {
-			ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
-			unconfirmedTransactions.remove(transactionHash);
-		}
+		this.unconfirmedTransactions.removeAll(block);
 	}
 
 	/**
@@ -141,21 +135,8 @@ public class Foraging implements AutoCloseable, Runnable {
 		return addUnconfirmedTransaction(transaction);
 	}
 
-
-	public ConcurrentMap<ByteArray, Transaction> getUnconfirmedTransactions() {
-		return unconfirmedTransactions;
-	}
-
-	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTIme) {
-		Set<Transaction> sortedTransactions = new TreeSet<>();
-		synchronized (blockChain) {
-			for (Transaction tx : unconfirmedTransactions.values()) {
-				if (tx.getTimeStamp().compareTo(blockTIme) < 0) {
-					sortedTransactions.add(tx);
-				}
-			}
-		}
-		return new ArrayList<>(sortedTransactions);
+	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
+		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
 	}
 
 	/**
@@ -184,7 +165,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	 */
 	private long calcBlockScore(Block block) {
 		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block).getRaw(), 10, 14)));
 
 		return r1 + r2;
 	}
@@ -202,11 +183,15 @@ public class Foraging implements AutoCloseable, Runnable {
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		List<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
+		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		synchronized (blockChain) {
+			org.nem.nis.dbmodel.Block lastBlock = blockChain.getLastDbBlock();
+			BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
+			System.out.println("   hit: 0x" + hit.toString(16));
+
 			for (Account forger : unlockedAccounts) {
-				Block newBlock = new Block(forger, blockChain.getLastBlockHash(), blockTime, blockChain.getLastBlockHeight() + 1);
-				if (transactionList.size() > 0) {
+				Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
+				if (!transactionList.isEmpty()) {
 					newBlock.addTransactions(transactionList);
 				}
 
@@ -222,11 +207,9 @@ public class Foraging implements AutoCloseable, Runnable {
 					continue;
 				}
 
-				BigInteger hit = new BigInteger(1, Arrays.copyOfRange(blockChain.getLastBlockSignature(), 2, 10));
 				long effectiveBalance = realAccout.getBalance().getNumNem();
-				BigInteger target = calculateTarget(new TimeInstant(blockChain.getLastBlockTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
+				BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
 
-				System.out.println("   hit: 0x" + hit.toString(16));
 				System.out.println("target: 0x" + target.toString(16));
 
 				if (hit.compareTo(target) < 0) {

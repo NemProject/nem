@@ -39,7 +39,7 @@ public class GenesisBlock extends Block {
 	 * @param timestamp The block timestamp.
 	 */
 	public GenesisBlock(final TimeInstant timestamp) {
-		super(ACCOUNT, new byte[HASH_LENGTH], timestamp, GENESIS_HEIGHT);
+		super(ACCOUNT, Hash.ZERO, timestamp, GENESIS_HEIGHT);
 
 		// TODO: as a placeholder distribute amounts equally
 		final String[] recipientIds = NetworkInfo.getDefault().getGenesisRecipientAccountIds();

@@ -11,7 +11,12 @@ import java.util.*;
 
 public class BlockTest {
 
-	final static byte[] DUMMY_PREVIOUS_HASH = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
+	final static Hash DUMMY_PREVIOUS_HASH = new Hash(new byte[] {
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2 });
+
 	//region Constructors
 
 	@Test
@@ -31,6 +36,27 @@ public class BlockTest {
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
+		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void ctorCanCreateBlockAroundPreviousBlock() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Block previousBlock = createBlock(signer);
+
+		// Act:
+		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
+
+		// Assert:
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11)));
+
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(4L));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 	}
 

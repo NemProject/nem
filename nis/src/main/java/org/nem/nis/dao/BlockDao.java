@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.nem.core.model.Hash;
 import org.nem.nis.dbmodel.Block;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public interface BlockDao {
 	 *
 	 * @return Block having given hash or null.
 	 */
-	public Block findByHash(byte[] blockHash);
+	public Block findByHash(final Hash blockHash);
 
 	/**
 	 * Retrieves Block from db at given height.

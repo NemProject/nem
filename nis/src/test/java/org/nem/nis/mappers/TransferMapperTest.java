@@ -10,7 +10,6 @@ import org.nem.core.model.Account;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.test.MockAccountDao;
 
 import java.security.InvalidParameterException;
@@ -119,7 +118,7 @@ public class TransferMapperTest {
 		private final org.nem.nis.dbmodel.Account dbSender;
 		private final org.nem.nis.dbmodel.Account dbRecipient;
 		private final MockAccountDao accountDao;
-		private final byte[] hash;
+		private final Hash hash;
 
 		public TestContext(final Message message, final Account sender, final Account recipient) {
 			this.model = new TransferTransaction(
@@ -168,7 +167,7 @@ public class TransferMapperTest {
 
 		public void assertDbModel(final Transfer dbModel, final int blockIndex) {
 			Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
-			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(ByteUtils.bytesToLong(this.hash)));
+			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));

@@ -17,7 +17,7 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
-	private final byte[] prevBlockHash;
+	private final Hash prevBlockHash;
 	private long height; // unsure yet, but probably will be easier to talk on forums having that
 	private Amount totalFee = Amount.ZERO;
 
@@ -31,11 +31,22 @@ public class Block extends VerifiableEntity {
 	 * @param timestamp     The block timestamp.
 	 * @param height        The block height.
 	 */
-	public Block(final Account forger, final byte[] prevBlockHash, final TimeInstant timestamp, final long height) {
+	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final long height) {
 		super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
+	}
+
+	/**
+	 * Creates a new block.
+	 *
+	 * @param forger    The forger.
+	 * @param timestamp The block timestamp.
+	 * @param prevBlock The previous block.
+	 */
+	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
+		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight() + 1);
 	}
 
 	/**
@@ -47,7 +58,7 @@ public class Block extends VerifiableEntity {
 	public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
 
-		this.prevBlockHash = deserializer.readBytes("prevBlockHash");
+		this.prevBlockHash = deserializer.readObject("prevBlockHash", Hash.DESERIALIZER);
 		this.height = deserializer.readLong("height");
 		this.totalFee = SerializationUtils.readAmount(deserializer, "totalFee");
 
@@ -79,7 +90,7 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return The hash of the previous block.
 	 */
-	public byte[] getPreviousBlockHash() {
+	public Hash getPreviousBlockHash() {
 		return this.prevBlockHash;
 	}
 
@@ -110,14 +121,14 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @param transactions The transactions to add.
 	 */
-	public void addTransactions(final List<Transaction> transactions) {
+	public void addTransactions(final Collection<Transaction> transactions) {
 		for (final Transaction transaction : transactions)
 			this.addTransaction(transaction);
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
-		serializer.writeBytes("prevBlockHash", this.prevBlockHash);
+		serializer.writeObject("prevBlockHash", this.prevBlockHash);
 		serializer.writeLong("height", this.height);
 		SerializationUtils.writeAmount(serializer, "totalFee", this.totalFee);
 
