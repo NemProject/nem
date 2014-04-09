@@ -353,7 +353,7 @@ public class BlockChain implements BlockSynchronizer {
 	 */
 	public boolean processBlock(Block block) {
 		final Hash blockHash = HashUtils.calculateHash(block);
-		final Hash parentHash = new Hash(block.getPreviousBlockHash());
+		final Hash parentHash = block.getPreviousBlockHash();
 
 		org.nem.nis.dbmodel.Block parent;
 

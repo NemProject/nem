@@ -15,7 +15,7 @@ public class EntityFactoryTest {
 		// Arrange:
 		final EntityFactory factory = new EntityFactory(new MockTimeProvider(11890));
 		final Account signer = Utils.generateRandomAccount();
-		final byte[] previousHash = Utils.generateRandomBytes();
+		final Hash previousHash = new Hash(Utils.generateRandomBytes());
 
 		// Act:
 		final Block block = factory.createBlock(signer, previousHash, 12);

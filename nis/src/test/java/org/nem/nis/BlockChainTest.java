@@ -52,7 +52,7 @@ public class BlockChainTest {
 
 		org.nem.core.model.Block b = new org.nem.core.model.Block(
 				SENDER,
-				new byte[32],
+				Hash.ZERO,
 				time.getCurrentTime(),
 				1L
 		);
@@ -66,10 +66,7 @@ public class BlockChainTest {
 				HashUtils.calculateHash(b),
 				1,
 				// prev hash
-				new byte[] {
-						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-				},
+				Hash.ZERO,
 				0, // timestamp
 				DB_SENDER,
 				// proof

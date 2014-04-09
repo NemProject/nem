@@ -111,7 +111,7 @@ public class UnconfirmedTransactionsTest {
 			unconfirmedTransactions.add(transaction);
 		}
 
-		final Block block = new Block(Utils.generateRandomAccount(), new byte[] { }, new TimeInstant(0), 1);
+		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(0), 1);
 		block.addTransaction(transactions.get(1));
 		block.addTransaction(transactions.get(7));
 		block.addTransaction(transactions.get(4));

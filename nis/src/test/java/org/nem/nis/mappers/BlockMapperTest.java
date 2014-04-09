@@ -101,7 +101,7 @@ public class BlockMapperTest {
 		public TestContext() {
 			this.model = new Block(
 					Utils.generateRandomAccount(),
-					Utils.generateRandomBytes(),
+					new Hash(Utils.generateRandomBytes()),
 					new TimeInstant(721),
 					17);
 

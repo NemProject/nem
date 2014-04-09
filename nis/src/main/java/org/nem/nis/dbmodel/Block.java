@@ -50,7 +50,7 @@ public class Block {
 	public Block(
 			Hash hash,
 			Integer version,
-			byte[] prevBlockHash,
+			Hash prevBlockHash,
 			Integer timestamp,
 			Account forger,
 			byte[] forgerProof,
@@ -60,7 +60,7 @@ public class Block {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
-		this.prevBlockHash = prevBlockHash;
+		this.prevBlockHash = prevBlockHash.getRaw();
 		this.blockHash = hash.getRaw();
 		this.timestamp = timestamp;
 		this.forger = forger;
@@ -94,8 +94,8 @@ public class Block {
 		this.version = version;
 	}
 
-	public byte[] getPrevBlockHash() {
-		return prevBlockHash;
+	public Hash getPrevBlockHash() {
+		return new Hash(this.prevBlockHash);
 	}
 
 	public void setPrevBlockHash(byte[] prevBlockHash) {
