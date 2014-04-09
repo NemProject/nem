@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  */
 public class UnconfirmedTransactions {
 
-	private final ConcurrentMap<ByteArray, Transaction> transactions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -29,7 +29,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction) {
-		final ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+		final Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
 
 		// TODO: add this back
 //		synchronized (blockChain) {
@@ -50,7 +50,7 @@ public class UnconfirmedTransactions {
 	 */
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
-			final ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+			final Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
 			this.transactions.remove(transactionHash);
 		}
 	}

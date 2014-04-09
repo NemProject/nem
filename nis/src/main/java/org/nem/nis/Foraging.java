@@ -93,10 +93,10 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		ByteArray transactionHash = new ByteArray(HashUtils.calculateHash(transaction));
+		Hash transactionHash = new Hash(HashUtils.calculateHash(transaction));
 
 		synchronized (blockChain) {
-			Transfer tx = transferDao.findByHash(transactionHash.get());
+			Transfer tx = transferDao.findByHash(transactionHash.getRaw());
 			if (tx != null) {
 				return false;
 			}

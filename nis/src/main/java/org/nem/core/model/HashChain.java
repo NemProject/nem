@@ -11,7 +11,7 @@ import java.util.List;
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
  */
 public class HashChain implements SerializableEntity {
-	private List<ByteArray> hashChainList;
+	private List<Hash> hashChainList;
 
 	/**
 	 * Creates new empty HashChain with specified capacity.
@@ -40,7 +40,7 @@ public class HashChain implements SerializableEntity {
 	 * @param deserializer The deserializer to use.
 	 */
 	public HashChain(Deserializer deserializer) {
-		hashChainList = deserializer.readObjectArray("data", ByteArrayFactory.deserializer);
+		hashChainList = deserializer.readObjectArray("data", Hash.DESERIALIZER);
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class HashChain implements SerializableEntity {
 	 *
 	 * @param bytes hash
 	 */
-	public void add(byte[] bytes) {
-		hashChainList.add(new ByteArray(bytes));
+	public final void add(byte[] bytes) {
+		hashChainList.add(new Hash(bytes));
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class HashChain implements SerializableEntity {
 		return hashChainList.size();
 	}
 
-	private ByteArray get(int i) {
+	private Hash get(int i) {
 		return this.hashChainList.get(i);
 	}
 

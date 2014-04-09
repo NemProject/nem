@@ -1,7 +1,6 @@
 package org.nem.peer.test;
 
 import org.nem.core.model.Block;
-import org.nem.core.model.ByteArray;
 import org.nem.core.model.HashChain;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
