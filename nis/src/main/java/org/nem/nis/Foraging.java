@@ -102,7 +102,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			}
 		}
 
-		return this.addUnconfirmedTransaction(transaction);
+		return this.addUnconfirmedTransactionWithoutDbCheck(transaction);
 	}
 
 	/**
@@ -186,6 +186,9 @@ public class Foraging implements AutoCloseable, Runnable {
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		synchronized (blockChain) {
 			org.nem.nis.dbmodel.Block lastBlock = blockChain.getLastDbBlock();
+			BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
+			System.out.println("   hit: 0x" + hit.toString(16));
+
 			for (Account forger : unlockedAccounts) {
 				Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
 				if (!transactionList.isEmpty()) {
@@ -204,11 +207,9 @@ public class Foraging implements AutoCloseable, Runnable {
 					continue;
 				}
 
-				BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
 				long effectiveBalance = realAccout.getBalance().getNumNem();
 				BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
 
-				System.out.println("   hit: 0x" + hit.toString(16));
 				System.out.println("target: 0x" + target.toString(16));
 
 				if (hit.compareTo(target) < 0) {
