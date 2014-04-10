@@ -48,6 +48,8 @@ public class BlockChain implements BlockSynchronizer {
 	// for now it's easier to keep it like this
 	private org.nem.nis.dbmodel.Block lastBlock;
 
+	private final BlockScorer scorer = new BlockScorer();
+
 	public BlockChain() {
 	}
 
@@ -126,25 +128,10 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private boolean validateBlock(Block block, Block parentBlock, AccountAnalyzer contemporaryAccountAnalyzer) {
-		if (block.getTimeStamp().compareTo(parentBlock.getTimeStamp()) < 0) {
-			return false;
-		}
-
 		Account forgerAccount = contemporaryAccountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
-			return false;
-		}
-
-		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parentBlock.getSignature().getBytes(), 2, 10));
-		TimeInstant blockTimeStamp = block.getTimeStamp();
-		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = Foraging.calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
-
-		if (hit.compareTo(target) >= 0) {
-			return false;
-		}
-
-		return true;
+		final BigInteger hit = this.scorer.calculateHit(parentBlock);
+		final BigInteger target = this.scorer.calculateTarget(parentBlock, block, forgerAccount);
+		return hit.compareTo(target) < 0;
 	}
 
 	private void penalize(Node node) {
@@ -400,12 +387,6 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
-
-		if (block.getTimeStamp().compareTo(parentTimeStamp) < 0) {
-			return false;
-		}
-
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
 			org.nem.nis.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
@@ -427,15 +408,9 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
-			return false;
-		}
-
-		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
-		TimeInstant blockTimeStamp = block.getTimeStamp();
-		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = Foraging.calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
+		final Block parentBlock = BlockMapper.toModel(parent, accountAnalyzer);
+		final BigInteger hit = this.scorer.calculateHit(parentBlock);
+		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;
