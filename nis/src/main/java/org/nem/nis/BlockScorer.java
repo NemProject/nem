@@ -13,6 +13,9 @@ import java.util.Arrays;
  */
 public class BlockScorer {
 
+	/**
+	 * 500_000_000 NEMs have force to generate block every minute.
+	 */
 	public static final long MAGIC_MULTIPLIER = 614891469L;
 
 	/**
