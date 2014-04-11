@@ -30,8 +30,7 @@ public class BlockChainValidator {
 	}
 
 	/**
-	 * Determines if blocks is a valid block chain given the parent block and
-	 * common block height.
+	 * Determines if blocks is a valid block chain given blocks and parentBlock.
 	 *
 	 * @param parentBlock The parent block.
 	 * @param blocks The block chain.
@@ -56,6 +55,39 @@ public class BlockChainValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Computes partial score given blocks and parentBlock.
+	 *
+	 * @param parentBlock The parent block.
+	 * @param blocks The block chain.
+	 *
+	 * @return "partial score" of blocks.
+	 */
+	long computePartialScore(Block parentBlock, final Collection<Block> blocks) {
+		long peersScore = 0L;
+
+		// used to distinguish first element, to calculate:
+		// 2*x_0 + x_1 + x_2 + ...
+		boolean isFirst = true;
+		for (final Block block : blocks) {
+			long score = scorer.calculateBlockScore(
+					HashUtils.calculateHash(parentBlock),
+					block.getSigner().getKeyPair().getPublicKey()
+			);
+
+			peersScore += score;
+
+			if (isFirst) {
+				peersScore += score;
+				isFirst = false;
+			}
+
+			parentBlock = block;
+		}
+
+		return peersScore;
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {

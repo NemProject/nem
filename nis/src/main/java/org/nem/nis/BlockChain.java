@@ -309,6 +309,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+		long ourScore = 0L;
 		if (synchronizeContext.hasOwnChain) {
 			// not to waste our time, first try to get first block that differs
 			final Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
@@ -328,7 +329,7 @@ public class BlockChain implements BlockSynchronizer {
 					}
 			});
 
-			chainScore.getScore();
+			ourScore = chainScore.getScore();
 		}
 		//endregion
 
@@ -345,6 +346,8 @@ public class BlockChain implements BlockSynchronizer {
 			penalize(node);
 			return;
 		}
+
+		long peerScore = validator.computePartialScore(parentBlock, peerChain);
 
 		for (final Block block : peerChain) {
 			Balance.apply(contemporaryAccountAnalyzer, block);
