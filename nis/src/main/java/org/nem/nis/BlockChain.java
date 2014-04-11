@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.nem.core.crypto.PublicKey;
 import org.nem.nis.balances.Balance;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -23,9 +24,9 @@ public class BlockChain implements BlockSynchronizer {
 
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
-    public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
+	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
 
-    public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
+	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -153,12 +154,43 @@ public class BlockChain implements BlockSynchronizer {
 		return peerLastBlock;
 	}
 
-	private void revertChain(final long wantedHeight, final AccountAnalyzer contemporaryAccountAnalyzer) {
+	interface DbBlockVisitor {
+		public void visit(org.nem.nis.dbmodel.Block dbBlock);
+	};
+
+	class PartialWeightedScoreReversedCalculator implements DbBlockVisitor {
+		private final BlockScorer blockScorer;
+		private long lastScore;
+		private long partialScore;
+
+		public PartialWeightedScoreReversedCalculator(BlockScorer scorer) {
+			blockScorer = scorer;
+			lastScore = 0L;
+			partialScore = 0L;
+		}
+
+		// visit should be called at most 1440 times, every score fits in 32-bits
+		// so long will be enough to keep partial score
+		@Override
+		public void visit(org.nem.nis.dbmodel.Block dbBlock) {
+			lastScore = blockScorer.calculateBlockScore(dbBlock.getPrevBlockHash(), dbBlock.getForger().getPublicKey());
+			partialScore += lastScore;
+		}
+
+		public long getScore() {
+			// equal to 2*x_0 + x_1 + x_2 + ...
+			return partialScore + lastScore;
+		}
+	}
+
+	private void reverseChainIterator(final long wantedHeight, final DbBlockVisitor[] dbBlockVisitors) {
 		long currentHeight = getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
-			Balance.unapply(contemporaryAccountAnalyzer, block);
+			for (DbBlockVisitor dbBlockVisitor : dbBlockVisitors) {
+				dbBlockVisitor.visit(block);
+			}
 			currentHeight--;
 		}
 	}
@@ -285,7 +317,18 @@ public class BlockChain implements BlockSynchronizer {
 				return;
 			}
 
-			revertChain(commonBlockHeight, contemporaryAccountAnalyzer);
+			PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
+			reverseChainIterator(commonBlockHeight, new DbBlockVisitor[]{
+					chainScore,
+					new DbBlockVisitor() {
+						@Override
+						public void visit(org.nem.nis.dbmodel.Block dbBlock) {
+							Balance.unapply(contemporaryAccountAnalyzer, dbBlock);
+						}
+					}
+			});
+
+			chainScore.getScore();
 		}
 		//endregion
 
