@@ -25,7 +25,6 @@ public class BlockChainTest {
 	private static org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
 
-	@Ignore
 	@Test
 	public void analyzeSavesResults() {
 		// Arrange:
