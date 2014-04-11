@@ -7,7 +7,6 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
@@ -21,9 +20,7 @@ import java.util.logging.Logger;
 
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
-	// 500_000_000 nems have force to generate block every minute
-	public static final long MAGIC_MULTIPLIER = 614891469L;
-	//
+
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
     public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
@@ -47,6 +44,8 @@ public class BlockChain implements BlockSynchronizer {
 
 	// for now it's easier to keep it like this
 	private org.nem.nis.dbmodel.Block lastBlock;
+
+	private final BlockScorer scorer = new BlockScorer();
 
 	public BlockChain() {
 	}
@@ -123,28 +122,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		return false;
-	}
-
-	private boolean validateBlock(Block block, Block parentBlock, AccountAnalyzer contemporaryAccountAnalyzer) {
-		if (block.getTimeStamp().compareTo(parentBlock.getTimeStamp()) < 0) {
-			return false;
-		}
-
-		Account forgerAccount = contemporaryAccountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
-			return false;
-		}
-
-		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parentBlock.getSignature().getBytes(), 2, 10));
-		TimeInstant blockTimeStamp = block.getTimeStamp();
-		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = Foraging.calculateTarget(parentBlock.getTimeStamp(), blockTimeStamp, forgerEffectiveBallance);
-
-		if (hit.compareTo(target) >= 0) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private void penalize(Node node) {
@@ -314,42 +291,22 @@ public class BlockChain implements BlockSynchronizer {
 
 
 		//region verify peer's chain
-		org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
-		List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
+		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		if (peerChain.size() > BLOCKS_LIMIT) {
+		// do not trust peer, take first block from our db and convert it
+		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+
+		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT, contemporaryAccountAnalyzer);
+		if (!validator.isValid(parentBlock, peerChain)) {
 			penalize(node);
 			return;
 		}
 
-		// do not trust peer, take first block from our db and convert it
-		Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-
-		long wantedHeight = commonBlockHeight + 1;
-		for (Block block : peerChain) {
-			if (block.getHeight() != wantedHeight ||
-					!block.verify() ||
-					!validateBlock(block, parentBlock, contemporaryAccountAnalyzer)) {
-				penalize(node);
-				return;
-			}
-
-			for (Transaction transaction : block.getTransactions()) {
-				if (!transaction.isValid()) {
-					penalize(node);
-					return;
-				}
-				if (!transaction.verify()) {
-					penalize(node);
-					return;
-				}
-			}
-
+		for (final Block block : peerChain) {
 			Balance.apply(contemporaryAccountAnalyzer, block);
-
-			parentBlock = block;
-			wantedHeight += 1;
 		}
+
 		//endregion
 
 		//region update our chain
@@ -400,12 +357,6 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		final TimeInstant parentTimeStamp = new TimeInstant(parent.getTimestamp());
-
-		if (block.getTimeStamp().compareTo(parentTimeStamp) < 0) {
-			return false;
-		}
-
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
 			org.nem.nis.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
@@ -427,15 +378,9 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		Account forgerAccount = accountAnalyzer.findByAddress(block.getSigner().getAddress());
-		if (forgerAccount.getBalance().compareTo(Amount.ZERO) < 1) {
-			return false;
-		}
-
-		BigInteger hit = new BigInteger(1, Arrays.copyOfRange(parent.getForgerProof(), 2, 10));
-		TimeInstant blockTimeStamp = block.getTimeStamp();
-		long forgerEffectiveBallance = forgerAccount.getBalance().getNumNem();
-		BigInteger target = Foraging.calculateTarget(parentTimeStamp, blockTimeStamp, forgerEffectiveBallance);
+		final Block parentBlock = BlockMapper.toModel(parent, accountAnalyzer);
+		final BigInteger hit = this.scorer.calculateHit(parentBlock);
+		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
 
 		if (hit.compareTo(target) >= 0) {
 			return false;

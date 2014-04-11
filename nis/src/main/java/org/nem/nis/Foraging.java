@@ -5,15 +5,13 @@ import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
+import org.nem.nis.mappers.BlockMapper;
 import org.nem.peer.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -30,7 +28,6 @@ import java.util.logging.Logger;
 //
 public class Foraging implements AutoCloseable, Runnable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
-	public static final long MAGIC_MULTIPLIER = 614891469L;
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 
@@ -139,37 +136,6 @@ public class Foraging implements AutoCloseable, Runnable {
 		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
 	}
 
-	/**
-	 * Calculates "target" basing on the inputs
-	 *
-	 * @param parentTimeStamp         timestamp of parent block
-	 * @param blockTimeStamp          timestamp or current block
-	 * @param forgerEffectiveBallance - effective balance used to forage
-	 *
-	 * @return The target.
-	 */
-	public static BigInteger calculateTarget(TimeInstant parentTimeStamp, TimeInstant blockTimeStamp, long forgerEffectiveBallance) {
-		return BigInteger.valueOf(blockTimeStamp.subtract(parentTimeStamp)).multiply(
-				BigInteger.valueOf(forgerEffectiveBallance).multiply(
-						BigInteger.valueOf(MAGIC_MULTIPLIER)
-				)
-		);
-	}
-
-	/**
-	 * Calculates how "good" given block is.
-	 *
-	 * @param block
-	 *
-	 * @return score of a block.
-	 */
-	private long calcBlockScore(Block block) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block).getRaw(), 10, 14)));
-
-		return r1 + r2;
-	}
-
 	@Override
 	public void run() {
 		if (blockChain.getLastDbBlock() == null) {
@@ -184,13 +150,19 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
+		final BlockScorer scorer = new BlockScorer();
 		synchronized (blockChain) {
-			org.nem.nis.dbmodel.Block lastBlock = blockChain.getLastDbBlock();
-			BigInteger hit = new BigInteger(1, Arrays.copyOfRange(lastBlock.getForgerProof(), 2, 10));
+			final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
+			final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
+			final BigInteger hit = scorer.calculateHit(lastBlock);
 			System.out.println("   hit: 0x" + hit.toString(16));
 
-			for (Account forger : unlockedAccounts) {
-				Block newBlock = new Block(forger, lastBlock.getBlockHash(), blockTime, lastBlock.getHeight() + 1);
+			for (Account virtualForger : unlockedAccounts) {
+
+				// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
+				final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
+
+				final Block newBlock = new Block(forger, lastBlock, blockTime);
 				if (!transactionList.isEmpty()) {
 					newBlock.addTransactions(transactionList);
 				}
@@ -199,23 +171,13 @@ public class Foraging implements AutoCloseable, Runnable {
 
 				LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
-				// dummy forging rule
-
-				// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-				Account realAccout = accountAnalyzer.findByAddress(forger.getAddress());
-				if (realAccout.getBalance().compareTo(Amount.ZERO) < 1) {
-					continue;
-				}
-
-				long effectiveBalance = realAccout.getBalance().getNumNem();
-				BigInteger target = calculateTarget(new TimeInstant(lastBlock.getTimestamp()), newBlock.getTimeStamp(), effectiveBalance);
-
+				final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
 				System.out.println("target: 0x" + target.toString(16));
 
 				if (hit.compareTo(target) < 0) {
 					System.out.println(" HIT ");
 
-					long score = calcBlockScore(newBlock);
+					final long score = scorer.calculateBlockScore(newBlock);
 					if (score < bestScore) {
 						bestBlock = newBlock;
 						bestScore = score;
