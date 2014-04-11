@@ -1,8 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
-import org.nem.core.model.HashUtils;
+import org.nem.core.model.*;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.dao.BlockDao;
 import org.nem.peer.Node;
@@ -10,6 +8,9 @@ import org.nem.peer.SyncConnector;
 
 import java.util.Arrays;
 
+/**
+ * Helper class for synchronizing a block chain.
+ */
 public class BlockSync {
 
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
@@ -28,7 +29,7 @@ public class BlockSync {
 		this.scorer = scorer;
 	}
 
-	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
+	private boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
 		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
 			if (HashUtils.calculateHash(peerLastBlock).equals(dbBlock.getBlockHash())) {
 				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
@@ -118,7 +119,7 @@ public class BlockSync {
 	 * @param commonHeight height at which we do comparison
 	 * @return true in peer's block has better score, false otherwise
 	 */
-	public boolean sychronizeCompareAt(Node node, Block peerBlock, long commonHeight) {
+	private boolean sychronizeCompareAt(Node node, Block peerBlock, long commonHeight) {
 		if (!peerBlock.verify()) {
 //			penalize(node);
 			return false;
@@ -134,11 +135,7 @@ public class BlockSync {
 
 		long peerScore = this.scorer.calculateBlockScore(commonBlock.getBlockHash(), peerBlock.getSigner().getKeyPair().getPublicKey());
 		long ourScore = this.scorer.calculateBlockScore(commonBlock.getBlockHash(), ourBlock.getForger().getPublicKey());
-		if (peerScore < ourScore) {
-			return true;
-		}
-
-		return false;
+		return peerScore < ourScore;
 	}
 
 	public SynchronizeContext synchronize(final SyncConnector connector, final Node node) {
