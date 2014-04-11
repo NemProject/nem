@@ -1,7 +1,9 @@
 package org.nem.nis;
 
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.model.Hash;
 import org.nem.core.model.HashUtils;
 import org.nem.core.utils.ByteUtils;
 
@@ -32,7 +34,7 @@ public class BlockScorer {
 	 * Calculates the target score for block given the previous block.
 	 *
 	 * @param prevBlock The previous block.
- 	 * @param block The block.
+	 * @param block The block.
 	 * @return The target score.
 	 */
 	BigInteger calculateTarget(final Block prevBlock, final Block block) {
@@ -61,12 +63,18 @@ public class BlockScorer {
 	/**
 	 * Calculates the block score for block.
 	 *
-	 * @param block The block.
+	 * @param parentBlockHash previous (parent block hash)
+	 * @param thisBlockSigner signer of block
+	 *
 	 * @return The block score.
+	 *
+	 * TODO: this api could take dbBlock, but this way we have one API for
+	 * both blocks and dbblocks.
 	 */
-	long calculateBlockScore(final Block block) {
-		long r1 = Math.abs(ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSignature().getBytes(), 10, 14)));
-		long r2 = Math.abs(ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block).getRaw(), 10, 14)));
+	long calculateBlockScore(final Hash parentBlockHash, final PublicKey thisBlockSigner) {
+		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(thisBlockSigner.getRaw(), 10, 14)));
+		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentBlockHash.getRaw(), 10, 14)));
+
 		return r1 + r2;
 	}
 }
