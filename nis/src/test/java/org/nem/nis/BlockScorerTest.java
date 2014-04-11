@@ -76,8 +76,8 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(101), 11);
+		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(101), 11);
+		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(1), 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
