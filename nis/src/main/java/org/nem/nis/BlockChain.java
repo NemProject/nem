@@ -1,6 +1,5 @@
 package org.nem.nis;
 
-import org.nem.core.crypto.PublicKey;
 import org.nem.nis.balances.Balance;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -10,8 +9,9 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.sync.BlockSync;
+import org.nem.nis.sync.SynchronizeContext;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,95 +63,14 @@ public class BlockChain implements BlockSynchronizer {
 		return lastBlock.getHeight();
 	}
 
-	private long calcDbBlockScore(Hash parentHash, org.nem.nis.dbmodel.Block block) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getForger().getPublicKey().getRaw(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash.getRaw(), 10, 14)));
-
-		return r1 + r2;
-	}
-
-	private long calcBlockScore(Hash parentHash, Block block) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(block.getSigner().getKeyPair().getPublicKey().getRaw(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentHash.getRaw(), 10, 14)));
-
-		return r1 + r2;
-	}
 
 	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		lastBlock = curBlock;
 	}
 
-
-	public boolean synchronizeCompareBlocks(Block peerLastBlock, org.nem.nis.dbmodel.Block dbBlock) {
-		if (peerLastBlock.getHeight() == dbBlock.getHeight()) {
-			if (HashUtils.calculateHash(peerLastBlock).equals(dbBlock.getBlockHash())) {
-				if (Arrays.equals(peerLastBlock.getSignature().getBytes(), dbBlock.getForgerProof())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Compares given peerBlock, with block from db at height.
-	 *
-	 * @param node current peer.
-	 * @param peerBlock block to compare
-	 * @param commonHeight height at which we do comparison
-	 * @return true in peer's block has better score, false otherwise
-	 */
-	public boolean sychronizeCompareAt(Node node, Block peerBlock, long commonHeight) {
-		if (!peerBlock.verify()) {
-			penalize(node);
-			return false;
-		}
-
-		org.nem.nis.dbmodel.Block commonBlock = blockDao.findByHeight(commonHeight);
-
-		org.nem.nis.dbmodel.Block ourBlock = blockDao.findByHeight(commonHeight + 1);
-
-		if (synchronizeCompareBlocks(peerBlock, ourBlock)) {
-			return false;
-		}
-
-		long peerScore = calcBlockScore(commonBlock.getBlockHash(), peerBlock);
-		long ourScore = calcDbBlockScore(commonBlock.getBlockHash(), ourBlock);
-		if (peerScore < ourScore) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private void penalize(Node node) {
 
-	}
-
-	/**
-	 * Retrieves last block from another peer and checks if it's different than ours.
-	 *
-	 * @param connector
-	 * @param node
-	 *
-	 * @return peer's last block or null
-	 */
-	private Block checkLastBlock(SyncConnector connector, Node node) {
-		Block peerLastBlock = connector.getLastBlock(node.getEndpoint());
-		if (peerLastBlock == null) {
-			return null;
-		}
-
-		if (this.synchronizeCompareBlocks(peerLastBlock, lastBlock)) {
-			return null;
-		}
-
-		if (! peerLastBlock.verify()) {
-			penalize(node);
-			return null;
-		}
-		return peerLastBlock;
 	}
 
 	interface DbBlockVisitor {
@@ -240,83 +159,15 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private Block synchronize1CompareLastBlock(final SyncConnector connector, final Node node) {
-		//region compare last block
-		final Block peerLastBlock = checkLastBlock(connector, node);
-		if (peerLastBlock == null) {
-			return null;
-		}
-		final long val = peerLastBlock.getHeight() - this.getLastBlockHeight();
-
-		/* if node is far behind, reject it, not to allow too deep
-		   rewrites of blockchain... */
-		if (val <= -REWRITE_LIMIT) {
-			return null;
-		}
-
-		return peerLastBlock;
-		//endregion
-	}
-
-	class SynchronizeContext {
-		public long commonBlockHeight;
-		public boolean hasOwnChain;
-
-		SynchronizeContext(long commonBlockHeight, boolean hasOwnChain) {
-			this.commonBlockHeight = commonBlockHeight;
-			this.hasOwnChain = hasOwnChain;
-		}
-	}
-
-	private SynchronizeContext synchronize2FindCommonBlock(SyncConnector connector, Node node) {
-		//region compare hash chains
-		final long startingPoint = Math.max(1, this.getLastBlockHeight() - REWRITE_LIMIT);
-		final HashChain peerHashes = connector.getHashesFrom(node.getEndpoint(), startingPoint);
-		if (peerHashes.size() > BLOCKS_LIMIT) {
-			penalize(node);
-			return null;
-		}
-
-		final HashChain ourHashes = new HashChain(blockDao.getHashesFrom(startingPoint, BLOCKS_LIMIT));
-		int i = ourHashes.findFirstDifferent(peerHashes);
-
-		// at least first compared block should be the same, if not, he's a lier or on a fork
-		if (i == 0) {
-			penalize(node);
-			return null;
-		}
-
-		// nothing to do, we have all of peers blocks
-		if (i == peerHashes.size()) {
-			return null;
-		}
-		SynchronizeContext synchronizeContext = new SynchronizeContext(startingPoint + i - 1,  ourHashes.size() > i);
-		return synchronizeContext;
-		//endregion
-	}
-
 	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
-		Block peerLastBlock = synchronize1CompareLastBlock(connector, node);
-		if (peerLastBlock == null) {
-			return;
-		}
-
-		SynchronizeContext synchronizeContext = synchronize2FindCommonBlock(connector, node);
-		if (synchronizeContext == null) {
-			return;
-		}
+		final BlockSync sync = new BlockSync(this.lastBlock, this.blockDao, this.scorer);
+		final SynchronizeContext synchronizeContext = sync.synchronize(connector, node);
 		final long commonBlockHeight = synchronizeContext.commonBlockHeight;
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		long ourScore = 0L;
 		if (synchronizeContext.hasOwnChain) {
-			// not to waste our time, first try to get first block that differs
-			final Block differBlock = connector.getBlockAt(node.getEndpoint(), commonBlockHeight + 1);
-
-			if (! this.sychronizeCompareAt(node, differBlock, commonBlockHeight)) {
-				return;
-			}
 
 			PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
 			reverseChainIterator(commonBlockHeight, new DbBlockVisitor[]{
