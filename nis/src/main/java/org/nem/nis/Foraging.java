@@ -38,18 +38,20 @@ public class Foraging implements AutoCloseable, Runnable {
 	@Autowired
 	private NisPeerNetworkHost host;
 
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-	@Autowired
 	private BlockChain blockChain;
 
 	private TransferDao transferDao;
 
 	@Autowired
-	public void setTransferDao(TransferDao transferDao) {
-		this.transferDao = transferDao;
-	}
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
+
+	@Autowired
+	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
 
 	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
@@ -161,14 +163,7 @@ public class Foraging implements AutoCloseable, Runnable {
 				for (Account virtualForger : unlockedAccounts) {
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
-
-					final Block newBlock = new Block(forger, lastBlock, blockTime);
-					if (!transactionList.isEmpty()) {
-						newBlock.addTransactions(transactionList);
-					}
-
-					newBlock.signBy(virtualForger);
+					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger);
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
@@ -196,6 +191,18 @@ public class Foraging implements AutoCloseable, Runnable {
 		if (bestBlock != null) {
 			addForagedBlock(bestBlock);
 		}
+	}
+
+	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger) {
+		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
+
+		final Block newBlock = new Block(forger, lastBlock, blockTime);
+		if (!transactionList.isEmpty()) {
+			newBlock.addTransactions(transactionList);
+		}
+
+		newBlock.signBy(virtualForger);
+		return newBlock;
 	}
 
 	private void addForagedBlock(Block bestBlock) {

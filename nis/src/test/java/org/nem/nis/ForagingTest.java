@@ -1,16 +1,19 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
+import org.nem.nis.test.MockAccountAnalyzer;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ForagingTest {
@@ -173,7 +176,38 @@ public class ForagingTest {
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
 
+	@Test
+	public void canSignBlock() {
+		// Arrange:
+		final MockForaging foraging = new MockForaging();
+		final MockAccountAnalyzer mockAccountAnalyzer = new MockAccountAnalyzer();
+		final Account account = Utils.generateRandomAccount();
+		mockAccountAnalyzer.initializeGenesisAccount(account);
+		final Account accountWithoutSecret = mockAccountAnalyzer.findByNemAddress(account);
+		accountWithoutSecret.incrementBalance(Amount.fromNem(100));
+
+		final Account signer = createAccountWithBalance(100);
+		final TimeInstant parentTime = new TimeInstant(0);
+		final Block parent = new Block(signer, new Hash(new byte[32]), parentTime, 1);
+		parent.sign();
+
+		// Act:
+		foraging.setAccountAnalyzer(mockAccountAnalyzer);
+		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account);
+
+		// Assert:
+		Assert.assertThat(accountWithoutSecret.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(accountWithoutSecret));
+	}
+
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
 		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), SENDER, recipient, new Amount(amount), null);
+	}
+
+	private static Account createAccountWithBalance(long balance) {
+		final Account account = Utils.generateRandomAccount();
+		account.incrementBalance(Amount.fromNem(balance));
+		return account;
 	}
 }
