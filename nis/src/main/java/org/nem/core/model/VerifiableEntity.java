@@ -167,21 +167,13 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * Signs this entity with the owner's private key.
 	 */
 	public void sign() {
-		if (!this.signer.getKeyPair().hasPrivateKey())
-			throw new InvalidParameterException("cannot sign because signer does not have private key");
-
-		// (1) serialize the entire transaction to a buffer
-		byte[] transactionBytes = this.getBytes();
-
-		// (2) sign the buffer
-		Signer signer = new Signer(this.signer.getKeyPair());
-		this.signature = signer.sign(transactionBytes);
+		this.signBy(this.signer);
 	}
 
 	/**
 	 * Signs this entity using private key of specified account.
 	 */
-	public void signBy(Account account) {
+	public void signBy(final Account account) {
 		if (!account.getKeyPair().hasPrivateKey())
 			throw new InvalidParameterException("cannot sign because signer does not have private key");
 
