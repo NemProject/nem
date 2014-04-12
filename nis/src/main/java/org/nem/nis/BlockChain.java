@@ -158,8 +158,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
-		final ComparisonContext context = new ComparisonContext(BLOCKS_LIMIT, REWRITE_LIMIT, this.scorer);
+	private ComparisonResult compareChains(final SyncConnector connector, final Node node) {		final ComparisonContext context = new ComparisonContext(BLOCKS_LIMIT, REWRITE_LIMIT, this.scorer);
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
@@ -169,10 +168,15 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (0 != (ComparisonResult.Code.REMOTE_IS_EVIL & result.getCode())) {
 			this.penalize(node);
-			return;
 		}
 
-		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode()) {
+		return result;
+	}
+
+	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+		final ComparisonResult result = compareChains(connector, node);
+
+		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return;
 		}
 
