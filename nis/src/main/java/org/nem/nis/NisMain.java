@@ -45,7 +45,7 @@ public class NisMain {
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
 		if (null == dbBlock) {
-			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the dba and rerun");
+			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}
 
@@ -60,7 +60,15 @@ public class NisMain {
 				this.blockChain.analyzeLastBlock(dbBlock);
 				break;
 			}
-		} while ((dbBlock = this.blockDao.findById(curBlockId)) != null);
+
+			dbBlock = this.blockDao.findById(curBlockId);
+			if (dbBlock == null) {
+				if (this.blockChain.getLastDbBlock() == null) {
+					LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
+					System.exit(-1);
+				}
+			}
+		} while (dbBlock != null);
 	}
 
 	@PostConstruct

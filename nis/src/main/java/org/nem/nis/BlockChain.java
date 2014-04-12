@@ -406,6 +406,8 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
+		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
+
 		if (peerScore < ourScore) {
 			// we could get peer's score upfront, if it mismatches with
 			// what we calculated, we could penalize peer.
