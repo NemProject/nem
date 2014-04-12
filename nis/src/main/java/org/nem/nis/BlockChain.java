@@ -10,8 +10,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.TransferMapper;
-import org.nem.nis.sync.BlockSync;
-import org.nem.nis.sync.SynchronizeContext;
+import org.nem.nis.sync.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -160,14 +159,29 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
-		final BlockSync sync = new BlockSync(this.lastBlock, this.blockDao, this.scorer);
-		final SynchronizeContext synchronizeContext = sync.synchronize(connector, node);
-		final long commonBlockHeight = synchronizeContext.commonBlockHeight;
+		final ComparisonContext context = new ComparisonContext(BLOCKS_LIMIT, REWRITE_LIMIT, this.scorer);
+		final BlockChainComparer comparer = new BlockChainComparer(context);
+
+		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
+		final BlockLookup localLookup = new LocalBlockLookupAdapter(this.blockDao, this.accountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
+
+		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
+
+		if (0 != (ComparisonResult.Code.REMOTE_IS_EVIL & result.getCode())) {
+			this.penalize(node);
+			return;
+		}
+
+		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode()) {
+			return;
+		}
+
+		final long commonBlockHeight = result.getCommonBlockHeight();
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		long ourScore = 0L;
-		if (synchronizeContext.hasOwnChain) {
+		if (!result.areChainsConsistent()) {
 
 			PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
 			reverseChainIterator(commonBlockHeight, new DbBlockVisitor[]{
@@ -209,7 +223,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region update our chain
 		accountAnalyzer.replace(contemporaryAccountAnalyzer);
 
-		if (synchronizeContext.hasOwnChain) {
+		if (!result.areChainsConsistent()) {
 			// mind that we're using "new" (replaced) accountAnalyzer
 			addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
 		}

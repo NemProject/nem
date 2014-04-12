@@ -30,7 +30,7 @@ public class BlockChainComparer {
 	 * @param remoteLookup The remote block chain.
 	 * @return The comparison result.
 	 */
-	public int compare(final BlockLookup localLookup, final BlockLookup remoteLookup) {
+	public ComparisonResult compare(final BlockLookup localLookup, final BlockLookup remoteLookup) {
 		final Impl impl = new Impl(this.context, localLookup, remoteLookup);
 		return impl.compare();
 	}
@@ -51,6 +51,9 @@ public class BlockChainComparer {
 		private final Block localLastBlock;
 		private final Block remoteLastBlock;
 
+		private long commonBlockIndex;
+		private boolean areChainsConsistent;
+
 		public Impl(final ComparisonContext context, final BlockLookup localLookup, final BlockLookup remoteLookup) {
 			this.context = context;
 			this.localLookup = localLookup;
@@ -63,12 +66,12 @@ public class BlockChainComparer {
 			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 		}
 
-		public int compare() {
-			int result = this.compareLastBlock();
-			if (ComparisonResult.UNKNOWN != result)
-				return result;
+		public ComparisonResult compare() {
+			int code = this.compareLastBlock();
+			if (ComparisonResult.Code.UNKNOWN == code)
+				code = this.compareHashes();
 
-			return this.compareHashes();
+			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent);
 
 			// TODO: return common block index
 			// TODO: resume tests here
@@ -93,40 +96,42 @@ public class BlockChainComparer {
 		}
 
 		private int compareHashes() {
-			final long startingPoint = Math.max(1, this.localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
-			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingPoint);
+			final long startingBlockHeight = Math.max(1, this.localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
+			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
 			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) // TODO: not sure if we should just used getMaxNumBlocksToRewrite too
-				return ComparisonResult.REMOTE_RETURNED_TOO_MANY_HASHES;
+				return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
 
-			final HashChain localHashes = this.localLookup.getHashesFrom(startingPoint);
+			final HashChain localHashes = this.localLookup.getHashesFrom(startingBlockHeight);
 			int firstDifferenceIndex = localHashes.findFirstDifferent(remoteHashes);
 			if (0 == firstDifferenceIndex) {
 				// at least first compared block should be the same, if not, the remote is a liar or on a fork
-				return ComparisonResult.REMOTE_RETURNED_INVALID_HASHES;
+				return ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES;
 			}
 
 			if (remoteHashes.size() == firstDifferenceIndex) {
 				// nothing to do, we have all of peers blocks
-				return ComparisonResult.REMOTE_IS_SYNCED;
+				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 			}
 
-			return ComparisonResult.REMOTE_IS_NOT_SYNCED;
+			this.commonBlockIndex = startingBlockHeight + firstDifferenceIndex - 1;
+			this.areChainsConsistent = firstDifferenceIndex == localHashes.size();
+			return ComparisonResult.Code.REMOTE_IS_NOT_SYNCED;
 		}
 
 		private int compareLastBlock() {
 			if (null == this.remoteLastBlock)
-				return ComparisonResult.REMOTE_HAS_NO_BLOCKS;
+				return ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS;
 
 			if (!remoteLastBlock.verify())
-				return ComparisonResult.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
+				return ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 
 			if (areBlocksEqual(localLastBlock, remoteLastBlock))
-				return ComparisonResult.REMOTE_IS_SYNCED;
+				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 
 			if (this.isRemoteTooFarBehind())
-				return ComparisonResult.REMOTE_IS_TOO_FAR_BEHIND;
+				return ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND;
 
-			return ComparisonResult.UNKNOWN;
+			return ComparisonResult.Code.UNKNOWN;
 		}
 
 		// TODO: I'm not sure if this makes sense anymore since it is only comparing the score for the current block but not the chain
