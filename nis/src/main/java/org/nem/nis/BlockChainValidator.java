@@ -36,7 +36,7 @@ public class BlockChainValidator {
 	 * @param blocks The block chain.
 	 * @return true if the blocks are valid.
 	 */
-	boolean isValid(Block parentBlock, final Collection<Block> blocks) {
+	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
 		if (blocks.size() > this.maxChainSize)
 			return false;
 
@@ -59,6 +59,7 @@ public class BlockChainValidator {
 
 	/**
 	 * Computes partial score given blocks and parentBlock.
+	 * TODO: move this and add tests for it
 	 *
 	 * @param parentBlock The parent block.
 	 * @param blocks The block chain.
