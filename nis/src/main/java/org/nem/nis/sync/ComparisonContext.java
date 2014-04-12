@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.nis.BlockScorer;
+import java.security.InvalidParameterException;
 
 /**
  * Provides contextual information that informs block chain comparisons.
@@ -9,19 +9,20 @@ public class ComparisonContext {
 
 	private final int maxNumBlocksToAnalyze;
 	private final int maxNumBlocksToRewrite;
-	private final BlockScorer scorer;
 
 	/**
 	 * Creates a new comparison context.
 	 *
 	 * @param maxNumBlocksToAnalyze The maximum number of blocks to rewrite.
 	 * @param maxNumBlocksToRewrite The maximum number of blocks to analyze.
-	 * @param scorer The block scorer.
 	 */
-	public ComparisonContext(int maxNumBlocksToAnalyze, int maxNumBlocksToRewrite, final BlockScorer scorer) {
+	public ComparisonContext(int maxNumBlocksToAnalyze, int maxNumBlocksToRewrite) {
 		this.maxNumBlocksToAnalyze = maxNumBlocksToAnalyze;
 		this.maxNumBlocksToRewrite = maxNumBlocksToRewrite;
-		this.scorer = scorer;
+
+		if (maxNumBlocksToAnalyze <= maxNumBlocksToRewrite) {
+			throw new InvalidParameterException("maxNumBlocksToAnalyze must be greater than maxNumBlocksToRewrite");
+		}
 	}
 
 	/**
@@ -40,14 +41,5 @@ public class ComparisonContext {
 	 */
 	public int getMaxNumBlocksToRewrite() {
 		return this.maxNumBlocksToRewrite;
-	}
-
-	/**
-	 * Gets the block scorer to use.
-	 *
-	 * @return The block scorer to use.
-	 */
-	public BlockScorer getBlockScorer() {
-		return this.scorer;
 	}
 }

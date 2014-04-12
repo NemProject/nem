@@ -6,9 +6,9 @@ import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.MockBlockScorer;
 
 import java.security.InvalidParameterException;
+import java.util.*;
 
 public class BlockChainComparerTest {
 
@@ -172,8 +172,7 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
-		final HashChain localChain = createHashChain(commonHashes);
-		localChain.add(Utils.generateRandomBytes(32));
+		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 		final HashChain remoteChain = createHashChain(commonHashes);
 
 		// Act:
@@ -192,8 +191,7 @@ public class BlockChainComparerTest {
 
 		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
 		final HashChain localChain = createHashChain(commonHashes);
-		final HashChain remoteChain = createHashChain(commonHashes);
-		remoteChain.add(Utils.generateRandomBytes(32));
+		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 
 		// Act:
 		final ComparisonResult result = comparer.compare(
@@ -207,20 +205,72 @@ public class BlockChainComparerTest {
 	}
 
 	@Test
-	public void remoteIsNotSyncedIfLocalIsSameSizeAsRemoteChainButContainsAtLeastOneDifferentHash() {
+	public void remoteHasNonVerifiableBlockIfFirstDifferentRemoteBlockIsNotVerifiable() {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer(5);
 
 		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
-		final HashChain localChain = createHashChain(commonHashes);
-		localChain.add(Utils.generateRandomBytes(32));
-		final HashChain remoteChain = createHashChain(commonHashes);
-		remoteChain.add(Utils.generateRandomBytes(32));
+		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
+				createVerifiableBlock(Utils.generateRandomAccount(), 8),
+				remoteChain);
+		remoteBlockLookup.addBlock(createNonVerifiableBlock(Utils.generateRandomAccount(), 5));
 
 		// Act:
 		final ComparisonResult result = comparer.compare(
 				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 8), localChain),
-				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 8), remoteChain));
+				remoteBlockLookup);
+
+		// Assert:
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
+	}
+
+	@Test
+	public void remoteIsNotSyncedIfFirstDifferentRemoteBlockIsVerifiable() {
+		// Arrange:
+		final BlockChainComparer comparer = createBlockChainComparer(5);
+
+		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
+				createVerifiableBlock(Utils.generateRandomAccount(), 8),
+				remoteChain);
+		remoteBlockLookup.addBlock(createVerifiableBlock(Utils.generateRandomAccount(), 5));
+
+		// Act:
+		final ComparisonResult result = comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 8), localChain),
+				remoteBlockLookup);
+
+		// Assert:
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void remoteIsNotSyncedIfSecondDifferentRemoteBlockIsNotVerifiable() {
+		// Arrange:
+		final BlockChainComparer comparer = createBlockChainComparer(5);
+
+		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
+
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
+				createVerifiableBlock(Utils.generateRandomAccount(), 8),
+				remoteChain);
+		remoteBlockLookup.addBlock(createVerifiableBlock(Utils.generateRandomAccount(), 5));
+		remoteBlockLookup.addBlock(createNonVerifiableBlock(Utils.generateRandomAccount(), 6));
+
+		// Act:
+		final ComparisonResult result = comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 8), localChain),
+				remoteBlockLookup);
 
 		// Assert:
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
@@ -230,11 +280,19 @@ public class BlockChainComparerTest {
 
 	//endregion
 
+	//region utils
+
 	private static HashChain createHashChain(byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
 		for (final byte[] hash : hashes)
 			chain.add(hash);
 
+		return chain;
+	}
+
+	private static HashChain createHashChain(byte[][] hashes, byte[] additionalHash) {
+		final HashChain chain = createHashChain(hashes);
+		chain.add(additionalHash);
 		return chain;
 	}
 
@@ -251,7 +309,7 @@ public class BlockChainComparerTest {
 	}
 
 	private static BlockChainComparer createBlockChainComparer(final int maxNumBlocksToRewrite) {
-		final ComparisonContext context = new ComparisonContext(20, maxNumBlocksToRewrite, new MockBlockScorer());
+		final ComparisonContext context = new ComparisonContext(20, maxNumBlocksToRewrite);
 		return new BlockChainComparer(context);
 	}
 
@@ -259,10 +317,15 @@ public class BlockChainComparerTest {
 		return createBlockChainComparer(10);
 	}
 
+	//endregion
+
+	//region MockBlockLookup
+
 	private static class MockBlockLookup implements BlockLookup {
 
 		private final Block lastBlock;
 		private final HashChain chain;
+		private final Map<Long, Block> heightToBlockMap = new HashMap<>();
 
 		public MockBlockLookup(final Block lastBlock) {
 			this(lastBlock, 1);
@@ -281,6 +344,10 @@ public class BlockChainComparerTest {
 			this.chain = hashChain;
 		}
 
+		public void addBlock(final Block block) {
+			this.heightToBlockMap.put(block.getHeight(), block);
+		}
+
 		@Override
 		public Block getLastBlock() {
 			return this.lastBlock;
@@ -288,7 +355,7 @@ public class BlockChainComparerTest {
 
 		@Override
 		public Block getBlockAt(long height) {
-			return null;
+			return this.heightToBlockMap.get(height);
 		}
 
 		@Override
@@ -296,4 +363,6 @@ public class BlockChainComparerTest {
 			return this.chain;
 		}
 	}
+
+	//endregion
 }

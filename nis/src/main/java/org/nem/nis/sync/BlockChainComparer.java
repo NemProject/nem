@@ -3,7 +3,6 @@ package org.nem.nis.sync;
 import org.nem.core.model.Block;
 import org.nem.core.model.HashChain;
 import org.nem.core.model.HashUtils;
-import org.nem.nis.BlockScorer;
 
 import java.security.InvalidParameterException;
 
@@ -71,13 +70,11 @@ public class BlockChainComparer {
 			if (ComparisonResult.Code.UNKNOWN == code)
 				code = this.compareHashes();
 
-
-			if (! this.areChainsConsistent) {
+			if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED == code && !this.areChainsConsistent) {
 				// not to waste our time, first try to get first block and verify it
 				// this is just to save time
-				final Block differBlock = this.remoteLookup.getBlockAt(this.commonBlockIndex + 1);
-
-				if (! differBlock.verify()) {
+				final Block firstDifferentRemoteBlock = this.remoteLookup.getBlockAt(this.commonBlockIndex + 1);
+				if (!firstDifferentRemoteBlock.verify()) {
 					code = ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 				}
 			}
@@ -93,7 +90,11 @@ public class BlockChainComparer {
 		private int compareHashes() {
 			final long startingBlockHeight = Math.max(1, this.localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
 			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
-			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) // TODO: not sure if we should just used getMaxNumBlocksToRewrite too
+
+			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node
+			// to sync properly with the network, the remote must be allowed to return at least rewriteLimit + 1 hashes
+			// (as an optimization, getMaxNumBlocksToAnalyze is used to allow faster syncing)
+			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze())
 				return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
 
 			final HashChain localHashes = this.localLookup.getHashesFrom(startingBlockHeight);
