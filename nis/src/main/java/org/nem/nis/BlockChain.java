@@ -214,6 +214,8 @@ public class BlockChain implements BlockSynchronizer {
 
 	private void dropDbBlocksAfter(long height) {
 		blockDao.deleteBlocksAfterHeight(height);
+
+		lastBlock = blockDao.findByHeight(height);
 	}
 
 	/**
