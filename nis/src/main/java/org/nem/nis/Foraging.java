@@ -168,7 +168,7 @@ public class Foraging implements AutoCloseable, Runnable {
 						newBlock.addTransactions(transactionList);
 					}
 
-					newBlock.sign();
+					newBlock.signBy(virtualForger);
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 

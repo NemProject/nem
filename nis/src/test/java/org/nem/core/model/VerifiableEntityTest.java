@@ -148,14 +148,21 @@ public class VerifiableEntityTest {
 	public void signCreatesValidSignature() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
+		final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
+		final MockVerifiableEntity entity = new MockVerifiableEntity(signerPublicKeyOnly);
 
 		// Act:
-		entity.sign();
+		entity.signBy(signer);
 
 		// Assert:
 		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void signByCreatesValidSignature() {
+		final Account signer = Utils.generateRandomAccount();
+		final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
 	}
 
 	@Test
