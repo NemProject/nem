@@ -151,41 +151,47 @@ public class Foraging implements AutoCloseable, Runnable {
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
-		synchronized (blockChain) {
-			final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
-			final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-			final BigInteger hit = scorer.calculateHit(lastBlock);
-			System.out.println("   hit: 0x" + hit.toString(16));
+		try {
+			synchronized (blockChain) {
+				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
+				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
+				final BigInteger hit = scorer.calculateHit(lastBlock);
+				System.out.println("   hit: 0x" + hit.toString(16));
 
-			for (Account virtualForger : unlockedAccounts) {
+				for (Account virtualForger : unlockedAccounts) {
 
-				// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-				final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
+					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
+					final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
 
-				final Block newBlock = new Block(forger, lastBlock, blockTime);
-				if (!transactionList.isEmpty()) {
-					newBlock.addTransactions(transactionList);
-				}
-
-				newBlock.sign();
-
-				LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
-
-				final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
-				System.out.println("target: 0x" + target.toString(16));
-
-				if (hit.compareTo(target) < 0) {
-					System.out.println(" HIT ");
-
-					final long score = scorer.calculateBlockScore(dbLastBlock.getBlockHash(), lastBlock.getSigner().getKeyPair().getPublicKey());
-					if (score < bestScore) {
-						bestBlock = newBlock;
-						bestScore = score;
+					final Block newBlock = new Block(forger, lastBlock, blockTime);
+					if (!transactionList.isEmpty()) {
+						newBlock.addTransactions(transactionList);
 					}
-				}
 
-			}
-		} // synchronized
+					newBlock.sign();
+
+					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
+
+					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
+					System.out.println("target: 0x" + target.toString(16));
+
+					if (hit.compareTo(target) < 0) {
+						System.out.println(" HIT ");
+
+						final long score = scorer.calculateBlockScore(dbLastBlock.getBlockHash(), lastBlock.getSigner().getKeyPair().getPublicKey());
+						if (score < bestScore) {
+							bestBlock = newBlock;
+							bestScore = score;
+						}
+					}
+
+				}
+			} // synchronized
+
+		} catch (RuntimeException e) {
+			LOGGER.warning("exception occured during generation of a block");
+			LOGGER.warning(e.toString());
+		}
 
 		if (bestBlock != null) {
 			addForagedBlock(bestBlock);
