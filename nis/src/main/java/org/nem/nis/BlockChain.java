@@ -362,14 +362,14 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region update our chain
-		accountAnalyzer.replace(contemporaryAccountAnalyzer);
-
-		if (synchronizeContext.hasOwnChain) {
-			// mind that we're using "new" (replaced) accountAnalyzer
-			addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
-		}
-
 		synchronized (this) {
+			accountAnalyzer.replace(contemporaryAccountAnalyzer);
+
+			if (synchronizeContext.hasOwnChain) {
+				// mind that we're using "new" (replaced) accountAnalyzer
+				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
+			}
+
 			dropDbBlocksAfter(commonBlockHeight);
 		}
 
