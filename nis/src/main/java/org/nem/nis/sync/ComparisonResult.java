@@ -82,16 +82,27 @@ public class ComparisonResult {
 	public int getCode() { return this.code; }
 
 	/**
-	 * Gets the common block height.
+	 * Gets the common block height (only supported when code is REMOTE_IS_NOT_SYNCED).
 	 *
 	 * @return The common block height.
 	 */
-	public long getCommonBlockHeight() { return this.commonBlockHeight; }
+	public long getCommonBlockHeight() {
+		if (Code.REMOTE_IS_NOT_SYNCED != this.code)
+			throw new UnsupportedOperationException("unsupported when code is not REMOTE_IS_NOT_SYNCED");
+
+		return this.commonBlockHeight;
+	}
 
 	/**
-	 * Gets the common block height.
+	 * Gets a value indicating whether or not the chains are consistent (only supported when
+	 * code is REMOTE_IS_NOT_SYNCED).
 	 *
-	 * @return The common block height.
+	 * @return true if the chains are consistent.
 	 */
-	public boolean areChainsConsistent() { return this.areChainsConsistent; }
+	public boolean areChainsConsistent() {
+		if (Code.REMOTE_IS_NOT_SYNCED != this.code)
+			throw new UnsupportedOperationException("unsupported when code is not REMOTE_IS_NOT_SYNCED");
+
+		return this.areChainsConsistent;
+	}
 }
