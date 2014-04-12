@@ -64,6 +64,22 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void returnedTransactionsAreSortedByFee() {
+		// Arrange:
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(5);
+
+		// Act:
+		Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
+		ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
+
+		// Assert:
+		Assert.assertThat(transactions.get(0).getFee().compareTo(transactions.get(1).getFee()), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(1).getFee().compareTo(transactions.get(2).getFee()), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(2).getFee().compareTo(transactions.get(3).getFee()), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(3).getFee().compareTo(transactions.get(4).getFee()), IsEqual.equalTo(1));
+	}
+
 	//endregion
 
 	//region getTransactionsBefore
@@ -140,6 +156,18 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
 		for (int i = 0; i < numTransactions; ++i) {
 			transactions.add(new MockTransaction(i, new TimeInstant(i * 10)));
+		}
+
+		return transactions;
+	}
+
+
+	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(int numTransactions) {
+		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		for (int i = 0; i < numTransactions; ++i) {
+			final MockTransaction mockTransaction = new MockTransaction(i, new TimeInstant(i * 10));
+			mockTransaction.setFee(Amount.fromNem(i + 1));
+			transactions.add(mockTransaction);
 		}
 
 		return transactions;
