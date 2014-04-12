@@ -67,17 +67,16 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void returnedTransactionsAreSortedByFee() {
 		// Arrange:
-		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(5);
+		final int numTransactions = 5;
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(numTransactions);
 
 		// Act:
-		Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
-		ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
+		final Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
+		final ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
 
 		// Assert:
-		Assert.assertThat(transactions.get(0).getFee().compareTo(transactions.get(1).getFee()), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(1).getFee().compareTo(transactions.get(2).getFee()), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(2).getFee().compareTo(transactions.get(3).getFee()), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(3).getFee().compareTo(transactions.get(4).getFee()), IsEqual.equalTo(1));
+		for (int i = 1; i < numTransactions; ++i)
+			Assert.assertThat(transactions.get(i - 1).getFee().compareTo(transactions.get(i).getFee()), IsEqual.equalTo(1));
 	}
 
 	//endregion
