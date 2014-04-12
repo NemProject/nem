@@ -28,6 +28,16 @@ public interface SyncConnector {
 	public Block getBlockAt(final NodeEndpoint endpoint, long height);
 
 	/**
+	 * Requests information about the hashes of all blocks in the chain after the specified height
+	 * from the specified node.
+	 *
+	 * @param endpoint The endpoint.
+	 * @param height The block height
+	 * @return The hashes of all blocks in the chain after the specified height.
+	 */
+	public HashChain getHashesFrom(final NodeEndpoint endpoint, long height);
+
+	/**
 	 * Requests information about all blocks in the chain after the specified height
 	 * from the specified node.
 	 *
@@ -36,8 +46,4 @@ public interface SyncConnector {
 	 * @return All blocks in the chain after the specified height.
 	 */
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, long height);
-
-
-	public HashChain getHashesFrom(NodeEndpoint endpoint, long startingPoint);
-
 }
