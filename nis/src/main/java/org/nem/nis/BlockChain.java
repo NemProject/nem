@@ -15,7 +15,6 @@ import org.nem.nis.mappers.TransferMapper;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
 

@@ -145,7 +145,7 @@ public class AccountAnalyzer implements AccountLookup {
 	 */
 	@Override
 	public Account findByAddress(Address id) {
-		LOGGER.info("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
+		LOGGER.finer("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
 
 		if (!id.isValid()) {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());

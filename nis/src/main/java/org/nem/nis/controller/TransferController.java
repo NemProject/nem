@@ -29,7 +29,7 @@ public class TransferController {
 	private NisPeerNetworkHost host;
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
-	@P2PApi
+	@ClientApi
 	public String transferPrepare(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
@@ -43,7 +43,7 @@ public class TransferController {
 	}
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
-	@P2PApi
+	@ClientApi
 	public String transferAnnounce(@RequestBody final String body) throws Exception {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
@@ -63,6 +63,8 @@ public class TransferController {
 			if (foraging.processTransaction(transfer)) {
 
 				// propagate transactions
+				// TODO: this should queue request and return immediately, so that client who
+				// actually has sent /transfer/announce won't wait for this...
 				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
 			}
 
