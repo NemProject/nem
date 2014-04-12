@@ -349,6 +349,12 @@ public class BlockChain implements BlockSynchronizer {
 
 		long peerScore = validator.computePartialScore(parentBlock, peerChain);
 
+		if (peerScore < ourScore) {
+			// we could get peer's score upfront, if it mismatches with
+			// what we calculated, we could penalize peer.
+			return;
+		}
+
 		for (final Block block : peerChain) {
 			Balance.apply(contemporaryAccountAnalyzer, block);
 		}
