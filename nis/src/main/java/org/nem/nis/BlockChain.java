@@ -297,6 +297,76 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 	}
 
+	/**
+	 * Reverses transactions between commonBlockHeight and current lastBlock.
+	 * Additionally calculates score.
+	 *
+	 * @param commonBlockHeight height up to which TXes should be reversed.
+	 * @param contemporaryAccountAnalyzer AccountLookup upon which reverse should be made
+	 *
+	 * @return score for iterated blocks.
+	 *
+	 * WARNING: although it might be tempting to split this function,
+	 * please don't. reverseChainIterator accesses blocks in DB,
+	 * which will be costly, so it's better to do it in one iteration
+	 */
+	private long undoTxesAndGetScore(long commonBlockHeight, final AccountAnalyzer contemporaryAccountAnalyzer) {
+		final PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
+		reverseChainIterator(commonBlockHeight, new DbBlockVisitor[] {
+				chainScore,
+				new DbBlockVisitor() {
+					@Override
+					public void visit(org.nem.nis.dbmodel.Block dbBlock) {
+						Balance.unapply(contemporaryAccountAnalyzer, dbBlock);
+					}
+				}
+		});
+
+		return chainScore.getScore();
+	}
+
+	/**
+	 * Validates blocks in peerChain.
+	 *
+	 * @param contemporaryAccountAnalyzer AccountLookup upon which TXes from peerChain should be applied.
+	 * @param parentDbBlock parent db block
+	 * @param peerChain analyzed fragment of peer's blockchain.
+	 *
+	 * @return score or -1 if chain is invalid
+	 */
+	private long validatePeerChainAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
+		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
+
+		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT, contemporaryAccountAnalyzer);
+		if (!validator.isValid(parentBlock, peerChain)) {
+			return -1L;
+		}
+		return validator.computePartialScore(parentBlock, peerChain);
+	}
+
+
+	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
+		//region update our chain
+		synchronized (this) {
+			accountAnalyzer.replace(contemporaryAccountAnalyzer);
+
+			if (hasOwnChain) {
+				// mind that we're using "new" (replaced) accountAnalyzer
+				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
+			}
+
+			dropDbBlocksAfter(commonBlockHeight);
+		}
+
+		for (Block peerBlock : peerChain) {
+			if (addBlockToDb(peerBlock)) {
+				foraging.removeFromUnconfirmedTransactions(peerBlock);
+			}
+		}
+		//endregion
+
+	}
+
 	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
 		Block peerLastBlock = synchronize1CompareLastBlock(connector, node);
 		if (peerLastBlock == null) {
@@ -320,18 +390,7 @@ public class BlockChain implements BlockSynchronizer {
 				return;
 			}
 
-			PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
-			reverseChainIterator(commonBlockHeight, new DbBlockVisitor[]{
-					chainScore,
-					new DbBlockVisitor() {
-						@Override
-						public void visit(org.nem.nis.dbmodel.Block dbBlock) {
-							Balance.unapply(contemporaryAccountAnalyzer, dbBlock);
-						}
-					}
-			});
-
-			ourScore = chainScore.getScore();
+			ourScore = undoTxesAndGetScore(commonBlockHeight, contemporaryAccountAnalyzer);
 		}
 		//endregion
 
@@ -341,15 +400,11 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		// do not trust peer, take first block from our db and convert it
-		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-
-		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT, contemporaryAccountAnalyzer);
-		if (!validator.isValid(parentBlock, peerChain)) {
+		long peerScore = validatePeerChainAndGetScore(contemporaryAccountAnalyzer, ourDbBlock, peerChain);
+		if (peerScore < 0L) {
 			penalize(node);
 			return;
 		}
-
-		long peerScore = validator.computePartialScore(parentBlock, peerChain);
 
 		if (peerScore < ourScore) {
 			// we could get peer's score upfront, if it mismatches with
@@ -360,27 +415,9 @@ public class BlockChain implements BlockSynchronizer {
 		for (final Block block : peerChain) {
 			Balance.apply(contemporaryAccountAnalyzer, block);
 		}
-
 		//endregion
 
-		//region update our chain
-		synchronized (this) {
-			accountAnalyzer.replace(contemporaryAccountAnalyzer);
-
-			if (synchronizeContext.hasOwnChain) {
-				// mind that we're using "new" (replaced) accountAnalyzer
-				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
-			}
-
-			dropDbBlocksAfter(commonBlockHeight);
-		}
-
-		for (Block peerBlock : peerChain) {
-			if (addBlockToDb(peerBlock)) {
-				foraging.removeFromUnconfirmedTransactions(peerBlock);
-			}
-		}
-		//endregion
+		updateOurChain(commonBlockHeight, contemporaryAccountAnalyzer, peerChain, synchronizeContext.hasOwnChain);
 	}
 
 	/**
@@ -394,7 +431,7 @@ public class BlockChain implements BlockSynchronizer {
 		final Hash blockHash = HashUtils.calculateHash(block);
 		final Hash parentHash = block.getPreviousBlockHash();
 
-		org.nem.nis.dbmodel.Block parent;
+		final org.nem.nis.dbmodel.Block parent;
 
 		// block already seen
 		synchronized (this) {
@@ -411,40 +448,42 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		// we have parent, check if it has child
-		if (parent.getNextBlockId() != null) {
-			org.nem.nis.dbmodel.Block child = blockDao.findById(parent.getNextBlockId());
-			// TODO: compare block score, if analyzed block is better, rollback block(s) from db
-			if (child != null) {
-				return false;
-			}
-		}
-
-		// TODO: can't apply it now, cause right now we don't generate empty blocks.
+		// TODO: we should have some time limit set
 //		if (block.getTimeStamp() > parent.getTimestamp() + 20*30) {
 //			return false;
 //		}
 
-		// TODO: WARNING: as for now this method processes only blocks
-		// that have been sent directly, so we can add quite strict rule here
+		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+		long ourScore = 0L;
+		boolean hasOwnChain = false;
+		// we have parent, check if it has child
+		if (parent.getNextBlockId() != null) {
+			ourScore = undoTxesAndGetScore(parent.getHeight(), contemporaryAccountAnalyzer);
+			hasOwnChain = true;
+		}
+
+		final ArrayList<Block> peerChain = new ArrayList(1);
+		peerChain.add(block);
+
+		long peerscore = validatePeerChainAndGetScore(contemporaryAccountAnalyzer, parent, peerChain);
+		if (peerscore < 0) {
+			// penalty?
+			return false;
+		}
+
+		if (peerscore < ourScore) {
+			return false;
+		}
+
+		// this method processes only blocks that have been sent directly (pushed)
+		// to us, so we can add quite strict rule here
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp().compareTo(currentTime.addMinutes(30)) > 0) {
+		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			return false;
 		}
 
-		final Block parentBlock = BlockMapper.toModel(parent, accountAnalyzer);
-		final BigInteger hit = this.scorer.calculateHit(parentBlock);
-		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
-
-		if (hit.compareTo(target) >= 0) {
-			return false;
-		}
-
-		throw new RuntimeException("not yet finished");
-
-		// 1. add block to db
-		// 2. remove transactions from unconfirmed transactions.
-		// run account analyzer?
+		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
+		return true;
 	}
 
 	public boolean addBlockToDb(Block bestBlock) {
