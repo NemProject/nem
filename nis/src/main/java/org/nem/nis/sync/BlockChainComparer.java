@@ -71,23 +71,18 @@ public class BlockChainComparer {
 			if (ComparisonResult.Code.UNKNOWN == code)
 				code = this.compareHashes();
 
+
+			if (! this.areChainsConsistent) {
+				// not to waste our time, first try to get first block and verify it
+				// this is just to save time
+				final Block differBlock = this.remoteLookup.getBlockAt(this.commonBlockIndex + 1);
+
+				if (! differBlock.verify()) {
+					code = ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
+				}
+			}
+
 			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent);
-
-			// TODO: return common block index
-			// TODO: resume tests here
-
-//			SynchronizeContext context = new SynchronizeContext(startingPoint + firstDifferenceIndex - 1,  localHashes.size() > firstDifferenceIndex);
-//
-//			final long commonBlockHeight = context.commonBlockHeight;
-//			// not to waste our time, first try to get first block that differs
-//			final Block differBlock = this.remoteLookup.getBlockAt(commonBlockHeight + 1);
-//			if (context.hasOwnChain) {
-//				if (! this.sychronizeCompareAt(differBlock, commonBlockHeight)) {
-//					return ComparisonResult.REMOTE_HAS_NO_BLOCKS; // TODO: return something different
-//				}
-//			}
-//
-//			return ComparisonResult.REMOTE_IS_BEHIND;
 		}
 
 		private boolean isRemoteTooFarBehind() {
@@ -132,27 +127,6 @@ public class BlockChainComparer {
 				return ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND;
 
 			return ComparisonResult.Code.UNKNOWN;
-		}
-
-		// TODO: I'm not sure if this makes sense anymore since it is only comparing the score for the current block but not the chain
-		private boolean sychronizeCompareAt(Block peerBlock, long commonHeight) {
-			if (!peerBlock.verify()) {
-//			penalize(node);
-				return false;
-			}
-
-			Block commonBlock = this.localLookup.getBlockAt(commonHeight);
-
-			Block ourBlock = this.localLookup.getBlockAt(commonHeight + 1);
-
-			if (areBlocksEqual(peerBlock, ourBlock)) {
-				return false;
-			}
-
-			final BlockScorer scorer = this.context.getBlockScorer();
-			long peerScore = scorer.calculateBlockScore(HashUtils.calculateHash(commonBlock), peerBlock.getSigner().getKeyPair().getPublicKey());
-			long ourScore = scorer.calculateBlockScore(HashUtils.calculateHash(commonBlock), ourBlock.getSigner().getKeyPair().getPublicKey());
-			return peerScore < ourScore;
 		}
 	}
 }
