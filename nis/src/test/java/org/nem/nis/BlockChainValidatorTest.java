@@ -4,16 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.MockTransaction;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.MockBlockScorer;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class BlockChainValidatorTest {
 
@@ -245,35 +241,6 @@ public class BlockChainValidatorTest {
 
 	private static BlockChainValidator createValidator() {
 		return createValidator(new MockBlockScorer());
-	}
-
-	//endregion
-
-	//region MockBlockScorer
-
-	private static class MockBlockScorer extends BlockScorer {
-
-		private Account lastCalculateTargetBlockSigner;
-		private Set<Block> zeroTargetBlocks = new HashSet<>();
-
-		public void setZeroTargetBlock(final Block block) {
-			this.zeroTargetBlocks.add(block);
-		}
-
-		public Account getLastCalculateTargetBlockSigner() {
-			return this.lastCalculateTargetBlockSigner;
-		}
-
-		@Override
-		public BigInteger calculateHit(final Block block) {
-			return BigInteger.ZERO;
-		}
-
-		@Override
-		public BigInteger calculateTarget(final Block prevBlock, final Block block, final Account blockSigner) {
-			this.lastCalculateTargetBlockSigner = blockSigner;
-			return zeroTargetBlocks.contains(block) ? BigInteger.ZERO : BigInteger.TEN;
-		}
 	}
 
 	//endregion
