@@ -31,7 +31,6 @@ public class BlockChainComparer {
 	 * @return The comparison result.
 	 */
 	public int compare(final BlockLookup localLookup, final BlockLookup remoteLookup) {
-
 		final Impl impl = new Impl(this.context, localLookup, remoteLookup);
 		return impl.compare();
 	}
@@ -65,6 +64,56 @@ public class BlockChainComparer {
 		}
 
 		public int compare() {
+			int result = this.compareLastBlock();
+			if (ComparisonResult.UNKNOWN != result)
+				return result;
+
+			return this.compareHashes();
+
+			// TODO: return common block index
+			// TODO: resume tests here
+
+//			SynchronizeContext context = new SynchronizeContext(startingPoint + firstDifferenceIndex - 1,  localHashes.size() > firstDifferenceIndex);
+//
+//			final long commonBlockHeight = context.commonBlockHeight;
+//			// not to waste our time, first try to get first block that differs
+//			final Block differBlock = this.remoteLookup.getBlockAt(commonBlockHeight + 1);
+//			if (context.hasOwnChain) {
+//				if (! this.sychronizeCompareAt(differBlock, commonBlockHeight)) {
+//					return ComparisonResult.REMOTE_HAS_NO_BLOCKS; // TODO: return something different
+//				}
+//			}
+//
+//			return ComparisonResult.REMOTE_IS_BEHIND;
+		}
+
+		private boolean isRemoteTooFarBehind() {
+			final long heightDifference = localLastBlock.getHeight() - remoteLastBlock.getHeight();
+			return heightDifference > this.context.getMaxNumBlocksToRewrite();
+		}
+
+		private int compareHashes() {
+			final long startingPoint = Math.max(1, this.localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
+			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingPoint);
+			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) // TODO: not sure if we should just used getMaxNumBlocksToRewrite too
+				return ComparisonResult.REMOTE_RETURNED_TOO_MANY_HASHES;
+
+			final HashChain localHashes = this.localLookup.getHashesFrom(startingPoint);
+			int firstDifferenceIndex = localHashes.findFirstDifferent(remoteHashes);
+			if (0 == firstDifferenceIndex) {
+				// at least first compared block should be the same, if not, the remote is a liar or on a fork
+				return ComparisonResult.REMOTE_RETURNED_INVALID_HASHES;
+			}
+
+			if (remoteHashes.size() == firstDifferenceIndex) {
+				// nothing to do, we have all of peers blocks
+				return ComparisonResult.REMOTE_IS_SYNCED;
+			}
+
+			return ComparisonResult.REMOTE_IS_NOT_SYNCED;
+		}
+
+		private int compareLastBlock() {
 			if (null == this.remoteLastBlock)
 				return ComparisonResult.REMOTE_HAS_NO_BLOCKS;
 
@@ -74,43 +123,13 @@ public class BlockChainComparer {
 			if (areBlocksEqual(localLastBlock, remoteLastBlock))
 				return ComparisonResult.REMOTE_IS_SYNCED;
 
-			// TODO: resume tests here
-
-			final long heightDifference = localLastBlock.getHeight() - remoteLastBlock.getHeight();
-			if (heightDifference <= -this.context.getMaxNumBlocksToRewrite())
+			if (this.isRemoteTooFarBehind())
 				return ComparisonResult.REMOTE_IS_TOO_FAR_BEHIND;
 
-			final long startingPoint = Math.max(1, localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
-			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingPoint);
-			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze())
-				return ComparisonResult.REMOTE_IS_EVIL; // TODO: too many hashes
-
-			final HashChain localHashes = this.localLookup.getHashesFrom(startingPoint);
-			int firstDifferenceIndex = localHashes.findFirstDifferent(remoteHashes);
-			if (0 == firstDifferenceIndex) {
-				// at least first compared block should be the same, if not, the remote is a liar or on a fork
-				return ComparisonResult.REMOTE_IS_EVIL; // TODO: no common block
-			}
-
-			if (remoteHashes.size() == firstDifferenceIndex) {
-				// nothing to do, we have all of peers blocks
-				return ComparisonResult.REMOTE_IS_SYNCED;
-			}
-
-			SynchronizeContext context = new SynchronizeContext(startingPoint + firstDifferenceIndex - 1,  localHashes.size() > firstDifferenceIndex);
-
-			final long commonBlockHeight = context.commonBlockHeight;
-			// not to waste our time, first try to get first block that differs
-			final Block differBlock = this.remoteLookup.getBlockAt(commonBlockHeight + 1);
-			if (context.hasOwnChain) {
-				if (! this.sychronizeCompareAt(differBlock, commonBlockHeight)) {
-					return ComparisonResult.REMOTE_HAS_NO_BLOCKS; // TODO: return something different
-				}
-			}
-
-			return ComparisonResult.REMOTE_IS_BEHIND;
+			return ComparisonResult.UNKNOWN;
 		}
 
+		// TODO: I'm not sure if this makes sense anymore since it is only comparing the score for the current block but not the chain
 		private boolean sychronizeCompareAt(Block peerBlock, long commonHeight) {
 			if (!peerBlock.verify()) {
 //			penalize(node);
