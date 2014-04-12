@@ -433,6 +433,13 @@ public class BlockChain implements BlockSynchronizer {
 
 		final org.nem.nis.dbmodel.Block parent;
 
+		// this method processes only blocks that have been sent directly (pushed)
+		// to us, so we can add quite strict rule here
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
+			return false;
+		}
+
 		// block already seen
 		synchronized (this) {
 			if (blockDao.findByHash(blockHash) != null) {
@@ -472,13 +479,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		if (peerscore < ourScore) {
-			return false;
-		}
-
-		// this method processes only blocks that have been sent directly (pushed)
-		// to us, so we can add quite strict rule here
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			return false;
 		}
 
