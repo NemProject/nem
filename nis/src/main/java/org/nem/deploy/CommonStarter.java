@@ -81,8 +81,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(createErrorHandler());
 
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		handlers.setHandlers(new Handler[] { contexts, servletContext, new ServletHandler(), new DefaultHandler() });
+		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
 		server.setDumpAfterStart(false);
 		server.setDumpBeforeStop(false);
