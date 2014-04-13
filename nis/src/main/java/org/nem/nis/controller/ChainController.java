@@ -38,9 +38,8 @@ public class ChainController {
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
-	public String blocksAfter(@RequestBody final String body) {
+	public String blocksAfter(@RequestBody final Deserializer deserializer) {
 		// TODO: refactor block lookup
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
@@ -66,8 +65,7 @@ public class ChainController {
 
 	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)
 	@P2PApi
-	public String hashesFrom(@RequestBody final String body) {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+	public String hashesFrom(@RequestBody final Deserializer deserializer) {
 		Long blockHeight = deserializer.readLong("height");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);

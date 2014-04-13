@@ -47,8 +47,7 @@ public class BlockController {
 
 	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
 	@P2PApi
-	public Block blockAt(@RequestBody final String body) {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+	public Block blockAt(@RequestBody final Deserializer deserializer) {
 		final Long blockHeight = deserializer.readLong("height");
 
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);

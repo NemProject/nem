@@ -6,32 +6,7 @@ import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.security.InvalidParameterException;
-
 public class ControllerUtilsTest {
-
-	@Test
-	public void jsonDeserializerIsAssociatedWithAccountLookup() {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final JsonSerializer serializer = new JsonSerializer();
-		originalEntity.serialize(serializer);
-		final String jsonString = serializer.getObject().toJSONString();
-
-		// Act:
-		final Deserializer deserializer = ControllerUtils.getDeserializer(jsonString, accountLookup);
-		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
-
-		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-	}
-
-	@Test(expected = InvalidParameterException.class)
-	public void getDeserializerFailsIfInputStringIsNotJsonObject() {
-		// Act:
-		ControllerUtils.getDeserializer("7", null);
-	}
 
 	@Test
 	public void byteArrayCanBeDeserialized() throws Exception {

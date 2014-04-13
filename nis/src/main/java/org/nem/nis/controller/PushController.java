@@ -47,8 +47,7 @@ public class PushController {
 
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
-	public String pushTransaction(@RequestBody String body) {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+	public String pushTransaction(final Deserializer deserializer) {
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
@@ -70,8 +69,7 @@ public class PushController {
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
-	public String pushBlock(@RequestBody String body) {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+	public String pushBlock(final Deserializer deserializer) {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
 		// TODO: refactor logging
