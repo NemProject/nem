@@ -1,9 +1,8 @@
 package org.nem.nis.controller;
 
-import org.apache.commons.codec.DecoderException;
 import org.nem.core.model.Hash;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.dao.BlockDao;
+import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
@@ -21,11 +20,11 @@ import java.util.MissingResourceException;
 @RestController
 public class BlockController {
 
-	private final BlockDao blockDao;
+	private final RequiredBlockDaoAdapter blockDao;
 	private final AccountAnalyzer accountAnalyzer;
 
 	@Autowired(required = true)
-	BlockController(final BlockDao blockDao, final AccountAnalyzer accountAnalyzer) {
+	BlockController(final RequiredBlockDaoAdapter blockDao, final AccountAnalyzer accountAnalyzer) {
 		this.blockDao = blockDao;
 		this.accountAnalyzer = accountAnalyzer;
 	}
@@ -40,12 +39,9 @@ public class BlockController {
 	@RequestMapping(value = "/block/get", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
+	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) {
 		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
-		if (null == dbBlock)
-			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHashString);
-
 		return BlockMapper.toModel(dbBlock, this.accountAnalyzer);
 	}
 
@@ -53,11 +49,7 @@ public class BlockController {
 	@P2PApi
 	public Block blockAt(@RequestBody final Deserializer deserializer) {
 		final Long blockHeight = deserializer.readLong("height");
-
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
-		if (null == dbBlock)
-			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
-
 		return BlockMapper.toModel(dbBlock, this.accountAnalyzer);
 	}
 }

@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.HashChain;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.dao.BlockDao;
+import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.Deserializer;
@@ -14,17 +14,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.MissingResourceException;
 
 @RestController
 public class ChainController {
 
 	private AccountAnalyzer accountAnalyzer;
-	private BlockDao blockDao;
+	private RequiredBlockDaoAdapter blockDao;
 	private BlockChain blockChain;
 
 	@Autowired(required = true)
-	ChainController(final BlockDao blockDao, final AccountAnalyzer accountAnalyzer, BlockChain blockChain) {
+	ChainController(final RequiredBlockDaoAdapter blockDao, final AccountAnalyzer accountAnalyzer, BlockChain blockChain) {
 		this.blockDao = blockDao;
 		this.accountAnalyzer = accountAnalyzer;
 		this.blockChain = blockChain;
@@ -40,14 +39,9 @@ public class ChainController {
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
 	public String blocksAfter(@RequestBody final Deserializer deserializer) {
-		// TODO: refactor block lookup
-		Long blockHeight = deserializer.readLong("height");
-
+		final Long blockHeight = deserializer.readLong("height");
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
-		if (null == dbBlock)
-			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
-
-		List<Block> blockList = new LinkedList<>();
+		final List<Block> blockList = new LinkedList<>();
 		for (int i = 0; i < BlockChain.ESTIMATED_BLOCKS_PER_DAY / 2; ++i) {
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
@@ -59,7 +53,7 @@ public class ChainController {
 		}
 
 		// TODO: add converter
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObjectArray("blocks", blockList);
 		return serializer.getObject().toString() + "\r\n";
 	}
@@ -67,18 +61,15 @@ public class ChainController {
 	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)
 	@P2PApi
 	public String hashesFrom(@RequestBody final Deserializer deserializer) {
-		Long blockHeight = deserializer.readLong("height");
-
-		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
-		if (null == dbBlock)
-			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
+		final Long blockHeight = deserializer.readLong("height");
+		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 
 		final List<byte[]> hashesList = this.blockDao.getHashesFrom(blockHeight, BlockChain.BLOCKS_LIMIT);
 		final HashChain hashChain = new HashChain(hashesList.size());
         for (final byte[] hash : hashesList)
 			hashChain.add(hash);
 
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObject("hashchain", hashChain);
 		return serializer.getObject().toString() + "\r\n";
 	}
