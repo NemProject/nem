@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AccountController {
 
-	@Autowired
-	AccountAnalyzer accountAnalyzer;
+	private final AccountAnalyzer accountAnalyzer;
+	private final Foraging foraging;
 
-	@Autowired
-	private Foraging foraging;
+	@Autowired(required = true)
+	AccountController(final AccountAnalyzer accountAnalyzer, final Foraging foraging) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.foraging = foraging;
+	}
 
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi

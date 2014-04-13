@@ -1,8 +1,10 @@
 package org.nem.nis.controller;
 
 import org.nem.core.serialization.Deserializer;
+import org.nem.nis.BlockChain;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.AccountAnalyzer;
+import org.nem.nis.dao.BlockDao;
 import org.nem.peer.*;
 import org.nem.peer.trust.NodeExperiencesPair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class NodeController {
 
-	@Autowired
 	private NisPeerNetworkHost host;
-
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
+
+	@Autowired(required = true)
+	NodeController(final NisPeerNetworkHost host, final AccountAnalyzer accountAnalyzer) {
+		this.host = host;
+		this.accountAnalyzer = accountAnalyzer;
+	}
 
 	/**
 	 * Gets information about the running node.

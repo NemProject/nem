@@ -28,17 +28,22 @@ import java.util.logging.Logger;
 public class PushController {
 	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
 
-	@Autowired
-	AccountAnalyzer accountAnalyzer;
+	private final AccountAnalyzer accountAnalyzer;
+	private final Foraging foraging;
+	private final BlockChain blockChain;
+	private final NisPeerNetworkHost host;
 
-	@Autowired
-	private Foraging foraging;
-
-	@Autowired
-	private BlockChain blockChain;
-
-	@Autowired
-	private NisPeerNetworkHost host;
+	@Autowired(required = true)
+	PushController(
+			final AccountAnalyzer accountAnalyzer,
+			final Foraging foraging,
+			final BlockChain blockChain,
+			final NisPeerNetworkHost host) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.foraging = foraging;
+		this.blockChain = blockChain;
+		this.host = host;
+	}
 
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi

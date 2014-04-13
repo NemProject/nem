@@ -20,14 +20,19 @@ import java.util.logging.Logger;
 public class TransferController {
 	private static final Logger LOGGER = Logger.getLogger(TransferController.class.getName());
 
-	@Autowired
-	AccountAnalyzer accountAnalyzer;
+	private final AccountAnalyzer accountAnalyzer;
+	private final Foraging foraging;
+	private final NisPeerNetworkHost host;
 
-	@Autowired
-	private Foraging foraging;
-
-	@Autowired
-	private NisPeerNetworkHost host;
+	@Autowired(required = true)
+	TransferController(
+			final AccountAnalyzer accountAnalyzer,
+			final Foraging foraging,
+			final NisPeerNetworkHost host) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.foraging = foraging;
+		this.host = host;
+	}
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
 	@ClientApi

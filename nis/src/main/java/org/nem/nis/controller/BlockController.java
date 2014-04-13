@@ -17,11 +17,14 @@ import java.util.MissingResourceException;
 @RestController
 public class BlockController {
 
-	@Autowired
-	private BlockDao blockDao;
+	private final BlockDao blockDao;
+	private final AccountAnalyzer accountAnalyzer;
 
-	@Autowired
-	private AccountAnalyzer accountAnalyzer;
+	@Autowired(required = true)
+	BlockController(final BlockDao blockDao, final AccountAnalyzer accountAnalyzer) {
+		this.blockDao = blockDao;
+		this.accountAnalyzer = accountAnalyzer;
+	}
 
 	/**
 	 * Obtain block from the block chain.

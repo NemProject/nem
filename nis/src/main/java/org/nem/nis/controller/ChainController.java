@@ -18,14 +18,16 @@ import java.util.MissingResourceException;
 @RestController
 public class ChainController {
 
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
-
-	@Autowired
 	private BlockDao blockDao;
-
-	@Autowired
 	private BlockChain blockChain;
+
+	@Autowired(required = true)
+	ChainController(final BlockDao blockDao, final AccountAnalyzer accountAnalyzer, BlockChain blockChain) {
+		this.blockDao = blockDao;
+		this.accountAnalyzer = accountAnalyzer;
+		this.blockChain = blockChain;
+	}
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@P2PApi
