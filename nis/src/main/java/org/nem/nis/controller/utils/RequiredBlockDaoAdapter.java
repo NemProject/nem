@@ -11,6 +11,9 @@ import java.util.MissingResourceException;
 /**
  * Adapter around BlockDao that throws a MissingResourceException if a requested
  * Block is not found.
+ *
+ * TODO: it would be better to have this as a decorator around a ReadOnlyBlockDao interface (so BlockDao extends ReadOnlyBlockDao)
+ * TODO: but I'm not sure how to wire up the beans correctly for that
  */
 public class RequiredBlockDaoAdapter {
 
