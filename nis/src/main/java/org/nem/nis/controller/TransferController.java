@@ -49,7 +49,7 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public String transferAnnounce(final Deserializer deserializer) throws Exception {
+	public void transferAnnounce(final Deserializer deserializer) throws Exception {
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
 
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
@@ -59,22 +59,19 @@ public class TransferController {
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
-		if (transfer.isValid() && transfer.verify()) {
-			final PeerNetwork network = this.host.getNetwork();
+		if (!transfer.isValid() || !transfer.verify())
+			throw new InvalidParameterException("transfer must be valid and verifiable");
 
-			// add to unconfirmed transactions
-			if (foraging.processTransaction(transfer)) {
+        final PeerNetwork network = this.host.getNetwork();
 
-				// propagate transactions
-				// TODO: this should queue request and return immediately, so that client who
-				// actually has sent /transfer/announce won't wait for this...
-				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
-			}
+        // add to unconfirmed transactions
+        if (foraging.processTransaction(transfer)) {
 
-			return Utils.jsonOk();
-		}
-
-		throw new InvalidParameterException("transfer must be valid and verifiable");
+            // propagate transactions
+            // TODO: this should queue request and return immediately, so that client who
+            // actually has sent /transfer/announce won't wait for this...
+            network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
+        }
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {

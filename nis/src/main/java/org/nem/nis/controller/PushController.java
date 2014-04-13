@@ -48,46 +48,41 @@ public class PushController {
 
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
-	public String pushTransaction(final Deserializer deserializer) {
+	public void pushTransaction(final Deserializer deserializer) {
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
 		// transaction timestamp is checked inside processTransaction
-		if (transaction.isValid() && transaction.verify()) {
-			final PeerNetwork network = this.host.getNetwork();
+		if (!transaction.isValid() || !transaction.verify())
+			throw new InvalidParameterException("transfer must be valid and verifiable");
 
-			// add to unconfirmed transactions
-			if (this.foraging.processTransaction(transaction))
-				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+		final PeerNetwork network = this.host.getNetwork();
 
-			return Utils.jsonOk();
-		}
-
-		throw new InvalidParameterException("transfer must be valid and verifiable");
+		// add to unconfirmed transactions
+		if (this.foraging.processTransaction(transaction))
+			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
-	public String pushBlock(final Deserializer deserializer) {
+	public void pushBlock(final Deserializer deserializer) {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
 		// TODO: refactor logging
 		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
-		if (block.verify()) {
-			// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
+		if (!block.verify())
+			throw new InvalidParameterException("block must be verifiable");
 
-			// validate block, add to chain
-			this.blockChain.processBlock(block);
+		// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 
-			// TODO: propagate block
-			//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
-			return Utils.jsonOk();
-		}
+		// validate block, add to chain
+		this.blockChain.processBlock(block);
 
-		throw new InvalidParameterException("block must be verifiable");
+		// TODO: propagate block
+		//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
 	}
 }

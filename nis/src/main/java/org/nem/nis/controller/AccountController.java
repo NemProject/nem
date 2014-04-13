@@ -8,6 +8,9 @@ import org.nem.nis.controller.annotations.ClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST API for interacting with Account objects.
+ */
 @RestController
 public class AccountController {
 
@@ -18,11 +21,15 @@ public class AccountController {
 		this.foraging = foraging;
 	}
 
+	/**
+	 * Unlocks an account for foraging.
+	 *
+	 * @param deserializer The private key of the account to unlock.
+	 */
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
-	public String accountUnlock(@RequestBody final Deserializer deserializer) {
+	public void accountUnlock(@RequestBody final Deserializer deserializer) {
 		final Account account = new Account(new KeyPair(new PrivateKey(deserializer)));
 		this.foraging.addUnlockedAccount(account);
-		return Utils.jsonOk();
 	}
 }

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.MissingResourceException;
 
+/**
+ * REST API for interacting with Block objects.
+ */
 @RestController
 public class BlockController {
 

@@ -54,12 +54,11 @@ public class NodeController {
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public String ping(final Deserializer deserializer) {
+	public void ping(final Deserializer deserializer) {
 		final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);
 
 		final PeerNetwork network = this.host.getNetwork();
 		network.getNodes().update(pair.getNode(), NodeStatus.ACTIVE);
 		network.setRemoteNodeExperiences(pair);
-		return Utils.jsonOk();
 	}
 }
