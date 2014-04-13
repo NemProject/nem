@@ -5,19 +5,27 @@ import org.springframework.http.*;
 import org.springframework.http.converter.*;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
+/**
+ * An HttpMessageConverter that maps SerializableEntity responses to application/json.
+ */
 public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<SerializableEntity> {
 
-	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
+	/**
+	 * Creates a new http message converter.
+	 */
 	public SerializableEntityHttpMessageConverter() {
-		super(new MediaType("application", "json", DEFAULT_CHARSET));
+		super(new MediaType("application", "json"));
 	}
 
 	@Override
 	protected boolean supports(final Class<?> aClass) {
 		return SerializableEntity.class.isAssignableFrom(aClass);
+	}
+
+	@Override
+	public boolean canRead(final Class<?> clazz, final MediaType type) {
+		return false;
 	}
 
 	@Override
