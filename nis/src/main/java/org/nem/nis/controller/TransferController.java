@@ -13,6 +13,7 @@ import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
 @RestController
@@ -30,16 +31,15 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
 	@ClientApi
-	public String transferPrepare(@RequestBody final String body) {
+	public RequestPrepare transferPrepare(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
-		// TODO: exception
 		if (!transfer.isValid())
-			return Utils.jsonError(1, "incorrect data");
+			throw new InvalidParameterException("transfer must be valid");
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
-		return ControllerUtils.serialize(new RequestPrepare(transferData));
+		return new RequestPrepare(transferData);
 	}
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
@@ -51,7 +51,6 @@ public class TransferController {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
-		// TODO: move logger to controller
 		LOGGER.info("   signer: " + transfer.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));

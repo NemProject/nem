@@ -28,9 +28,8 @@ public class NodeController {
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public String getInfo() {
-		final Node node = this.host.getNetwork().getLocalNode();
-		return ControllerUtils.serialize(node);
+	public Node getInfo() {
+		return this.host.getNetwork().getLocalNode();
 	}
 
 	/**
@@ -41,9 +40,8 @@ public class NodeController {
 	@RequestMapping(value = "/node/peer-list", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public String getPeerList() {
-		final NodeCollection nodes = this.host.getNetwork().getNodes();
-		return ControllerUtils.serialize(nodes);
+	public NodeCollection getPeerList() {
+		return this.host.getNetwork().getNodes();
 	}
 
 	/**

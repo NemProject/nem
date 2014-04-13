@@ -9,17 +9,6 @@ import java.security.InvalidParameterException;
 public class ControllerUtils {
 
 	/**
-	 * Serializes entity into a JSON string.
-	 *
-	 * @param entity The entity to serialize.
-	 *
-	 * @return The serialized JSON string.
-	 */
-	public static String serialize(final SerializableEntity entity) {
-		return JsonSerializer.serializeToJson(entity).toString() + "\r\n";
-	}
-
-	/**
 	 * Creates a deserializer around a JSON string.
 	 *
 	 * @param jsonString    The JSON string.

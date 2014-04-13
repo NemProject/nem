@@ -12,6 +12,8 @@ import org.nem.nis.AccountAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.MissingResourceException;
+
 @RestController
 public class BlockController {
 
@@ -31,27 +33,25 @@ public class BlockController {
 	@RequestMapping(value = "/block/get", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public String blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
+	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) throws DecoderException {
 		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
 		if (null == dbBlock)
-			return Utils.jsonError(2, "hash not found in the db");
+			throw new MissingResourceException("hash not found in the db", Block.class.getName(), blockHashString);
 
-		final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer);
-		return ControllerUtils.serialize(block);
+		return BlockMapper.toModel(dbBlock, this.accountAnalyzer);
 	}
 
 	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
 	@P2PApi
-	public String blockAt(@RequestBody final String body) {
+	public Block blockAt(@RequestBody final String body) {
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-		Long blockHeight = deserializer.readLong("height");
+		final Long blockHeight = deserializer.readLong("height");
 
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		if (null == dbBlock)
-			return Utils.jsonError(2, "block not found in the db");
+			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
 
-		final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer);
-		return ControllerUtils.serialize(block);
+		return BlockMapper.toModel(dbBlock, this.accountAnalyzer);
 	}
 }
