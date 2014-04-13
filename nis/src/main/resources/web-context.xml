@@ -12,7 +12,11 @@
 	http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 <!-- Configures the @Controller programming model -->
-<mvc:annotation-driven/>
+<mvc:annotation-driven>
+    <mvc:message-converters register-defaults="false">
+        <bean class="org.nem.nis.config.SerializableEntityHttpMessageConverter" />
+    </mvc:message-converters>
+</mvc:annotation-driven>
 
 <!-- Forwards requests to the "/" resource to the "home" view -->
 

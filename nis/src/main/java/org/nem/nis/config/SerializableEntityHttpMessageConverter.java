@@ -1,19 +1,13 @@
 package org.nem.nis.config;
 
-import org.nem.core.model.Block;
-import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.nem.core.serialization.*;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<Block> {
+public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<SerializableEntity> {
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
@@ -23,19 +17,12 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 	@Override
 	protected boolean supports(final Class<?> aClass) {
-		final Class[] interfaces = aClass.getInterfaces();
-		for (final Class i : interfaces) {
-			if (i == SerializableEntity.class) {
-				return true;
-			}
-		}
-
-		return false;
+		return SerializableEntity.class.isAssignableFrom(aClass);
 	}
 
 	@Override
-	protected Block readInternal(
-			final Class<? extends Block> aClass,
+	protected SerializableEntity readInternal(
+			final Class<? extends SerializableEntity> aClass,
 			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
 
 		throw new UnsupportedOperationException();
@@ -43,10 +30,13 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 	@Override
 	protected void writeInternal(
-			final Block serializableEntity,
+			final SerializableEntity serializableEntity,
 			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
 
 		final JsonSerializer serializer = new JsonSerializer();
 		serializableEntity.serialize(serializer);
+
+		final String rawJson = serializer.getObject().toJSONString() + "\r\n";
+		httpOutputMessage.getBody().write(rawJson.getBytes());
 	}
 }
