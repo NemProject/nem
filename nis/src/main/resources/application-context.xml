@@ -67,5 +67,6 @@
     <bean class="org.nem.nis.AccountAnalyzer" />
     <bean class="org.nem.nis.NisMain" />
     <bean class="org.nem.nis.NisPeerNetworkHost" />
+    <bean class="org.nem.nis.controller.utils.RequiredBlockDaoAdapter" />
 
 </beans>

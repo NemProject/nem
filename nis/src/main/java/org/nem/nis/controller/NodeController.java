@@ -54,7 +54,7 @@ public class NodeController {
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(final Deserializer deserializer) {
+	public void ping(@RequestBody final Deserializer deserializer) {
 		final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);
 
 		final PeerNetwork network = this.host.getNetwork();

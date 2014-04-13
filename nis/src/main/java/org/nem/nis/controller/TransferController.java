@@ -38,7 +38,7 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
 	@ClientApi
-	public RequestPrepare transferPrepare(final Deserializer deserializer) {
+	public RequestPrepare transferPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
 		if (!transfer.isValid())
@@ -50,7 +50,7 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public void transferAnnounce(final Deserializer deserializer) throws Exception {
+	public void transferAnnounce(@RequestBody final Deserializer deserializer) throws Exception {
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
 
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());

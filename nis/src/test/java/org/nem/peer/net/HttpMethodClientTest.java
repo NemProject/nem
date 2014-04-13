@@ -23,7 +23,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
 		// Act:
-		JsonDeserializer deserializer = client.get(new URL(GOOD_URL));
+		final JsonDeserializer deserializer = client.get(new URL(GOOD_URL));
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -68,7 +68,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = new HttpMethodClient(null, GOOD_TIMEOUT);
 
 		// Act:
-		JsonDeserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity());
+		final JsonDeserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity());
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
