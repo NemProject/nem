@@ -9,10 +9,7 @@ import org.nem.core.serialization.JsonSerializer;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,9 +29,8 @@ public class ChainController {
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public String blockLast() {
-		final Block lastBlock = BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountAnalyzer);
-		return ControllerUtils.serialize(lastBlock);
+	public Block blockLast(@RequestHeader(value="Accept") String acceptHeader) {
+		return BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountAnalyzer);
 	}
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
