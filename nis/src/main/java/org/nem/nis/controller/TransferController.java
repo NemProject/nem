@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
+// TODO: add tests
 @RestController
 public class TransferController {
 	private static final Logger LOGGER = Logger.getLogger(TransferController.class.getName());

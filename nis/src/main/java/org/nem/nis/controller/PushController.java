@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  * (I think it might pay off in future, if we'd like to add restrictions to client APIs)
  */
 
+// TODO: add tests
 @RestController
 public class PushController {
 	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());

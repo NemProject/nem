@@ -1,9 +1,42 @@
 package org.nem.nis.test;
 
 import org.nem.nis.BlockChain;
+import org.nem.nis.dbmodel.Block;
 
+/**
+ * A mock BlockChain implementation.
+ */
 public class MockBlockChain extends BlockChain {
+
+	private final Block lastDbBlock;
+	private int numGetLastDbBlockCalls;
+
+	/**
+	 * Creates a new mock block chain.
+	 */
 	public MockBlockChain() {
-		super();
+		this(new Block());
 	}
+
+	/**
+	 * Creates a new mock block chain.
+	 *
+	 * @param lastBlock The last block.
+	 */
+	public MockBlockChain(final Block lastBlock) {
+		this.lastDbBlock = lastBlock;
+	}
+
+	@Override
+	public org.nem.nis.dbmodel.Block getLastDbBlock() {
+		++this.numGetLastDbBlockCalls;
+		return this.lastDbBlock;
+	}
+
+	/**
+	 * Gets the number of times getLastDbBlock was called.
+	 *
+	 * @return The number of times getLastDbBlock was called.
+	 */
+	public int getNumGetLastDbBlockCalls() { return this.numGetLastDbBlockCalls; }
 }

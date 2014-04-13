@@ -1,17 +1,13 @@
 package org.nem.nis.controller.utils;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
-import org.nem.core.model.Hash;
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.Block;
-import org.nem.nis.test.MockBlockDao;
+import org.nem.nis.test.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.util.*;
 
 public class RequiredBlockDaoAdapterTest {
 
@@ -98,15 +94,15 @@ public class RequiredBlockDaoAdapterTest {
 	@Test
 	public void getHashesFromDelegatesToBlockDao() {
 		// Arrange:
-		final List<byte[]> originalHashes = new ArrayList<>();
+		final List<byte[]> originalHashes = NisUtils.createRawHashesList(3);
 		final MockBlockDao blockDao = new MockBlockDao(new Block(), originalHashes);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
 		// Act:
-		final List<byte[]> hashes = requiredBlockDao.getHashesFrom(11, 14);
+		final HashChain hashes = requiredBlockDao.getHashesFrom(11, 14);
 
 		// Assert:
-		Assert.assertThat(hashes, IsSame.sameInstance(originalHashes));
+		Assert.assertThat(hashes.findFirstDifferent(new HashChain(originalHashes)), IsEqual.equalTo(3));
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(11L));
 		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(14));

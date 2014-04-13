@@ -1,11 +1,9 @@
 package org.nem.nis.controller.utils;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.Hash;
+import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.MissingResourceException;
 
 /**
@@ -73,10 +71,10 @@ public class RequiredBlockDaoAdapter {
 	 * Retrieves list of hashes for blocks starting at given height.
 	 * This should be used, not to pull whole block from the db.
 	 *
-	 * @return list of block hashes.
+	 * @return Chain of block hashes.
 	 */
-	public List<byte[]> getHashesFrom(long blockHeight, int limit) {
-		return this.blockDao.getHashesFrom(blockHeight, limit);
+	public HashChain getHashesFrom(long blockHeight, int limit) {
+		return new HashChain(this.blockDao.getHashesFrom(blockHeight, limit));
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {
