@@ -70,8 +70,7 @@ public class TransferController {
 			return Utils.jsonOk();
 		}
 
-		// TODO: exception
-		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transfer.verify()));
+		throw new InvalidParameterException("transfer must be valid and verifiable");
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {

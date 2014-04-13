@@ -11,6 +11,7 @@ import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
 /**
@@ -59,8 +60,7 @@ public class PushController {
 			return Utils.jsonOk();
 		}
 
-		// TODO: throw exception here
-		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transaction.verify()));
+		throw new InvalidParameterException("transfer must be valid and verifiable");
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
@@ -84,7 +84,6 @@ public class PushController {
 			return Utils.jsonOk();
 		}
 
-		// TODO: throw exception here
-		return Utils.jsonError(2, "block couldn't be verified " + Boolean.toString(block.verify()));
+		throw new InvalidParameterException("block must be verifiable");
 	}
 }

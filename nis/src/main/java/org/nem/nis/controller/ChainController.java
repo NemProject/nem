@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 @RestController
 public class ChainController {
@@ -36,26 +37,26 @@ public class ChainController {
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
 	public String blocksAfter(@RequestBody final String body) {
+		// TODO: refactor block lookup
 		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
 		Long blockHeight = deserializer.readLong("height");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		if (null == dbBlock)
-			return Utils.jsonError(2, "block not found in the db");
+			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
 
-		List<Block> blockList = new LinkedList<Block>();
-		for (int i = 0; i < blockChain.ESTIMATED_BLOCKS_PER_DAY / 2; ++i) {
+		List<Block> blockList = new LinkedList<>();
+		for (int i = 0; i < BlockChain.ESTIMATED_BLOCKS_PER_DAY / 2; ++i) {
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				break;
 			}
+
 			dbBlock = this.blockDao.findById(curBlockId);
 			blockList.add(BlockMapper.toModel(dbBlock, this.accountAnalyzer));
 		}
 
-		if (0 == blockList.size())
-			return Utils.jsonError(3, "invalid call");
-
+		// TODO: add converter
 		JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObjectArray("blocks", blockList);
 		return serializer.getObject().toString() + "\r\n";
@@ -68,18 +69,13 @@ public class ChainController {
 		Long blockHeight = deserializer.readLong("height");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
-		if (null == dbBlock) {
-			return Utils.jsonError(2, "block not found in the db");
-		}
+		if (null == dbBlock)
+			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHeight.toString());
 
-		List<byte[]> hashesList = this.blockDao.getHashesFrom(blockHeight, BlockChain.BLOCKS_LIMIT);
-		if (0 == hashesList.size())
-			return Utils.jsonError(3, "invalid call");
-
-		HashChain hashChain = new HashChain(hashesList.size());
-        for (int i = 0; i < hashesList.size(); ++i) {
-			hashChain.add(hashesList.get(i));
-        }
+		final List<byte[]> hashesList = this.blockDao.getHashesFrom(blockHeight, BlockChain.BLOCKS_LIMIT);
+		final HashChain hashChain = new HashChain(hashesList.size());
+        for (final byte[] hash : hashesList)
+			hashChain.add(hash);
 
 		JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObject("hashchain", hashChain);

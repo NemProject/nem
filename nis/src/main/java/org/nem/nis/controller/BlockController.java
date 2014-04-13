@@ -37,7 +37,7 @@ public class BlockController {
 		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
 		final org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(blockHash);
 		if (null == dbBlock)
-			throw new MissingResourceException("hash not found in the db", Block.class.getName(), blockHashString);
+			throw new MissingResourceException("block not found in the db", Block.class.getName(), blockHashString);
 
 		return BlockMapper.toModel(dbBlock, this.accountAnalyzer);
 	}
