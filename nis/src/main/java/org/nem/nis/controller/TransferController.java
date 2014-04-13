@@ -75,12 +75,16 @@ public class TransferController {
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
-		try (final BinaryDeserializer dataDeserializer = ControllerUtils.getDeserializer(bytes, this.accountAnalyzer)) {
+		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountAnalyzer)) {
 			return deserializeTransaction(dataDeserializer);
 		}
 	}
 
 	private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
 		return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+	}
+
+	private static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
+		return new BinaryDeserializer(bytes, new DeserializationContext(accountLookup));
 	}
 }
