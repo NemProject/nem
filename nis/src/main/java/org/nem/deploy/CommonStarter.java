@@ -20,15 +20,11 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.nem.nis.config.JsonErrorHandler;
 import org.springframework.web.context.ContextLoaderListener;
 
 /**
@@ -44,13 +40,6 @@ import org.springframework.web.context.ContextLoaderListener;
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
-
-
-	private static ErrorHandler createErrorHandler() {
-		ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
-		errorHandler.addErrorPage(404, "/errors/404.html");
-		return errorHandler;
-	}
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");
@@ -79,7 +68,7 @@ public class CommonStarter implements ServletContextListener {
 		//Special Listener to set-up the environment for Spring
 		servletContext.addEventListener(new CommonStarter());
 		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(createErrorHandler());
+		servletContext.setErrorHandler(new JsonErrorHandler());
 
 		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
