@@ -7,6 +7,7 @@ import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

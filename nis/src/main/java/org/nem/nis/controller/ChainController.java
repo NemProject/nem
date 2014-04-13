@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.model.HashChain;
+import org.nem.nis.controller.annotations.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;

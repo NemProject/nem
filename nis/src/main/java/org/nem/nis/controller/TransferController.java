@@ -8,6 +8,7 @@ import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;

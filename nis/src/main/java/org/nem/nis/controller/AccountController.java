@@ -4,6 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.serialization.Deserializer;
 import org.nem.nis.Foraging;
+import org.nem.nis.controller.annotations.ClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

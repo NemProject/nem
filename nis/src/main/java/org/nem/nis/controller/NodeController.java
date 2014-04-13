@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.serialization.Deserializer;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.annotations.*;
 import org.nem.peer.*;
 import org.nem.peer.trust.NodeExperiencesPair;
 import org.springframework.beans.factory.annotation.Autowired;

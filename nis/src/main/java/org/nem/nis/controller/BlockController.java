@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.apache.commons.codec.DecoderException;
 import org.nem.core.model.Hash;
+import org.nem.nis.controller.annotations.*;
 import org.nem.nis.dao.BlockDao;
 
 import org.nem.nis.mappers.BlockMapper;
