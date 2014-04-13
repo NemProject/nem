@@ -1,4 +1,4 @@
-package org.nem.nis.controller;
+package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
 import org.apache.commons.codec.DecoderException;
