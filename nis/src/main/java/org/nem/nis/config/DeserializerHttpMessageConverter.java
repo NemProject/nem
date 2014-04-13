@@ -12,7 +12,7 @@ import java.security.InvalidParameterException;
 /**
  * An HttpMessageConverter that maps application/json requests to Deserializer objects.
  */
-public class DeserializerHttpMessageConverter extends AbstractHttpMessageConverter<JsonDeserializer> {
+public class DeserializerHttpMessageConverter extends AbstractHttpMessageConverter<Deserializer> {
 
 	private final AccountLookup accountLookup;
 
@@ -29,7 +29,7 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 
 	@Override
 	protected boolean supports(final Class<?> aClass) {
-		return aClass.isAssignableFrom(JsonDeserializer.class);
+		return Deserializer.class.isAssignableFrom(aClass);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 
 	@Override
 	protected JsonDeserializer readInternal(
-			final Class<? extends JsonDeserializer> aClass,
+			final Class<? extends Deserializer> aClass,
 			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
 
 		final Object result = JSONValue.parse(httpInputMessage.getBody());
@@ -51,7 +51,7 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 
 	@Override
 	protected void writeInternal(
-			final JsonDeserializer serializableEntity,
+			final Deserializer serializableEntity,
 			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
 
 		throw new UnsupportedOperationException();

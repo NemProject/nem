@@ -1,6 +1,5 @@
 package org.nem.nis.controller;
 
-import org.nem.core.serialization.Deserializer;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.peer.*;
@@ -48,17 +47,13 @@ public class NodeController {
 	/**
 	 * Ping that means the pinging node is part of the NEM P2P network.
 	 *
-	 * @param deserializer The request body (information about the requesting node).
-	 *
-	 * @return OK json on success.
+	 * @param nodeExperiencesPair Information about the experiences the pinging node has had with other nodes.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(@RequestBody final Deserializer deserializer) {
-		final NodeExperiencesPair pair = new NodeExperiencesPair(deserializer);
-
+	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair) {
 		final PeerNetwork network = this.host.getNetwork();
-		network.getNodes().update(pair.getNode(), NodeStatus.ACTIVE);
-		network.setRemoteNodeExperiences(pair);
+		network.getNodes().update(nodeExperiencesPair.getNode(), NodeStatus.ACTIVE);
+		network.setRemoteNodeExperiences(nodeExperiencesPair);
 	}
 }

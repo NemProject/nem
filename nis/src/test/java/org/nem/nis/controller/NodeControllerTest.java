@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
 import org.nem.peer.test.MockPeerNetwork;
@@ -56,7 +55,7 @@ public class NodeControllerTest {
 		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));
 
 		// Act:
-		controller.ping(getNodeExperiencesPairDeserializer(pair));
+		controller.ping(pair);
 
 		// Assert:
 		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.ACTIVE));
@@ -82,7 +81,7 @@ public class NodeControllerTest {
 				IsEqual.equalTo(0L));
 
 		// Act:
-		controller.ping(getNodeExperiencesPairDeserializer(pair));
+		controller.ping(pair);
 
 		// Assert:
 		final NodeExperience experience = nodeExperiences.getNodeExperience(sourceNode, partnerNode);
@@ -95,12 +94,6 @@ public class NodeControllerTest {
 		experience.successfulCalls().set(numSuccessfulCalls);
 		experience.failedCalls().set(numFailureCalls);
 		return experience;
-	}
-
-	private static JsonDeserializer getNodeExperiencesPairDeserializer(final NodeExperiencesPair pair) {
-		final JsonSerializer serializer = new JsonSerializer();
-		pair.serialize(serializer);
-		return new JsonDeserializer(serializer.getObject(), new DeserializationContext(null));
 	}
 
 	/**

@@ -61,6 +61,7 @@ public class DeserializerHttpMessageConverterTest {
 
 		// Assert:
 		Assert.assertThat(mc.canRead(MediaType.class, supportedType), IsEqual.equalTo(false));
+		Assert.assertThat(mc.canRead(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
 	//endregion

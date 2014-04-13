@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
-import org.nem.core.serialization.Deserializer;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +23,12 @@ public class AccountController {
 	/**
 	 * Unlocks an account for foraging.
 	 *
-	 * @param deserializer The private key of the account to unlock.
+	 * @param privateKey The private key of the account to unlock.
 	 */
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
-	public void accountUnlock(@RequestBody final Deserializer deserializer) {
-		final Account account = new Account(new KeyPair(new PrivateKey(deserializer)));
+	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
+		final Account account = new Account(new KeyPair(privateKey));
 		this.foraging.addUnlockedAccount(account);
 	}
 }

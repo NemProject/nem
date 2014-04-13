@@ -50,9 +50,7 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public void transferAnnounce(@RequestBody final Deserializer deserializer) throws Exception {
-		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
-
+	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
