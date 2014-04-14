@@ -72,7 +72,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	interface DbBlockVisitor {
-		public void visit(org.nem.nis.dbmodel.Block dbBlock);
+		public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock);
 	};
 
 	class PartialWeightedScoreReversedCalculator implements DbBlockVisitor {
@@ -89,8 +89,8 @@ public class BlockChain implements BlockSynchronizer {
 		// visit should be called at most 1440 times, every score fits in 32-bits
 		// so long will be enough to keep partial score
 		@Override
-		public void visit(org.nem.nis.dbmodel.Block dbBlock) {
-			lastScore = blockScorer.calculateBlockScore(dbBlock);
+		public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
+			lastScore = blockScorer.calculateBlockScore(parentBlock, dbBlock);
 			partialScore += lastScore;
 		}
 
@@ -103,12 +103,20 @@ public class BlockChain implements BlockSynchronizer {
 	private void reverseChainIterator(final long wantedHeight, final DbBlockVisitor[] dbBlockVisitors) {
 		long currentHeight = getLastBlockHeight();
 
+		if (currentHeight <= 1 || wantedHeight <= 1) {
+			return;
+		}
+
+		org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
 		while (currentHeight != wantedHeight) {
-			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
+			org.nem.nis.dbmodel.Block parentBlock = blockDao.findByHeight(currentHeight - 1);
+
 			for (DbBlockVisitor dbBlockVisitor : dbBlockVisitors) {
-				dbBlockVisitor.visit(block);
+				dbBlockVisitor.visit(parentBlock, block);
 			}
 			currentHeight--;
+
+			block = parentBlock;
 		}
 	}
 
@@ -194,7 +202,7 @@ public class BlockChain implements BlockSynchronizer {
 				chainScore,
 				new DbBlockVisitor() {
 					@Override
-					public void visit(org.nem.nis.dbmodel.Block dbBlock) {
+					public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
 						Balance.unapply(contemporaryAccountAnalyzer, dbBlock);
 					}
 				}

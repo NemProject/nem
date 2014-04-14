@@ -72,11 +72,10 @@ public class BlockScorer {
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey());
-
 	}
 
-	public long calculateBlockScore(final org.nem.nis.dbmodel.Block currentBlock) {
-		return calculateBlockScoreImpl(currentBlock.getPrevBlockHash(), currentBlock.getForger().getPublicKey());
+	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
+		return calculateBlockScoreImpl(parentBlock.getBlockHash(), currentBlock.getForger().getPublicKey());
 	}
 
 	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner) {
