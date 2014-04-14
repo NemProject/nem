@@ -71,14 +71,19 @@ public class BlockScorer {
 	 * @return The block score.
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
-		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey());
+		int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp())
+		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey(), timeDiff);
 	}
 
 	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
-		return calculateBlockScoreImpl(parentBlock.getBlockHash(), currentBlock.getForger().getPublicKey());
+		int timeDiff = (currentBlock.getTimestamp() - parentBlock.getTimestamp());
+		return calculateBlockScoreImpl(parentBlock.getBlockHash(), currentBlock.getForger().getPublicKey(), timeDiff);
 	}
 
-	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner) {
+	/**
+	 * @param timeDiff positive time difference between blocks
+	 */
+	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner, int timeDiff) {
 		byte[] hash = Hashes.sha3(ArrayUtils.concat(thisBlockSigner.getRaw(), parentBlockHash.getRaw()));
 		return intToUlong(ByteUtils.bytesToInt(Arrays.copyOfRange(hash, 10, 14)));
 	}

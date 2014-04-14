@@ -107,6 +107,10 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
+		if (currentHeight == wantedHeight) {
+			return;
+		}
+
 		org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block parentBlock = blockDao.findByHeight(currentHeight - 1);
