@@ -20,15 +20,11 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.nem.nis.config.JsonErrorHandler;
 import org.springframework.web.context.ContextLoaderListener;
 
 /**
@@ -44,18 +40,6 @@ import org.springframework.web.context.ContextLoaderListener;
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
-
-	public static final String VERSION = "0.1.0";
-	public static final String APP_NAME = "NIS";
-	public static final int NEM_PORT = 7890;
-	public static final Integer NEM_PROTOCOL = new Integer(1);
-
-
-	private static ErrorHandler createErrorHandler() {
-		ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
-		errorHandler.addErrorPage(404, "/errors/404.html");
-		return errorHandler;
-	}
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");
@@ -84,10 +68,9 @@ public class CommonStarter implements ServletContextListener {
 		//Special Listener to set-up the environment for Spring
 		servletContext.addEventListener(new CommonStarter());
 		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(createErrorHandler());
+		servletContext.setErrorHandler(new JsonErrorHandler());
 
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		handlers.setHandlers(new Handler[] { contexts, servletContext, new ServletHandler(), new DefaultHandler() });
+		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
 		server.setDumpAfterStart(false);
 		server.setDumpBeforeStop(false);
@@ -99,7 +82,7 @@ public class CommonStarter implements ServletContextListener {
 
 		LOGGER.info("Calling start().");
 		server.start();
-		//
+
 		openStartPage();
 		server.join();
 	}
@@ -109,8 +92,8 @@ public class CommonStarter implements ServletContextListener {
 		boolean result = false;
 		// Let the show start without binding statically to JNLP
 		//We first try to get the JNLP Service Manager
-		Class jnlpServiceManager = null;
-		Class jnlpBasicService = null;
+		Class jnlpServiceManager;
+		Class jnlpBasicService;
 		try {
 			jnlpServiceManager = Class.forName("javax.jnlp.ServiceManager");
 			jnlpBasicService = Class.forName("javax.jnlp.BasicService");
@@ -126,14 +109,11 @@ public class CommonStarter implements ServletContextListener {
 		} catch (ClassNotFoundException | NoClassDefFoundError ex) {
 			// handle exception case
 			LOGGER.info("JNLP not available, not started via WebStart. Assuming headless run.");
-		} catch (NoSuchMethodException e) {
-			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
 		} catch (InvocationTargetException e) {
 			LOGGER.log(Level.INFO, "WebStart services failed: <" + e.getCause().getMessage() + ">. Not started via WebStart. Assuming headless run.");
-		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
 			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			LOGGER.log(Level.SEVERE, "home URL incorrect", e);
 		}
 
@@ -142,8 +122,7 @@ public class CommonStarter implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 
 	@Override

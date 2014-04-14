@@ -69,6 +69,14 @@ public class UnconfirmedTransactions {
 			}
 		}
 
+		Collections.sort(transactions, new Comparator<Transaction>() {
+			@Override
+			public int compare(final Transaction lhs, final Transaction rhs) {
+				// TODO: should we just use Transaction.compare (it weights things other than fees more heavily) ?
+				return rhs.getFee().compareTo(lhs.getFee());
+			}
+		});
+
 		return transactions;
 	}
 }

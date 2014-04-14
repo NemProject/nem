@@ -85,7 +85,7 @@ public class HttpMethodClient {
 			public Request createRequest(final HttpClient httpClient, final URI uri) {
 				Request req = httpClient.newRequest(uri);
 				req.method(HttpMethod.POST);
-				req.content(new BytesContentProvider(requestData.toString().getBytes()), "text/plain");
+				req.content(new BytesContentProvider(requestData.toString().getBytes()), "application/json");
 				return req;
 			}
 		});

@@ -1,15 +1,20 @@
 package org.nem.peer.trust.score;
 
+import org.nem.core.utils.AbstractTwoLevelMap;
 import org.nem.peer.Node;
 import org.nem.core.math.*;
 
 import java.security.InvalidParameterException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Scores<T extends Score> {
 
-	private final Map<Node, Map<Node, T>> scores = new ConcurrentHashMap<>();
+	private final AbstractTwoLevelMap<Node, T> scores = new AbstractTwoLevelMap<Node, T>() {
+
+		@Override
+		protected T createValue() {
+			return createScore();
+		}
+	};
 
 	/**
 	 * Creates a new blank score.
@@ -27,25 +32,7 @@ public abstract class Scores<T extends Score> {
 	 * @return The score source has with other.
 	 */
 	public T getScore(final Node source, final Node other) {
-		final Map<Node, T> localScores = this.getScores(source);
-
-		T score = localScores.get(other);
-		if (null == score) {
-			score = this.createScore();
-			localScores.put(other, score);
-		}
-
-		return score;
-	}
-
-	protected Map<Node, T> getScores(final Node source) {
-		Map<Node, T> localExperiences = this.scores.get(source);
-		if (null == localExperiences) {
-			localExperiences = new ConcurrentHashMap<>();
-			this.scores.put(source, localExperiences);
-		}
-
-		return localExperiences;
+		return this.scores.getItem(source, other);
 	}
 
 	/**

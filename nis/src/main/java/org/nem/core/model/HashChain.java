@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
+ *
+ * TODO: add support for equals and then check findFirstDifferent usages
  */
 public class HashChain implements SerializableEntity {
 	private List<Hash> hashChainList;

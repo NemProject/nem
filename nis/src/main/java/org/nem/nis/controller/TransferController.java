@@ -8,80 +8,82 @@ import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.peer.NodeApiId;
 import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
+// TODO: add tests
 @RestController
 public class TransferController {
 	private static final Logger LOGGER = Logger.getLogger(TransferController.class.getName());
 
-	@Autowired
-	AccountAnalyzer accountAnalyzer;
+	private final AccountAnalyzer accountAnalyzer;
+	private final Foraging foraging;
+	private final NisPeerNetworkHost host;
 
-	@Autowired
-	private Foraging foraging;
-
-	@Autowired
-	private NisPeerNetworkHost host;
+	@Autowired(required = true)
+	TransferController(
+			final AccountAnalyzer accountAnalyzer,
+			final Foraging foraging,
+			final NisPeerNetworkHost host) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.foraging = foraging;
+		this.host = host;
+	}
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
 	@ClientApi
-	public String transferPrepare(@RequestBody final String body) {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
+	public RequestPrepare transferPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
-		// TODO: exception
 		if (!transfer.isValid())
-			return Utils.jsonError(1, "incorrect data");
+			throw new InvalidParameterException("transfer must be valid");
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
-		return ControllerUtils.serialize(new RequestPrepare(transferData));
+		return new RequestPrepare(transferData);
 	}
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public String transferAnnounce(@RequestBody final String body) throws Exception {
-		final Deserializer deserializer = ControllerUtils.getDeserializer(body, this.accountAnalyzer);
-		final RequestAnnounce requestAnnounce = new RequestAnnounce(deserializer);
-
+	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
-		// TODO: move logger to controller
 		LOGGER.info("   signer: " + transfer.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
-		if (transfer.isValid() && transfer.verify()) {
-			final PeerNetwork network = this.host.getNetwork();
+		if (!transfer.isValid() || !transfer.verify())
+			throw new InvalidParameterException("transfer must be valid and verifiable");
 
-			// add to unconfirmed transactions
-			if (foraging.processTransaction(transfer)) {
+        final PeerNetwork network = this.host.getNetwork();
 
-				// propagate transactions
-				// TODO: this should queue request and return immediately, so that client who
-				// actually has sent /transfer/announce won't wait for this...
-				network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
-			}
+        // add to unconfirmed transactions
+        if (foraging.processTransaction(transfer)) {
 
-			return Utils.jsonOk();
-		}
-
-		// TODO: exception
-		return Utils.jsonError(2, "transaction couldn't be verified " + Boolean.toString(transfer.verify()));
+            // propagate transactions
+            // TODO: this should queue request and return immediately, so that client who
+            // actually has sent /transfer/announce won't wait for this...
+            network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
+        }
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
-		try (final BinaryDeserializer dataDeserializer = ControllerUtils.getDeserializer(bytes, this.accountAnalyzer)) {
+		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountAnalyzer)) {
 			return deserializeTransaction(dataDeserializer);
 		}
 	}
 
 	private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
 		return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+	}
+
+	private static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
+		return new BinaryDeserializer(bytes, new DeserializationContext(accountLookup));
 	}
 }

@@ -2,7 +2,6 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.Utils;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.NodeExperiencesPair;
@@ -115,73 +114,6 @@ public class PeerNetworkHostTest {
 
 			// Assert:
 			Assert.assertThat(network.getNumSynchronizeCalls(), IsEqual.equalTo(1));
-		}
-	}
-
-	private static class MockPeerNetwork extends PeerNetwork {
-
-		private final Object refreshMonitor;
-		private int numRefreshCalls;
-		private int numBroadcastCalls;
-		private int numSynchronizeCalls;
-		private NodeApiId lastBroadcastId;
-		private SerializableEntity lastBroadcastEntity;
-
-		public MockPeerNetwork() {
-			this(null);
-		}
-
-		public MockPeerNetwork(final Object refreshMonitor) {
-			super(ConfigFactory.createDefaultTestConfig(), createMockPeerNetworkServices());
-			this.refreshMonitor = refreshMonitor;
-		}
-
-		public int getNumRefreshCalls() {
-			return this.numRefreshCalls;
-		}
-
-		public int getNumBroadcastCalls() {
-			return this.numBroadcastCalls;
-		}
-
-		public NodeApiId getLastBroadcastId() {
-			return this.lastBroadcastId;
-		}
-
-		public SerializableEntity getLastBroadcastEntity() {
-			return this.lastBroadcastEntity;
-		}
-
-		public int getNumSynchronizeCalls() {
-			return this.numSynchronizeCalls;
-		}
-
-		@Override
-		public void refresh() {
-			if (null != this.refreshMonitor)
-				Utils.monitorWait(this.refreshMonitor);
-
-			++this.numRefreshCalls;
-		}
-
-		@Override
-		public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-			++this.numBroadcastCalls;
-			this.lastBroadcastId = broadcastId;
-			this.lastBroadcastEntity = entity;
-		}
-
-		@Override
-		public void synchronize() {
-			++this.numSynchronizeCalls;
-		}
-
-		private static PeerNetworkServices createMockPeerNetworkServices() {
-			return new PeerNetworkServices(
-					new MockConnector(),
-					new MockConnector(),
-					new MockNodeSchedulerFactory(),
-					new MockBlockSynchronizer());
 		}
 	}
 }

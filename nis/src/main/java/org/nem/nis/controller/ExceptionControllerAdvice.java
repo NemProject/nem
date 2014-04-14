@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import net.minidev.json.JSONObject;
+import org.nem.core.serialization.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ public class ExceptionControllerAdvice {
 	 * @return The appropriate JSON indicating an error.
 	 */
 	@ExceptionHandler(MissingResourceException.class)
-	public String handleMissingResourceException(final Exception e) {
+	public Error handleMissingResourceException(final Exception e) {
 		return getErrorString(e, HttpStatus.NOT_FOUND);
 	}
 
@@ -37,7 +37,7 @@ public class ExceptionControllerAdvice {
 	 * @return The appropriate JSON indicating an error.
 	 */
 	@ExceptionHandler(InvalidParameterException.class)
-	public String handleInvalidParameterException(final Exception e) {
+	public Error handleInvalidParameterException(final Exception e) {
 		return getErrorString(e, HttpStatus.BAD_REQUEST);
 	}
 
@@ -49,20 +49,32 @@ public class ExceptionControllerAdvice {
 	 * @return The appropriate JSON indicating an error.
 	 */
 	@ExceptionHandler(Exception.class)
-	public String handleException(final Exception e) {
+	public Error handleException(final Exception e) {
 		return getErrorString(e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// TODO: add a few tests
 
 	// TODO: unify with Utils.jsonError
-	private static String getErrorString(final Exception e, final HttpStatus status) {
+	private static Error getErrorString(final Exception e, final HttpStatus status) {
 		Level logLevel = HttpStatus.INTERNAL_SERVER_ERROR == status ? Level.SEVERE : Level.INFO;
 		LOGGER.log(logLevel, e.getMessage());
+		return new Error(status);
+	}
 
-		final JSONObject jsonObject = new JSONObject();
-		jsonObject.put("status", status.value());
-		jsonObject.put("error", status.getReasonPhrase());
-		return jsonObject.toJSONString() + "\r\n";
+	// TODO: rename and promote
+	public static class Error implements SerializableEntity {
+
+		final HttpStatus status;
+
+		public Error(final HttpStatus status) {
+			this.status = status;
+		}
+
+		@Override
+		public void serialize(final Serializer serializer) {
+			serializer.writeInt("status", status.value());
+			serializer.writeString("error", status.getReasonPhrase());
+		}
 	}
 }
