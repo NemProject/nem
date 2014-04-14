@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Response that is returned when an action fails.
  */
-class ErrorResponse implements SerializableEntity {
+public class ErrorResponse implements SerializableEntity {
 
 	private static final Logger LOGGER = Logger.getLogger(ErrorResponse.class.getName());
 	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
