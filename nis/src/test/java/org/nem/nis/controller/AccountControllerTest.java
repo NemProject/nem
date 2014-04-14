@@ -4,7 +4,9 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.nis.Foraging;
+import org.nem.nis.test.MockAccountAnalyzer;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 
 public class AccountControllerTest {
@@ -14,7 +16,8 @@ public class AccountControllerTest {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		try (final MockForaging foraging = new MockForaging()) {
-			final AccountController controller = new AccountController(foraging);
+			final MockAccountAnalyzer accountAnalyzer = new MockAccountAnalyzer();
+			final AccountController controller = new AccountController(foraging, accountAnalyzer);
 
 			// Act:
 			controller.accountUnlock(account.getKeyPair().getPrivateKey());
@@ -23,6 +26,20 @@ public class AccountControllerTest {
 			Assert.assertThat(foraging.getUnlockedAccounts().size(), IsEqual.equalTo(1));
 			Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsEqual.equalTo(account));
 			Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsNot.not(IsSame.sameInstance(account)));
+		}
+	}
+
+	//
+	@Test(expected = InvalidParameterException.class)
+	public void accountGetReturnsError() throws Exception {
+		// Arrange:
+		try (final MockForaging foraging = new MockForaging()) {
+			final MockAccountAnalyzer accountAnalyzer = new MockAccountAnalyzer();
+			final AccountController controller = new AccountController(foraging, accountAnalyzer);
+
+			// Act:
+			controller.accountGet("dummy");
+
 		}
 	}
 
