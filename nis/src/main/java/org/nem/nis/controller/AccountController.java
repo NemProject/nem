@@ -2,8 +2,11 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.Address;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +16,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AccountController {
 
+	private final AccountLookup accountLookup;
 	private final Foraging foraging;
 
 	@Autowired(required = true)
-	AccountController(final Foraging foraging) {
+	AccountController(final Foraging foraging, final AccountLookup accountLookup) {
 		this.foraging = foraging;
+		this.accountLookup = accountLookup;
 	}
 
+	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
+	@ClientApi
+	public Account accountGet(@RequestParam(value = "address") final String nemAddress) {
+		return this.accountLookup.findByAddress(Address.fromEncoded(nemAddress));
+	}
 	/**
 	 * Unlocks an account for foraging.
 	 *

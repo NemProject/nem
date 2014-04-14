@@ -1,13 +1,17 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
+import org.nem.core.serialization.AccountEncoding;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.SerializationUtils;
+import org.nem.core.serialization.Serializer;
 
 import java.util.*;
 
 /**
  * A NEM account.
  */
-public class Account {
+public class Account implements SerializableEntity {
 
 	private final KeyPair keyPair;
 	private final Address address;
@@ -46,6 +50,18 @@ public class Account {
 
 		this.label = null == account.getLabel() ? null : new String(account.getLabel());
 		this.balance = new Amount(account.getBalance().getNumMicroNem());
+	}
+
+
+	@Override
+	public void serialize(Serializer serializer) {
+		SerializationUtils.writeAccount(serializer, "address", this, AccountEncoding.ADDRESS);
+		if (this.keyPair != null) {
+			SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+		}
+		serializer.writeLong("balance", getBalance().getNumMicroNem());
+		serializer.writeString("label", getLabel());
+		serializer.writeObjectArray("messages", getMessages());
 	}
 
 	/**
