@@ -73,10 +73,7 @@ public class BlockChainValidator {
 		// 2*x_0 + x_1 + x_2 + ...
 		boolean isFirst = true;
 		for (final Block block : blocks) {
-			long score = scorer.calculateBlockScore(
-					HashUtils.calculateHash(parentBlock),
-					block.getSigner().getKeyPair().getPublicKey()
-			);
+			long score = scorer.calculateBlockScore(parentBlock, block);
 
 			peersScore += score;
 

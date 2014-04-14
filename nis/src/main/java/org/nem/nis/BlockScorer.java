@@ -1,9 +1,12 @@
 package org.nem.nis;
 
+import org.nem.core.crypto.Hashes;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.Hash;
+import org.nem.core.model.HashUtils;
+import org.nem.core.utils.ArrayUtils;
 import org.nem.core.utils.ByteUtils;
 
 import java.math.BigInteger;
@@ -62,18 +65,27 @@ public class BlockScorer {
 	/**
 	 * Calculates the block score for block.
 	 *
-	 * @param parentBlockHash previous (parent block hash)
-	 * @param thisBlockSigner signer of block
+	 * @param parentBlock previous block in the chain.
+	 * @param currentBlock currently analyzed block.
 	 *
 	 * @return The block score.
-	 *
-	 * TODO: this api could take dbBlock, but this way we have one API for
-	 * both blocks and dbblocks.
 	 */
-	public long calculateBlockScore(final Hash parentBlockHash, final PublicKey thisBlockSigner) {
-		long r1 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(thisBlockSigner.getRaw(), 10, 14)));
-		long r2 = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(parentBlockHash.getRaw(), 10, 14)));
+	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
+		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey());
 
-		return r1 + r2;
+	}
+
+	public long calculateBlockScore(final org.nem.nis.dbmodel.Block currentBlock) {
+		return calculateBlockScoreImpl(currentBlock.getPrevBlockHash(), currentBlock.getForger().getPublicKey());
+	}
+
+	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner) {
+		byte[] hash = Hashes.sha3(ArrayUtils.concat(thisBlockSigner.getRaw(), parentBlockHash.getRaw()));
+		return intToUlong(ByteUtils.bytesToInt(Arrays.copyOfRange(hash, 10, 14)));
+	}
+
+	private static long intToUlong(int value) {
+		//final long fix = Math.abs((long)Integer.MIN_VALUE);
+		return Math.abs((long)value);
 	}
 }

@@ -90,7 +90,7 @@ public class BlockChain implements BlockSynchronizer {
 		// so long will be enough to keep partial score
 		@Override
 		public void visit(org.nem.nis.dbmodel.Block dbBlock) {
-			lastScore = blockScorer.calculateBlockScore(dbBlock.getPrevBlockHash(), dbBlock.getForger().getPublicKey());
+			lastScore = blockScorer.calculateBlockScore(dbBlock);
 			partialScore += lastScore;
 		}
 
