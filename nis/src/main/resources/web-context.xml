@@ -13,7 +13,7 @@
 
 <!-- Configures the @Controller programming model -->
 <mvc:annotation-driven>
-    <mvc:message-converters register-defaults="false">
+    <mvc:message-converters register-defaults="true">
         <bean class="org.nem.nis.config.SerializableEntityHttpMessageConverter" />
         <bean class="org.nem.nis.config.DeserializerHttpMessageConverter" />
     </mvc:message-converters>
