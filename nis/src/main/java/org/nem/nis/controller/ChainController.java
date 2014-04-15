@@ -44,7 +44,7 @@ public class ChainController {
 		final Long blockHeight = deserializer.readLong("height");
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
 		final List<Block> blockList = new LinkedList<>();
-		for (int i = 0; i < BlockChain.ESTIMATED_BLOCKS_PER_DAY / 2; ++i) {
+		for (int i = 0; i < BlockChain.BLOCKS_LIMIT; ++i) {
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				break;
