@@ -151,6 +151,13 @@
 			<scope>test</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
 		<!-- actually we don't need flyway-maven, flyway-core will be enough <dependency> 
 			<groupId>com.googlecode.flyway</groupId> <artifactId>flyway-maven-plugin</artifactId> 
 			<version>2.3</version> </dependency> -->
