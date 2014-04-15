@@ -38,6 +38,8 @@ public class Block {
 	private Long totalAmount;
 	private Long totalFee;
 
+	private Long difficulty;
+
 	private Long nextBlockId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "block", orphanRemoval=true)
@@ -56,7 +58,8 @@ public class Block {
 			byte[] forgerProof,
 			Long height,
 			Long totalAmount,
-			Long totalFee) {
+			Long totalFee,
+			Long difficulty) {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
@@ -68,6 +71,7 @@ public class Block {
 		this.height = height;
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
+		this.difficulty = difficulty;
 	}
 
 	public Long getId() {
@@ -156,6 +160,14 @@ public class Block {
 
 	public void setTotalFee(Long totalFee) {
 		this.totalFee = totalFee;
+	}
+
+	public Long getDifficulty() {
+		return this.difficulty;
+	}
+
+	public void setDifficulty(Long difficulty) {
+		this.difficulty = difficulty;
 	}
 
 	public Long getNextBlockId() {

@@ -109,7 +109,7 @@ public class AccountAnalyzerTest {
 		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
 
 		Block b = new Block(
-				Hash.ZERO, 1, Hash.ZERO, 0, sender, new byte[64], 1L, 8 * 1000000L, 0L
+				Hash.ZERO, 1, Hash.ZERO, 0, sender, new byte[64], 1L, 8 * 1000000L, 0L, 123L
 		);
 
 		b.setBlockTransfers(Arrays.asList(t1, t2));

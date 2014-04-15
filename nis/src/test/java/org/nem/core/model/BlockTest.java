@@ -93,6 +93,30 @@ public class BlockTest {
 	}
 
 	@Test
+	public void blockDifficultyIsNotRoundTripped() {
+		// Act:
+		final Block block = createBlockForRoundTripTests(true, null);
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsNot.not(IsEqual.equalTo(123L)));
+	}
+
+	@Test
+	public void changingDifficultyDoesNotInvalidateBlock() {
+		// Arrange:
+		final Block block = createBlockForRoundTripTests(true, null);
+
+		// Act
+		boolean result = block.verify();
+		block.setDifficulty(678L);
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(678L));
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void blockAndTransactionsCanBeVerifiedAfterVerifiableRoundTrip() {
 		// Act:
 		final Block block = createBlockForRoundTripTests(true, null);
@@ -136,6 +160,7 @@ public class BlockTest {
 
 		final TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
 		originalBlock.addTransaction(transaction2);
+		originalBlock.setDifficulty(123L);
 		originalBlock.sign();
 
 		// Arrange:

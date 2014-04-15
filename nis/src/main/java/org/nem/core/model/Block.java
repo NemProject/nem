@@ -18,10 +18,13 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_VERSION = 1;
 
 	private final Hash prevBlockHash;
-	private long height; // unsure yet, but probably will be easier to talk on forums having that
+	private long height;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
+
+	// this is helper field and (probably) shouldn't be serialized
+	private long difficulty;
 
 	/**
 	 * Creates a new block.
@@ -36,6 +39,8 @@ public class Block extends VerifiableEntity {
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
+
+		this.difficulty = 0;
 	}
 
 	/**
@@ -104,7 +109,18 @@ public class Block extends VerifiableEntity {
 		return this.transactions;
 	}
 
+	/**
+	 * Gets the difficulty associated with this block.
+	 *
+	 * @return Difficulty of this block.
+	 */
+	public long getDifficulty() { return this.difficulty; }
+
 	//endregion
+
+	public void setDifficulty(long difficulty) {
+		this.difficulty = difficulty;
+	}
 
 	/**
 	 * Adds a new transaction to this block.

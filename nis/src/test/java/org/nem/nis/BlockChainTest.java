@@ -72,7 +72,8 @@ public class BlockChainTest {
 				b.getSignature().getBytes(),
 				b.getHeight(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
-				0L
+				0L,
+				123L
 		);
 
 		Transfer dbTransaction1 = new Transfer(
