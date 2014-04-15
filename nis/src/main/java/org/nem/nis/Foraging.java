@@ -157,8 +157,6 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final BigInteger hit = scorer.calculateHit(lastBlock);
-				System.out.println("   hit: 0x" + hit.toString(16));
 
 				for (Account virtualForger : unlockedAccounts) {
 
@@ -167,6 +165,8 @@ public class Foraging implements AutoCloseable, Runnable {
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
+					final BigInteger hit = scorer.calculateHit(lastBlock, virtualForger);
+					System.out.println("   hit: 0x" + hit.toString(16));
 					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
 

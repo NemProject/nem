@@ -28,8 +28,9 @@ public class BlockScorer {
 	 * @param block The block.
 	 * @return the hit score.
 	 */
-	public BigInteger calculateHit(final Block block) {
-		return new BigInteger(1, Arrays.copyOfRange(block.getSignature().getBytes(), 2, 10));
+	public BigInteger calculateHit(final Block block, final Account blockSigner) {
+		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), HashUtils.calculateHash(block).getRaw()));
+		return new BigInteger(1, Arrays.copyOfRange(hash, 10, 18));
 	}
 
 	/**

@@ -90,7 +90,7 @@ public class BlockChainValidator {
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
 		Account forgerAccount = this.accountLookup.findByAddress(block.getSigner().getAddress());
-		final BigInteger hit = this.scorer.calculateHit(parentBlock);
+		final BigInteger hit = this.scorer.calculateHit(parentBlock, forgerAccount);
 		final BigInteger target = this.scorer.calculateTarget(parentBlock, block, forgerAccount);
 		return hit.compareTo(target) < 0;
 	}
