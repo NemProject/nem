@@ -65,10 +65,10 @@ public class SystemTimeProviderTest {
 
 	private static CurrentTimeInfo getDeterministicCurrentTime() {
 		// Arrange:
-		TimeProvider provider = new SystemTimeProvider();
+		final TimeProvider provider = new SystemTimeProvider();
 
 		// Act:
-		CurrentTimeInfo ctInfo = new CurrentTimeInfo();
+		final CurrentTimeInfo ctInfo = new CurrentTimeInfo();
 		long systemTimeEnd;
 		do {
 			ctInfo.systemTime = System.currentTimeMillis();
