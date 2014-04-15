@@ -20,7 +20,7 @@ public class MockPeerConnector {
 		super();
 
 		this.baseURL = new URL("http", "127.0.0.1", 7890, "/");
-		this.httpMethodClient = new HttpMethodClient(new DeserializationContext(new MockAccountLookup()), 30);
+		this.httpMethodClient = null;//new HttpMethodClient(new DeserializationContext(new MockAccountLookup()), 30);
 	}
 
 	public JsonDeserializer transferPrepare(final JSONObject transferPrepareData) throws MalformedURLException {
@@ -44,6 +44,7 @@ public class MockPeerConnector {
 	}
 
 	private JsonDeserializer post(final String path, final JSONObject requestData) throws MalformedURLException {
-		return this.httpMethodClient.post(new URL(this.baseURL, path), requestData);
+		return null;
+//		return this.httpMethodClient.post(new URL(this.baseURL, path), requestData);
 	}
 }

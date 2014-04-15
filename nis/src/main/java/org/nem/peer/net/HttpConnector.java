@@ -15,7 +15,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	private static final int DEFAULT_TIMEOUT = 30;
 
-	private final HttpMethodClient httpMethodClient;
+	private final HttpMethodClient<Deserializer> httpMethodClient;
 
 	/**
 	 * Creates a new HTTP peer connector.
@@ -23,7 +23,9 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	 * @param context The deserialization context to use when deserializing responses.
 	 */
 	public HttpConnector(final DeserializationContext context) {
-		this.httpMethodClient = new HttpMethodClient(context, DEFAULT_TIMEOUT);
+		this.httpMethodClient = new HttpMethodClient<>(
+				new HttpDeserializerResponseStrategy(context),
+				DEFAULT_TIMEOUT);
 	}
 
 	//region PeerConnector
@@ -67,8 +69,8 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
 		final JSONObject obj = getJsonObjectWithHeight(height);
-		final JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
-		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
+		final Deserializer deserializer = this.httpMethodClient.post(url, obj);
+		return deserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
