@@ -102,4 +102,26 @@ public class ErrorResponseTest {
 		// Assert:
 		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(systemTime));
 	}
+
+	@Test
+	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsKnown() {
+		// Assert:
+		Assert.assertThat(
+				"Http Status Code 404: badness",
+				IsEqual.equalTo(new ErrorResponse("badness", 404).toString()));
+		Assert.assertThat(
+				"Http Status Code 404: Not Found",
+				IsEqual.equalTo(new ErrorResponse(null, 404).toString()));
+	}
+
+	@Test
+	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsUnknown() {
+		// Assert:
+		Assert.assertThat(
+				"Http Status Code -123: badness",
+				IsEqual.equalTo(new ErrorResponse("badness", -123).toString()));
+		Assert.assertThat(
+				"Http Status Code -123",
+				IsEqual.equalTo(new ErrorResponse(null, -123).toString()));
+	}
 }

@@ -44,7 +44,7 @@ public class ErrorResponse implements SerializableEntity {
 		this.timeStamp = TIME_PROVIDER.getCurrentTime().getRawTime();
 
 		final Level logLevel = this.status >= 500 ? Level.SEVERE : Level.INFO;
-		LOGGER.log(logLevel, this.message);
+		LOGGER.log(logLevel, this.toString());
 	}
 
 	/**
@@ -103,5 +103,20 @@ public class ErrorResponse implements SerializableEntity {
 		catch (IllegalArgumentException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Http Status Code ");
+		builder.append(this.status);
+
+		final String message = null != this.message ? this.message : this.error;
+		if (null != message) {
+			builder.append(": ");
+			builder.append(message);
+		}
+
+		return builder.toString();
 	}
 }
