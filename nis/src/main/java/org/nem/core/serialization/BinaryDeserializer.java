@@ -51,7 +51,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	@Override
 	public byte[] readBytes(final String label) {
 		int numBytes = this.readInt(null);
-		return this.readBytes(numBytes);
+		return BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numBytes ? null : this.readBytes(numBytes);
 	}
 
 	@Override

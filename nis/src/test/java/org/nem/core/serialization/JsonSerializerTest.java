@@ -71,6 +71,20 @@ public class JsonSerializerTest {
 	}
 
 	@Test
+	public void canWriteNullBytes() {
+		// Arrange:
+		JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeBytes("bytes", null);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("bytes"), IsEqual.equalTo(null));
+	}
+
+	@Test
 	public void canWriteString() {
 		// Arrange:
 		JsonSerializer serializer = new JsonSerializer();
@@ -196,6 +210,21 @@ public class JsonSerializerTest {
 
 		// Assert:
 		Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
+	}
+
+	@Test
+	public void canRoundtripNullBytes() {
+		// Arrange:
+		JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeBytes("bytes", null);
+
+		JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final byte[] readBytes = deserializer.readBytes("bytes");
+
+		// Assert:
+		Assert.assertThat(readBytes, IsEqual.equalTo(null));
 	}
 
 	@Test

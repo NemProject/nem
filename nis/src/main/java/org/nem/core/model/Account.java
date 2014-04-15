@@ -51,11 +51,10 @@ public class Account implements SerializableEntity {
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		SerializationUtils.writeAccount(serializer, "address", this, AccountEncoding.ADDRESS);
-		if (this.keyPair != null) {
-			SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
-		}
+		SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+
 		serializer.writeLong("balance", getBalance().getNumMicroNem());
 		serializer.writeString("label", getLabel());
 		serializer.writeObjectArray("messages", getMessages());

@@ -62,6 +62,9 @@ public class JsonDeserializer implements Deserializer {
 	@Override
 	public byte[] readBytes(final String label) {
 		final String s = this.readString(label);
+		if (null == s)
+			return null;
+
 		return s.isEmpty() ? new byte[] { } : Base64Encoder.getBytes(s);
 	}
 

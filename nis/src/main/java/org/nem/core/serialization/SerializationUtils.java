@@ -1,11 +1,15 @@
 package org.nem.core.serialization;
 
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
-public class SerializationUtils {
+/**
+ * Static class containing helper functions for serializing and deserializing objects.
+ */
+public abstract class SerializationUtils {
 
 	//region Address
 
@@ -59,7 +63,8 @@ public class SerializationUtils {
 	public static void writeAccount(final Serializer serializer, final String label, final Account account, final AccountEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
-				serializer.writeBytes(label, account.getKeyPair().getPublicKey().getRaw());
+				final KeyPair keyPair = account.getKeyPair();
+				serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
 				break;
 
 			case ADDRESS:
