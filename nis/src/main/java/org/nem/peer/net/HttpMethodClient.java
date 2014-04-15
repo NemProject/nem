@@ -5,6 +5,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.*;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.*;
@@ -15,23 +16,23 @@ import java.util.concurrent.*;
 
 /**
  * Helper class that wraps an HttpClient.
+ *
+ * @param <T> The type of responses
  */
-public class HttpMethodClient {
+public class HttpMethodClient<T> {
 
-	private static final int HTTP_STATUS_OK = 200;
-
-	private final DeserializationContext context;
+	private final HttpResponseStrategy<T> responseStrategy;
 	private final int timeout;
 	private final HttpClient httpClient;
 
 	/**
 	 * Creates a new HTTP method client.
 	 *
-	 * @param context The deserialization context to use when deserializing responses.
+	 * @param responseStrategy The response strategy to use.
 	 * @param timeout The timeout (in seconds) that should be used.
 	 */
-	public HttpMethodClient(final DeserializationContext context, final int timeout) {
-		this.context = context;
+	public HttpMethodClient(final HttpResponseStrategy<T> responseStrategy, final int timeout) {
+		this.responseStrategy = responseStrategy;
 		this.timeout = timeout;
 
 		try {
@@ -50,7 +51,7 @@ public class HttpMethodClient {
 	 *
 	 * @return The response from the server.
 	 */
-	public JsonDeserializer get(final URL url) {
+	public T get(final URL url) {
 		return sendRequest(url, new RequestFactory() {
 			@Override
 			public Request createRequest(final HttpClient httpClient, final URI uri) {
@@ -67,7 +68,7 @@ public class HttpMethodClient {
 	 *
 	 * @return The response from the server.
 	 */
-	public JsonDeserializer post(final URL url, final SerializableEntity entity) {
+	public T post(final URL url, final SerializableEntity entity) {
 		return this.post(url, JsonSerializer.serializeToJson(entity));
 	}
 
@@ -79,13 +80,15 @@ public class HttpMethodClient {
 	 *
 	 * @return The response from the server.
 	 */
-	public JsonDeserializer post(final URL url, final JSONObject requestData) {
+	public T post(final URL url, final JSONObject requestData) {
 		return sendRequest(url, new RequestFactory() {
 			@Override
 			public Request createRequest(final HttpClient httpClient, final URI uri) {
 				Request req = httpClient.newRequest(uri);
 				req.method(HttpMethod.POST);
-				req.content(new BytesContentProvider(requestData.toString().getBytes()), "application/json");
+				req.content(
+						new BytesContentProvider(requestData.toString().getBytes()),
+						MimeTypes.Type.APPLICATION_JSON.asString());
 				return req;
 			}
 		});
@@ -98,7 +101,7 @@ public class HttpMethodClient {
 	 *
 	 * @return The response from the server.
 	 */
-	private JsonDeserializer sendRequest(final URL url, final RequestFactory requestFactory) {
+	private T sendRequest(final URL url, final RequestFactory requestFactory) {
 		try {
 			final URI uri = url.toURI();
 			final InputStreamResponseListener listener = new InputStreamResponseListener();
@@ -107,14 +110,7 @@ public class HttpMethodClient {
 			req.send(listener);
 
 			final Response res = listener.get(this.timeout, TimeUnit.SECONDS);
-			if (res.getStatus() != HTTP_STATUS_OK)
-				throw new InactivePeerException(String.format("Peer returned: %d", res.getStatus()));
-
-			try (InputStream responseStream = listener.getInputStream()) {
-				return new JsonDeserializer(
-						(JSONObject)JSONValue.parse(responseStream),
-						this.context);
-			}
+			return this.responseStrategy.coerce(req, res);
 		} catch (TimeoutException e) {
 			throw new InactivePeerException(e);
 		} catch (URISyntaxException | ExecutionException | IOException e) {

@@ -72,6 +72,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.flyway:flyway-core:2.3.1" level="project" />
   </component>
   <component name="SonarSettingsModuleComponent">

@@ -2,27 +2,25 @@ package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-import org.nem.core.serialization.JsonDeserializer;
-import org.nem.nis.test.MockPeerConnector;
-
-import java.net.MalformedURLException;
+import org.junit.*;
+import org.nem.nis.test.LocalHostConnector;
 
 public class PushControllerTest {
 
-	@Test
-	public void transferIncorrectPush() throws MalformedURLException {
-		// Arrange:
-		MockPeerConnector pc = new MockPeerConnector();
+	private static final String PUSH_TRANSACTION_PATH = "push/transaction";
 
-		JSONObject obj = new JSONObject();
+	@Test
+	public void transferIncorrectPush() {
+		// Arrange:
+		final LocalHostConnector connector = new LocalHostConnector();
+
+		final JSONObject obj = new JSONObject();
 		obj.put("type", 123456);
 
 		// Act:
-		JsonDeserializer res = pc.pushTransaction(obj);
+		final LocalHostConnector.Result result = connector.post(PUSH_TRANSACTION_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(res.readInt("status"), IsEqual.equalTo(400));
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
 	}
 }
