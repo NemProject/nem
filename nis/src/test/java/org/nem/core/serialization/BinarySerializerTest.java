@@ -75,6 +75,33 @@ public class BinarySerializerTest {
 	}
 
 	@Test
+	public void canWriteNullBytes() throws Exception {
+		// Arrange:
+		try (BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			serializer.writeBytes("bytes", null);
+
+			// Assert:
+			final byte[] expectedBytes = new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF };
+			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+		}
+	}
+
+	@Test
+	public void canWriteEmptyBytes() throws Exception {
+		// Arrange:
+		try (BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			final byte[] bytes = new byte[0];
+			serializer.writeBytes("bytes", bytes);
+
+			// Assert:
+			final byte[] expectedBytes = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+		}
+	}
+
+	@Test
 	public void canWriteString() throws Exception {
 		// Arrange:
 		try (BinarySerializer serializer = new BinarySerializer()) {
@@ -203,6 +230,41 @@ public class BinarySerializerTest {
 		try (BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
+			serializer.writeBytes("bytes", bytes);
+
+			try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+				final byte[] readBytes = deserializer.readBytes("bytes");
+
+				// Assert:
+				Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
+				Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
+			}
+		}
+	}
+
+	@Test
+	public void canRoundtripNullBytes() throws Exception {
+		// Arrange:
+		try (BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			serializer.writeBytes("bytes", null);
+
+			try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+				final byte[] readBytes = deserializer.readBytes("bytes");
+
+				// Assert:
+				Assert.assertThat(readBytes, IsEqual.equalTo(null));
+				Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
+			}
+		}
+	}
+
+	@Test
+	public void canRoundtripEmptyBytes() throws Exception {
+		// Arrange:
+		try (BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			final byte[] bytes = new byte[0];
 			serializer.writeBytes("bytes", bytes);
 
 			try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {

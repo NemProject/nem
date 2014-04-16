@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.apache.commons.collections4.Predicate;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
@@ -92,16 +93,14 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
-
-		synchronized (blockChain) {
-			Transfer tx = transferDao.findByHash(transactionHash.getRaw());
-			if (tx != null) {
-				return false;
+		return this.unconfirmedTransactions.add(transaction, new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(final Hash hash) {
+				synchronized (blockChain) {
+					return null != transferDao.findByHash(hash.getRaw());
+				}
 			}
-		}
-
-		return this.addUnconfirmedTransactionWithoutDbCheck(transaction);
+		});
 	}
 
 	/**

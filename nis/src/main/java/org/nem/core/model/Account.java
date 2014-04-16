@@ -25,9 +25,7 @@ public class Account implements SerializableEntity {
 	 * @param keyPair The key pair.
 	 */
 	public Account(final KeyPair keyPair) {
-		this.keyPair = keyPair;
-		this.address = Address.fromPublicKey(keyPair.getPublicKey());
-		this.messages = new ArrayList<>();
+		this(keyPair, Address.fromPublicKey(keyPair.getPublicKey()));
 	}
 
 	/**
@@ -37,28 +35,26 @@ public class Account implements SerializableEntity {
 	 * @param address The address.
 	 */
 	public Account(final Address address) {
-		this.keyPair = null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
+		this(null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey()), address);
+	}
+
+	/**
+	 * Creates an account around a key pair and address.
+	 *
+	 * @param keyPair The key pair.
+	 * @param address The address.
+	 */
+	protected Account(final KeyPair keyPair, final Address address) {
+		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
 	}
 
-	public Account(Account account) {
-		this.keyPair = null == account.keyPair ? null : (account.getKeyPair().getPrivateKey() != null ? new KeyPair(account.getKeyPair().getPrivateKey()) : new KeyPair(account.getKeyPair().getPublicKey()));
-		this.address = account.getAddress();
-		// TODO: for now do not clone messages...
-		this.messages = new ArrayList<>();
-
-		this.label = null == account.getLabel() ? null : new String(account.getLabel());
-		this.balance = new Amount(account.getBalance().getNumMicroNem());
-	}
-
-
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		SerializationUtils.writeAccount(serializer, "address", this, AccountEncoding.ADDRESS);
-		if (this.keyPair != null) {
-			SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
-		}
+		SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+
 		serializer.writeLong("balance", getBalance().getNumMicroNem());
 		serializer.writeString("label", getLabel());
 		serializer.writeObjectArray("messages", getMessages());

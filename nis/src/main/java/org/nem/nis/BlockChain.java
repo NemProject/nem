@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
+	private static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
 
