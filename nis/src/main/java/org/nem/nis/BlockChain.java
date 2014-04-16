@@ -227,7 +227,7 @@ public class BlockChain implements BlockSynchronizer {
 	private long validatePeerChainAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
 		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
 
-		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT, contemporaryAccountAnalyzer);
+		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		if (!validator.isValid(parentBlock, peerChain)) {
 			return -1L;
 		}
