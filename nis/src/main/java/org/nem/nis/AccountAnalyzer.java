@@ -30,11 +30,11 @@ public class AccountAnalyzer implements AccountLookup {
 		mapByAddressId = new HashMap<>();
 
 		for (Map.Entry<String, Account> pair : rhs.mapByAddressId.entrySet()) {
-			mapByAddressId.put(pair.getKey(), new Account(pair.getValue()));
+			mapByAddressId.put(pair.getKey(), new VirtualAccount(pair.getValue()));
 		}
 
 		for (Map.Entry<PublicKey, Account> pair : rhs.mapByPublicKey.entrySet()) {
-			mapByPublicKey.put(pair.getKey(), new Account(pair.getValue()));
+			mapByPublicKey.put(pair.getKey(), new VirtualAccount(pair.getValue()));
 		}
 	}
 

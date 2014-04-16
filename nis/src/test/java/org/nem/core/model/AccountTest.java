@@ -3,10 +3,12 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.messages.PlainMessage;
+import org.nem.core.messages.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class AccountTest {
 
@@ -59,6 +61,8 @@ public class AccountTest {
 
 	//endregion
 
+	//region Label
+
 	@Test
 	public void labelCanBeSet() {
 		// Arrange:
@@ -70,6 +74,8 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo("Beta Gamma"));
 	}
+
+	//endregion
 
 	//region Balance
 
@@ -115,6 +121,8 @@ public class AccountTest {
 
 	//endregion
 
+	//region Message
+
 	@Test
 	public void singleMessageCanBeAdded() {
 		// Arrange:
@@ -145,6 +153,8 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
 		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
 	}
+
+	//endregion
 
 	//region equals / hashCode
 
@@ -194,6 +204,64 @@ public class AccountTest {
 				new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
 				new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
 		};
+	}
+
+	//endregion
+
+	//region Serialization
+
+	@Test
+	public void accountWithPublicKeyCanBeSerialized() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Assert:
+		assertAccountSerialization(address, address.getPublicKey().getRaw());
+	}
+
+	@Test
+	public void accountWithoutPublicKeyCanBeSerialized() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertAccountSerialization(address, null);
+	}
+
+	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
+		// Arrange:
+		final Account originalAccount = createAccountForSerializationTests(address);
+
+		// Act:
+		final JsonDeserializer deserializer = serializeAccountAndCreateDeserializer(originalAccount);
+
+		// Assert:
+		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
+		Assert.assertThat(deserializer.readBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
+		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
+
+		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.createDeserializer(null, null));
+		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
+		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+	}
+
+	private static Account createAccountForSerializationTests(final Address address) {
+		// Arrange:
+		final Account account = new Account(address);
+		account.setLabel("alpha gamma");
+		account.incrementBalance(new Amount(747));
+		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
+		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
+		return account;
+	}
+
+	private static JsonDeserializer serializeAccountAndCreateDeserializer(final Account account) {
+		// Act:
+		final JsonSerializer serializer = new JsonSerializer(true);
+		account.serialize(serializer);
+		return new JsonDeserializer(serializer.getObject(), null);
 	}
 
 	//endregion

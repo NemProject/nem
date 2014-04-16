@@ -94,6 +94,18 @@ public class SerializationUtilsTest {
 				Base64Encoder.getString(kp.getPublicKey().getRaw()));
 	}
 
+	@Test
+	public void canWriteAccountThatDoesNotHavePublicKeyWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(address),
+				AccountEncoding.PUBLIC_KEY,
+				null);
+	}
+
 	private static void assertCanWriteAccountWithEncoding(
 			final Account account,
 			final AccountEncoding encoding,
