@@ -8,9 +8,9 @@ import java.security.InvalidParameterException;
 public class BlockHeight implements Comparable<BlockHeight> {
 
 	/**
-	 * Value representing 0 height.
+	 * Value representing initial height.
 	 */
-	public static final BlockHeight ZERO = new BlockHeight(0);
+	public static final BlockHeight ONE = new BlockHeight(1);
 
 	private final long height;
 
@@ -20,8 +20,8 @@ public class BlockHeight implements Comparable<BlockHeight> {
 	 * @param height The block height.
 	 */
 	public BlockHeight(long height) {
-		if (height < 0)
-			throw new InvalidParameterException("height must be non-negative");
+		if (height <= 0)
+			throw new InvalidParameterException("height must be positive");
 
 		this.height = height;
 	}
@@ -33,6 +33,16 @@ public class BlockHeight implements Comparable<BlockHeight> {
 	 */
 	public BlockHeight next() {
 		return new BlockHeight(this.height + 1);
+	}
+
+	/**
+	 * Calculates the difference in height between this height and another height.
+	 *
+	 * @param height The other height.
+	 * @return The difference in height.
+	 */
+	public long subtract(final BlockHeight height) {
+		return this.getRaw() - height.getRaw();
 	}
 
 	/**

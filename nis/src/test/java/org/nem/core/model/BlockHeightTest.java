@@ -12,7 +12,7 @@ public class BlockHeightTest {
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(BlockHeight.ZERO, IsEqual.equalTo(new BlockHeight(0)));
+		Assert.assertThat(BlockHeight.ONE, IsEqual.equalTo(new BlockHeight(1)));
 	}
 
 	//endregion
@@ -25,13 +25,10 @@ public class BlockHeightTest {
 		new BlockHeight(-1);
 	}
 
-	@Test
-	public void canBeCreatedAroundZeroHeight() {
+	@Test(expected = InvalidParameterException.class)
+	public void cannotBeCreatedAroundZeroHeight() {
 		// Act:
-		final BlockHeight height = new BlockHeight(0);
-
-		// Assert:
-		Assert.assertThat(height.getRaw(), IsEqual.equalTo(0L));
+		new BlockHeight(0);
 	}
 
 	@Test
@@ -59,6 +56,23 @@ public class BlockHeightTest {
 		Assert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
 		Assert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(46)));
 	}
+
+	//endregion
+
+	//region subtract
+
+	@Test
+	public void heightsCanBeSubtracted() {
+		// Arrange:
+		final BlockHeight height1 = new BlockHeight(17);
+		final BlockHeight height2 = new BlockHeight(3);
+
+		// Assert:
+		Assert.assertThat(14L, IsEqual.equalTo(height1.subtract(height2)));
+		Assert.assertThat(-14L, IsEqual.equalTo(height2.subtract(height1)));
+	}
+
+	//endregion
 
 	//region compareTo
 
