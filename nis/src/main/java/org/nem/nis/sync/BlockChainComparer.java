@@ -34,7 +34,7 @@ public class BlockChainComparer {
 
 	private static boolean areBlocksEqual(final Block lhs, final Block rhs) {
 		// TODO: move to Block.equals
-		return lhs.getHeight() == rhs.getHeight()
+		return lhs.getHeight().equals(rhs.getHeight())
 				&& HashUtils.calculateHash(lhs).equals(HashUtils.calculateHash(rhs))
 				&& lhs.getSignature().equals(rhs.getSignature());
 	}
