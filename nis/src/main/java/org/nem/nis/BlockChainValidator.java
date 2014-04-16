@@ -1,7 +1,6 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -13,20 +12,15 @@ public class BlockChainValidator {
 
 	private final int maxChainSize;
 	private final BlockScorer scorer;
-	private final AccountLookup accountLookup;
 
 	/**
 	 * Creates a new block chain validator.
 	 *
 	 * @param scorer The block scorer to use.
-	 * @param accountLookup An account lookup that should be used.
-	 *
-	 * TODO: see if there's a way we can avoid an account lookup here
 	 */
-	public BlockChainValidator(final BlockScorer scorer, final int maxChainSize, final AccountLookup accountLookup) {
+	public BlockChainValidator(final BlockScorer scorer, final int maxChainSize) {
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
-		this.accountLookup = accountLookup;
 	}
 
 	/**
@@ -89,9 +83,8 @@ public class BlockChainValidator {
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
-		Account forgerAccount = this.accountLookup.findByAddress(block.getSigner().getAddress());
 		final BigInteger hit = this.scorer.calculateHit(parentBlock);
-		final BigInteger target = this.scorer.calculateTarget(parentBlock, block, forgerAccount);
+		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
 		return hit.compareTo(target) < 0;
 	}
 }

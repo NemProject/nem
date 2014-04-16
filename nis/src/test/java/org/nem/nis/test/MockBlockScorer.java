@@ -1,6 +1,5 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
 
@@ -12,7 +11,6 @@ import java.util.*;
  */
 public class MockBlockScorer extends BlockScorer {
 
-	private Account lastCalculateTargetBlockSigner;
 	private Set<Block> zeroTargetBlocks = new HashSet<>();
 
 	/**
@@ -24,24 +22,13 @@ public class MockBlockScorer extends BlockScorer {
 		this.zeroTargetBlocks.add(block);
 	}
 
-	/**
-	 * Gets the last block signer passed to calculateTarget.
-	 *
-	 * @return The last block signer passed to calculateTarget.
-	 */
-	public Account getLastCalculateTargetBlockSigner() {
-
-		return this.lastCalculateTargetBlockSigner;
-	}
-
 	@Override
 	public BigInteger calculateHit(final Block block) {
 		return BigInteger.ZERO;
 	}
 
 	@Override
-	public BigInteger calculateTarget(final Block prevBlock, final Block block, final Account blockSigner) {
-		this.lastCalculateTargetBlockSigner = blockSigner;
+	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
 		return zeroTargetBlocks.contains(block) ? BigInteger.ZERO : BigInteger.TEN;
 	}
 }

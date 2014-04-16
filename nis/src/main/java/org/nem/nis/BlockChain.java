@@ -159,13 +159,13 @@ public class BlockChain implements BlockSynchronizer {
 	 *  5. Once we've verified it, we can apply it
 	 *     (all-or-nothing policy, if verification failed, we won't try to apply part of it)
 	 *
-	 * @param connector
-	 * @param node
+	 * @param connectorPool The sync connector pool.
+	 * @param node The other node.
 	 */
 	@Override
-	public void synchronizeNode(final SyncConnector connector, final Node node) {
+	public void synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
-			this.synchronizeNodeInternal(connector, node);
+			this.synchronizeNodeInternal(connectorPool, node);
 		} catch (InactivePeerException|FatalPeerException ex) {
 			penalize(node);
 		}
@@ -227,7 +227,7 @@ public class BlockChain implements BlockSynchronizer {
 	private long validatePeerChainAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
 		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
 
-		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT, contemporaryAccountAnalyzer);
+		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		if (!validator.isValid(parentBlock, peerChain)) {
 			return -1L;
 		}
@@ -257,7 +257,9 @@ public class BlockChain implements BlockSynchronizer {
 
 	}
 
-	private void synchronizeNodeInternal(final SyncConnector connector, final Node node) {
+	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
+		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(this.accountAnalyzer);
+		final SyncConnector connector = connectorPool.getSyncConnector(contemporaryAccountAnalyzer);
 		final ComparisonResult result = compareChains(connector, node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
@@ -267,7 +269,6 @@ public class BlockChain implements BlockSynchronizer {
 		final long commonBlockHeight = result.getCommonBlockHeight();
 
 		//region revert TXes inside contemporaryAccountAnalyzer
-		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
 

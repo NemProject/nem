@@ -120,22 +120,6 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
-	@Test
-	public void targetCalculationGivesExternalSignerAccountPrecedence() {
-		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(42);
-
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block = new Block(createAccountWithBalance(11), Hash.ZERO, new TimeInstant(101), 11);
-
-		// Act:
-		final BigInteger target = scorer.calculateTarget(previousBlock, block, blockSigner);
-
-		// Assert: (time-difference * block-signer-balance * magic-number)
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 42 * 614891469L)));
-	}
-
 	// TODO: not sure how to make sensible test now...
 //	@Test
 //	public void blockScoreIsCalculatedCorrectly() {

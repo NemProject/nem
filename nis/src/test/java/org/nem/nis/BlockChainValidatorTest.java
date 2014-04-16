@@ -97,27 +97,6 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void externalAccountIsPassedToBlockSignerCalculateTarget() {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = new BlockChainValidator(scorer, 11, accountLookup);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 1);
-		final Block middleBlock = blocks.get(0);
-		final Account externalAccount = new Account(middleBlock.getSigner().getKeyPair());
-		accountLookup.setMockAccount(externalAccount);
-
-		// Act:
-		validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(scorer.getLastCalculateTargetBlockSigner(), IsSame.sameInstance(externalAccount));
-	}
-
-	@Test
 	public void chainIsValidIfAllBlockChecksPass() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -236,7 +215,7 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(scorer, 21, new MockAccountLookup());
+		return new BlockChainValidator(scorer, 21);
 	}
 
 	private static BlockChainValidator createValidator() {

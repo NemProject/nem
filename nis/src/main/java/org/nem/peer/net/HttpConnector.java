@@ -13,17 +13,20 @@ import java.util.List;
  */
 public class HttpConnector implements PeerConnector, SyncConnector {
 
-	private static final int DEFAULT_TIMEOUT = 30;
-
-	private final HttpMethodClient httpMethodClient;
+	private final HttpMethodClient<Deserializer> httpMethodClient;
+	private final HttpResponseStrategy<Deserializer> responseStrategy;
 
 	/**
-	 * Creates a new HTTP peer connector.
+	 * Creates a new HTTP connector.
 	 *
-	 * @param context The deserialization context to use when deserializing responses.
+	 * @param httpMethodClient The HTTP client to use.
+	 * @param responseStrategy The response strategy to use.
 	 */
-	public HttpConnector(final DeserializationContext context) {
-		this.httpMethodClient = new HttpMethodClient(context, DEFAULT_TIMEOUT);
+	public HttpConnector(
+			HttpMethodClient<Deserializer> httpMethodClient,
+			final HttpResponseStrategy<Deserializer> responseStrategy) {
+		this.httpMethodClient = httpMethodClient;
+		this.responseStrategy = responseStrategy;
 	}
 
 	//region PeerConnector
@@ -31,19 +34,19 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public Node getInfo(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_INFO);
-		return new Node(this.httpMethodClient.get(url));
+		return new Node(this.get(url));
 	}
 
 	@Override
 	public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
-		return new NodeCollection(this.httpMethodClient.get(url));
+		return new NodeCollection(this.get(url));
 	}
 
 	@Override
 	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
-		this.httpMethodClient.post(url, entity);
+		this.post(url, entity);
 	}
 
 	//endregion
@@ -53,32 +56,44 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
-		return BlockFactory.VERIFIABLE.deserialize(this.httpMethodClient.get(url));
+		return BlockFactory.VERIFIABLE.deserialize(this.get(url));
 	}
 
 	@Override
 	public Block getBlockAt(final NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT);
 		final JSONObject obj = getJsonObjectWithHeight(height);
-		return BlockFactory.VERIFIABLE.deserialize(this.httpMethodClient.post(url, obj));
+		return BlockFactory.VERIFIABLE.deserialize(this.post(url, obj));
 	}
 
 	@Override
 	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
 		final JSONObject obj = getJsonObjectWithHeight(height);
-		final JsonDeserializer jsonDeserializer = this.httpMethodClient.post(url, obj);
-		return jsonDeserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
+		final Deserializer deserializer = this.post(url, obj);
+		return deserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
 	public HashChain getHashesFrom(NodeEndpoint endpoint, long height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
 		final JSONObject obj = getJsonObjectWithHeight(height);
-		return HashChainFactory.deserializer.deserialize(this.httpMethodClient.post(url, obj));
+		return HashChainFactory.deserializer.deserialize(this.post(url, obj));
 	}
 
 	//endregion
+
+	private Deserializer get(final URL url) {
+		return this.httpMethodClient.get(url, this.responseStrategy);
+	}
+
+	private Deserializer post(final URL url, final JSONObject object) {
+		return this.httpMethodClient.post(url, object, this.responseStrategy);
+	}
+
+	private Deserializer post(final URL url, final SerializableEntity entity) {
+		return this.httpMethodClient.post(url, entity, this.responseStrategy);
+	}
 
 	private static JSONObject getJsonObjectWithHeight(long height) {
 		final JSONObject obj = new JSONObject();
