@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.apache.commons.collections4.Predicate;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
@@ -23,21 +24,32 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds an unconfirmed transaction.
+	 * Adds an unconfirmed transaction unconditionally.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		return this.add(transaction, new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(final Hash hash) {
+				return false;
+			}
+		});
+	}
 
-		// TODO: add this back
-//		synchronized (blockChain) {
-//			Transfer tx = transferDao.findByHash(transactionHash.get());
-//			if (tx != null) {
-//				return false;
-//			}
-//		}
+	/**
+	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
+	 *
+	 * @param transaction The transaction.
+	 * @param exists Predicate that determines the existence of the transaction given its hash.
+	 * @return true if the transaction was added.
+	 */
+	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		if (exists.evaluate(transactionHash)) {
+			return false;
+		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;

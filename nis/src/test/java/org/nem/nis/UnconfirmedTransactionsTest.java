@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.apache.commons.collections4.Predicate;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -63,6 +64,46 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
 	}
+
+	@Test
+	public void transactionCanBeAddedIfTransactionPredicateReturnsFalse() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+
+		// Act:
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(Hash hash) {
+				return false;
+			}
+		});
+
+		// Assert:
+		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void transactionCannotBeAddedIfTransactionPredicateReturnsTrue() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+
+		// Act:
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(Hash hash) {
+				return true;
+			}
+		});
+
+		// Assert:
+		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region sorting
 
 	@Test
 	public void returnedTransactionsAreSortedByFee() {
