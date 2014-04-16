@@ -69,7 +69,7 @@ public class AmountTest {
 
 	//endregion
 
-	//region
+	//region getNumNem
 
 	@Test
 	public void getNumNemRoundsDownToTheNearestWholeNem() {
