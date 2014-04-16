@@ -104,7 +104,7 @@ public class BlockScorerTest {
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
 
 		// Assert: (time-difference * block-signer-balance * magic-number)
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 72 * 614891469L)));
+		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 72).multiply(BlockScorer.TWO_TO_THE_POWER_OF_64).divide(BigInteger.valueOf(BlockScorer.INITIAL_DIFFICULTY))));
 	}
 
 	@Test
@@ -138,7 +138,7 @@ public class BlockScorerTest {
 		final BigInteger target = scorer.calculateTarget(previousBlock, block, blockSigner);
 
 		// Assert: (time-difference * block-signer-balance * magic-number)
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 42 * 614891469L)));
+		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 42).multiply(BlockScorer.TWO_TO_THE_POWER_OF_64).divide(BigInteger.valueOf(BlockScorer.INITIAL_DIFFICULTY))));
 	}
 
 	// TODO: not sure how to make sensible test now...

@@ -21,29 +21,34 @@ public class BlockScorer {
 	/**
 	 * 500_000_000 NEMs have force to generate block every minute.
 	 */
-	public static final long INITIAL_MAGIC_MULTIPLIER = 614891469L;
+	public static final long INITIAL_DIFFICULTY = 614891469L;
 	
 	/**
-	 * Minimum value for magic multiplier.
+	 * Minimum value for difficulty.
 	 */
-	public static final long MIN_MAGIC_MULTIPLIER = INITIAL_MAGIC_MULTIPLIER/10L;
+	public static final long MIN_DIFFICULTY = INITIAL_DIFFICULTY / 10L;
 	
 	/**
-	 * Maximum value for magic multiplier.
+	 * Maximum value for difficulty.
 	 */
-	public static final long Max_MAGIC_MULTIPLIER = INITIAL_MAGIC_MULTIPLIER*10L;
+	public static final long Max_DIFFICULTY = INITIAL_DIFFICULTY * 10L;
 	
 	/**
 	 * The target time between two blocks in seconds.
 	 */
-	public static final long TARGET_TIME_BETWEEN_BLOCKS = 60;
+	public static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
-	 * Current magic multiplier used in target calculation.
+	 * BigInteger constant 2^64
 	 */
-	public static long magicMultiplier = INITIAL_MAGIC_MULTIPLIER;
+    public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
 
 	/**
+	 * Number of blocks which the calculation of difficulty should include 
+	 */
+    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 10;
+
+    /**
 	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.
@@ -80,8 +85,9 @@ public class BlockScorer {
 
 		long forgerBalance = blockSigner.getBalance().getNumNem();
 		return BigInteger.valueOf(timeStampDifference)
-				.multiply(BigInteger.valueOf(forgerBalance))
-				.multiply(BigInteger.valueOf(magicMultiplier));
+						 .multiply(BigInteger.valueOf(forgerBalance))
+						 .multiply(TWO_TO_THE_POWER_OF_64)
+						 .divide(BigInteger.valueOf(block.getDifficulty()));
 	}
 
 	/**
@@ -116,29 +122,37 @@ public class BlockScorer {
 	}
 	
 	/**
-	 * Calculates the new magic multiplier.
+	 * Calculates the difficulty based on the last block and the
+	 * average time between blocks since historical block.
+	 * 
+	 * @param lastBlock last block in the chain.
+	 * @param historicalBlock historical block, i.e. a block before last block.
+	 *
+	 * @return The difficulty for the next block.
 	 */
-	public void calculateMagicMultiplier(final Block lastBlock, final Block historicalBlock) {
+	public long calculateDfficulty(final Block lastBlock, final Block historicalBlock) {
 		if (lastBlock.getHeight() == 1) {
-			magicMultiplier = INITIAL_MAGIC_MULTIPLIER;
+			return INITIAL_DIFFICULTY;
 		}
 		else {
 			if (lastBlock.getHeight() <= historicalBlock.getHeight()) {
 				throw new InvalidParameterException("historicalBlock must have lower height than lastBlock");
 			}
 			
+			long difficulty;
 			final long timeDiff = lastBlock.getTimeStamp().subtract(historicalBlock.getTimeStamp());
 			final long heightDiff = lastBlock.getHeight() - historicalBlock.getHeight();
-			magicMultiplier = BigInteger.valueOf(magicMultiplier).multiply(BigInteger.valueOf(timeDiff))
-																 .divide(BigInteger.valueOf(heightDiff))
-																 .divide(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
-																 .longValue();
-            if (magicMultiplier < MIN_MAGIC_MULTIPLIER) {
-            	magicMultiplier = MIN_MAGIC_MULTIPLIER;
+			difficulty = BigInteger.valueOf(lastBlock.getDifficulty()).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+																	  .multiply(BigInteger.valueOf(heightDiff))
+																	  .divide(BigInteger.valueOf(timeDiff))
+																	  .longValue();
+            if (difficulty < MIN_DIFFICULTY) {
+            	difficulty = MIN_DIFFICULTY;
             }
-            if (magicMultiplier > Max_MAGIC_MULTIPLIER) {
-            	magicMultiplier = Max_MAGIC_MULTIPLIER;
+            if (difficulty > Max_DIFFICULTY) {
+            	difficulty = Max_DIFFICULTY;
             }
+            return difficulty;
 		}
 	}
 }

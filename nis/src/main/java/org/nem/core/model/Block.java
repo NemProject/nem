@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransactionFactory;
+import org.nem.nis.BlockScorer;
 
 import java.util.*;
 
@@ -40,7 +41,8 @@ public class Block extends VerifiableEntity {
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
 
-		this.difficulty = 0;
+		this.difficulty = BlockScorer.INITIAL_DIFFICULTY;
+;
 	}
 
 	/**

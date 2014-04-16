@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
@@ -42,6 +43,8 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private BlockChain blockChain;
 
+	private BlockDao blockDao;
+
 	private TransferDao transferDao;
 
 	@Autowired
@@ -49,6 +52,9 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	@Autowired
 	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
@@ -157,11 +163,14 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
+				final org.nem.nis.dbmodel.Block dbHistoricalBlock = blockDao.findByHeight(Math.max(1L, lastBlock.getHeight() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
+				final Block historicalBlock = BlockMapper.toModel(dbHistoricalBlock, this.accountAnalyzer);
+				final long difficulty = scorer.calculateDfficulty(lastBlock, historicalBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger);
+					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
@@ -193,10 +202,12 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 	}
 
-	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger) {
+	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger, long difficulty) {
 		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
 
-		final Block newBlock = new Block(forger, lastBlock, blockTime);
+		// Probably better to include difficulty in the block constructor?
+		Block newBlock = new Block(forger, lastBlock, blockTime);
+		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
 			newBlock.addTransactions(transactionList);
 		}
