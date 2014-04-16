@@ -31,12 +31,12 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		long result = comparer.compare(
+		final BlockHeight height = comparer.compare(
 				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 7)),
 				new MockBlockLookup(createNonVerifiableBlock(Utils.generateRandomAccount(), 7))).getRemoteHeight();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(7L));
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(7)));
 	}
 
 	@Test
@@ -216,7 +216,7 @@ public class BlockChainComparerTest {
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
 		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
 		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(8L));
+		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
 	}
 
 	@Test
@@ -312,13 +312,13 @@ public class BlockChainComparerTest {
 	}
 
 	private static Block createVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, height);
+		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.sign();
 		return block;
 	}
 
 	private static Block createNonVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, height);
+		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.setSignature(new Signature(Utils.generateRandomBytes(64)));
 		return block;
 	}
@@ -340,7 +340,7 @@ public class BlockChainComparerTest {
 
 		private final Block lastBlock;
 		private final HashChain chain;
-		private final Map<Long, Block> heightToBlockMap = new HashMap<>();
+		private final Map<BlockHeight, Block> heightToBlockMap = new HashMap<>();
 
 		public MockBlockLookup(final Block lastBlock) {
 			this(lastBlock, 1);
@@ -370,7 +370,7 @@ public class BlockChainComparerTest {
 
 		@Override
 		public Block getBlockAt(long height) {
-			return this.heightToBlockMap.get(height);
+			return this.heightToBlockMap.get(new BlockHeight(height));
 		}
 
 		@Override

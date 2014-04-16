@@ -34,9 +34,9 @@ public class BlockChainValidator {
 		if (blocks.size() > this.maxChainSize)
 			return false;
 
-		long expectedHeight = parentBlock.getHeight() + 1;
+		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
-			if (expectedHeight != block.getHeight() || !block.verify() || !isBlockHit(parentBlock, block))
+			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
 				return false;
 
 			for (final Transaction transaction : block.getTransactions()) {
@@ -45,7 +45,7 @@ public class BlockChainValidator {
 			}
 
 			parentBlock = block;
-			++expectedHeight;
+			expectedHeight = expectedHeight.next();
 		}
 
 		return true;

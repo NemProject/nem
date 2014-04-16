@@ -25,7 +25,7 @@ public class BlockFactoryTest {
 	public void canDeserializeVerifiableBlock() {
 		// Arrange:
 		final Account forger = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, 1);
+		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, new MockAccountLookup());
 
 		// Act:
@@ -41,7 +41,7 @@ public class BlockFactoryTest {
 	public void canDeserializeNonVerifiableBlock() {
 		// Arrange:
 		final Account forger = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, 1);
+		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				originalBlock.asNonVerifiable(),
 				new MockAccountLookup());

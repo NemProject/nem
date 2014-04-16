@@ -22,7 +22,7 @@ public class GenesisBlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(8));
 	}
 

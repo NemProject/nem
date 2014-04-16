@@ -25,7 +25,7 @@ public class BlockControllerTest {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(result.getBodyAsDeserializer());
 
 		// Assert:
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(1)));
 	}
 
 	@Test

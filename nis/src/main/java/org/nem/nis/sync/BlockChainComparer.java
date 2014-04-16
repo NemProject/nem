@@ -1,8 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
-import org.nem.core.model.HashUtils;
+import org.nem.core.model.*;
 
 import java.security.InvalidParameterException;
 
@@ -79,17 +77,23 @@ public class BlockChainComparer {
 				}
 			}
 
-			long height = this.remoteLastBlock == null ? 0 : this.remoteLastBlock.getHeight();
-			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent, height);
+			final BlockHeight height = null == this.remoteLastBlock ? null : this.remoteLastBlock.getHeight();
+			return new ComparisonResult(
+					code,
+					this.commonBlockIndex,
+					this.areChainsConsistent,
+					height);
 		}
 
 		private boolean isRemoteTooFarBehind() {
-			final long heightDifference = localLastBlock.getHeight() - remoteLastBlock.getHeight();
+			final long heightDifference = this.localLastBlock.getHeight().subtract(this.remoteLastBlock.getHeight());
 			return heightDifference > this.context.getMaxNumBlocksToRewrite();
 		}
 
 		private int compareHashes() {
-			final long startingBlockHeight = Math.max(1, this.localLastBlock.getHeight() - this.context.getMaxNumBlocksToRewrite());
+			final long startingBlockHeight = Math.max(
+					1,
+					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite());
 			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
 
 			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node

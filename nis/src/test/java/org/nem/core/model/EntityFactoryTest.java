@@ -18,13 +18,13 @@ public class EntityFactoryTest {
 		final Hash previousHash = new Hash(Utils.generateRandomBytes());
 
 		// Act:
-		final Block block = factory.createBlock(signer, previousHash, 12);
+		final Block block = factory.createBlock(signer, previousHash, new BlockHeight(12));
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(12L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11890)));
 	}

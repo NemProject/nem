@@ -103,7 +103,7 @@ public class BlockMapperTest {
 					Utils.generateRandomAccount(),
 					new Hash(Utils.generateRandomBytes()),
 					new TimeInstant(721),
-					17);
+					new BlockHeight(17));
 
 			this.signModel();
 
