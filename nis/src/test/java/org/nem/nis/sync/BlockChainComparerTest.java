@@ -26,6 +26,20 @@ public class BlockChainComparerTest {
 	}
 
 	@Test
+	public void remoteChainHeightIsStoredInResult() {
+		// Arrange:
+		final BlockChainComparer comparer = createBlockChainComparer();
+
+		// Act:
+		long result = comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 7)),
+				new MockBlockLookup(createNonVerifiableBlock(Utils.generateRandomAccount(), 7))).getRemoteHeight();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(7L));
+	}
+
+	@Test
 	public void remoteHasNoBlocksIfRemoteDoesNotHaveLastBlock() {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
@@ -108,7 +122,7 @@ public class BlockChainComparerTest {
 	//region chain comparison
 
 	@Test
-	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksTAnalyze() {
+	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksToAnalyze() {
 		// Assert:
 		Assert.assertThat(
 				compareBlocksWithNumRemoteHashes(21),
@@ -202,6 +216,7 @@ public class BlockChainComparerTest {
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
 		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
 		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(8L));
 	}
 
 	@Test

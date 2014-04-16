@@ -79,7 +79,8 @@ public class BlockChainComparer {
 				}
 			}
 
-			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent);
+			long height = this.remoteLastBlock == null ? 0 : this.remoteLastBlock.getHeight();
+			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent, height);
 		}
 
 		private boolean isRemoteTooFarBehind() {
