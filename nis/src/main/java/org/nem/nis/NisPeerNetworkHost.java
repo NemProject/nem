@@ -1,8 +1,7 @@
 package org.nem.nis;
 
-import org.nem.core.serialization.DeserializationContext;
 import org.nem.peer.*;
-import org.nem.peer.net.HttpConnector;
+import org.nem.peer.net.HttpConnectorPool;
 import org.nem.peer.scheduling.ParallelSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,8 +42,9 @@ public class NisPeerNetworkHost {
 	}
 
 	private PeerNetworkServices createNetworkServices() {
-		final HttpConnector connector = new HttpConnector(new DeserializationContext(this.accountAnalyzer));
+		final HttpConnectorPool connectorPool = new HttpConnectorPool();
+		final PeerConnector connector = connectorPool.getPeerConnector(this.accountAnalyzer);
 		final ParallelSchedulerFactory<Node> schedulerFactory = new ParallelSchedulerFactory<>(2 * NUM_CORES);
-		return new PeerNetworkServices(connector, connector, schedulerFactory, this.blockChain);
+		return new PeerNetworkServices(connector, connectorPool, schedulerFactory, this.blockChain);
 	}
 }

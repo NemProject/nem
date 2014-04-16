@@ -17,6 +17,9 @@ public class HttpMethodClientTest {
 	private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 	private final int GOOD_TIMEOUT = 5;
 
+
+	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpDeserializerResponseStrategy(null);
+
 	//region get
 
 	@Test
@@ -25,7 +28,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		final Deserializer deserializer = client.get(new URL(GOOD_URL));
+		final Deserializer deserializer = client.get(new URL(GOOD_URL), DEFAULT_STRATEGY);
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -37,10 +40,10 @@ public class HttpMethodClientTest {
 	public void getDelegatesToStrategyOnSuccess() throws Exception {
 		// Arrange:
 		final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
-		final HttpMethodClient client = new HttpMethodClient<>(strategy, GOOD_TIMEOUT);
+		final HttpMethodClient client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(GOOD_URL));
+		client.get(new URL(GOOD_URL), strategy);
 
 		// Assert:
 		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(Request.class), Mockito.any(Response.class));
@@ -50,10 +53,10 @@ public class HttpMethodClientTest {
 	public void getSetsRequestHeadersCorrectly() throws Exception {
 		// Arrange:
 		final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
-		final HttpMethodClient client = new HttpMethodClient<>(strategy, GOOD_TIMEOUT);
+		final HttpMethodClient client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(GOOD_URL));
+		client.get(new URL(GOOD_URL), strategy);
 
 		// Assert:
 		Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo("GET"));
@@ -66,7 +69,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = createClient(0);
 
 		// Act:
-		client.get(new URL(GOOD_URL));
+		client.get(new URL(GOOD_URL), DEFAULT_STRATEGY);
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -75,7 +78,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(MALFORMED_URI));
+		client.get(new URL(MALFORMED_URI), DEFAULT_STRATEGY);
 	}
 
 	//endregion
@@ -88,7 +91,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		final Deserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity());
+		final Deserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY);
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -100,10 +103,10 @@ public class HttpMethodClientTest {
 	public void postDelegatesToStrategyOnSuccess() throws Exception {
 		// Arrange:
 		final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
-		final HttpMethodClient client = new HttpMethodClient<>(strategy, GOOD_TIMEOUT);
+		final HttpMethodClient client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity());
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy);
 
 		// Assert:
 		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(Request.class), Mockito.any(Response.class));
@@ -113,10 +116,10 @@ public class HttpMethodClientTest {
 	public void postSetsRequestHeadersCorrectly() throws Exception {
 		// Arrange:
 		final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
-		final HttpMethodClient client = new HttpMethodClient<>(strategy, GOOD_TIMEOUT);
+		final HttpMethodClient client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity());
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy);
 
 		// Assert:
 		Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo("POST"));
@@ -129,7 +132,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = createClient(0);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity());
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY);
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -138,13 +141,13 @@ public class HttpMethodClientTest {
 		final HttpMethodClient client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(MALFORMED_URI), new MockSerializableEntity());
+		client.post(new URL(MALFORMED_URI), new MockSerializableEntity(), DEFAULT_STRATEGY);
 	}
 
 	//endregion
 
 	private static HttpMethodClient<Deserializer> createClient(int timeout) {
-		return new HttpMethodClient<>(new HttpDeserializerResponseStrategy(null), timeout);
+		return new HttpMethodClient<>(timeout);
 	}
 
 	private static class MockHttpResponseStrategy<T> implements HttpResponseStrategy<T> {

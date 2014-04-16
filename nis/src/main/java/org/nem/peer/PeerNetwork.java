@@ -16,7 +16,7 @@ public class PeerNetwork {
 	private final Config config;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
-	private final SyncConnector syncConnector;
+	private final SyncConnectorPool syncConnectorPool;
 	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
@@ -37,7 +37,7 @@ public class PeerNetwork {
 		this.config = config;
 		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
-		this.syncConnector = services.getSyncConnector();
+		this.syncConnectorPool = services.getSyncConnectorPool();
 		this.schedulerFactory = services.getSchedulerFactory();
 		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
@@ -155,7 +155,7 @@ public class PeerNetwork {
 		this.forAllActiveNodes(new Action<Node>() {
 			@Override
 			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(syncConnector, element);
+				blockSynchronizer.synchronizeNode(syncConnectorPool, element);
 			}
 		});
 	}

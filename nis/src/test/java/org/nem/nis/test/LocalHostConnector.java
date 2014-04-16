@@ -70,7 +70,7 @@ public class LocalHostConnector {
 		}
 	}
 
-	private final HttpMethodClient<Result> httpMethodClient = new HttpMethodClient<>(new HttpResultResponseStrategy(), 30);
+	private final HttpMethodClient<Result> httpMethodClient = new HttpMethodClient<>(30);
 
 	/**
 	 * Returns the result of a POST operation to the specified path on the local host.
@@ -82,7 +82,7 @@ public class LocalHostConnector {
 	public Result post(final String path, final JSONObject input) {
 		try {
 			final URL url = new URL("http", "127.0.0.1", 7890, "/" + path);
-			return this.httpMethodClient.post(url, input);
+			return this.httpMethodClient.post(url, input, new HttpResultResponseStrategy());
 		} catch (MalformedURLException e) {
 			throw new UnsupportedOperationException(e);
 		}

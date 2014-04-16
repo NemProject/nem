@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.test.MockTransaction;
@@ -414,7 +415,7 @@ public class PeerNetworkTest {
 		network.synchronize();
 
 		// Assert:
-		Assert.assertThat(synchronizer.getLastConnector(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(synchronizer.getLastConnectorPool(), IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	//endregion
@@ -435,7 +436,7 @@ public class PeerNetworkTest {
 					createTestConfig(),
 					new PeerNetworkServices(
 							this.connector,
-							this.connector,
+							Mockito.mock(SyncConnectorPool.class),
 							this.schedulerFactory,
 							new MockBlockSynchronizer()));
 			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
@@ -624,7 +625,7 @@ public class PeerNetworkTest {
 	private static PeerNetworkServices createMockPeerNetworkServices() {
 		return new PeerNetworkServices(
 				new MockConnector(),
-				new MockConnector(),
+				Mockito.mock(SyncConnectorPool.class),
 				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
@@ -634,7 +635,7 @@ public class PeerNetworkTest {
 				ConfigFactory.createDefaultTestConfig(),
 				new PeerNetworkServices(
 						new MockConnector(),
-						new MockConnector(),
+						Mockito.mock(SyncConnectorPool.class),
 						new MockNodeSchedulerFactory(),
 						synchronizer));
 	}
@@ -644,7 +645,7 @@ public class PeerNetworkTest {
 				ConfigFactory.createDefaultTestConfig(),
 				new PeerNetworkServices(
 						connector,
-						connector,
+						Mockito.mock(SyncConnectorPool.class),
 						new MockNodeSchedulerFactory(),
 						new MockBlockSynchronizer()));
 	}
@@ -654,7 +655,7 @@ public class PeerNetworkTest {
 				ConfigFactory.createDefaultTestConfig(),
 				new PeerNetworkServices(
 						new MockConnector(),
-						new MockConnector(),
+						Mockito.mock(SyncConnectorPool.class),
 						new MockNodeSchedulerFactory(),
 						new MockBlockSynchronizer()),
 				nodeExperiences);

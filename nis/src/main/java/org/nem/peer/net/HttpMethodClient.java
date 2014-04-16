@@ -17,22 +17,19 @@ import java.util.concurrent.*;
 /**
  * Helper class that wraps an HttpClient.
  *
- * @param <T> The type of responses
+ * @param <T> The type of responses.
  */
 public class HttpMethodClient<T> {
 
-	private final HttpResponseStrategy<T> responseStrategy;
 	private final int timeout;
 	private final HttpClient httpClient;
 
 	/**
 	 * Creates a new HTTP method client.
 	 *
-	 * @param responseStrategy The response strategy to use.
 	 * @param timeout The timeout (in seconds) that should be used.
 	 */
-	public HttpMethodClient(final HttpResponseStrategy<T> responseStrategy, final int timeout) {
-		this.responseStrategy = responseStrategy;
+	public HttpMethodClient(final int timeout) {
 		this.timeout = timeout;
 
 		try {
@@ -48,16 +45,16 @@ public class HttpMethodClient<T> {
 	 * Issues a HTTP GET response.
 	 *
 	 * @param url The url.
-	 *
+	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T get(final URL url) {
+	public T get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
 		return sendRequest(url, new RequestFactory() {
 			@Override
 			public Request createRequest(final HttpClient httpClient, final URI uri) {
 				return httpClient.newRequest(uri);
 			}
-		});
+		}, responseStrategy);
 	}
 
 	/**
@@ -65,11 +62,11 @@ public class HttpMethodClient<T> {
 	 *
 	 * @param url    The url.
 	 * @param entity The request data.
-	 *
+	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T post(final URL url, final SerializableEntity entity) {
-		return this.post(url, JsonSerializer.serializeToJson(entity));
+	public T post(final URL url, final SerializableEntity entity, final HttpResponseStrategy<T> responseStrategy) {
+		return this.post(url, JsonSerializer.serializeToJson(entity), responseStrategy);
 	}
 
 	/**
@@ -77,10 +74,10 @@ public class HttpMethodClient<T> {
 	 *
 	 * @param url         The url.
 	 * @param requestData The request data.
-	 *
+	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T post(final URL url, final JSONObject requestData) {
+	public T post(final URL url, final JSONObject requestData, final HttpResponseStrategy<T> responseStrategy) {
 		return sendRequest(url, new RequestFactory() {
 			@Override
 			public Request createRequest(final HttpClient httpClient, final URI uri) {
@@ -91,17 +88,17 @@ public class HttpMethodClient<T> {
 						MimeTypes.Type.APPLICATION_JSON.asString());
 				return req;
 			}
-		});
+		}, responseStrategy);
 	}
 
 	/**
 	 * Sends an HTTP request.
 	 *
 	 * @param requestFactory The factory that creates the specified request.
-	 *
+	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	private T sendRequest(final URL url, final RequestFactory requestFactory) {
+	private T sendRequest(final URL url, final RequestFactory requestFactory, final HttpResponseStrategy<T> responseStrategy) {
 		try {
 			final URI uri = url.toURI();
 			final InputStreamResponseListener listener = new InputStreamResponseListener();
@@ -110,7 +107,7 @@ public class HttpMethodClient<T> {
 			req.send(listener);
 
 			final Response res = listener.get(this.timeout, TimeUnit.SECONDS);
-			return this.responseStrategy.coerce(req, res);
+			return responseStrategy.coerce(req, res);
 		} catch (TimeoutException e) {
 			throw new InactivePeerException(e);
 		} catch (URISyntaxException | ExecutionException | IOException e) {
