@@ -7,10 +7,14 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.peer.trust.simulation.NetworkSimulatorTest;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class BlockScorerTest {
+	private static final Logger LOGGER = Logger.getLogger(BlockScorerTest.class.getName());
 
 	private static final byte[] PUBKEY_BYTES = new byte[] {
 			(byte) 0x02,
@@ -141,6 +145,73 @@ public class BlockScorerTest {
 		Assert.assertThat(target, IsEqual.equalTo(BigInteger.valueOf(100 * 42).multiply(BlockScorer.TWO_TO_THE_POWER_OF_64).divide(BigInteger.valueOf(BlockScorer.INITIAL_DIFFICULTY))));
 	}
 
+	@Test
+	public void timeBetweenBlocksIsAboutSixtySeconds() {
+		// Only 250 million nem (going below this limit will result in higher block creation times)
+		forgerTest(1000, 250000000L, 10);
+
+		// 1000 million nem
+		forgerTest(1000, 1000000000L, 10);
+
+		// Full 4000 million nem
+		forgerTest(1000, 4000000000L, 10);
+	}
+	
+	private void forgerTest(int numRounds, long numNEM, int numForgers) {
+		// Arrange
+		final Account[] forgerAccounts = new Account[numForgers];
+		for (int i=0; i<numForgers; i++) {
+			forgerAccounts[i]	= createAccountWithBalance(numNEM/numForgers);
+		}
+		int averageTime = 0, maxTime = 0, minTime = Integer.MAX_VALUE, index=0;
+		final BlockScorer scorer = new BlockScorer();
+		Block block;
+		Block[] blocks = new Block[numRounds];
+		int[] secondsBetweenBlocks = new int[numRounds];
+		Hash hash = new Hash(HASH_BYTES);
+		blocks[0] = new Block(forgerAccounts[0], hash, new TimeInstant(1), 1);
+		blocks[0].setDifficulty(BlockScorer.INITIAL_DIFFICULTY);
+		
+		// Act:
+		for (int i=1; i<numRounds; i++) {
+			// Don't know creation time yet, so construct helper block
+			block = new Block(forgerAccounts[0], HashUtils.calculateHash(blocks[i-1]), new TimeInstant(1), i+1);
+			block.setDifficulty(scorer.calculateDfficulty(blocks[i-1], Arrays.copyOfRange(blocks, Math.max(0, (int)(i - 1 - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), i-1)));
+			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
+			for (int j=0; j<numForgers; j++) {
+				BigInteger hit = scorer.calculateHit(blocks[i-1], forgerAccounts[j]);
+				int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty()))
+								 .divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
+								 .divide(BigInteger.valueOf(forgerAccounts[j].getBalance().getNumNem()))
+								 .intValue();
+				if (seconds < secondsBetweenBlocks[i]) {
+					secondsBetweenBlocks[i] = seconds;
+					index = j;
+				}
+			}
+			if (secondsBetweenBlocks[i] == 0) {
+				// This will not happen in our network
+				secondsBetweenBlocks[i] = 1;
+			}
+			blocks[i] = new Block(forgerAccounts[index], HashUtils.calculateHash(blocks[i-1]), new TimeInstant(blocks[i-1].getTimeStamp().getRawTime() + secondsBetweenBlocks[i]), i+1);
+			blocks[i].setDifficulty(block.getDifficulty());
+		}
+		for (int i=1; i<numRounds; i++) {
+			averageTime += secondsBetweenBlocks[i];
+			if (secondsBetweenBlocks[i] < minTime) {
+				minTime = secondsBetweenBlocks[i];
+			}
+			if (secondsBetweenBlocks[i] > maxTime) {
+				maxTime = secondsBetweenBlocks[i];
+			}
+		}
+		averageTime /= numRounds-1;
+		LOGGER.info("Minimum time between blocks: " + minTime + " seconds.");
+		LOGGER.info("Maximum time between blocks: " + maxTime + " seconds.");
+		LOGGER.info("Average time between blocks: " + averageTime + " seconds.");
+		Assert.assertTrue("Average time between blocks not within reasonable range!", 55 < averageTime && averageTime < 65);
+	}
+	
 	// TODO: not sure how to make sensible test now...
 //	@Test
 //	public void blockScoreIsCalculatedCorrectly() {

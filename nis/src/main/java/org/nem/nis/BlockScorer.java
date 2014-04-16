@@ -19,9 +19,9 @@ import java.util.Arrays;
 public class BlockScorer {
 
 	/**
-	 * 500_000_000 NEMs have force to generate block every minute.
+	 * 1_000_000_000 NEMs have force to generate block every minute.
 	 */
-	public static final long INITIAL_DIFFICULTY = 614891469L;
+	public static final long INITIAL_DIFFICULTY = 120000000000L;
 	
 	/**
 	 * Minimum value for difficulty.
@@ -46,7 +46,7 @@ public class BlockScorer {
 	/**
 	 * Number of blocks which the calculation of difficulty should include 
 	 */
-    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 10;
+    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
 
     /**
 	 * Calculates the hit score for block.
@@ -126,26 +126,32 @@ public class BlockScorer {
 	 * average time between blocks since historical block.
 	 * 
 	 * @param lastBlock last block in the chain.
-	 * @param historicalBlock historical block, i.e. a block before last block.
+	 * @param historicalBlocks historical blocks, i.e. a block before last block.
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDfficulty(final Block lastBlock, final Block historicalBlock) {
+	public long calculateDfficulty(final Block lastBlock, final Block[] historicalBlocks) {
 		if (lastBlock.getHeight() == 1) {
 			return INITIAL_DIFFICULTY;
 		}
 		else {
-			if (lastBlock.getHeight() <= historicalBlock.getHeight()) {
-				throw new InvalidParameterException("historicalBlock must have lower height than lastBlock");
+			if (lastBlock.getHeight() <= historicalBlocks[historicalBlocks.length - 1].getHeight()) {
+				throw new InvalidParameterException("historicalBlocks must have lower height than lastBlock");
 			}
 			
 			long difficulty;
-			final long timeDiff = lastBlock.getTimeStamp().subtract(historicalBlock.getTimeStamp());
-			final long heightDiff = lastBlock.getHeight() - historicalBlock.getHeight();
-			difficulty = BigInteger.valueOf(lastBlock.getDifficulty()).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
-																	  .multiply(BigInteger.valueOf(heightDiff))
-																	  .divide(BigInteger.valueOf(timeDiff))
-																	  .longValue();
+			long timeDiff = lastBlock.getTimeStamp().subtract(historicalBlocks[0].getTimeStamp());
+			final long heightDiff = lastBlock.getHeight() - historicalBlocks[0].getHeight();
+			long averageDifficulty = 0;
+			for (int i=0; i<historicalBlocks.length; i++) {
+				averageDifficulty += historicalBlocks[i].getDifficulty();
+			}
+			averageDifficulty /= historicalBlocks.length;
+			
+			difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+															  .multiply(BigInteger.valueOf(heightDiff))
+															  .divide(BigInteger.valueOf(timeDiff))
+															  .longValue();
             if (difficulty < MIN_DIFFICULTY) {
             	difficulty = MIN_DIFFICULTY;
             }
