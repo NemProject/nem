@@ -6,7 +6,6 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,11 +70,8 @@ public class BlockMapper {
 				new TimeInstant(dbBlock.getTimestamp()),
 				dbBlock.getHeight());
 
-		Long difficulty = dbBlock.getDifficulty();
-		if (difficulty == null) {
-			difficulty = 0L;
-		}
-		block.setDifficulty(difficulty);
+		final Long difficulty = dbBlock.getDifficulty();
+		block.setDifficulty(null == difficulty ? 0L : difficulty);
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
