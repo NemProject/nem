@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.connect.*;
 import org.nem.peer.scheduling.SchedulerFactory;
 import org.nem.peer.test.*;
 

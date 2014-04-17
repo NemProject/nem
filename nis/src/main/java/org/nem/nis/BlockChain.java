@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.nem.core.connect.*;
 import org.nem.nis.balances.Balance;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -166,7 +167,7 @@ public class BlockChain implements BlockSynchronizer {
 	public void synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			this.synchronizeNodeInternal(connectorPool, node);
-		} catch (InactivePeerException|FatalPeerException ex) {
+		} catch (InactivePeerException |FatalPeerException ex) {
 			penalize(node);
 		}
 	}

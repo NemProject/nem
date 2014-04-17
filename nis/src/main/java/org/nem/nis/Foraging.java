@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.peer.NodeApiId;
+import org.nem.core.connect.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;

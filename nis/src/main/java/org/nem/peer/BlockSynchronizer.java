@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import org.nem.core.connect.SyncConnectorPool;
+
 /**
  * Synchronizes the running node's block chain with the another node's block chain.
  */

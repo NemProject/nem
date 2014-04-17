@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.connect.NodeApiId;
 import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.transactions.TransactionFactory;

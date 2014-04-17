@@ -3,10 +3,8 @@ package org.nem.core.connect;
 import net.minidev.json.*;
 import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
-import org.nem.peer.FatalPeerException;
 import org.springframework.http.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.InactivePeerException;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.peer.*;
 

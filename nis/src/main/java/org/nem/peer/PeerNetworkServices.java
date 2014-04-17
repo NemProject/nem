@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.nem.core.connect.*;
 import org.nem.peer.scheduling.SchedulerFactory;
 
 /**

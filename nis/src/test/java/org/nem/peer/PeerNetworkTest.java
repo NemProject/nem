@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.test.MockTransaction;

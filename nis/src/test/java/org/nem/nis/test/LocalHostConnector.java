@@ -3,10 +3,10 @@ package org.nem.nis.test;
 import net.minidev.json.*;
 import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.nem.core.connect.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.nis.controller.utils.ErrorResponse;
-import org.nem.peer.net.*;
 
 import java.io.*;
 import java.net.MalformedURLException;

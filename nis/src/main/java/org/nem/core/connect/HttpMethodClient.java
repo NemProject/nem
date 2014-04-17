@@ -8,7 +8,6 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.peer.*;
 
 import java.io.*;
 import java.net.*;

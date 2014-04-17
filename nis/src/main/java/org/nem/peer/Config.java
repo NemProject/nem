@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.*;
 import org.nem.peer.trust.*;
 

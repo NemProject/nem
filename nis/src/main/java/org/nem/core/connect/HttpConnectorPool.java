@@ -1,7 +1,6 @@
 package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
-import org.nem.peer.*;
 
 /**
  * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern

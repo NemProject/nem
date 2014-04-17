@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.connect.NodeApiId;
 import org.nem.core.test.Utils;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.NodeExperiencesPair;

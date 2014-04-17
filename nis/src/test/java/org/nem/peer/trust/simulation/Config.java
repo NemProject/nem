@@ -1,5 +1,6 @@
 package org.nem.peer.trust.simulation;
 
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.peer.*;
 
 import java.io.*;

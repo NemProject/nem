@@ -3,6 +3,7 @@ package org.nem.peer;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;

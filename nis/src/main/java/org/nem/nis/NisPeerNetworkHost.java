@@ -1,7 +1,8 @@
 package org.nem.nis;
 
+import org.nem.core.connect.PeerConnector;
 import org.nem.peer.*;
-import org.nem.peer.net.HttpConnectorPool;
+import org.nem.core.connect.HttpConnectorPool;
 import org.nem.peer.scheduling.ParallelSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
