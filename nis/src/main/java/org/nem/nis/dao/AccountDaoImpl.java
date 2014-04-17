@@ -13,8 +13,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class AccountDaoImpl implements AccountDao {
-	@Autowired
-	private SessionFactory sessionFactory;
+
+	private final SessionFactory sessionFactory;
+
+	@Autowired(required = true)
+	public AccountDaoImpl(final SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	private Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();

@@ -21,8 +21,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {
-	@Autowired
-	private SessionFactory sessionFactory;
+
+	private final SessionFactory sessionFactory;
+
+	@Autowired(required = true)
+	public BlockDaoImpl(final SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	private Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();

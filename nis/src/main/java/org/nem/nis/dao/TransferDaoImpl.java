@@ -13,11 +13,15 @@ import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class TransferDaoImpl implements TransferDao {
-	@Autowired
-	private SessionFactory sessionFactory;
+
+	private final SessionFactory sessionFactory;
+
+	@Autowired(required = true)
+	public TransferDaoImpl(final SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	private Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
