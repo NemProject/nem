@@ -8,6 +8,7 @@ import org.nem.core.test.*;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SerializableEntityHttpMessageConverterTest {
@@ -57,11 +58,15 @@ public class SerializableEntityHttpMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
+		final Class[] types = new Class[] {
+				MockSerializableEntity.class,
+				SerializableEntityWithConstructorThatThrowsCheckedException.class,
+				SerializableEntityWithConstructorThatThrowsUncheckedException.class
+		};
+
 		// Assert:
-		Assert.assertThat(mc.canRead(MockSerializableEntity.class, supportedType), IsEqual.equalTo(true));
-		Assert.assertThat(
-				mc.canRead(SerializableEntityWithInaccessibleDeserializerConstructor.class, supportedType),
-				IsEqual.equalTo(true));
+		for (final Class type : types)
+			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -70,11 +75,14 @@ public class SerializableEntityHttpMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
+		final Class[] types = new Class[] {
+				SerializableEntity.class,
+				SerializableEntityWithoutDeserializerConstructor.class
+		};
+
 		// Assert:
-		Assert.assertThat(
-				mc.canRead(SerializableEntityWithoutDeserializerConstructor.class, supportedType),
-				IsEqual.equalTo(false));
-		Assert.assertThat(mc.canRead(SerializableEntity.class, supportedType), IsEqual.equalTo(false));
+		for (final Class type : types)
+			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -108,13 +116,24 @@ public class SerializableEntityHttpMessageConverterTest {
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void readIsUnsupportedForCompatibleTypeWithInaccessibleDeserializerConstructor() throws Exception {
+	public void readIsUnsupportedForCompatibleTypeWithConstructorThatThrowsCheckedException() throws Exception {
 		// Arrange:
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
 		// Act:
 		mc.read(
-				SerializableEntityWithInaccessibleDeserializerConstructor.class,
+				SerializableEntityWithConstructorThatThrowsCheckedException.class,
+				new MockHttpInputMessage(new JSONObject()));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void readIsUnsupportedForCompatibleTypeWithConstructorThatThrowsUncheckedException() throws Exception {
+		// Arrange:
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
+
+		// Act:
+		mc.read(
+				SerializableEntityWithConstructorThatThrowsUncheckedException.class,
 				new MockHttpInputMessage(new JSONObject()));
 	}
 
@@ -176,10 +195,17 @@ public class SerializableEntityHttpMessageConverterTest {
 		}
 	}
 
-	private static class SerializableEntityWithInaccessibleDeserializerConstructor extends MockSerializableEntity{
+	private static class SerializableEntityWithConstructorThatThrowsUncheckedException extends MockSerializableEntity{
 
-		public SerializableEntityWithInaccessibleDeserializerConstructor(final Deserializer deserializer) {
-			throw new RuntimeException("constructor failed: " + deserializer.toString());
+		public SerializableEntityWithConstructorThatThrowsUncheckedException(final Deserializer deserializer) {
+			throw new IllegalArgumentException("constructor failed: " + deserializer.toString());
+		}
+	}
+
+	private static class SerializableEntityWithConstructorThatThrowsCheckedException extends MockSerializableEntity{
+
+		public SerializableEntityWithConstructorThatThrowsCheckedException(final Deserializer deserializer) throws IOException {
+			throw new IOException("constructor failed: " + deserializer.toString());
 		}
 	}
 }
