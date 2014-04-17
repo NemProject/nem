@@ -1,11 +1,11 @@
 package org.nem.nis;
 
-import org.apache.commons.collections4.Predicate;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.Predicate;
 
 import java.util.*;
 
