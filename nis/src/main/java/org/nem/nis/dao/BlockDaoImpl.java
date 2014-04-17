@@ -11,7 +11,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
+import org.nem.core.model.HashChain;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,27 +70,27 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public Block findByHeight(long blockHeight) {
+	public Block findByHeight(final BlockHeight height) {
 		Query query = getCurrentSession()
 				.createQuery("from Block a where a.height = :height")
-				.setParameter("height", blockHeight);
+				.setParameter("height", height.getRaw());
 		return executeSingleQuery(query);
 	}
 
     @Override
     @Transactional
-    public List<byte[]> getHashesFrom(long blockHeight, int limit) {
+    public HashChain getHashesFrom(final BlockHeight height, int limit) {
         Criteria criteria = getCurrentSession().createCriteria(Block.class)
                 .setMaxResults(limit)
-                .add(Restrictions.ge("height", blockHeight)) // >=
+                .add(Restrictions.ge("height", height.getRaw())) // >=
                 .setProjection(Projections.property("blockHash"));
         final List<byte[]> blockList = criteria.list();
-        return blockList;
+        return new HashChain(blockList);
     }
 
 	@Override
 	@Transactional
-	public void deleteBlocksAfterHeight(long height) {
+	public void deleteBlocksAfterHeight(final BlockHeight blockHeight) {
 		// apparently delete on blocks is not enough, as
 		// delete is not cascaded :/
 		//
@@ -97,12 +99,12 @@ public class BlockDaoImpl implements BlockDao {
 
 		Query getTxes = getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
-				.setParameter("height", height);
+				.setParameter("height", blockHeight.getRaw());
 		List<Long> txToDelete = getTxes.list();
 
 		Query query = getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
-				.setParameter("height", height);
+				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 
 		if (! txToDelete.isEmpty()) {

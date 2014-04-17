@@ -71,8 +71,9 @@ public class BlockChainComparer {
 			if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED == code && !this.areChainsConsistent) {
 				// not to waste our time, first try to get first block and verify it
 				// this is just to save time
-				final Block firstDifferentRemoteBlock = this.remoteLookup.getBlockAt(this.commonBlockIndex + 1);
-				if (!firstDifferentRemoteBlock.verify()) {
+				final BlockHeight firstDifferenceHeight = new BlockHeight(this.commonBlockIndex + 1);
+				final Block firstDifferenceRemoteBlock = this.remoteLookup.getBlockAt(firstDifferenceHeight);
+				if (!firstDifferenceRemoteBlock.verify()) {
 					code = ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 				}
 			}
@@ -91,9 +92,9 @@ public class BlockChainComparer {
 		}
 
 		private int compareHashes() {
-			final long startingBlockHeight = Math.max(
+			final BlockHeight startingBlockHeight = new BlockHeight(Math.max(
 					1,
-					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite());
+					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite()));
 			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
 
 			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node
@@ -114,7 +115,7 @@ public class BlockChainComparer {
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 			}
 
-			this.commonBlockIndex = startingBlockHeight + firstDifferenceIndex - 1;
+			this.commonBlockIndex = startingBlockHeight.getRaw() + firstDifferenceIndex - 1;
 			this.areChainsConsistent = firstDifferenceIndex == localHashes.size();
 			return ComparisonResult.Code.REMOTE_IS_NOT_SYNCED;
 		}

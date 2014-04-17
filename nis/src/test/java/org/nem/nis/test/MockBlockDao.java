@@ -1,10 +1,8 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.Hash;
+import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
-
-import java.util.List;
 
 /**
  * A mock BlockDao implementation.
@@ -12,7 +10,7 @@ import java.util.List;
 public class MockBlockDao implements BlockDao {
 
 	private final Block block;
-	private final List<byte[]> hashes;
+	private final HashChain chain;
 	private int numFindByIdCalls;
 	private int numFindByHashCalls;
 	private int numFindByHeightCalls;
@@ -20,8 +18,8 @@ public class MockBlockDao implements BlockDao {
 
 	private long lastFindByIdId;
 	private Hash lastFindByHashHash;
-	private long lastFindByHeightHeight;
-	private long lastGetHashesFromHeight;
+	private BlockHeight lastFindByHeightHeight;
+	private BlockHeight lastGetHashesFromHeight;
 	private int lastGetHashesFromLimit;
 
 	/**
@@ -37,11 +35,11 @@ public class MockBlockDao implements BlockDao {
 	 * Creates a mock block dao.
 	 *
 	 * @param block The block to return from findBy* methods.
-	 * @param hashes The hashes to return from getHashesFrom.
+	 * @param chain The hash chain to return from getHashesFrom.
 	 */
-	public MockBlockDao(final Block block, final List<byte[]> hashes) {
+	public MockBlockDao(final Block block, final HashChain chain) {
 		this.block = block;
-		this.hashes = hashes;
+		this.chain = chain;
 	}
 
 
@@ -75,22 +73,22 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Block findByHeight(long blockHeight) {
+	public Block findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
-		this.lastFindByHeightHeight = blockHeight;
+		this.lastFindByHeightHeight = height;
 		return this.block;
 	}
 
 	@Override
-	public List<byte[]> getHashesFrom(long blockHeight, int limit) {
+	public HashChain getHashesFrom(final BlockHeight height, int limit) {
 		++this.numGetHashesFromCalls;
-		this.lastGetHashesFromHeight = blockHeight;
+		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
-		return this.hashes;
+		return this.chain;
 	}
 
 	@Override
-	public void deleteBlocksAfterHeight(long height) {
+	public void deleteBlocksAfterHeight(final BlockHeight height) {
 
 	}
 
@@ -141,14 +139,14 @@ public class MockBlockDao implements BlockDao {
 	 *
 	 * @return The last height passed to findByHeight.
 	 */
-	public long getLastFindByHeightHeight() { return this.lastFindByHeightHeight; }
+	public BlockHeight getLastFindByHeightHeight() { return this.lastFindByHeightHeight; }
 
 	/**
 	 * Gets the last height passed to getHashesFrom.
 	 *
 	 * @return The last height passed to getHashesFrom.
 	 */
-	public long getLastGetHashesFromHeight() { return this.lastGetHashesFromHeight; }
+	public BlockHeight getLastGetHashesFromHeight() { return this.lastGetHashesFromHeight; }
 
 	/**
 	 * Gets the last limit passed to getHashesFrom.

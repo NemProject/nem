@@ -1,7 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
+import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
@@ -41,13 +40,13 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	}
 
 	@Override
-	public Block getBlockAt(long height) {
+	public Block getBlockAt(final BlockHeight height) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
 		return BlockMapper.toModel(dbBlock, this.accountLookup);
 	}
 
 	@Override
-	public HashChain getHashesFrom(long height) {
-		return new HashChain(blockDao.getHashesFrom(height, this.maxHashesToReturn));
+	public HashChain getHashesFrom(final BlockHeight height) {
+		return blockDao.getHashesFrom(height, this.maxHashesToReturn);
 	}
 }

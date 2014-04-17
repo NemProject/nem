@@ -60,25 +60,22 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public Block getBlockAt(final NodeEndpoint endpoint, long height) {
+	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT);
-		final JSONObject obj = getJsonObjectWithHeight(height);
-		return BlockFactory.VERIFIABLE.deserialize(this.post(url, obj));
+		return BlockFactory.VERIFIABLE.deserialize(this.post(url, height));
 	}
 
 	@Override
-	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
+	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
-		final JSONObject obj = getJsonObjectWithHeight(height);
-		final Deserializer deserializer = this.post(url, obj);
+		final Deserializer deserializer = this.post(url, height);
 		return deserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
-	public HashChain getHashesFrom(NodeEndpoint endpoint, long height) {
+	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		final JSONObject obj = getJsonObjectWithHeight(height);
-		return HashChainFactory.deserializer.deserialize(this.post(url, obj));
+		return HashChainFactory.deserializer.deserialize(this.post(url, height));
 	}
 
 	//endregion
@@ -87,17 +84,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 		return this.httpMethodClient.get(url, this.responseStrategy);
 	}
 
-	private Deserializer post(final URL url, final JSONObject object) {
-		return this.httpMethodClient.post(url, object, this.responseStrategy);
-	}
-
 	private Deserializer post(final URL url, final SerializableEntity entity) {
 		return this.httpMethodClient.post(url, entity, this.responseStrategy);
-	}
-
-	private static JSONObject getJsonObjectWithHeight(long height) {
-		final JSONObject obj = new JSONObject();
-		obj.put("height", height);
-		return obj;
 	}
 }

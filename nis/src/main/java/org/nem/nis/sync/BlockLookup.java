@@ -1,7 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
+import org.nem.core.model.*;
 
 /**
  * An interface for looking up blocks.
@@ -21,7 +20,7 @@ public interface BlockLookup {
 	 * @param height The block height.
 	 * @return The block at the specified height
 	 */
-	public Block getBlockAt(long height);
+	public Block getBlockAt(final BlockHeight height);
 
 	/**
 	 * Requests information about the hashes of all blocks in the chain after the specified height.
@@ -29,5 +28,5 @@ public interface BlockLookup {
 	 * @param height The block height.
 	 * @return The hashes of all blocks in the chain after the specified height.
 	 */
-	public HashChain getHashesFrom(long height);
+	public HashChain getHashesFrom(final BlockHeight height);
 }

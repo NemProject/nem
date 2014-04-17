@@ -369,12 +369,12 @@ public class BlockChainComparerTest {
 		}
 
 		@Override
-		public Block getBlockAt(long height) {
-			return this.heightToBlockMap.get(new BlockHeight(height));
+		public Block getBlockAt(final BlockHeight height) {
+			return this.heightToBlockMap.get(height);
 		}
 
 		@Override
-		public HashChain getHashesFrom(long height) {
+		public HashChain getHashesFrom(final BlockHeight height) {
 			return this.chain;
 		}
 	}
