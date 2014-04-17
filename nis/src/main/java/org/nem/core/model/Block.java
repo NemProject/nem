@@ -93,6 +93,14 @@ public class Block extends VerifiableEntity {
 	}
 
 	/**
+	 * Sets total amount of fees in this block.
+	 * This is for testing purposes only
+	 */
+	public void setTotalFee(Amount fee) {
+		this.totalFee = fee;
+	}
+
+	/**
 	 * Gets the hash of the previous block.
 	 *
 	 * @return The hash of the previous block.

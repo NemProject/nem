@@ -390,23 +390,24 @@ public class BlockChain implements BlockSynchronizer {
 		return true;
 	}
 
-	public Block[] getBlocks(final long blockHeight, final long numBlocks) {
+	/**
+	 * Returns up to numBlocks beginning with block at height blockHeight
+	 * 
+	 * @param blockHeight the height of the block to begin with
+	 * @param numBlocks maximum number of blocks to return
+	 * @return List of blocks
+	 */
+	public List<Block> getBlocks(final long blockHeight, final long numBlocks) {
 		if (blockHeight > lastBlock.getHeight()) {
 			throw new InvalidParameterException("getBlocks can only return blocks up to height " + lastBlock.getHeight());
 		}
-		int count = (int) Math.min(numBlocks, lastBlock.getHeight() - blockHeight + 1);
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
-		final Block[] blocks = new Block[count];
-		int i=0;
-		while (i < count) {
-			blocks[i++] = BlockMapper.toModel(dbBlock, this.accountAnalyzer);
-			Long curBlockId = dbBlock.getNextBlockId();
-			if (null == curBlockId) {
-				break;
-			}
-
-			dbBlock = this.blockDao.findById(curBlockId);
-		}
+		final List<Block> blocks = new LinkedList<>();
+		int i=1;
+		do {
+			blocks.add(BlockMapper.toModel(dbBlock, this.accountAnalyzer));
+			dbBlock = this.blockDao.findById(dbBlock.getNextBlockId());
+		} while (dbBlock != null && i++ < numBlocks);
 
 		return blocks;
 	}

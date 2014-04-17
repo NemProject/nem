@@ -12,6 +12,7 @@ import org.nem.core.utils.ByteUtils;
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Provides functions for scoring block hits and targets.
@@ -122,36 +123,31 @@ public class BlockScorer {
 	}
 	
 	/**
-	 * Calculates the difficulty based on the last block and the
-	 * average time between blocks since historical block.
+	 * Calculates the difficulty based the last n blocks.
 	 * 
-	 * @param lastBlock last block in the chain.
-	 * @param historicalBlocks historical blocks, i.e. a block before last block.
+	 * @param historicalBlocks historical blocks, i.e. the last n blocks.
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDfficulty(final Block lastBlock, final Block[] historicalBlocks) {
-		if (lastBlock.getHeight() == 1) {
+	public long calculateDfficulty(final List<Block> historicalBlocks) {
+		if (historicalBlocks.size() < 2) {
 			return INITIAL_DIFFICULTY;
 		}
 		else {
-			if (lastBlock.getHeight() <= historicalBlocks[historicalBlocks.length - 1].getHeight()) {
-				throw new InvalidParameterException("historicalBlocks must have lower height than lastBlock");
-			}
-			
-			long difficulty;
-			long timeDiff = lastBlock.getTimeStamp().subtract(historicalBlocks[0].getTimeStamp());
-			final long heightDiff = lastBlock.getHeight() - historicalBlocks[0].getHeight();
+			Block lastBlock = historicalBlocks.get(historicalBlocks.size() - 1);
+			Block firstBlock = historicalBlocks.get(0);
+			long timeDiff = lastBlock.getTimeStamp().subtract(firstBlock.getTimeStamp());
+			final long heightDiff = lastBlock.getHeight() - firstBlock.getHeight();
 			long averageDifficulty = 0;
-			for (int i=0; i<historicalBlocks.length; i++) {
-				averageDifficulty += historicalBlocks[i].getDifficulty();
+			for (Block block : historicalBlocks) {
+				averageDifficulty += block.getDifficulty();
 			}
-			averageDifficulty /= historicalBlocks.length;
+			averageDifficulty /= historicalBlocks.size();
 			
-			difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
-															  .multiply(BigInteger.valueOf(heightDiff))
-															  .divide(BigInteger.valueOf(timeDiff))
-															  .longValue();
+			long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+																   .multiply(BigInteger.valueOf(heightDiff))
+																   .divide(BigInteger.valueOf(timeDiff))
+																   .longValue();
             if (difficulty < MIN_DIFFICULTY) {
             	difficulty = MIN_DIFFICULTY;
             }
