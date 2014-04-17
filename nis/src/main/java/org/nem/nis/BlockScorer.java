@@ -2,10 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hashes;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.Hash;
-import org.nem.core.model.HashUtils;
+import org.nem.core.model.*;
 import org.nem.core.utils.ArrayUtils;
 import org.nem.core.utils.ByteUtils;
 

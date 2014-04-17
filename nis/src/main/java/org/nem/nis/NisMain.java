@@ -12,7 +12,6 @@ import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
-import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {

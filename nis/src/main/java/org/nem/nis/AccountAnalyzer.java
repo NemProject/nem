@@ -6,13 +6,10 @@ import java.util.logging.Logger;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
 import org.nem.nis.balances.Balance;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class AccountAnalyzer implements AccountLookup {
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());

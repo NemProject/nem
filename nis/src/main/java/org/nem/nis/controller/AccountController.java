@@ -6,7 +6,6 @@ import org.nem.core.model.Address;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
