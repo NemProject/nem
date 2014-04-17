@@ -1,11 +1,13 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.*;
+
 import java.security.InvalidParameterException;
 
 /**
  * Represents a NEM block height.
  */
-public class BlockHeight extends AbstractPrimitive<BlockHeight> {
+public class BlockHeight extends AbstractPrimitive<BlockHeight> implements SerializableEntity {
 
 	/**
 	 * Value representing initial height.
@@ -22,6 +24,15 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight> {
 
 		if (this.getRaw() <= 0)
 			throw new InvalidParameterException("height must be positive");
+	}
+
+	/**
+	 * Deserializes a block height.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public BlockHeight(final Deserializer deserializer) {
+		this(deserializer.readLong("height"));
 	}
 
 	/**
@@ -49,4 +60,9 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight> {
 	 * @return The underlying height.
 	 */
 	public long getRaw() { return this.getValue(); }
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeLong("height", this.getRaw());
+	}
 }
