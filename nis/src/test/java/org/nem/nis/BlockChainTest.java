@@ -10,7 +10,6 @@ import org.nem.nis.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
 
 import java.util.Arrays;
 
@@ -53,8 +52,7 @@ public class BlockChainTest {
 				SENDER,
 				Hash.ZERO,
 				time.getCurrentTime(),
-				1L
-		);
+				BlockHeight.ONE);
 
 		b.addTransaction(tx1);
 		b.addTransaction(tx2);
@@ -70,7 +68,7 @@ public class BlockChainTest {
 				DB_SENDER,
 				// proof
 				b.getSignature().getBytes(),
-				b.getHeight(), // height
+				b.getHeight().getRaw(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
 				0L
 		);

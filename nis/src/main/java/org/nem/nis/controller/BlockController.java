@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.*;
@@ -7,7 +8,6 @@ import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
-import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +45,8 @@ public class BlockController {
 
 	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
 	@P2PApi
-	public Block blockAt(@RequestBody final Deserializer deserializer) {
-		final Long blockHeight = deserializer.readLong("height");
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+	public Block blockAt(@RequestBody final BlockHeight height) {
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
 		return BlockMapper.toModel(dbBlock, this.accountLookup);
 	}
 }

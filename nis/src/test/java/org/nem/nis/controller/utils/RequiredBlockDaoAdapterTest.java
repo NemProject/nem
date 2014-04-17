@@ -73,12 +73,12 @@ public class RequiredBlockDaoAdapterTest {
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
 		// Act:
-		final Block block = requiredBlockDao.findByHeight(124);
+		final Block block = requiredBlockDao.findByHeight(new BlockHeight(124));
 
 		// Assert:
 		Assert.assertThat(block, IsSame.sameInstance(originalBlock));
 		Assert.assertThat(blockDao.getNumFindByHeightCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(blockDao.getLastFindByHeightHeight(), IsEqual.equalTo(124L));
+		Assert.assertThat(blockDao.getLastFindByHeightHeight(), IsEqual.equalTo(new BlockHeight(124)));
 	}
 
 	@Test(expected = MissingResourceException.class)
@@ -88,23 +88,23 @@ public class RequiredBlockDaoAdapterTest {
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
 		// Act:
-		requiredBlockDao.findByHeight(124);
+		requiredBlockDao.findByHeight(new BlockHeight(124));
 	}
 
 	@Test
 	public void getHashesFromDelegatesToBlockDao() {
 		// Arrange:
-		final List<byte[]> originalHashes = NisUtils.createRawHashesList(3);
+		final HashChain originalHashes = new HashChain(NisUtils.createRawHashesList(3));
 		final MockBlockDao blockDao = new MockBlockDao(new Block(), originalHashes);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
 		// Act:
-		final HashChain hashes = requiredBlockDao.getHashesFrom(11, 14);
+		final HashChain hashes = requiredBlockDao.getHashesFrom(new BlockHeight(11), 14);
 
 		// Assert:
-		Assert.assertThat(hashes.findFirstDifferent(new HashChain(originalHashes)), IsEqual.equalTo(3));
+		Assert.assertThat(hashes.findFirstDifferent(originalHashes), IsEqual.equalTo(3));
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(11L));
+		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(14));
 	}
 }

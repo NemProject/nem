@@ -1,7 +1,6 @@
 package org.nem.peer.trust.simulation;
 
 import java.net.URL;
-import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.*;
 
@@ -27,7 +26,7 @@ public class NetworkSimulatorTest {
 	private static void runTest(final EigenTrust trust) {
 		final URL url = NetworkSimulator.class.getClassLoader().getResource("");
 		if (null == url || null == url.getFile())
-			throw new InvalidParameterException("could not find output file");
+			throw new IllegalArgumentException("could not find output file");
 
 		final StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < 10; ++i) {

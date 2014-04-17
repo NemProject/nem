@@ -9,7 +9,6 @@ import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 import java.net.URL;
-import java.security.InvalidParameterException;
 
 public class NodeTest {
 
@@ -42,7 +41,7 @@ public class NodeTest {
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void endpointCannotBeNull() {
 		// Act:
 		new Node(null, "plat", "app");

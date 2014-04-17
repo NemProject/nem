@@ -1,8 +1,8 @@
 package org.nem.nis;
 
-import org.apache.commons.collections4.Predicate;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.Predicate;
 
 import java.util.*;
 import java.util.concurrent.*;

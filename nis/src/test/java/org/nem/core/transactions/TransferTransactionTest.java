@@ -8,13 +8,11 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.security.InvalidParameterException;
-
 public class TransferTransactionTest {
 
 	//region Constructor
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void recipientIsRequired() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();

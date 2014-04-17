@@ -36,7 +36,7 @@ public class BlockMapper {
 				block.getTimeStamp().getRawTime(),
 				forager,
 				block.getSignature().getBytes(),
-				block.getHeight(),
+				block.getHeight().getRaw(),
 				0L,
 				block.getTotalFee().getNumMicroNem());
 
@@ -68,7 +68,7 @@ public class BlockMapper {
 				forager,
 				dbBlock.getPrevBlockHash(),
 				new TimeInstant(dbBlock.getTimestamp()),
-				dbBlock.getHeight());
+				new BlockHeight(dbBlock.getHeight()));
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

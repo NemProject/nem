@@ -2,8 +2,6 @@ package org.nem.peer;
 
 import org.nem.core.serialization.*;
 
-import java.security.InvalidParameterException;
-
 /**
  * Represents a node in the NEM network.
  * Each Node is uniquely identified by its endpoint.
@@ -100,7 +98,7 @@ public class Node implements SerializableEntity {
 
 	private void ensureValidity() {
 		if (null == this.endpoint)
-			throw new InvalidParameterException("endpoint must be non-null");
+			throw new IllegalArgumentException("endpoint must be non-null");
 	}
 
 	@Override

@@ -7,8 +7,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.security.InvalidParameterException;
-
 public class VerifiableEntityTest {
 
 	//region Constructor
@@ -41,7 +39,7 @@ public class VerifiableEntityTest {
 		new MockVerifiableEntity(new Account(publicOnlyKeyPair));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void ctorCannotCreateEntityForAccountWithoutSignerKeyPair() {
 		// Arrange:
 		final Address address = Address.fromEncoded("Alpha");
@@ -188,7 +186,7 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotSignWithoutPrivateKey() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();

@@ -4,8 +4,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.security.InvalidParameterException;
-
 /**
  * Base class for all entities that need to be verified
  * (e.g. blocks and transactions).
@@ -45,7 +43,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 */
 	public VerifiableEntity(final int type, final int version, final TimeInstant timestamp, final Account signer) {
 		if (null == signer.getKeyPair())
-			throw new InvalidParameterException("signer key pair is required to create a verifiable entity ");
+			throw new IllegalArgumentException("signer key pair is required to create a verifiable entity ");
 
 		this.type = type;
 		this.version = version;
@@ -175,7 +173,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 */
 	public void signBy(final Account account) {
 		if (!account.getKeyPair().hasPrivateKey())
-			throw new InvalidParameterException("cannot sign because signer does not have private key");
+			throw new IllegalArgumentException("cannot sign because signer does not have private key");
 
 		// (1) serialize the entire transaction to a buffer
 		byte[] transactionBytes = this.getBytes();

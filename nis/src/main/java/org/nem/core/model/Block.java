@@ -18,7 +18,7 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_VERSION = 1;
 
 	private final Hash prevBlockHash;
-	private long height; // unsure yet, but probably will be easier to talk on forums having that
+	private final BlockHeight height;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
@@ -31,7 +31,7 @@ public class Block extends VerifiableEntity {
 	 * @param timestamp     The block timestamp.
 	 * @param height        The block height.
 	 */
-	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final long height) {
+	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final BlockHeight height) {
 		super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
@@ -46,7 +46,7 @@ public class Block extends VerifiableEntity {
 	 * @param prevBlock The previous block.
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
-		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight() + 1);
+		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class Block extends VerifiableEntity {
 		super(type, options, deserializer);
 
 		this.prevBlockHash = deserializer.readObject("prevBlockHash", Hash.DESERIALIZER);
-		this.height = deserializer.readLong("height");
+		this.height = SerializationUtils.readBlockHeight(deserializer, "height");
 		this.totalFee = SerializationUtils.readAmount(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
@@ -72,8 +72,8 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return The height of this block in the block chain.
 	 */
-	public long getHeight() {
-		return height;
+	public BlockHeight getHeight() {
+		return this.height;
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class Block extends VerifiableEntity {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeObject("prevBlockHash", this.prevBlockHash);
-		serializer.writeLong("height", this.height);
+		SerializationUtils.writeBlockHeight(serializer, "height", this.height);
 		SerializationUtils.writeAmount(serializer, "totalFee", this.totalFee);
 
 		serializer.writeObjectArray("transactions", this.transactions);

@@ -7,7 +7,6 @@ import org.springframework.http.*;
 import org.springframework.http.converter.*;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 
 /**
  * An HttpMessageConverter that maps application/json requests to Deserializer objects.
@@ -46,7 +45,7 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 		if (result instanceof JSONObject)
 			return new JsonDeserializer((JSONObject)result, new DeserializationContext(this.accountLookup));
 
-		throw new InvalidParameterException("JSON Object was expected");
+		throw new IllegalArgumentException("JSON Object was expected");
 	}
 
 	@Override

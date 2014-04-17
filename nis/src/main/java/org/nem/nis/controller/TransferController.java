@@ -14,7 +14,6 @@ import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
 // TODO: add tests
@@ -42,7 +41,7 @@ public class TransferController {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
 		if (!transfer.isValid())
-			throw new InvalidParameterException("transfer must be valid");
+			throw new IllegalArgumentException("transfer must be valid");
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
 		return new RequestPrepare(transferData);
@@ -59,7 +58,7 @@ public class TransferController {
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
 		if (!transfer.isValid() || !transfer.verify())
-			throw new InvalidParameterException("transfer must be valid and verifiable");
+			throw new IllegalArgumentException("transfer must be valid and verifiable");
 
         final PeerNetwork network = this.host.getNetwork();
 

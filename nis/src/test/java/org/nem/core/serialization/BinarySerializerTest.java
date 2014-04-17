@@ -306,7 +306,7 @@ public class BinarySerializerTest {
 				final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
 
 				// Assert:
-				CustomAsserts.assertMockSerializableEntity(object, 17, "foo", 42L);
+				Assert.assertThat(object, IsEqual.equalTo(new MockSerializableEntity(17, "foo", 42)));
 			}
 		}
 	}
@@ -345,9 +345,8 @@ public class BinarySerializerTest {
 
 				// Assert:
 				Assert.assertThat(objects.size(), IsEqual.equalTo(3));
-				CustomAsserts.assertMockSerializableEntity(objects.get(0), 17, "foo", 42L);
-				CustomAsserts.assertMockSerializableEntity(objects.get(1), 111, "bar", 22L);
-				CustomAsserts.assertMockSerializableEntity(objects.get(2), 1, "alpha", 34L);
+				for (int i = 0; i < objects.size(); ++i)
+					Assert.assertThat(objects.get(i), IsEqual.equalTo(originalObjects.get(i)));
 			}
 		}
 	}
@@ -384,8 +383,14 @@ public class BinarySerializerTest {
 			serializer.writeInt("alpha", 0x09513510);
 			serializer.writeLong("zeta", 0xF239A033CE951350L);
 			serializer.writeBytes("beta", new byte[] { 2, 4, 6 });
+			serializer.writeObject("object", new MockSerializableEntity(7, "foo", 5));
 			serializer.writeInt("gamma", 7);
 			serializer.writeString("epsilon", "FooBar");
+			serializer.writeObjectArray("entities", Arrays.asList(
+					new MockSerializableEntity(5, "ooo", 62),
+					new MockSerializableEntity(8, "ala", 15)
+			));
+			serializer.writeBigInteger("bi", new BigInteger("14"));
 			serializer.writeLong("sigma", 8);
 
 			try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
@@ -393,8 +398,22 @@ public class BinarySerializerTest {
 				Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
 				Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
 				Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
+
+				final MockSerializableEntity entity = deserializer.readObject(
+						"object",
+						new MockSerializableEntity.Activator());
+				Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
+
 				Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
 				Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
+
+				final List<MockSerializableEntity> entities = deserializer.readObjectArray(
+						"entities",
+						new MockSerializableEntity.Activator());
+				Assert.assertThat(entities.get(0), IsEqual.equalTo(new MockSerializableEntity(5, "ooo", 62)));
+				Assert.assertThat(entities.get(1), IsEqual.equalTo(new MockSerializableEntity(8, "ala", 15)));
+
+				Assert.assertThat(deserializer.readBigInteger("bi"), IsEqual.equalTo(new BigInteger("14")));
 				Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
 			}
 		}

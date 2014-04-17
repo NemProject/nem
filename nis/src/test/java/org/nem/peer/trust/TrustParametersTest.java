@@ -3,8 +3,6 @@ package org.nem.peer.trust;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class TrustParametersTest {
 
 	@Test
@@ -73,7 +71,7 @@ public class TrustParametersTest {
 		Assert.assertThat(params.getAsDouble("d", 3.14), IsEqual.equalTo(3.14));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void unsetStringValueCannotBeRetrieved() {
 		// Arrange:
 		final TrustParameters params = new TrustParameters();
@@ -82,7 +80,7 @@ public class TrustParametersTest {
 		params.get("s");
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void unsetIntegerValueCannotBeRetrieved() {
 		// Arrange:
 		final TrustParameters params = new TrustParameters();
@@ -91,7 +89,7 @@ public class TrustParametersTest {
 		params.getAsInteger("i");
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void unsetDoubleValueCannotBeRetrieved() {
 		// Arrange:
 		final TrustParameters params = new TrustParameters();

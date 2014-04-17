@@ -55,14 +55,14 @@ public class RequiredBlockDaoAdapter {
 	/**
 	 * Retrieves Block from db at given height.
 	 *
-	 * @param blockHeight height of a block to retrieve.
+	 * @param height Height of the block to retrieve.
 	 * @return Block at given height.
 	 * @throws MissingResourceException If a matching block cannot be found.
 	 */
-	public org.nem.nis.dbmodel.Block findByHeight(long blockHeight) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+	public org.nem.nis.dbmodel.Block findByHeight(final BlockHeight height) {
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
 		if (null == dbBlock)
-			throw createMissingResourceException(Long.toBinaryString(blockHeight));
+			throw createMissingResourceException(height.toString());
 
 		return dbBlock;
 	}
@@ -71,10 +71,11 @@ public class RequiredBlockDaoAdapter {
 	 * Retrieves list of hashes for blocks starting at given height.
 	 * This should be used, not to pull whole block from the db.
 	 *
+	 * @param height height of starting block.
 	 * @return Chain of block hashes.
 	 */
-	public HashChain getHashesFrom(long blockHeight, int limit) {
-		return new HashChain(this.blockDao.getHashesFrom(blockHeight, limit));
+	public HashChain getHashesFrom(final BlockHeight height, int limit) {
+		return this.blockDao.getHashesFrom(height, limit);
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

@@ -35,7 +35,7 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
@@ -56,7 +56,7 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(4L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(4)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
@@ -80,7 +80,7 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(2L)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
 		final List<Transaction> transactions = block.getTransactions();
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
@@ -229,7 +229,7 @@ public class BlockTest {
 
 	private static Block createBlock(final Account forger) {
 		// Arrange:
-		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), 3);
+		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
 	}
 
 	private static Block createBlock() {

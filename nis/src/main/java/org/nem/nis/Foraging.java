@@ -1,9 +1,8 @@
 package org.nem.nis;
 
-import org.apache.commons.collections4.Predicate;
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.utils.Predicate;
 import org.nem.nis.dao.TransferDao;
-import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;

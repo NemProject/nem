@@ -77,6 +77,9 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 			return constructor.newInstance(deserializer);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			if (e.getCause() instanceof RuntimeException)
+				throw (RuntimeException)e.getCause();
+
 			throw new UnsupportedOperationException("could not instantiate object");
 		}
 	}

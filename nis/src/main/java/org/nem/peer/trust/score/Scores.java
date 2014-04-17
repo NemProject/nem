@@ -4,8 +4,6 @@ import org.nem.core.utils.AbstractTwoLevelMap;
 import org.nem.peer.Node;
 import org.nem.core.math.*;
 
-import java.security.InvalidParameterException;
-
 public abstract class Scores<T extends Score> {
 
 	private final AbstractTwoLevelMap<Node, T> scores = new AbstractTwoLevelMap<Node, T>() {
@@ -62,7 +60,7 @@ public abstract class Scores<T extends Score> {
 	 */
 	public void setScoreVector(final Node node, final Node[] nodes, final ColumnVector scoreVector) {
 		if (nodes.length != scoreVector.getSize())
-			throw new InvalidParameterException("nodes and scoreVector must be same size");
+			throw new IllegalArgumentException("nodes and scoreVector must be same size");
 
 		for (int i = 0; i < nodes.length; ++i) {
 			final T score = this.getScore(node, nodes[i]);

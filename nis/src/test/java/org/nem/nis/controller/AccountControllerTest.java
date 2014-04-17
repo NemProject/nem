@@ -6,7 +6,6 @@ import org.nem.core.model.Account;
 import org.nem.nis.Foraging;
 import org.nem.nis.test.MockAccountAnalyzer;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 public class AccountControllerTest {
@@ -29,8 +28,7 @@ public class AccountControllerTest {
 		}
 	}
 
-	//
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
 		try (final MockForaging foraging = new MockForaging()) {

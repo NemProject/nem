@@ -111,9 +111,9 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
-		org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
+		org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
 		while (currentHeight != wantedHeight) {
-			org.nem.nis.dbmodel.Block parentBlock = blockDao.findByHeight(currentHeight - 1);
+			org.nem.nis.dbmodel.Block parentBlock = blockDao.findByHeight(new BlockHeight(currentHeight - 1));
 
 			for (DbBlockVisitor dbBlockVisitor : dbBlockVisitors) {
 				dbBlockVisitor.visit(parentBlock, block);
@@ -128,7 +128,7 @@ public class BlockChain implements BlockSynchronizer {
 		long currentHeight = getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
-			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(currentHeight);
+			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
 
 			// if the transaction is in DB it means at some point
 			// isValid and verify had to be called on it, so we can safely add it
@@ -141,7 +141,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void dropDbBlocksAfter(long height) {
+	private void dropDbBlocksAfter(final BlockHeight height) {
 		blockDao.deleteBlocksAfterHeight(height);
 
 		lastBlock = blockDao.findByHeight(height);
@@ -245,7 +245,7 @@ public class BlockChain implements BlockSynchronizer {
 				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
 			}
 
-			dropDbBlocksAfter(commonBlockHeight);
+			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
 		for (Block peerBlock : peerChain) {
@@ -266,13 +266,13 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
-		final long commonBlockHeight = result.getCommonBlockHeight();
+		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
 
-			ourScore = undoTxesAndGetScore(commonBlockHeight, contemporaryAccountAnalyzer);
+			ourScore = undoTxesAndGetScore(commonBlockHeight.getRaw(), contemporaryAccountAnalyzer);
 		}
 		//endregion
 
@@ -302,7 +302,7 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		// mind "not" consistent
-		updateOurChain(commonBlockHeight, contemporaryAccountAnalyzer, peerChain, ! result.areChainsConsistent());
+		updateOurChain(commonBlockHeight.getRaw(), contemporaryAccountAnalyzer, peerChain, ! result.areChainsConsistent());
 	}
 
 	/**

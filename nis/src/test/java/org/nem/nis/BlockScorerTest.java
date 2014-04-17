@@ -6,10 +6,8 @@ import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ByteUtils;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class BlockScorerTest {
 
@@ -28,7 +26,7 @@ public class BlockScorerTest {
 	public void hitIsCalculatedCorrectly() {
 		// Arrange:
 		final BlockScorer scorer = new BlockScorer();
-		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block block = createBlock(Utils.generateRandomAccount(), 0, 11);
 		block.setSignature(new Signature(SIGNATURE_BYTES));
 
 		// Act:
@@ -44,8 +42,8 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(0);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(101), 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 101, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -60,8 +58,8 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(1), 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 1, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -76,8 +74,8 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(101), 11);
-		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(1), 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 101, 11);
+		final Block block = createBlock(blockSigner, 1, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -92,8 +90,8 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block = new Block(blockSigner, Hash.ZERO, new TimeInstant(101), 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 101, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -108,9 +106,9 @@ public class BlockScorerTest {
 		final BlockScorer scorer = new BlockScorer();
 		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(1), 11);
-		final Block block1 = new Block(blockSigner, Hash.ZERO, new TimeInstant(101), 11);
-		final Block block2 = new Block(blockSigner, Hash.ZERO, new TimeInstant(201), 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block1 = createBlock(blockSigner, 101, 11);
+		final Block block2 = createBlock(blockSigner, 201, 11);
 
 		// Act:
 		final BigInteger target1 = scorer.calculateTarget(previousBlock, block1);
@@ -136,6 +134,10 @@ public class BlockScorerTest {
 //		// Assert:
 //		Assert.assertThat(blockScore, IsEqual.equalTo(Math.abs(0xE2E3E4E5) + blockScoreHashPart));
 //	}
+
+	private static Block createBlock(final Account account, int timeStamp, long height) {
+		return new Block(account, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
+	}
 
 	private static Account createAccountWithBalance(long balance) {
 		final Account account = Utils.generateRandomAccount();

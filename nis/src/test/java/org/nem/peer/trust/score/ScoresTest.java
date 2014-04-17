@@ -8,8 +8,6 @@ import org.nem.peer.Node;
 import org.nem.peer.test.*;
 import org.nem.core.math.*;
 
-import java.security.InvalidParameterException;
-
 public class ScoresTest {
 
 	//region basic operations
@@ -74,7 +72,7 @@ public class ScoresTest {
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(2.0));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void smallerTrustVectorCannotBeSet() {
 		// Arrange:
 		final TestContext context = new TestContext(3);
@@ -85,7 +83,7 @@ public class ScoresTest {
 		context.scores.setScoreVector(context.nodes[0], context.nodes, vector);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void largerTrustVectorCannotBeSet() {
 		// Arrange:
 		final TestContext context = new TestContext(3);

@@ -1,11 +1,11 @@
 package org.nem.nis;
 
-import org.apache.commons.collections4.Predicate;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.Predicate;
 
 import java.util.*;
 
@@ -167,7 +167,7 @@ public class UnconfirmedTransactionsTest {
 			unconfirmedTransactions.add(transaction);
 		}
 
-		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(0), 1);
+		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		block.addTransaction(transactions.get(1));
 		block.addTransaction(transactions.get(7));
 		block.addTransaction(transactions.get(4));

@@ -25,8 +25,7 @@ public class GenesisBlock extends Block {
 	private final static PrivateKey CREATOR_PRIVATE_KEY = PrivateKey.fromHexString(
 			"aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
 
-	private final static int GENESIS_HEIGHT = 1;
-	private final static int HASH_LENGTH = 32;
+	private final static BlockHeight GENESIS_HEIGHT = BlockHeight.ONE;
 
 	static {
 		final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);

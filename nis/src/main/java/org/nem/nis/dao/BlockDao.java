@@ -1,9 +1,7 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.Hash;
+import org.nem.core.model.*;
 import org.nem.nis.dbmodel.Block;
-
-import java.util.List;
 
 /**
  * DAO for accessing db Block objects.
@@ -51,11 +49,11 @@ public interface BlockDao {
 	/**
 	 * Retrieves Block from db at given height.
 	 *
-	 * @param blockHeight height of a block to retrieve.
+	 * @param height height of a block to retrieve.
 	 *
 	 * @return Block at given height or null.
 	 */
-	public Block findByHeight(long blockHeight);
+	public Block findByHeight(final BlockHeight height);
 
     /**
      * Retrieves list of hashes for blocks starting at given height.
@@ -63,12 +61,12 @@ public interface BlockDao {
      *
      * @return list of block hashes.
      */
-    public List<byte[]> getHashesFrom(long blockHeight, int limit);
+    public HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Deletes blocks after given block
 	 *
 	 * @param height
 	 */
-	public void deleteBlocksAfterHeight(long height);
+	public void deleteBlocksAfterHeight(final BlockHeight height);
 }

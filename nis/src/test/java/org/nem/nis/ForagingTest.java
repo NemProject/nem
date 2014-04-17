@@ -188,7 +188,7 @@ public class ForagingTest {
 
 		final Account signer = createAccountWithBalance(100);
 		final TimeInstant parentTime = new TimeInstant(0);
-		final Block parent = new Block(signer, new Hash(new byte[32]), parentTime, 1);
+		final Block parent = new Block(signer, new Hash(new byte[32]), parentTime, BlockHeight.ONE);
 		parent.sign();
 
 		// Act:

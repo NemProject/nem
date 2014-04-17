@@ -20,10 +20,10 @@ public class ExceptionControllerAdviceTest {
 	}
 
 	@Test
-	public void handleInvalidParameterExceptionCreatesAppropriateResponse() {
+	public void handleIllegalArgumentExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = new ExceptionControllerAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleInvalidParameterException(new Exception("badness"));
+		final ResponseEntity<ErrorResponse> entity = advice.handleIllegalArgumentException(new Exception("badness"));
 
 		// Assert:
 		Assert.assertThat(entity.getStatusCode(), IsEqual.equalTo(HttpStatus.BAD_REQUEST));

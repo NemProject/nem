@@ -9,7 +9,6 @@ import org.nem.core.test.*;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 public class DeserializerHttpMessageConverterTest {
@@ -92,7 +91,7 @@ public class DeserializerHttpMessageConverterTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		CustomAsserts.assertMockSerializableEntity(entity, 7, "foo", 3L);
+		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test
@@ -113,7 +112,7 @@ public class DeserializerHttpMessageConverterTest {
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void readFailsIfInputStringIsNotJsonObject() throws Exception {
 		// Arrange:
 		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
