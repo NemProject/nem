@@ -4,7 +4,6 @@ import org.nem.nis.controller.utils.ErrorResponse;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.InvalidParameterException;
 import java.util.MissingResourceException;
 
 /**
@@ -31,8 +30,8 @@ public class ExceptionControllerAdvice {
 	 * @param e The exception.
 	 * @return The appropriate JSON indicating an error.
 	 */
-	@ExceptionHandler(InvalidParameterException.class)
-	public ResponseEntity<ErrorResponse> handleInvalidParameterException(final Exception e) {
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final Exception e) {
 		return createResponse(e, HttpStatus.BAD_REQUEST);
 	}
 

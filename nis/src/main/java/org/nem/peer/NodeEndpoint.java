@@ -3,7 +3,6 @@ package org.nem.peer;
 import org.nem.core.serialization.*;
 
 import java.net.*;
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -85,7 +84,7 @@ public class NodeEndpoint implements SerializableEntity {
 			final InetAddress address = InetAddress.getByName(host);
 			return address.getHostAddress();
 		} catch (UnknownHostException e) {
-			throw new InvalidParameterException("host is unknown");
+			throw new IllegalArgumentException("host is unknown");
 		}
 	}
 
@@ -93,7 +92,7 @@ public class NodeEndpoint implements SerializableEntity {
 		try {
 			return new URL(this.protocol, this.host, this.port, "/");
 		} catch (MalformedURLException e) {
-			throw new InvalidParameterException("url is malformed");
+			throw new IllegalArgumentException("url is malformed");
 		}
 	}
 
@@ -112,7 +111,7 @@ public class NodeEndpoint implements SerializableEntity {
 			return nodeApiToUrlMap;
 
 		} catch (MalformedURLException e) {
-			throw new InvalidParameterException("url is malformed");
+			throw new IllegalArgumentException("url is malformed");
 		}
 	}
 

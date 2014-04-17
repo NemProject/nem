@@ -12,7 +12,6 @@ import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
 /**
@@ -57,7 +56,7 @@ public class PushController {
 
 		// transaction timestamp is checked inside processTransaction
 		if (!transaction.isValid() || !transaction.verify())
-			throw new InvalidParameterException("transfer must be valid and verifiable");
+			throw new IllegalArgumentException("transfer must be valid and verifiable");
 
 		final PeerNetwork network = this.host.getNetwork();
 
@@ -76,7 +75,7 @@ public class PushController {
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
 		if (!block.verify())
-			throw new InvalidParameterException("block must be verifiable");
+			throw new IllegalArgumentException("block must be verifiable");
 
 		// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
 

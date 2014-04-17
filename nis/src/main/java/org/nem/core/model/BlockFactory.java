@@ -3,8 +3,6 @@ package org.nem.core.model;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.ObjectDeserializer;
 
-import java.security.InvalidParameterException;
-
 /**
  * similar to transaction factory, but for the blocks
  * <p/>
@@ -46,6 +44,6 @@ public class BlockFactory {
 				return new Block(1, options, deserializer);
 		}
 
-		throw new InvalidParameterException("Unknown block type: " + type);
+		throw new IllegalArgumentException("Unknown block type: " + type);
 	}
 }

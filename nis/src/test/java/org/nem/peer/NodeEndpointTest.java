@@ -6,7 +6,6 @@ import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 import java.net.URL;
-import java.security.InvalidParameterException;
 
 public class NodeEndpointTest {
 
@@ -51,13 +50,13 @@ public class NodeEndpointTest {
 
 	//region invalid parameters
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void ctorFailsIfProtocolIsInvalid() throws Exception {
 		// Act:
 		new NodeEndpoint("xyz", "10.8.8.2", 12);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void ctorFailsIfProtocolIsHostIsInvalid() throws Exception {
 		// Act:
 		new NodeEndpoint("ftp", "10.8.8.2.1", 12);

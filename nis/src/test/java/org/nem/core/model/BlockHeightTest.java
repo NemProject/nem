@@ -6,8 +6,6 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
-import java.security.InvalidParameterException;
-
 public class BlockHeightTest {
 
 	//region constants
@@ -22,13 +20,13 @@ public class BlockHeightTest {
 
 	//region constructor
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeHeight() {
 		// Act:
 		new BlockHeight(-1);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundZeroHeight() {
 		// Act:
 		new BlockHeight(0);

@@ -3,8 +3,6 @@ package org.nem.nis.sync;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class ComparisonContextTest {
 
 	@Test
@@ -17,13 +15,13 @@ public class ComparisonContextTest {
 		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(33));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void maxBlocksToAnalyzeCannotBeLessThanMaxBlocksToRewrite() {
 		// Act:
 		new ComparisonContext(123, 124);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void maxBlocksToAnalyzeCannotBeEqualToMaxBlocksToRewrite() {
 		// Act:
 		new ComparisonContext(124, 124);

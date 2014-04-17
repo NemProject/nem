@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 public class SignatureTest {
 
@@ -38,13 +37,13 @@ public class SignatureTest {
 		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void byteArrayCtorFailsIfByteArrayIsTooSmall() {
 		// Act:
 		new Signature(new byte[63]);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void byteArrayCtorFailsIfByteArrayIsTooLarge() {
 		// Act:
 		new Signature(new byte[65]);

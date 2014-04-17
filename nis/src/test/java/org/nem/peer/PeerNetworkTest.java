@@ -12,7 +12,6 @@ import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 public class PeerNetworkTest {
@@ -583,7 +582,7 @@ public class PeerNetworkTest {
 		Assert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBatchSetLocalExperiences() {
 		// Arrange:
 		final NodeExperiences experiences = new NodeExperiences();

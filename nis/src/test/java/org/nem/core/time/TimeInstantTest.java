@@ -3,8 +3,6 @@ package org.nem.core.time;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class TimeInstantTest {
 
 	//region constants
@@ -19,7 +17,7 @@ public class TimeInstantTest {
 
 	//region constructor
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeTime() {
 		// Act:
 		new TimeInstant(-1);

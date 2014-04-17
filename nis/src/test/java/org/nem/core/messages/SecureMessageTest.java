@@ -7,8 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
-import java.security.InvalidParameterException;
-
 public class SecureMessageTest {
 
 	@Test
@@ -81,7 +79,7 @@ public class SecureMessageTest {
 		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void secureMessageCannotBeCreatedAroundDecodedPayloadWithoutSenderPrivateKey() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();

@@ -1,6 +1,5 @@
 package org.nem.peer.trust;
 
-import java.security.InvalidParameterException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,7 +29,7 @@ public class TrustParameters {
 	public String get(final String name) {
 		final String value = this.params.get(name);
 		if (null == value)
-			throw new InvalidParameterException(name + " parameter does not exist");
+			throw new IllegalArgumentException(name + " parameter does not exist");
 
 		return value;
 	}

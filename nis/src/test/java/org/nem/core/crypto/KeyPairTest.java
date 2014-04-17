@@ -3,8 +3,6 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class KeyPairTest {
 
 	@Test
@@ -69,7 +67,7 @@ public class KeyPairTest {
 		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void ctorFailsIfPublicKeyIsNotCompressed() {
 		// Arrange:
 		final PublicKey publicKey = createUncompressedPublicKey();

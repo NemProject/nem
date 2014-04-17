@@ -3,7 +3,6 @@ package org.nem.core.crypto;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 /**
  * A EC signature.
@@ -31,7 +30,7 @@ public class Signature {
 	 */
 	public Signature(final byte[] bytes) {
 		if (64 != bytes.length)
-			throw new InvalidParameterException("binary signature representation must be 64 bytes");
+			throw new IllegalArgumentException("binary signature representation must be 64 bytes");
 
 		byte[][] parts = ArrayUtils.split(bytes, 32);
 		this.r = ArrayUtils.toBigInteger(parts[0]);

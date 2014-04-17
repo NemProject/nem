@@ -5,8 +5,6 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.security.InvalidParameterException;
-
 /**
  * A transaction that represents the exchange of funds and/or a message
  * between a sender and a recipient.
@@ -34,7 +32,7 @@ public class TransferTransaction extends Transaction {
 		this.message = message;
 
 		if (null == this.recipient)
-			throw new InvalidParameterException("recipient is required");
+			throw new IllegalArgumentException("recipient is required");
 	}
 
 	/**

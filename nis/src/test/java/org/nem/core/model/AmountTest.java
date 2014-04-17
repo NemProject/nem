@@ -3,8 +3,6 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class AmountTest {
 
 	//region constants
@@ -43,7 +41,7 @@ public class AmountTest {
 
 	//region constructor
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeAmount() {
 		// Act:
 		new Amount(-1);
@@ -111,7 +109,7 @@ public class AmountTest {
 		Assert.assertThat(result, IsEqual.equalTo(new Amount(46)));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void largerAmountCannotBeSubtractedFromSmallerAmount() {
 		// Arrange:
 		final Amount amount1 = new Amount(65);

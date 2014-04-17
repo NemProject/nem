@@ -5,7 +5,6 @@ import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -93,7 +92,7 @@ public class PeerNetwork {
 	 */
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		if (this.getLocalNode().equals(pair.getNode()))
-			throw new InvalidParameterException("cannot set local node experiences");
+			throw new IllegalArgumentException("cannot set local node experiences");
 
 		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
 	}

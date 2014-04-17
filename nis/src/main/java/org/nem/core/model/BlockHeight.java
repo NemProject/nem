@@ -2,8 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-import java.security.InvalidParameterException;
-
 /**
  * Represents a NEM block height.
  */
@@ -23,7 +21,7 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight> implements Seria
 		super(height, BlockHeight.class);
 
 		if (this.getRaw() <= 0)
-			throw new InvalidParameterException("height must be positive");
+			throw new IllegalArgumentException("height must be positive");
 	}
 
 	/**

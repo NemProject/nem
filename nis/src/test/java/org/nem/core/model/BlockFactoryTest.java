@@ -7,10 +7,8 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.security.InvalidParameterException;
-
 public class BlockFactoryTest {
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotDeserializeUnknownBlock() {
 		// Arrange:
 		final JSONObject object = new JSONObject();

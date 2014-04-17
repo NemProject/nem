@@ -8,8 +8,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.core.transactions.TransferTransaction;
 import org.nem.nis.dbmodel.Transfer;
 
-import java.security.InvalidParameterException;
-
 /**
  * Static class that contains functions for converting to and from
  * db-model Transfer and model TransferTransaction.
@@ -100,6 +98,6 @@ public class TransferMapper {
 				return SecureMessage.fromEncodedPayload(sender, recipient, payload);
 		}
 
-		throw new InvalidParameterException("Unknown message type in database");
+		throw new IllegalArgumentException("Unknown message type in database");
 	}
 }

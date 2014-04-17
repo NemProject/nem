@@ -2,8 +2,6 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.*;
 
-import java.security.InvalidParameterException;
-
 /**
  * Helper class for comparing two block chains.
  */
@@ -58,7 +56,7 @@ public class BlockChainComparer {
 
 			this.localLastBlock = this.localLookup.getLastBlock();
 			if (null == this.localLastBlock)
-				throw new InvalidParameterException("Local does not have any blocks");
+				throw new IllegalArgumentException("Local does not have any blocks");
 
 			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 		}

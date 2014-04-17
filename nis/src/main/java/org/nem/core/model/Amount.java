@@ -1,7 +1,5 @@
 package org.nem.core.model;
 
-import java.security.InvalidParameterException;
-
 /**
  * Represents an amount of NEM.
  */
@@ -45,7 +43,7 @@ public class Amount extends AbstractPrimitive<Amount> {
 		super(amount, Amount.class);
 
 		if (amount < 0)
-			throw new InvalidParameterException("amount must be non-negative");
+			throw new IllegalArgumentException("amount must be non-negative");
 	}
 
 	/**

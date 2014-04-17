@@ -7,14 +7,13 @@ import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 public class BlockChainComparerTest {
 
 	//region last block comparison
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void localBlockChainMustHaveAtLeastOneBlock() {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();

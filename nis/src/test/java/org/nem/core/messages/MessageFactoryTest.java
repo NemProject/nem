@@ -7,11 +7,9 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.security.InvalidParameterException;
-
 public class MessageFactoryTest {
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotDeserializeUnknownMessage() {
 		// Arrange:
 		final JSONObject object = new JSONObject();

@@ -5,7 +5,6 @@ import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.security.InvalidParameterException;
 import java.security.SecureRandom;
 
 public class KeyPair {
@@ -57,7 +56,7 @@ public class KeyPair {
 		this.publicKey = publicKey;
 
 		if (!publicKey.isCompressed())
-			throw new InvalidParameterException("publicKey must be in compressed form");
+			throw new IllegalArgumentException("publicKey must be in compressed form");
 	}
 
 	private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {

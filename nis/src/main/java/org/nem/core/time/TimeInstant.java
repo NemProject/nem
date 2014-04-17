@@ -1,7 +1,5 @@
 package org.nem.core.time;
 
-import java.security.InvalidParameterException;
-
 /**
  * Represents an instant in time.
  */
@@ -21,7 +19,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 */
 	public TimeInstant(int time) {
 		if (time < 0)
-			throw new InvalidParameterException("time must be non-negative");
+			throw new IllegalArgumentException("time must be non-negative");
 
 		this.time = time;
 	}

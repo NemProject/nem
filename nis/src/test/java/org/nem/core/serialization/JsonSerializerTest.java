@@ -6,7 +6,6 @@ import org.junit.*;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 import java.util.*;
 
 public class JsonSerializerTest {
@@ -481,7 +480,7 @@ public class JsonSerializerTest {
 		Assert.assertThat((String)orderArray.get(1), IsEqual.equalTo("Bar"));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void deserializerCanOptionallyEnforceOrderedReads() {
 		// Arrange:
 		JsonSerializer serializer = new JsonSerializer(true);

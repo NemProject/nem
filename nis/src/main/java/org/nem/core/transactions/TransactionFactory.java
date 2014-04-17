@@ -3,8 +3,6 @@ package org.nem.core.transactions;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-import java.security.InvalidParameterException;
-
 /**
  * Factory class that can deserialize all known transactions.
  */
@@ -43,6 +41,6 @@ public class TransactionFactory {
 				return new TransferTransaction(options, deserializer);
 		}
 
-		throw new InvalidParameterException("Unknown transaction type: " + type);
+		throw new IllegalArgumentException("Unknown transaction type: " + type);
 	}
 }
