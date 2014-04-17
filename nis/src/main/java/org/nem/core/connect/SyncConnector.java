@@ -1,5 +1,6 @@
-package org.nem.peer;
+package org.nem.core.connect;
 
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.model.*;
 
 import java.util.List;

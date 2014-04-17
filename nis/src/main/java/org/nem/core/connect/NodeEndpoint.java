@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
 

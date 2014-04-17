@@ -1,6 +1,5 @@
-package org.nem.peer.net;
+package org.nem.core.connect;
 
-import net.minidev.json.JSONObject;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.*;

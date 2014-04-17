@@ -1,4 +1,4 @@
-package org.nem.peer.net;
+package org.nem.core.connect;
 
 import net.minidev.json.*;
 import org.eclipse.jetty.client.HttpClient;

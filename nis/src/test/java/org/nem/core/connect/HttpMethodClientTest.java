@@ -1,12 +1,12 @@
-package org.nem.peer.net;
+package org.nem.core.connect;
 
 import org.eclipse.jetty.client.api.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.connect.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
-import org.nem.peer.*;
 
 import java.io.IOException;
 import java.net.URL;

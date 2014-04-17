@@ -1,15 +1,16 @@
-package org.nem.peer.net;
+package org.nem.core.connect;
 
 import org.eclipse.jetty.client.api.*;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.connect.FatalPeerException;
+import org.nem.core.connect.HttpDeserializerResponseStrategy;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.peer.*;
-import org.nem.peer.InactivePeerException;
+import org.nem.core.connect.InactivePeerException;
 
 import java.io.*;
 import java.util.*;
