@@ -1,15 +1,13 @@
 package org.nem.core.utils;
 
-import org.nem.core.serialization.SerializationException;
-
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Static class that contains utility functions for converting strings to and from UTF-8 bytes.
  */
 public class StringEncoder {
 
-	private static final String ENCODING_NAME = "UTF-8";
+	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
 	/**
 	 * Converts a string to a UTF-8 byte array.
@@ -19,11 +17,7 @@ public class StringEncoder {
 	 * @return The output byte array.
 	 */
 	public static byte[] getBytes(final String s) {
-		try {
-			return s.getBytes(ENCODING_NAME);
-		} catch (UnsupportedEncodingException e) {
-			throw new SerializationException(e);
-		}
+		return s.getBytes(ENCODING_CHARSET);
 	}
 
 	/**
@@ -34,10 +28,6 @@ public class StringEncoder {
 	 * @return The output string.
 	 */
 	public static String getString(byte[] bytes) {
-		try {
-			return new String(bytes, ENCODING_NAME);
-		} catch (UnsupportedEncodingException e) {
-			throw new SerializationException(e);
-		}
+		return new String(bytes, ENCODING_CHARSET);
 	}
 }

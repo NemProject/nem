@@ -2,7 +2,6 @@ package org.nem.core.utils;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.nem.core.serialization.SerializationException;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
@@ -23,7 +22,7 @@ public class HexEncoder {
 		try {
 			return codec.decode(encodedBytes);
 		} catch (DecoderException e) {
-			throw new SerializationException(e);
+			throw new EncodingException(e);
 		}
 	}
 

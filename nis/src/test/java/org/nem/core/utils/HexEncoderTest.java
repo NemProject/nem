@@ -22,7 +22,7 @@ public class HexEncoderTest {
 		Assert.assertThat(HexEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("4e454d465457"));
 	}
 
-	@Test(expected = SerializationException.class)
+	@Test(expected = EncodingException.class)
 	public void malformedStringCannotBeConvertedToByteArray() {
 		// Act:
 		HexEncoder.getBytes("4e454g465457");
