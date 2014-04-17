@@ -28,7 +28,6 @@ public class AccountControllerTest {
 		}
 	}
 
-	//
 	@Test(expected = IllegalArgumentException.class)
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
