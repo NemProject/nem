@@ -104,7 +104,7 @@ public class SerializableEntityHttpMessageConverterTest {
 				new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity)));
 
 		// Assert:
-		CustomAsserts.assertMockSerializableEntity(entity, 7, "foo", 3L);
+		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -160,7 +160,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		CustomAsserts.assertMockSerializableEntity(entity, 7, "foo", 3L);
+		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	//endregion

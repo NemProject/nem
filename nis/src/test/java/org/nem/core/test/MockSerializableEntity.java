@@ -76,6 +76,32 @@ public class MockSerializableEntity implements SerializableEntity {
 		serializer.writeLong("long", this.longValue);
 	}
 
+	@Override
+	public int hashCode() {
+		return this.intValue;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof MockSerializableEntity))
+			return false;
+
+		final MockSerializableEntity rhs = (MockSerializableEntity)obj;
+		return
+				this.intValue == rhs.intValue
+				&& this.stringValue.equals(rhs.stringValue)
+				&& this.longValue == rhs.longValue;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"int: %d; string: %s; long: %d",
+				this.intValue,
+				this.stringValue,
+				this.longValue);
+	}
+
 	/**
 	 * ObjectDeserializer implementation that can activate MockSerializableEntity objects.
 	 */

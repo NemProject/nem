@@ -91,7 +91,7 @@ public class DeserializerHttpMessageConverterTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		CustomAsserts.assertMockSerializableEntity(entity, 7, "foo", 3L);
+		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test
