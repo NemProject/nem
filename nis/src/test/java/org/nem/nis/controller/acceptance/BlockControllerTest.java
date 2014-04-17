@@ -14,7 +14,7 @@ public class BlockControllerTest {
 	private static final String INVALID_PATH = "wrong/at";
 
 	@Test
-	public void validHeightReturnsValidBlock() throws MalformedURLException {
+	public void validHeightReturnsValidBlock() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
@@ -29,21 +29,32 @@ public class BlockControllerTest {
 	}
 
 	@Test
-	public void invalidHeightReturnsNotFound() throws MalformedURLException {
+	public void invalidBlockHeightReturnsBadRequest() {
+		// Assert:
+		assertRequestForBlockAtHeightReturnsStatus(0, 400);
+	}
+
+	@Test
+	public void futureBlockHeightReturnsNotFound() {
+		// Assert:
+		assertRequestForBlockAtHeightReturnsStatus(Long.MAX_VALUE, 404);
+	}
+
+	private static void assertRequestForBlockAtHeightReturnsStatus(final long height, final int expectedStatus) {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
-		input.put("height", 0);
+		input.put("height", height);
 
 		// Act:
 		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(expectedStatus));
 	}
 
 	@Test
-	public void missingHeightReturnsServerError() throws MalformedURLException {
+	public void missingHeightReturnsServerError() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
