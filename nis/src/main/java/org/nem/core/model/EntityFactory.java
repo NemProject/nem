@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.time.*;
-import org.nem.core.transactions.TransferTransaction;
 
 /**
  * Factory class that creates time-synced entities.

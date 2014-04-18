@@ -1,4 +1,4 @@
-package org.nem.core.transactions;
+package org.nem.core.model;
 
 import org.nem.core.messages.*;
 import org.nem.core.model.*;

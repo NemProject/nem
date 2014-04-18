@@ -6,7 +6,6 @@ import org.nem.core.messages.PlainMessage;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
-import org.nem.core.transactions.TransferTransaction;
 
 public class EntityFactoryTest {
 

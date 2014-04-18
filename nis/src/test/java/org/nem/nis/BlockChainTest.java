@@ -9,7 +9,7 @@ import org.nem.core.test.MockAccount;
 import org.nem.nis.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransferTransaction;
 
 import java.util.Arrays;
 

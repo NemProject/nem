@@ -1,4 +1,4 @@
-package org.nem.core.transactions;
+package org.nem.core.model;
 
 import net.minidev.json.*;
 import org.hamcrest.core.*;

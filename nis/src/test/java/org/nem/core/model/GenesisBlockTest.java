@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 public class GenesisBlockTest {
 

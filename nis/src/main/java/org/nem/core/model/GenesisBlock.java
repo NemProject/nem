@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 /**
  * Represents the genesis block.

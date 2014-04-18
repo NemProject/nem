@@ -2,7 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransactionFactory;
 
 import java.util.*;
 

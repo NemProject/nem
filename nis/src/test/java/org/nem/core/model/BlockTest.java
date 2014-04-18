@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 import java.util.*;
 
