@@ -233,19 +233,22 @@ public class BlockScorerTest {
 		// NOTE: Since the attacker has a balance considerably lower than 200 million,
 		//       his the average time between blocks is considerably higher than 60 seconds!
 		//       That's why the normal forger wins this time.
-		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 3960000000L, 40000000L);
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 3_960_000_000L, 40_000_000L);
 
 		//  5% attack: 10 rounds with approximately 100 blocks each
-		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 3800000000L, 200000000L);
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 3_800_000_000L, 200_000_000L);
 
 		//  10% attack: 10 rounds with approximately 100 blocks each
-		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 2700000000L, 300000000L);
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 2_700_000_000L, 300_000_000L);
 
 		//  20% attack: 10 rounds with approximately 100 blocks each
-		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 2000000000L, 500000000L);
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 2_000_000_000L, 500_000_000L);
 
 		//  40% attack: 10 rounds with approximately 100 blocks each
-		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1500000000L, 1000000000L);
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_500_000_000L, 1_000_000_000L);
+
+		//  50% attack: 10 rounds with approximately 100 blocks each
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 900_000_000L, 900_000_000L);
 		
 		Assert.assertTrue("Selfish forager created better chain!", selfishForagerWins == 0);
 	}
@@ -278,15 +281,17 @@ public class BlockScorerTest {
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("NORMAL==== ==== ==== ==== ");
 			normalForagerScore = calculateScore(blocks, scorer);
 
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				Block block = generateNextBlock(selfishForager, blocks, scorer, true); 
+				Block block = generateNextBlock(selfishForager, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("SELFISH=== ==== ==== ==== ");
 			selfishForagerScore = calculateScore(blocks, scorer);
 			if (selfishForagerScore > normalForagerScore) {
 				selfishForagerWins++;

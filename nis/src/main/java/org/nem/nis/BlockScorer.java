@@ -13,11 +13,13 @@ import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
+	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
 
 	/**
 	 * 1_000_000_000 NEMs have force to generate block every minute.
@@ -101,20 +103,19 @@ public class BlockScorer {
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey(), timeDiff);
+		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty());
 	}
 
 	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
 		int timeDiff = (currentBlock.getTimestamp() - parentBlock.getTimestamp());
-		return calculateBlockScoreImpl(parentBlock.getBlockHash(), currentBlock.getForger().getPublicKey(), timeDiff);
+		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty());
 	}
 
 	/**
 	 * @param timeDiff positive time difference between blocks
 	 */
-	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner, int timeDiff) {
-		byte[] hash = Hashes.sha3(ArrayUtils.concat(thisBlockSigner.getRaw(), parentBlockHash.getRaw()));
-		return intToUlong(ByteUtils.bytesToInt(Arrays.copyOfRange(hash, 10, 14)));
+	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
+		return difficulty;
 	}
 
 	private static long intToUlong(int value) {
