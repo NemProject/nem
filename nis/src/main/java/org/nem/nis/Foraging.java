@@ -161,10 +161,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
-				final List<Integer> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-				final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-				final long difficulty = scorer.calculateDifficulty(difficulties, timestamps);
+				final long difficulty = this.calculateDifficulty(scorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
 
@@ -199,6 +196,13 @@ public class Foraging implements AutoCloseable, Runnable {
 		if (bestBlock != null) {
 			addForagedBlock(bestBlock);
 		}
+	}
+
+	private long calculateDifficulty(BlockScorer scorer, Block lastBlock) {
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+		final List<Integer> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		return scorer.calculateDifficulty(difficulties, timestamps);
 	}
 
 	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger, long difficulty) {
