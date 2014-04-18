@@ -87,16 +87,14 @@ public class CommonStarter implements ServletContextListener {
 		server.join();
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	public static boolean openStartPage() {
 		boolean result = false;
 		// Let the show start without binding statically to JNLP
 		//We first try to get the JNLP Service Manager
-		Class jnlpServiceManager;
-		Class jnlpBasicService;
 		try {
-			jnlpServiceManager = Class.forName("javax.jnlp.ServiceManager");
-			jnlpBasicService = Class.forName("javax.jnlp.BasicService");
+			final Class jnlpServiceManager = Class.forName("javax.jnlp.ServiceManager");
+			final Class jnlpBasicService = Class.forName("javax.jnlp.BasicService");
 
 			Method lookup = jnlpServiceManager.getMethod("lookup", new Class[] { String.class });
 			Method showDocument = jnlpBasicService.getMethod("showDocument", new Class[] { URL.class });

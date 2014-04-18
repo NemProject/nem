@@ -355,7 +355,7 @@ public class BlockChain implements BlockSynchronizer {
 			hasOwnChain = true;
 		}
 
-		final ArrayList<Block> peerChain = new ArrayList(1);
+		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(block);
 
 		long peerscore = validatePeerChainAndGetScore(contemporaryAccountAnalyzer, parent, peerChain);
