@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	private static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
+	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
 
@@ -399,8 +399,8 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param numBlocks maximum number of blocks to return
 	 * @return List of blocks
 	 */
-	public List<Block> getBlocks(final long blockHeight, final long numBlocks) {
-		if (blockHeight > lastBlock.getHeight()) {
+	public List<Block> getBlocks(final BlockHeight blockHeight, final long numBlocks) {
+		if (blockHeight.getRaw() > lastBlock.getHeight()) {
 			throw new InvalidParameterException("getBlocks can only return blocks up to height " + lastBlock.getHeight());
 		}
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);

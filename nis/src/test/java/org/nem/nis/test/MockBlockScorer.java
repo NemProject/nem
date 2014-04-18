@@ -1,5 +1,6 @@
 package org.nem.nis.test;
 
+import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
 

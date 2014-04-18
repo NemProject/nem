@@ -51,11 +51,11 @@ public class BlockScorer {
     /**
 	 * Calculates the hit score for block.
 	 *
-	 * @param block The block.
+	 * @param prevBlock The block.
 	 * @return the hit score.
 	 */
-	public BigInteger calculateHit(final Block block, final Account blockSigner) {
-		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), HashUtils.calculateHash(block).getRaw()));
+	public BigInteger calculateHit(final Block prevBlock, final Account blockSigner) {
+		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), HashUtils.calculateHash(prevBlock).getRaw()));
 		return new BigInteger(1, Arrays.copyOfRange(hash, 10, 18));
 	}
 
@@ -123,7 +123,7 @@ public class BlockScorer {
 			Block lastBlock = historicalBlocks.get(historicalBlocks.size() - 1);
 			Block firstBlock = historicalBlocks.get(0);
 			long timeDiff = lastBlock.getTimeStamp().subtract(firstBlock.getTimeStamp());
-			final long heightDiff = lastBlock.getHeight() - firstBlock.getHeight();
+			final long heightDiff = lastBlock.getHeight().subtract(firstBlock.getHeight());
 			long averageDifficulty = 0;
 			for (Block block : historicalBlocks) {
 				averageDifficulty += block.getDifficulty();

@@ -161,7 +161,8 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final List<Block> historicalBlocks = blockChain.getBlocks(Math.max(1L, lastBlock.getHeight() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+				final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+				final List<Block> historicalBlocks = blockChain.getBlocks(blockHeight, BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 				final long difficulty = scorer.calculateDfficulty(historicalBlocks);
 
 				for (Account virtualForger : unlockedAccounts) {
