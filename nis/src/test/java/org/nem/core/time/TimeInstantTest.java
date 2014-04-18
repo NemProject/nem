@@ -1,7 +1,10 @@
 package org.nem.core.time;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 
 public class TimeInstantTest {
 
@@ -185,6 +188,41 @@ public class TimeInstantTest {
 
 		// Assert:
 		Assert.assertThat(instant.toString(), IsEqual.equalTo("22561"));
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteTimeInstant() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final TimeInstant instant = new TimeInstant(77124);
+
+		// Act:
+		TimeInstant.writeTo(serializer, "TimeInstant", instant);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Integer)object.get("TimeInstant"), IsEqual.equalTo(77124));
+	}
+
+	@Test
+	public void canRoundtripTimeInstant() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final TimeInstant originalInstant = new TimeInstant(77124);
+
+		// Act:
+		TimeInstant.writeTo(serializer, "TimeInstant", originalInstant);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final TimeInstant instant = TimeInstant.readFrom(deserializer, "TimeInstant");
+
+		// Assert:
+		Assert.assertThat(instant, IsEqual.equalTo(originalInstant));
 	}
 
 	//endregion

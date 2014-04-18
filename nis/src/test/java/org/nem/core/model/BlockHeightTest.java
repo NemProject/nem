@@ -107,4 +107,39 @@ public class BlockHeightTest {
 	}
 
 	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteBlockHeight() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final BlockHeight height = new BlockHeight(0x8712411223456L);
+
+		// Act:
+		BlockHeight.writeTo(serializer, "Height", height);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Long)object.get("Height"), IsEqual.equalTo(0x8712411223456L));
+	}
+
+	@Test
+	public void canRoundtripBlockHeight() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final BlockHeight originalHeight = new BlockHeight(0x8712411223456L);
+
+		// Act:
+		BlockHeight.writeTo(serializer, "Height", originalHeight);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final BlockHeight height = BlockHeight.readFrom(deserializer, "Height");
+
+		// Assert:
+		Assert.assertThat(height, IsEqual.equalTo(originalHeight));
+	}
+
+	//endregion
 }

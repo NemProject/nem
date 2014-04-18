@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.*;
+
 /**
  * Represents an amount of NEM.
  */
@@ -85,4 +87,31 @@ public class Amount extends AbstractPrimitive<Amount> {
 	public long getNumNem() {
 		return this.getValue() / MICRONEMS_IN_NEM;
 	}
+
+	//region inline serialization
+
+	/**
+	 * Writes an amount object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param amount     The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Amount amount) {
+		serializer.writeLong(label, amount.getNumMicroNem());
+	}
+
+	/**
+	 * Reads an amount object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Amount readFrom(final Deserializer deserializer, final String label) {
+		return new Amount(deserializer.readLong(label));
+	}
+
+	//endregion
 }

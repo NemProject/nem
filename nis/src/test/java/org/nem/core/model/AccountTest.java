@@ -1,11 +1,13 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.messages.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
+import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -262,6 +264,128 @@ public class AccountTest {
 		final JsonSerializer serializer = new JsonSerializer(true);
 		account.serialize(serializer);
 		return new JsonDeserializer(serializer.getObject(), null);
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+
+		// Act:
+		Account.writeTo(serializer, "Account", new MockAccount(address));
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
+	}
+
+	@Test
+	public void canWriteAccountWithAddressEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("MockAcc");
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new MockAccount(address),
+				AccountEncoding.ADDRESS,
+				address.getEncoded());
+	}
+
+	@Test
+	public void canWriteAccountWithPublicKeyEncoding() {
+		// Arrange:
+		final KeyPair kp = new KeyPair();
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(kp),
+				AccountEncoding.PUBLIC_KEY,
+				Base64Encoder.getString(kp.getPublicKey().getRaw()));
+	}
+
+	@Test
+	public void canWriteAccountThatDoesNotHavePublicKeyWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(address),
+				AccountEncoding.PUBLIC_KEY,
+				null);
+	}
+
+	private static void assertCanWriteAccountWithEncoding(
+			final Account account,
+			final AccountEncoding encoding,
+			final String expectedSerializedString) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		Account.writeTo(serializer, "Account", account, encoding);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(expectedSerializedString));
+	}
+
+	@Test
+	public void canRoundtripAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+
+		// Act:
+		Account.writeTo(serializer, "Account", new MockAccount(address));
+
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = Account.readFrom(deserializer, "Account");
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void canRoundtripAccountWithAddressEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
+	}
+
+	@Test
+	public void canRoundtripAccountWithPublicKeyEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
+	}
+
+	private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+
+		// Act:
+		Account.writeTo(serializer, "Account", originalAccount, encoding);
+
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = Account.readFrom(deserializer, "Account", encoding);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
 	//endregion

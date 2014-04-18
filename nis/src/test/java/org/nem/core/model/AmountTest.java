@@ -1,7 +1,10 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 
 public class AmountTest {
 
@@ -117,6 +120,41 @@ public class AmountTest {
 
 		// Act:
 		amount1.subtract(amount2);
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteAmount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount amount = new Amount(0x7712411223456L);
+
+		// Act:
+		Amount.writeTo(serializer, "Amount", amount);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Long)object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
+	}
+
+	@Test
+	public void canRoundtripAmount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount originalAmount = new Amount(0x7712411223456L);
+
+		// Act:
+		Amount.writeTo(serializer, "Amount", originalAmount);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Amount amount = Amount.readFrom(deserializer, "Amount");
+
+		// Assert:
+		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
 	}
 
 	//endregion

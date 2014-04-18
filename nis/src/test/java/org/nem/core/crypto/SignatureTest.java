@@ -1,8 +1,11 @@
 package org.nem.core.crypto;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 
@@ -151,6 +154,41 @@ public class SignatureTest {
 		Assert.assertThat(createSignature(1235, 7789).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(createSignature(1234, 7789).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(createSignature(1235, 7790).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteSignature() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Signature signature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
+
+		// Act:
+		Signature.writeTo(serializer, "Signature", signature);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
+	}
+
+	@Test
+	public void canRoundtripSignature() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Signature originalSignature = new Signature(new BigInteger("7A", 16), new BigInteger("A4F0", 16));
+
+		// Act:
+		Signature.writeTo(serializer, "Signature", originalSignature);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Signature signature = Signature.readFrom(deserializer, "Signature");
+
+		// Assert:
+		Assert.assertThat(signature, IsEqual.equalTo(originalSignature));
 	}
 
 	//endregion

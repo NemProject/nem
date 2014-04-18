@@ -63,4 +63,31 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight> implements Seria
 	public void serialize(final Serializer serializer) {
 		serializer.writeLong("height", this.getRaw());
 	}
+
+	//region inline serialization
+
+	/**
+	 * Writes a block height object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param height     The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final BlockHeight height) {
+		serializer.writeLong(label, height.getRaw());
+	}
+
+	/**
+	 * Reads a block height object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static BlockHeight readFrom(final Deserializer deserializer, final String label) {
+		return new BlockHeight(deserializer.readLong(label));
+	}
+
+	//endregion
 }

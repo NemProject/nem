@@ -1,5 +1,7 @@
 package org.nem.core.time;
 
+import org.nem.core.serialization.*;
+
 /**
  * Represents an instant in time.
  */
@@ -118,4 +120,31 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	public String toString() {
 		return String.format("%d", this.time);
 	}
+
+	//region inline serialization
+
+	/**
+	 * Writes a time instant object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param instant    The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final TimeInstant instant) {
+		serializer.writeInt(label, instant.getRawTime());
+	}
+
+	/**
+	 * Reads a time instant object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static TimeInstant readFrom(final Deserializer deserializer, final String label) {
+		return new TimeInstant(deserializer.readInt(label));
+	}
+
+	//endregion
 }

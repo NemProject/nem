@@ -1,8 +1,10 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
@@ -167,6 +169,40 @@ public class AddressTest {
 		Assert.assertThat(Address.fromEncoded(address.getEncoded()).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteAddress() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+
+		// Act:
+		Address.writeTo(serializer, "Address", address);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Address"), IsEqual.equalTo(address.getEncoded()));
+	}
+
+	@Test
+	public void canRoundtripAddress() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		Address.writeTo(serializer, "Address", Address.fromEncoded("MockAcc"));
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Address address = Address.readFrom(deserializer, "Address");
+
+		// Assert:
+		Assert.assertThat(address, IsEqual.equalTo(address));
 	}
 
 	//endregion

@@ -58,8 +58,8 @@ public class Block extends VerifiableEntity {
 		super(type, options, deserializer);
 
 		this.prevBlockHash = deserializer.readObject("prevBlockHash", Hash.DESERIALIZER);
-		this.height = SerializationUtils.readBlockHeight(deserializer, "height");
-		this.totalFee = SerializationUtils.readAmount(deserializer, "totalFee");
+		this.height = BlockHeight.readFrom(deserializer, "height");
+		this.totalFee = Amount.readFrom(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 	}
@@ -128,8 +128,8 @@ public class Block extends VerifiableEntity {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeObject("prevBlockHash", this.prevBlockHash);
-		SerializationUtils.writeBlockHeight(serializer, "height", this.height);
-		SerializationUtils.writeAmount(serializer, "totalFee", this.totalFee);
+		BlockHeight.writeTo(serializer, "height", this.height);
+		Amount.writeTo(serializer, "totalFee", this.totalFee);
 
 		serializer.writeObjectArray("transactions", this.transactions);
 	}

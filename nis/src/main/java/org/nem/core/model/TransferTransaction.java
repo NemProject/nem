@@ -42,8 +42,8 @@ public class TransferTransaction extends Transaction {
 	 */
 	public TransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.TRANSFER, options, deserializer);
-		this.recipient = SerializationUtils.readAccount(deserializer, "recipient");
-		this.amount = SerializationUtils.readAmount(deserializer, "amount");
+		this.recipient = Account.readFrom(deserializer, "recipient");
+		this.amount = Amount.readFrom(deserializer, "amount");
 		this.message = deserializer.readObject("message", MessageFactory.createDeserializer(this.getSigner(), this.getRecipient()));
 	}
 
@@ -99,8 +99,8 @@ public class TransferTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		SerializationUtils.writeAccount(serializer, "recipient", this.recipient);
-		SerializationUtils.writeAmount(serializer, "amount", this.amount);
+		Account.writeTo(serializer, "recipient", this.recipient);
+		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.message);
 	}
 

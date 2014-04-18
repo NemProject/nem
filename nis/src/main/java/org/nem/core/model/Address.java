@@ -3,6 +3,7 @@ package org.nem.core.model;
 import java.util.Arrays;
 
 import org.nem.core.crypto.*;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
 /**
@@ -135,5 +136,29 @@ public class Address {
 
 		Address rhs = (Address)obj;
 		return this.encoded.equals(rhs.encoded);
+	}
+
+	/**
+	 * Writes an address object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param address    The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Address address) {
+		serializer.writeString(label, address.getEncoded());
+	}
+
+	/**
+	 * Reads an address object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Address readFrom(final Deserializer deserializer, final String label) {
+		final String encodedAddress = deserializer.readString(label);
+		return Address.fromEncoded(encodedAddress);
 	}
 }

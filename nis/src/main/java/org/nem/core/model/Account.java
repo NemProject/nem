@@ -1,10 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
-import org.nem.core.serialization.AccountEncoding;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializationUtils;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 import java.util.*;
 
@@ -52,8 +49,8 @@ public class Account implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		SerializationUtils.writeAccount(serializer, "address", this, AccountEncoding.ADDRESS);
-		SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+		writeTo(serializer, "address", this, AccountEncoding.ADDRESS);
+		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
 
 		serializer.writeLong("balance", getBalance().getNumMicroNem());
 		serializer.writeString("label", getLabel());
@@ -154,4 +151,85 @@ public class Account implements SerializableEntity {
 		Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
 	}
+
+	//region inline serialization
+
+	/**
+	 * Writes an account object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param account    The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Account account) {
+		writeTo(serializer, label, account, AccountEncoding.ADDRESS);
+	}
+
+	/**
+	 * Writes an account object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param account    The object.
+	 * @param encoding   The account encoding mode.
+	 */
+	public static void writeTo(
+			final Serializer serializer,
+			final String label,
+			final Account account,
+			final AccountEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				final KeyPair keyPair = account.getKeyPair();
+				serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
+				break;
+
+			case ADDRESS:
+			default:
+				Address.writeTo(serializer, label, account.getAddress());
+				break;
+		}
+	}
+
+	/**
+	 * Reads an account object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Account readFrom(final Deserializer deserializer, final String label) {
+		return readFrom(deserializer, label, AccountEncoding.ADDRESS);
+	}
+
+	/**
+	 * Reads an account object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param encoding     The account encoding.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Account readFrom(
+			final Deserializer deserializer,
+			final String label,
+			final AccountEncoding encoding) {
+		Address address;
+		switch (encoding) {
+			case PUBLIC_KEY:
+				address = Address.fromPublicKey(new PublicKey(deserializer.readBytes(label)));
+				break;
+
+			case ADDRESS:
+			default:
+				address = Address.readFrom(deserializer, label);
+				break;
+		}
+
+		return deserializer.getContext().findAccountByAddress(address);
+	}
+
+	//endregion
 }

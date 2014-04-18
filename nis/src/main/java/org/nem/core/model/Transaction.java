@@ -31,8 +31,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = SerializationUtils.readAmount(deserializer, "fee");
-		this.deadline = SerializationUtils.readTimeInstant(deserializer, "deadline");
+		this.fee = Amount.readFrom(deserializer, "fee");
+		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
 	}
 
 	//region Setters and Getters
@@ -96,8 +96,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
-		SerializationUtils.writeAmount(serializer, "fee", this.getFee());
-		SerializationUtils.writeTimeInstant(serializer, "deadline", this.getDeadline());
+		Amount.writeTo(serializer, "fee", this.getFee());
+		TimeInstant.writeTo(serializer, "deadline", this.getDeadline());
 	}
 
 	/**

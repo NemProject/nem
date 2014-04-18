@@ -61,11 +61,11 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	public VerifiableEntity(final int type, DeserializationOptions options, Deserializer deserializer) {
 		this.type = type;
 		this.version = deserializer.readInt("version");
-		this.timestamp = SerializationUtils.readTimeInstant(deserializer, "timestamp");
-		this.signer = SerializationUtils.readAccount(deserializer, "signer", AccountEncoding.PUBLIC_KEY);
+		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");
+		this.signer = Account.readFrom(deserializer, "signer", AccountEncoding.PUBLIC_KEY);
 
 		if (DeserializationOptions.VERIFIABLE == options)
-			this.signature = SerializationUtils.readSignature(deserializer, "signature");
+			this.signature = Signature.readFrom(deserializer, "signature");
 	}
 
 	//endregion
@@ -145,11 +145,11 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	private void serialize(final Serializer serializer, boolean includeSignature) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
-		SerializationUtils.writeTimeInstant(serializer, "timestamp", this.getTimeStamp());
-		SerializationUtils.writeAccount(serializer, "signer", this.getSigner(), AccountEncoding.PUBLIC_KEY);
+		TimeInstant.writeTo(serializer, "timestamp", this.getTimeStamp());
+		Account.writeTo(serializer, "signer", this.getSigner(), AccountEncoding.PUBLIC_KEY);
 
 		if (includeSignature)
-			SerializationUtils.writeSignature(serializer, "signature", this.getSignature());
+			Signature.writeTo(serializer, "signature", this.getSignature());
 
 		this.serializeImpl(serializer);
 	}
