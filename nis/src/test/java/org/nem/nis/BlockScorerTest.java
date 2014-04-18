@@ -2,21 +2,17 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ArrayUtils;
-import org.nem.peer.trust.simulation.NetworkSimulatorTest;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 public class BlockScorerTest {
@@ -168,7 +164,7 @@ public class BlockScorerTest {
 		for (int i=1; i<numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(foragerAccounts[0], blocks[i-1], new TimeInstant(1));
-			block.setDifficulty(scorer.calculateDfficulty(historicalBlocks));
+			block.setDifficulty(scorer.calculateDifficulty(historicalBlocks));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
 				BigInteger hit = scorer.calculateHit(blocks[i-1], foragerAccounts[j]);
@@ -293,7 +289,7 @@ public class BlockScorerTest {
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 		
 		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size()-1);
-		long difficulty = scorer.calculateDfficulty(historicalBlocks);
+		long difficulty = scorer.calculateDifficulty(historicalBlocks);
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(lastBlock, forger);
 		int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty()))

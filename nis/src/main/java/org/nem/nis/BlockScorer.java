@@ -1,13 +1,10 @@
 package org.nem.nis;
 
 import org.nem.core.crypto.Hashes;
-import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.utils.ArrayUtils;
-import org.nem.core.utils.ByteUtils;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,17 +23,17 @@ public class BlockScorer {
 	/**
 	 * Minimum value for difficulty.
 	 */
-	public static final long MIN_DIFFICULTY = INITIAL_DIFFICULTY / 10L;
+	private static final long MIN_DIFFICULTY = INITIAL_DIFFICULTY / 10L;
 	
 	/**
 	 * Maximum value for difficulty.
 	 */
-	public static final long Max_DIFFICULTY = INITIAL_DIFFICULTY * 10L;
+	private static final long MAX_DIFFICULTY = INITIAL_DIFFICULTY * 10L;
 	
 	/**
 	 * The target time between two blocks in seconds.
 	 */
-	public static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * BigInteger constant 2^64
@@ -103,11 +100,6 @@ public class BlockScorer {
 		return difficulty;
 	}
 
-	private static long intToUlong(int value) {
-		//final long fix = Math.abs((long)Integer.MIN_VALUE);
-		return Math.abs((long)value);
-	}
-	
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 * 
@@ -115,7 +107,7 @@ public class BlockScorer {
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDfficulty(final List<Block> historicalBlocks) {
+	public long calculateDifficulty(final List<Block> historicalBlocks) {
 		if (historicalBlocks.size() < 2) {
 			return INITIAL_DIFFICULTY;
 		}
@@ -123,12 +115,12 @@ public class BlockScorer {
 			Block lastBlock = historicalBlocks.get(historicalBlocks.size() - 1);
 			Block firstBlock = historicalBlocks.get(0);
 			long timeDiff = lastBlock.getTimeStamp().subtract(firstBlock.getTimeStamp());
-			final long heightDiff = lastBlock.getHeight().subtract(firstBlock.getHeight());
+			final long heightDiff = historicalBlocks.size();
 			long averageDifficulty = 0;
 			for (Block block : historicalBlocks) {
 				averageDifficulty += block.getDifficulty();
 			}
-			averageDifficulty /= historicalBlocks.size();
+			averageDifficulty /= heightDiff;
 			
 			long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
 																   .multiply(BigInteger.valueOf(heightDiff))
@@ -137,8 +129,8 @@ public class BlockScorer {
             if (difficulty < MIN_DIFFICULTY) {
             	difficulty = MIN_DIFFICULTY;
             }
-            if (difficulty > Max_DIFFICULTY) {
-            	difficulty = Max_DIFFICULTY;
+            if (difficulty > MAX_DIFFICULTY) {
+            	difficulty = MAX_DIFFICULTY;
             }
             return difficulty;
 		}

@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.utils.Predicate;
-import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 
 //
 // Initial logic is as follows:
-//   * we recieve new TX, IF it hasn't been seen,
+//   * we receive new TX, IF it hasn't been seen,
 //     it is added to unconfirmedTransactions,
 //   * blockGeneratorExecutor periodically tries to generate a block containing
 //     unconfirmed transactions
@@ -43,8 +42,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private BlockChain blockChain;
 
-	private BlockDao blockDao;
-
 	private TransferDao transferDao;
 
 	@Autowired
@@ -52,9 +49,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	@Autowired
 	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
-
-	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
@@ -163,7 +157,7 @@ public class Foraging implements AutoCloseable, Runnable {
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
 				final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 				final List<Block> historicalBlocks = blockChain.getBlocks(blockHeight, BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-				final long difficulty = scorer.calculateDfficulty(historicalBlocks);
+				final long difficulty = scorer.calculateDifficulty(historicalBlocks);
 
 				for (Account virtualForger : unlockedAccounts) {
 
@@ -191,7 +185,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			} // synchronized
 
 		} catch (RuntimeException e) {
-			LOGGER.warning("exception occured during generation of a block");
+			LOGGER.warning("exception occurred during generation of a block");
 			LOGGER.warning(e.toString());
 		}
 
