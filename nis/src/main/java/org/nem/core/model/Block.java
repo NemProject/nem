@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockScorer;
 
 import java.util.*;
 
@@ -22,6 +23,9 @@ public class Block extends VerifiableEntity {
 
 	private final List<Transaction> transactions;
 
+	// this is helper field and (probably) shouldn't be serialized
+	private long difficulty;
+
 	/**
 	 * Creates a new block.
 	 *
@@ -35,6 +39,9 @@ public class Block extends VerifiableEntity {
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
+
+		this.difficulty = BlockScorer.INITIAL_DIFFICULTY;
+;
 	}
 
 	/**
@@ -85,6 +92,14 @@ public class Block extends VerifiableEntity {
 	}
 
 	/**
+	 * Sets total amount of fees in this block.
+	 * This is for testing purposes only
+	 */
+	public void setTotalFee(Amount fee) {
+		this.totalFee = fee;
+	}
+
+	/**
 	 * Gets the hash of the previous block.
 	 *
 	 * @return The hash of the previous block.
@@ -103,7 +118,18 @@ public class Block extends VerifiableEntity {
 		return this.transactions;
 	}
 
+	/**
+	 * Gets the difficulty associated with this block.
+	 *
+	 * @return Difficulty of this block.
+	 */
+	public long getDifficulty() { return this.difficulty; }
+
 	//endregion
+
+	public void setDifficulty(long difficulty) {
+		this.difficulty = difficulty;
+	}
 
 	/**
 	 * Adds a new transaction to this block.

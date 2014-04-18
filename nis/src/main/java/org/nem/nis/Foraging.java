@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.utils.Predicate;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
@@ -42,6 +43,8 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private BlockChain blockChain;
 
+	private BlockDao blockDao;
+
 	private TransferDao transferDao;
 
 	@Autowired
@@ -49,6 +52,9 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	@Autowired
 	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
@@ -155,16 +161,18 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final BigInteger hit = scorer.calculateHit(lastBlock);
-				System.out.println("   hit: 0x" + hit.toString(16));
+				final List<Block> historicalBlocks = blockChain.getBlocks(Math.max(1L, lastBlock.getHeight() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+				final long difficulty = scorer.calculateDfficulty(historicalBlocks);
 
 				for (Account virtualForger : unlockedAccounts) {
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger);
+					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
+					final BigInteger hit = scorer.calculateHit(lastBlock, virtualForger);
+					System.out.println("   hit: 0x" + hit.toString(16));
 					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
 
@@ -172,7 +180,7 @@ public class Foraging implements AutoCloseable, Runnable {
 						System.out.println(" HIT ");
 
 						final long score = scorer.calculateBlockScore(lastBlock, newBlock);
-						if (score < bestScore) {
+						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;
 						}
@@ -191,10 +199,12 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 	}
 
-	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger) {
+	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger, long difficulty) {
 		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
 
-		final Block newBlock = new Block(forger, lastBlock, blockTime);
+		// Probably better to include difficulty in the block constructor?
+		Block newBlock = new Block(forger, lastBlock, blockTime);
+		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
 			newBlock.addTransactions(transactionList);
 		}

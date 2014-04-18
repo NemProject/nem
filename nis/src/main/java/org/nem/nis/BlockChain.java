@@ -8,13 +8,13 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.TransferMapper;
 import org.nem.nis.sync.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -390,5 +390,27 @@ public class BlockChain implements BlockSynchronizer {
 		} // synchronized
 
 		return true;
+	}
+
+	/**
+	 * Returns up to numBlocks beginning with block at height blockHeight
+	 * 
+	 * @param blockHeight the height of the block to begin with
+	 * @param numBlocks maximum number of blocks to return
+	 * @return List of blocks
+	 */
+	public List<Block> getBlocks(final long blockHeight, final long numBlocks) {
+		if (blockHeight > lastBlock.getHeight()) {
+			throw new InvalidParameterException("getBlocks can only return blocks up to height " + lastBlock.getHeight());
+		}
+		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(blockHeight);
+		final List<Block> blocks = new LinkedList<>();
+		int i=1;
+		do {
+			blocks.add(BlockMapper.toModel(dbBlock, this.accountAnalyzer));
+			dbBlock = this.blockDao.findById(dbBlock.getNextBlockId());
+		} while (dbBlock != null && i++ < numBlocks);
+
+		return blocks;
 	}
 }
