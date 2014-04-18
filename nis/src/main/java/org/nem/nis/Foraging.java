@@ -182,7 +182,7 @@ public class Foraging implements AutoCloseable, Runnable {
 						System.out.println(" HIT ");
 
 						final long score = scorer.calculateBlockScore(lastBlock, newBlock);
-						if (score < bestScore) {
+						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;
 						}
