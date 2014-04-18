@@ -90,11 +90,13 @@ public class BlockDaoImpl implements BlockDao {
     }
 
 	@Override
+	@Transactional
 	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
 		return prepareCriteriaGetFor("difficulty", height, limit).list();
 	}
 
 	@Override
+	@Transactional
 	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
 		return prepareCriteriaGetFor("timestamp", height, limit).list();
 	}
