@@ -10,9 +10,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class BlockScorerTest {
@@ -157,6 +155,9 @@ public class BlockScorerTest {
 		Hash hash = new Hash(HASH_BYTES);
 		blocks[0] = new Block(foragerAccounts[0], hash, new TimeInstant(1), new BlockHeight(1));
 		blocks[0].setDifficulty(BlockScorer.INITIAL_DIFFICULTY);
+
+		List<Long> difficulties = new LinkedList<>();
+		difficulties.add(BlockScorer.INITIAL_DIFFICULTY);
 		List<Block> historicalBlocks = new LinkedList<>();
 		historicalBlocks.add(blocks[0]);
 		
@@ -164,7 +165,7 @@ public class BlockScorerTest {
 		for (int i=1; i<numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(foragerAccounts[0], blocks[i-1], new TimeInstant(1));
-			block.setDifficulty(scorer.calculateDifficulty(historicalBlocks));
+			block.setDifficulty(scorer.calculateDifficulty(difficulties, historicalBlocks));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
 				BigInteger hit = scorer.calculateHit(blocks[i-1], foragerAccounts[j]);
@@ -183,9 +184,11 @@ public class BlockScorerTest {
 			}
 			blocks[i] = new Block(foragerAccounts[index], blocks[i-1], new TimeInstant(blocks[i-1].getTimeStamp().getRawTime() + secondsBetweenBlocks[i]));
 			blocks[i].setDifficulty(block.getDifficulty());
+			difficulties.add(block.getDifficulty());
 			historicalBlocks.add(blocks[i]);
 			if (historicalBlocks.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
 				historicalBlocks.remove(0);
+				difficulties.remove(0);
 			}
 		}
 		for (int i=1; i<numRounds; i++) {
@@ -256,7 +259,7 @@ public class BlockScorerTest {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				Block block = generateNextBlock(normalForager, blocks, scorer, false); 
+				Block block = generateNextBlock(normalForager, createDifficultiesList(blocks), blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -266,7 +269,7 @@ public class BlockScorerTest {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				Block block = generateNextBlock(selfishForager, blocks, scorer, false);
+				Block block = generateNextBlock(selfishForager, createDifficultiesList(blocks), blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -283,13 +286,21 @@ public class BlockScorerTest {
 		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
 		return selfishForagerWins;
 	}
-	
-	private Block generateNextBlock(Account forger, List<Block> blocks, BlockScorer scorer, boolean optimizeBlockScore) {
+
+	private List<Long> createDifficultiesList(List<Block> blocks) {
+		List<Long> ret = new LinkedList<>();
+		for (Block block : blocks) {
+			ret.add(block.getDifficulty());
+		}
+		return ret;
+	}
+
+	private Block generateNextBlock(Account forger, List<Long> difficulties, List<Block> blocks, BlockScorer scorer, boolean optimizeBlockScore) {
 		Block lastBlock = blocks.get(blocks.size()-1);
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 		
-		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size()-1);
-		long difficulty = scorer.calculateDifficulty(historicalBlocks);
+		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
+		long difficulty = scorer.calculateDifficulty(difficulties, historicalBlocks);
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(lastBlock, forger);
 		int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty()))

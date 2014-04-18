@@ -3,6 +3,8 @@ package org.nem.nis.dao;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.Block;
 
+import java.util.List;
+
 /**
  * DAO for accessing db Block objects.
  */
@@ -59,9 +61,16 @@ public interface BlockDao {
      * Retrieves list of hashes for blocks starting at given height.
      * This should be used, not to pull whole block from the db.
      *
-     * @return list of block hashes.
+     * @return HashChain.
      */
     public HashChain getHashesFrom(final BlockHeight height, int limit);
+
+	/**
+	 * Retrieves list of difficulties for blocks starting at given height.
+	 *
+	 * @return list of block's difficulties.
+	 */
+	public List<Long> getDifficultiesFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Deletes blocks after given block

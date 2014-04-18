@@ -94,6 +94,15 @@ public class BlockDaoImpl implements BlockDao {
     }
 
 	@Override
+	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
+		Criteria criteria = getCurrentSession().createCriteria(Block.class)
+				.setMaxResults(limit)
+				.add(Restrictions.ge("height", height.getRaw())) // >=
+				.setProjection(Projections.property("difficulty"));
+		return criteria.list();
+	}
+
+	@Override
 	@Transactional
 	public void deleteBlocksAfterHeight(final BlockHeight blockHeight) {
 		// apparently delete on blocks is not enough, as

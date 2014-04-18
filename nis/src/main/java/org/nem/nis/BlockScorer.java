@@ -18,7 +18,7 @@ public class BlockScorer {
 	/**
 	 * 1_000_000_000 NEMs have force to generate block every minute.
 	 */
-	public static final long INITIAL_DIFFICULTY = 120000000000L;
+	public static final long INITIAL_DIFFICULTY = 120_000_000_000L;
 	
 	/**
 	 * Minimum value for difficulty.
@@ -107,18 +107,18 @@ public class BlockScorer {
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDifficulty(final List<Block> historicalBlocks) {
-		if (historicalBlocks.size() < 2) {
+	public long calculateDifficulty(final List<Long> difficulties, final List<Block> historicalBlocks) {
+		if (difficulties.size() < 2) {
 			return INITIAL_DIFFICULTY;
 		}
 		else {
 			Block lastBlock = historicalBlocks.get(historicalBlocks.size() - 1);
 			Block firstBlock = historicalBlocks.get(0);
 			long timeDiff = lastBlock.getTimeStamp().subtract(firstBlock.getTimeStamp());
-			final long heightDiff = historicalBlocks.size();
+			final long heightDiff = difficulties.size();
 			long averageDifficulty = 0;
-			for (Block block : historicalBlocks) {
-				averageDifficulty += block.getDifficulty();
+			for (Long diff : difficulties) {
+				averageDifficulty += diff;
 			}
 			averageDifficulty /= heightDiff;
 			
