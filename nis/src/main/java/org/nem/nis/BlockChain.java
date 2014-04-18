@@ -1,8 +1,9 @@
 package org.nem.nis;
 
 import org.nem.core.connect.*;
+import org.nem.core.model.Block;
 import org.nem.nis.balances.Balance;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -14,7 +15,6 @@ import org.nem.nis.sync.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -216,6 +216,26 @@ public class BlockChain implements BlockSynchronizer {
 		return chainScore.getScore();
 	}
 
+
+	private void calculatePeerChainDifficulties(Block parentBlock, List<Block> peerChain) {
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+		final List<Integer> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+
+		for (Block block : peerChain) {
+			long difficulty = this.scorer.calculateDifficulty(difficulties, timestamps);
+			block.setDifficulty(difficulty);
+
+			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
+			difficulties.add(difficulty);
+			timestamps.add(block.getTimeStamp().getRawTime());
+			if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
+				difficulties.remove(0);
+				timestamps.remove(0);
+			}
+		}
+	}
+
 	/**
 	 * Validates blocks in peerChain.
 	 *
@@ -229,6 +249,7 @@ public class BlockChain implements BlockSynchronizer {
 		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
 
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
+		calculatePeerChainDifficulties(parentBlock, peerChain);
 		if (!validator.isValid(parentBlock, peerChain)) {
 			return -1L;
 		}

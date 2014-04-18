@@ -6,6 +6,7 @@ import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -103,7 +104,8 @@ public class BlockScorer {
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 * 
-	 * @param historicalBlocks historical blocks, i.e. the last n blocks.
+	 * @param difficulties historical difficulties.
+	 * @param timestamps historical timestamps.
 	 *
 	 * @return The difficulty for the next block.
 	 */
