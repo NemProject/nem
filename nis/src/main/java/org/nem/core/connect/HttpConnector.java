@@ -74,7 +74,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		return HashChainFactory.deserializer.deserialize(this.post(url, height));
+		return new HashChain(this.post(url, height));
 	}
 
 	//endregion

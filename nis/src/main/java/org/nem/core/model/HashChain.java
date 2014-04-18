@@ -1,11 +1,8 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
