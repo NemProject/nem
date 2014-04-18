@@ -3,6 +3,8 @@ package org.nem.nis.dao;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.Block;
 
+import java.util.List;
+
 /**
  * DAO for accessing db Block objects.
  */
@@ -56,12 +58,33 @@ public interface BlockDao {
 	public Block findByHeight(final BlockHeight height);
 
     /**
-     * Retrieves list of hashes for blocks starting at given height.
+     * Retrieves list of at most limit hashes for blocks starting at given height.
      * This should be used, not to pull whole block from the db.
      *
-     * @return list of block hashes.
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return HashChain.
      */
     public HashChain getHashesFrom(final BlockHeight height, int limit);
+
+	/**
+	 * Retrieves list of at most limit difficulties for blocks starting at given height.
+	 *
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's difficulties.
+	 */
+	public List<Long> getDifficultiesFrom(final BlockHeight height, int limit);
+
+
+	/**
+	 * Retrieves list of at most limit timestamps for blocks starting at given height.
+	 *
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's timestamps.
+	 */
+	public List<Integer> getTimestampsFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Deletes blocks after given block

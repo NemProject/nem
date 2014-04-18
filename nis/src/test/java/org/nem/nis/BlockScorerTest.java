@@ -10,9 +10,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class BlockScorerTest {
@@ -157,6 +155,7 @@ public class BlockScorerTest {
 		Hash hash = new Hash(HASH_BYTES);
 		blocks[0] = new Block(foragerAccounts[0], hash, new TimeInstant(1), new BlockHeight(1));
 		blocks[0].setDifficulty(BlockScorer.INITIAL_DIFFICULTY);
+
 		List<Block> historicalBlocks = new LinkedList<>();
 		historicalBlocks.add(blocks[0]);
 		
@@ -164,7 +163,7 @@ public class BlockScorerTest {
 		for (int i=1; i<numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(foragerAccounts[0], blocks[i-1], new TimeInstant(1));
-			block.setDifficulty(scorer.calculateDifficulty(historicalBlocks));
+			block.setDifficulty(scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
 				BigInteger hit = scorer.calculateHit(blocks[i-1], foragerAccounts[j]);
@@ -203,7 +202,7 @@ public class BlockScorerTest {
 		LOGGER.info("Average time between blocks: " + averageTime + " seconds.");
 		Assert.assertTrue("Average time between blocks not within reasonable range!", 55 < averageTime && averageTime < 65);
 	}
-	
+
 	@Test
 	public void selfishForagerCannotForageBetterChain() {
 		int selfishForagerWins = 0;
@@ -256,7 +255,7 @@ public class BlockScorerTest {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				Block block = generateNextBlock(normalForager, blocks, scorer, false); 
+				Block block = generateNextBlock(normalForager, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -283,13 +282,30 @@ public class BlockScorerTest {
 		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
 		return selfishForagerWins;
 	}
-	
+
+	private List<Long> createDifficultiesList(List<Block> blocks) {
+		List<Long> ret = new LinkedList<>();
+		for (Block block : blocks) {
+			ret.add(block.getDifficulty());
+		}
+		return ret;
+	}
+
+	private List<Integer> createTimestampsList(List<Block> blocks) {
+		List<Integer> ret = new LinkedList<>();
+		for (Block block : blocks) {
+			ret.add(block.getTimeStamp().getRawTime());
+		}
+		return ret;
+	}
+
+
 	private Block generateNextBlock(Account forger, List<Block> blocks, BlockScorer scorer, boolean optimizeBlockScore) {
 		Block lastBlock = blocks.get(blocks.size()-1);
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 		
-		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size()-1);
-		long difficulty = scorer.calculateDifficulty(historicalBlocks);
+		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
+		long difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(lastBlock, forger);
 		int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty()))

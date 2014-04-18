@@ -4,6 +4,8 @@ import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
 
+import java.util.List;
+
 /**
  * A mock BlockDao implementation.
  */
@@ -85,6 +87,16 @@ public class MockBlockDao implements BlockDao {
 		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
 		return this.chain;
+	}
+
+	@Override
+	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
+		return null;
+	}
+
+	@Override
+	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
+		return null;
 	}
 
 	@Override
