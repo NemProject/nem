@@ -107,14 +107,14 @@ public class BlockScorer {
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDifficulty(final List<Long> difficulties, final List<Block> historicalBlocks) {
+	public long calculateDifficulty(final List<Long> difficulties, final List<Integer> timestamps) {
 		if (difficulties.size() < 2) {
 			return INITIAL_DIFFICULTY;
 		}
 		else {
-			Block lastBlock = historicalBlocks.get(historicalBlocks.size() - 1);
-			Block firstBlock = historicalBlocks.get(0);
-			long timeDiff = lastBlock.getTimeStamp().subtract(firstBlock.getTimeStamp());
+			Integer newestTimestamp = timestamps.get(timestamps.size() - 1);
+			Integer oldestTimestamp = timestamps.get(0);
+			long timeDiff = newestTimestamp.longValue() - oldestTimestamp.longValue();
 			final long heightDiff = difficulties.size();
 			long averageDifficulty = 0;
 			for (Long diff : difficulties) {

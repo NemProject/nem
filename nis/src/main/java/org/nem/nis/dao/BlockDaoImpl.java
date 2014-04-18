@@ -85,21 +85,18 @@ public class BlockDaoImpl implements BlockDao {
     @Override
     @Transactional
     public HashChain getHashesFrom(final BlockHeight height, int limit) {
-        Criteria criteria = getCurrentSession().createCriteria(Block.class)
-                .setMaxResults(limit)
-                .add(Restrictions.ge("height", height.getRaw())) // >=
-                .setProjection(Projections.property("blockHash"));
-        final List<byte[]> blockList = criteria.list();
+		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit).list();
         return new HashChain(blockList);
     }
 
 	@Override
 	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
-		Criteria criteria = getCurrentSession().createCriteria(Block.class)
-				.setMaxResults(limit)
-				.add(Restrictions.ge("height", height.getRaw())) // >=
-				.setProjection(Projections.property("difficulty"));
-		return criteria.list();
+		return prepareCriteriaGetFor("difficulty", height, limit).list();
+	}
+
+	@Override
+	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
+		return prepareCriteriaGetFor("timestamp", height, limit).list();
 	}
 
 	@Override
@@ -132,6 +129,13 @@ public class BlockDaoImpl implements BlockDao {
 	private <T> T executeSingleQuery(final Query query) {
 		final List<?> blockList = query.list();
 		return blockList.size() > 0 ? (T)blockList.get(0) : null;
+	}
+
+	private Criteria prepareCriteriaGetFor(String name, BlockHeight height, int limit) {
+		return getCurrentSession().createCriteria(Block.class)
+				.setMaxResults(limit)
+				.add(Restrictions.ge("height", height.getRaw())) // >=
+				.setProjection(Projections.property(name));
 	}
 
 	/**

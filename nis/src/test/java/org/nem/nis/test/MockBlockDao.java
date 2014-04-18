@@ -95,6 +95,11 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
+	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
+		return null;
+	}
+
+	@Override
 	public void deleteBlocksAfterHeight(final BlockHeight height) {
 
 	}
