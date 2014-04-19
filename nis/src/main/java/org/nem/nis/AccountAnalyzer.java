@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
@@ -14,19 +15,16 @@ import org.nem.core.utils.Func;
  * by their addresses.
  */
 public class AccountAnalyzer implements AccountLookup {
+
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
-	private final Map<Address, Account> addressToAccountMap;
+	private final ConcurrentHashMap<Address, Account> addressToAccountMap;
 
 	/**
 	 * Creates a new, empty account cache.
 	 */
 	public AccountAnalyzer() {
-		this.addressToAccountMap = new HashMap<>();
-	}
-
-	public AccountAnalyzer(final AccountAnalyzer accountAnalyzer) {
-		this();
+		this.addressToAccountMap = new ConcurrentHashMap<>();
 	}
 
 	/**
@@ -47,11 +45,14 @@ public class AccountAnalyzer implements AccountLookup {
 		return new AutoCacheAccountLookup(this);
 	}
 
-	public void replace(AccountAnalyzer other) {
-		synchronized (this) {
-//			this.mapByAddressId = other.mapByAddressId;
-//			this.mapByPublicKey = other.mapByPublicKey;
-		}
+	/**
+	 * Copies this analyzer's account to address map to another analyzer's map.
+	 *
+	 * @param rhs The other analyzer.
+	 */
+	public void shallowCopyTo(final AccountAnalyzer rhs) {
+		rhs.addressToAccountMap.clear();
+		rhs.addressToAccountMap.putAll(this.addressToAccountMap);
 	}
 
 	/**
@@ -71,7 +72,6 @@ public class AccountAnalyzer implements AccountLookup {
 			}
 		});
 	}
-
 
 	private Account findByAddress(final Address address, final Func<Account> notFoundHandler) {
 		if (!address.isValid()) {
@@ -125,24 +125,19 @@ public class AccountAnalyzer implements AccountLookup {
 				: new Account(Address.fromEncoded(encodedAddress));
 	}
 
-//	/**
-//	 * Creates a copy of this analyzer.
-//	 *
-//	 * @return A copy of this analyzer.
-//	 */
-//	public AccountAnalyzer copy() {
-//		final AccountAnalyzer copy = new AccountAnalyzer();
-//		for (final Map.Entry<>)
-//		final Account copy = new Account(this.getKeyPair(), this.getAddress());
-//		copy.balance = this.getBalance();
-//		copy.label = this.getLabel();
-//		copy.foragedBlocks = this.getForagedBlocks();
-//
-//		for (final Message message : this.getMessages())
-//			copy.messages.add(message);
-//
-//		return copy;
-//	}
+	/**
+	 * Creates a copy of this analyzer.
+	 *
+	 * @return A copy of this analyzer.
+	 */
+	public AccountAnalyzer copy() {
+		final AccountAnalyzer copy = new AccountAnalyzer();
+		for (final Map.Entry<Address, Account> entry : this.addressToAccountMap.entrySet()) {
+			copy.addressToAccountMap.put(entry.getKey(), entry.getValue().copy());
+		}
+
+		return copy;
+	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {
 

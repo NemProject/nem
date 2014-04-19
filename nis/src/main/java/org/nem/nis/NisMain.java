@@ -72,8 +72,7 @@ public class NisMain {
 			}
 		} while (dbBlock != null);
 
-		LOGGER.info("Known accounts: " + this.accountAnalyzer.getEncodedAddressMap().size());
-		LOGGER.info("Accounts with public keys: " + this.accountAnalyzer.getPublicKeyMap().size());
+		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 	}
 
 	@PostConstruct

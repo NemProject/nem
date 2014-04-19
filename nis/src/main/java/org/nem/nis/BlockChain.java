@@ -269,7 +269,7 @@ public class BlockChain implements BlockSynchronizer {
 	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
 		//region update our chain
 		synchronized (this) {
-			accountAnalyzer.replace(contemporaryAccountAnalyzer);
+			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
 			if (hasOwnChain) {
 				// mind that we're using "new" (replaced) accountAnalyzer
@@ -289,7 +289,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
-		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(this.accountAnalyzer);
+		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
 		final SyncConnector connector = connectorPool.getSyncConnector(contemporaryAccountAnalyzer);
 		final ComparisonResult result = compareChains(connector, node);
 
@@ -376,7 +376,7 @@ public class BlockChain implements BlockSynchronizer {
 //			return false;
 //		}
 
-		final AccountAnalyzer contemporaryAccountAnalyzer = new AccountAnalyzer(accountAnalyzer);
+		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
 		long ourScore = 0L;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child

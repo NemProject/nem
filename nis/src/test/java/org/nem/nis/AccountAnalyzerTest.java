@@ -212,4 +212,108 @@ public class AccountAnalyzerTest {
 	}
 
 	//endregion
+
+	//region copy
+
+	@Test
+	public void copyCreatesUnlinkedAnalyzerCopy() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		final Address address3 = Utils.generateRandomAddress();
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+
+		final Account account1 = analyzer.addAccountToCache(address1);
+		final Account account2 = analyzer.addAccountToCache(address2);
+		final Account account3 = analyzer.addAccountToCache(address3);
+
+		// Act:
+		final AccountAnalyzer copyAnalyzer = analyzer.copy();
+
+		final Account copyAccount1 = copyAnalyzer.findByAddress(address1);
+		final Account copyAccount2 = copyAnalyzer.findByAddress(address2);
+		final Account copyAccount3 = copyAnalyzer.findByAddress(address3);
+
+		// Assert:
+		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(3));
+		Assert.assertThat(copyAccount1, IsNot.not(IsSame.sameInstance(account1)));
+		Assert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
+		Assert.assertThat(copyAccount3, IsNot.not(IsSame.sameInstance(account3)));
+	}
+
+	@Test
+	 public void copyReturnsSameAccountGivenPublicKeyOrAddress() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+
+		analyzer.addAccountToCache(address1);
+
+		// Act:
+		final AccountAnalyzer copyAnalyzer = analyzer.copy();
+
+		final Account copyAccountFromEncoded = copyAnalyzer.findByAddress(Address.fromEncoded(address1.getEncoded()));
+		final Account copyAccountFromPublicKey = copyAnalyzer.findByAddress(address1);
+
+		// Assert:
+		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(1));
+		Assert.assertThat(copyAccountFromEncoded, IsSame.sameInstance(copyAccountFromPublicKey));
+	}
+
+	//endregion
+
+	//region replace
+
+	@Test
+	public void shallowCopyToCreatesLinkedAnalyzerCopy() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		final Address address3 = Utils.generateRandomAddress();
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+
+		final Account account1 = analyzer.addAccountToCache(address1);
+		final Account account2 = analyzer.addAccountToCache(address2);
+		final Account account3 = analyzer.addAccountToCache(address3);
+
+		// Act:
+		final AccountAnalyzer copyAnalyzer = new AccountAnalyzer();
+		analyzer.shallowCopyTo(copyAnalyzer);
+
+		final Account copyAccount1 = copyAnalyzer.findByAddress(address1);
+		final Account copyAccount2 = copyAnalyzer.findByAddress(address2);
+		final Account copyAccount3 = copyAnalyzer.findByAddress(address3);
+
+		// Assert:
+		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(3));
+		Assert.assertThat(copyAccount1, IsSame.sameInstance(account1));
+		Assert.assertThat(copyAccount2, IsSame.sameInstance(account2));
+		Assert.assertThat(copyAccount3, IsSame.sameInstance(account3));
+	}
+
+	@Test
+	public void shallowCopyToRemovesAnyPreviouslyExistingEntries() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+
+		final Account account1 = analyzer.addAccountToCache(address1);
+
+		final AccountAnalyzer copyAnalyzer = new AccountAnalyzer();
+		final Account account2 = copyAnalyzer.addAccountToCache(address2);
+
+		// Act:
+		analyzer.shallowCopyTo(copyAnalyzer);
+
+		final Account copyAccount1 = copyAnalyzer.findByAddress(address1);
+		final Account copyAccount2 = copyAnalyzer.findByAddress(address2);
+
+		// Assert:
+		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(1));
+		Assert.assertThat(copyAccount1, IsSame.sameInstance(account1));
+		Assert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
+	}
+
+	//endregion
 }
