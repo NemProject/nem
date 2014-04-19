@@ -88,14 +88,14 @@ public class BlockDaoImpl implements BlockDao {
     @Override
     @Transactional
     public HashChain getHashesFrom(final BlockHeight height, int limit) {
-		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit).list();
+		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit);
         return new HashChain(blockList);
     }
 
 	@Override
 	@Transactional
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
-		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit).list();
+		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit);
 		final List<BlockDifficulty> difficulties = new ArrayList<>(rawDifficulties.size());
 		for (final Long difficulty : rawDifficulties)
 			difficulties.add(new BlockDifficulty(difficulty));
@@ -106,7 +106,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
-		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit).list();
+		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
 		final List<TimeInstant> timestamps = new ArrayList<>(rawTimestamps.size());
 		for (final Integer timestamp : rawTimestamps)
 			timestamps.add(new TimeInstant(timestamp));
@@ -126,7 +126,7 @@ public class BlockDaoImpl implements BlockDao {
 		Query getTxes = getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
-		List<Long> txToDelete = getTxes.list();
+		List<Long> txToDelete = listAndCast(getTxes);
 
 		Query query = getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
@@ -142,15 +142,16 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private <T> T executeSingleQuery(final Query query) {
-		final List<?> blockList = query.list();
-		return blockList.size() > 0 ? (T)blockList.get(0) : null;
+		final List<T> blockList = listAndCast(query);
+		return blockList.size() > 0 ? blockList.get(0) : null;
 	}
 
-	private Criteria prepareCriteriaGetFor(String name, BlockHeight height, int limit) {
-		return getCurrentSession().createCriteria(Block.class)
+	private <T> List<T> prepareCriteriaGetFor(String name, BlockHeight height, int limit) {
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setMaxResults(limit)
 				.add(Restrictions.ge("height", height.getRaw())) // >=
 				.setProjection(Projections.property(name));
+		return listAndCast(criteria);
 	}
 
 	/**
@@ -173,5 +174,15 @@ public class BlockDaoImpl implements BlockDao {
 			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query q) {
+		return q.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Criteria criteria) {
+		return criteria.list();
 	}
 }
