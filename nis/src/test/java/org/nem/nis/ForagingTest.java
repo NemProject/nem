@@ -181,25 +181,35 @@ public class ForagingTest {
 	public void canSignBlock() {
 		// Arrange:
 		final MockForaging foraging = new MockForaging();
-		final MockAccountLookup mockAccountLookup = new MockAccountLookup();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
 		final Account account = Utils.generateRandomAccount();
-		mockAccountLookup.setMockAccount(account);
-		account.incrementBalance(Amount.fromNem(100));
+		accountAnalyzer.addAccountToCache(account.getAddress());
+		final Account accountWithoutSecret = accountAnalyzer.findByAddress(account.getAddress());
+		accountWithoutSecret.incrementBalance(Amount.fromNem(100));
 
 		final Account signer = createAccountWithBalance(100);
 		final TimeInstant parentTime = new TimeInstant(0);
-		final Block parent = new Block(signer, Hash.ZERO, parentTime, BlockHeight.ONE);
+		final Block parent = new Block(
+				signer,
+				Hash.ZERO,
+				parentTime,
+				BlockHeight.ONE);
 		parent.sign();
 		parent.setGenerationHash(Hash.ZERO);
 
 		// Act:
-		foraging.setAccountLookup(mockAccountLookup);
-		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account, BlockDifficulty.INITIAL_DIFFICULTY);
+		foraging.setAccountLookup(accountAnalyzer);
+		final Block block = foraging.createSignedBlock(
+				new TimeInstant(10),
+				new LinkedList<Transaction>(),
+				parent,
+				account,
+				BlockDifficulty.INITIAL_DIFFICULTY);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		Assert.assertThat(accountWithoutSecret.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(account));
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(accountWithoutSecret));
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {

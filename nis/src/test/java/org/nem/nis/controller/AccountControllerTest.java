@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.test.MockAccountLookup;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 
 import java.util.*;
@@ -31,11 +32,10 @@ public class AccountControllerTest {
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
 		try (final MockForaging foraging = new MockForaging()) {
-			final AccountController controller = new AccountController(foraging, new MockAccountLookup());
+			final AccountController controller = new AccountController(foraging, new AccountAnalyzer());
 
 			// Act:
 			controller.accountGet("dummy");
-
 		}
 	}
 

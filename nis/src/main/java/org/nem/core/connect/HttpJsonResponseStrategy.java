@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrategy<T> {
 
 	@Override
-	public final T coerce(final Request request, final Response response) throws IOException {
+	public T coerce(final Request request, final Response response) throws IOException {
 		if (response.getStatus() != HttpStatus.OK.value())
 			throw new InactivePeerException(String.format("Peer returned: %d", response.getStatus()));
 
