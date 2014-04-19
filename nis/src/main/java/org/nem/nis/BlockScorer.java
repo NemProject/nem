@@ -33,12 +33,11 @@ public class BlockScorer {
     /**
 	 * Calculates the hit score for block.
 	 *
-	 * @param prevBlock The block.
+	 * @param block The block.
 	 * @return the hit score.
 	 */
-	public BigInteger calculateHit(final Block prevBlock, final Account blockSigner) {
-		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), prevBlock.getGenerationHash().getRaw()));
-		return new BigInteger(1, Arrays.copyOfRange(hash, 10, 18));
+	public BigInteger calculateHit(final Block block) {
+		return new BigInteger(1, Arrays.copyOfRange(block.getGenerationHash().getRaw(), 10, 18));
 	}
 
 	/**
