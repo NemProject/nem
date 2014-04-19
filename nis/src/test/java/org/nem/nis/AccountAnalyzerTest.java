@@ -1,131 +1,235 @@
 package org.nem.nis;
 
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Transfer;
-import org.nem.core.test.MockAccount;
-import org.nem.nis.test.MockAccountAnalyzer;
+import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
 
 import java.util.*;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsSame.sameInstance;
-
 public class AccountAnalyzerTest {
-	public static final Amount SENDER_AMOUNT = Amount.fromNem(10);
-	public static final Amount RECIPIENT1_AMOUNT = Amount.fromNem(3);
-	public static final Amount RECIPIENT2_AMOUNT = Amount.fromNem(5);
-	public static final Amount RECIPIENT1_FEE = Amount.fromMicroNem(6000);
-	public static final Amount RECIPIENT2_FEE = Amount.fromMicroNem(10000);
-	private static org.nem.core.model.Account sender = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
-	private static org.nem.core.model.Account recipient1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.model.Account recipient2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static Account dbSender = new Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-	private static Account dbRecipient1 = new Account(recipient1.getAddress().getEncoded(), null);
-	private static Account dbRecipient2 = new Account(recipient2.getAddress().getEncoded(), null);
+
+	//region addAccountToCache
 
 	@Test
-	public void aaAnalyzeDoesntCacheDummyResults() {
+	public void accountWithoutPublicKeyCanBeAddedToCache() {
 		// Arrange:
-		MockAccountAnalyzer aa = new MockAccountAnalyzer();
-		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		org.nem.core.model.Account t1 = aa.findByAddress(recipient1.getAddress());
-		org.nem.core.model.Account t2 = aa.findByAddress(recipient2.getAddress());
+		final Account cachedAccount = analyzer.addAccountToCache(address);
+		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(t1, not(sameInstance(t2)));
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(cachedAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount));
 	}
 
 	@Test
-	public void aaAnalyzeCachesAccounts() {
+	public void accountWithPublicKeyCanBeAddedToCache() {
 		// Arrange:
-		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
-		MockAccountAnalyzer aa = new MockAccountAnalyzer();
-		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
-		aa.analyze(b);
-		org.nem.core.model.Account t1a = aa.findByNemAddress(recipient1);
-		org.nem.core.model.Account t1b = aa.findByNemAddress(recipient1);
-		org.nem.core.model.Account t2 = aa.findByNemAddress(recipient2);
+		final Account cachedAccount = analyzer.addAccountToCache(address);
+		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
+		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(t1a, equalTo(recipient1));
-		Assert.assertThat(t1a, equalTo(t1b));
-		Assert.assertThat(t1a, sameInstance(t1b));
-		Assert.assertThat(t1a, not(sameInstance(t2)));
-		Assert.assertThat(t2, equalTo(recipient2));
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(cachedAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount));
+		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(cachedAccount));
 	}
 
 	@Test
-	public void aaAnalyzeSearchingByPublicKeyWorks() {
+	public void cachedAccountWithPublicKeyIsUnchangedWhenQueryingByPublicKey() {
 		// Arrange:
-		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
-		MockAccountAnalyzer aa = new MockAccountAnalyzer();
-		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
-		aa.analyze(b);
-		// this should search by nem address
-		org.nem.core.model.Account t3a = aa.findByNemAddress(sender);
-		// this should search by public key
-		org.nem.core.model.Account t3b = aa.findByPublicKey(sender);
+		final Account cachedAccount1 = analyzer.addAccountToCache(address);
+		final Account cachedAccount2 = analyzer.addAccountToCache(address);
 
 		// Assert:
-		Assert.assertThat(t3a, sameInstance(t3b));
+		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1));
 	}
 
 	@Test
-	public void aaAnalyzeChangesBalances() {
+	public void cachedAccountWithoutPublicKeyIsUnchangedWhenQueryingByEncodedAddress() {
 		// Arrange:
-		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
-		MockAccountAnalyzer aa = new MockAccountAnalyzer();
-		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		aa.analyze(b);
-		org.nem.core.model.Account t1 = aa.findByNemAddress(recipient1);
-		org.nem.core.model.Account t2 = aa.findByNemAddress(recipient2);
-		org.nem.core.model.Account t3 = aa.findByNemAddress(sender);
+		final Account cachedAccount1 = analyzer.addAccountToCache(address);
+		final Account cachedAccount2 = analyzer.addAccountToCache(address);
 
 		// Assert:
-		Assert.assertThat(t1.getBalance(), equalTo(RECIPIENT1_AMOUNT));
-		Assert.assertThat(t2.getBalance(), equalTo(RECIPIENT2_AMOUNT));
-		// zero fees
-		final Amount rest = SENDER_AMOUNT
-				.subtract(RECIPIENT1_AMOUNT).subtract(RECIPIENT1_FEE)
-				.subtract(RECIPIENT2_AMOUNT).subtract(RECIPIENT2_FEE);
-		Assert.assertThat(t3.getBalance(), equalTo(rest));
+		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1));
 	}
 
-	private org.nem.nis.dbmodel.Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {
-		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT, RECIPIENT1_FEE, 0);
-		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
+	@Test
+	public void cachedAccountWithoutPublicKeyIsUpdatedWhenQueryingWithPublicKey() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
 
-		org.nem.nis.dbmodel.Block b = new org.nem.nis.dbmodel.Block(
-				Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 0, sender, new byte[64], 1L, 8 * 1000000L, 0L, 123L
-		);
+		// Act:
+		final Account cachedAccount1 = analyzer.addAccountToCache(addressWithoutPublicKey);
+		final Account cachedAccount2 = analyzer.addAccountToCache(address);
+		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
+		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
 
-		b.setBlockTransfers(Arrays.asList(t1, t2));
-
-		return b;
+		// Assert:
+		Assert.assertThat(cachedAccount2.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
+		Assert.assertThat(cachedAccount2, IsNot.not(IsSame.sameInstance(cachedAccount1)));
+		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount2));
+		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(cachedAccount2));
 	}
 
-	private Transfer prepareTransfer(Account sender, Account recipient, Amount amount, Amount fee, int idInBlock) {
-		return new Transfer(Hash.ZERO, 1, TransactionTypes.TRANSFER,
-				fee.getNumMicroNem(),
-				0, 0,
-				sender,
-				new byte[64], // sig
-				recipient,
-				idInBlock,
-				amount.getNumMicroNem(),
-				0L
-		);
+	@Test
+	public void balanceIsPreservedWhenPublicKeyIsAddedToAccountWithNonZeroBalanceWithoutPublicKey() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
+
+		// Act:
+		final Account cachedAccount1 = analyzer.addAccountToCache(addressWithoutPublicKey);
+		cachedAccount1.incrementBalance(new Amount(9527L));
+		final Account cachedAccount2 = analyzer.addAccountToCache(address);
+
+		// Assert:
+		Assert.assertThat(cachedAccount2.getBalance(), IsEqual.equalTo(new Amount(9527L)));
 	}
+
+	//endregion
+
+	//region findByAddress
+
+	@Test(expected = MissingResourceException.class)
+	public void findByAddressFailsIfAddressIsInvalid() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
+		final String realAddress = address.getEncoded();
+		final String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
+
+		// Act:
+		analyzer.findByAddress(Address.fromEncoded(fakeAddress));
+	}
+
+	@Test
+	public void findByAddressReturnsCachedAddressIfAvailable() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		final Account cachedAccount1 = analyzer.addAccountToCache(address);
+		final Account foundAddress = analyzer.findByAddress(address);
+
+		// Assert:
+		Assert.assertThat(foundAddress, IsSame.sameInstance(cachedAccount1));
+	}
+
+	@Test
+	public void findByAddressReturnsNonCachedAddressIfPublicKeyIsNotFound() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		final Account foundAccount = analyzer.findByAddress(address);
+
+		// Assert:
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+	}
+
+	@Test
+	public void findByAddressReturnsNonCachedAddressIfEncodedAddressIsNotFound() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
+
+		// Act:
+		final Account foundAccount = analyzer.findByAddress(address);
+
+		// Assert:
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void findByAddressUpdatesAccountPublicKeyIfQueryingAccountHasPublicKeyButCachedAccountDoesNot() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
+
+		// Act:
+		final Account cachedAccount1 = analyzer.addAccountToCache(addressWithoutPublicKey);
+		final Account foundAccount = analyzer.findByAddress(address);
+
+		// Assert:
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
+		Assert.assertThat(foundAccount, IsNot.not(IsSame.sameInstance(cachedAccount1)));
+	}
+
+	//endregion
+
+	//region asAutoCache
+
+
+	@Test
+	public void asAutoCacheFindByAddressReturnsCachedAddressIfPublicKeyIsNotFound() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		final Account foundAccount = analyzer.asAutoCache().findByAddress(address);
+		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
+		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(foundAccount));
+		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(foundAccount));
+	}
+
+	@Test
+	public void asAutoCacheFindByAddressReturnsCachedAddressIfEncodedAddressIsNotFound() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
+
+		// Act:
+		final Account foundAccount = analyzer.asAutoCache().findByAddress(address);
+		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
+
+		// Assert:
+		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(foundAccount));
+	}
+
+	//endregion
 }

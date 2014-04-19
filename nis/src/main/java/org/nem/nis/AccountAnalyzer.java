@@ -5,26 +5,48 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
-import org.nem.nis.balances.BlockExecutor;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.utils.Func;
 
+/**
+ * Account cache that implements AccountLookup and provides the lookup of accounts
+ * by their addresses.
+ */
 public class AccountAnalyzer implements AccountLookup {
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
-	private Map<PublicKey, Account> mapByPublicKey;
-	private Map<String, Account> mapByAddressId;
+	private final Map<PublicKey, Account> mapByPublicKey;
+	private final Map<String, Account> mapByAddressId;
 
+	/**
+	 * Creates a new, empty account cache.
+	 */
 	public AccountAnalyzer() {
 		mapByPublicKey = new HashMap<>();
 		mapByAddressId = new HashMap<>();
 	}
 
-	public AccountAnalyzer(AccountAnalyzer rhs) {
-		mapByPublicKey = new HashMap<>();
-		mapByAddressId = new HashMap<>();
+	/**
+	 * Gets the public key to Account map.
+	 *
+	 * @return The public key to Account map.
+	 */
+	public Map<PublicKey, Account> getPublicKeyMap() {
+		return Collections.unmodifiableMap(this.mapByPublicKey);
+	}
+
+	/**
+	 * Gets the encoded address to Account map.
+	 *
+	 * @return The encoded address to Account map.
+	 */
+	public Map<String, Account> getEncodedAddressMap() {
+		return Collections.unmodifiableMap(this.mapByAddressId);
+	}
+
+	public AccountAnalyzer(final AccountAnalyzer rhs) {
+		this();
 
 		for (Map.Entry<String, Account> pair : rhs.mapByAddressId.entrySet()) {
 			mapByAddressId.put(pair.getKey(), new VirtualAccount(pair.getValue()));
@@ -37,88 +59,61 @@ public class AccountAnalyzer implements AccountLookup {
 
 	public void replace(AccountAnalyzer other) {
 		synchronized (this) {
-			this.mapByAddressId = other.mapByAddressId;
-			this.mapByPublicKey = other.mapByPublicKey;
-		}
-	}
-
-	private Account addAccountToCacheImpl(final PublicKey publicKey, final String encodedAddress) {
-		Account account = findByAddressImpl(publicKey, encodedAddress);
-		if (account == null) {
-			if (publicKey != null) {
-				account = new Account(new KeyPair(publicKey));
-
-				mapByPublicKey.put(publicKey, account);
-				if (!mapByAddressId.containsKey(encodedAddress)) {
-					mapByAddressId.put(encodedAddress, account);
-				}
-
-			} else {
-				account = new Account(Address.fromEncoded(encodedAddress));
-				mapByAddressId.put(encodedAddress, account);
-			}
-		}
-
-		return account;
-	}
-
-	private Account addAccountToCache(org.nem.nis.dbmodel.Account a) {
-		return addAccountToCacheImpl(a.getPublicKey(), a.getPrintableKey());
-	}
-
-	public Account initializeGenesisAccount(Account genesisKeyPai) {
-		return addAccountToCacheImpl(genesisKeyPai.getKeyPair().getPublicKey(), genesisKeyPai.getAddress().getEncoded());
-	}
-
-	/*
-	 * analyze block from db
-	 * 
-	 * if we're here it means that both block an it's transactions
-	 * have been saved in db
-	 *
-	 * Currently it analyzes ONLY "transfers"
-	 */
-	public void analyze(final Block curBlock) {
-		List<Transfer> txes = curBlock.getBlockTransfers();
-		LOGGER.info("analyzing block: " + Long.toString(curBlock.getShortId()) + ", #tx " + Integer.toString(txes.size()));
-
-		addAccountToCache(curBlock.getForger());
-		for (final Transfer tx : txes) {
-			addAccountToCache(tx.getSender());
-			addAccountToCache(tx.getRecipient());
-		}
-
-		BlockExecutor.apply(this, curBlock);
-
-		for (final Transfer tx : txes) {
-			Account recipient = addAccountToCache(tx.getRecipient());
-			LOGGER.info(String.format("%s + %d [fee: %d]", recipient.getAddress().getEncoded(), tx.getAmount(), tx.getFee()));
+//			this.mapByAddressId = other.mapByAddressId;
+//			this.mapByPublicKey = other.mapByPublicKey;
 		}
 	}
 
 	/**
-	 * Finds an account, updating it's public key if there's a need.
+	 * Adds an account to the cache if it is not already in the cache
 	 *
-	 * @param publicKey      - public key of an account, might be null
-	 * @param encodedAddress - encoded address of an account
-	 *
-	 * @return null if account is unknown or Account associated with an address
+	 * @param address The account's address.
+	 * @return The account.
 	 */
-	protected Account findByAddressImpl(PublicKey publicKey, String encodedAddress) {
-		// if possible return by public key
-		if (publicKey != null) {
-			if (mapByPublicKey.containsKey(publicKey)) {
-				return mapByPublicKey.get(publicKey);
+	public Account addAccountToCache(final Address address) {
+		return this.findByAddress(address, new Func<Account>() {
+
+			@Override
+			public Account evaluate() {
+				return addAccountToCache(address.getPublicKey(), address.getEncoded());
 			}
+		});
+	}
+
+	private Account addAccountToCache(final PublicKey publicKey, final String encodedAddress) {
+		final Account account = createAccount(publicKey, encodedAddress);
+		if (null != publicKey) {
+			this.mapByPublicKey.put(publicKey, account);
+		}
+
+		this.mapByAddressId.put(encodedAddress, account);
+		return account;
+	}
+
+	private Account findByAddress(final Address address, final Func<Account> notFoundHandler) {
+		if (!address.isValid()) {
+			throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
+		}
+
+		final Account account = findByAddress(address.getPublicKey(), address.getEncoded());
+		return null != account ? account : notFoundHandler.evaluate();
+	}
+
+	private Account findByAddress(final PublicKey publicKey, final String encodedAddress) {
+		// if possible return by public key
+		if (null != publicKey && mapByPublicKey.containsKey(publicKey)) {
+			return mapByPublicKey.get(publicKey);
 		}
 
 		// otherwise try to return by address
 		if (mapByAddressId.containsKey(encodedAddress)) {
-			Account oldAccount = mapByAddressId.get(encodedAddress);
+			final Account oldAccount = mapByAddressId.get(encodedAddress);
 
-			// if possible update account's public key
-			if (publicKey != null) {
-				Account account = new Account(new KeyPair(publicKey));
+			// if possible, update account's public key
+			if (null != publicKey) {
+				// note that if an account does not have a public key, it can only have a balance
+				// so we only need to copy the balance to the new account
+				final Account account = new Account(new KeyPair(publicKey));
 				final Amount balance = oldAccount.getBalance();
 				account.incrementBalance(balance);
 				mapByAddressId.put(encodedAddress, account);
@@ -136,31 +131,49 @@ public class AccountAnalyzer implements AccountLookup {
 	/**
 	 * Finds an account, updating it's public key if there's a need.
 	 *
-	 * @param id - Address of an account
+	 * @param address Address of an account
 	 *
 	 * @return Account associated with an address or new Account if address was unknown
 	 */
 	@Override
-	public Account findByAddress(Address id) {
-		LOGGER.finer("looking for [" + id.getEncoded() + "]" + Integer.toString(mapByAddressId.size()));
+	public Account findByAddress(final Address address) {
+		LOGGER.finer("looking for [" + address + "]" + Integer.toString(mapByAddressId.size()));
 
-		if (!id.isValid()) {
-			throw new MissingResourceException("invalid address: ", Address.class.getName(), id.getEncoded());
-		}
+		return this.findByAddress(address, new Func<Account>() {
 
-		Account account = findByAddressImpl(id.getPublicKey(), id.getEncoded());
-
-		// we don't know it yet, so create dummy account
-		// without adding it anywhere yet
-		if (account == null) {
-			if (id.getPublicKey() != null) {
-				account = new Account(new KeyPair(id.getPublicKey()));
-
-			} else {
-				account = new Account(Address.fromEncoded(id.getEncoded()));
+			@Override
+			public Account evaluate() {
+				return createAccount(address.getPublicKey(), address.getEncoded());
 			}
+		});
+	}
+
+	private static Account createAccount(final PublicKey publicKey, final String encodedAddress) {
+		return null != publicKey
+				? new Account(new KeyPair(publicKey))
+				: new Account(Address.fromEncoded(encodedAddress));
+	}
+
+	/**
+	 * Returns an AccountLookup that automatically caches unknown accounts.
+	 *
+	 * @return An AccountLookup that automatically caches unknown accounts.
+	 */
+	public AccountLookup asAutoCache() {
+		return new AutoCacheAccountLookup(this);
+	}
+
+	private static class AutoCacheAccountLookup implements AccountLookup {
+
+		final AccountAnalyzer accountAnalyzer;
+
+		public AutoCacheAccountLookup(final AccountAnalyzer accountAnalyzer) {
+			this.accountAnalyzer = accountAnalyzer;
 		}
 
-		return account;
+		@Override
+		public Account findByAddress(final Address id) {
+			return this.accountAnalyzer.addAccountToCache(id);
+		}
 	}
 }

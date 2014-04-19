@@ -14,5 +14,4 @@ public interface Predicate<T> {
 	 * @return The predicate result.
 	 */
 	public boolean evaluate(T obj);
-
 }

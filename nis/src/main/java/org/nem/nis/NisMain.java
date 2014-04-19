@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.utils.HexEncoder;
+import org.nem.nis.balances.BlockExecutor;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 
@@ -51,11 +52,12 @@ public class NisMain {
 			System.exit(-1);
 		}
 
-		final Account genesisAccount = accountAnalyzer.initializeGenesisAccount(GenesisBlock.ACCOUNT);
+		final Account genesisAccount = accountAnalyzer.addAccountToCache(GenesisBlock.ACCOUNT.getAddress());
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
 
 		do {
-			this.accountAnalyzer.analyze(dbBlock);
+			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
+			BlockExecutor.apply(this.accountAnalyzer, block);
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
@@ -64,13 +66,14 @@ public class NisMain {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			if (dbBlock == null) {
-				if (this.blockChain.getLastDbBlock() == null) {
-					LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
-					System.exit(-1);
-				}
+			if (dbBlock == null && this.blockChain.getLastDbBlock() == null) {
+				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
+				System.exit(-1);
 			}
 		} while (dbBlock != null);
+
+		LOGGER.info("Known accounts: " + this.accountAnalyzer.getEncodedAddressMap().size());
+		LOGGER.info("Accounts with public keys: " + this.accountAnalyzer.getPublicKeyMap().size());
 	}
 
 	@PostConstruct
