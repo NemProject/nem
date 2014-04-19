@@ -44,8 +44,9 @@ public class NisMain {
 		System.out.println("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
+		LOGGER.info("hex: " + HexEncoder.getString(dbBlock.getGenerationHash().getRaw()));
 		if (null == dbBlock ||
-				dbBlock.getGenerationHash() != new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
+				! dbBlock.getGenerationHash().equals(new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8")))) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}
