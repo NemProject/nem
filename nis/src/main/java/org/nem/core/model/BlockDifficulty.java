@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+
 /**
  * Represents a NEM block height.
  */
@@ -40,6 +42,15 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
 	 * @return The underlying difficulty.
 	 */
 	public long getRaw() { return this.getValue(); }
+
+	/**
+	 * Returns the underlying difficulty as a BigInteger.
+	 *
+	 * @return The underlying difficulty as a BigInteger.
+	 */
+	public BigInteger asBigInteger() {
+		return BigInteger.valueOf(this.getValue());
+	}
 
 	private static long Clamp(long difficulty) {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));

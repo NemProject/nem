@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 
+import java.math.BigInteger;
+
 public class BlockDifficultyTest {
 
 	//region constants
@@ -47,4 +49,13 @@ public class BlockDifficultyTest {
 	}
 
 	//endregion
+
+	@Test
+	public void valueCanBeReturnedAsBigInteger() {
+		// Arrange:
+		final BlockDifficulty difficulty = new BlockDifficulty(987_654_321_123L);
+
+		// Assert:
+		Assert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("987654321123")));
+	}
 }

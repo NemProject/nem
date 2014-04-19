@@ -110,7 +110,7 @@ public class BlockScorerTest {
 		// Assert: (time-difference * block-signer-balance * magic-number)
 		final BigInteger expectedTarget = BigInteger.valueOf(100 * 72)
 				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BigInteger.valueOf(BlockDifficulty.INITIAL_DIFFICULTY.getRaw()));
+				.divide(BlockDifficulty.INITIAL_DIFFICULTY.asBigInteger());
 
 		Assert.assertThat(target, IsEqual.equalTo(expectedTarget));
 	}
@@ -171,7 +171,7 @@ public class BlockScorerTest {
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
 				BigInteger hit = scorer.calculateHit(blocks[i-1], foragerAccounts[j]);
-				int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty().getRaw()))
+				int seconds = hit.multiply(block.getDifficulty().asBigInteger())
 								 .divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
 								 .divide(BigInteger.valueOf(foragerAccounts[j].getBalance().getNumNem()))
 								 .intValue();
@@ -287,18 +287,18 @@ public class BlockScorerTest {
 		return selfishForagerWins;
 	}
 
-	private List<Long> createDifficultiesList(List<Block> blocks) {
-		List<Long> ret = new LinkedList<>();
+	private List<BlockDifficulty> createDifficultiesList(List<Block> blocks) {
+		List<BlockDifficulty> ret = new LinkedList<>();
 		for (Block block : blocks) {
-			ret.add(block.getDifficulty().getRaw());
+			ret.add(block.getDifficulty());
 		}
 		return ret;
 	}
 
-	private List<Integer> createTimestampsList(List<Block> blocks) {
-		List<Integer> ret = new LinkedList<>();
+	private List<TimeInstant> createTimestampsList(List<Block> blocks) {
+		List<TimeInstant> ret = new LinkedList<>();
 		for (Block block : blocks) {
-			ret.add(block.getTimeStamp().getRawTime());
+			ret.add(block.getTimeStamp());
 		}
 		return ret;
 	}
@@ -312,7 +312,7 @@ public class BlockScorerTest {
 		final BlockDifficulty difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(lastBlock, forger);
-		int seconds = hit.multiply(BigInteger.valueOf(block.getDifficulty().getRaw()))
+		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
 						 .divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
 						 .divide(BigInteger.valueOf(forger.getBalance().getNumNem()))
 						 .intValue();

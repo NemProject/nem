@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,9 +12,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.nem.core.model.BlockDifficulty;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
 import org.nem.core.model.HashChain;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,14 +94,24 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
-		return prepareCriteriaGetFor("difficulty", height, limit).list();
+	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
+		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit).list();
+		final List<BlockDifficulty> difficulties = new ArrayList<>(rawDifficulties.size());
+		for (final Long difficulty : rawDifficulties)
+			difficulties.add(new BlockDifficulty(difficulty));
+
+		return difficulties;
 	}
 
 	@Override
 	@Transactional
-	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
-		return prepareCriteriaGetFor("timestamp", height, limit).list();
+	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
+		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit).list();
+		final List<TimeInstant> timestamps = new ArrayList<>(rawTimestamps.size());
+		for (final Integer timestamp : rawTimestamps)
+			timestamps.add(new TimeInstant(timestamp));
+
+		return timestamps;
 	}
 
 	@Override

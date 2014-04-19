@@ -219,16 +219,16 @@ public class BlockChain implements BlockSynchronizer {
 
 	private void calculatePeerChainDifficulties(Block parentBlock, List<Block> peerChain) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
-		final List<Integer> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-		final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 
 		for (Block block : peerChain) {
 			final BlockDifficulty difficulty = this.scorer.calculateDifficulty(difficulties, timestamps);
 			block.setDifficulty(difficulty);
 
 			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-			difficulties.add(difficulty.getRaw()); // TODO: should this list be BlockDifficulty ?
-			timestamps.add(block.getTimeStamp().getRawTime());
+			difficulties.add(difficulty);
+			timestamps.add(block.getTimeStamp());
 			if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
 				difficulties.remove(0);
 				timestamps.remove(0);

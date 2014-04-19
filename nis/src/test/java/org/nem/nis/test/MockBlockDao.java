@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
 
@@ -90,12 +91,12 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<Long> getDifficultiesFrom(BlockHeight height, int limit) {
+	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
 		return null;
 	}
 
 	@Override
-	public List<Integer> getTimestampsFrom(BlockHeight height, int limit) {
+	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
 		return null;
 	}
 

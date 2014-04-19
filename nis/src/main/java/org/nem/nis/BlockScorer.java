@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hashes;
 import org.nem.core.model.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
@@ -55,7 +56,7 @@ public class BlockScorer {
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)
-						 .divide(BigInteger.valueOf(block.getDifficulty().getRaw()));
+						 .divide(block.getDifficulty().asBigInteger());
 	}
 
 	/**
@@ -91,19 +92,20 @@ public class BlockScorer {
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<Long> difficulties, final List<Integer> timestamps) {
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timestamps) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
 
-		Integer newestTimestamp = timestamps.get(timestamps.size() - 1);
-		Integer oldestTimestamp = timestamps.get(0);
-		long timeDiff = newestTimestamp.longValue() - oldestTimestamp.longValue();
+		final TimeInstant newestTimestamp = timestamps.get(timestamps.size() - 1);
+		final TimeInstant oldestTimestamp = timestamps.get(0);
+		final long timeDiff = newestTimestamp.subtract(oldestTimestamp);
 		final long heightDiff = difficulties.size();
 		long averageDifficulty = 0;
-		for (Long diff : difficulties) {
-			averageDifficulty += diff;
+		for (final BlockDifficulty diff : difficulties) {
+			averageDifficulty += diff.getRaw();
 		}
+
 		averageDifficulty /= heightDiff;
 
 		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))

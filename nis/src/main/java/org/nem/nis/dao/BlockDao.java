@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
 import org.nem.core.model.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public interface BlockDao {
 	 * @param limit maximal number of elements to return.
 	 * @return list of block's difficulties.
 	 */
-	public List<Long> getDifficultiesFrom(final BlockHeight height, int limit);
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
 
 
 	/**
@@ -84,12 +85,12 @@ public interface BlockDao {
 	 * @param limit maximal number of elements to return.
 	 * @return list of block's timestamps.
 	 */
-	public List<Integer> getTimestampsFrom(final BlockHeight height, int limit);
+	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, int limit);
 
 	/**
-	 * Deletes blocks after given block
+	 * Deletes blocks after given block.
 	 *
-	 * @param height
+	 * @param height The height of the reference block.
 	 */
 	public void deleteBlocksAfterHeight(final BlockHeight height);
 }
