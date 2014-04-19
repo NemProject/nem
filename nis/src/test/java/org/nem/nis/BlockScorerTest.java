@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
@@ -235,6 +236,41 @@ public class BlockScorerTest {
 		
 		Assert.assertTrue("Selfish forager created better chain!", selfishForagerWins == 0);
 	}
+
+	@Test
+	public void differentChainsProduceDifferentScores() {
+		// Arrange:
+		final Account foragerA = createAccountWithBalance(1_000_000_000);
+		final Account foragerB = createAccountWithBalance(1_000_000_000);
+
+		final BlockScorer scorer = new BlockScorer();
+		final List<Block> blocks = new LinkedList<>();
+		byte[] rndBytes = new byte[32];
+
+		final Hash hash = new Hash(rndBytes);
+		final Block firstBlock = new Block(foragerA, hash, new TimeInstant(1), new BlockHeight(1));
+		firstBlock.setGenerationHash(new Hash(HASH_BYTES));
+		foragerA.incrementForagedBlocks();
+		Block block;
+
+		// Act:
+		blocks.clear();
+		blocks.add(firstBlock);
+		block = generateNextBlock(foragerA, blocks, scorer, false);
+		foragerA.incrementForagedBlocks();
+		blocks.add(block);
+		long scoreA = calculateScore(blocks, scorer);
+
+		blocks.clear();
+		blocks.add(firstBlock);
+		block = generateNextBlock(foragerB, blocks, scorer, true);
+		foragerB.incrementForagedBlocks();
+		blocks.add(block);
+		long scoreB = calculateScore(blocks, scorer);
+
+		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
+		Assert.assertThat(scoreA < scoreB, IsEqual.equalTo(true));
+	}
 	
 	public int normalForagerVersusSelfishForager(int numRounds, int maxTime, long normalForgerBalance, long selfishForgerBalance) {
 		// Arrange:
@@ -284,6 +320,7 @@ public class BlockScorerTest {
 			else {
 				normalForagerWins++;
 			}
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagerScore);
 		}
 
 		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
@@ -323,30 +360,12 @@ public class BlockScorerTest {
 			// This will not happen in our network
 			seconds = 1;
 		}
+		if (randomizeTime) {
+			seconds += (new SecureRandom()).nextInt(10);
+		}
 
 		block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds));
 		block.setDifficulty(difficulty);
-		
-		// We abuse the totalFee field of the block to optimize the score for the next block.
-		// In a real situation we would include a suited transaction for achieving the same goal.
-		// Iterate a hundred times. For a uniform distributed random variable this is enough to get about 99% of the optimal score.
-
-		// not needed anymore
-//		if (optimizeBlockScore) {
-//			Amount bestFee = null;
-//			long bestScore = 0;
-//			for (int i=0; i<100; i++) {
-//				Amount fee = new Amount(i);
-//				block.setTotalFee(fee);
-//				byte[] hash = Hashes.sha3(ArrayUtils.concat(forger.getKeyPair().getPublicKey().getRaw(), HashUtils.calculateHash(block).getRaw()));
-//				long score = Math.abs((long)ByteUtils.bytesToInt(Arrays.copyOfRange(hash, 10, 14)));
-//				if (score > bestScore) {
-//					bestScore = score;
-//					bestFee = fee;
-//				}
-//			}
-//			block.setTotalFee(bestFee);
-//		}
 
 		return block;
 	}
