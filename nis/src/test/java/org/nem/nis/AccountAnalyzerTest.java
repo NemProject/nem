@@ -19,14 +19,11 @@ public class AccountAnalyzerTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final Account cachedAccount = analyzer.addAccountToCache(address);
-		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
+		final Account account = analyzer.addAccountToCache(address);
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
-		Assert.assertThat(cachedAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
+		Assert.assertThat(account, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
@@ -36,16 +33,11 @@ public class AccountAnalyzerTest {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
-		final Account cachedAccount = analyzer.addAccountToCache(address);
-		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
-		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
+		final Account account = analyzer.addAccountToCache(address);
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(1));
-		Assert.assertThat(cachedAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount));
-		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(cachedAccount));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
+		Assert.assertThat(account, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
@@ -59,6 +51,7 @@ public class AccountAnalyzerTest {
 		final Account cachedAccount2 = analyzer.addAccountToCache(address);
 
 		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1));
 	}
 
@@ -73,6 +66,7 @@ public class AccountAnalyzerTest {
 		final Account cachedAccount2 = analyzer.addAccountToCache(address);
 
 		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1));
 	}
 
@@ -86,14 +80,11 @@ public class AccountAnalyzerTest {
 		// Act:
 		final Account cachedAccount1 = analyzer.addAccountToCache(addressWithoutPublicKey);
 		final Account cachedAccount2 = analyzer.addAccountToCache(address);
-		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
-		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
 
 		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
 		Assert.assertThat(cachedAccount2, IsNot.not(IsSame.sameInstance(cachedAccount1)));
-		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(cachedAccount2));
-		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(cachedAccount2));
 	}
 
 	@Test
@@ -152,8 +143,7 @@ public class AccountAnalyzerTest {
 		final Account foundAccount = analyzer.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(0));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
@@ -168,8 +158,7 @@ public class AccountAnalyzerTest {
 		final Account foundAccount = analyzer.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(0));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
 	}
@@ -194,7 +183,6 @@ public class AccountAnalyzerTest {
 
 	//region asAutoCache
 
-
 	@Test
 	public void asAutoCacheFindByAddressReturnsCachedAddressIfPublicKeyIsNotFound() {
 		// Arrange:
@@ -203,15 +191,10 @@ public class AccountAnalyzerTest {
 
 		// Act:
 		final Account foundAccount = analyzer.asAutoCache().findByAddress(address);
-		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
-		final Account accountFromPublicKey = analyzer.getPublicKeyMap().get(address.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(1));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(foundAccount));
-		Assert.assertThat(accountFromPublicKey, IsSame.sameInstance(foundAccount));
 	}
 
 	@Test
@@ -222,13 +205,10 @@ public class AccountAnalyzerTest {
 
 		// Act:
 		final Account foundAccount = analyzer.asAutoCache().findByAddress(address);
-		final Account accountFromEncodedAddress = analyzer.getEncodedAddressMap().get(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(analyzer.getEncodedAddressMap().size(), IsEqual.equalTo(1));
-		Assert.assertThat(analyzer.getPublicKeyMap().size(), IsEqual.equalTo(0));
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountFromEncodedAddress, IsSame.sameInstance(foundAccount));
 	}
 
 	//endregion
