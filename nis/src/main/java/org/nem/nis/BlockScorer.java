@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import com.sun.java_cup.internal.runtime.lr_parser;
 import org.nem.core.crypto.Hashes;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
@@ -36,7 +37,7 @@ public class BlockScorer {
 	 * @return the hit score.
 	 */
 	public BigInteger calculateHit(final Block prevBlock, final Account blockSigner) {
-		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), HashUtils.calculateHash(prevBlock).getRaw()));
+		byte[] hash = Hashes.sha3(ArrayUtils.concat(blockSigner.getKeyPair().getPublicKey().getRaw(), prevBlock.getGenerationHash().getRaw()));
 		return new BigInteger(1, Arrays.copyOfRange(hash, 10, 18));
 	}
 
