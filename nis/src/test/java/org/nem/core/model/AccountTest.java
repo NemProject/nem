@@ -444,4 +444,90 @@ public class AccountTest {
 	}
 
 	//endregion
+
+	//region copy
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithoutPublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddress());
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
+		Assert.assertThat(copyAccount.getKeyPair(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithPublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithPrivateKey() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNot.not(IsEqual.equalTo(null)));
+	}
+
+	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
+		// Arrange:
+		account.incrementBalance(new Amount(1000));
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.setLabel("Alpha Sigma");
+		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
+		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
+
+		// Act:
+		final Account copyAccount = account.copy();
+
+		// Assert:
+		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
+		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
+
+		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
+		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
+
+		// note that only getMessages is mutable, so it's important to verify that it is not the same
+		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
+		Assert.assertThat(copyAccount.getMessages().size(), IsEqual.equalTo(2));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 0), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
+		return copyAccount;
+	}
+
+	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
+		if (null == actual || null == expected) {
+			Assert.assertThat(actual, IsEqual.equalTo(expected));
+		}
+		else {
+			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
+			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
+		}
+	}
+
+	private static byte[] getEncodedMessageAt(final Account account, final int index) {
+		return account.getMessages().get(index).getEncodedPayload();
+	}
+
+	//endregion
 }

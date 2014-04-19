@@ -258,4 +258,21 @@ public class Account implements SerializableEntity {
 		return deserializer.getContext().findAccountByAddress(address);
 	}
 	//endregion
+
+	/**
+	 * Creates an unlinked copy of this account.
+	 *
+	 * @return An unlinked copy of this account.
+	 */
+	public Account copy() {
+		final Account copy = new Account(this.getKeyPair(), this.getAddress());
+		copy.balance = this.getBalance();
+		copy.label = this.getLabel();
+		copy.foragedBlocks = this.getForagedBlocks();
+
+		for (final Message message : this.getMessages())
+			copy.messages.add(message);
+
+		return copy;
+	}
 }
