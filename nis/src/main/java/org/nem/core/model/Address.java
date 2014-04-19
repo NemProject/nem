@@ -92,7 +92,7 @@ public class Address {
 	 * @return The encoded address string.
 	 */
 	public String getEncoded() {
-		return encoded;
+		return this.encoded;
 	}
 
 	/**
@@ -136,6 +136,11 @@ public class Address {
 
 		Address rhs = (Address)obj;
 		return this.encoded.equals(rhs.encoded);
+	}
+
+	@Override
+	public String toString() {
+		return this.encoded;
 	}
 
 	/**

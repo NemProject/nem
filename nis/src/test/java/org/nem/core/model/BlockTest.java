@@ -266,6 +266,21 @@ public class BlockTest {
 
 	//endregion
 
+	//region toString
+
+	@Test
+	public void toStringReturnsAppropriateRepresentation() {
+		// Arrange:
+		final Block block = createBlock();
+		block.addTransaction(createTransactionWithFee(1));
+		block.addTransaction(createTransactionWithFee(7));
+
+		// Assert:
+		Assert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
+	}
+
+	//endregion
+
 	private static Transaction createTransactionWithFee(final long fee) {
 		// Arrange:
 		Account sender = Utils.generateRandomAccount();

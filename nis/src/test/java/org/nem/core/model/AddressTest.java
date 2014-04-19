@@ -206,4 +206,17 @@ public class AddressTest {
 	}
 
 	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsEncodedAddress() {
+		// Arrange:
+		final Address address = Address.fromEncoded("Sigma Gamma");
+
+		// Assert:
+		Assert.assertThat(address.toString(), IsEqual.equalTo("Sigma Gamma"));
+	}
+
+	//endregion
 }

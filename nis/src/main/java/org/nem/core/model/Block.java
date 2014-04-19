@@ -166,4 +166,9 @@ public class Block extends VerifiableEntity {
 
 		serializer.writeObjectArray("transactions", this.transactions);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("height: %d, #tx: %d", this.height.getRaw(), this.transactions.size());
+	}
 }
