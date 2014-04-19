@@ -16,6 +16,8 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 
+	private BlockAmount foragedBlocks;
+
 	/**
 	 * Creates an account around a key pair.
 	 *
@@ -45,6 +47,7 @@ public class Account implements SerializableEntity {
 		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
+		this.foragedBlocks = BlockAmount.ZERO;
 	}
 
 	@Override
@@ -53,6 +56,7 @@ public class Account implements SerializableEntity {
 		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
 
 		serializer.writeLong("balance", getBalance().getNumMicroNem());
+		BlockAmount.writeTo(serializer, "foragedBlocks", getForagedBlocks());
 		serializer.writeString("label", getLabel());
 		serializer.writeObjectArray("messages", getMessages());
 	}
@@ -60,7 +64,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's key pair.
 	 *
-	 * @return The account's key pair.
+	 * @return This account's key pair.
 	 */
 	public KeyPair getKeyPair() {
 		return this.keyPair;
@@ -69,7 +73,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's address.
 	 *
-	 * @return The account's address.
+	 * @return This account's address.
 	 */
 	public Address getAddress() {
 		return this.address;
@@ -78,7 +82,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's balance.
 	 *
-	 * @return The account's balance.
+	 * @return This account's balance.
 	 */
 	public Amount getBalance() {
 		return this.balance;
@@ -100,6 +104,29 @@ public class Account implements SerializableEntity {
 	 */
 	public void decrementBalance(final Amount amount) {
 		this.balance = this.balance.subtract(amount);
+	}
+
+	/**
+	 * Gets number of foraged blocks.
+	 *
+	 * @return Number of blocks foraged by this account.
+	 */
+	public BlockAmount getForagedBlocks() {
+		return foragedBlocks;
+	}
+
+	/**
+	 * Increments number of foraged blocks by this account by one.
+	 */
+	public void incrementForagedBlocks() {
+		this.foragedBlocks = this.foragedBlocks.increment();
+	}
+
+	/**
+	 * Decrements number of foraged blocks by this account by one.
+	 */
+	public void decrementForagedBlocks() {
+		this.foragedBlocks = this.foragedBlocks.decrement();
 	}
 
 	/**
@@ -230,6 +257,5 @@ public class Account implements SerializableEntity {
 
 		return deserializer.getContext().findAccountByAddress(address);
 	}
-
 	//endregion
 }

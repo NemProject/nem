@@ -27,6 +27,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -41,6 +42,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -57,6 +59,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -119,6 +122,54 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(85)));
+	}
+
+	//endregion
+
+	//region foraged blocks
+
+	@Test
+	public void foragedBlocksCanBeIncremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	@Test
+	public void foragedBlocksCanBeDecremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
+	}
+
+	@Test
+	public void foragedBlocksCanBeIncrementedAndDecrementedMultipleTimes() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	//endregion
@@ -241,6 +292,7 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
 		Assert.assertThat(deserializer.readBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
+		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 
 		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.createDeserializer(null, null));
@@ -254,6 +306,9 @@ public class AccountTest {
 		final Account account = new Account(address);
 		account.setLabel("alpha gamma");
 		account.incrementBalance(new Amount(747));
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
