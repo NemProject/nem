@@ -136,7 +136,7 @@ public class BlockScorerTest {
 	@Test
 	public void timeBetweenBlocksIsAboutSixtySeconds() {
 		// Only 250 million nem (going below this limit will result in higher block creation times)
-		foragerTest(1000, 250000000L, 10);
+		foragerTest(1000, 200000000L, 10);
 
 		// 1000 million nem
 		foragerTest(1000, 1000000000L, 10);
