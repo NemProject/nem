@@ -73,36 +73,6 @@ public class BlockChain implements BlockSynchronizer {
 
 	}
 
-	interface DbBlockVisitor {
-		public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock);
-	};
-
-	class PartialWeightedScoreReversedCalculator implements DbBlockVisitor {
-		private final BlockScorer blockScorer;
-		private AccountLookup contemporaryAccountAnalyzer;
-		private long lastScore;
-		private long partialScore;
-
-		public PartialWeightedScoreReversedCalculator(BlockScorer scorer, AccountLookup contemporaryAccountAnalyzer) {
-			this.blockScorer = scorer;
-			this.contemporaryAccountAnalyzer = contemporaryAccountAnalyzer;
-			this.lastScore = 0L;
-			this.partialScore = 0L;
-		}
-
-		// visit should be called at most 1440 times, every score fits in 32-bits
-		// so long will be enough to keep partial score
-		@Override
-		public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
-			lastScore = blockScorer.calculateBlockScore(contemporaryAccountAnalyzer, parentBlock, dbBlock);
-			partialScore += lastScore;
-		}
-
-		public long getScore() {
-			// equal to 2*x_0 + x_1 + x_2 + ...
-			return partialScore + lastScore;
-		}
-	}
 
 	private void reverseChainIterator(final long wantedHeight, final DbBlockVisitor[] dbBlockVisitors) {
 		long currentHeight = getLastBlockHeight();
@@ -205,7 +175,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * which will be costly, so it's better to do it in one iteration
 	 */
 	private long undoTxesAndGetScore(long commonBlockHeight, final AccountAnalyzer contemporaryAccountAnalyzer) {
-		final PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer, contemporaryAccountAnalyzer);
+		final PartialWeightedScoreVisitor chainScore = new PartialWeightedScoreVisitor(scorer, contemporaryAccountAnalyzer);
 
 		// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 		// second visitor needs that information
