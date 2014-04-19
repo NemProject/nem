@@ -22,8 +22,10 @@ public class Block extends VerifiableEntity {
 
 	private final List<Transaction> transactions;
 
-	// this is helper field and (probably) shouldn't be serialized
+	// these are helper fields and shouldn't be serialized
 	private BlockDifficulty difficulty;
+
+	private Hash generationHash;
 
 	/**
 	 * Creates a new block.
@@ -51,6 +53,7 @@ public class Block extends VerifiableEntity {
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
 		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
+		setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash()));
 	}
 
 	/**
@@ -116,6 +119,17 @@ public class Block extends VerifiableEntity {
 	 */
 	public BlockDifficulty getDifficulty() {
 		return this.difficulty;
+	}
+
+	/**
+	 * Gets the generation hash associated with this block.
+	 *
+	 * @return Generation hash of this block.
+	 */
+	public Hash getGenerationHash() { return this.generationHash; }
+
+	public void setGenerationHash(Hash generationHash) {
+		this.generationHash = generationHash;
 	}
 
 	//endregion

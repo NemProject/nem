@@ -31,6 +31,7 @@ public class BlockMapper {
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
 				blockHash,
 				block.getVersion(),
+				block.getGenerationHash(),
 				block.getPreviousBlockHash(),
 				block.getTimeStamp().getRawTime(),
 				forager,
@@ -72,6 +73,7 @@ public class BlockMapper {
 
 		final Long difficulty = dbBlock.getDifficulty();
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
+		block.setGenerationHash(dbBlock.getGenerationHash());
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

@@ -188,8 +188,9 @@ public class ForagingTest {
 
 		final Account signer = createAccountWithBalance(100);
 		final TimeInstant parentTime = new TimeInstant(0);
-		final Block parent = new Block(signer, new Hash(new byte[32]), parentTime, BlockHeight.ONE);
+		final Block parent = new Block(signer, Hash.ZERO, parentTime, BlockHeight.ONE);
 		parent.sign();
+		parent.setGenerationHash(Hash.ZERO);
 
 		// Act:
 		foraging.setAccountAnalyzer(mockAccountAnalyzer);

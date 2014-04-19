@@ -25,6 +25,7 @@ public class Block {
 	private Integer version;
 	private byte[] prevBlockHash;
 	private byte[] blockHash;
+	private byte[] generationHash;
 	private Integer timestamp;
 
 	@ManyToOne
@@ -52,6 +53,7 @@ public class Block {
 	public Block(
 			Hash hash,
 			Integer version,
+			Hash generationHash,
 			Hash prevBlockHash,
 			Integer timestamp,
 			Account forger,
@@ -63,6 +65,7 @@ public class Block {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
+		this.generationHash = generationHash.getRaw();
 		this.prevBlockHash = prevBlockHash.getRaw();
 		this.blockHash = hash.getRaw();
 		this.timestamp = timestamp;
@@ -111,6 +114,14 @@ public class Block {
 	}
 
 	public void setBlockHash(byte[] blockHash) {
+		this.blockHash = blockHash;
+	}
+
+	public Hash getGenerationHash() {
+		return new Hash(this.generationHash);
+	}
+
+	public void setGenerationHash(byte[] blockHash) {
 		this.blockHash = blockHash;
 	}
 

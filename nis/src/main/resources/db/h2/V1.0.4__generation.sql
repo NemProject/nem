@@ -1,0 +1,1 @@
+ALTER TABLE blocks ADD COLUMN `generationHash` VARBINARY(34) NOT NULL;

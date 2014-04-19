@@ -16,6 +16,12 @@ public class BlockTest {
 			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 			1, 2 });
 
+	final static Hash DUMMY_GENERATION_HASH = new Hash(new byte[] {
+			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+			8, 7 });
+
 	//region Constructors
 
 	@Test
@@ -270,7 +276,9 @@ public class BlockTest {
 
 	private static Block createBlock(final Account forger) {
 		// Arrange:
-		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
+		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
+		block.setGenerationHash(DUMMY_GENERATION_HASH);
+		return block;
 	}
 
 	private static Block createBlock() {

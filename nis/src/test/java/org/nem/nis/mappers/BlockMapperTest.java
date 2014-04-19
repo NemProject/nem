@@ -122,6 +122,8 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(77_777_777_777L));
 			this.signModel();
 
+			this.model.setGenerationHash(new Hash(Utils.generateRandomBytes()));
+
 			this.dbForager = new org.nem.nis.dbmodel.Account();
 			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());

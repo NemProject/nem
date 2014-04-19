@@ -19,4 +19,8 @@ public abstract class HashUtils {
 		byte[] data = BinarySerializer.serializeToBytes(entity.asNonVerifiable());
 		return new Hash(Hashes.sha3(data));
 	}
+
+	public static Hash nextHash(final Hash hash) {
+		return new Hash(Hashes.sha3(hash.getRaw()));
+	}
 }
