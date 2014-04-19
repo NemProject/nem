@@ -18,6 +18,10 @@ public class Account implements SerializableEntity {
 	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
+	
+	private LinkedList<AccountLink> inLinks;
+	
+	private LinkedList<AccountLink> outLinks;
 
 	/**
 	 * Creates an account around a key pair.
@@ -143,6 +147,54 @@ public class Account implements SerializableEntity {
 	 */
 	public void addMessage(final Message message) {
 		this.messages.add(message);
+	}
+
+	/**
+	 * @param acctLink - an inLink to add
+	 */
+	public void addInLink(AccountLink acctLink) {
+		if (this.inLinks == null) {
+			this.inLinks = new LinkedList<AccountLink>();
+		}
+		this.inLinks.add(acctLink);
+	}
+	
+	/**
+	 * @return the inLinks
+	 */
+	public LinkedList<AccountLink> getInLinks() {
+		return inLinks;
+	}
+
+	/**
+	 * @param inLinks the inLinks to set
+	 */
+	public void setInLinks(LinkedList<AccountLink> inLinks) {
+		this.inLinks = inLinks;
+	}
+	
+	/**
+	 * @param acctLink - an outLink to add
+	 */
+	public void addOutLink(AccountLink acctLink) {
+		if (this.outLinks == null) {
+			this.outLinks = new LinkedList<AccountLink>();
+		}
+		this.outLinks.add(acctLink);
+	}
+
+	/**
+	 * @return the outLinks
+	 */
+	public LinkedList<AccountLink> getOutLinks() {
+		return outLinks;
+	}
+
+	/**
+	 * @param outLinks the outLinks to set
+	 */
+	public void setOutLinks(LinkedList<AccountLink> outLinks) {
+		this.outLinks = outLinks;
 	}
 
 	@Override

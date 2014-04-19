@@ -107,6 +107,9 @@ public class ColumnVector {
 	/**
 	 * Normalizes this vector's elements so that the absolute value of all
 	 * elements sums to 1.0.
+	 * 
+	 * This method has the side effect of modifying the implicit context 
+	 * object, so be careful.
 	 */
 	public void normalize() {
 		double sum = this.absSum();
@@ -134,6 +137,29 @@ public class ColumnVector {
 	public double getMagnitude() {
 		final ColumnVector nullVector = new ColumnVector(this.size);
 		return this.distance(nullVector);
+	}
+	
+	/**
+	 * Gets the maximum value for an individual element in this vector.
+	 *
+	 * @return The maximum value in of this vector.
+	 */
+	public double getMax() {
+		//TODO: do some error checking here
+//		if (this.vector.length < 1){
+			//Throw a not-1337 exception or something?
+		//This is Java, so let's call our Not1337ExceptionFactoryFactory.initializeNot1337ExceptionFactory().createNewFactory().not1337().thisIsJavaSoLetsDoAnotherFactoryInitializerFactory().oRly().yArly();
+//		}
+		
+		double maxVal = this.vector[0];
+		
+		for (double val : this.vector) {
+			if (val > maxVal) {
+				maxVal = val;
+			}
+		}
+		
+		return maxVal;
 	}
 
 	/**
