@@ -1,19 +1,12 @@
 package org.nem.core.connect;
 
 import net.minidev.json.*;
-import org.eclipse.jetty.client.api.*;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
-import org.springframework.http.*;
 import org.nem.core.serialization.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * Strategy for coercing an HTTP response into a Deserializer.
  */
-public class HttpDeserializerResponseStrategy implements HttpResponseStrategy<Deserializer> {
+public class HttpDeserializerResponseStrategy extends HttpJsonResponseStrategy<Deserializer> {
 
 	private final DeserializationContext context;
 
@@ -27,21 +20,10 @@ public class HttpDeserializerResponseStrategy implements HttpResponseStrategy<De
 	}
 
 	@Override
- 	public Deserializer coerce(final Request request, final Response response) throws IOException {
+	protected Deserializer coerce(final Object parsedStream) {
+		if (parsedStream instanceof JSONObject)
+			return new JsonDeserializer((JSONObject) parsedStream, this.context);
 
-		if (response.getStatus() != HttpStatus.OK.value())
-			throw new InactivePeerException(String.format("Peer returned: %d", response.getStatus()));
-
-		final List<InputStreamResponseListener> listeners = response.getListeners(InputStreamResponseListener.class);
-		if (1 != listeners.size())
-			throw new FatalPeerException(String.format("Unexpected number of listeners: %d", listeners.size()));
-
-		final InputStreamResponseListener listener = listeners.get(0);
-		try (final InputStream responseStream = listener.getInputStream()) {
-			final Object parsedStream = JSONValue.parse(responseStream);
-			if (!(parsedStream instanceof JSONObject))
-				throw new FatalPeerException("Peer returned unexpected data");
-
-			return new JsonDeserializer((JSONObject)parsedStream, this.context);
+		throw new FatalPeerException("Peer returned unexpected data");
 	}
-}}
+}

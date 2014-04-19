@@ -12,7 +12,9 @@ import org.nem.core.test.*;
 import java.io.*;
 import java.util.*;
 
-public class HttpDeserializerResponseStrategyTest {
+public class HttpJsonResponseStrategyTest {
+
+	//region HttpJsonResponseStrategy
 
 	@Test(expected = InactivePeerException.class)
 	public void coerceThrowsInactivePeerExceptionOnHttpError() throws Exception {
@@ -55,6 +57,10 @@ public class HttpDeserializerResponseStrategyTest {
 		strategy.coerce(Mockito.mock(Request.class), response);
 	}
 
+	//endregion
+
+	//region HttpDeserializerResponseStrategy
+
 	@Test
 	public void coercedDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
 		// Arrange:
@@ -83,7 +89,7 @@ public class HttpDeserializerResponseStrategyTest {
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedData() throws Exception {
+	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedDataWhenDeserializerIsExpected() throws Exception {
 		// Arrange:
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 
@@ -91,12 +97,37 @@ public class HttpDeserializerResponseStrategyTest {
 		coerceDeserializer(new byte[] { }, accountLookup);
 	}
 
+	//endregion
+
+	//region HttpVoidResponseStrategy
+
+	@Test
+	public void nullIsReturnedIfRequestSucceedsAndNoDataIsReturned() throws Exception {
+		// Arrange:
+		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
+
+		// Act:
+		final Deserializer deserializer = coerceDeserializer(new byte[] { }, strategy);
+
+		// Assert:
+		Assert.assertThat(deserializer, IsEqual.equalTo(null));
+	}
+
+	@Test(expected = FatalPeerException.class)
+	public void coerceThrowsFatalPeerExceptionIfPeerReturnsDataWhenNoneIsExpected() throws Exception {
+		// Arrange:
+		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
+
+		// Act:
+		coerceDeserializer("some data".getBytes(), strategy);
+	}
+
+	//endregion
+
 	private static Deserializer coerceDeserializer(
 			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
+			final HttpJsonResponseStrategy<Deserializer> strategy) throws IOException {
 		// Arrange:
-		final DeserializationContext context = new DeserializationContext(accountLookup);
-		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(context);
 		final Response response = Mockito.mock(Response.class);
 		Mockito.when(response.getStatus()).thenReturn(200);
 
@@ -108,6 +139,17 @@ public class HttpDeserializerResponseStrategyTest {
 
 		// Act:
 		return strategy.coerce(Mockito.mock(Request.class), response);
+	}
+
+	private static Deserializer coerceDeserializer(
+			final byte[] serializedBytes,
+			final AccountLookup accountLookup) throws IOException {
+		// Arrange:
+		final DeserializationContext context = new DeserializationContext(accountLookup);
+		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(context);
+
+		// Act:
+		return coerceDeserializer(serializedBytes, strategy);
 	}
 
 	private static Deserializer coerceDeserializer(

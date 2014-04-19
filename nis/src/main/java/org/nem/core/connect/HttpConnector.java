@@ -14,18 +14,22 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	private final HttpMethodClient<Deserializer> httpMethodClient;
 	private final HttpResponseStrategy<Deserializer> responseStrategy;
+	private final HttpResponseStrategy<Deserializer> voidResponseStrategy;
 
 	/**
 	 * Creates a new HTTP connector.
 	 *
 	 * @param httpMethodClient The HTTP client to use.
-	 * @param responseStrategy The response strategy to use.
+	 * @param responseStrategy The response strategy to use for functions expected to return data.
+	 * @param voidResponseStrategy The response strategy to use for functions expected to not return data.
 	 */
 	public HttpConnector(
 			HttpMethodClient<Deserializer> httpMethodClient,
-			final HttpResponseStrategy<Deserializer> responseStrategy) {
+			final HttpResponseStrategy<Deserializer> responseStrategy,
+			final HttpResponseStrategy<Deserializer> voidResponseStrategy) {
 		this.httpMethodClient = httpMethodClient;
 		this.responseStrategy = responseStrategy;
+		this.voidResponseStrategy = voidResponseStrategy;
 	}
 
 	//region PeerConnector
@@ -45,7 +49,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
-		this.post(url, entity);
+		this.postVoid(url, entity);
 	}
 
 	//endregion
@@ -85,5 +89,9 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	private Deserializer post(final URL url, final SerializableEntity entity) {
 		return this.httpMethodClient.post(url, entity, this.responseStrategy);
+	}
+
+	private Deserializer postVoid(final URL url, final SerializableEntity entity) {
+		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
 	}
 }

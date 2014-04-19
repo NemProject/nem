@@ -37,6 +37,7 @@ public class HttpConnectorPool implements SyncConnectorPool {
 	private HttpConnector getConnector(final AccountLookup accountLookup) {
 		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(context);
-		return new HttpConnector(this.httpMethodClient, strategy);
+		final HttpVoidResponseStrategy voidStrategy = new HttpVoidResponseStrategy();
+		return new HttpConnector(this.httpMethodClient, strategy, voidStrategy);
 	}
 }
