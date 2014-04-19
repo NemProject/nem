@@ -17,6 +17,7 @@ public class BlockExecutor {
 			transaction.execute();
 		}
 
+		block.getSigner().incrementForagedBlocks();
 		block.getSigner().incrementBalance(block.getTotalFee());
 	}
 
@@ -34,6 +35,7 @@ public class BlockExecutor {
 
 		final Address foragerAddress = Address.fromPublicKey(block.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
+		forager.incrementForagedBlocks();
 		forager.incrementBalance(Amount.fromMicroNem(block.getTotalFee()));
 	}
 
@@ -41,6 +43,7 @@ public class BlockExecutor {
 		final Address foragerAddress = Address.fromPublicKey(block.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
 		forager.decrementBalance(Amount.fromMicroNem(block.getTotalFee()));
+		forager.decrementForagedBlocks();
 
 		for (Transfer transfer : new Iterable<Transfer>() {
 			@Override
