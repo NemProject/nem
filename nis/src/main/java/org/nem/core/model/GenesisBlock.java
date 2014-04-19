@@ -1,8 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.Hashes;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
+import org.nem.core.crypto.*;
 import org.nem.core.time.TimeInstant;
 
 /**

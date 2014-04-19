@@ -48,13 +48,13 @@ public class Block extends VerifiableEntity {
 	 * Creates a new block.
 	 *
 	 * @param forger    The forger.
-	 * @param timestamp The block timestamp.
 	 * @param prevBlock The previous block.
+	 * @param timestamp The block timestamp.
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
 		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
 
-		setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
+		this.setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 	}
 
 	/**
@@ -129,15 +129,29 @@ public class Block extends VerifiableEntity {
 	 */
 	public Hash getGenerationHash() { return this.generationHash; }
 
-	public void setGenerationHash(Hash generationHash) {
+	//endregion
+
+	//region Setters
+
+	/**
+	 * Sets the generation hash.
+	 *
+	 * @param generationHash the generation hash.
+	 */
+	public void setGenerationHash(final Hash generationHash) {
 		this.generationHash = generationHash;
 	}
 
-	//endregion
-
+	/**
+	 * Sets the difficulty.
+	 *
+	 * @param difficulty The difficulty.
+	 */
 	public void setDifficulty(final BlockDifficulty difficulty) {
 		this.difficulty = difficulty;
 	}
+
+	// endregion
 
 	/**
 	 * Adds a new transaction to this block.

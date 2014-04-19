@@ -16,12 +16,6 @@ public class BlockTest {
 			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 			1, 2 });
 
-	final static Hash DUMMY_GENERATION_HASH = new Hash(new byte[] {
-			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-			9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-			8, 7 });
-
 	//region Constructors
 
 	@Test
@@ -42,6 +36,9 @@ public class BlockTest {
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(null));
 	}
 
 	@Test
@@ -49,6 +46,7 @@ public class BlockTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Block previousBlock = createBlock(signer);
+		previousBlock.setGenerationHash(new Hash(Utils.generateRandomBytes(64)));
 
 		// Act:
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
@@ -63,6 +61,12 @@ public class BlockTest {
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(4)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		final Hash expectedGenerationHash = HashUtils.nextHash(
+				previousBlock.getGenerationHash(),
+				signer.getKeyPair().getPublicKey());
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 
 	//endregion
@@ -80,6 +84,19 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
+	}
+
+	@Test
+	public void generationHashCanBeSet() {
+		// Arrange:
+		final Block block = createBlock(Utils.generateRandomAccount());
+		final Hash hash = new Hash(Utils.generateRandomBytes(64));
+
+		// Act:
+		block.setGenerationHash(hash);
+
+		// Assert:
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(hash));
 	}
 
 	//endregion
@@ -291,9 +308,7 @@ public class BlockTest {
 
 	private static Block createBlock(final Account forger) {
 		// Arrange:
-		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
-		block.setGenerationHash(DUMMY_GENERATION_HASH);
-		return block;
+		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
 	}
 
 	private static Block createBlock() {
