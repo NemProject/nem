@@ -171,7 +171,8 @@ public class BlockScorerTest {
 			block.setDifficulty(scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
-				BigInteger hit = scorer.calculateHit(block);
+				Block temporaryDummy = new Block(foragerAccounts[j], blocks[i-1], new TimeInstant(1));
+				BigInteger hit = scorer.calculateHit(temporaryDummy);
 				int seconds = hit.multiply(block.getDifficulty().asBigInteger())
 								 .divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
 								 .divide(BigInteger.valueOf(foragerAccounts[j].getBalance().getNumNem()))
