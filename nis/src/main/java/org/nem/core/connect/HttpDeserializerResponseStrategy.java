@@ -38,8 +38,10 @@ public class HttpDeserializerResponseStrategy implements HttpResponseStrategy<De
 
 		final InputStreamResponseListener listener = listeners.get(0);
 		try (final InputStream responseStream = listener.getInputStream()) {
-			return new JsonDeserializer(
-					(JSONObject)JSONValue.parse(responseStream),
-					this.context);
+			final Object parsedStream = JSONValue.parse(responseStream);
+			if (!(parsedStream instanceof JSONObject))
+				throw new FatalPeerException("Peer returned unexpected data");
+
+			return new JsonDeserializer((JSONObject)parsedStream, this.context);
 	}
 }}

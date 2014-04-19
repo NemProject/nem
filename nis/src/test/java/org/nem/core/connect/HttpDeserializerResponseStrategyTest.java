@@ -5,12 +5,9 @@ import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.connect.FatalPeerException;
-import org.nem.core.connect.HttpDeserializerResponseStrategy;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.core.connect.InactivePeerException;
 
 import java.io.*;
 import java.util.*;
@@ -85,8 +82,17 @@ public class HttpDeserializerResponseStrategyTest {
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
+	@Test(expected = FatalPeerException.class)
+	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedData() throws Exception {
+		// Arrange:
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+
+		// Act:
+		coerceDeserializer(new byte[] { }, accountLookup);
+	}
+
 	private static Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
+			final byte[] serializedBytes,
 			final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
@@ -94,7 +100,6 @@ public class HttpDeserializerResponseStrategyTest {
 		final Response response = Mockito.mock(Response.class);
 		Mockito.when(response.getStatus()).thenReturn(200);
 
-		final byte[] serializedBytes = JsonSerializer.serializeToJson(originalEntity).toJSONString().getBytes();
 		final ByteArrayInputStream inputStream = new ByteArrayInputStream(serializedBytes);
 		final List<InputStreamResponseListener> listeners = new ArrayList<>();
 		listeners.add(Mockito.mock(InputStreamResponseListener.class));
@@ -103,5 +108,15 @@ public class HttpDeserializerResponseStrategyTest {
 
 		// Act:
 		return strategy.coerce(Mockito.mock(Request.class), response);
+	}
+
+	private static Deserializer coerceDeserializer(
+			final SerializableEntity originalEntity,
+			final AccountLookup accountLookup) throws IOException {
+		// Arrange:
+		final byte[] serializedBytes = JsonSerializer.serializeToJson(originalEntity).toJSONString().getBytes();
+
+		// Act:
+		return coerceDeserializer(serializedBytes, accountLookup);
 	}
 }
