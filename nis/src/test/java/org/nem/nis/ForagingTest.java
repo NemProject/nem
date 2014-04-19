@@ -5,8 +5,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccount;
-import org.nem.nis.test.MockAccountAnalyzer;
+import org.nem.core.test.*;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
@@ -180,11 +179,10 @@ public class ForagingTest {
 	public void canSignBlock() {
 		// Arrange:
 		final MockForaging foraging = new MockForaging();
-		final MockAccountAnalyzer mockAccountAnalyzer = new MockAccountAnalyzer();
+		final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 		final Account account = Utils.generateRandomAccount();
-		mockAccountAnalyzer.initializeGenesisAccount(account);
-		final Account accountWithoutSecret = mockAccountAnalyzer.findByNemAddress(account);
-		accountWithoutSecret.incrementBalance(Amount.fromNem(100));
+		mockAccountLookup.setMockAccount(account);
+		account.incrementBalance(Amount.fromNem(100));
 
 		final Account signer = createAccountWithBalance(100);
 		final TimeInstant parentTime = new TimeInstant(0);
@@ -193,13 +191,13 @@ public class ForagingTest {
 		parent.setGenerationHash(Hash.ZERO);
 
 		// Act:
-		foraging.setAccountAnalyzer(mockAccountAnalyzer);
+		foraging.setAccountLookup(mockAccountLookup);
 		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account, BlockDifficulty.INITIAL_DIFFICULTY);
 
 		// Assert:
-		Assert.assertThat(accountWithoutSecret.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(accountWithoutSecret));
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(account));
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {

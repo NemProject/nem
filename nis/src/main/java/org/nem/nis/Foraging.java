@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.utils.Predicate;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
@@ -39,7 +40,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	@Autowired
 	private NisPeerNetworkHost host;
 
-	private AccountAnalyzer accountAnalyzer;
+	private AccountLookup accountLookup;
 
 	private BlockChain blockChain;
 
@@ -48,7 +49,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	private TransferDao transferDao;
 
 	@Autowired
-	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
+	public void setAccountLookup(AccountLookup accountLookup) { this.accountLookup = accountLookup; }
 
 	@Autowired
 	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
@@ -160,7 +161,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		try {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
-				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
+				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
@@ -211,7 +212,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			final Block lastBlock,
 			final Account virtualForger,
 			final BlockDifficulty difficulty) {
-		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
+		final Account forger = this.accountLookup.findByAddress(virtualForger.getAddress());
 
 		// Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
