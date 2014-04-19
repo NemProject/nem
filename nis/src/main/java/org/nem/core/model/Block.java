@@ -53,7 +53,8 @@ public class Block extends VerifiableEntity {
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
 		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
-		setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash()));
+
+		setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 	}
 
 	/**
