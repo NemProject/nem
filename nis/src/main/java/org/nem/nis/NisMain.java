@@ -93,9 +93,10 @@ public class NisMain {
 
 		final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
 		final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();
-		LOGGER.info("genesis account private key: " + genesisKeyPair.getPrivateKey());
+		LOGGER.info("genesis account private key          : " + genesisKeyPair.getPrivateKey());
 		LOGGER.info("genesis account            public key: " + genesisKeyPair.getPublicKey());
 		LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
+		LOGGER.info("genesis account generetion hash      : " + GENESIS_BLOCK.getGenerationHash());
 	}
 
 	private void populateDb() {

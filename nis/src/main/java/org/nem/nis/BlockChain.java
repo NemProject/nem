@@ -217,7 +217,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 
-	private void calculatePeerChainDifficulties(Block parentBlock, List<Block> peerChain) {
+	private void calculatePeerChainDifficulties(Block parentBlock, final List<Block> peerChain) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
@@ -236,6 +236,14 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
+	private void calculatePeerChainGenerations(Block parentBlock, final List<Block> peerChain) {
+		for (Block block : peerChain) {
+			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash()));
+
+			parentBlock = block;
+		}
+	}
+
 	/**
 	 * Validates blocks in peerChain.
 	 *
@@ -250,6 +258,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
+		calculatePeerChainGenerations(parentBlock, peerChain);
 		if (!validator.isValid(parentBlock, peerChain)) {
 			return -1L;
 		}
