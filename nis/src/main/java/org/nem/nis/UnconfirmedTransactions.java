@@ -84,8 +84,14 @@ public class UnconfirmedTransactions {
 		Collections.sort(transactions, new Comparator<Transaction>() {
 			@Override
 			public int compare(final Transaction lhs, final Transaction rhs) {
-				// TODO: should we just use Transaction.compare (it weights things other than fees more heavily) ?
-				return rhs.getFee().compareTo(lhs.getFee());
+				// should we just use Transaction.compare (it weights things other than fees more heavily) ?
+				// maybe we should change Transaction.compare? also it
+				// TODO: should fee or time be more important inside Transaction.compare
+				int result = -lhs.getFee().compareTo(rhs.getFee());
+				if (result == 0) {
+					result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
+				}
+				return result;
 			}
 		});
 

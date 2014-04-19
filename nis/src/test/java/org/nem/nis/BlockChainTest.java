@@ -28,7 +28,7 @@ public class BlockChainTest {
 	public void analyzeSavesResults() {
 		// Arrange:
 		Block block = createDummyDbBlock();
-		BlockChain blockChain = new MockBlockChain();
+		BlockChain blockChain = new BlockChain();
 		blockChain.bootup();
 
 		// Act:
