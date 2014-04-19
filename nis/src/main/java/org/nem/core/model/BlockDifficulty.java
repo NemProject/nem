@@ -11,7 +11,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
 	 * The initial block difficulty.
 	 * 1_000_000_000 NEMs have force to generate block every minute.
 	 */
-	public static final BlockDifficulty INITIAL_DIFFICULTY = new BlockDifficulty(20_000_000_000L, false);
+	public static final BlockDifficulty INITIAL_DIFFICULTY = new BlockDifficulty(120_000_000_000L, false);
 
 	/**
 	 * Minimum value for difficulty.
