@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
-import org.nem.nis.balances.Balance;
+import org.nem.nis.balances.BlockExecutor;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
@@ -208,7 +208,7 @@ public class BlockChain implements BlockSynchronizer {
 				new DbBlockVisitor() {
 					@Override
 					public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
-						Balance.unapply(contemporaryAccountAnalyzer, dbBlock);
+						BlockExecutor.unapply(contemporaryAccountAnalyzer, dbBlock);
 					}
 				}
 		});
@@ -319,7 +319,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		for (final Block block : peerChain) {
-			Balance.apply(contemporaryAccountAnalyzer, block);
+			BlockExecutor.apply(contemporaryAccountAnalyzer, block);
 		}
 		//endregion
 

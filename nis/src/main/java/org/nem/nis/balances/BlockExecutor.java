@@ -8,7 +8,7 @@ import org.nem.nis.dbmodel.Transfer;
 
 import java.util.Iterator;
 
-public class Balance {
+public class BlockExecutor {
 	public static void apply(final AccountAnalyzer accountLookup, final Block block) {
 		// assuming AccountAnalyzer used to create block is the same as
 		// the one passed in accountLookup

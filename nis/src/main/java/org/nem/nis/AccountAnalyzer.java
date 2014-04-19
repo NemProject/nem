@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
-import org.nem.nis.balances.Balance;
+import org.nem.nis.balances.BlockExecutor;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
@@ -88,7 +88,7 @@ public class AccountAnalyzer implements AccountLookup {
 			addAccountToCache(tx.getRecipient());
 		}
 
-		Balance.apply(this, curBlock);
+		BlockExecutor.apply(this, curBlock);
 
 		for (final Transfer tx : txes) {
 			Account recipient = addAccountToCache(tx.getRecipient());
