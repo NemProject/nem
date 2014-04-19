@@ -24,7 +24,7 @@ public class MockBlockScorer extends BlockScorer {
 	}
 
 	@Override
-	public BigInteger calculateHit(final Block block, final Account blockSigner) {
+	public BigInteger calculateHit(final Block block) {
 		return BigInteger.ZERO;
 	}
 

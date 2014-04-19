@@ -238,7 +238,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	private void calculatePeerChainGenerations(Block parentBlock, final List<Block> peerChain) {
 		for (Block block : peerChain) {
-			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash()));
+			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash(), block.getSigner().getKeyPair().getPublicKey()));
 
 			parentBlock = block;
 		}

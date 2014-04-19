@@ -83,7 +83,7 @@ public class BlockChainValidator {
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
-		final BigInteger hit = this.scorer.calculateHit(parentBlock, block.getSigner());
+		final BigInteger hit = this.scorer.calculateHit(block);
 		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
 		return hit.compareTo(target) < 0;
 	}

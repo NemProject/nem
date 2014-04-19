@@ -171,7 +171,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
-					final BigInteger hit = scorer.calculateHit(lastBlock, virtualForger);
+					final BigInteger hit = scorer.calculateHit(newBlock);
 					System.out.println("   hit: 0x" + hit.toString(16));
 					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
@@ -216,7 +216,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		// Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
-		newBlock.setGenerationHash(HashUtils.nextHash(lastBlock.getGenerationHash()));
+		newBlock.setGenerationHash(HashUtils.nextHash(lastBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 
 		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
