@@ -320,7 +320,7 @@ public class BlockScorerTest {
 			else {
 				normalForagerWins++;
 			}
-			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagerScore);
+			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagerScore);
 		}
 
 		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");

@@ -14,7 +14,7 @@ public class BlockChainScore {
 
 	/**
 	 * Computes partial score given blocks and parentBlock.
-	 * TODO: move this and add tests for it
+	 * TODO: add tests for it
 	 *
 	 * @param parentBlock The parent block.
 	 * @param blocks The block chain.
