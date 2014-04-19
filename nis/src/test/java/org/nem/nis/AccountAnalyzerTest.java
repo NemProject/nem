@@ -3,7 +3,6 @@ package org.nem.nis;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.test.MockAccount;
 import org.nem.nis.test.MockAccountAnalyzer;
@@ -45,7 +44,7 @@ public class AccountAnalyzerTest {
 	@Test
 	public void aaAnalyzeCachesAccounts() {
 		// Arrange:
-		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
+		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
 		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
@@ -66,7 +65,7 @@ public class AccountAnalyzerTest {
 	@Test
 	public void aaAnalyzeSearchingByPublicKeyWorks() {
 		// Arrange:
-		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
+		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
 		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
@@ -84,7 +83,7 @@ public class AccountAnalyzerTest {
 	@Test
 	public void aaAnalyzeChangesBalances() {
 		// Arrange:
-		Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
+		org.nem.nis.dbmodel.Block b = prepareTestBlock(dbSender, dbRecipient1, dbRecipient2);
 		MockAccountAnalyzer aa = new MockAccountAnalyzer();
 		aa.initializeGenesisAccount(sender).incrementBalance(SENDER_AMOUNT);
 
@@ -104,12 +103,12 @@ public class AccountAnalyzerTest {
 		Assert.assertThat(t3.getBalance(), equalTo(rest));
 	}
 
-	private Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {
+	private org.nem.nis.dbmodel.Block prepareTestBlock(Account sender, Account recipient1, Account recipient2) {
 		Transfer t1 = prepareTransfer(sender, recipient1, RECIPIENT1_AMOUNT, RECIPIENT1_FEE, 0);
 		Transfer t2 = prepareTransfer(sender, recipient2, RECIPIENT2_AMOUNT, RECIPIENT2_FEE, 1);
 
-		Block b = new Block(
-				Hash.ZERO, 1, Hash.ZERO, 0, sender, new byte[64], 1L, 8 * 1000000L, 0L, 123L
+		org.nem.nis.dbmodel.Block b = new org.nem.nis.dbmodel.Block(
+				Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 0, sender, new byte[64], 1L, 8 * 1000000L, 0L, 123L
 		);
 
 		b.setBlockTransfers(Arrays.asList(t1, t2));

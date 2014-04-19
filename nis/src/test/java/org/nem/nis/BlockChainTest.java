@@ -62,6 +62,8 @@ public class BlockChainTest {
 		Block dbBlock = new Block(
 				HashUtils.calculateHash(b),
 				1,
+				// generation hash
+				Hash.ZERO,
 				// prev hash
 				Hash.ZERO,
 				0, // timestamp

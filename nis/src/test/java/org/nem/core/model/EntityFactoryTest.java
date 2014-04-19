@@ -15,14 +15,17 @@ public class EntityFactoryTest {
 		final EntityFactory factory = new EntityFactory(new MockTimeProvider(11890));
 		final Account signer = Utils.generateRandomAccount();
 		final Hash previousHash = new Hash(Utils.generateRandomBytes());
+		final Hash generationHash = new Hash(Utils.generateRandomBytes());
 
 		// Act:
-		final Block block = factory.createBlock(signer, previousHash, new BlockHeight(12));
+		final Block block = factory.createBlock(signer, generationHash, previousHash, new BlockHeight(12));
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(generationHash));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11890)));

@@ -37,14 +37,14 @@ public class BlockScorerTest {
 		final KeyPair keyPair = new KeyPair(new PublicKey(PUBKEY_BYTES));
 		final Account blockSigner = new Account(keyPair);
 		final BlockScorer scorer = new BlockScorer();
-		final Block previousBlock = new Block(blockSigner, new Hash(HASH_BYTES), TimeInstant.ZERO, new BlockHeight(11));
-
+		final Block previousBlock = new Block(blockSigner, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(11));
+		previousBlock.setGenerationHash(new Hash(HASH_BYTES));
 
 		// Act:
 		final BigInteger hit = scorer.calculateHit(previousBlock, blockSigner);
 
 		// Assert:
-		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("bd3bef408122b58c", 16)));
+		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("75bc0e5B27d7a9b6", 16)));
 	}
 
 	@Test
@@ -159,6 +159,7 @@ public class BlockScorerTest {
 		Hash hash = new Hash(HASH_BYTES);
 		blocks[0] = new Block(foragerAccounts[0], hash, new TimeInstant(1), new BlockHeight(1));
 		blocks[0].setDifficulty(BlockDifficulty.INITIAL_DIFFICULTY);
+		blocks[0].setGenerationHash(HashUtils.nextHash(hash));
 
 		List<Block> historicalBlocks = new LinkedList<>();
 		historicalBlocks.add(blocks[0]);
@@ -255,6 +256,7 @@ public class BlockScorerTest {
 			sr.nextBytes(rndBytes);
 			Hash hash = new Hash(rndBytes);
 			firstBlock = new Block(normalForager, hash, new TimeInstant(1), new BlockHeight(1));
+			firstBlock.setGenerationHash(HashUtils.nextHash(hash));
 
 			blocks.clear();
 			blocks.add(firstBlock);

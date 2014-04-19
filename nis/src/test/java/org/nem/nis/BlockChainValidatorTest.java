@@ -223,7 +223,9 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Block createBlock(final Account account, long height) {
-		return new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		block.setGenerationHash(Hash.ZERO);
+		return block;
 	}
 
 	//endregion

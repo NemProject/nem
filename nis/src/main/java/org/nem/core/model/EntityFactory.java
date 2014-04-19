@@ -27,8 +27,10 @@ public class EntityFactory {
 	 *
 	 * @return The new Block.
 	 */
-	public Block createBlock(final Account forger, final Hash prevBlockHash, final BlockHeight height) {
-		return new Block(forger, prevBlockHash, this.timeProvider.getCurrentTime(), height);
+	public Block createBlock(final Account forger, final Hash generationHash, final Hash prevBlockHash, final BlockHeight height) {
+		Block block = new Block(forger, prevBlockHash, this.timeProvider.getCurrentTime(), height);
+		block.setGenerationHash(generationHash);
+		return block;
 	}
 
 	/**

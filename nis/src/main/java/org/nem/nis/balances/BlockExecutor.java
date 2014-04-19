@@ -8,7 +8,7 @@ import org.nem.nis.dbmodel.Transfer;
 
 import java.util.Iterator;
 
-public class Balance {
+public class BlockExecutor {
 	public static void apply(final AccountAnalyzer accountLookup, final Block block) {
 		// assuming AccountAnalyzer used to create block is the same as
 		// the one passed in accountLookup
@@ -17,6 +17,7 @@ public class Balance {
 			transaction.execute();
 		}
 
+		block.getSigner().incrementForagedBlocks();
 		block.getSigner().incrementBalance(block.getTotalFee());
 	}
 
@@ -34,6 +35,7 @@ public class Balance {
 
 		final Address foragerAddress = Address.fromPublicKey(block.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
+		forager.incrementForagedBlocks();
 		forager.incrementBalance(Amount.fromMicroNem(block.getTotalFee()));
 	}
 
@@ -41,6 +43,7 @@ public class Balance {
 		final Address foragerAddress = Address.fromPublicKey(block.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
 		forager.decrementBalance(Amount.fromMicroNem(block.getTotalFee()));
+		forager.decrementForagedBlocks();
 
 		for (Transfer transfer : new Iterable<Transfer>() {
 			@Override
