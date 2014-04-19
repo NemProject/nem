@@ -3,18 +3,21 @@ package org.nem.nis;
 import com.sun.java_cup.internal.runtime.lr_parser;
 import org.nem.core.crypto.Hashes;
 import org.nem.core.model.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
-	
+	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
+
 	/**
 	 * The target time between two blocks in seconds.
 	 */
@@ -68,20 +71,19 @@ public class BlockScorer {
 	 * @return The block score.
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
-		int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
+		final Account account = currentBlock.getSigner();
+		final long personalScore = -account.getForagedBlocks().getRaw();
+		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty().getRaw());
 	}
 
-	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
-		int timeDiff = (currentBlock.getTimestamp() - parentBlock.getTimestamp());
-		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty());
+	public long calculateBlockScore(final AccountLookup accountAnalyzer, final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
+		final Account account = accountAnalyzer.findByAddress(Address.fromEncoded(currentBlock.getForger().getPrintableKey()));
+		final long personalScore = -account.getForagedBlocks().getRaw();
+		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty());
 	}
 
-	/**
-	 * @param timeDiff positive time difference between blocks
-	 */
-	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
-		return difficulty;
+	private long calculateBlockScoreImpl(long foragedBlocks, long difficulty) {
+		return difficulty + foragedBlocks;
 	}
 
 	/**

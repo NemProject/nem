@@ -51,37 +51,6 @@ public class BlockChainValidator {
 		return true;
 	}
 
-	/**
-	 * Computes partial score given blocks and parentBlock.
-	 * TODO: move this and add tests for it
-	 *
-	 * @param parentBlock The parent block.
-	 * @param blocks The block chain.
-	 *
-	 * @return "partial score" of blocks.
-	 */
-	long computePartialScore(Block parentBlock, final Collection<Block> blocks) {
-		long peersScore = 0L;
-
-		// used to distinguish first element, to calculate:
-		// 2*x_0 + x_1 + x_2 + ...
-		boolean isFirst = true;
-		for (final Block block : blocks) {
-			long score = scorer.calculateBlockScore(parentBlock, block);
-
-			peersScore += score;
-
-			if (isFirst) {
-				peersScore += score;
-				isFirst = false;
-			}
-
-			parentBlock = block;
-		}
-
-		return peersScore;
-	}
-
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
 		final BigInteger hit = this.scorer.calculateHit(block);
 		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);

@@ -126,10 +126,10 @@ public class ForagingTest {
 
 		// Act:
 		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(10));
+		transaction1.setFee(new Amount(5));
 		transaction1.sign();
 		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
+		transaction2.setFee(new Amount(10));
 		transaction2.sign();
 
 		boolean result1 = foraging.processTransaction(transaction1);
@@ -141,6 +141,7 @@ public class ForagingTest {
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		// higher fee goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
@@ -159,7 +160,7 @@ public class ForagingTest {
 		transaction1.setFee(new Amount(5));
 		transaction1.sign();
 		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
+		transaction2.setFee(new Amount(5));
 		transaction2.sign();
 
 		boolean result1 = foraging.processTransaction(transaction1);
@@ -171,6 +172,7 @@ public class ForagingTest {
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		// earlier transaction goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}

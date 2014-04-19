@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.balances.BlockExecutor;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -78,20 +79,22 @@ public class BlockChain implements BlockSynchronizer {
 
 	class PartialWeightedScoreReversedCalculator implements DbBlockVisitor {
 		private final BlockScorer blockScorer;
+		private AccountLookup contemporaryAccountAnalyzer;
 		private long lastScore;
 		private long partialScore;
 
-		public PartialWeightedScoreReversedCalculator(BlockScorer scorer) {
-			blockScorer = scorer;
-			lastScore = 0L;
-			partialScore = 0L;
+		public PartialWeightedScoreReversedCalculator(BlockScorer scorer, AccountLookup contemporaryAccountAnalyzer) {
+			this.blockScorer = scorer;
+			this.contemporaryAccountAnalyzer = contemporaryAccountAnalyzer;
+			this.lastScore = 0L;
+			this.partialScore = 0L;
 		}
 
 		// visit should be called at most 1440 times, every score fits in 32-bits
 		// so long will be enough to keep partial score
 		@Override
 		public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
-			lastScore = blockScorer.calculateBlockScore(parentBlock, dbBlock);
+			lastScore = blockScorer.calculateBlockScore(contemporaryAccountAnalyzer, parentBlock, dbBlock);
 			partialScore += lastScore;
 		}
 
@@ -202,15 +205,18 @@ public class BlockChain implements BlockSynchronizer {
 	 * which will be costly, so it's better to do it in one iteration
 	 */
 	private long undoTxesAndGetScore(long commonBlockHeight, final AccountAnalyzer contemporaryAccountAnalyzer) {
-		final PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer);
+		final PartialWeightedScoreReversedCalculator chainScore = new PartialWeightedScoreReversedCalculator(scorer, contemporaryAccountAnalyzer);
+
+		// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
+		// second visitor needs that information
 		reverseChainIterator(commonBlockHeight, new DbBlockVisitor[] {
-				chainScore,
 				new DbBlockVisitor() {
 					@Override
 					public void visit(org.nem.nis.dbmodel.Block parentBlock, org.nem.nis.dbmodel.Block dbBlock) {
 						BlockExecutor.unapply(contemporaryAccountAnalyzer, dbBlock);
 					}
-				}
+				},
+				chainScore
 		});
 
 		return chainScore.getScore();
@@ -253,16 +259,19 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return score or -1 if chain is invalid
 	 */
-	private long validatePeerChainAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
+	private boolean validatePeerChain(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
 		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
 
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
 		calculatePeerChainGenerations(parentBlock, peerChain);
-		if (!validator.isValid(parentBlock, peerChain)) {
-			return -1L;
-		}
-		return validator.computePartialScore(parentBlock, peerChain);
+		return validator.isValid(parentBlock, peerChain);
+	}
+
+	private long getPeerChainScore(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
+		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
+		final BlockChainScore blockChainScore = new BlockChainScore(this.scorer);
+		return blockChainScore.computePartialScore(parentBlock, peerChain);
 	}
 
 
@@ -313,7 +322,13 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		// do not trust peer, take first block from our db and convert it
-		long peerScore = validatePeerChainAndGetScore(contemporaryAccountAnalyzer, ourDbBlock, peerChain);
+		if (! validatePeerChain(contemporaryAccountAnalyzer, ourDbBlock, peerChain)) {
+			penalize(node);
+			return;
+		}
+
+		// warning: this changes number of foraged blocks
+		long peerScore = getPeerChainScore(contemporaryAccountAnalyzer, ourDbBlock, peerChain);
 		if (peerScore < 0L) {
 			penalize(node);
 			return;
@@ -388,7 +403,13 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(block);
 
-		long peerscore = validatePeerChainAndGetScore(contemporaryAccountAnalyzer, parent, peerChain);
+		if (! validatePeerChain(contemporaryAccountAnalyzer, parent, peerChain)) {
+			// penalty?
+			return false;
+		}
+
+		// warning: this changes number of foraged blocks
+		long peerscore = getPeerChainScore(contemporaryAccountAnalyzer, parent, peerChain);
 		if (peerscore < 0) {
 			// penalty?
 			return false;
