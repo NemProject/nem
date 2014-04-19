@@ -193,7 +193,7 @@ public class ForagingTest {
 
 		// Act:
 		foraging.setAccountAnalyzer(mockAccountAnalyzer);
-		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account, 0);
+		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account, BlockDifficulty.INITIAL_DIFFICULTY);
 
 		// Assert:
 		Assert.assertThat(accountWithoutSecret.getKeyPair().getPrivateKey(), IsNull.nullValue());

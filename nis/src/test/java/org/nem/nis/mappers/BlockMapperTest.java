@@ -96,7 +96,7 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(0L));
+		Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(0)));
 	}
 
 	private class TestContext {
@@ -119,7 +119,7 @@ public class BlockMapperTest {
 					new TimeInstant(721),
 					new BlockHeight(17));
 
-			this.model.setDifficulty(53);
+			this.model.setDifficulty(new BlockDifficulty(77_777_777_777L));
 			this.signModel();
 
 			this.dbForager = new org.nem.nis.dbmodel.Account();
@@ -198,7 +198,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
 			Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
-			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(53L));
+			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(77_777_777_777L));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));

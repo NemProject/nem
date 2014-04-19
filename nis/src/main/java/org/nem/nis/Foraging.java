@@ -161,7 +161,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final long difficulty = this.calculateDifficulty(scorer, lastBlock);
+				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
 
@@ -198,18 +198,23 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 	}
 
-	private long calculateDifficulty(BlockScorer scorer, Block lastBlock) {
+	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 		final List<Integer> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 		final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 		return scorer.calculateDifficulty(difficulties, timestamps);
 	}
 
-	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger, long difficulty) {
+	public Block createSignedBlock(
+			final TimeInstant blockTime,
+			final Collection<Transaction> transactionList,
+			final Block lastBlock,
+			final Account virtualForger,
+			final BlockDifficulty difficulty) {
 		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
 
 		// Probably better to include difficulty in the block constructor?
-		Block newBlock = new Block(forger, lastBlock, blockTime);
+		final Block newBlock = new Block(forger, lastBlock, blockTime);
 		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
 			newBlock.addTransactions(transactionList);

@@ -61,6 +61,23 @@ public class BlockTest {
 
 	//endregion
 
+	//region Setters
+
+	@Test
+	public void blockDifficultyCanBeSet() {
+		// Arrange:
+		final Block block = createBlock(Utils.generateRandomAccount());
+		final BlockDifficulty blockDifficulty = new BlockDifficulty(44_444_444_444L);
+
+		// Act:
+		block.setDifficulty(blockDifficulty);
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
+	}
+
+	//endregion
+
 	//region Serialization
 
 	@Test
@@ -97,7 +114,7 @@ public class BlockTest {
 		final Block block = createBlockForRoundTripTests(true, null);
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsNot.not(IsEqual.equalTo(123L)));
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 	}
 
 	@Test
@@ -107,10 +124,10 @@ public class BlockTest {
 
 		// Act
 		boolean result = block.verify();
-		block.setDifficulty(678L);
+		block.setDifficulty(new BlockDifficulty(55_444_333_222_111L));
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(678L));
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(55_444_333_222_111L)));
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
@@ -159,7 +176,7 @@ public class BlockTest {
 
 		final TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
 		originalBlock.addTransaction(transaction2);
-		originalBlock.setDifficulty(123L);
+		originalBlock.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		originalBlock.sign();
 
 		// Arrange:

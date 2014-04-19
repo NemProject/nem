@@ -2,7 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockScorer;
 
 import java.util.*;
 
@@ -24,7 +23,7 @@ public class Block extends VerifiableEntity {
 	private final List<Transaction> transactions;
 
 	// this is helper field and (probably) shouldn't be serialized
-	private long difficulty;
+	private BlockDifficulty difficulty;
 
 	/**
 	 * Creates a new block.
@@ -40,8 +39,7 @@ public class Block extends VerifiableEntity {
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
 
-		this.difficulty = BlockScorer.INITIAL_DIFFICULTY;
-;
+		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
 	}
 
 	/**
@@ -69,6 +67,8 @@ public class Block extends VerifiableEntity {
 		this.totalFee = Amount.readFrom(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
+
+		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
 	}
 
 	//region Getters
@@ -92,14 +92,6 @@ public class Block extends VerifiableEntity {
 	}
 
 	/**
-	 * Sets total amount of fees in this block.
-	 * This is for testing purposes only
-	 */
-	public void setTotalFee(Amount fee) {
-		this.totalFee = fee;
-	}
-
-	/**
 	 * Gets the hash of the previous block.
 	 *
 	 * @return The hash of the previous block.
@@ -107,7 +99,6 @@ public class Block extends VerifiableEntity {
 	public Hash getPreviousBlockHash() {
 		return this.prevBlockHash;
 	}
-
 
 	/**
 	 * Gets the transactions associated with this block.
@@ -123,11 +114,13 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return Difficulty of this block.
 	 */
-	public long getDifficulty() { return this.difficulty; }
+	public BlockDifficulty getDifficulty() {
+		return this.difficulty;
+	}
 
 	//endregion
 
-	public void setDifficulty(long difficulty) {
+	public void setDifficulty(final BlockDifficulty difficulty) {
 		this.difficulty = difficulty;
 	}
 

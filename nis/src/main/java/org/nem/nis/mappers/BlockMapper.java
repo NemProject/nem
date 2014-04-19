@@ -38,7 +38,7 @@ public class BlockMapper {
 				block.getHeight().getRaw(),
 				0L,
 				block.getTotalFee().getNumMicroNem(),
-				block.getDifficulty());
+				block.getDifficulty().getRaw());
 
 		int i = 0;
 		final List<Transfer> transactions = new ArrayList<>(block.getTransactions().size());
@@ -71,7 +71,7 @@ public class BlockMapper {
 				new BlockHeight(dbBlock.getHeight()));
 
 		final Long difficulty = dbBlock.getDifficulty();
-		block.setDifficulty(null == difficulty ? 0L : difficulty);
+		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

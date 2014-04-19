@@ -223,11 +223,11 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Long> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 
 		for (Block block : peerChain) {
-			long difficulty = this.scorer.calculateDifficulty(difficulties, timestamps);
+			final BlockDifficulty difficulty = this.scorer.calculateDifficulty(difficulties, timestamps);
 			block.setDifficulty(difficulty);
 
 			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-			difficulties.add(difficulty);
+			difficulties.add(difficulty.getRaw()); // TODO: should this list be BlockDifficulty ?
 			timestamps.add(block.getTimeStamp().getRawTime());
 			if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
 				difficulties.remove(0);

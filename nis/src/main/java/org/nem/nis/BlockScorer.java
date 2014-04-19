@@ -6,30 +6,12 @@ import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
-	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
-
-	/**
-	 * 1_000_000_000 NEMs have force to generate block every minute.
-	 */
-	public static final long INITIAL_DIFFICULTY = 120_000_000_000L;
-	
-	/**
-	 * Minimum value for difficulty.
-	 */
-	private static final long MIN_DIFFICULTY = INITIAL_DIFFICULTY / 10L;
-	
-	/**
-	 * Maximum value for difficulty.
-	 */
-	private static final long MAX_DIFFICULTY = INITIAL_DIFFICULTY * 10L;
 	
 	/**
 	 * The target time between two blocks in seconds.
@@ -73,7 +55,7 @@ public class BlockScorer {
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)
-						 .divide(BigInteger.valueOf(block.getDifficulty()));
+						 .divide(BigInteger.valueOf(block.getDifficulty().getRaw()));
 	}
 
 	/**
@@ -86,7 +68,7 @@ public class BlockScorer {
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty());
+		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
 	}
 
 	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
@@ -109,32 +91,26 @@ public class BlockScorer {
 	 *
 	 * @return The difficulty for the next block.
 	 */
-	public long calculateDifficulty(final List<Long> difficulties, final List<Integer> timestamps) {
+	public BlockDifficulty calculateDifficulty(final List<Long> difficulties, final List<Integer> timestamps) {
 		if (difficulties.size() < 2) {
-			return INITIAL_DIFFICULTY;
+			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
-		else {
-			Integer newestTimestamp = timestamps.get(timestamps.size() - 1);
-			Integer oldestTimestamp = timestamps.get(0);
-			long timeDiff = newestTimestamp.longValue() - oldestTimestamp.longValue();
-			final long heightDiff = difficulties.size();
-			long averageDifficulty = 0;
-			for (Long diff : difficulties) {
-				averageDifficulty += diff;
-			}
-			averageDifficulty /= heightDiff;
-			
-			long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
-																   .multiply(BigInteger.valueOf(heightDiff))
-																   .divide(BigInteger.valueOf(timeDiff))
-																   .longValue();
-            if (difficulty < MIN_DIFFICULTY) {
-            	difficulty = MIN_DIFFICULTY;
-            }
-            if (difficulty > MAX_DIFFICULTY) {
-            	difficulty = MAX_DIFFICULTY;
-            }
-            return difficulty;
+
+		Integer newestTimestamp = timestamps.get(timestamps.size() - 1);
+		Integer oldestTimestamp = timestamps.get(0);
+		long timeDiff = newestTimestamp.longValue() - oldestTimestamp.longValue();
+		final long heightDiff = difficulties.size();
+		long averageDifficulty = 0;
+		for (Long diff : difficulties) {
+			averageDifficulty += diff;
 		}
+		averageDifficulty /= heightDiff;
+
+		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+															   .multiply(BigInteger.valueOf(heightDiff))
+															   .divide(BigInteger.valueOf(timeDiff))
+															   .longValue();
+
+		return new BlockDifficulty(difficulty);
 	}
 }
