@@ -27,7 +27,7 @@ public class BlockAmountTest {
 	}
 
 	@Test
-	public void cannotBeCreatedAroundZeroAmount() {
+	public void canBeCreatedAroundZeroAmount() {
 		// Act:
 		final BlockAmount amount = new BlockAmount(0);
 
@@ -47,16 +47,18 @@ public class BlockAmountTest {
 	//endregion
 
 	//region inc/dec
+
 	@Test
 	public void incrementChangesAmountByOne() {
 		// Arrange:
 		final BlockAmount amount = new BlockAmount(0x1233L);
 
 		// Act:
-		BlockAmount result = amount.increment();
+		final BlockAmount result = amount.increment();
 
 		// Assert:
-		Assert.assertThat(result.getRaw(), IsEqual.equalTo(0x1234L));
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
 	}
 
 	@Test
@@ -65,10 +67,11 @@ public class BlockAmountTest {
 		final BlockAmount amount = new BlockAmount(0x1235L);
 
 		// Act:
-		BlockAmount result = amount.decrement();
+		final BlockAmount result = amount.decrement();
 
 		// Assert:
-		Assert.assertThat(result.getRaw(), IsEqual.equalTo(0x1234L));
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -78,38 +81,6 @@ public class BlockAmountTest {
 
 		// Act:
 		amount.decrement();
-	}
-	//endregion
-
-	//region serialization
-
-	@Test
-	public void amountCanBeSerialized() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final BlockAmount amount = new BlockAmount(142);
-
-		// Act:
-		amount.serialize(serializer);
-		final JSONObject jsonObject = serializer.getObject();
-
-		// Assert:
-		Assert.assertThat((Long)jsonObject.get("amount"), IsEqual.equalTo(142L));
-	}
-
-	@Test
-	public void responseCanBeRoundTripped() {
-		// Act:
-		final BlockAmount amount = createRoundTrippedAmount(new BlockAmount(142));
-
-		// Assert:
-		Assert.assertThat(amount.getRaw(), IsEqual.equalTo(142L));
-	}
-
-	private static BlockAmount createRoundTrippedAmount(final BlockAmount originalAmount) {
-		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalAmount, null);
-		return new BlockAmount(deserializer);
 	}
 
 	//endregion

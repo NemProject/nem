@@ -1,18 +1,16 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 /**
- * Represents number of blocks foraged by an account.
+ * Represents a non-negative amount of blocks.
  */
-public class BlockAmount extends AbstractPrimitive<BlockAmount> implements SerializableEntity {
+public class BlockAmount extends AbstractPrimitive<BlockAmount> {
+
 	/**
 	 * Value representing initial height.
 	 */
 	public static final BlockAmount ZERO = new BlockAmount(0);
-
 
 	/**
 	 * Creates a block amount.
@@ -23,16 +21,7 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount> implements Seria
 		super(amount, BlockAmount.class);
 
 		if (this.getRaw() < 0)
-			throw new IllegalArgumentException("height must be positive");
-	}
-
-	/**
-	 * Deserializes a block amount.
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public BlockAmount(final Deserializer deserializer) {
-		this(deserializer.readLong("amount"));
+			throw new IllegalArgumentException("amount must be non-negative");
 	}
 
 	/**
@@ -50,9 +39,6 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount> implements Seria
 	 * @return The new amount.
 	 */
 	public BlockAmount decrement() {
-		if (getValue() == 0) {
-			throw new IllegalArgumentException("decrement would make amount negative");
-		}
 		return new BlockAmount(getValue() - 1);
 	}
 
@@ -62,11 +48,6 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount> implements Seria
 	 * @return The underlying amount.
 	 */
 	public long getRaw() { return this.getValue(); }
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeLong("amount", this.getRaw());
-	}
 
 	/**
 	 * Writes a block amount object.
