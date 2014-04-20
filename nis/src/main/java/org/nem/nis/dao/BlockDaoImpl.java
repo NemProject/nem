@@ -89,7 +89,7 @@ public class BlockDaoImpl implements BlockDao {
     @Transactional
     public HashChain getHashesFrom(final BlockHeight height, int limit) {
 		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit);
-        return new HashChain(blockList);
+        return HashChain.fromRawHashes(blockList);
     }
 
 	@Override

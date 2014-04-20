@@ -17,7 +17,7 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @param initialCapacity The initial capacity.
 	 */
 	public SerializableList(int initialCapacity) {
-		this.list = new ArrayList<>();
+		this.list = new ArrayList<>(initialCapacity);
 	}
 
 	/**
@@ -76,6 +76,10 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @return The index of the first difference.
 	 */
 	public int findFirstDifference(final SerializableList<T> rhs) {
+		return findFirstDifferenceInternal(rhs);
+	}
+
+	private int findFirstDifferenceInternal(final SerializableList<?> rhs) {
 		final int limit = Math.min(this.size(), rhs.size());
 
 		for (int i = 0; i < limit; ++i) {
@@ -87,13 +91,17 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 		return limit;
 	}
 
-	/**
-	 * Determines if this list is equal to another list.
-	 *
-	 * @param rhs The other list.
-	 * @return true if the lists are equal; false otherwise.
-	 */
-	public boolean equals(final SerializableList<T> rhs) {
-		return this.size() == rhs.size() && this.size() == this.findFirstDifference(rhs);
+	@Override
+	public int hashCode() {
+		return this.list.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof SerializableList<?>))
+			return false;
+
+		final SerializableList<?> rhs = (SerializableList<?>)obj;
+		return this.size() == rhs.size() && this.size() == this.findFirstDifferenceInternal(rhs);
 	}
 }

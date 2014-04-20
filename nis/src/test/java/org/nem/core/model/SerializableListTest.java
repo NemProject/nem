@@ -1,15 +1,14 @@
 package org.nem.core.model;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
+import net.minidev.json.*;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.MockSerializableEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SerializableListTest {
@@ -217,14 +216,69 @@ public class SerializableListTest {
 
 	//endregion
 
+	//region hashCode / equals
+
+	@Test
+	public void hashCodeIsConsistentForUnchangedList() {
+		// Arrange:
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(10);
+		final int hashCode = list.hashCode();
+
+		// Assert:
+		Assert.assertThat(list.hashCode(), IsEqual.equalTo(hashCode));
+	}
+
+	@Test
+	public void hashCodeChangesWhenListChanges() {
+		// Arrange:
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(10);
+		final int hashCode = list.hashCode();
+
+		// Act:
+		list.add(new MockSerializableEntity());
+
+		// Assert:
+		Assert.assertThat(list.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final List<MockSerializableEntity> entities1 = Arrays.asList(
+				new MockSerializableEntity(5, "foo", 6),
+				new MockSerializableEntity(8, "bar", 7));
+		final List<MockSerializableEntity> entities2 = Arrays.asList(
+				new MockSerializableEntity(5, "foo", 6),
+				new MockSerializableEntity(8, "bar", 8));
+
+		final SerializableList<MockSerializableEntity> list1 = new SerializableList<>(entities1);
+		final SerializableList<MockSerializableEntity> list2 = new SerializableList<>(entities1);
+		final SerializableList<MockSerializableEntity> list3 = new SerializableList<>(entities2);
+
+		// Assert:
+		Assert.assertThat(list2, IsEqual.equalTo(list1));
+		Assert.assertThat(list3, IsNot.not(IsEqual.equalTo(list1)));
+		Assert.assertThat(entities1, IsNot.not((Object)IsEqual.equalTo(list1)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(list1)));
+	}
+
+	//endregion
+
 	private static void assertListComparison(
 			final SerializableList<MockSerializableEntity> list1,
 			final SerializableList<MockSerializableEntity> list2,
 			final int expectedDifferenceIndex,
 			final boolean expectedEquals) {
 		// Assert:
-		Assert.assertThat(list1.equals(list2), IsEqual.equalTo(expectedEquals));
-		Assert.assertThat(list2.equals(list1), IsEqual.equalTo(expectedEquals));
+		if (expectedEquals) {
+			Assert.assertThat(list1, IsEqual.equalTo(list2));
+			Assert.assertThat(list2, IsEqual.equalTo(list1));
+		}
+		else {
+			Assert.assertThat(list1, IsNot.not(IsEqual.equalTo(list2)));
+			Assert.assertThat(list2, IsNot.not(IsEqual.equalTo(list1)));
+		}
+
 		Assert.assertThat(list1.findFirstDifference(list2), IsEqual.equalTo(expectedDifferenceIndex));
 		Assert.assertThat(list2.findFirstDifference(list1), IsEqual.equalTo(expectedDifferenceIndex));
 	}

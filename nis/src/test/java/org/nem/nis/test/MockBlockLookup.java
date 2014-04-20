@@ -36,7 +36,7 @@ public class MockBlockLookup implements BlockLookup {
 
 		this.chain = new HashChain(numHashesToReturn);
 		for (int i = 0; i < numHashesToReturn; ++i)
-			this.chain.add(Utils.generateRandomBytes(64));
+			this.chain.add(Utils.generateRandomHash());
 	}
 
 	/**

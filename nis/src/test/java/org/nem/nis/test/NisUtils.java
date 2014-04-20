@@ -55,15 +55,15 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a raw hashes list.
+	 * Creates a hashes list.
 	 *
 	 * @param numHashes The number of hashes desired.
-	 * @return A raw hashes list.
+	 * @return A hashes list.
 	 */
-	public static List<byte[]> createRawHashesList(final int numHashes) {
-		final List<byte[]> hashes = new ArrayList<>();
+	public static List<Hash> createHashesList(final int numHashes) {
+		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < numHashes; ++i)
-			hashes.add(Utils.generateRandomBytes(64));
+			hashes.add(Utils.generateRandomHash());
 
 		return hashes;
 	}

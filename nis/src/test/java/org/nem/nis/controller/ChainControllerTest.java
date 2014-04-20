@@ -33,7 +33,7 @@ public class ChainControllerTest {
 	@Test
 	public void hashesFromReturnsHashesFromHeight() {
 		// Arrange:
-		final HashChain originalHashes = new HashChain(NisUtils.createRawHashesList(3));
+		final HashChain originalHashes = new HashChain(NisUtils.createHashesList(3));
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final MockBlockDao blockDao = new MockBlockDao(null, originalHashes);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
@@ -44,7 +44,7 @@ public class ChainControllerTest {
 		final HashChain chain = controller.hashesFrom(new BlockHeight(44));
 
 		// Assert:
-		Assert.assertThat(chain.findFirstDifferent(originalHashes), IsEqual.equalTo(3));
+		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(new BlockHeight(44)));
 		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(BlockChain.BLOCKS_LIMIT));

@@ -298,14 +298,14 @@ public class BlockChainComparerTest {
 	private static HashChain createHashChain(byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
 		for (final byte[] hash : hashes)
-			chain.add(hash);
+			chain.add(new Hash(hash));
 
 		return chain;
 	}
 
 	private static HashChain createHashChain(byte[][] hashes, byte[] additionalHash) {
 		final HashChain chain = createHashChain(hashes);
-		chain.add(additionalHash);
+		chain.add(new Hash(additionalHash));
 		return chain;
 	}
 

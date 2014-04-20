@@ -94,7 +94,7 @@ public class RequiredBlockDaoAdapterTest {
 	@Test
 	public void getHashesFromDelegatesToBlockDao() {
 		// Arrange:
-		final HashChain originalHashes = new HashChain(NisUtils.createRawHashesList(3));
+		final HashChain originalHashes = new HashChain(NisUtils.createHashesList(3));
 		final MockBlockDao blockDao = new MockBlockDao(new Block(), originalHashes);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
@@ -102,7 +102,7 @@ public class RequiredBlockDaoAdapterTest {
 		final HashChain hashes = requiredBlockDao.getHashesFrom(new BlockHeight(11), 14);
 
 		// Assert:
-		Assert.assertThat(hashes.findFirstDifferent(originalHashes), IsEqual.equalTo(3));
+		Assert.assertThat(hashes, IsEqual.equalTo(originalHashes));
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(14));
