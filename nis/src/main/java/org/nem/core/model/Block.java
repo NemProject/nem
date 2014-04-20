@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -171,6 +172,39 @@ public class Block extends VerifiableEntity {
 	public void addTransactions(final Collection<Transaction> transactions) {
 		for (final Transaction transaction : transactions)
 			this.addTransaction(transaction);
+	}
+
+	/**
+	 * Executes all transactions in the block.
+	 */
+	public void execute() {
+		for (final Transaction transaction : this.transactions) {
+			transaction.execute();
+		}
+
+		this.getSigner().incrementForagedBlocks();
+		this.getSigner().incrementBalance(this.getTotalFee());
+	}
+
+	/**
+	 * Undoes all transactions in the block.
+	 */
+	public void undo() {
+		this.getSigner().decrementForagedBlocks();
+		this.getSigner().decrementBalance(this.getTotalFee());
+
+		for (final Transaction transaction : this.getReverseTransactions()) {
+			transaction.undo();
+		}
+	}
+
+	private Iterable<Transaction> getReverseTransactions() {
+		return new Iterable<Transaction>() {
+			@Override
+			public Iterator<Transaction> iterator() {
+				return new ReverseListIterator<>(transactions);
+			}
+		};
 	}
 
 	@Override

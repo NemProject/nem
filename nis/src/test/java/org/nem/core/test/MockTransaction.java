@@ -4,6 +4,9 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A mock Transaction implementation.
  */
@@ -15,6 +18,9 @@ public class MockTransaction extends Transaction {
 
 	private int customField;
 	private long minimumFee;
+
+	private List<Integer> executeList = new ArrayList<>();
+	private List<Integer> undoList = new ArrayList<>();
 
 	/**
 	 * Creates a mock transaction.
@@ -97,6 +103,24 @@ public class MockTransaction extends Transaction {
 		this.minimumFee = minimumFee;
 	}
 
+	/**
+	 * Sets a list that this transaction should add its custom field to when execute is called.
+	 *
+	 * @param list The list.
+	 */
+	public void setExecuteList(final List<Integer> list) {
+		this.executeList = list;
+	}
+
+	/**
+	 * Sets a list that this transaction should add its custom field to when undo is called.
+	 *
+	 * @param list The list.
+	 */
+	public void setUndoList(final List<Integer> list) {
+		this.undoList = list;
+	}
+
 	@Override
 	public boolean isValid() {
 		return super.isValid();
@@ -115,9 +139,11 @@ public class MockTransaction extends Transaction {
 
 	@Override
 	public void execute() {
+		this.executeList.add(this.customField);
 	}
 
 	@Override
 	public void undo() {
+		this.undoList.add(this.customField);
 	}
 }
