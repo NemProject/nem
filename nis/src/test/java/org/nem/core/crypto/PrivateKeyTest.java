@@ -114,7 +114,7 @@ public class PrivateKeyTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PrivateKey key = new PrivateKey(new BigInteger("2275"));
 		int hashCode = key.hashCode();

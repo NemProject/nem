@@ -110,7 +110,7 @@ public class NodeEndpointTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
 		int hashCode = endpoint.hashCode();

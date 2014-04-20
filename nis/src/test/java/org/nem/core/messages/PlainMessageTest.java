@@ -52,7 +52,7 @@ public class PlainMessageTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PlainMessage message = new PlainMessage(new byte[] { 12, 77, 56 });
 		int hashCode = message.hashCode();

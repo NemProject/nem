@@ -100,7 +100,7 @@ public class PublicKeyTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PublicKey key = new PublicKey(TEST_BYTES);
 		int hashCode = key.hashCode();

@@ -283,7 +283,7 @@ public class AccountTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		KeyPair kp = new KeyPair();
 		Account account = new Account(kp);

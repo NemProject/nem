@@ -145,7 +145,7 @@ public class SignatureTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		Signature signature = createSignature(1235, 7789);
 		int hashCode = signature.hashCode();

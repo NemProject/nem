@@ -67,7 +67,7 @@ public class HashTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final Hash hash = new Hash(TEST_BYTES);
 		int hashCode = hash.hashCode();

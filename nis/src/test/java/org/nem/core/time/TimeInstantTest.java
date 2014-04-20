@@ -166,7 +166,7 @@ public class TimeInstantTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final TimeInstant instant = new TimeInstant(7);
 		final int hashCode = instant.hashCode();

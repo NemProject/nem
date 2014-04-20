@@ -158,7 +158,7 @@ public class AddressTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
 		final Address address = Address.fromPublicKey(publicKey);

@@ -101,7 +101,7 @@ public class NodeTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
 		int hashCode = node.hashCode();

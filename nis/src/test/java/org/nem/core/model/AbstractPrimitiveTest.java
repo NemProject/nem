@@ -61,7 +61,7 @@ public class AbstractPrimitiveTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final FooPrimitive foo = new FooPrimitive(7);
 		final int hashCode = foo.hashCode();
