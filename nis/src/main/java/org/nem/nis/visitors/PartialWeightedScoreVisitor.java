@@ -1,38 +1,64 @@
 package org.nem.nis.visitors;
 
+import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.visitors.DbBlockVisitor;
 
 /**
- * DB block visitor that visits all blocks in reverse order and calculates
- * a chain score.
+ * Block visitor that visits all blocks in a chain and calculates
+ * a partial chain score.
+ *
+ * The first block is weighted twice as much as all other blocks:
+ * 2*x_0 + x_1 + x_2 + ...
  */
-class PartialWeightedScoreVisitor implements DbBlockVisitor {
+public class PartialWeightedScoreVisitor implements BlockVisitor {
+
+	/**
+	 * The order of blocks passed to the visitor.
+	 */
+	public enum BlockOrder {
+		/**
+		 * The blocks are passed in forward order.
+		 */
+		Forward,
+
+		/**
+		 * The blocks are passed in reverse order.
+		 */
+		Reverse
+	}
+
 	private final BlockScorer blockScorer;
+	private final BlockOrder order;
 	private AccountLookup accountLookup;
 	private long lastScore;
+
+	// visit should be called at most 1440 times, every score fits in 32-bits
+	// so long will be enough to keep partial score
 	private long partialScore;
+
+	private int numVisitedBlocks;
 
 	/**
 	 * Creates a new visitor.
 	 *
 	 * @param scorer The scorer.
-	 * @param accountLookup The account lookup.
+	 * @param order The order of visited blocks.
 	 */
-	public PartialWeightedScoreVisitor(final BlockScorer scorer, boolean areBlocksVisitedInOrder) {
+	public PartialWeightedScoreVisitor(final BlockScorer scorer, BlockOrder order) {
 		this.blockScorer = scorer;
-		this.accountLookup = accountLookup;
-		this.lastScore = 0L;
-		this.partialScore = 0L;
+		this.order = order;
 	}
 
 	@Override
-	public void visit(final Block dbParentBlock, final Block dbBlock) {
-		// visit should be called at most 1440 times, every score fits in 32-bits
-		// so long will be enough to keep partial score
-//		this.lastScore = this.blockScorer.calculateBlockScore(dbParentBlock, dbBlock);
+	public void visit(final Block block) {
+
+		this.lastScore = this.blockScorer.calculateBlockScore(block);
+
+		if (0 == numVisitedBlocks++ && BlockOrder.Forward == this.order) {
+			this.partialScore += this.lastScore;
+		}
+
 		this.partialScore += this.lastScore;
 	}
 
@@ -42,7 +68,8 @@ class PartialWeightedScoreVisitor implements DbBlockVisitor {
 	 * @return The cumulative score.
 	 */
 	public long getScore() {
-		// equal to 2*x_0 + x_1 + x_2 + ...
-		return this.partialScore + this.lastScore;
+
+		final long adjustment = BlockOrder.Reverse == this.order ? this.lastScore : 0;
+		return this.partialScore + adjustment;
 	}
 }

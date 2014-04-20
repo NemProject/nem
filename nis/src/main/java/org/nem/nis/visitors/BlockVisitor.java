@@ -1,17 +1,16 @@
 package org.nem.nis.visitors;
 
-import org.nem.nis.dbmodel.Block;
+import org.nem.core.model.Block;
 
 /**
- * Visitor that visits a block and its parent.
+ * Visitor that visits blocks.
  */
-interface DbBlockVisitor {
+public interface BlockVisitor {
 
 	/**
-	 * Visits a block and its parent.
+	 * Visits a block.
 	 *
-	 * @param dbParentBlock The parent block.
-	 * @param dbBlock The block.
+	 * @param block The block.
 	 */
-	public void visit(final Block dbParentBlock, final Block dbBlock);
+	public void visit(final Block block);
 }

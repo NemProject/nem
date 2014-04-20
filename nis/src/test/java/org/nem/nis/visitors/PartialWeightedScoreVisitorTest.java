@@ -2,59 +2,81 @@ package org.nem.nis.visitors;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.BlockScorer;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.visitors.PartialWeightedScoreVisitor;
+import org.nem.core.model.*;
+import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.MockBlockScorer;
 
 public class PartialWeightedScoreVisitorTest {
 
 	@Test
-	public void scoreIsInitiallyZero() {
+	public void scoresAreCalculatedCorrectlyForForwardChains() {
 		// Arrange:
-		final PartialWeightedScoreVisitor visitor = createVisitor();
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(
+				scorer,
+				PartialWeightedScoreVisitor.BlockOrder.Forward);
 
 		// Assert:
 		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(0L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 1);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(2L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 4);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(6L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 14);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(20L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 7);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(27L));
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(27L));
 	}
 
 	@Test
-	public void scoresAreCalculatedCorrectlyForChains() {
-		// Assert:
-		Assert.assertThat(calculatePartialScore(new long[] { 1, 4, 14, 2 }), IsEqual.equalTo(23L));
-		Assert.assertThat(calculatePartialScore(new long[] { 90, 11, 50 }), IsEqual.equalTo(201L));
-	}
-
-	private static PartialWeightedScoreVisitor createVisitor() {
+	public void scoresAreCalculatedCorrectlyForReverseChains() {
 		// Arrange:
-		return new PartialWeightedScoreVisitor(null, false);
-	}
-
-	private static long calculatePartialScore(final long[] scores) {
-		// Arrange:
+		final MockBlockScorer scorer = new MockBlockScorer();
 		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(
-				new MockBlockScorer(scores), false);
-		for (long ignored : scores)
-			visitor.visit(new Block(), new Block());
+				scorer,
+				PartialWeightedScoreVisitor.BlockOrder.Reverse);
 
-		return visitor.getScore();
+		// Assert:
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(0L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 1);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(2L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 4);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(9L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 14);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(33L));
+
+		// Act / Assert:
+		visitBlockWithScore(visitor, scorer, 6);
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(31L));
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(31L));
 	}
 
-	private static class MockBlockScorer extends BlockScorer {
+	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {
+		// Arrange:
+		final Block block = new Block(
+				Utils.generateRandomAccount(),
+				new Hash(Utils.generateRandomBytes()),
+				TimeInstant.ZERO,
+				BlockHeight.ONE);
+		scorer.setBlockScore(block, score);
 
-		final long[] scores;
-		int scoreIndex;
-
-		public MockBlockScorer(final long[] scores) {
-			this.scores = scores;
-		}
-
-//		@Override
-		public long calculateBlockScore(
-				final AccountLookup accountLookup,
-				final Block dbParentBlock,
-				final Block dbBlock) {
-			return this.scores[this.scoreIndex++];
-		}
+		// Act:
+		visitor.visit(block);
 	}
 }
