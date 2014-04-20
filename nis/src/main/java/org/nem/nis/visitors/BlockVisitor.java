@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.visitors;
 
 import org.nem.nis.dbmodel.Block;
 

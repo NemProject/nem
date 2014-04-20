@@ -1,10 +1,11 @@
-package org.nem.nis;
+package org.nem.nis.visitors;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.nis.BlockScorer;
 import org.nem.nis.dbmodel.Block;
+import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 
 public class PartialWeightedScoreVisitorTest {
 
@@ -26,14 +27,13 @@ public class PartialWeightedScoreVisitorTest {
 
 	private static PartialWeightedScoreVisitor createVisitor() {
 		// Arrange:
-		return new PartialWeightedScoreVisitor(null, null);
+		return new PartialWeightedScoreVisitor(null, false);
 	}
 
 	private static long calculatePartialScore(final long[] scores) {
 		// Arrange:
 		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(
-				new MockBlockScorer(scores),
-				new MockAccountLookup());
+				new MockBlockScorer(scores), false);
 		for (long ignored : scores)
 			visitor.visit(new Block(), new Block());
 
@@ -49,7 +49,7 @@ public class PartialWeightedScoreVisitorTest {
 			this.scores = scores;
 		}
 
-		@Override
+//		@Override
 		public long calculateBlockScore(
 				final AccountLookup accountLookup,
 				final Block dbParentBlock,

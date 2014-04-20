@@ -1,7 +1,9 @@
-package org.nem.nis;
+package org.nem.nis.visitors;
 
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.BlockScorer;
 import org.nem.nis.dbmodel.Block;
+import org.nem.nis.visitors.DbBlockVisitor;
 
 /**
  * DB block visitor that visits all blocks in reverse order and calculates
@@ -19,7 +21,7 @@ class PartialWeightedScoreVisitor implements DbBlockVisitor {
 	 * @param scorer The scorer.
 	 * @param accountLookup The account lookup.
 	 */
-	public PartialWeightedScoreVisitor(final BlockScorer scorer, final AccountLookup accountLookup) {
+	public PartialWeightedScoreVisitor(final BlockScorer scorer, boolean areBlocksVisitedInOrder) {
 		this.blockScorer = scorer;
 		this.accountLookup = accountLookup;
 		this.lastScore = 0L;
@@ -30,7 +32,7 @@ class PartialWeightedScoreVisitor implements DbBlockVisitor {
 	public void visit(final Block dbParentBlock, final Block dbBlock) {
 		// visit should be called at most 1440 times, every score fits in 32-bits
 		// so long will be enough to keep partial score
-		this.lastScore = this.blockScorer.calculateBlockScore(this.accountLookup, dbParentBlock, dbBlock);
+//		this.lastScore = this.blockScorer.calculateBlockScore(dbParentBlock, dbBlock);
 		this.partialScore += this.lastScore;
 	}
 
