@@ -38,7 +38,7 @@ public class NisUtils {
 	public static Block createRandomBlock() {
 		return new Block(
 				Utils.generateRandomAccount(),
-				new Hash(Utils.generateRandomBytes()),
+				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
 				BlockHeight.ONE);
 	}
@@ -49,7 +49,7 @@ public class NisUtils {
 	public static Block createRandomBlock(long height) {
 		return new Block(
 				Utils.generateRandomAccount(),
-				new Hash(Utils.generateRandomBytes()),
+				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
 				new BlockHeight(height));
 	}

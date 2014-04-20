@@ -41,7 +41,7 @@ public class RequiredBlockDaoAdapterTest {
 	public void findByHashDelegatesToBlockDao() {
 		// Arrange:
 		final Block originalBlock = new Block();
-		final Hash hash = new Hash(Utils.generateRandomBytes(64));
+		final Hash hash = Utils.generateRandomHash();
 		final MockBlockDao blockDao = new MockBlockDao(originalBlock);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 
@@ -57,7 +57,7 @@ public class RequiredBlockDaoAdapterTest {
 	@Test(expected = MissingResourceException.class)
 	public void findByHashThrowsExceptionIfBlockCannotBeFound() {
 		// Arrange:
-		final Hash hash = new Hash(Utils.generateRandomBytes(64));
+		final Hash hash = Utils.generateRandomHash();
 		final MockBlockDao blockDao = new MockBlockDao(null);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 

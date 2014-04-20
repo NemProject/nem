@@ -28,6 +28,16 @@ public class Utils {
 	}
 
 	/**
+	 * Generates a random hash.
+	 *
+	 * @return A random hash.
+	 */
+	public static Hash generateRandomHash() {
+		final byte[] bytes = Utils.generateRandomBytes(64);
+		return new Hash(bytes);
+	}
+
+	/**
 	 * Generates a byte array containing random data.
 	 *
 	 * @return A byte array containing random data.

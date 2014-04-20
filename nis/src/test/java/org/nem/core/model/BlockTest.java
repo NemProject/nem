@@ -46,7 +46,7 @@ public class BlockTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Block previousBlock = createBlock(signer);
-		previousBlock.setGenerationHash(new Hash(Utils.generateRandomBytes(64)));
+		previousBlock.setGenerationHash(Utils.generateRandomHash());
 
 		// Act:
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
@@ -90,7 +90,7 @@ public class BlockTest {
 	public void generationHashCanBeSet() {
 		// Arrange:
 		final Block block = createBlock(Utils.generateRandomAccount());
-		final Hash hash = new Hash(Utils.generateRandomBytes(64));
+		final Hash hash = Utils.generateRandomHash();
 
 		// Act:
 		block.setGenerationHash(hash);

@@ -13,7 +13,7 @@ public class BlockControllerTest {
 	@Test
 	public void blockGetReturnsMappedBlockFromDao() {
 		// Arrange:
-		final Hash hash = new Hash(Utils.generateRandomBytes(64));
+		final Hash hash = Utils.generateRandomHash();
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final MockBlockDao blockDao = new MockBlockDao(NisUtils.createBlockWithTimeStamp(27));
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);

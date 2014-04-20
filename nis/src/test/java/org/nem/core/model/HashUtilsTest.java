@@ -81,7 +81,7 @@ public class HashUtilsTest {
 	@Test
 	public void nextHashProducesHashEquivalentToConcatenatingTheInputs() {
 		// Arrange:
-		final Hash inputHash = new Hash(Utils.generateRandomBytes(64));
+		final Hash inputHash = Utils.generateRandomHash();
 		final PublicKey inputKey = Utils.generateRandomPublicKey();
 
 		// Act:

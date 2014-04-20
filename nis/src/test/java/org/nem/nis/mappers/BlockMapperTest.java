@@ -116,11 +116,11 @@ public class BlockMapperTest {
 		public TestContext() {
 			this.model = new Block(
 					Utils.generateRandomAccount(),
-					new Hash(Utils.generateRandomBytes()),
+					Utils.generateRandomHash(),
 					new TimeInstant(721),
 					new BlockHeight(17));
 
-			this.blockGenerationHash = new Hash(Utils.generateRandomBytes(64));
+			this.blockGenerationHash = Utils.generateRandomHash();
 			this.model.setDifficulty(new BlockDifficulty(77_777_777_777L));
 			this.model.setGenerationHash(this.blockGenerationHash);
 			this.signModel();
