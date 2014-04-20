@@ -6,8 +6,7 @@ import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
+import org.nem.nis.test.MockBlockLookup;
 
 public class BlockChainComparerTest {
 
@@ -329,53 +328,6 @@ public class BlockChainComparerTest {
 
 	private static BlockChainComparer createBlockChainComparer() {
 		return createBlockChainComparer(10);
-	}
-
-	//endregion
-
-	//region MockBlockLookup
-
-	private static class MockBlockLookup implements BlockLookup {
-
-		private final Block lastBlock;
-		private final HashChain chain;
-		private final Map<BlockHeight, Block> heightToBlockMap = new HashMap<>();
-
-		public MockBlockLookup(final Block lastBlock) {
-			this(lastBlock, 1);
-		}
-
-		public MockBlockLookup(final Block lastBlock, int numHashesToReturn) {
-			this.lastBlock = lastBlock;
-
-			this.chain = new HashChain(numHashesToReturn);
-			for (int i = 0; i < numHashesToReturn; ++i)
-				this.chain.add(Utils.generateRandomBytes(64));
-		}
-
-		public MockBlockLookup(final Block lastBlock, final HashChain hashChain) {
-			this.lastBlock = lastBlock;
-			this.chain = hashChain;
-		}
-
-		public void addBlock(final Block block) {
-			this.heightToBlockMap.put(block.getHeight(), block);
-		}
-
-		@Override
-		public Block getLastBlock() {
-			return this.lastBlock;
-		}
-
-		@Override
-		public Block getBlockAt(final BlockHeight height) {
-			return this.heightToBlockMap.get(height);
-		}
-
-		@Override
-		public HashChain getHashesFrom(final BlockHeight height) {
-			return this.chain;
-		}
 	}
 
 	//endregion

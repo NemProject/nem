@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.utils.HexEncoder;
-import org.nem.nis.balances.BlockExecutor;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 
@@ -57,7 +56,7 @@ public class NisMain {
 
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
-			BlockExecutor.apply(this.accountAnalyzer, block);
+			block.execute();
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
