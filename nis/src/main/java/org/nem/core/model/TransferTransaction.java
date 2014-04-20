@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.messages.*;
-import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -111,5 +110,15 @@ public class TransferTransaction extends Transaction {
 
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);
+	}
+
+	@Override
+	public void undo() {
+		this.getSigner().incrementBalance(this.amount.add(this.getFee()));
+		this.recipient.decrementBalance(this.amount);
+
+		if (0 != this.getMessageLength())
+			this.recipient.removeMessage(this.message);
+
 	}
 }

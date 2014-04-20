@@ -116,4 +116,8 @@ public class MockTransaction extends Transaction {
 	@Override
 	public void execute() {
 	}
+
+	@Override
+	public void undo() {
+	}
 }

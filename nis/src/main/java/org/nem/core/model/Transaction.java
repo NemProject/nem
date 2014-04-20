@@ -102,10 +102,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	/**
 	 * Executes the transaction.
-	 * <p/>
-	 * TODO: not sure about this api ... what do we want to happen if execution fails?
 	 */
 	public abstract void execute();
+
+	/**
+	 * Undoes the transaction.
+	 */
+	public abstract void undo();
 
 	/**
 	 * Determines if this transaction is valid.

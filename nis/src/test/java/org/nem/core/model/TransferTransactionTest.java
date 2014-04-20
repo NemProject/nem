@@ -257,7 +257,7 @@ public class TransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(new Amount(10));
 
 		// Act:
@@ -268,12 +268,12 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void executeTransfersAmountToSigner() {
+	public void executeTransfersAmountToRecipient() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(new Amount(10));
 
 		// Act:
@@ -284,12 +284,12 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void executeDoesNotAppendEmptyMessageToAccount() {
+	public void executeDoesNotAppendEmptyMessageToRecipientAccount() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(new Amount(10));
 
 		// Act:
@@ -300,13 +300,13 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void executeAppendsNonEmptyMessageToAccount() {
+	public void executeAppendsNonEmptyMessageToRecipientAccount() {
 		// Arrange:
 		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
 		transaction.setFee(new Amount(10));
 
 		// Act:
@@ -315,6 +315,92 @@ public class TransferTransactionTest {
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
 		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
+	}
+
+	//endregion
+
+	//region undo
+
+	@Test
+	public void undoTransfersAmountAndFeeToSigner() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.undo();
+
+		// Assert:
+		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(1109L)));
+	}
+
+	@Test
+	public void undoTransfersAmountFromRecipient() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.undo();
+
+		// Assert:
+		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(1L)));
+	}
+
+	@Test
+	public void undoDoesNotRemoveEmptyMessageFomAccount() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		recipient.addMessage(new PlainMessage(new byte[] { 0x25, 0x52, 0x7F }));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.undo();
+
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
+		Assert.assertThat(
+				recipient.getMessages().get(0).getDecodedPayload(),
+				IsEqual.equalTo(new byte[] { 0x25, 0x52, 0x7F }));
+	}
+
+	@Test
+	public void undoRemovesNonEmptyMessageFromAccount() {
+		// Arrange:
+		final byte[] messageInput1 = Utils.generateRandomBytes();
+		final byte[] messageInput2 = Utils.generateRandomBytes();
+		final Message message = new PlainMessage(messageInput1);
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.undo();
+
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(3));
+		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(messageInput1));
+		Assert.assertThat(recipient.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(messageInput2));
+		Assert.assertThat(recipient.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(messageInput2));
 	}
 
 	//endregion

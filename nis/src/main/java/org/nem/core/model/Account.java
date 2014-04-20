@@ -165,6 +165,20 @@ public class Account implements SerializableEntity {
 		this.messages.add(message);
 	}
 
+	/**
+	 * Removes the last occurrence of the specified message from this account.
+	 *
+	 * @param message The message to remove from this account.
+	 */
+	public void removeMessage(final Message message) {
+		for (int i = this.messages.size() - 1; i >= 0; --i) {
+			if (message.equals(this.messages.get(i))) {
+				this.messages.remove(i);
+				break;
+			}
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return this.address.hashCode();

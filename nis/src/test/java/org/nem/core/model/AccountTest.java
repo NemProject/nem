@@ -207,6 +207,60 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
 	}
 
+	@Test
+	public void messageCanBeRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.removeMessage(new PlainMessage(input1));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input2));
+	}
+
+	@Test
+	public void lastMatchingMessageIsRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.removeMessage(new PlainMessage(input1));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(3));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
+		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
+		Assert.assertThat(account.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(input2));
+	}
+
+	@Test
+	public void nothingHappensIfMessageNotAssociatedWithAccountIsRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.removeMessage(new PlainMessage(input2));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
+	}
+
 	//endregion
 
 	//region equals / hashCode
