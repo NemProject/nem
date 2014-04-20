@@ -37,6 +37,33 @@ public class PlainMessageTest {
 		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
 	}
 
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final PlainMessage message = new PlainMessage(new byte[] { 12, 77, 56 });
+
+		// Assert:
+		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsEqual.equalTo(message));
+		Assert.assertThat(new PlainMessage(new byte[] { 12, 77 }), IsNot.not(IsEqual.equalTo(message)));
+		Assert.assertThat(new byte[] { 12, 77, 56 }, IsNot.not((Object)IsEqual.equalTo(message)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
+	}
+
+	@Test
+	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+		// Arrange:
+		final PlainMessage message = new PlainMessage(new byte[] { 12, 77, 56 });
+		int hashCode = message.hashCode();
+
+		// Assert:
+		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new PlainMessage(new byte[] { 12, 77 }).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
+
 	private static PlainMessage createRoundTrippedMessage(final PlainMessage originalMessage) {
 		// Act:
 		Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, null);
