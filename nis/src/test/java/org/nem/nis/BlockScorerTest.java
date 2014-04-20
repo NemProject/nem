@@ -378,9 +378,9 @@ public class BlockScorerTest {
 			while (iter.hasNext()) {
 				Block block = iter.next();
 				if (scoreSum == 0) {
-					scoreSum += scorer.calculateBlockScore(parentBlock, block);
+					scoreSum += scorer.calculateBlockScore(block);
 				}
-				long score = scorer.calculateBlockScore(parentBlock, block);
+				long score = scorer.calculateBlockScore(block);
 				scoreSum += score;
 				parentBlock = block;
 			}

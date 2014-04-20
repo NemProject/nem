@@ -63,23 +63,16 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Calculates the block score for block.
+	 * Calculates the block score for the specified block.
 	 *
-	 * @param parentBlock previous block in the chain.
-	 * @param currentBlock currently analyzed block.
+	 * @param currentBlock The currently analyzed block.
 	 *
 	 * @return The block score.
 	 */
-	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
+	public long calculateBlockScore(final Block currentBlock) {
 		final Account account = currentBlock.getSigner();
 		final long personalScore = -account.getForagedBlocks().getRaw();
 		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty().getRaw());
-	}
-
-	public long calculateBlockScore(final AccountLookup accountAnalyzer, final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
-		final Account account = accountAnalyzer.findByAddress(Address.fromEncoded(currentBlock.getForger().getPrintableKey()));
-		final long personalScore = -account.getForagedBlocks().getRaw();
-		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty());
 	}
 
 	private long calculateBlockScoreImpl(long foragedBlocks, long difficulty) {

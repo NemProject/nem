@@ -44,6 +44,17 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a new random Block with the specified height.
+	 */
+	public static Block createRandomBlock(long height) {
+		return new Block(
+				Utils.generateRandomAccount(),
+				new Hash(Utils.generateRandomBytes()),
+				TimeInstant.ZERO,
+				new BlockHeight(height));
+	}
+
+	/**
 	 * Creates a raw hashes list.
 	 *
 	 * @param numHashes The number of hashes desired.
