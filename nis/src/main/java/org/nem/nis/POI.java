@@ -187,7 +187,12 @@ public class POI {
 			
 			prevIterImportances = importances;//TODO: need to do a deep copy here
 			importances = dict.fromkeys(prevIterImportances.keys(),0);
-			danglesum = teleporations[n]*scale*sum(prevIterImportances[n] for n in dangle);
+			
+			double dangleSum = 0;
+			for (Integer dangleNdx : dangleIndices) {
+				dangleSum += prevIterImportances.getAt(dangleNdx);
+			}
+			dangleSum = dangleSum*teleporations[dangleNdx]*scale;
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
