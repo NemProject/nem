@@ -182,36 +182,33 @@ public class POI {
 		
 		
 		int iterCount = 0;
+		ColumnVector prevIterImportances;
 		while (true) { // power iteration; do up to maxIter iterations
 			
-			xlast = x;
-			x = dict.fromkeys(xlast.keys(),0);
-			danglesum = teleporations[n]*scale*sum(xlast[n] for n in dangle);
+			prevIterImportances = importances;//TODO: need to do a deep copy here
+			importances = dict.fromkeys(prevIterImportances.keys(),0);
+			danglesum = teleporations[n]*scale*sum(prevIterImportances[n] for n in dangle);
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
 				// doing a left multiply x^T=xlast^T*W
 				for (nbr in W[n]) {
-				    x[nbr] += teleporations[n]*xlast[n]*W[n][nbr][weight];
+					importances.getAt(nbr) += teleporations[n]*prevIterImportances[n]*W[n][nbr][weight];
 				}
 				    
-				x[n] += danglesum+(1.0-teleporations[n]);
+				importances[n] += danglesum+(1.0-teleporations[n]);
 			}
 
 			// normalize vector
 			importances.normalize();
-//			s = 1.0/sum(x.values())
-//			for (n in x) {
-//				x[n] *= s;
-//			}
 
 			// check convergence using l1 norm
-			err = sum([abs(x[n] - xlast[n]) for n in x]);
+			double err = prevIterImportances.l1Distance(importances);
 			
 			if (err < tol) { //we've made it
 				break;
 			} else if (iterCount > maxIter) { //pwned
-//				raise NetworkXError('poirank: power iteration failed to converge in %d iterations.'%(i-1));
+//				raise ConvergenceError('poi: power iteration failed to converge in %d iterations.'%(i-1));
 			}
 			iterCount += 1;
 		}
@@ -244,7 +241,7 @@ public class POI {
 		double[] ows = new double[];
 		double[] normBalances = new double[];
 	    
-		for (n in x) {
+		for (n in importances) {
 			x[n] /= maxRank;
 			
 			pois.append(x[n]);
@@ -257,7 +254,7 @@ public class POI {
 			normBalances.append(balances[n] / maxBalance);
 		}   
 		
-		return x;//, pois, ows, normBalances
+		return importances;//, pois, ows, normBalances
 	}
 
 	private  getStochasticGraph(G, weight='weight') {

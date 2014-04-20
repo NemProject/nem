@@ -240,7 +240,27 @@ public class ColumnVector {
 	}
 
 	/**
-	 * Calculates the Euclidean distance between the specified vector and this vector.
+	 * Calculates the Manhattan distance (L1-norm) between the specified vector and this vector.
+	 *
+	 * @param vector The specified vector.
+	 *
+	 * @return The Manhattan distance (L1-norm).
+	 */
+	public double l1Distance(final ColumnVector vector) {
+		if (this.size != vector.size)
+			throw new InvalidParameterException("cannot determine the distance between vectors with different sizes");
+
+		double distance = 0;
+		for (int i = 0; i < this.size; i++) {
+			double difference = Math.abs(this.vector[i] - vector.vector[i]);
+			distance += difference;
+		}
+
+		return distance;
+	}
+	
+	/**
+	 * Calculates the Euclidean distance (L2-norm) between the specified vector and this vector.
 	 *
 	 * @param vector The specified vector.
 	 *
