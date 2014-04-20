@@ -1,7 +1,8 @@
 package org.nem.nis.test;
 
-import org.nem.core.serialization.*;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
 
 import java.util.ArrayList;
@@ -32,15 +33,14 @@ public class NisUtils {
 	}
 
 	/**
-	 * Gets a JsonDeserializer that contains a single height property.
-	 *
-	 * @param height The height value.
-	 * @return The deserializer.
+	 * Creates a new random Block.
 	 */
-	public static JsonDeserializer getHeightDeserializer(final long height) {
-		final JsonSerializer serializer = new JsonSerializer();
-		serializer.writeLong("height", height);
-		return new JsonDeserializer(serializer.getObject(), new DeserializationContext(null));
+	public static Block createRandomBlock() {
+		return new Block(
+				Utils.generateRandomAccount(),
+				new Hash(Utils.generateRandomBytes()),
+				TimeInstant.ZERO,
+				BlockHeight.ONE);
 	}
 
 	/**

@@ -3,9 +3,8 @@ package org.nem.nis.visitors;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
+import org.nem.nis.test.NisUtils;
 
 public class PartialWeightedScoreVisitorTest {
 
@@ -69,11 +68,7 @@ public class PartialWeightedScoreVisitorTest {
 
 	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {
 		// Arrange:
-		final Block block = new Block(
-				Utils.generateRandomAccount(),
-				new Hash(Utils.generateRandomBytes()),
-				TimeInstant.ZERO,
-				BlockHeight.ONE);
+		final Block block = NisUtils.createRandomBlock();
 		scorer.setBlockScore(block, score);
 
 		// Act:
