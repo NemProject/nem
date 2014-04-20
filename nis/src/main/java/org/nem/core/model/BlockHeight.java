@@ -34,6 +34,15 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight> implements Seria
 	}
 
 	/**
+	 * Creates a new BlockHeight by subtracting one from this height.
+	 *
+	 * @return The new height.
+	 */
+	public BlockHeight prev() {
+		return new BlockHeight(this.getRaw() - 1);
+	}
+
+	/**
 	 * Creates a new BlockHeight by adding one to this height.
 	 *
 	 * @return The new height.

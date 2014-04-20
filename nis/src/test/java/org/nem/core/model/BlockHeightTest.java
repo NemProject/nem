@@ -43,7 +43,7 @@ public class BlockHeightTest {
 
 	//endregion
 
-	//region next
+	//region next / prev
 
 	@Test
 	public void nextHeightIsOneGreaterThanCurrentHeight() {
@@ -56,6 +56,19 @@ public class BlockHeightTest {
 		// Assert:
 		Assert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
 		Assert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(46)));
+	}
+
+	@Test
+	public void prevHeightIsOneLessThanCurrentHeight() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(45);
+
+		// Act:
+		final BlockHeight nextHeight = height.prev();
+
+		// Assert:
+		Assert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
+		Assert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(44)));
 	}
 
 	//endregion
