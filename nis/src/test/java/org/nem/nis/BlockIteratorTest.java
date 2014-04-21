@@ -53,7 +53,7 @@ public class BlockIteratorTest {
 		final MockBlockVisitor visitor = new MockBlockVisitor();
 
 		// Act:
-		BlockIterator.all(blocks, visitor);
+		BlockIterator.all(null, blocks, visitor);
 
 		// Assert:
 		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 11L, 8L)));
@@ -64,7 +64,7 @@ public class BlockIteratorTest {
 		private final List<Long> visitedBlockHeights = new ArrayList<>();
 
 		@Override
-		public void visit(final Block block) {
+		public void visit(final Block parentBlock, final Block block) {
 			this.visitedBlockHeights.add(block.getHeight().getRaw());
 		}
 	}

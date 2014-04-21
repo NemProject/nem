@@ -44,7 +44,7 @@ public class MockBlockScorer extends BlockScorer {
 	}
 
 	@Override
-	public long calculateBlockScore(final Block block) {
+	public long calculateBlockScore(final Block parentBlock, final Block block) {
 		return blockScores.get(block);
 	}
 }

@@ -72,6 +72,6 @@ public class PartialWeightedScoreVisitorTest {
 		scorer.setBlockScore(block, score);
 
 		// Act:
-		visitor.visit(block);
+		visitor.visit(null, block);
 	}
 }
