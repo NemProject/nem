@@ -40,6 +40,7 @@ public class BlockIteratorTest {
 
 		// Assert:
 		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 6L, 5L)));
+		Assert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L)));
 	}
 
 	@Test
@@ -53,18 +54,21 @@ public class BlockIteratorTest {
 		final MockBlockVisitor visitor = new MockBlockVisitor();
 
 		// Act:
-		BlockIterator.all(null, blocks, visitor);
+		BlockIterator.all(NisUtils.createRandomBlock(12), blocks, visitor);
 
 		// Assert:
 		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 11L, 8L)));
+		Assert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(12L, 7L, 11L)));
 	}
 
 	private class MockBlockVisitor implements BlockVisitor {
 
+		private final List<Long> visitedParentBlockHeights = new ArrayList<>();
 		private final List<Long> visitedBlockHeights = new ArrayList<>();
 
 		@Override
 		public void visit(final Block parentBlock, final Block block) {
+			this.visitedParentBlockHeights.add(parentBlock.getHeight().getRaw());
 			this.visitedBlockHeights.add(block.getHeight().getRaw());
 		}
 	}

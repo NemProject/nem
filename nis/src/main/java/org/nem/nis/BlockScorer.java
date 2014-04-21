@@ -1,22 +1,16 @@
 package org.nem.nis;
 
-import com.sun.java_cup.internal.runtime.lr_parser;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
-	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
 
 	/**
 	 * The target time between two blocks in seconds.
@@ -61,19 +55,6 @@ public class BlockScorer {
 						 .multiply(TWO_TO_THE_POWER_OF_64)
 						 .divide(block.getDifficulty().asBigInteger());
 	}
-
-	/**
-	 * Calculates the block score for the specified block.
-	 *
-	 * @param currentBlock The currently analyzed block.
-	 *
-	 * @return The block score.
-	 */
-//	public long calculateBlockScore(final Block currentBlock) {
-//		final Account account = currentBlock.getSigner();
-//		final long foragedBlocks = account.getForagedBlocks().getRaw();
-//		return calculateBlockScoreImpl(1, foragedBlocks, currentBlock.getDifficulty().getRaw());
-//	}
 
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());

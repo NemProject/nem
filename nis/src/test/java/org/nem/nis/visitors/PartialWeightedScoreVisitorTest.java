@@ -69,9 +69,10 @@ public class PartialWeightedScoreVisitorTest {
 	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlock();
-		scorer.setBlockScore(block, score);
+		final Block parentBlock = NisUtils.createRandomBlock();
+		scorer.setBlockScore(parentBlock, block, score);
 
 		// Act:
-		visitor.visit(null, block);
+		visitor.visit(parentBlock, block);
 	}
 }

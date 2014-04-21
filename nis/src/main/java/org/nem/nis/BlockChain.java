@@ -191,20 +191,19 @@ public class BlockChain implements BlockSynchronizer {
 	/**
 	 * Validates blocks in peerChain.
 	 *
-	 * @param contemporaryAccountAnalyzer AccountLookup upon which TXes from peerChain should be applied.
 	 * @param parentBlock parent block
 	 * @param peerChain analyzed fragment of peer's blockchain.
 	 *
 	 * @return score or -1 if chain is invalid
 	 */
-	private boolean validatePeerChain(AccountAnalyzer contemporaryAccountAnalyzer, final Block parentBlock, final List<Block> peerChain) {
+	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
 		calculatePeerChainGenerations(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
-	private long getPeerChainScore(Block parentBlock, List<Block> peerChain) {
+	private long getPeerChainScore(final Block parentBlock, final List<Block> peerChain) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 				this.scorer,
 				PartialWeightedScoreVisitor.BlockOrder.Forward);
@@ -261,7 +260,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(contemporaryAccountAnalyzer, parentBlock, peerChain)) {
+		if (! validatePeerChain(parentBlock, peerChain)) {
 			penalize(node);
 			return;
 		}
@@ -343,7 +342,7 @@ public class BlockChain implements BlockSynchronizer {
 		peerChain.add(block);
 
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(contemporaryAccountAnalyzer, parentBlock, peerChain)) {
+		if (! validatePeerChain(parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}

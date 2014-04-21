@@ -30,7 +30,6 @@ public class PartialWeightedScoreVisitor implements BlockVisitor {
 
 	private final BlockScorer blockScorer;
 	private final BlockOrder order;
-	private AccountLookup accountLookup;
 	private long lastScore;
 
 	// visit should be called at most 1440 times, every score fits in 32-bits
