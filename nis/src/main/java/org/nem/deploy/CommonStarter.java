@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 /**
  * Did not find a better way of launching Jetty in combination with WebStart. The
@@ -100,26 +101,29 @@ public class CommonStarter implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 		// This is the replacement for the web.xml
 		// New with Servlet 3.0
-		ApplicationContext ctx = new AnnotationConfigApplicationContext(NisAppConfig.class);
-		ServletContext context = event.getServletContext();
-		//context.setInitParameter("contextConfigLocation", "classpath:application-context.xml");
-		context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
-		//context.setInitParameter("contextConfigLocation", "org.nem.deploy.NisAppConfig");
+		AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(NisAppConfig.class);
 
-//		Dynamic springServlet = context.addServlet("Spring MVC Dispatcher Servlet", "org.springframework.web.servlet.DispatcherServlet");
-//		springServlet.setInitParameter("contextConfigLocation", "classpath:web-context.xml");
-//		springServlet.addMapping("/");
-//
-//		// Denial of server Filter
-//		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-//		dosFilter.setInitParameter("delayMs", "1000");
-//		dosFilter.setInitParameter("trackSessions", "false");
-//		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-//
-//		// GZIP filter
-//		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-//		dosFilter.setInitParameter("mimeTypes",
-//				"text/html,text/plain,text/xml,application/xhtml+xml,text/css,application/javascript,image/svg+xml");
-//		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+		webCtx.register(NisWebAppInitializer.class);
+		webCtx.setParent(appCtx);
+
+		ServletContext context = event.getServletContext();
+		ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+		dispatcher.setLoadOnStartup(1);
+		dispatcher.addMapping("/");
+
+		context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+
+		// Denial of server Filter
+		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
+		dosFilter.setInitParameter("delayMs", "1000");
+		dosFilter.setInitParameter("trackSessions", "false");
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+
+		// GZIP filter
+		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
+		dosFilter.setInitParameter("mimeTypes",
+				"text/html,text/plain,text/xml,application/xhtml+xml,text/css,application/javascript,image/svg+xml");
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 }

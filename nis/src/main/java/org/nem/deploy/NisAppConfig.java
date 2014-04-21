@@ -4,6 +4,7 @@ import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
 import org.nem.nis.config.DeserializerHttpMessageConverter;
+import org.nem.nis.config.SerializableEntityHttpMessageConverter;
 import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Account;
@@ -99,7 +100,6 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	@Scope("test")
 	public RequiredBlockDaoAdapter requiredBlockDaoAdapter() {
 		return new RequiredBlockDaoAdapter(blockDao);
 	}
@@ -107,5 +107,10 @@ public class NisAppConfig {
 	@Bean
 	public DeserializerHttpMessageConverter deserializerHttpMessageConverter() {
 		return new DeserializerHttpMessageConverter(this.accountAnalyzer());
+	}
+
+	@Bean
+	public SerializableEntityHttpMessageConverter serializableEntityHttpMessageConverter() {
+		return new SerializableEntityHttpMessageConverter(this.deserializerHttpMessageConverter());
 	}
 }
