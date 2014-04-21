@@ -19,6 +19,18 @@ public class HistoricalBalances {
 	// TODO: Is there an easy way to get the height of the current last block?
 
 	/**
+	 * The height of the last block in the block chain
+	 */
+	private BlockHeight lastBlockHeight;
+	
+	/**
+	 * Sets the last block Height
+	 */
+	public void setLastBlockHeight(BlockHeight lastBlockHeight) {
+		this.lastBlockHeight = lastBlockHeight;
+	}
+	
+	/**
 	 * Gets the size of the list
 	 * 
 	 * @return the size of the list
@@ -34,7 +46,7 @@ public class HistoricalBalances {
 	 * 
 	 * @return the historical balance
 	 */
-	public HistoricalBalance getHistoricalBalance(final BlockHeight height, final BlockHeight lastBlockHeight) {
+	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
 		if (lastBlockHeight.getRaw() - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
 		}
@@ -69,7 +81,7 @@ public class HistoricalBalances {
 	 * @param height the height where the amount is inserted
 	 * @param amount the amount to add
 	 */
-	public void add(final BlockHeight height, final Amount amount, final BlockHeight lastBlockHeight) {
+	public void add(final BlockHeight height, final Amount amount) {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
@@ -86,7 +98,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)), lastBlockHeight);
+		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -96,7 +108,7 @@ public class HistoricalBalances {
 	 * @param height the height where the amount is inserted
 	 * @param amount the amount to add
 	 */
-	public void subtract(final BlockHeight height, final Amount amount, final BlockHeight lastBlockHeight) {
+	public void subtract(final BlockHeight height, final Amount amount) {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
@@ -113,7 +125,7 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)), lastBlockHeight);
+		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -122,12 +134,12 @@ public class HistoricalBalances {
 	 * 
 	 * @param height the height to compare to
 	 */
-	private void trim(final BlockHeight height, final BlockHeight lastBlockHeight) {
+	private void trim(final BlockHeight height) {
 		if (balances.size() == 0 || balances.get(0).getHeight().getRaw() >= height.getRaw()) {
 			return;
 		}
 		// Remember the historical balance at the point we start deleting entries
-		HistoricalBalance balance = getHistoricalBalance(height, lastBlockHeight);
+		HistoricalBalance balance = getHistoricalBalance(height);
 		boolean insertBalance = false;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
