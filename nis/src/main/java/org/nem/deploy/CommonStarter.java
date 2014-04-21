@@ -35,11 +35,37 @@ public class CommonStarter implements ServletContextListener {
 		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
 		//JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
 
-		//Taken from Jetty doc 
-		QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMaxThreads(500);
-		Server server = new Server(threadPool);
+		//Taken from Jetty doc
+		Server server = new Server(createThreadPool());
 		server.addBean(new ScheduledExecutorScheduler());
+
+		server.addConnector(createConnector(server));
+		server.setHandler(createHandlers());
+
+		server.setDumpAfterStart(false);
+		server.setDumpBeforeStop(false);
+		server.setStopAtShutdown(true);
+
+		LOGGER.info("Calling start().");
+		server.start();
+		server.join();
+	}
+
+	private static Handler createHandlers() {
+		HandlerCollection handlers = new HandlerCollection();
+		ServletContextHandler servletContext = new ServletContextHandler();
+
+		//Special Listener to set-up the environment for Spring
+		servletContext.addEventListener(new CommonStarter());
+		servletContext.addEventListener(new ContextLoaderListener());
+		servletContext.setErrorHandler(new JsonErrorHandler());
+
+		handlers.setHandlers(new Handler[] { servletContext });
+
+		return handlers;
+	}
+
+	public static Connector createConnector(Server server) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
 		//PORT
@@ -50,27 +76,16 @@ public class CommonStarter implements ServletContextListener {
 		http_config.setSendServerVersion(true);
 		http_config.setSendDateHeader(false);
 
-		HandlerCollection handlers = new HandlerCollection();
-		ServletContextHandler servletContext = new ServletContextHandler();
-
-		//Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(new CommonStarter());
-		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(new JsonErrorHandler());
-
-		handlers.setHandlers(new Handler[] { servletContext });
-		server.setHandler(handlers);
-		server.setDumpAfterStart(false);
-		server.setDumpBeforeStop(false);
-		server.setStopAtShutdown(true);
 		ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
 		http.setPort(7890);
 		http.setIdleTimeout(30000);
-		server.addConnector(http);
+		return http;
+	}
 
-		LOGGER.info("Calling start().");
-		server.start();
-		server.join();
+	public static QueuedThreadPool createThreadPool() {
+		QueuedThreadPool threadPool = new QueuedThreadPool();
+		threadPool.setMaxThreads(500);
+		return threadPool;
 	}
 
 	@Override
@@ -86,6 +101,7 @@ public class CommonStarter implements ServletContextListener {
 		//context.addListener(org.springframework.web.context.ContextLoaderListener.class);
 		//context.addListener("org.springframework.web.context.ContextLoaderListener");
 		context.setInitParameter("contextConfigLocation", "classpath:application-context.xml");
+
 		Dynamic springServlet = context.addServlet("Spring MVC Dispatcher Servlet", "org.springframework.web.servlet.DispatcherServlet");
 		springServlet.setInitParameter("contextConfigLocation", "classpath:web-context.xml");
 		springServlet.addMapping("/");
