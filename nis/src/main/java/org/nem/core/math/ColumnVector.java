@@ -135,7 +135,7 @@ public class ColumnVector {
 	 */
 	public double getMagnitude() {
 		final ColumnVector nullVector = new ColumnVector(this.size);
-		return this.distance(nullVector);
+		return this.l2Distance(nullVector);
 	}
 	
 	/**
@@ -247,7 +247,7 @@ public class ColumnVector {
 	 */
 	public double l1Distance(final ColumnVector vector) {
 		if (this.size != vector.size)
-			throw new InvalidParameterException("cannot determine the distance between vectors with different sizes");
+			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
 
 		double distance = 0;
 		for (int i = 0; i < this.size; i++) {
@@ -265,7 +265,7 @@ public class ColumnVector {
 	 *
 	 * @return The Euclidean distance.
 	 */
-	public double distance(final ColumnVector vector) {
+	public double l2Distance(final ColumnVector vector) {
 		if (this.size != vector.size)
 			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
 

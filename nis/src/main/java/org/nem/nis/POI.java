@@ -28,129 +28,130 @@ public class POI {
 	public static final double WEIGHT = .99;
 
 	public double getImportance() {
-		return calculateBlockScoreImpl();
+		return calculateImportancesImpl();
 	}
 
 	
 //this is some code i wrote for school before, just putting it in here temporarily for reference
-	public static void calcWeightedPageRanks(List gains,
-			HashMap<String, Integer> directions,
-			HashMap<String, Double> transitionProbs) {
-
-		ArrayList<ArrayList<Double>> ranks = new ArrayList<ArrayList<Double>>();
-		ArrayList<DecisionPoint> nodes = new ArrayList<DecisionPoint>();
-		ArrayList<List<DecisionPoint>> nodesPointingToMe = new ArrayList<List<DecisionPoint>>();
-		ArrayList<List<DecisionPoint>> nodesPointingFromMe = new ArrayList<List<DecisionPoint>>();
-		HashMap<String, Integer> nodeIndices = new HashMap<String, Integer>();
-
-		final int V = gains.size();
-		final double IV = 1.0 / V;
-
-		int count = 0;
-		/* initialize page ranks to info gain */
-		for (final InformationGain gain : gains) {
-			nodeIndices.put(gain.getPoint().toString(), count);
-			ArrayList<DecisionPoint> friends = new ArrayList<DecisionPoint>();
-			ArrayList<DecisionPoint> outLinks = new ArrayList<DecisionPoint>();
-
-			for (Edge e : gain.getPoint().getEdges()) {
-				Integer away = directions.get(gain.getPoint().toString()
-						+ e.getOtherPoint(gain.getPoint()).toString());
-				Integer toward = directions.get(e
-						.getOtherPoint(gain.getPoint()).toString()
-						+ gain.getPoint().toString());
-				if (toward != null && (away == null || toward >= away)) {
-					// if (!(toward != null && (away == null || toward >=
-					// away))) {
-					friends.add(e.getOtherPoint(gain.getPoint()));
-				} else {
-					outLinks.add(e.getOtherPoint(gain.getPoint()));
-				}
-			}
-			nodesPointingToMe.add(friends);
-			nodesPointingFromMe.add(outLinks);
-			nodes.add(gain.getPoint());
-			ranks.add(new ArrayList<Double>() {
-				{
-					add(0, gain.getInformationGain());
-				}
-			});
-			count++;
-		}
-
-		int currIter = 1;
-		int numRunning = gains.size();
-		double newRank;
-		double inSum = 0;
-
-		while (numRunning > 0) {
-			numRunning = gains.size();
-
-			for (int ndx = 0; ndx < gains.size(); ndx++) {
-				inSum = 0;
-				double probTot = 0;
-				for ( neighbor : nodesPointingToMe.get(ndx)) {
-					if (nodeIndices.get(neighbor.toString()) == null) {
-						continue;
-					}
-					probTot += gains.get(nodeIndices.get(neighbor.toString()))
-							.getProbability();
-				}
-				for ( neighbor : nodesPointingToMe.get(ndx)) {
-					if (nodeIndices.get(neighbor.toString()) == null) {
-						continue;
-					}
-					int nOut = 0;
-					for (Edge ne : neighbor.getEdges()) {
-						Integer away = directions.get(neighbor.toString()
-								+ ne.getOtherPoint(neighbor).toString());
-						Integer toward = directions.get(ne.getOtherPoint(
-								neighbor).toString()
-								+ neighbor.toString());
-						if (away != null && (toward == null || away >= toward)) {
-							nOut++;
-						}
-					}
-					if (nOut == 0) {
-						inSum += 0;
-					} else {
-						Double transProb = transitionProbs.get(neighbor
-								.toString()
-								+ gains.get(ndx).getPoint().toString());
-						transProb = transProb == null ? 0 : transProb;
-						inSum += (1.0 / nOut)
-								* ranks.get(
-										nodeIndices.get(neighbor.toString()))
-										.get(currIter - 1);
-					}
-				}
-
-				newRank = ((1.0 - WEIGHT) * IV) + (WEIGHT * inSum);
-				ranks.get(ndx).add(newRank);
-				
-				// check for stopping condition
-				if (currIter > 1
-						&& (ranks.get(ndx).get(currIter) - ranks.get(ndx).get(
-								currIter - 1)) < EPSILON) {
-					numRunning--;
-					continue;
-				}
-			}
-			currIter++;
-		}
-
-	}
+//	public static void calcWeightedPageRanks(List gains,
+//			HashMap<String, Integer> directions,
+//			HashMap<String, Double> transitionProbs) {
+//
+//		ArrayList<ArrayList<Double>> ranks = new ArrayList<ArrayList<Double>>();
+//		ArrayList<DecisionPoint> nodes = new ArrayList<DecisionPoint>();
+//		ArrayList<List<DecisionPoint>> nodesPointingToMe = new ArrayList<List<DecisionPoint>>();
+//		ArrayList<List<DecisionPoint>> nodesPointingFromMe = new ArrayList<List<DecisionPoint>>();
+//		HashMap<String, Integer> nodeIndices = new HashMap<String, Integer>();
+//
+//		final int V = gains.size();
+//		final double IV = 1.0 / V;
+//
+//		int count = 0;
+//		/* initialize page ranks to info gain */
+//		for (final  gain : gains) {
+//			nodeIndices.put(gain.getPoint().toString(), count);
+//			ArrayList<DecisionPoint> friends = new ArrayList<DecisionPoint>();
+//			ArrayList<DecisionPoint> outLinks = new ArrayList<DecisionPoint>();
+//
+//			for (Edge e : gain.getPoint().getEdges()) {
+//				Integer away = directions.get(gain.getPoint().toString()
+//						+ e.getOtherPoint(gain.getPoint()).toString());
+//				Integer toward = directions.get(e
+//						.getOtherPoint(gain.getPoint()).toString()
+//						+ gain.getPoint().toString());
+//				if (toward != null && (away == null || toward >= away)) {
+//					// if (!(toward != null && (away == null || toward >=
+//					// away))) {
+//					friends.add(e.getOtherPoint(gain.getPoint()));
+//				} else {
+//					outLinks.add(e.getOtherPoint(gain.getPoint()));
+//				}
+//			}
+//			nodesPointingToMe.add(friends);
+//			nodesPointingFromMe.add(outLinks);
+//			nodes.add(gain.getPoint());
+//			ranks.add(new ArrayList<Double>() {
+//				{
+//					add(0, gain.getInformationGain());
+//				}
+//			});
+//			count++;
+//		}
+//
+//		int currIter = 1;
+//		int numRunning = gains.size();
+//		double newRank;
+//		double inSum = 0;
+//
+//		while (numRunning > 0) {
+//			numRunning = gains.size();
+//
+//			for (int ndx = 0; ndx < gains.size(); ndx++) {
+//				inSum = 0;
+//				double probTot = 0;
+//				for ( neighbor : nodesPointingToMe.get(ndx)) {
+//					if (nodeIndices.get(neighbor.toString()) == null) {
+//						continue;
+//					}
+//					probTot += gains.get(nodeIndices.get(neighbor.toString()))
+//							.getProbability();
+//				}
+//				for ( neighbor : nodesPointingToMe.get(ndx)) {
+//					if (nodeIndices.get(neighbor.toString()) == null) {
+//						continue;
+//					}
+//					int nOut = 0;
+//					for (Edge ne : neighbor.getEdges()) {
+//						Integer away = directions.get(neighbor.toString()
+//								+ ne.getOtherPoint(neighbor).toString());
+//						Integer toward = directions.get(ne.getOtherPoint(
+//								neighbor).toString()
+//								+ neighbor.toString());
+//						if (away != null && (toward == null || away >= toward)) {
+//							nOut++;
+//						}
+//					}
+//					if (nOut == 0) {
+//						inSum += 0;
+//					} else {
+//						Double transProb = transitionProbs.get(neighbor
+//								.toString()
+//								+ gains.get(ndx).getPoint().toString());
+//						transProb = transProb == null ? 0 : transProb;
+//						inSum += (1.0 / nOut)
+//								* ranks.get(
+//										nodeIndices.get(neighbor.toString()))
+//										.get(currIter - 1);
+//					}
+//				}
+//
+//				newRank = ((1.0 - WEIGHT) * IV) + (WEIGHT * inSum);
+//				ranks.get(ndx).add(newRank);
+//				
+//				// check for stopping condition
+//				if (currIter > 1
+//						&& (ranks.get(ndx).get(currIter) - ranks.get(ndx).get(
+//								currIter - 1)) < EPSILON) {
+//					numRunning--;
+//					continue;
+//				}
+//			}
+//			currIter++;
+//		}
+//
+//	}
 	
 	// This is the draft implementation for calculating proof-of-importance
-	private double[] calculateImportance(List<Account> accounts, int maxIter, double tol, String weight) {
+	private double[] calculateImportancesImpl(List<Account> accounts, int maxIter, double tol, String weight) {
 //		 maxIter=100, tol=1.0e-8, weight='weight'
 		D=G;
 
 		// create a copy in (right) stochastic form
 		W = nx.stochastic_graph(D, weight=weight);
-		scale = 1.0 /W.number_of_nodes();
-
+		
 		int numAccounts = accounts.size();
+		
+		double scale = 1.0 /numAccounts;
 		
 		ColumnVector importances = new ColumnVector(numAccounts);
 		
@@ -190,7 +191,7 @@ public class POI {
 			
 			double dangleSum = 0;
 			for (Integer dangleNdx : dangleIndices) {
-				dangleSum += prevIterImportances.getAt(dangleNdx);
+				dangleSum += prevIterImportances.getAt(dangleNdx)*scale;
 			}
 			dangleSum = dangleSum*teleporations[dangleNdx]*scale;
 			

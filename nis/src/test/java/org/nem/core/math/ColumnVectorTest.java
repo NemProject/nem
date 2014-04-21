@@ -268,7 +268,7 @@ public class ColumnVectorTest {
 	//region distance / getMagnitude
 
 	@Test
-	public void distanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
+	public void l1DistanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
 		// Arrange:
 		final ColumnVector a = new ColumnVector(3);
 		a.setAt(0, 7);
@@ -281,30 +281,70 @@ public class ColumnVectorTest {
 		b.setAt(2, 1);
 
 		// Act:
-		final double distance = a.distance(b);
+		final double distance = a.l1Distance(b);
+
+		// Assert:
+		Assert.assertEquals(24.0, distance, 0.0000001);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void l1DistanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
+		// Arrange:
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
+
+		// Act:
+		largerVector.l1Distance(smallerVector);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void l1DistanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
+		// Arrange:
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
+
+		// Act:
+		smallerVector.l1Distance(largerVector);
+	}
+	
+	@Test
+	public void l2DistanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
+		// Arrange:
+		final ColumnVector a = new ColumnVector(3);
+		a.setAt(0, 7);
+		a.setAt(1, 5);
+		a.setAt(2, 11);
+
+		final ColumnVector b = new ColumnVector(3);
+		b.setAt(0, 2);
+		b.setAt(1, -4);
+		b.setAt(2, 1);
+
+		// Act:
+		final double distance = a.l2Distance(b);
 
 		// Assert:
 		Assert.assertEquals(14.3527, distance, 0.0000001);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void distanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
+	public void l2DistanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		largerVector.distance(smallerVector);
+		largerVector.l2Distance(smallerVector);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void distanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
+	public void l2DistanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		smallerVector.distance(largerVector);
+		smallerVector.l2Distance(largerVector);
 	}
 
 	@Test
