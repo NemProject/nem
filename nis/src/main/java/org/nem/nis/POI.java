@@ -144,10 +144,11 @@ public class POI {
 	// This is the draft implementation for calculating proof-of-importance
 	private double[] calculateImportancesImpl(List<Account> accounts, int maxIter, double tol, String weight) {
 //		 maxIter=100, tol=1.0e-8, weight='weight'
-		D=G;
+//		D=G;
 
 		// create a copy in (right) stochastic form
-		W = nx.stochastic_graph(D, weight=weight);
+		//TODO: we probably don't need this
+//		W = nx.stochastic_graph(D, weight=weight);
 		
 		int numAccounts = accounts.size();
 		
@@ -186,14 +187,14 @@ public class POI {
 		ColumnVector prevIterImportances;
 		while (true) { // power iteration; do up to maxIter iterations
 			
-			prevIterImportances = importances;//TODO: need to do a deep copy here
+			prevIterImportances = importances.clone();// deep copy
 			importances = dict.fromkeys(prevIterImportances.keys(),0);
 			
 			double dangleSum = 0;
 			for (Integer dangleNdx : dangleIndices) {
-				dangleSum += prevIterImportances.getAt(dangleNdx)*scale;
+				dangleSum += prevIterImportances.getAt(dangleNdx)*teleporations[dangleNdx];
 			}
-			dangleSum = dangleSum*teleporations[dangleNdx]*scale;
+			dangleSum = dangleSum*scale;
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
