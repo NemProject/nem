@@ -239,7 +239,8 @@ public class BlockScorerTest {
 
 	@Test
 	public void selfishForagerVersusXNormal() {
-		long selfishForagerWins = normalXForagerVersusSelfishForager(10, 100 * 60, 10, 500_000_000L, 500_000_000L);
+		// change first number (number of tests) from 10, to 100 to get better statistics
+		long selfishForagerWins = normalXForagerVersusSelfishForager(10, 100 * 60, 10, 500_000_000L, 55_000_000_000L);
 
 		Assert.assertTrue("Selfish forager vs X created better chain!", selfishForagerWins == 0);
 	}
@@ -255,7 +256,7 @@ public class BlockScorerTest {
 		byte[] rndBytes = new byte[32];
 
 		final Hash hash = new Hash(rndBytes);
-		final Block firstBlock = new Block(foragerA, hash, new TimeInstant(1), new BlockHeight(1));
+		Block firstBlock = new Block(foragerA, hash, new TimeInstant(1), new BlockHeight(1));
 		firstBlock.setGenerationHash(new Hash(HASH_BYTES));
 		foragerA.incrementForagedBlocks();
 		Block block;
@@ -268,6 +269,9 @@ public class BlockScorerTest {
 		blocks.add(block);
 		long scoreA = calculateScore(blocks, scorer);
 
+		firstBlock = new Block(foragerB, hash, new TimeInstant(1), new BlockHeight(1));
+		firstBlock.setGenerationHash(new Hash(HASH_BYTES));
+		foragerB.incrementForagedBlocks();;
 		blocks.clear();
 		blocks.add(firstBlock);
 		block = generateNextBlock(foragerB, blocks, scorer, true);
@@ -363,8 +367,8 @@ public class BlockScorerTest {
 
 			sr.nextBytes(rndBytes);
 			Hash hash = new Hash(rndBytes);
-			firstBlock = new Block(forargers[i], hash, new TimeInstant(1), new BlockHeight(1));
-			firstBlock.setGenerationHash(HashUtils.nextHash(hash, forargers[i].getKeyPair().getPublicKey()));
+			firstBlock = new Block(forargers[i % count], hash, new TimeInstant(1), new BlockHeight(1));
+			firstBlock.setGenerationHash(HashUtils.nextHash(hash, forargers[i % count].getKeyPair().getPublicKey()));
 
 			blocks.clear();
 			blocks.add(firstBlock);
@@ -394,7 +398,7 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore);
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
 		LOGGER.info("selfish forager vs 2 wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
@@ -449,6 +453,7 @@ public class BlockScorerTest {
 
 		Block bestBlock = null;
 		long maxSum = Integer.MIN_VALUE;
+		int minTime = Integer.MAX_VALUE;
 		for (Account forger : forgers) {
 			Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
@@ -474,6 +479,12 @@ public class BlockScorerTest {
 			List<Block> temp = new LinkedList<>();
 			temp.addAll(blocks);
 			temp.add(block);
+
+//			int time = block.getTimeStamp().getRawTime();
+//			if (time < minTime) {
+//				minTime = time;
+//				bestBlock = block;
+//			}
 			long scoreSum = calculateScore(temp, scorer);
 			if (scoreSum > maxSum) {
 				bestBlock = block;
@@ -494,9 +505,9 @@ public class BlockScorerTest {
 			while (iter.hasNext()) {
 				Block block = iter.next();
 				if (scoreSum == 0) {
-					scoreSum += scorer.calculateBlockScore(block);
+					scoreSum += scorer.calculateBlockScore(parent, block);
 				}
-				long score = scorer.calculateBlockScore(block);
+				long score = scorer.calculateBlockScore(parent, block);
 				scoreSum += score;
 				parent = block;
 			}
