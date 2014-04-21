@@ -238,6 +238,13 @@ public class BlockScorerTest {
 	}
 
 	@Test
+	public void selfishForagerVersusXNormal() {
+		long selfishForagerWins = normalXForagerVersusSelfishForager(10, 100 * 60, 10, 500_000_000L, 500_000_000L);
+
+		Assert.assertTrue("Selfish forager vs X created better chain!", selfishForagerWins == 0);
+	}
+
+	@Test
 	public void differentChainsProduceDifferentScores() {
 		// Arrange:
 		final Account foragerA = createAccountWithBalance(1_000_000_000);
@@ -274,9 +281,6 @@ public class BlockScorerTest {
 	
 	public int normalForagerVersusSelfishForager(int numRounds, int maxTime, long normalForgerBalance, long selfishForgerBalance) {
 		// Arrange:
-		Account normalForager = createAccountWithBalance(normalForgerBalance);
-		Account selfishForager = createAccountWithBalance(selfishForgerBalance);
-		
 		final BlockScorer scorer = new BlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
@@ -290,6 +294,10 @@ public class BlockScorerTest {
 
 		// Act: normal forager vs. selfish forger
 		for (int i=0; i<numRounds; i++) {
+			// create here to reset number of foraged blocks
+			Account normalForager = createAccountWithBalance(normalForgerBalance);
+			Account selfishForager = createAccountWithBalance(selfishForgerBalance);
+
 			sr.nextBytes(rndBytes);
 			Hash hash = new Hash(rndBytes);
 			firstBlock = new Block(normalForager, hash, new TimeInstant(1), new BlockHeight(1));
@@ -300,6 +308,7 @@ public class BlockScorerTest {
 			do {
 				Block block = generateNextBlock(normalForager, blocks, scorer, false);
 				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
 			//LOGGER.info("NORMAL==== ==== ==== ==== ");
@@ -310,6 +319,7 @@ public class BlockScorerTest {
 			do {
 				Block block = generateNextBlock(selfishForager, blocks, scorer, false);
 				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
 			//LOGGER.info("SELFISH=== ==== ==== ==== ");
@@ -324,6 +334,70 @@ public class BlockScorerTest {
 		}
 
 		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
+		return selfishForagerWins;
+	}
+
+
+	public int normalXForagerVersusSelfishForager(int numRounds, int maxTime, int count, long normalForgerBalance,  long selfishForgerBalance) {
+		// Arrange:
+
+		final BlockScorer scorer = new BlockScorer();
+		List<Block> blocks = new LinkedList<>();
+		SecureRandom sr = new SecureRandom();
+		byte[] rndBytes = new byte[32];
+		Block firstBlock;
+		Block lastBlock;
+		int normalForagersWins = 0;
+		int selfishForagerWins = 0;
+		long normalForagersScore;
+		long selfishForagerScore;
+
+		// Act: normal forager duo vs. selfish forger
+		for (int i=0; i<numRounds; i++) {
+			// create here to reset number of foraged blocks
+			Account selfishForager = createAccountWithBalance(selfishForgerBalance);
+			Account[] forargers = new Account[count];
+			for (int j = 0; j < count; j++) {
+				forargers[j] = createAccountWithBalance(normalForgerBalance);
+			}
+
+			sr.nextBytes(rndBytes);
+			Hash hash = new Hash(rndBytes);
+			firstBlock = new Block(forargers[i], hash, new TimeInstant(1), new BlockHeight(1));
+			firstBlock.setGenerationHash(HashUtils.nextHash(hash, forargers[i].getKeyPair().getPublicKey()));
+
+			blocks.clear();
+			blocks.add(firstBlock);
+			do {
+				Block block = generateNextBlockMultiple(forargers, blocks, scorer, false);
+				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
+				lastBlock = block;
+
+			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("NORMAL==== ==== ==== ==== ");
+			normalForagersScore = calculateScore(blocks, scorer);
+
+			blocks.clear();
+			blocks.add(firstBlock);
+			do {
+				Block block = generateNextBlock(selfishForager, blocks, scorer, false);
+				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
+				lastBlock = block;
+			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("SELFISH=== ==== ==== ==== ");
+			selfishForagerScore = calculateScore(blocks, scorer);
+			if (selfishForagerScore > normalForagersScore) {
+				selfishForagerWins++;
+			}
+			else {
+				normalForagersWins++;
+			}
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore);
+		}
+
+		LOGGER.info("selfish forager vs 2 wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
 		return selfishForagerWins;
 	}
 
@@ -342,7 +416,6 @@ public class BlockScorerTest {
 		}
 		return ret;
 	}
-
 
 	private Block generateNextBlock(Account forger, List<Block> blocks, BlockScorer scorer, boolean randomizeTime) {
 		Block lastBlock = blocks.get(blocks.size()-1);
@@ -369,12 +442,55 @@ public class BlockScorerTest {
 
 		return block;
 	}
+
+
+	private Block generateNextBlockMultiple(Account[] forgers, List<Block> blocks, BlockScorer scorer, boolean randomizeTime) {
+		Block lastBlock = blocks.get(blocks.size()-1);
+
+		Block bestBlock = null;
+		long maxSum = Integer.MIN_VALUE;
+		for (Account forger : forgers) {
+			Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
+
+			List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
+			final BlockDifficulty difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
+			block.setDifficulty(difficulty);
+			BigInteger hit = scorer.calculateHit(block);
+			int seconds = hit.multiply(block.getDifficulty().asBigInteger())
+					.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
+					.divide(BigInteger.valueOf(forger.getBalance().getNumNem()))
+					.intValue();
+			if (seconds == 0) {
+				// This will not happen in our network
+				seconds = 1;
+			}
+			if (randomizeTime) {
+				seconds += (new SecureRandom()).nextInt(10);
+			}
+
+			block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds));
+			block.setDifficulty(difficulty);
+
+			List<Block> temp = new LinkedList<>();
+			temp.addAll(blocks);
+			temp.add(block);
+			long scoreSum = calculateScore(temp, scorer);
+			if (scoreSum > maxSum) {
+				bestBlock = block;
+				maxSum = scoreSum;
+			}
+		}
+		//LOGGER.info(bestBlock.getSigner().getLabel());
+		return bestBlock;
+	}
 	
 	private long calculateScore(List<Block> blocks, BlockScorer scorer) {
 		long scoreSum = 0;
 		if (blocks.size() > 1) {
 			Iterator<Block> iter = blocks.iterator();
-			Block parentBlock = iter.next();
+
+			Block parent = iter.next(); // skip first "same" block
+
 			while (iter.hasNext()) {
 				Block block = iter.next();
 				if (scoreSum == 0) {
@@ -382,7 +498,7 @@ public class BlockScorerTest {
 				}
 				long score = scorer.calculateBlockScore(block);
 				scoreSum += score;
-				parentBlock = block;
+				parent = block;
 			}
 		}
 		return scoreSum;
