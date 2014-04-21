@@ -8,7 +8,7 @@ import org.nem.core.model.Block;
 public class UndoBlockVisitor implements BlockVisitor {
 
 	@Override
-	public void visit(final Block block) {
+	public void visit(final Block parentBlock, final Block block) {
 		block.undo();
 	}
 }

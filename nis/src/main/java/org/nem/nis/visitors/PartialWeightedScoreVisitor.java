@@ -51,9 +51,9 @@ public class PartialWeightedScoreVisitor implements BlockVisitor {
 	}
 
 	@Override
-	public void visit(final Block block) {
+	public void visit(final Block parentBlock, final Block block) {
 
-		this.lastScore = this.blockScorer.calculateBlockScore(block);
+		this.lastScore = this.blockScorer.calculateBlockScore(parentBlock, block);
 
 		if (0 == numVisitedBlocks++ && BlockOrder.Forward == this.order) {
 			this.partialScore += this.lastScore;

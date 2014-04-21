@@ -192,25 +192,23 @@ public class BlockChain implements BlockSynchronizer {
 	 * Validates blocks in peerChain.
 	 *
 	 * @param contemporaryAccountAnalyzer AccountLookup upon which TXes from peerChain should be applied.
-	 * @param parentDbBlock parent db block
+	 * @param parentBlock parent block
 	 * @param peerChain analyzed fragment of peer's blockchain.
 	 *
 	 * @return score or -1 if chain is invalid
 	 */
-	private boolean validatePeerChain(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
-		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
-
+	private boolean validatePeerChain(AccountAnalyzer contemporaryAccountAnalyzer, final Block parentBlock, final List<Block> peerChain) {
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
 		calculatePeerChainGenerations(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
-	private long getPeerChainScore(List<Block> peerChain) {
+	private long getPeerChainScore(Block parentBlock, List<Block> peerChain) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 				this.scorer,
 				PartialWeightedScoreVisitor.BlockOrder.Forward);
-		BlockIterator.all(peerChain, scoreVisitor);
+		BlockIterator.all(parentBlock, peerChain, scoreVisitor);
 		return scoreVisitor.getScore();
 	}
 
@@ -262,13 +260,14 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		// do not trust peer, take first block from our db and convert it
-		if (! validatePeerChain(contemporaryAccountAnalyzer, ourDbBlock, peerChain)) {
+		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+		if (! validatePeerChain(contemporaryAccountAnalyzer, parentBlock, peerChain)) {
 			penalize(node);
 			return;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(peerChain);
+		long peerScore = getPeerChainScore(parentBlock, peerChain);
 		if (peerScore < 0L) {
 			penalize(node);
 			return;
@@ -343,13 +342,14 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(block);
 
-		if (! validatePeerChain(contemporaryAccountAnalyzer, parent, peerChain)) {
+		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
+		if (! validatePeerChain(contemporaryAccountAnalyzer, parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerscore = getPeerChainScore(peerChain);
+		long peerscore = getPeerChainScore(parentBlock, peerChain);
 		if (peerscore < 0) {
 			// penalty?
 			return false;
