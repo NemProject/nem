@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.logging.Logger;
 
 import javax.servlet.*;
-import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.annotation.WebListener;
 
 import org.eclipse.jetty.server.*;
@@ -12,8 +11,6 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
-import org.nem.nis.config.JsonErrorHandler;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;

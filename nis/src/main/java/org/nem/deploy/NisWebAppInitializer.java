@@ -1,7 +1,5 @@
 package org.nem.deploy;
 
-import org.nem.nis.config.DeserializerHttpMessageConverter;
-import org.nem.nis.config.SerializableEntityHttpMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

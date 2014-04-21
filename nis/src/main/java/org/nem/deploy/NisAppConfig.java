@@ -3,8 +3,6 @@ package org.nem.deploy;
 import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
-import org.nem.nis.config.DeserializerHttpMessageConverter;
-import org.nem.nis.config.SerializableEntityHttpMessageConverter;
 import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Account;

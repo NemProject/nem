@@ -68,6 +68,6 @@
     <bean class="org.nem.nis.NisMain" />
     <bean class="org.nem.nis.NisPeerNetworkHost" />
     <bean class="org.nem.nis.controller.utils.RequiredBlockDaoAdapter" />
-    <bean class="org.nem.nis.config.DeserializerHttpMessageConverter" />
+    <bean class="org.nem.deploy.DeserializerHttpMessageConverter" />
 
 </beans>
