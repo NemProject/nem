@@ -32,6 +32,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean matches(final java.lang.Object arg) {
 		if (!(arg instanceof Collection<?>))
 			return false;

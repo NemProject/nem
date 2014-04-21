@@ -1,7 +1,6 @@
 package org.nem.peer.trust.simulation;
 
 import java.io.*;
-import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
@@ -68,7 +67,7 @@ public class NetworkSimulator {
 	 */
 	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
 		if (minTrust <= 0.0 || minTrust > 1.0)
-			throw new InvalidParameterException("min trust must be in the range (0, 1]");
+			throw new IllegalArgumentException("min trust must be in the range (0, 1]");
 
 		this.config = config;
 		this.trustProvider = trustProvider;
@@ -177,7 +176,7 @@ public class NetworkSimulator {
 				return entry.getBehavior();
 		}
 
-		throw new InvalidParameterException(String.format("%s could not be found in the configuration", node));
+		throw new IllegalArgumentException(String.format("%s could not be found in the configuration", node));
 	}
 
 	private NodeExperience getNodeExperience(final Node a, final Node b) {

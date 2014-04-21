@@ -1,9 +1,9 @@
 package org.nem.core.crypto;
 
+import org.nem.core.serialization.*;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 /**
  * A EC signature.
@@ -31,7 +31,7 @@ public class Signature {
 	 */
 	public Signature(final byte[] bytes) {
 		if (64 != bytes.length)
-			throw new InvalidParameterException("binary signature representation must be 64 bytes");
+			throw new IllegalArgumentException("binary signature representation must be 64 bytes");
 
 		byte[][] parts = ArrayUtils.split(bytes, 32);
 		this.r = ArrayUtils.toBigInteger(parts[0]);
@@ -97,4 +97,32 @@ public class Signature {
 		Signature rhs = (Signature)obj;
 		return 0 == this.r.compareTo(rhs.r) && 0 == this.s.compareTo(rhs.s);
 	}
+
+	//region inline serialization
+
+	/**
+	 * Writes a signature object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param signature  The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Signature signature) {
+		serializer.writeBytes(label, signature.getBytes());
+	}
+
+	/**
+	 * Reads a signature object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Signature readFrom(final Deserializer deserializer, final String label) {
+		final byte[] bytes = deserializer.readBytes(label);
+		return new Signature(bytes);
+	}
+
+	//endregion
 }

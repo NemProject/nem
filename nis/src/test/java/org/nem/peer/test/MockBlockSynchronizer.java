@@ -1,8 +1,7 @@
 package org.nem.peer.test;
 
-import org.nem.peer.BlockSynchronizer;
-import org.nem.peer.Node;
-import org.nem.peer.SyncConnector;
+import org.nem.core.connect.SyncConnectorPool;
+import org.nem.peer.*;
 
 /**
  * A mock BlockSynchronizer implementation.
@@ -10,7 +9,7 @@ import org.nem.peer.SyncConnector;
 public class MockBlockSynchronizer implements BlockSynchronizer {
 
 	private int numSynchronizeNodeCalls;
-	private SyncConnector lastConnector;
+	private SyncConnectorPool lastConnectorPool;
 
 	/**
 	 * Gets the number of times synchronizeNode was called.
@@ -22,17 +21,17 @@ public class MockBlockSynchronizer implements BlockSynchronizer {
 	}
 
 	/**
-	 * Gets the last SyncConnector passed to synchronizeNode.
+	 * Gets the last SyncConnectorPool passed to synchronizeNode.
 	 *
-	 * @return The last SyncConnector passed to synchronizeNode.
+	 * @return The last SyncConnectorPool passed to synchronizeNode.
 	 */
-	public SyncConnector getLastConnector() {
-		return this.lastConnector;
+	public SyncConnectorPool getLastConnectorPool() {
+		return this.lastConnectorPool;
 	}
 
 	@Override
-	public void synchronizeNode(final SyncConnector connector, final Node node) {
+	public void synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		++this.numSynchronizeNodeCalls;
-		this.lastConnector = connector;
+		this.lastConnectorPool = connectorPool;
 	}
 }

@@ -1,7 +1,6 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -13,20 +12,15 @@ public class BlockChainValidator {
 
 	private final int maxChainSize;
 	private final BlockScorer scorer;
-	private final AccountLookup accountLookup;
 
 	/**
 	 * Creates a new block chain validator.
 	 *
 	 * @param scorer The block scorer to use.
-	 * @param accountLookup An account lookup that should be used.
-	 *
-	 * TODO: see if there's a way we can avoid an account lookup here
 	 */
-	public BlockChainValidator(final BlockScorer scorer, final int maxChainSize, final AccountLookup accountLookup) {
+	public BlockChainValidator(final BlockScorer scorer, final int maxChainSize) {
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
-		this.accountLookup = accountLookup;
 	}
 
 	/**
@@ -40,9 +34,9 @@ public class BlockChainValidator {
 		if (blocks.size() > this.maxChainSize)
 			return false;
 
-		long expectedHeight = parentBlock.getHeight() + 1;
+		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
-			if (expectedHeight != block.getHeight() || !block.verify() || !isBlockHit(parentBlock, block))
+			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
 				return false;
 
 			for (final Transaction transaction : block.getTransactions()) {
@@ -51,47 +45,15 @@ public class BlockChainValidator {
 			}
 
 			parentBlock = block;
-			++expectedHeight;
+			expectedHeight = expectedHeight.next();
 		}
 
 		return true;
 	}
 
-	/**
-	 * Computes partial score given blocks and parentBlock.
-	 * TODO: move this and add tests for it
-	 *
-	 * @param parentBlock The parent block.
-	 * @param blocks The block chain.
-	 *
-	 * @return "partial score" of blocks.
-	 */
-	long computePartialScore(Block parentBlock, final Collection<Block> blocks) {
-		long peersScore = 0L;
-
-		// used to distinguish first element, to calculate:
-		// 2*x_0 + x_1 + x_2 + ...
-		boolean isFirst = true;
-		for (final Block block : blocks) {
-			long score = scorer.calculateBlockScore(parentBlock, block);
-
-			peersScore += score;
-
-			if (isFirst) {
-				peersScore += score;
-				isFirst = false;
-			}
-
-			parentBlock = block;
-		}
-
-		return peersScore;
-	}
-
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
-		Account forgerAccount = this.accountLookup.findByAddress(block.getSigner().getAddress());
-		final BigInteger hit = this.scorer.calculateHit(parentBlock);
-		final BigInteger target = this.scorer.calculateTarget(parentBlock, block, forgerAccount);
+		final BigInteger hit = this.scorer.calculateHit(block);
+		final BigInteger target = this.scorer.calculateTarget(parentBlock, block);
 		return hit.compareTo(target) < 0;
 	}
 }

@@ -9,8 +9,7 @@ import org.nem.core.test.MockAccount;
 import org.nem.nis.test.MockBlockChain;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
+import org.nem.core.model.TransferTransaction;
 
 import java.util.Arrays;
 
@@ -29,7 +28,7 @@ public class BlockChainTest {
 	public void analyzeSavesResults() {
 		// Arrange:
 		Block block = createDummyDbBlock();
-		BlockChain blockChain = new MockBlockChain();
+		BlockChain blockChain = new BlockChain();
 		blockChain.bootup();
 
 		// Act:
@@ -53,8 +52,7 @@ public class BlockChainTest {
 				SENDER,
 				Hash.ZERO,
 				time.getCurrentTime(),
-				1L
-		);
+				BlockHeight.ONE);
 
 		b.addTransaction(tx1);
 		b.addTransaction(tx2);
@@ -64,15 +62,18 @@ public class BlockChainTest {
 		Block dbBlock = new Block(
 				HashUtils.calculateHash(b),
 				1,
+				// generation hash
+				Hash.ZERO,
 				// prev hash
 				Hash.ZERO,
 				0, // timestamp
 				DB_SENDER,
 				// proof
 				b.getSignature().getBytes(),
-				b.getHeight(), // height
+				b.getHeight().getRaw(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
-				0L
+				0L,
+				123L
 		);
 
 		Transfer dbTransaction1 = new Transfer(

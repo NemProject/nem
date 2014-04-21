@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.Predicate;
 
 import java.util.*;
 
@@ -63,6 +64,46 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
 	}
+
+	@Test
+	public void transactionCanBeAddedIfTransactionPredicateReturnsFalse() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+
+		// Act:
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(Hash hash) {
+				return false;
+			}
+		});
+
+		// Assert:
+		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void transactionCannotBeAddedIfTransactionPredicateReturnsTrue() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+
+		// Act:
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(Hash hash) {
+				return true;
+			}
+		});
+
+		// Assert:
+		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region sorting
 
 	@Test
 	public void returnedTransactionsAreSortedByFee() {
@@ -126,7 +167,7 @@ public class UnconfirmedTransactionsTest {
 			unconfirmedTransactions.add(transaction);
 		}
 
-		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, new TimeInstant(0), 1);
+		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		block.addTransaction(transactions.get(1));
 		block.addTransaction(transactions.get(7));
 		block.addTransaction(transactions.get(4));

@@ -1,8 +1,8 @@
 package org.nem.core.model;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransactionFactory;
 
 import java.util.*;
 
@@ -18,10 +18,15 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_VERSION = 1;
 
 	private final Hash prevBlockHash;
-	private long height; // unsure yet, but probably will be easier to talk on forums having that
+	private final BlockHeight height;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
+
+	// these are helper fields and shouldn't be serialized
+	private BlockDifficulty difficulty;
+
+	private Hash generationHash;
 
 	/**
 	 * Creates a new block.
@@ -31,22 +36,26 @@ public class Block extends VerifiableEntity {
 	 * @param timestamp     The block timestamp.
 	 * @param height        The block height.
 	 */
-	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final long height) {
+	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final BlockHeight height) {
 		super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.height = height;
+
+		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
 	}
 
 	/**
 	 * Creates a new block.
 	 *
 	 * @param forger    The forger.
-	 * @param timestamp The block timestamp.
 	 * @param prevBlock The previous block.
+	 * @param timestamp The block timestamp.
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
-		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight() + 1);
+		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
+
+		this.setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 	}
 
 	/**
@@ -59,10 +68,12 @@ public class Block extends VerifiableEntity {
 		super(type, options, deserializer);
 
 		this.prevBlockHash = deserializer.readObject("prevBlockHash", Hash.DESERIALIZER);
-		this.height = deserializer.readLong("height");
-		this.totalFee = SerializationUtils.readAmount(deserializer, "totalFee");
+		this.height = BlockHeight.readFrom(deserializer, "height");
+		this.totalFee = Amount.readFrom(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
+
+		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
 	}
 
 	//region Getters
@@ -72,8 +83,8 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return The height of this block in the block chain.
 	 */
-	public long getHeight() {
-		return height;
+	public BlockHeight getHeight() {
+		return this.height;
 	}
 
 	/**
@@ -94,7 +105,6 @@ public class Block extends VerifiableEntity {
 		return this.prevBlockHash;
 	}
 
-
 	/**
 	 * Gets the transactions associated with this block.
 	 *
@@ -104,7 +114,45 @@ public class Block extends VerifiableEntity {
 		return this.transactions;
 	}
 
+	/**
+	 * Gets the difficulty associated with this block.
+	 *
+	 * @return Difficulty of this block.
+	 */
+	public BlockDifficulty getDifficulty() {
+		return this.difficulty;
+	}
+
+	/**
+	 * Gets the generation hash associated with this block.
+	 *
+	 * @return Generation hash of this block.
+	 */
+	public Hash getGenerationHash() { return this.generationHash; }
+
 	//endregion
+
+	//region Setters
+
+	/**
+	 * Sets the generation hash.
+	 *
+	 * @param generationHash the generation hash.
+	 */
+	public void setGenerationHash(final Hash generationHash) {
+		this.generationHash = generationHash;
+	}
+
+	/**
+	 * Sets the difficulty.
+	 *
+	 * @param difficulty The difficulty.
+	 */
+	public void setDifficulty(final BlockDifficulty difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	// endregion
 
 	/**
 	 * Adds a new transaction to this block.
@@ -126,12 +174,50 @@ public class Block extends VerifiableEntity {
 			this.addTransaction(transaction);
 	}
 
+	/**
+	 * Executes all transactions in the block.
+	 */
+	public void execute() {
+		for (final Transaction transaction : this.transactions) {
+			transaction.execute();
+		}
+
+		this.getSigner().incrementForagedBlocks();
+		this.getSigner().incrementBalance(this.getTotalFee());
+	}
+
+	/**
+	 * Undoes all transactions in the block.
+	 */
+	public void undo() {
+		this.getSigner().decrementForagedBlocks();
+		this.getSigner().decrementBalance(this.getTotalFee());
+
+		for (final Transaction transaction : this.getReverseTransactions()) {
+			transaction.undo();
+		}
+	}
+
+	private Iterable<Transaction> getReverseTransactions() {
+		return new Iterable<Transaction>() {
+			@Override
+			public Iterator<Transaction> iterator() {
+				return new ReverseListIterator<>(transactions);
+			}
+		};
+	}
+
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeObject("prevBlockHash", this.prevBlockHash);
-		serializer.writeLong("height", this.height);
-		SerializationUtils.writeAmount(serializer, "totalFee", this.totalFee);
+		BlockHeight.writeTo(serializer, "height", this.height);
+		Amount.writeTo(serializer, "totalFee", this.totalFee);
 
 		serializer.writeObjectArray("transactions", this.transactions);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("height: %d, #tx: %d", this.height.getRaw(), this.transactions.size());
 	}
 }

@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.utils.HexEncoder;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 
@@ -12,7 +13,6 @@ import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
-import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -44,16 +44,19 @@ public class NisMain {
 		System.out.println("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
-		if (null == dbBlock) {
+		LOGGER.info("hex: " + HexEncoder.getString(dbBlock.getGenerationHash().getRaw()));
+		if (null == dbBlock ||
+				! dbBlock.getGenerationHash().equals(new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8")))) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}
 
-		final Account genesisAccount = accountAnalyzer.initializeGenesisAccount(GenesisBlock.ACCOUNT);
+		final Account genesisAccount = accountAnalyzer.addAccountToCache(GenesisBlock.ACCOUNT.getAddress());
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
 
 		do {
-			this.accountAnalyzer.analyze(dbBlock);
+			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
+			block.execute();
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
@@ -62,13 +65,13 @@ public class NisMain {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			if (dbBlock == null) {
-				if (this.blockChain.getLastDbBlock() == null) {
-					LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
-					System.exit(-1);
-				}
+			if (dbBlock == null && this.blockChain.getLastDbBlock() == null) {
+				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
+				System.exit(-1);
 			}
 		} while (dbBlock != null);
+
+		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 	}
 
 	@PostConstruct
@@ -91,9 +94,10 @@ public class NisMain {
 
 		final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
 		final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();
-		LOGGER.info("genesis account private key: " + genesisKeyPair.getPrivateKey());
+		LOGGER.info("genesis account private key          : " + genesisKeyPair.getPrivateKey());
 		LOGGER.info("genesis account            public key: " + genesisKeyPair.getPublicKey());
 		LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
+		LOGGER.info("genesis account generetion hash      : " + GENESIS_BLOCK.getGenerationHash());
 	}
 
 	private void populateDb() {

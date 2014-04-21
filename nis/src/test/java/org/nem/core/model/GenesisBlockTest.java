@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 public class GenesisBlockTest {
 
@@ -22,8 +21,11 @@ public class GenesisBlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(8));
+
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		Assert.assertThat(block.getGenerationHash(), IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test

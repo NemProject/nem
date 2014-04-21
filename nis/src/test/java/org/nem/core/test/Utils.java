@@ -1,5 +1,6 @@
 package org.nem.core.test;
 
+import net.minidev.json.JSONObject;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.crypto.PublicKey;
@@ -24,6 +25,16 @@ public class Utils {
 		final byte[] bytes = Utils.generateRandomBytes(33);
 		bytes[0] = 0x02;
 		return new PublicKey(bytes);
+	}
+
+	/**
+	 * Generates a random hash.
+	 *
+	 * @return A random hash.
+	 */
+	public static Hash generateRandomHash() {
+		final byte[] bytes = Utils.generateRandomBytes(64);
+		return new Hash(bytes);
 	}
 
 	/**
@@ -274,5 +285,16 @@ public class Utils {
 	 */
 	public static PrivateKey mutate(final PrivateKey key) {
 		return new PrivateKey(key.getRaw().add(BigInteger.ONE));
+	}
+
+	/**
+	 * Creates a JsonDeserializer around a JSONObject.
+	 * @param object The json object.
+	 * @return The deserializer.
+	 */
+	public static JsonDeserializer createDeserializer(final JSONObject object) {
+		return new JsonDeserializer(
+				object,
+				new DeserializationContext(new MockAccountLookup()));
 	}
 }

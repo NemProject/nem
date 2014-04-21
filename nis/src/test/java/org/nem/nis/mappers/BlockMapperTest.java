@@ -9,7 +9,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransferTransaction;
 import org.nem.nis.test.MockAccountDao;
 
 public class BlockMapperTest {
@@ -85,6 +85,20 @@ public class BlockMapperTest {
 		}
 	}
 
+	@Test
+	public void dbModelWithoutDifficultyCanBeMappedToModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		dbModel.setDifficulty(null);
+
+		// Act:
+		final Block model = context.toModel(dbModel);
+
+		// Assert:
+		Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(0)));
+	}
+
 	private class TestContext {
 
 		private final Block model;
@@ -96,15 +110,19 @@ public class BlockMapperTest {
 		private final Account account3;
 		private final org.nem.nis.dbmodel.Account dbAccount3;
 		private final MockAccountDao accountDao;
+		private final Hash blockGenerationHash;
 		private Hash hash;
 
 		public TestContext() {
 			this.model = new Block(
 					Utils.generateRandomAccount(),
-					new Hash(Utils.generateRandomBytes()),
+					Utils.generateRandomHash(),
 					new TimeInstant(721),
-					17);
+					new BlockHeight(17));
 
+			this.blockGenerationHash = Utils.generateRandomHash();
+			this.model.setDifficulty(new BlockDifficulty(77_777_777_777L));
+			this.model.setGenerationHash(this.blockGenerationHash);
 			this.signModel();
 
 			this.dbForager = new org.nem.nis.dbmodel.Account();
@@ -121,10 +139,10 @@ public class BlockMapperTest {
 			this.dbAccount3 = createDbAccount(this.account3);
 
 			this.accountDao = new MockAccountDao();
-			accountDao.addMapping(this.model.getSigner(), this.dbForager);
-			accountDao.addMapping(this.account1, this.dbAccount1);
-			accountDao.addMapping(this.account2, this.dbAccount2);
-			accountDao.addMapping(this.account3, this.dbAccount3);
+			this.accountDao.addMapping(this.model.getSigner(), this.dbForager);
+			this.accountDao.addMapping(this.account1, this.dbAccount1);
+			this.accountDao.addMapping(this.account2, this.dbAccount2);
+			this.accountDao.addMapping(this.account3, this.dbAccount3);
 		}
 
 		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
@@ -183,6 +201,8 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
 			Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
+			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(77_777_777_777L));
+			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
@@ -198,6 +218,8 @@ public class BlockMapperTest {
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(model.getSignature()));
 			Assert.assertThat(rhs.getHeight(), IsEqual.equalTo(model.getHeight()));
 			Assert.assertThat(rhs.getTotalFee(), IsEqual.equalTo(model.getTotalFee()));
+			Assert.assertThat(rhs.getDifficulty(), IsEqual.equalTo(model.getDifficulty()));
+			Assert.assertThat(rhs.getGenerationHash(), IsEqual.equalTo(model.getGenerationHash()));
 		}
 	}
 }

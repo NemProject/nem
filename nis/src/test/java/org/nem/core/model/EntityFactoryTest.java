@@ -6,7 +6,6 @@ import org.nem.core.messages.PlainMessage;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
-import org.nem.core.transactions.TransferTransaction;
 
 public class EntityFactoryTest {
 
@@ -15,16 +14,18 @@ public class EntityFactoryTest {
 		// Arrange:
 		final EntityFactory factory = new EntityFactory(new MockTimeProvider(11890));
 		final Account signer = Utils.generateRandomAccount();
-		final Hash previousHash = new Hash(Utils.generateRandomBytes());
+		final Hash previousHash = Utils.generateRandomHash();
+		final Hash generationHash = Utils.generateRandomHash();
 
 		// Act:
-		final Block block = factory.createBlock(signer, previousHash, 12);
+		final Block block = factory.createBlock(signer, generationHash, previousHash, new BlockHeight(12));
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(12L));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(generationHash));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(previousHash));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11890)));
 	}

@@ -3,8 +3,6 @@ package org.nem.core.math;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class MatrixTest {
 
 	//region constructor / getAt / setAt
@@ -171,7 +169,7 @@ public class MatrixTest {
 
 	//region multiplyElementWise
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void matrixCannotBeMultipliedElementWiseWithDifferentSizeMatrix() {
 		// Arrange:
 		final Matrix matrix1 = new Matrix(3, 2);
@@ -247,7 +245,7 @@ public class MatrixTest {
 
 	private static Matrix createThreeByTwoMatrix(final double[] values) {
 		if (6 != values.length)
-			throw new InvalidParameterException("values must have 6 elements");
+			throw new IllegalArgumentException("values must have 6 elements");
 
 		// Arrange:
 		final Matrix matrix = new Matrix(3, 2);

@@ -1,5 +1,7 @@
 package org.nem.nis.sync;
 
+import org.nem.core.model.BlockHeight;
+
 /**
  * Possible comparison results.
  *
@@ -59,6 +61,7 @@ public class ComparisonResult {
 
 	private final int code;
 	private final long commonBlockHeight;
+	private final BlockHeight remoteHeight;
 	private final boolean areChainsConsistent;
 
 	/**
@@ -68,10 +71,15 @@ public class ComparisonResult {
 	 * @param commonBlockHeight The height of the last common block between two chains.
 	 * @param areChainsConsistent true if the two chains are consistent.
 	 */
-	public ComparisonResult(int code, long commonBlockHeight, boolean areChainsConsistent) {
+	public ComparisonResult(
+			final int code,
+			final long commonBlockHeight,
+			final boolean areChainsConsistent,
+			final BlockHeight remoteHeight) {
 		this.code = code;
 		this.commonBlockHeight = commonBlockHeight;
 		this.areChainsConsistent = areChainsConsistent;
+		this.remoteHeight = remoteHeight;
 	}
 
 	/**
@@ -91,6 +99,18 @@ public class ComparisonResult {
 			throw new UnsupportedOperationException("unsupported when code is not REMOTE_IS_NOT_SYNCED");
 
 		return this.commonBlockHeight;
+	}
+
+	/**
+	 * Gets full height of remote chain. (only supported when code is not REMOTE_HAS_NO_BLOCKS).
+	 *
+	 * @return The height of remote chain.
+	 */
+	public BlockHeight getRemoteHeight() {
+		if (Code.REMOTE_HAS_NO_BLOCKS == this.code)
+			throw new UnsupportedOperationException("unsupported when code is not REMOTE_HAS_NO_BLOCKS");
+
+		return this.remoteHeight;
 	}
 
 	/**

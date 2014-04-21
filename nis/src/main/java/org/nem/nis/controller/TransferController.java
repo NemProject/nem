@@ -3,18 +3,17 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.core.transactions.TransactionFactory;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransactionFactory;
+import org.nem.core.model.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.peer.NodeApiId;
+import org.nem.core.connect.NodeApiId;
 import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Logger;
 
 // TODO: add tests
@@ -42,7 +41,7 @@ public class TransferController {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
 		if (!transfer.isValid())
-			throw new InvalidParameterException("transfer must be valid");
+			throw new IllegalArgumentException("transfer must be valid");
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
 		return new RequestPrepare(transferData);
@@ -59,7 +58,7 @@ public class TransferController {
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
 
 		if (!transfer.isValid() || !transfer.verify())
-			throw new InvalidParameterException("transfer must be valid and verifiable");
+			throw new IllegalArgumentException("transfer must be valid and verifiable");
 
         final PeerNetwork network = this.host.getNetwork();
 

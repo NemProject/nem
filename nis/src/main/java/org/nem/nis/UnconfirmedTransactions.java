@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.Predicate;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -23,21 +24,32 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds an unconfirmed transaction.
+	 * Adds an unconfirmed transaction unconditionally.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		return this.add(transaction, new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(final Hash hash) {
+				return false;
+			}
+		});
+	}
 
-		// TODO: add this back
-//		synchronized (blockChain) {
-//			Transfer tx = transferDao.findByHash(transactionHash.get());
-//			if (tx != null) {
-//				return false;
-//			}
-//		}
+	/**
+	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
+	 *
+	 * @param transaction The transaction.
+	 * @param exists Predicate that determines the existence of the transaction given its hash.
+	 * @return true if the transaction was added.
+	 */
+	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		if (exists.evaluate(transactionHash)) {
+			return false;
+		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
@@ -72,8 +84,14 @@ public class UnconfirmedTransactions {
 		Collections.sort(transactions, new Comparator<Transaction>() {
 			@Override
 			public int compare(final Transaction lhs, final Transaction rhs) {
-				// TODO: should we just use Transaction.compare (it weights things other than fees more heavily) ?
-				return rhs.getFee().compareTo(lhs.getFee());
+				// should we just use Transaction.compare (it weights things other than fees more heavily) ?
+				// maybe we should change Transaction.compare? also it
+				// TODO: should fee or time be more important inside Transaction.compare
+				int result = -lhs.getFee().compareTo(rhs.getFee());
+				if (result == 0) {
+					result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
+				}
+				return result;
 			}
 		});
 

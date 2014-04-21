@@ -1,99 +1,52 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
- *
- * TODO: add support for equals and then check findFirstDifferent usages
  */
-public class HashChain implements SerializableEntity {
-	private List<Hash> hashChainList;
+public class HashChain extends SerializableList<Hash> {
 
 	/**
 	 * Creates new empty HashChain with specified capacity.
 	 *
-	 * @param initialCapacity the initial capacity of HashChain
+	 * @param initialCapacity The initial capacity.
 	 */
 	public HashChain(int initialCapacity) {
-		hashChainList = new ArrayList<>(initialCapacity);
+		super(initialCapacity);
 	}
 
 	/**
 	 * Creates new HashChain and initializes it with passed list of hashes.
 	 *
-	 * @param rawByteArrayList list of hashes
+	 * @param hashList The list of hashes.
 	 */
-	public HashChain(List<byte[]> rawByteArrayList) {
-		this(rawByteArrayList.size());
-		for (byte[] elem : rawByteArrayList) {
-			this.add(elem);
-		}
+	public HashChain(final List<Hash> hashList) {
+		super(hashList);
 	}
 
 	/**
-	 * Deserializes new HashChain.
+	 * Deserializes a HashChain.
 	 *
 	 * @param deserializer The deserializer to use.
 	 */
 	public HashChain(Deserializer deserializer) {
-		hashChainList = deserializer.readObjectArray("data", Hash.DESERIALIZER);
-	}
-
-	@Override
-	public void serialize(Serializer serializer) {
-		serializer.writeObjectArray("data", hashChainList);
+		super(deserializer.readObjectArray("data", Hash.DESERIALIZER));
 	}
 
 	/**
-	 * add new hash to this HashChain
+	 * Creates new HashChain and initializes it with the passed list of raw hashes.
 	 *
-	 * @param bytes hash
+	 * @param rawHashList The list of raw hashes.
 	 */
-	public final void add(byte[] bytes) {
-		hashChainList.add(new Hash(bytes));
-	}
-
-	/**
-	 * Returns number of hashes in this chain.
-	 *
-	 * @return
-	 */
-	public int size() {
-		return hashChainList.size();
-	}
-
-	private Hash get(int i) {
-		return this.hashChainList.get(i);
-	}
-
-	/**
-	 * Compares with another HashChain (might be of different length)
-	 * and finds first different element.
-	 *
-	 * @param other HashChain to compare to.
-	 *
-	 * @return index of different element.
-	 */
-	public int findFirstDifferent(HashChain other) {
-		int limit = Math.min(this.size(), other.size());
-		int i;
-		for (i = 0; i < limit; ++i) {
-			if (this.get(i) == null) {
-				System.out.println("null");
-			}
-			if (other.get(i) == null) {
-				System.out.println("null");
-			}
-			if (! this.get(i).equals(other.get(i))) {
-				break;
-			}
+	public static HashChain fromRawHashes(final List<byte[]> rawHashList) {
+		final List<Hash> hashList = new ArrayList<>(rawHashList.size());
+		for (final byte[] rawHash : rawHashList) {
+			hashList.add(new Hash(rawHash));
 		}
-		return i;
+
+		return new HashChain(hashList);
 	}
 }

@@ -1,10 +1,8 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
-import org.nem.peer.Node;
-import org.nem.peer.NodeEndpoint;
-import org.nem.peer.SyncConnector;
+import org.nem.core.connect.*;
+import org.nem.core.model.*;
+import org.nem.peer.*;
 
 /**
  * A BlockLookup implementation that looks up blocks from a remote node.
@@ -31,12 +29,12 @@ public class RemoteBlockLookupAdapter implements BlockLookup {
 	}
 
 	@Override
-	public Block getBlockAt(long height) {
+	public Block getBlockAt(final BlockHeight height) {
 		return this.connector.getBlockAt(remoteEndpoint, height);
 	}
 
 	@Override
-	public HashChain getHashesFrom(long height) {
+	public HashChain getHashesFrom(final BlockHeight height) {
 		return this.connector.getHashesFrom(remoteEndpoint, height);
 	}
 }

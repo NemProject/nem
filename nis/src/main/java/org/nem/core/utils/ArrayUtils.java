@@ -1,7 +1,6 @@
 package org.nem.core.utils;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 /**
  * Static class that contains a handful of array helper functions.
@@ -47,7 +46,7 @@ public class ArrayUtils {
 	 */
 	public static byte[][] split(final byte[] bytes, final int splitIndex) {
 		if (splitIndex < 0 || bytes.length < splitIndex)
-			throw new InvalidParameterException("split index is out of range");
+			throw new IllegalArgumentException("split index is out of range");
 
 		final byte[] lhs = new byte[splitIndex];
 		final byte[] rhs = new byte[bytes.length - splitIndex];

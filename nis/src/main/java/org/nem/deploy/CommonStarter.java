@@ -1,25 +1,13 @@
 package org.nem.deploy;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.EnumSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.servlet.*;
 import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.annotation.WebListener;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -82,42 +70,7 @@ public class CommonStarter implements ServletContextListener {
 
 		LOGGER.info("Calling start().");
 		server.start();
-
-		openStartPage();
 		server.join();
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static boolean openStartPage() {
-		boolean result = false;
-		// Let the show start without binding statically to JNLP
-		//We first try to get the JNLP Service Manager
-		Class jnlpServiceManager;
-		Class jnlpBasicService;
-		try {
-			jnlpServiceManager = Class.forName("javax.jnlp.ServiceManager");
-			jnlpBasicService = Class.forName("javax.jnlp.BasicService");
-
-			Method lookup = jnlpServiceManager.getMethod("lookup", new Class[] { String.class });
-			Method showDocument = jnlpBasicService.getMethod("showDocument", new Class[] { URL.class });
-
-			Object basicService = lookup.invoke(jnlpServiceManager, "javax.jnlp.BasicService");
-			URL homeURL = new URL("http://127.0.0.1:7890/peer");
-			showDocument.invoke(basicService, homeURL);
-
-			result = true;
-		} catch (ClassNotFoundException | NoClassDefFoundError ex) {
-			// handle exception case
-			LOGGER.info("JNLP not available, not started via WebStart. Assuming headless run.");
-		} catch (InvocationTargetException e) {
-			LOGGER.log(Level.INFO, "WebStart services failed: <" + e.getCause().getMessage() + ">. Not started via WebStart. Assuming headless run.");
-		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
-			LOGGER.log(Level.SEVERE, "Method reflection failed.", e);
-		} catch (MalformedURLException e) {
-			LOGGER.log(Level.SEVERE, "home URL incorrect", e);
-		}
-
-		return result;
 	}
 
 	@Override

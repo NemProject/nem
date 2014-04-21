@@ -5,8 +5,7 @@ import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
-import org.nem.core.utils.ByteUtils;
+import org.nem.core.model.TransferTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +31,15 @@ public class BlockMapper {
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
 				blockHash,
 				block.getVersion(),
+				block.getGenerationHash(),
 				block.getPreviousBlockHash(),
 				block.getTimeStamp().getRawTime(),
 				forager,
 				block.getSignature().getBytes(),
-				block.getHeight(),
+				block.getHeight().getRaw(),
 				0L,
-				block.getTotalFee().getNumMicroNem());
+				block.getTotalFee().getNumMicroNem(),
+				block.getDifficulty().getRaw());
 
 		int i = 0;
 		final List<Transfer> transactions = new ArrayList<>(block.getTransactions().size());
@@ -68,7 +69,11 @@ public class BlockMapper {
 				forager,
 				dbBlock.getPrevBlockHash(),
 				new TimeInstant(dbBlock.getTimestamp()),
-				dbBlock.getHeight());
+				new BlockHeight(dbBlock.getHeight()));
+
+		final Long difficulty = dbBlock.getDifficulty();
+		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
+		block.setGenerationHash(dbBlock.getGenerationHash());
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

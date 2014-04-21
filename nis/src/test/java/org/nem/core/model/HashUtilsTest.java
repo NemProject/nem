@@ -2,10 +2,15 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.PublicKey;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.Serializer;
 import org.nem.core.test.MockVerifiableEntity;
 import org.nem.core.test.Utils;
 
 public class HashUtilsTest {
+
+	//region calculateHash
 
 	@Test
 	public void identicalEntitiesHaveSameHash() {
@@ -70,4 +75,39 @@ public class HashUtilsTest {
 	}
 
 	//endregion
+
+	//region nextHash
+
+	@Test
+	public void nextHashProducesHashEquivalentToConcatenatingTheInputs() {
+		// Arrange:
+		final Hash inputHash = Utils.generateRandomHash();
+		final PublicKey inputKey = Utils.generateRandomPublicKey();
+
+		// Act:
+		final Hash hash1 = HashUtils.nextHash(inputHash, inputKey);
+		final Hash hash2 = HashUtils.calculateHash(new HashPublicKeyPair(inputHash, inputKey));
+
+		// Assert:
+		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
+	}
+
+	//endregion
+
+	private static class HashPublicKeyPair implements SerializableEntity {
+
+		private final Hash hash;
+		private final PublicKey key;
+
+		public HashPublicKeyPair(final Hash hash, final PublicKey key) {
+			this.hash = hash;
+			this.key = key;
+		}
+
+		@Override
+		public void serialize(final Serializer serializer) {
+			serializer.writeBytes("hash", this.hash.getRaw());
+			serializer.writeBytes("key", this.key.getRaw());
+		}
+	}
 }

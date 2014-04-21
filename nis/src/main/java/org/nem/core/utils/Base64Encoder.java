@@ -2,8 +2,6 @@ package org.nem.core.utils;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.security.InvalidParameterException;
-
 /**
  * Static class that contains utility functions for converting Base64 strings to and from bytes.
  */
@@ -20,7 +18,7 @@ public class Base64Encoder {
 		Base64 codec = new Base64();
 		byte[] encodedBytes = StringEncoder.getBytes(base64String);
 		if (!codec.isInAlphabet(encodedBytes, true))
-			throw new InvalidParameterException("malformed base64 string passed to getBytes");
+			throw new IllegalArgumentException("malformed base64 string passed to getBytes");
 
 		return codec.decode(encodedBytes);
 	}

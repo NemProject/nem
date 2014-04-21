@@ -1,14 +1,13 @@
 package org.nem.core.model;
 
-import java.security.InvalidParameterException;
+import org.nem.core.serialization.*;
 
 /**
  * Represents an amount of NEM.
  */
-public class Amount implements Comparable<Amount> {
+public class Amount extends AbstractPrimitive<Amount> {
 
 	public static final int MICRONEMS_IN_NEM = 1000000;
-	private final long amount;
 
 	/**
 	 * Amount representing 0 NEM.
@@ -43,10 +42,10 @@ public class Amount implements Comparable<Amount> {
 	 * @param amount The number of micro NEM.
 	 */
 	public Amount(long amount) {
-		if (amount < 0)
-			throw new InvalidParameterException("amount must be non-negative");
+		super(amount, Amount.class);
 
-		this.amount = amount;
+		if (amount < 0)
+			throw new IllegalArgumentException("amount must be non-negative");
 	}
 
 	/**
@@ -72,24 +71,12 @@ public class Amount implements Comparable<Amount> {
 	}
 
 	/**
-	 * Compares this amount to another Amount.
-	 *
-	 * @param rhs The amount to compare against.
-	 *
-	 * @return -1, 0 or 1 as this Amount is numerically less than, equal to, or greater than rhs.
-	 */
-	@Override
-	public int compareTo(final Amount rhs) {
-		return Long.compare(this.amount, rhs.amount);
-	}
-
-	/**
 	 * Returns the number of micro NEM.
 	 *
 	 * @return The number of micro NEM.
 	 */
 	public long getNumMicroNem() {
-		return this.amount;
+		return this.getValue();
 	}
 
 	/**
@@ -98,25 +85,33 @@ public class Amount implements Comparable<Amount> {
 	 * @return The number of NEM.
 	 */
 	public long getNumNem() {
-		return this.amount / MICRONEMS_IN_NEM;
+		return this.getValue() / MICRONEMS_IN_NEM;
 	}
 
-	@Override
-	public int hashCode() {
-		return Long.valueOf(this.amount).intValue();
+	//region inline serialization
+
+	/**
+	 * Writes an amount object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param amount     The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Amount amount) {
+		serializer.writeLong(label, amount.getNumMicroNem());
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Amount))
-			return false;
-
-		Amount rhs = (Amount)obj;
-		return this.amount == rhs.amount;
+	/**
+	 * Reads an amount object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Amount readFrom(final Deserializer deserializer, final String label) {
+		return new Amount(deserializer.readLong(label));
 	}
 
-	@Override
-	public String toString() {
-		return String.format("%d", this.amount);
-	}
+	//endregion
 }

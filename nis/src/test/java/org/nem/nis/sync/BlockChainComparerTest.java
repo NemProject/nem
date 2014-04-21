@@ -6,15 +6,13 @@ import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-
-import java.security.InvalidParameterException;
-import java.util.*;
+import org.nem.nis.test.MockBlockLookup;
 
 public class BlockChainComparerTest {
 
 	//region last block comparison
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void localBlockChainMustHaveAtLeastOneBlock() {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
@@ -23,6 +21,20 @@ public class BlockChainComparerTest {
 		comparer.compare(
 				new MockBlockLookup(null),
 				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 7)));
+	}
+
+	@Test
+	public void remoteChainHeightIsStoredInResult() {
+		// Arrange:
+		final BlockChainComparer comparer = createBlockChainComparer();
+
+		// Act:
+		final BlockHeight height = comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 7)),
+				new MockBlockLookup(createNonVerifiableBlock(Utils.generateRandomAccount(), 7))).getRemoteHeight();
+
+		// Assert:
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(7)));
 	}
 
 	@Test
@@ -108,7 +120,7 @@ public class BlockChainComparerTest {
 	//region chain comparison
 
 	@Test
-	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksTAnalyze() {
+	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksToAnalyze() {
 		// Assert:
 		Assert.assertThat(
 				compareBlocksWithNumRemoteHashes(21),
@@ -202,6 +214,7 @@ public class BlockChainComparerTest {
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
 		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
 		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
 	}
 
 	@Test
@@ -285,25 +298,25 @@ public class BlockChainComparerTest {
 	private static HashChain createHashChain(byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
 		for (final byte[] hash : hashes)
-			chain.add(hash);
+			chain.add(new Hash(hash));
 
 		return chain;
 	}
 
 	private static HashChain createHashChain(byte[][] hashes, byte[] additionalHash) {
 		final HashChain chain = createHashChain(hashes);
-		chain.add(additionalHash);
+		chain.add(new Hash(additionalHash));
 		return chain;
 	}
 
 	private static Block createVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, height);
+		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.sign();
 		return block;
 	}
 
 	private static Block createNonVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, height);
+		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.setSignature(new Signature(Utils.generateRandomBytes(64)));
 		return block;
 	}
@@ -315,53 +328,6 @@ public class BlockChainComparerTest {
 
 	private static BlockChainComparer createBlockChainComparer() {
 		return createBlockChainComparer(10);
-	}
-
-	//endregion
-
-	//region MockBlockLookup
-
-	private static class MockBlockLookup implements BlockLookup {
-
-		private final Block lastBlock;
-		private final HashChain chain;
-		private final Map<Long, Block> heightToBlockMap = new HashMap<>();
-
-		public MockBlockLookup(final Block lastBlock) {
-			this(lastBlock, 1);
-		}
-
-		public MockBlockLookup(final Block lastBlock, int numHashesToReturn) {
-			this.lastBlock = lastBlock;
-
-			this.chain = new HashChain(numHashesToReturn);
-			for (int i = 0; i < numHashesToReturn; ++i)
-				this.chain.add(Utils.generateRandomBytes(64));
-		}
-
-		public MockBlockLookup(final Block lastBlock, final HashChain hashChain) {
-			this.lastBlock = lastBlock;
-			this.chain = hashChain;
-		}
-
-		public void addBlock(final Block block) {
-			this.heightToBlockMap.put(block.getHeight(), block);
-		}
-
-		@Override
-		public Block getLastBlock() {
-			return this.lastBlock;
-		}
-
-		@Override
-		public Block getBlockAt(long height) {
-			return this.heightToBlockMap.get(height);
-		}
-
-		@Override
-		public HashChain getHashesFrom(long height) {
-			return this.chain;
-		}
 	}
 
 	//endregion

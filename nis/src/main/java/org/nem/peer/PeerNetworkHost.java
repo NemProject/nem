@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import org.nem.core.connect.NodeApiId;
+
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 

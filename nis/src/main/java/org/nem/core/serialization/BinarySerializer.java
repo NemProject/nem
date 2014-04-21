@@ -12,6 +12,11 @@ import java.util.Collection;
  */
 public class BinarySerializer implements AutoCloseable, Serializer {
 
+	/**
+	 * Sentinel value used to indicate that a serialized byte array should be deserialized as null.
+	 */
+	public static final int NULL_BYTES_SENTINEL_VALUE = 0xFFFFFFFF;
+
 	private final ByteArrayOutputStream stream;
 
 	/**
@@ -45,8 +50,13 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
 	@Override
 	public void writeBytes(final String label, final byte[] bytes) {
-		this.writeInt(null, bytes.length);
-		this.writeBytesInternal(bytes);
+		if (null == bytes) {
+			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
+		}
+		else {
+			this.writeInt(null, bytes.length);
+			this.writeBytesInternal(bytes);
+		}
 	}
 
 	@Override

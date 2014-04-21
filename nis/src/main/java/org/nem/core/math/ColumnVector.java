@@ -2,7 +2,6 @@ package org.nem.core.math;
 
 import org.nem.core.utils.FormatUtils;
 
-import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 
 /**
@@ -171,7 +170,7 @@ public class ColumnVector {
 	 */
 	public ColumnVector add(final ColumnVector vector) {
 		if (this.size != vector.size)
-			throw new InvalidParameterException("cannot add vectors with different sizes");
+			throw new IllegalArgumentException("cannot add vectors with different sizes");
 
 		final ColumnVector result = new ColumnVector(this.size);
 		for (int i = 0; i < this.size; ++i)
@@ -190,7 +189,7 @@ public class ColumnVector {
 	 */
 	public ColumnVector multiplyElementWise(final ColumnVector vector) {
 		if (this.size != vector.size)
-			throw new InvalidParameterException("vector sizes must be equal");
+			throw new IllegalArgumentException("vector sizes must be equal");
 
 		final ColumnVector result = new ColumnVector(this.size);
 		for (int i = 0; i < this.size; ++i)
@@ -224,7 +223,7 @@ public class ColumnVector {
 	public ColumnVector multiply(final Matrix matrix) {
 		final int columnCount = matrix.getColumnCount();
 		if (this.size != columnCount)
-			throw new InvalidParameterException("vector size and matrix column count must be equal");
+			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 
 		final int rowCount = matrix.getRowCount();
 		final ColumnVector result = new ColumnVector(rowCount);
@@ -268,7 +267,7 @@ public class ColumnVector {
 	 */
 	public double distance(final ColumnVector vector) {
 		if (this.size != vector.size)
-			throw new InvalidParameterException("cannot determine the distance between vectors with different sizes");
+			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
 
 		double distance = 0;
 		for (int i = 0; i < this.size; ++i) {

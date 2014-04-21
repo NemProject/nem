@@ -3,6 +3,8 @@ package org.nem.core.messages;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
+import java.util.Arrays;
+
 /**
  * A plain, unencrypted message.
  */
@@ -49,5 +51,19 @@ public class PlainMessage extends Message {
 	public void serialize(final Serializer serializer) {
 		super.serialize(serializer);
 		serializer.writeBytes("payload", this.payload);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(this.payload);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof PlainMessage))
+			return false;
+
+		final PlainMessage rhs = (PlainMessage)obj;
+		return Arrays.equals(this.payload, rhs.payload);
 	}
 }

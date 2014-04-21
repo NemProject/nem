@@ -5,13 +5,12 @@ import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccount;
-import org.nem.nis.test.MockAccountAnalyzer;
+import org.nem.core.test.*;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransferTransaction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -127,10 +126,10 @@ public class ForagingTest {
 
 		// Act:
 		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(10));
+		transaction1.setFee(new Amount(5));
 		transaction1.sign();
 		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
+		transaction2.setFee(new Amount(10));
 		transaction2.sign();
 
 		boolean result1 = foraging.processTransaction(transaction1);
@@ -142,6 +141,7 @@ public class ForagingTest {
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		// higher fee goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
@@ -160,7 +160,7 @@ public class ForagingTest {
 		transaction1.setFee(new Amount(5));
 		transaction1.sign();
 		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
+		transaction2.setFee(new Amount(5));
 		transaction2.sign();
 
 		boolean result1 = foraging.processTransaction(transaction1);
@@ -172,6 +172,7 @@ public class ForagingTest {
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
+		// earlier transaction goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
@@ -180,20 +181,30 @@ public class ForagingTest {
 	public void canSignBlock() {
 		// Arrange:
 		final MockForaging foraging = new MockForaging();
-		final MockAccountAnalyzer mockAccountAnalyzer = new MockAccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
 		final Account account = Utils.generateRandomAccount();
-		mockAccountAnalyzer.initializeGenesisAccount(account);
-		final Account accountWithoutSecret = mockAccountAnalyzer.findByNemAddress(account);
+		accountAnalyzer.addAccountToCache(account.getAddress());
+		final Account accountWithoutSecret = accountAnalyzer.findByAddress(account.getAddress());
 		accountWithoutSecret.incrementBalance(Amount.fromNem(100));
 
 		final Account signer = createAccountWithBalance(100);
 		final TimeInstant parentTime = new TimeInstant(0);
-		final Block parent = new Block(signer, new Hash(new byte[32]), parentTime, 1);
+		final Block parent = new Block(
+				signer,
+				Hash.ZERO,
+				parentTime,
+				BlockHeight.ONE);
 		parent.sign();
+		parent.setGenerationHash(Hash.ZERO);
 
 		// Act:
-		foraging.setAccountAnalyzer(mockAccountAnalyzer);
-		final Block block = foraging.createSignedBlock(new TimeInstant(10), new LinkedList<Transaction>(), parent, account);
+		foraging.setAccountLookup(accountAnalyzer);
+		final Block block = foraging.createSignedBlock(
+				new TimeInstant(10),
+				new LinkedList<Transaction>(),
+				parent,
+				account,
+				BlockDifficulty.INITIAL_DIFFICULTY);
 
 		// Assert:
 		Assert.assertThat(accountWithoutSecret.getKeyPair().getPrivateKey(), IsNull.nullValue());

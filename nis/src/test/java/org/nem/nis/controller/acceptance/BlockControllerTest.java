@@ -4,68 +4,78 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.serialization.Deserializer;
-import org.nem.nis.test.MockPeerConnector;
+import org.nem.nis.test.LocalHostConnector;
 
 import java.net.MalformedURLException;
 
 public class BlockControllerTest {
 
+	private static final String BLOCK_AT_PATH = "block/at";
+	private static final String INVALID_PATH = "wrong/at";
+
 	@Test
-	public void validHeightReturnsValidBlock() throws MalformedURLException {
+	public void validHeightReturnsValidBlock() {
 		// Arrange:
-		final MockPeerConnector pc = new MockPeerConnector();
+		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
 		input.put("height", 1);
 
 		// Act:
-		final Block block = BlockFactory.VERIFIABLE.deserialize(pc.blockAt(input));
+		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
+		final Block block = BlockFactory.VERIFIABLE.deserialize(result.getBodyAsDeserializer());
 
 		// Assert:
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(1)));
 	}
 
 	@Test
-	public void invalidHeightReturnsNotFound() throws MalformedURLException {
-		// Arrange:
-		final MockPeerConnector pc = new MockPeerConnector();
-		final JSONObject input = new JSONObject();
-		input.put("height", 0);
-
-		// Act:
-		final Deserializer deserializer = pc.blockAt(input);
-
+	public void invalidBlockHeightReturnsBadRequest() {
 		// Assert:
-		Assert.assertThat(deserializer.readInt("status"), IsEqual.equalTo(404));
+		assertRequestForBlockAtHeightReturnsStatus(0, 400);
 	}
 
 	@Test
-	public void missingHeightReturnsServerError() throws MalformedURLException {
+	public void futureBlockHeightReturnsNotFound() {
+		// Assert:
+		assertRequestForBlockAtHeightReturnsStatus(Long.MAX_VALUE, 404);
+	}
+
+	private static void assertRequestForBlockAtHeightReturnsStatus(final long height, final int expectedStatus) {
 		// Arrange:
-		final MockPeerConnector pc = new MockPeerConnector();
+		final LocalHostConnector connector = new LocalHostConnector();
+		final JSONObject input = new JSONObject();
+		input.put("height", height);
+
+		// Act:
+		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
+
+		// Assert:
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(expectedStatus));
+	}
+
+	@Test
+	public void missingHeightReturnsServerError() {
+		// Arrange:
+		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
 
 		// Act:
-		final Deserializer deserializer = pc.blockAt(input);
+		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
-		Assert.assertThat(deserializer.readInt("status"), IsEqual.equalTo(500));
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(500));
 	}
 
 	@Test
 	public void wrongUrlReturnsNotFound() throws MalformedURLException {
-
-		// TODO: does it make sense to return HTTP status codes for errors
-		// TODO: i think so, but that means additional changes need to be made to MockPeerConnector
-
 		// Arrange:
-		final MockPeerConnector pc = new MockPeerConnector();
+		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject input = new JSONObject();
 
 		// Act:
-		final Deserializer deserializer = pc.wrongUrl(input);
+		final LocalHostConnector.Result result = connector.post(INVALID_PATH, input);
 
 		// Assert:
-		Assert.assertThat(deserializer.readInt("code"), IsEqual.equalTo(404));
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
 	}
 }

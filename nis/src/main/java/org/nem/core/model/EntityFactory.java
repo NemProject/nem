@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.time.*;
-import org.nem.core.transactions.TransferTransaction;
 
 /**
  * Factory class that creates time-synced entities.
@@ -28,8 +27,10 @@ public class EntityFactory {
 	 *
 	 * @return The new Block.
 	 */
-	public Block createBlock(final Account forger, final Hash prevBlockHash, int height) {
-		return new Block(forger, prevBlockHash, this.timeProvider.getCurrentTime(), height);
+	public Block createBlock(final Account forger, final Hash generationHash, final Hash prevBlockHash, final BlockHeight height) {
+		Block block = new Block(forger, prevBlockHash, this.timeProvider.getCurrentTime(), height);
+		block.setGenerationHash(generationHash);
+		return block;
 	}
 
 	/**

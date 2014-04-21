@@ -2,7 +2,6 @@ package org.nem.core.math;
 
 import org.nem.core.utils.FormatUtils;
 
-import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 
 /**
@@ -129,7 +128,7 @@ public class Matrix {
 	 */
 	public Matrix multiplyElementWise(final Matrix matrix) {
 		if (!this.isSameSize(matrix))
-			throw new InvalidParameterException("matrix sizes must be equal");
+			throw new IllegalArgumentException("matrix sizes must be equal");
 
 		final Matrix result = new Matrix(this.rows, this.cols);
 		for (int i = 0; i < this.cols; ++i)

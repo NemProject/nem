@@ -1,9 +1,9 @@
 package org.nem.peer.trust.simulation;
 
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.peer.*;
 
 import java.io.*;
-import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -127,7 +127,7 @@ public class Config {
 		public Entry(final String line) {
 			final String[] nodeAttributes = line.split(";");
 			if (nodeAttributes.length != NODE_ATTRIBUTE_COUNT)
-				throw new InvalidParameterException(String.format("Malformed data in configuration file [%s]", line));
+				throw new IllegalArgumentException(String.format("Malformed data in configuration file [%s]", line));
 
 			this.isPreTrusted = nodeAttributes[2].equals("1");
 

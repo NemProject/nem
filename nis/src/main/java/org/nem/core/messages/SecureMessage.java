@@ -4,7 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-import java.security.InvalidParameterException;
+import java.util.Arrays;
 
 /**
  * A secure, encrypted message.
@@ -32,7 +32,7 @@ public class SecureMessage extends Message {
 	public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
 
 		if (!sender.getKeyPair().hasPrivateKey())
-			throw new InvalidParameterException("sender private key is required for creating secure message");
+			throw new IllegalArgumentException("sender private key is required for creating secure message");
 
 		final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
 		return new SecureMessage(sender, recipient, cipher.encrypt(payload));
@@ -86,6 +86,22 @@ public class SecureMessage extends Message {
 	public void serialize(final Serializer serializer) {
 		super.serialize(serializer);
 		serializer.writeBytes("payload", this.payload);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(this.payload);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof SecureMessage))
+			return false;
+
+		final SecureMessage rhs = (SecureMessage)obj;
+		return Arrays.equals(this.payload, rhs.payload)
+				&& this.sender.getAddress().equals(rhs.sender.getAddress())
+				&& this.recipient.getAddress().equals(rhs.recipient.getAddress());
 	}
 }
 

@@ -3,13 +3,13 @@ package org.nem.peer;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 import java.net.URL;
-import java.security.InvalidParameterException;
 
 public class NodeTest {
 
@@ -42,7 +42,7 @@ public class NodeTest {
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void endpointCannotBeNull() {
 		// Act:
 		new Node(null, "plat", "app");
@@ -101,7 +101,7 @@ public class NodeTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
 		int hashCode = node.hashCode();

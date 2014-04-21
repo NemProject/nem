@@ -4,7 +4,6 @@ import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -62,6 +61,9 @@ public class JsonDeserializer implements Deserializer {
 	@Override
 	public byte[] readBytes(final String label) {
 		final String s = this.readString(label);
+		if (null == s)
+			return null;
+
 		return s.isEmpty() ? new byte[] { } : Base64Encoder.getBytes(s);
 	}
 
@@ -115,6 +117,6 @@ public class JsonDeserializer implements Deserializer {
 				"expected property '%s' but request was for property '%s'",
 				expectedLabel,
 				label);
-		throw new InvalidParameterException(message);
+		throw new IllegalArgumentException(message);
 	}
 }

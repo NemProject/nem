@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.nem.core.connect.*;
 import org.nem.peer.scheduling.SchedulerFactory;
 
 /**
@@ -8,7 +9,7 @@ import org.nem.peer.scheduling.SchedulerFactory;
 public class PeerNetworkServices {
 
 	private final PeerConnector peerConnector;
-	private final SyncConnector syncConnector;
+	private final SyncConnectorPool syncConnectorPool;
 	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
@@ -16,17 +17,17 @@ public class PeerNetworkServices {
 	 * Creates a new services aggregate.
 	 *
 	 * @param peerConnector     The peer connector to use.
-	 * @param syncConnector     The sync connector to use.
+	 * @param syncConnectorPool     The sync connector pool to use.
 	 * @param schedulerFactory  The scheduler factory to use.
 	 * @param blockSynchronizer The block synchronizer to use.
 	 */
 	public PeerNetworkServices(
 			final PeerConnector peerConnector,
-			final SyncConnector syncConnector,
+			final SyncConnectorPool syncConnectorPool,
 			final SchedulerFactory<Node> schedulerFactory,
 			final BlockSynchronizer blockSynchronizer) {
 		this.peerConnector = peerConnector;
-		this.syncConnector = syncConnector;
+		this.syncConnectorPool = syncConnectorPool;
 		this.schedulerFactory = schedulerFactory;
 		this.blockSynchronizer = blockSynchronizer;
 	}
@@ -39,11 +40,11 @@ public class PeerNetworkServices {
 	public PeerConnector getPeerConnector() { return this.peerConnector; }
 
 	/**
-	 * Gets the sync connector.
+	 * Gets the sync connector pool.
 	 *
-	 * @return The sync connector.
+	 * @return The sync connector pool.
 	 */
-	public SyncConnector getSyncConnector() { return this.syncConnector; }
+	public SyncConnectorPool getSyncConnectorPool() { return this.syncConnectorPool; }
 
 	/**
 	 * Gets the scheduler factory.

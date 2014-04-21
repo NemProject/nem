@@ -1,13 +1,15 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.core.utils.Predicate;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
-import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.peer.NodeApiId;
+import org.nem.core.connect.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -18,7 +20,7 @@ import java.util.logging.Logger;
 
 //
 // Initial logic is as follows:
-//   * we recieve new TX, IF it hasn't been seen,
+//   * we receive new TX, IF it hasn't been seen,
 //     it is added to unconfirmedTransactions,
 //   * blockGeneratorExecutor periodically tries to generate a block containing
 //     unconfirmed transactions
@@ -38,17 +40,22 @@ public class Foraging implements AutoCloseable, Runnable {
 	@Autowired
 	private NisPeerNetworkHost host;
 
-	private AccountAnalyzer accountAnalyzer;
+	private AccountLookup accountLookup;
 
 	private BlockChain blockChain;
+
+	private BlockDao blockDao;
 
 	private TransferDao transferDao;
 
 	@Autowired
-	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
+	public void setAccountLookup(AccountLookup accountLookup) { this.accountLookup = accountLookup; }
 
 	@Autowired
 	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
@@ -92,16 +99,14 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
-
-		synchronized (blockChain) {
-			Transfer tx = transferDao.findByHash(transactionHash.getRaw());
-			if (tx != null) {
-				return false;
+		return this.unconfirmedTransactions.add(transaction, new Predicate<Hash>() {
+			@Override
+			public boolean evaluate(final Hash hash) {
+				synchronized (blockChain) {
+					return null != transferDao.findByHash(hash.getRaw());
+				}
 			}
-		}
-
-		return this.addUnconfirmedTransactionWithoutDbCheck(transaction);
+		});
 	}
 
 	/**
@@ -156,25 +161,26 @@ public class Foraging implements AutoCloseable, Runnable {
 		try {
 			synchronized (blockChain) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
-				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountAnalyzer);
-				final BigInteger hit = scorer.calculateHit(lastBlock);
-				System.out.println("   hit: 0x" + hit.toString(16));
+				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
+				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger);
+					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
+					final BigInteger hit = scorer.calculateHit(newBlock);
+					System.out.println("   hit: 0x" + hit.toString(16));
 					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
 
-						final long score = scorer.calculateBlockScore(lastBlock, newBlock);
-						if (score < bestScore) {
+						final long score = scorer.calculateBlockScore(newBlock);
+						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;
 						}
@@ -184,7 +190,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			} // synchronized
 
 		} catch (RuntimeException e) {
-			LOGGER.warning("exception occured during generation of a block");
+			LOGGER.warning("exception occurred during generation of a block");
 			LOGGER.warning(e.toString());
 		}
 
@@ -193,10 +199,26 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 	}
 
-	public Block createSignedBlock(TimeInstant blockTime, Collection<Transaction> transactionList, Block lastBlock, Account virtualForger) {
-		final Account forger = accountAnalyzer.findByAddress(virtualForger.getAddress());
+	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		return scorer.calculateDifficulty(difficulties, timestamps);
+	}
 
+	public Block createSignedBlock(
+			final TimeInstant blockTime,
+			final Collection<Transaction> transactionList,
+			final Block lastBlock,
+			final Account virtualForger,
+			final BlockDifficulty difficulty) {
+		final Account forger = this.accountLookup.findByAddress(virtualForger.getAddress());
+
+		// Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
+		newBlock.setGenerationHash(HashUtils.nextHash(lastBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
+
+		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
 			newBlock.addTransactions(transactionList);
 		}

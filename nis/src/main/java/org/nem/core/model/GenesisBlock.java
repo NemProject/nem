@@ -1,9 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
+import org.nem.core.crypto.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 /**
  * Represents the genesis block.
@@ -25,8 +23,8 @@ public class GenesisBlock extends Block {
 	private final static PrivateKey CREATOR_PRIVATE_KEY = PrivateKey.fromHexString(
 			"aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
 
-	private final static int GENESIS_HEIGHT = 1;
-	private final static int HASH_LENGTH = 32;
+	private final static Hash GENESIS_GENERATION_HASH = new Hash(Hashes.sha3("If ever I to the moment shall say: Beautiful moment, do not pass away! Then you may forge your chains to bind me,".getBytes()));
+	private final static BlockHeight GENESIS_HEIGHT = BlockHeight.ONE;
 
 	static {
 		final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
@@ -40,6 +38,7 @@ public class GenesisBlock extends Block {
 	 */
 	public GenesisBlock(final TimeInstant timestamp) {
 		super(ACCOUNT, Hash.ZERO, timestamp, GENESIS_HEIGHT);
+		setGenerationHash(GENESIS_GENERATION_HASH);
 
 		// TODO: as a placeholder distribute amounts equally
 		final String[] recipientIds = NetworkInfo.getDefault().getGenesisRecipientAccountIds();

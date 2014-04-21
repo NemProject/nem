@@ -1,9 +1,10 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.security.InvalidParameterException;
+import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 
 public class AmountTest {
 
@@ -43,7 +44,7 @@ public class AmountTest {
 
 	//region constructor
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeAmount() {
 		// Act:
 		new Amount(-1);
@@ -69,7 +70,7 @@ public class AmountTest {
 
 	//endregion
 
-	//region
+	//region getNumNem
 
 	@Test
 	public void getNumNemRoundsDownToTheNearestWholeNem() {
@@ -111,7 +112,7 @@ public class AmountTest {
 		Assert.assertThat(result, IsEqual.equalTo(new Amount(46)));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void largerAmountCannotBeSubtractedFromSmallerAmount() {
 		// Arrange:
 		final Amount amount1 = new Amount(65);
@@ -123,70 +124,37 @@ public class AmountTest {
 
 	//endregion
 
-	//region compareTo
+	//region inline serialization
 
 	@Test
-	public void compareToCanCompareEqualInstances() {
+	public void canWriteAmount() {
 		// Arrange:
-		final Amount amount1 = new Amount(7);
-		final Amount amount2 = new Amount(7);
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount amount = new Amount(0x7712411223456L);
+
+		// Act:
+		Amount.writeTo(serializer, "Amount", amount);
 
 		// Assert:
-		Assert.assertThat(amount1.compareTo(amount2), IsEqual.equalTo(0));
-		Assert.assertThat(amount2.compareTo(amount1), IsEqual.equalTo(0));
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((Long)object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
 	}
 
 	@Test
-	public void compareToCanCompareUnequalInstances() {
+	public void canRoundtripAmount() {
 		// Arrange:
-		final Amount amount1 = new Amount(7);
-		final Amount amount2 = new Amount(8);
+		final JsonSerializer serializer = new JsonSerializer();
+		final Amount originalAmount = new Amount(0x7712411223456L);
+
+		// Act:
+		Amount.writeTo(serializer, "Amount", originalAmount);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Amount amount = Amount.readFrom(deserializer, "Amount");
 
 		// Assert:
-		Assert.assertThat(amount1.compareTo(amount2), IsEqual.equalTo(-1));
-		Assert.assertThat(amount2.compareTo(amount1), IsEqual.equalTo(1));
-	}
-
-	//endregion
-
-	//region equals / hashCode
-
-	@Test
-	public void equalsOnlyReturnsTrueForEquivalentObjects() {
-		// Arrange:
-		final Amount amount = new Amount(7);
-
-		// Assert:
-		Assert.assertThat(new Amount(7), IsEqual.equalTo(amount));
-		Assert.assertThat(new Amount(6), IsNot.not(IsEqual.equalTo(amount)));
-		Assert.assertThat(new Amount(8), IsNot.not(IsEqual.equalTo(amount)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(amount)));
-		Assert.assertThat(7, IsNot.not(IsEqual.equalTo((Object)amount)));
-	}
-
-	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
-		// Arrange:
-		final Amount amount = new Amount(7);
-		final int hashCode = amount.hashCode();
-
-		// Assert:
-		Assert.assertThat(new Amount(7).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new Amount(6).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new Amount(8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-	}
-
-	//endregion
-
-	//region toString
-
-	@Test
-	public void toStringReturnsRawAmount() {
-		// Arrange:
-		final Amount amount = new Amount(22561);
-
-		// Assert:
-		Assert.assertThat(amount.toString(), IsEqual.equalTo("22561"));
+		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
 	}
 
 	//endregion

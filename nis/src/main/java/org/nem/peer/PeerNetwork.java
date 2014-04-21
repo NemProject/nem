@@ -1,11 +1,11 @@
 package org.nem.peer;
 
+import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -16,7 +16,7 @@ public class PeerNetwork {
 	private final Config config;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
-	private final SyncConnector syncConnector;
+	private final SyncConnectorPool syncConnectorPool;
 	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
@@ -37,7 +37,7 @@ public class PeerNetwork {
 		this.config = config;
 		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
-		this.syncConnector = services.getSyncConnector();
+		this.syncConnectorPool = services.getSyncConnectorPool();
 		this.schedulerFactory = services.getSchedulerFactory();
 		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
@@ -93,7 +93,7 @@ public class PeerNetwork {
 	 */
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		if (this.getLocalNode().equals(pair.getNode()))
-			throw new InvalidParameterException("cannot set local node experiences");
+			throw new IllegalArgumentException("cannot set local node experiences");
 
 		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
 	}
@@ -155,7 +155,7 @@ public class PeerNetwork {
 		this.forAllActiveNodes(new Action<Node>() {
 			@Override
 			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(syncConnector, element);
+				blockSynchronizer.synchronizeNode(syncConnectorPool, element);
 			}
 		});
 	}

@@ -25,6 +25,7 @@ public class Block {
 	private Integer version;
 	private byte[] prevBlockHash;
 	private byte[] blockHash;
+	private byte[] generationHash;
 	private Integer timestamp;
 
 	@ManyToOne
@@ -38,6 +39,8 @@ public class Block {
 	private Long totalAmount;
 	private Long totalFee;
 
+	private Long difficulty;
+
 	private Long nextBlockId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "block", orphanRemoval=true)
@@ -50,16 +53,19 @@ public class Block {
 	public Block(
 			Hash hash,
 			Integer version,
+			Hash generationHash,
 			Hash prevBlockHash,
 			Integer timestamp,
 			Account forger,
 			byte[] forgerProof,
 			Long height,
 			Long totalAmount,
-			Long totalFee) {
+			Long totalFee,
+			Long difficulty) {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
+		this.generationHash = generationHash.getRaw();
 		this.prevBlockHash = prevBlockHash.getRaw();
 		this.blockHash = hash.getRaw();
 		this.timestamp = timestamp;
@@ -68,6 +74,7 @@ public class Block {
 		this.height = height;
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
+		this.difficulty = difficulty;
 	}
 
 	public Long getId() {
@@ -107,6 +114,14 @@ public class Block {
 	}
 
 	public void setBlockHash(byte[] blockHash) {
+		this.blockHash = blockHash;
+	}
+
+	public Hash getGenerationHash() {
+		return new Hash(this.generationHash);
+	}
+
+	public void setGenerationHash(byte[] blockHash) {
 		this.blockHash = blockHash;
 	}
 
@@ -156,6 +171,14 @@ public class Block {
 
 	public void setTotalFee(Long totalFee) {
 		this.totalFee = totalFee;
+	}
+
+	public Long getDifficulty() {
+		return this.difficulty;
+	}
+
+	public void setDifficulty(Long difficulty) {
+		this.difficulty = difficulty;
 	}
 
 	public Long getNextBlockId() {

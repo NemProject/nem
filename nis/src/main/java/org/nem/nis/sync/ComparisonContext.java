@@ -1,7 +1,5 @@
 package org.nem.nis.sync;
 
-import java.security.InvalidParameterException;
-
 /**
  * Provides contextual information that informs block chain comparisons.
  */
@@ -21,7 +19,7 @@ public class ComparisonContext {
 		this.maxNumBlocksToRewrite = maxNumBlocksToRewrite;
 
 		if (maxNumBlocksToAnalyze <= maxNumBlocksToRewrite) {
-			throw new InvalidParameterException("maxNumBlocksToAnalyze must be greater than maxNumBlocksToRewrite");
+			throw new IllegalArgumentException("maxNumBlocksToAnalyze must be greater than maxNumBlocksToRewrite");
 		}
 	}
 

@@ -3,8 +3,6 @@ package org.nem.core.messages;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-import java.security.InvalidParameterException;
-
 /**
  * Factory class that can deserialize all known messages.
  */
@@ -48,6 +46,6 @@ public class MessageFactory {
 				return new SecureMessage(sender, recipient, deserializer);
 		}
 
-		throw new InvalidParameterException("Unknown message type: " + type);
+		throw new IllegalArgumentException("Unknown message type: " + type);
 	}
 }

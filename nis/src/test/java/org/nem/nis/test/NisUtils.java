@@ -1,7 +1,8 @@
 package org.nem.nis.test;
 
-import org.nem.core.serialization.*;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
 
 import java.util.ArrayList;
@@ -32,27 +33,37 @@ public class NisUtils {
 	}
 
 	/**
-	 * Gets a JsonDeserializer that contains a single height property.
-	 *
-	 * @param height The height value.
-	 * @return The deserializer.
+	 * Creates a new random Block.
 	 */
-	public static JsonDeserializer getHeightDeserializer(final long height) {
-		final JsonSerializer serializer = new JsonSerializer();
-		serializer.writeLong("height", height);
-		return new JsonDeserializer(serializer.getObject(), new DeserializationContext(null));
+	public static Block createRandomBlock() {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				TimeInstant.ZERO,
+				BlockHeight.ONE);
 	}
 
 	/**
-	 * Creates a raw hashes list.
+	 * Creates a new random Block with the specified height.
+	 */
+	public static Block createRandomBlock(long height) {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				TimeInstant.ZERO,
+				new BlockHeight(height));
+	}
+
+	/**
+	 * Creates a hashes list.
 	 *
 	 * @param numHashes The number of hashes desired.
-	 * @return A raw hashes list.
+	 * @return A hashes list.
 	 */
-	public static List<byte[]> createRawHashesList(final int numHashes) {
-		final List<byte[]> hashes = new ArrayList<>();
+	public static List<Hash> createHashesList(final int numHashes) {
+		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < numHashes; ++i)
-			hashes.add(Utils.generateRandomBytes(64));
+			hashes.add(Utils.generateRandomHash());
 
 		return hashes;
 	}

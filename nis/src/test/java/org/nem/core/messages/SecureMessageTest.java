@@ -7,8 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
-import java.security.InvalidParameterException;
-
 public class SecureMessageTest {
 
 	@Test
@@ -81,7 +79,7 @@ public class SecureMessageTest {
 		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void secureMessageCannotBeCreatedAroundDecodedPayloadWithoutSenderPrivateKey() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
@@ -125,6 +123,59 @@ public class SecureMessageTest {
 		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(null));
 		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
+
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account other = Utils.generateRandomAccount();
+		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 });
+
+		// Assert:
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }),
+				IsEqual.equalTo(message));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }),
+				IsNot.not(IsEqual.equalTo(message)));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }),
+				IsNot.not(IsEqual.equalTo(message)));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }),
+				IsNot.not(IsEqual.equalTo(message)));
+		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsNot.not((Object)IsEqual.equalTo(message)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account other = Utils.generateRandomAccount();
+		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 });
+		final int hashCode = message.hashCode();
+
+		// Assert:
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }).hashCode(),
+				IsEqual.equalTo(hashCode));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }).hashCode(),
+				IsEqual.equalTo(hashCode));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }).hashCode(),
+				IsEqual.equalTo(hashCode));
+		Assert.assertThat(
+				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }).hashCode(),
+				IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
 
 	private static SecureMessage createRoundTrippedMessage(
 			final SecureMessage originalMessage,

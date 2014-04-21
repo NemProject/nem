@@ -1,10 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
-import org.nem.core.serialization.AccountEncoding;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializationUtils;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 import java.util.*;
 
@@ -23,15 +20,15 @@ public class Account implements SerializableEntity {
 	
 	private LinkedList<AccountLink> outLinks;
 
+	private BlockAmount foragedBlocks;
+
 	/**
 	 * Creates an account around a key pair.
 	 *
 	 * @param keyPair The key pair.
 	 */
 	public Account(final KeyPair keyPair) {
-		this.keyPair = keyPair;
-		this.address = Address.fromPublicKey(keyPair.getPublicKey());
-		this.messages = new ArrayList<>();
+		this(keyPair, Address.fromPublicKey(keyPair.getPublicKey()));
 	}
 
 	/**
@@ -41,29 +38,29 @@ public class Account implements SerializableEntity {
 	 * @param address The address.
 	 */
 	public Account(final Address address) {
-		this.keyPair = null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
+		this(null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey()), address);
+	}
+
+	/**
+	 * Creates an account around a key pair and address.
+	 *
+	 * @param keyPair The key pair.
+	 * @param address The address.
+	 */
+	protected Account(final KeyPair keyPair, final Address address) {
+		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
+		this.foragedBlocks = BlockAmount.ZERO;
 	}
-
-	public Account(Account account) {
-		this.keyPair = null == account.keyPair ? null : (account.getKeyPair().getPrivateKey() != null ? new KeyPair(account.getKeyPair().getPrivateKey()) : new KeyPair(account.getKeyPair().getPublicKey()));
-		this.address = account.getAddress();
-		// TODO: for now do not clone messages...
-		this.messages = new ArrayList<>();
-
-		this.label = null == account.getLabel() ? null : new String(account.getLabel());
-		this.balance = new Amount(account.getBalance().getNumMicroNem());
-	}
-
 
 	@Override
-	public void serialize(Serializer serializer) {
-		SerializationUtils.writeAccount(serializer, "address", this, AccountEncoding.ADDRESS);
-		if (this.keyPair != null) {
-			SerializationUtils.writeAccount(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
-		}
+	public void serialize(final Serializer serializer) {
+		writeTo(serializer, "address", this, AccountEncoding.ADDRESS);
+		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+
 		serializer.writeLong("balance", getBalance().getNumMicroNem());
+		BlockAmount.writeTo(serializer, "foragedBlocks", getForagedBlocks());
 		serializer.writeString("label", getLabel());
 		serializer.writeObjectArray("messages", getMessages());
 	}
@@ -71,7 +68,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's key pair.
 	 *
-	 * @return The account's key pair.
+	 * @return This account's key pair.
 	 */
 	public KeyPair getKeyPair() {
 		return this.keyPair;
@@ -80,7 +77,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's address.
 	 *
-	 * @return The account's address.
+	 * @return This account's address.
 	 */
 	public Address getAddress() {
 		return this.address;
@@ -89,7 +86,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * Gets the account's balance.
 	 *
-	 * @return The account's balance.
+	 * @return This account's balance.
 	 */
 	public Amount getBalance() {
 		return this.balance;
@@ -111,6 +108,29 @@ public class Account implements SerializableEntity {
 	 */
 	public void decrementBalance(final Amount amount) {
 		this.balance = this.balance.subtract(amount);
+	}
+
+	/**
+	 * Gets number of foraged blocks.
+	 *
+	 * @return Number of blocks foraged by this account.
+	 */
+	public BlockAmount getForagedBlocks() {
+		return foragedBlocks;
+	}
+
+	/**
+	 * Increments number of foraged blocks by this account by one.
+	 */
+	public void incrementForagedBlocks() {
+		this.foragedBlocks = this.foragedBlocks.increment();
+	}
+
+	/**
+	 * Decrements number of foraged blocks by this account by one.
+	 */
+	public void decrementForagedBlocks() {
+		this.foragedBlocks = this.foragedBlocks.decrement();
 	}
 
 	/**
@@ -147,6 +167,20 @@ public class Account implements SerializableEntity {
 	 */
 	public void addMessage(final Message message) {
 		this.messages.add(message);
+	}
+	
+	/**
+	 * Removes the last occurrence of the specified message from this account.
+	 *
+	 * @param message The message to remove from this account.
+	 */
+	public void removeMessage(final Message message) {
+		for (int i = this.messages.size() - 1; i >= 0; --i) {
+			if (message.equals(this.messages.get(i))) {
+				this.messages.remove(i);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -196,6 +230,8 @@ public class Account implements SerializableEntity {
 	public void setOutLinks(LinkedList<AccountLink> outLinks) {
 		this.outLinks = outLinks;
 	}
+	
+	
 
 	@Override
 	public int hashCode() {
@@ -209,5 +245,102 @@ public class Account implements SerializableEntity {
 
 		Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
+	}
+
+	//region inline serialization
+
+	/**
+	 * Writes an account object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param account    The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final Account account) {
+		writeTo(serializer, label, account, AccountEncoding.ADDRESS);
+	}
+
+	/**
+	 * Writes an account object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param account    The object.
+	 * @param encoding   The account encoding mode.
+	 */
+	public static void writeTo(
+			final Serializer serializer,
+			final String label,
+			final Account account,
+			final AccountEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				final KeyPair keyPair = account.getKeyPair();
+				serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
+				break;
+
+			case ADDRESS:
+			default:
+				Address.writeTo(serializer, label, account.getAddress());
+				break;
+		}
+	}
+
+	/**
+	 * Reads an account object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Account readFrom(final Deserializer deserializer, final String label) {
+		return readFrom(deserializer, label, AccountEncoding.ADDRESS);
+	}
+
+	/**
+	 * Reads an account object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param encoding     The account encoding.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static Account readFrom(
+			final Deserializer deserializer,
+			final String label,
+			final AccountEncoding encoding) {
+		Address address;
+		switch (encoding) {
+			case PUBLIC_KEY:
+				address = Address.fromPublicKey(new PublicKey(deserializer.readBytes(label)));
+				break;
+
+			case ADDRESS:
+			default:
+				address = Address.readFrom(deserializer, label);
+				break;
+		}
+
+		return deserializer.getContext().findAccountByAddress(address);
+	}
+	//endregion
+
+	/**
+	 * Creates an unlinked copy of this account.
+	 *
+	 * @return An unlinked copy of this account.
+	 */
+	public Account copy() {
+		final Account copy = new Account(this.getKeyPair(), this.getAddress());
+		copy.balance = this.getBalance();
+		copy.label = this.getLabel();
+		copy.foragedBlocks = this.getForagedBlocks();
+
+		for (final Message message : this.getMessages())
+			copy.messages.add(message);
+
+		return copy;
 	}
 }

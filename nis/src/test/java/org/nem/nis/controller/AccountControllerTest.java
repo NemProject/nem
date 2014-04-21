@@ -3,10 +3,10 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
+import org.nem.core.test.MockAccountLookup;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
-import org.nem.nis.test.MockAccountAnalyzer;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 public class AccountControllerTest {
@@ -16,8 +16,7 @@ public class AccountControllerTest {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		try (final MockForaging foraging = new MockForaging()) {
-			final MockAccountAnalyzer accountAnalyzer = new MockAccountAnalyzer();
-			final AccountController controller = new AccountController(foraging, accountAnalyzer);
+			final AccountController controller = new AccountController(foraging, new MockAccountLookup());
 
 			// Act:
 			controller.accountUnlock(account.getKeyPair().getPrivateKey());
@@ -29,17 +28,14 @@ public class AccountControllerTest {
 		}
 	}
 
-	//
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
 		try (final MockForaging foraging = new MockForaging()) {
-			final MockAccountAnalyzer accountAnalyzer = new MockAccountAnalyzer();
-			final AccountController controller = new AccountController(foraging, accountAnalyzer);
+			final AccountController controller = new AccountController(foraging, new AccountAnalyzer());
 
 			// Act:
 			controller.accountGet("dummy");
-
 		}
 	}
 

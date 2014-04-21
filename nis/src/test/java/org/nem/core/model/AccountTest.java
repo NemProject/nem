@@ -1,12 +1,16 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.messages.PlainMessage;
-import org.nem.core.test.Utils;
+import org.nem.core.messages.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
+import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class AccountTest {
 
@@ -23,6 +27,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -37,6 +42,7 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
@@ -53,11 +59,14 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
 	}
 
 	//endregion
+
+	//region Label
 
 	@Test
 	public void labelCanBeSet() {
@@ -70,6 +79,8 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo("Beta Gamma"));
 	}
+
+	//endregion
 
 	//region Balance
 
@@ -115,6 +126,56 @@ public class AccountTest {
 
 	//endregion
 
+	//region foraged blocks
+
+	@Test
+	public void foragedBlocksCanBeIncremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	@Test
+	public void foragedBlocksCanBeDecremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
+	}
+
+	@Test
+	public void foragedBlocksCanBeIncrementedAndDecrementedMultipleTimes() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.decrementForagedBlocks();
+
+		// Assert:
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	//endregion
+
+	//region Message
+
 	@Test
 	public void singleMessageCanBeAdded() {
 		// Arrange:
@@ -146,6 +207,62 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
 	}
 
+	@Test
+	public void messageCanBeRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.removeMessage(new PlainMessage(input1));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input2));
+	}
+
+	@Test
+	public void lastMatchingMessageIsRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.addMessage(new PlainMessage(input1));
+		account.addMessage(new PlainMessage(input2));
+		account.removeMessage(new PlainMessage(input1));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(3));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
+		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
+		Assert.assertThat(account.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(input2));
+	}
+
+	@Test
+	public void nothingHappensIfMessageNotAssociatedWithAccountIsRemoved() {
+		// Arrange:
+		final byte[] input1 = Utils.generateRandomBytes();
+		final byte[] input2 = Utils.generateRandomBytes();
+		final Account account = new Account(new KeyPair());
+
+		// Act:
+		account.addMessage(new PlainMessage(input1));
+		account.removeMessage(new PlainMessage(input2));
+
+		// Assert:
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test
@@ -166,7 +283,7 @@ public class AccountTest {
 	}
 
 	@Test
-	public void hashCodesAreOnlyEqualForEquivalentObjects() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		KeyPair kp = new KeyPair();
 		Account account = new Account(kp);
@@ -194,6 +311,276 @@ public class AccountTest {
 				new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
 				new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
 		};
+	}
+
+	//endregion
+
+	//region Serialization
+
+	@Test
+	public void accountWithPublicKeyCanBeSerialized() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Assert:
+		assertAccountSerialization(address, address.getPublicKey().getRaw());
+	}
+
+	@Test
+	public void accountWithoutPublicKeyCanBeSerialized() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertAccountSerialization(address, null);
+	}
+
+	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
+		// Arrange:
+		final Account originalAccount = createAccountForSerializationTests(address);
+
+		// Act:
+		final JsonDeserializer deserializer = serializeAccountAndCreateDeserializer(originalAccount);
+
+		// Assert:
+		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
+		Assert.assertThat(deserializer.readBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
+		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
+		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
+
+		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.createDeserializer(null, null));
+		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
+		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+	}
+
+	private static Account createAccountForSerializationTests(final Address address) {
+		// Arrange:
+		final Account account = new Account(address);
+		account.setLabel("alpha gamma");
+		account.incrementBalance(new Amount(747));
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
+		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
+		return account;
+	}
+
+	private static JsonDeserializer serializeAccountAndCreateDeserializer(final Account account) {
+		// Act:
+		final JsonSerializer serializer = new JsonSerializer(true);
+		account.serialize(serializer);
+		return new JsonDeserializer(serializer.getObject(), null);
+	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+
+		// Act:
+		Account.writeTo(serializer, "Account", new MockAccount(address));
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
+	}
+
+	@Test
+	public void canWriteAccountWithAddressEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("MockAcc");
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new MockAccount(address),
+				AccountEncoding.ADDRESS,
+				address.getEncoded());
+	}
+
+	@Test
+	public void canWriteAccountWithPublicKeyEncoding() {
+		// Arrange:
+		final KeyPair kp = new KeyPair();
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(kp),
+				AccountEncoding.PUBLIC_KEY,
+				Base64Encoder.getString(kp.getPublicKey().getRaw()));
+	}
+
+	@Test
+	public void canWriteAccountThatDoesNotHavePublicKeyWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertCanWriteAccountWithEncoding(
+				new Account(address),
+				AccountEncoding.PUBLIC_KEY,
+				null);
+	}
+
+	private static void assertCanWriteAccountWithEncoding(
+			final Account account,
+			final AccountEncoding encoding,
+			final String expectedSerializedString) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		Account.writeTo(serializer, "Account", account, encoding);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(expectedSerializedString));
+	}
+
+	@Test
+	public void canRoundtripAccount() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address address = Address.fromEncoded("MockAcc");
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+
+		// Act:
+		Account.writeTo(serializer, "Account", new MockAccount(address));
+
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = Account.readFrom(deserializer, "Account");
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void canRoundtripAccountWithAddressEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
+	}
+
+	@Test
+	public void canRoundtripAccountWithPublicKeyEncoding() {
+		// Assert:
+		assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
+	}
+
+	private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+
+		// Act:
+		Account.writeTo(serializer, "Account", originalAccount, encoding);
+
+		final JsonDeserializer deserializer = new JsonDeserializer(
+				serializer.getObject(),
+				new DeserializationContext(accountLookup));
+		final Account account = Account.readFrom(deserializer, "Account", encoding);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
+		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+	}
+
+	//endregion
+
+	//region copy
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithoutPublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddress());
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
+		Assert.assertThat(copyAccount.getKeyPair(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithPublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountWithPrivateKey() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Assert:
+		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNot.not(IsEqual.equalTo(null)));
+	}
+
+	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
+		// Arrange:
+		account.incrementBalance(new Amount(1000));
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.setLabel("Alpha Sigma");
+		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
+		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
+
+		// Act:
+		final Account copyAccount = account.copy();
+
+		// Assert:
+		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
+		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
+
+		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
+		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
+
+		// note that only getMessages is mutable, so it's important to verify that it is not the same
+		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
+		Assert.assertThat(copyAccount.getMessages().size(), IsEqual.equalTo(2));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 0), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
+		return copyAccount;
+	}
+
+	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
+		if (null == actual || null == expected) {
+			Assert.assertThat(actual, IsEqual.equalTo(expected));
+		}
+		else {
+			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
+			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
+		}
+	}
+
+	private static byte[] getEncodedMessageAt(final Account account, final int index) {
+		return account.getMessages().get(index).getEncodedPayload();
 	}
 
 	//endregion

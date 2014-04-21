@@ -19,7 +19,7 @@ public class BlockChainValidatorTest {
 	public void blockChainMustBeNoGreaterThanBlockLimit() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		// Assert:
@@ -36,12 +36,12 @@ public class BlockChainValidatorTest {
 	public void allBlocksInChainMustHaveCorrectHeight() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = new ArrayList<>();
-		blocks.add(new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 12));
-		blocks.add(new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 15));
+		blocks.add(createBlock(Utils.generateRandomAccount(), 12));
+		blocks.add(createBlock(Utils.generateRandomAccount(), 15));
 		signAllBlocks(blocks);
 
 		// Assert:
@@ -52,13 +52,13 @@ public class BlockChainValidatorTest {
 	public void allBlocksInChainMustHaveCorrectHeightInOrder() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = new ArrayList<>();
-		blocks.add(new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 12));
-		blocks.add(new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 14));
-		blocks.add(new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 13));
+		blocks.add(createBlock(Utils.generateRandomAccount(), 12));
+		blocks.add(createBlock(Utils.generateRandomAccount(), 14));
+		blocks.add(createBlock(Utils.generateRandomAccount(), 13));
 		signAllBlocks(blocks);
 
 		// Assert:
@@ -69,7 +69,7 @@ public class BlockChainValidatorTest {
 	public void allBlocksInChainMustVerify() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -85,7 +85,7 @@ public class BlockChainValidatorTest {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -97,32 +97,11 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void externalAccountIsPassedToBlockSignerCalculateTarget() {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = new BlockChainValidator(scorer, 11, accountLookup);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 1);
-		final Block middleBlock = blocks.get(0);
-		final Account externalAccount = new Account(middleBlock.getSigner().getKeyPair());
-		accountLookup.setMockAccount(externalAccount);
-
-		// Act:
-		validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(scorer.getLastCalculateTargetBlockSigner(), IsSame.sameInstance(externalAccount));
-	}
-
-	@Test
 	public void chainIsValidIfAllBlockChecksPass() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -140,7 +119,7 @@ public class BlockChainValidatorTest {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -159,7 +138,7 @@ public class BlockChainValidatorTest {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -178,7 +157,7 @@ public class BlockChainValidatorTest {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
@@ -236,11 +215,17 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(scorer, 21, new MockAccountLookup());
+		return new BlockChainValidator(scorer, 21);
 	}
 
 	private static BlockChainValidator createValidator() {
 		return createValidator(new MockBlockScorer());
+	}
+
+	private static Block createBlock(final Account account, long height) {
+		Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		block.setGenerationHash(Hash.ZERO);
+		return block;
 	}
 
 	//endregion

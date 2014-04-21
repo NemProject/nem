@@ -6,7 +6,6 @@ import org.hamcrest.core.IsSame;
 import org.junit.*;
 
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
 
 public class ArrayUtilsTest {
 	//region duplicate
@@ -105,7 +104,7 @@ public class ArrayUtilsTest {
 
 	//region split
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void splitFailsIfSplitIndexIsNegative() {
 		// Arrange:
 		byte[] bytes = new byte[] { 7, 13, 12, 4, 6 };
@@ -114,7 +113,7 @@ public class ArrayUtilsTest {
 		ArrayUtils.split(bytes, -1);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void splitFailsIfSplitIndexIsGreaterThanInputLength() {
 		// Arrange:
 		byte[] bytes = new byte[] { 7, 13, 12, 4, 6 };

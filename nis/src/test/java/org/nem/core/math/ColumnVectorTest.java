@@ -3,8 +3,6 @@ package org.nem.core.math;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.security.InvalidParameterException;
-
 public class ColumnVectorTest {
 
 	//region constructor / getAt / setAt
@@ -245,7 +243,7 @@ public class ColumnVectorTest {
 		Assert.assertThat(result.getAt(2), IsEqual.equalTo(12.0));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void smallerVectorCannotBeAddedToLargerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
@@ -255,7 +253,7 @@ public class ColumnVectorTest {
 		largerVector.add(smallerVector);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void largerVectorCannotBeAddedToSmallerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
@@ -289,7 +287,7 @@ public class ColumnVectorTest {
 		Assert.assertEquals(14.3527, distance, 0.0000001);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void distanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
@@ -299,7 +297,7 @@ public class ColumnVectorTest {
 		largerVector.distance(smallerVector);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void distanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
@@ -372,7 +370,7 @@ public class ColumnVectorTest {
 		Assert.assertThat(result.getAt(2), IsEqual.equalTo(31.0));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void vectorCannotBeMultipliedByMatrixWithFewerColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
@@ -382,7 +380,7 @@ public class ColumnVectorTest {
 		v.multiply(m);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void vectorCannotBeMultipliedByMatrixWithMoreColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
@@ -421,7 +419,7 @@ public class ColumnVectorTest {
 		Assert.assertThat(result.getAt(2), IsEqual.equalTo(6.0));
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void vectorCannotBeMultipliedByVectorWithFewerColumns() {
 		// Arrange:
 		final ColumnVector v1 = new ColumnVector(2);
@@ -431,7 +429,7 @@ public class ColumnVectorTest {
 		v1.multiplyElementWise(v2);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void vectorCannotBeMultipliedByVectorWithMoreColumns() {
 		// Arrange:
 		final ColumnVector v1 = new ColumnVector(3);

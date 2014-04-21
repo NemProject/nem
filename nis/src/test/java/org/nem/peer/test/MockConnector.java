@@ -1,7 +1,7 @@
 package org.nem.peer.test;
 
-import org.nem.core.model.Block;
-import org.nem.core.model.HashChain;
+import org.nem.core.connect.*;
+import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 
@@ -132,22 +132,22 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public Block getLastBlock(NodeEndpoint endpoint) {
+	public Block getLastBlock(final NodeEndpoint endpoint) {
 		return null;
 	}
 
 	@Override
-	public Block getBlockAt(NodeEndpoint endpoint, long height) {
+	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
 		return null;
 	}
 
 	@Override
-	public List<Block> getChainAfter(NodeEndpoint endpoint, long height) {
+	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
 		return null;
 	}
 
 	@Override
-	public HashChain getHashesFrom(NodeEndpoint endpoint, long startingPoint) {
+	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
 		return null;
 	}
 

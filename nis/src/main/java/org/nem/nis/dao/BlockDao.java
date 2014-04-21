@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.Hash;
+import org.nem.core.model.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 
 import java.util.List;
@@ -51,24 +52,45 @@ public interface BlockDao {
 	/**
 	 * Retrieves Block from db at given height.
 	 *
-	 * @param blockHeight height of a block to retrieve.
+	 * @param height height of a block to retrieve.
 	 *
 	 * @return Block at given height or null.
 	 */
-	public Block findByHeight(long blockHeight);
+	public Block findByHeight(final BlockHeight height);
 
     /**
-     * Retrieves list of hashes for blocks starting at given height.
+     * Retrieves list of at most limit hashes for blocks starting at given height.
      * This should be used, not to pull whole block from the db.
      *
-     * @return list of block hashes.
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return HashChain.
      */
-    public List<byte[]> getHashesFrom(long blockHeight, int limit);
+    public HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
-	 * Deletes blocks after given block
+	 * Retrieves list of at most limit difficulties for blocks starting at given height.
 	 *
-	 * @param height
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's difficulties.
 	 */
-	public void deleteBlocksAfterHeight(long height);
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
+
+
+	/**
+	 * Retrieves list of at most limit timestamps for blocks starting at given height.
+	 *
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's timestamps.
+	 */
+	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, int limit);
+
+	/**
+	 * Deletes blocks after given block.
+	 *
+	 * @param height The height of the reference block.
+	 */
+	public void deleteBlocksAfterHeight(final BlockHeight height);
 }

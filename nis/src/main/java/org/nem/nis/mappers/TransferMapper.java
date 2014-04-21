@@ -5,10 +5,8 @@ import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransferTransaction;
 import org.nem.nis.dbmodel.Transfer;
-
-import java.security.InvalidParameterException;
 
 /**
  * Static class that contains functions for converting to and from
@@ -100,6 +98,6 @@ public class TransferMapper {
 				return SecureMessage.fromEncodedPayload(sender, recipient, payload);
 		}
 
-		throw new InvalidParameterException("Unknown message type in database");
+		throw new IllegalArgumentException("Unknown message type in database");
 	}
 }

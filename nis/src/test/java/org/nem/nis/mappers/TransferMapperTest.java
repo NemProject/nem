@@ -9,10 +9,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
+import org.nem.core.model.TransferTransaction;
 import org.nem.nis.test.MockAccountDao;
-
-import java.security.InvalidParameterException;
 
 public class TransferMapperTest {
 
@@ -101,7 +99,7 @@ public class TransferMapperTest {
 		context.assertModel(model);
 	}
 
-	@Test(expected = InvalidParameterException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void transferDbModelWithUnknownMessageTypeCannotBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext(new PlainMessage(new byte[] { 12, 45, 16 }));

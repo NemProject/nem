@@ -1,46 +1,46 @@
 package org.nem.nis;
 
+import com.sun.java_cup.internal.runtime.lr_parser;
 import org.nem.core.crypto.Hashes;
-import org.nem.core.crypto.PublicKey;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.Hash;
-import org.nem.core.model.HashUtils;
+import org.nem.core.model.*;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ArrayUtils;
-import org.nem.core.utils.ByteUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
+	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
 
 	/**
-	 * 500_000_000 NEMs have force to generate block every minute.
+	 * The target time between two blocks in seconds.
 	 */
-	public static final long MAGIC_MULTIPLIER = 614891469L;
+	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
+	 * BigInteger constant 2^64
+	 */
+    public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
+
+	/**
+	 * Number of blocks which the calculation of difficulty should include 
+	 */
+    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
+
+    /**
 	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.
 	 * @return the hit score.
 	 */
 	public BigInteger calculateHit(final Block block) {
-		return new BigInteger(1, Arrays.copyOfRange(block.getSignature().getBytes(), 2, 10));
-	}
-
-	/**
-	 * Calculates the target score for block given the previous block.
-	 *
-	 * @param prevBlock The previous block.
-	 * @param block The block.
-	 * @return The target score.
-	 */
-	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
-		return this.calculateTarget(prevBlock, block, block.getSigner());
+		return new BigInteger(1, Arrays.copyOfRange(block.getGenerationHash().getRaw(), 10, 18));
 	}
 
 	/**
@@ -48,48 +48,66 @@ public class BlockScorer {
 	 *
 	 * @param prevBlock The previous block.
 	 * @param block The block.
-	 * @param blockSigner The block signer.
 	 * @return The target score.
 	 */
-	public BigInteger calculateTarget(final Block prevBlock, final Block block, final Account blockSigner) {
+	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
 		int timeStampDifference = block.getTimeStamp().subtract(prevBlock.getTimeStamp());
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = blockSigner.getBalance().getNumNem();
+		long forgerBalance = block.getSigner().getBalance().getNumNem();
 		return BigInteger.valueOf(timeStampDifference)
-				.multiply(BigInteger.valueOf(forgerBalance))
-				.multiply(BigInteger.valueOf(MAGIC_MULTIPLIER));
+						 .multiply(BigInteger.valueOf(forgerBalance))
+						 .multiply(TWO_TO_THE_POWER_OF_64)
+						 .divide(block.getDifficulty().asBigInteger());
 	}
 
 	/**
-	 * Calculates the block score for block.
+	 * Calculates the block score for the specified block.
 	 *
-	 * @param parentBlock previous block in the chain.
-	 * @param currentBlock currently analyzed block.
+	 * @param currentBlock The currently analyzed block.
 	 *
 	 * @return The block score.
 	 */
-	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
-		int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		return calculateBlockScoreImpl(HashUtils.calculateHash(parentBlock), currentBlock.getSigner().getKeyPair().getPublicKey(), timeDiff);
+	public long calculateBlockScore(final Block currentBlock) {
+		final Account account = currentBlock.getSigner();
+		final long personalScore = -account.getForagedBlocks().getRaw();
+		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty().getRaw());
 	}
 
-	public long calculateBlockScore(final org.nem.nis.dbmodel.Block parentBlock, final org.nem.nis.dbmodel.Block currentBlock) {
-		int timeDiff = (currentBlock.getTimestamp() - parentBlock.getTimestamp());
-		return calculateBlockScoreImpl(parentBlock.getBlockHash(), currentBlock.getForger().getPublicKey(), timeDiff);
+	private long calculateBlockScoreImpl(long foragedBlocks, long difficulty) {
+		return difficulty + foragedBlocks;
 	}
 
 	/**
-	 * @param timeDiff positive time difference between blocks
+	 * Calculates the difficulty based the last n blocks.
+	 * 
+	 * @param difficulties historical difficulties.
+	 * @param timestamps historical timestamps.
+	 *
+	 * @return The difficulty for the next block.
 	 */
-	private long calculateBlockScoreImpl(final Hash parentBlockHash, final PublicKey thisBlockSigner, int timeDiff) {
-		byte[] hash = Hashes.sha3(ArrayUtils.concat(thisBlockSigner.getRaw(), parentBlockHash.getRaw()));
-		return intToUlong(ByteUtils.bytesToInt(Arrays.copyOfRange(hash, 10, 14)));
-	}
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timestamps) {
+		if (difficulties.size() < 2) {
+			return BlockDifficulty.INITIAL_DIFFICULTY;
+		}
 
-	private static long intToUlong(int value) {
-		//final long fix = Math.abs((long)Integer.MIN_VALUE);
-		return Math.abs((long)value);
+		final TimeInstant newestTimestamp = timestamps.get(timestamps.size() - 1);
+		final TimeInstant oldestTimestamp = timestamps.get(0);
+		final long timeDiff = newestTimestamp.subtract(oldestTimestamp);
+		final long heightDiff = difficulties.size();
+		long averageDifficulty = 0;
+		for (final BlockDifficulty diff : difficulties) {
+			averageDifficulty += diff.getRaw();
+		}
+
+		averageDifficulty /= heightDiff;
+
+		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+															   .multiply(BigInteger.valueOf(heightDiff))
+															   .divide(BigInteger.valueOf(timeDiff))
+															   .longValue();
+
+		return new BlockDifficulty(difficulty);
 	}
 }

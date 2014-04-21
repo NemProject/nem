@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.transactions.TransferTransaction;
 
 import java.util.*;
 
@@ -35,8 +34,11 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(null));
 	}
 
 	@Test
@@ -44,6 +46,7 @@ public class BlockTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Block previousBlock = createBlock(signer);
+		previousBlock.setGenerationHash(Utils.generateRandomHash());
 
 		// Act:
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
@@ -56,8 +59,44 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(4L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(4)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		final Hash expectedGenerationHash = HashUtils.nextHash(
+				previousBlock.getGenerationHash(),
+				signer.getKeyPair().getPublicKey());
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+	}
+
+	//endregion
+
+	//region Setters
+
+	@Test
+	public void blockDifficultyCanBeSet() {
+		// Arrange:
+		final Block block = createBlock(Utils.generateRandomAccount());
+		final BlockDifficulty blockDifficulty = new BlockDifficulty(44_444_444_444L);
+
+		// Act:
+		block.setDifficulty(blockDifficulty);
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
+	}
+
+	@Test
+	public void generationHashCanBeSet() {
+		// Arrange:
+		final Block block = createBlock(Utils.generateRandomAccount());
+		final Hash hash = Utils.generateRandomHash();
+
+		// Act:
+		block.setGenerationHash(hash);
+
+		// Assert:
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(hash));
 	}
 
 	//endregion
@@ -80,7 +119,7 @@ public class BlockTest {
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(2L)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(3L));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
 		final List<Transaction> transactions = block.getTransactions();
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
@@ -90,6 +129,30 @@ public class BlockTest {
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
 		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(new Amount(290L)));
+	}
+
+	@Test
+	public void blockDifficultyIsNotRoundTripped() {
+		// Act:
+		final Block block = createBlockForRoundTripTests(true, null);
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+	}
+
+	@Test
+	public void changingDifficultyDoesNotInvalidateBlock() {
+		// Arrange:
+		final Block block = createBlockForRoundTripTests(true, null);
+
+		// Act
+		boolean result = block.verify();
+		block.setDifficulty(new BlockDifficulty(55_444_333_222_111L));
+
+		// Assert:
+		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(55_444_333_222_111L)));
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -136,6 +199,7 @@ public class BlockTest {
 
 		final TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
 		originalBlock.addTransaction(transaction2);
+		originalBlock.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		originalBlock.sign();
 
 		// Arrange:
@@ -210,7 +274,7 @@ public class BlockTest {
 		final Block block = createBlock();
 		block.addTransaction(createTransactionWithFee(17));
 		block.addTransaction(createTransactionWithFee(11));
-		block.addTransactions(Arrays.asList(createTransactionWithFee(3), createTransactionWithFee(50)));
+		block.addTransactions(Arrays.asList((Transaction) createTransactionWithFee(3), createTransactionWithFee(50)));
 		block.addTransaction(createTransactionWithFee(22));
 
 		// Assert:
@@ -219,17 +283,148 @@ public class BlockTest {
 
 	//endregion
 
-	private static Transaction createTransactionWithFee(final long fee) {
+ 	//region execute / undo
+
+	@Test
+	public void executeIncrementsForagedBlocks() {
+		// Arrange: initial foraged blocks = 3
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.execute();
+
+		// Assert:
+		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+	}
+
+	@Test
+	public void executeIncrementsForagerBalanceByTotalFee() {
+		// Arrange: initial balance = 100, total fee = 28
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.execute();
+
+		// Assert:
+		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(128)));
+	}
+
+	@Test
+	public void executeCallsExecuteOnAllTransactionsInForwardOrder() {
+		// Arrange:
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.execute();
+
+		// Assert:
+		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
+	}
+
+	//endregion
+
+	//region undo
+
+	@Test
+	public void executeDecrementsForagedBlocks() {
+		// Arrange: initial foraged blocks = 3
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	@Test
+	public void executeDecrementsForagerBalanceByTotalFee() {
+		// Arrange: initial balance = 100, total fee = 28
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
+	}
+
+	@Test
+	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
+		// Arrange:
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
+	}
+
+	private final class UndoExecuteTestContext {
+
+		private final Account account;
+		private final Block block;
+		private final MockTransaction transaction1;
+		private final MockTransaction transaction2;
+		private final List<Integer> executeList = new ArrayList<>();
+		private final List<Integer> undoList = new ArrayList<>();
+
+		public UndoExecuteTestContext() {
+			this.account = Utils.generateRandomAccount();
+			account.incrementBalance(new Amount(100));
+			for (int i = 0; i < 3; ++i)
+				account.incrementForagedBlocks();
+
+			this.transaction1 = createTransaction(1, 17);
+			this.transaction2 = createTransaction(2, 11);
+
+			this.block = createBlock(account);
+			block.addTransaction(this.transaction1);
+			block.addTransaction(this.transaction2);
+		}
+
+		private MockTransaction createTransaction(final int customField, final long fee) {
+			final MockTransaction transaction = createTransactionWithFee(customField, fee);
+			transaction.setExecuteList(this.executeList);
+			transaction.setUndoList(this.undoList);
+			return transaction;
+		}
+	}
+
+	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsAppropriateRepresentation() {
+		// Arrange:
+		final Block block = createBlock();
+		block.addTransaction(createTransactionWithFee(1));
+		block.addTransaction(createTransactionWithFee(7));
+
+		// Assert:
+		Assert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
+	}
+
+	//endregion
+
+	private static MockTransaction createTransactionWithFee(final long fee) {
+		// Arrange:
+		return createTransactionWithFee(127, fee);
+	}
+
+	private static MockTransaction createTransactionWithFee(final int customField, final long fee) {
 		// Arrange:
 		Account sender = Utils.generateRandomAccount();
-		MockTransaction transaction = new MockTransaction(sender);
+		MockTransaction transaction = new MockTransaction(sender, customField);
 		transaction.setFee(new Amount(fee));
 		return transaction;
 	}
 
 	private static Block createBlock(final Account forger) {
 		// Arrange:
-		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), 3);
+		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
 	}
 
 	private static Block createBlock() {
