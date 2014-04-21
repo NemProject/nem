@@ -69,11 +69,11 @@ public class BlockScorer {
 	 *
 	 * @return The block score.
 	 */
-	public long calculateBlockScore(final Block currentBlock) {
-		final Account account = currentBlock.getSigner();
-		final long foragedBlocks = account.getForagedBlocks().getRaw();
-		return calculateBlockScoreImpl(1, foragedBlocks, currentBlock.getDifficulty().getRaw());
-	}
+//	public long calculateBlockScore(final Block currentBlock) {
+//		final Account account = currentBlock.getSigner();
+//		final long foragedBlocks = account.getForagedBlocks().getRaw();
+//		return calculateBlockScoreImpl(1, foragedBlocks, currentBlock.getDifficulty().getRaw());
+//	}
 
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
