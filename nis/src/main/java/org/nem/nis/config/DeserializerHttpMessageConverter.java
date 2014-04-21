@@ -21,7 +21,7 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 	 * @param accountLookup The account lookup to use.
 	 */
 	@Autowired(required = true)
-	DeserializerHttpMessageConverter(final AccountLookup accountLookup) {
+	public DeserializerHttpMessageConverter(final AccountLookup accountLookup) {
 		super(new MediaType("application", "json"));
 		this.accountLookup = accountLookup;
 	}
