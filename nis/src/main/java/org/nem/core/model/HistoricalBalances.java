@@ -5,24 +5,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
-import org.nem.nis.mappers.BlockMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalBalances {
 
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
 	 */
-	public final long MAX_HISTORY = 1440;
+	public final long MAX_HISTORY = BlockChain.ESTIMATED_BLOCKS_PER_DAY + BlockChain.REWRITE_LIMIT;
 	
 	private final ArrayList<HistoricalBalance> balances = new ArrayList<HistoricalBalance>();
 	
-	// TODO: Is there any better way to get the height of the current last block?
-	//@Autowired
-	//private BlockChain blockChain;
-	//private AccountAnalyzer accountAnalyzer;
+	// TODO: Is there an easy way to get the height of the current last block?
 
 	/**
 	 * Gets the size of the list
@@ -92,7 +86,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY - BlockChain.REWRITE_LIMIT)));
+		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)), lastBlockHeight);
 	}
 	
 	/**
@@ -119,19 +113,26 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY - BlockChain.REWRITE_LIMIT)));
+		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)), lastBlockHeight);
 	}
 	
 	/**
 	 * Eliminate all entries that have a block height smaller than the given height.
-	 * Note: height should be at least MAX_HISTORY + REWRITE_LIMIT smaller than the height of the last block in the chain.
+	 * Note: height should be at least MAX_HISTORY smaller than the height of the last block in the chain.
 	 * 
 	 * @param height the height to compare to
 	 */
-	private void trim(final BlockHeight height) {
+	private void trim(final BlockHeight height, final BlockHeight lastBlockHeight) {
+		if (balances.size() == 0 || balances.get(0).getHeight().getRaw() >= height.getRaw()) {
+			return;
+		}
+		// Remember the historical balance at the point we start deleting entries
+		HistoricalBalance balance = getHistoricalBalance(height, lastBlockHeight);
+		boolean insertBalance = false;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
 			index = -index - 1;
+			insertBalance = true;
 		}
 		if (index > 0) {
 			Iterator<HistoricalBalance> iter = balances.listIterator();
@@ -139,6 +140,9 @@ public class HistoricalBalances {
 				iter.next();
 				iter.remove();
 			}
+		}
+		if (insertBalance) {
+			balances.add(0, balance);
 		}
 	}
 }

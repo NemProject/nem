@@ -127,7 +127,8 @@ public class HistoricalBalancesTest {
 
 		// Assert:
 		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(2500L), lastBlockHeight).getBalance().getNumMicroNem(), IsEqual.equalTo(15L));
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
+		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(2000L), lastBlockHeight).getBalance().getNumMicroNem(), IsEqual.equalTo(7L));
+		Assert.assertThat(balances.size(), IsEqual.equalTo(2));
 	}
 	//endregion
 }
