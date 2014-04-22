@@ -241,8 +241,6 @@ public class POI {
 		double maxRank          = np.max(x.values());
 		double maxOutlinkWeight = np.max(outlinkWeights.values());
 		double maxBalance = np.max(balances.values());
-
-		
 		
 		// We are going to calculate all of this now so we can use this for testing.
 		double[] pois = new double[];
