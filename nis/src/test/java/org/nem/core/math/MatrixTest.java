@@ -234,7 +234,7 @@ public class MatrixTest {
 		// Assert:
 		final String expectedResult =
 				"2.123 11.123" + System.lineSeparator() +
-						"3.234 1.000" + System.lineSeparator() +
+						"3.235 1.000" + System.lineSeparator() +
 						"5012.013 8.000";
 
 		// Assert:

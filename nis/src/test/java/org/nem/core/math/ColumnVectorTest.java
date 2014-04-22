@@ -455,7 +455,7 @@ public class ColumnVectorTest {
 		vector.setAt(5, 8);
 
 		// Assert:
-		final String expectedResult = "2.123 3.234 5012.013 11.123 1.000 8.000";
+		final String expectedResult = "2.123 3.235 5012.013 11.123 1.000 8.000";
 
 		// Assert:
 		Assert.assertThat(vector.toString(), IsEqual.equalTo(expectedResult));
