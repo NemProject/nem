@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.nis.BlockChain;
+import org.nem.nis.test.MockBlockChain;
 
 public class HistoricalBalancesTest {
 
@@ -10,8 +12,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeRetrieved() {
 		// Arrange:
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setLastBlockHeight(new BlockHeight(40L));
+		BlockChain blockchain = new MockBlockChain();
+		blockchain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances(blockchain);
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -37,8 +40,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeAdded() {
 		// Arrange:
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setLastBlockHeight(new BlockHeight(40L));
+		BlockChain blockchain = new MockBlockChain();
+		blockchain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances(blockchain);
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -60,8 +64,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted() {
 		// Arrange:
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setLastBlockHeight(new BlockHeight(40L));
+		BlockChain blockchain = new MockBlockChain();
+		blockchain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances(blockchain);
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -83,8 +88,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted2() {
 		// Arrange:
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setLastBlockHeight(new BlockHeight(40L));
+		BlockChain blockchain = new MockBlockChain();
+		blockchain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances(blockchain);
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -110,8 +116,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeTrimmed() {
 		// Arrange:
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setLastBlockHeight(new BlockHeight(1000L));
+		BlockChain blockchain = new MockBlockChain();
+		blockchain.getLastDbBlock().setHeight(1000L);
+		final HistoricalBalances balances = new HistoricalBalances(blockchain);
 		
 		// Act:
 		balances.add(new BlockHeight(100L), new Amount(1L));
@@ -122,7 +129,7 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.size(), IsEqual.equalTo(3));
 
 		// Act:
-		balances.setLastBlockHeight(new BlockHeight(3000L));
+		blockchain.getLastDbBlock().setHeight(3000L);
 		balances.add(new BlockHeight(2500L), new Amount(8L));
 
 		// Assert:

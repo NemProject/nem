@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.nem.nis.BlockChain;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalBalances {
 
@@ -16,18 +17,14 @@ public class HistoricalBalances {
 	
 	private final ArrayList<HistoricalBalance> balances = new ArrayList<HistoricalBalance>();
 	
-	// TODO: Is there an easy way to get the height of the current last block?
+	/**
+	 * The block chain
+	 */
+	private BlockChain blockchain;
 
-	/**
-	 * The height of the last block in the block chain
-	 */
-	private BlockHeight lastBlockHeight;
-	
-	/**
-	 * Sets the last block Height
-	 */
-	public void setLastBlockHeight(BlockHeight lastBlockHeight) {
-		this.lastBlockHeight = lastBlockHeight;
+	@Autowired(required = true)
+	HistoricalBalances(final BlockChain blockchain) {
+		this.blockchain = blockchain;
 	}
 	
 	/**
@@ -47,10 +44,11 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
-		if (lastBlockHeight.getRaw() - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
+		long lastBlockHeight = blockchain.getLastDbBlock().getHeight();
+		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
 		}
-		if (lastBlockHeight.getRaw() < height.getRaw()) {
+		if (lastBlockHeight < height.getRaw()) {
 			throw new InvalidParameterException("Future historical balances are not known.");
 		}
 		if (balances.size() == 0) {
@@ -98,7 +96,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -125,7 +123,7 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, lastBlockHeight.getRaw() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
 	}
 	
 	/**
