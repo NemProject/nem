@@ -179,6 +179,7 @@ public class POI {
 		for (int acctNdx=0; acctNdx < importances.getSize(); acctNdx++) {
 	        // assign a value between .7 and .95 based on the amount of NEM in an account
 			// more NEM = higher teleportation seems to work better
+			// NOTE: importances were initialized with acct balances, so this is why this works
 			teleporations[acctNdx] = .7 + .25*(importances.getAt(acctNdx)/maxImportance); // the importance vector was already normalized to sum to 1 in the code above
 		}
 		
@@ -188,22 +189,22 @@ public class POI {
 		while (true) { // power iteration; do up to maxIter iterations
 			
 			prevIterImportances = importances.clone();// deep copy
-			importances = dict.fromkeys(prevIterImportances.keys(),0);
+//			importances = dict.fromkeys(prevIterImportances.keys(),0); //XXX:not needed in java impl
 			
 			double dangleSum = 0;
 			for (Integer dangleNdx : dangleIndices) {
 				dangleSum += prevIterImportances.getAt(dangleNdx)*teleporations[dangleNdx];
 			}
-			dangleSum = dangleSum*scale;
+			dangleSum = dangleSum*scale; //normalize this
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
 				// doing a left multiply x^T=xlast^T*W
-				for (nbr in W[n]) {
+				for (nbr in W[n]) { //I need to double check, but I think W are the acct. balances
 					importances.getAt(nbr) += teleporations[n]*prevIterImportances[n]*W[n][nbr][weight];
 				}
 				    
-				importances[n] += danglesum+(1.0-teleporations[n]);
+				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (1.0-teleporations[ndx]));
 			}
 
 			// normalize vector
@@ -241,24 +242,26 @@ public class POI {
 		double maxOutlinkWeight = np.max(outlinkWeights.values());
 		double maxBalance = np.max(balances.values());
 
-		// normalize x
+		
 		
 		// We are going to calculate all of this now so we can use this for testing.
 		double[] pois = new double[];
 		double[] ows = new double[];
 		double[] normBalances = new double[];
 	    
-		for (n in importances) {
-			x[n] /= maxRank;
+		// normalize importances
+		for (int ndx = 0; ndx < numAccounts; ndx++) {
+			x[ndx] /= maxRank;
 			
-			pois.append(x[n]);
+			pois.append(importances.getAt(ndx));
 			ows.append((outlinkWeights[n] / maxOutlinkWeight));
 			
-			x[n] += (outlinkWeights[n] / maxOutlinkWeight);
+			importances.setAt(ndx, importances.getAt(ndx) + (outlinkWeights[ndx] / maxOutlinkWeight));
 	        
 			//weight by balance at the end
-			x[n] *= (balances[n] / maxBalance);
-			normBalances.append(balances[n] / maxBalance);
+			//TODO: XXX: weight this by coindays
+			importances[ndx] *= (balances[ndx] / maxBalance);
+			normBalances.append(balances[ndx] / maxBalance);
 		}   
 		
 		return importances;//, pois, ows, normBalances
