@@ -100,7 +100,7 @@ public class PeerNetwork {
 
 	/**
 	 * Gets a communication partner node.
-	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested
+	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested.
 	 *
 	 * @return A communication partner node.
 	 */
@@ -114,7 +114,7 @@ public class PeerNetwork {
 				this.config.getPreTrustedNodes(),
 				this.config.getTrustParameters());
 
-		final NodeSelector basicNodeSelector = getNodeSelector();
+		final NodeSelector basicNodeSelector = this.getNodeSelector();
 		return basicNodeSelector.selectNode(context);
 	}
 
@@ -132,7 +132,11 @@ public class PeerNetwork {
 	 * Refreshes the network.
 	 */
 	public void refresh() {
-		final NodeRefresher refresher = new NodeRefresher(this.nodes, this.peerConnector, this.schedulerFactory);
+		final NodeRefresher refresher = new NodeRefresher(
+				this.getLocalNode(),
+				this.getNodes(),
+				this.peerConnector,
+				this.schedulerFactory);
 		refresher.refresh();
 	}
 
@@ -167,12 +171,18 @@ public class PeerNetwork {
 	}
 
 	private static class NodeRefresher {
+		final Node localNode;
 		final NodeCollection nodes;
 		final PeerConnector connector;
 		final SchedulerFactory<Node> schedulerFactory;
 		final Map<Node, NodeStatus> nodesToUpdate;
 
-		public NodeRefresher(final NodeCollection nodes, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
+		public NodeRefresher(
+				final Node localNode,
+				final NodeCollection nodes,
+				final PeerConnector connector,
+				final SchedulerFactory<Node> schedulerFactory) {
+			this.localNode = localNode;
 			this.nodes = nodes;
 			this.connector = connector;
 			this.schedulerFactory = schedulerFactory;
@@ -193,7 +203,6 @@ public class PeerNetwork {
 
 			for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
 				this.nodes.update(entry.getKey(), entry.getValue());
-
 		}
 
 		private void refreshNode(final Node node) {
@@ -223,7 +232,7 @@ public class PeerNetwork {
 		}
 
 		private void update(final Node node, final NodeStatus status) {
-			if (status == this.nodes.getNodeStatus(node))
+			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
 			this.nodesToUpdate.put(node, status);

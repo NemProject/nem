@@ -66,6 +66,8 @@ public class PeerNetworkTest {
 
 	//endregion
 
+	//region refresh
+
 	//region getLocalNode
 
 	@Test
@@ -259,7 +261,7 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void refreshMergesInKnownPeers() {
+	public void refreshGivesPrecedenceToFirstHandExperience() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
@@ -267,7 +269,7 @@ public class PeerNetworkTest {
 
 		// Arrange: set up a node peers list that indicates the reverse of direct communication
 		// (i.e. 10.0.0.2 is active and all other nodes are inactive)
-		NodeCollection knownPeers = new NodeCollection();
+		final NodeCollection knownPeers = new NodeCollection();
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.1", 12), "p", "a"), NodeStatus.INACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.3", 12), "p", "a"), NodeStatus.INACTIVE);
@@ -282,12 +284,12 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void refreshGivesPrecedenceToFirstHandExperience() {
+	public void refreshMergesInKnownPeers() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
-		NodeCollection knownPeers = new NodeCollection();
+		final NodeCollection knownPeers = new NodeCollection();
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.11", 12), "p", "a"), NodeStatus.INACTIVE);
@@ -304,6 +306,29 @@ public class PeerNetworkTest {
 				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
 				new String[] { "10.0.0.7", "10.0.0.11" });
 	}
+
+	@Test
+	public void refreshDoesNotMergeInLocalNode() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+
+		final NodeCollection knownPeers = new NodeCollection();
+		knownPeers.update(network.getLocalNode(), NodeStatus.ACTIVE);
+		connector.setKnownPeers(knownPeers);
+
+		// Act:
+		network.refresh();
+		final NodeCollection nodes = network.getNodes();
+
+		// Assert:
+		NodeCollectionAssert.areHostsEquivalent(
+				nodes,
+				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" },
+				new String[] { });
+	}
+
+	//endregion
 
 	//endregion
 
@@ -619,6 +644,8 @@ public class PeerNetworkTest {
 		Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
 		Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
 	}
+
+	//endregion
 
 	//region factories
 
