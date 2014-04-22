@@ -142,13 +142,8 @@ public class POI {
 //	}
 	
 	// This is the draft implementation for calculating proof-of-importance
-	private double[] calculateImportancesImpl(List<Account> accounts, int maxIter, double tol, String weight) {
+	private double[] calculateImportancesImpl(List<Account> accounts, int maxIter, double tol) {
 //		 maxIter=100, tol=1.0e-8, weight='weight'
-//		D=G;
-
-		// create a copy in (right) stochastic form
-		//TODO: we probably don't need this
-//		W = nx.stochastic_graph(D, weight=weight);
 		
 		int numAccounts = accounts.size();
 		
@@ -183,7 +178,6 @@ public class POI {
 			teleporations[acctNdx] = .7 + .25*(importances.getAt(acctNdx)/maxImportance); // the importance vector was already normalized to sum to 1 in the code above
 		}
 		
-		
 		int iterCount = 0;
 		ColumnVector prevIterImportances;
 		while (true) { // power iteration; do up to maxIter iterations
@@ -200,7 +194,7 @@ public class POI {
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
 				// doing a left multiply x^T=xlast^T*W
-				for (nbr in W[n]) { //I need to double check, but I think W are the acct. balances
+				for (nbr in W[n]) { //W are edge weights in right-stochastic form
 					importances.getAt(nbr) += teleporations[n]*prevIterImportances[n]*W[n][nbr][weight];
 				}
 				    
@@ -216,25 +210,31 @@ public class POI {
 			if (err < tol) { //we've made it
 				break;
 			} else if (iterCount > maxIter) { //pwned
+				//TODO: make convergenceerror class
 //				raise ConvergenceError('poi: power iteration failed to converge in %d iterations.'%(i-1));
 			}
 			iterCount += 1;
 		}
 		    
-		// normalize with outlinks degree and median outlinking trans amt; otherwise people will hoard NEM
-		outlinkWeights = {}
-		for (n in G) {
-			currNodeOut = [i[2]['weight'] for i in G.edges(data=True) if i[0] == n]
+		// normalize with outlinks degree and median outlinking trans amt, otherwise people will hoard NEM
+		double[] outlinkWeights = new double[numAccounts];
+		for (int ndx = 0; ndx < numAccounts; ndx++) {
+			LinkedList<AccountLink> outLinks = accounts.get(ndx).getOutLinks();
+//			currNodeOut = [i[2]['weight'] for i in G.edges(data=True) if i[0] == ndx]
 			
-			median = np.median(currNodeOut);
-			outDegree = len(currNodeOut);
+			if (outLinks != null) {
+				double median = np.median(outLinks); //TODO: calc median of accountlink strength
+				double outDegree = outLinks.size();
 
-			outlinkWeight = median*outDegree;
-			if (np.isnan(outlinkWeight)) {
-				outlinkWeight = 0;
+				double outlinkWeight = median*outDegree;
+				if (np.isnan(outlinkWeight)) {
+					outlinkWeight = 0;
+				}
+				    
+				outlinkWeights[ndx] = outlinkWeight;
+			} else {
+				outlinkWeights[ndx] = 0;
 			}
-			    
-			outlinkWeights[n] = outlinkWeight;
 		}
 		    
 		// normalize outlink weights
@@ -243,9 +243,9 @@ public class POI {
 		double maxBalance = np.max(balances.values());
 		
 		// We are going to calculate all of this now so we can use this for testing.
-		double[] pois = new double[];
-		double[] ows = new double[];
-		double[] normBalances = new double[];
+		double[] pois = new double[numAccounts];
+		double[] ows = new double[numAccounts];
+		double[] normBalances = new double[numAccounts];
 	    
 		// normalize importances
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
