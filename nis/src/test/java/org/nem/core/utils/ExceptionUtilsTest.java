@@ -5,7 +5,11 @@ import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.junit.*;
 
+import java.io.IOException;
+
 public class ExceptionUtilsTest {
+
+	//region toUnchecked
 
 	@Test
 	public void toUncheckedReturnsAnUncheckedException() throws Exception {
@@ -85,4 +89,37 @@ public class ExceptionUtilsTest {
 			this.blockingThread.join();
 		}
 	}
+
+	//endregion
+
+	//region propagate
+
+	@Test
+	public void propagateReturnsResultOnSuccess() {
+		// Act:
+		final int result = ExceptionUtils.propagate(() -> 7);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(7));
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateAllowsRuntimeExceptionsToPropagate() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new EncodingException(); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new IOException(); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new IOException(); }, EncodingException::new);
+	}
+
+	//endregion
 }
