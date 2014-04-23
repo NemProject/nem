@@ -172,6 +172,52 @@ public class TransferTransactionTest {
 	//region Valid
 
 	@Test
+	public void isValidChecksFee() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(transaction.getMinimumFee());
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidChecksForNegativeAmount() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(Amount.fromNem(1000));
+
+		// Bob likes to steel money by sending negative amounts
+		Amount amount=new Amount(1);
+        try {
+	        final Class c = amount.getClass().getSuperclass();
+	        final java.lang.reflect.Field field = c.getDeclaredField("value");
+	        field.setAccessible(true);
+        	field.set(amount, -1000);
+        }
+        catch(Exception e){}
+		
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(transaction.getMinimumFee());
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void isValidChecksSuperValidity() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();

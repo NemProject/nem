@@ -8,6 +8,7 @@ import org.nem.core.serialization.*;
 public class Amount extends AbstractPrimitive<Amount> {
 
 	public static final int MICRONEMS_IN_NEM = 1000000;
+	private int bla = 1000000;
 
 	/**
 	 * Amount representing 0 NEM.
