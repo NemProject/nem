@@ -219,12 +219,16 @@ public class POI {
 		// normalize with outlinks degree and median outlinking trans amt, otherwise people will hoard NEM
 		double[] outlinkWeights = new double[numAccounts];
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
-			LinkedList<AccountLink> outLinks = accounts.get(ndx).getOutLinks();
+			LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
 //			currNodeOut = [i[2]['weight'] for i in G.edges(data=True) if i[0] == ndx]
 			
-			if (outLinks != null) {
-				double median = np.median(outLinks); //TODO: calc median of accountlink strength
-				double outDegree = outLinks.size();
+			if (outlinks != null) {
+				double median = np.median(outlinks); //TODO: calc median of accountlink strength
+				double outDegree = 0; //outDegree is the sum of strengths for outlinks
+				for (AccountLink outlink : outlinks){
+					outDegree += outlink.getStrength();
+				}
+				
 
 				double outlinkWeight = median*outDegree;
 				if (np.isnan(outlinkWeight)) {
@@ -238,7 +242,7 @@ public class POI {
 		}
 		    
 		// normalize outlink weights
-		double maxRank          = np.max(x.values());
+		double maxRank          = importances.getMax();
 		double maxOutlinkWeight = np.max(outlinkWeights.values());
 		double maxBalance = np.max(balances.values());
 		
@@ -262,7 +266,7 @@ public class POI {
 			normBalances.append(balances[ndx] / maxBalance);
 		}   
 		
-		return importances;//, pois, ows, normBalances
+		return importances.getVector();//, pois, ows, normBalances
 	}
 
 	private  getStochasticGraph(G, weight='weight') {

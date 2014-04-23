@@ -16,9 +16,9 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	
-	private LinkedList<AccountLink> inLinks;
+	private LinkedList<AccountLink> inlinks;
 	
-	private LinkedList<AccountLink> outLinks;
+	private LinkedList<AccountLink> outlinks;
 
 	private BlockAmount foragedBlocks;
 
@@ -186,49 +186,49 @@ public class Account implements SerializableEntity {
 	/**
 	 * @param acctLink - an inLink to add
 	 */
-	public void addInLink(AccountLink acctLink) {
-		if (this.inLinks == null) {
-			this.inLinks = new LinkedList<AccountLink>();
+	public void addInlink(AccountLink acctLink) {
+		if (this.inlinks == null) {
+			this.inlinks = new LinkedList<AccountLink>();
 		}
-		this.inLinks.add(acctLink);
+		this.inlinks.add(acctLink);
 	}
 	
 	/**
-	 * @return the inLinks
+	 * @return the inlinks
 	 */
-	public LinkedList<AccountLink> getInLinks() {
-		return inLinks;
+	public LinkedList<AccountLink> getInlinks() {
+		return inlinks;
 	}
 
 	/**
 	 * @param inLinks the inLinks to set
 	 */
-	public void setInLinks(LinkedList<AccountLink> inLinks) {
-		this.inLinks = inLinks;
+	public void setInlinks(LinkedList<AccountLink> inlinks) {
+		this.inlinks = inlinks;
 	}
 	
 	/**
-	 * @param acctLink - an outLink to add
+	 * @param acctLink - an outlink to add
 	 */
-	public void addOutLink(AccountLink acctLink) {
-		if (this.outLinks == null) {
-			this.outLinks = new LinkedList<AccountLink>();
+	public void addOutlink(AccountLink acctLink) {
+		if (this.outlinks == null) {
+			this.outlinks = new LinkedList<AccountLink>();
 		}
-		this.outLinks.add(acctLink);
+		this.outlinks.add(acctLink);
 	}
 	
 	/**
-	 * @return the outLinks
+	 * @return the outlinks
 	 */
-	public LinkedList<AccountLink> getOutLinks() {
-		return outLinks;
+	public LinkedList<AccountLink> getOutlinks() {
+		return outlinks;
 	}
 
 	/**
-	 * @param outLinks the outLinks to set
+	 * @param outlinks the outlinks to set
 	 */
-	public void setOutLinks(LinkedList<AccountLink> outLinks) {
-		this.outLinks = outLinks;
+	public void setOutlinks(LinkedList<AccountLink> outlinks) {
+		this.outlinks = outlinks;
 	}
 	
 	

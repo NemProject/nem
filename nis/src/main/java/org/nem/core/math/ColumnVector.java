@@ -41,6 +41,16 @@ public class ColumnVector {
 		return this.size;
 	}
 
+	
+	/**
+	 * TODO: I see no reason not to include this too. Is there a reason to leave it out?
+	 * 
+	 * @return the vector
+	 */
+	public double[] getVector() {
+		return vector;
+	}
+
 	/**
 	 * Gets the value at the specified index.
 	 *
