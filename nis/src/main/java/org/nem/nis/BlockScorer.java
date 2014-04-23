@@ -92,7 +92,7 @@ public class BlockScorer {
 	}
 
 	private long calculateBlockScoreImpl(long foragedBlocks, long difficulty) {
-		return difficulty + foragedBlocks;
+		return difficulty;
 	}
 
 	/**
