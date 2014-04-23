@@ -45,7 +45,7 @@ public class BlockScorerTest {
 		final BigInteger hit = scorer.calculateHit(previousBlock);
 
 		// Assert:
-		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("e5e4e3e2e1e0d7d6", 16)));
+		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
 	}
 
 	@Test
@@ -228,33 +228,67 @@ public class BlockScorerTest {
 		//  20% attack: 10 rounds with approximately 100 blocks each
 		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 2_000_000_000L, 500_000_000L);
 
+		//  30% attack: 10 rounds with approximately 100 blocks each
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_400_000_000L, 600_000_000L);
+
 		//  40% attack: 10 rounds with approximately 100 blocks each
 		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_500_000_000L, 1_000_000_000L);
 
-		//  50% attack: 10 rounds with approximately 100 blocks each
-		// selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 900_000_000L, 900_000_000L);
+		//  45% attack: 10 rounds with approximately 100 blocks each
+		//  Due to variance the selfish forger sometimes wins
+		selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_100_000_000L, 900_000_000L);
 		
 		Assert.assertTrue("Selfish forager created better chain!", selfishForagerWins == 0);
 	}
 
 	@Test
-	public void selfishForagerVersusXNormal() {
-		// change first number (number of tests) from 10, to 100 to get better statistics
+	public void selfishForagerVersusMultipleNormal() {
+		// Act
+		long selfishForagerWins = normalXForagerVersusSelfishForager(10, 100 * 60, 10, 1_100_000_000L, 900_000_000L);
+
+		// Assert:
+		Assert.assertTrue("Selfish forager vs multiple normal: created better chain!", selfishForagerWins == 0);
+	}
+
+	@Test
+	public void manyOldNormalForagersVersusManyFreshSelfishForarges() {
+		// The selfish forager waits till the normal foragers have foraged foragedBlocksPerNormalForager blocks in average.
+		// (Assuming 5000 normal forgagers in a real NEM network each forager has foraged about 100 blocks after a year.)
+		// Then the selfish forager creates brand-new accounts and forages with them.
+		long selfishForagerWins = oldNormalXForagerAccountsVersusSelfishForagerXBrandNewAccounts(10, 100*60, 100, 10, 1_100_000_000L, 900_000_000);
+
+		// Assert
+		Assert.assertTrue("(multiple) Selfish forager vs vs multiple normal: created better chain!", selfishForagerWins == 0);
+	}
+
+	@Test
+	public void selfishForagerVersusManyRandom() {
 		long selfishForagerWins = 0;
 
-		selfishForagerWins += normalXForagerVersusSelfishForager(10, 100 * 60, 10, 500_000_000L, 55_000_000_000L);
+		// 5%
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 5, 10, 500_000_000L);
 
-		// in this test selfish forager has 66% of NEMs, so this test might occasionally fail
-		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 10, 500_000_000L);
+		// 10%
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 10, 10, 500_000_000L);
 
-		Assert.assertTrue("Selfish forager vs X created better chain!", selfishForagerWins == 0);
+		// 20%
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 20, 10, 500_000_000L);
+
+		// 40%
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 40, 10, 500_000_000L);
+
+		// 40%
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(10, 100*60, 45, 10, 500_000_000L);
+
+		// Assert:
+		Assert.assertTrue("Selfish forager vs multiple normal (random): created better chain!", selfishForagerWins == 0);
 	}
 
 	@Test
 	public void differentChainsProduceDifferentScores() {
 		// Arrange:
 		final Account foragerA = createAccountWithBalance(1_000_000_000);
-		final Account foragerB = createAccountWithBalance(900_000_000);
+		final Account foragerB = createAccountWithBalance(100_000_000);
 
 		final BlockScorer scorer = new BlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -269,18 +303,23 @@ public class BlockScorerTest {
 		// Act:
 		blocks.clear();
 		blocks.add(firstBlock);
-		block = generateNextBlock(foragerA, blocks, scorer, false);
-		foragerA.incrementForagedBlocks();
-		blocks.add(block);
+		for (int i=0; i < 2; ++i) {
+			block = generateNextBlock(foragerA, blocks, scorer, false);
+			foragerA.incrementForagedBlocks();
+			blocks.add(block);
+		}
 		long scoreA = calculateScore(blocks, scorer);
 
 		blocks.clear();
 		blocks.add(firstBlock);
-		block = generateNextBlock(foragerB, blocks, scorer, true);
-		foragerB.incrementForagedBlocks();
-		blocks.add(block);
+		for (int i=0; i < 2; ++i) {
+			block = generateNextBlock(foragerB, blocks, scorer, true);
+			foragerB.incrementForagedBlocks();
+			blocks.add(block);
+		}
 		long scoreB = calculateScore(blocks, scorer);
 
+		LOGGER.info("a: " + scoreA + " b: " + scoreB);
 		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 	
@@ -338,10 +377,78 @@ public class BlockScorerTest {
 			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagerScore);
 		}
 
-		LOGGER.info("selfish forager wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
+		
+		LOGGER.info("selfish forager (" + (selfishForgerBalance*100L)/(normalForgerBalance+selfishForgerBalance) + "% of all nem) wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagerWins) + "%.");
 		return selfishForagerWins;
 	}
 
+
+	public int oldNormalXForagerAccountsVersusSelfishForagerXBrandNewAccounts(int numRounds, int maxTime, long foragedBlocksPerNormalForager, int count, long normalForgerBalance,  long selfishForgerBalance) {
+		// Arrange:
+
+		final BlockScorer scorer = new BlockScorer();
+		List<Block> blocks = new LinkedList<>();
+		SecureRandom sr = new SecureRandom();
+		byte[] rndBytes = new byte[32];
+		Block firstBlock;
+		Block lastBlock;
+		int normalForagersWins = 0;
+		int selfishForagerWins = 0;
+		long normalForagersScore;
+		long selfishForagerScore;
+
+		// Act: normal forager duo vs. selfish forger
+		for (int i=0; i<numRounds; i++) {
+			// create here to reset number of foraged blocks
+			Account[] selfishForagerAccounts = new Account[count];
+			Account[] foragers = new Account[count];
+			for (int j = 0; j < count; j++) {
+				foragers[j] = createAccountWithBalance(normalForgerBalance);
+				for (int k=0; k<foragedBlocksPerNormalForager; k++) {
+					foragers[j].incrementForagedBlocks();
+				}
+				selfishForagerAccounts[j] = createAccountWithBalance(selfishForgerBalance);
+			}
+
+			sr.nextBytes(rndBytes);
+			Hash hash = new Hash(rndBytes);
+			firstBlock = new Block(foragers[i % count], hash, new TimeInstant(1), new BlockHeight(1));
+			firstBlock.setGenerationHash(HashUtils.nextHash(hash, foragers[i % count].getKeyPair().getPublicKey()));
+
+			blocks.clear();
+			blocks.add(firstBlock);
+			do {
+				Block block = generateNextBlockMultiple(foragers, blocks, scorer, false);
+				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
+				lastBlock = block;
+
+			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("NORMAL==== ==== ==== ==== ");
+			normalForagersScore = calculateScore(blocks, scorer);
+
+			blocks.clear();
+			blocks.add(firstBlock);
+			do {
+				Block block = generateNextBlockMultiple(selfishForagerAccounts, blocks, scorer, false);
+				blocks.add(block);
+				block.getSigner().incrementForagedBlocks();
+				lastBlock = block;
+			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+			//LOGGER.info("SELFISH=== ==== ==== ==== ");
+			selfishForagerScore = calculateScore(blocks, scorer);
+			if (selfishForagerScore > normalForagersScore) {
+				selfishForagerWins++;
+			}
+			else {
+				normalForagersWins++;
+			}
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+		}
+
+		LOGGER.info("selfish forager vs 2 (" + (selfishForgerBalance*100L)/(normalForgerBalance+selfishForgerBalance) + "% of all nem) wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
+		return selfishForagerWins;
+	}
 
 	public int normalXForagerVersusSelfishForager(int numRounds, int maxTime, int count, long normalForgerBalance,  long selfishForgerBalance) {
 		// Arrange:
@@ -363,7 +470,7 @@ public class BlockScorerTest {
 			Account selfishForager = createAccountWithBalance(selfishForgerBalance);
 			Account[] forargers = new Account[count];
 			for (int j = 0; j < count; j++) {
-				forargers[j] = createAccountWithBalance(normalForgerBalance);
+				forargers[j] = createAccountWithBalance(normalForgerBalance/count);
 			}
 
 			sr.nextBytes(rndBytes);
@@ -399,14 +506,14 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
-		LOGGER.info("selfish forager vs 2 wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
+		LOGGER.info("selfish forager vs 2 (" + (selfishForgerBalance*100L)/(normalForgerBalance+selfishForgerBalance) + "% of all nem) wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
 		return selfishForagerWins;
 	}
 
-	public int normalXRandomForagerVersusSelfishForager(int numRounds, int maxTime, int count, long normalForgerBalance) {
+	public int normalXRandomForagerVersusSelfishForager(int numRounds, int maxTime, int percentage, int count, long normalForgerBalance) {
 		// Arrange:
 
 		final BlockScorer scorer = new BlockScorer();
@@ -429,7 +536,7 @@ public class BlockScorerTest {
 				forargers[j] = createAccountWithBalance(Math.abs(sr.nextLong() % normalForgerBalance));
 				selfishForgerBalance += forargers[j].getBalance().getNumNem();
 			}
-			Account selfishForager = createAccountWithBalance(selfishForgerBalance*2);
+			Account selfishForager = createAccountWithBalance(selfishForgerBalance * percentage * 2 / 100);
 
 			sr.nextBytes(rndBytes);
 			Hash hash = new Hash(rndBytes);
@@ -464,10 +571,10 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
-		LOGGER.info("selfish forager vs x random wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
+		LOGGER.info("selfish forager (" + percentage + "% of all nems) vs x random wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
 		return selfishForagerWins;
 	}
 
@@ -518,7 +625,7 @@ public class BlockScorerTest {
 		Block lastBlock = blocks.get(blocks.size()-1);
 
 		Block bestBlock = null;
-		long maxSum = Integer.MIN_VALUE;
+		//long maxSum = Integer.MIN_VALUE;
 		int minTime = Integer.MAX_VALUE;
 		for (Account forger : forgers) {
 			Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
@@ -546,16 +653,16 @@ public class BlockScorerTest {
 			temp.addAll(blocks);
 			temp.add(block);
 
-//			int time = block.getTimeStamp().getRawTime();
-//			if (time < minTime) {
-//				minTime = time;
-//				bestBlock = block;
-//			}
-			long scoreSum = calculateScore(temp, scorer);
-			if (scoreSum > maxSum) {
+			int time = block.getTimeStamp().getRawTime();
+			if (time < minTime) {
+				minTime = time;
 				bestBlock = block;
-				maxSum = scoreSum;
 			}
+//			long scoreSum = calculateScore(temp, scorer);
+//			if (scoreSum > maxSum) {
+//				bestBlock = block;
+//				maxSum = scoreSum;
+//			}
 		}
 		//LOGGER.info(bestBlock.getSigner().getLabel());
 		return bestBlock;
@@ -566,16 +673,13 @@ public class BlockScorerTest {
 		if (blocks.size() > 1) {
 			Iterator<Block> iter = blocks.iterator();
 
-			Block parent = iter.next(); // skip first "same" block
+			Block parentBlock = iter.next();
 
 			while (iter.hasNext()) {
 				Block block = iter.next();
-				if (scoreSum == 0) {
-					scoreSum += scorer.calculateBlockScore(parent, block);
-				}
-				long score = scorer.calculateBlockScore(parent, block);
+				long score = scorer.calculateBlockScore(parentBlock, block);
 				scoreSum += score;
-				parent = block;
+				parentBlock = block;
 			}
 		}
 		return scoreSum;
