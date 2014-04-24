@@ -172,8 +172,8 @@ public class TransferTransactionTest {
 	//region Valid
 
 	@Test
-	public void isValidChecksFee() {
-		// Arrange:
+	public void isValidChecksForMinimumFee() {
+		// Arrange (category spam attack):
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
@@ -192,23 +192,62 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	public void isValidChecksForMaximumFee() {
+		// Arrange: I might be be paranoid, is a overflow attack possible?
+		//          Checking for fee <= ALL_NEM is cheap.
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1_000_000_000_001L));
+		final Account recipient = Utils.generateRandomAccount();
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(Amount.fromNem(1_000_000_000_000L));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void isValidChecksForNegativeAmount() {
-		// Arrange:
+		// Arrange (category stealing attack):
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		recipient.incrementBalance(Amount.fromNem(1000));
 
-		// Bob likes to steel money by sending negative amounts
+		// Bob likes to steal money by sending negative amounts.
+		// He waits till he forages a block and includes the following transaction.
 		Amount amount=new Amount(1);
         try {
 	        final Class c = amount.getClass().getSuperclass();
 	        final java.lang.reflect.Field field = c.getDeclaredField("value");
 	        field.setAccessible(true);
-        	field.set(amount, -1000);
+        	field.set(amount, -1000000);
         }
         catch(Exception e){}
 		
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(Amount.fromMicroNem(1000000));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidChecksForMaximumAmount() {
+		// Arrange: I might be be paranoid, is a overflow attack possible?
+		//          Checking for amount <= ALL_NEM is cheap.
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1_000_000_000_001L));
+		final Account recipient = Utils.generateRandomAccount();
+		Amount amount=new Amount(1_000_000_000_001L);
+
 		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
 		transaction.setDeadline(new TimeInstant(60));
 		transaction.setFee(transaction.getMinimumFee());
