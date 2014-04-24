@@ -44,7 +44,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(GOOD_URL), strategy);
+		client.get(new URL(GOOD_URL), strategy).get();
 
 		// Assert:
 		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
@@ -57,7 +57,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(GOOD_URL), strategy);
+		client.get(new URL(GOOD_URL), strategy).get();
 
 		// Assert:
 		Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo("GET"));
@@ -70,7 +70,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(0);
 
 		// Act:
-		client.get(new URL(GOOD_URL), DEFAULT_STRATEGY);
+		client.get(new URL(GOOD_URL), DEFAULT_STRATEGY).get();
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -79,7 +79,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		client.get(new URL(MALFORMED_URI), DEFAULT_STRATEGY);
+		client.get(new URL(MALFORMED_URI), DEFAULT_STRATEGY).get();
 	}
 
 	//endregion
@@ -107,7 +107,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy);
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy).get();
 
 		// Assert:
 		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
@@ -120,7 +120,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy);
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy).get();
 
 		// Assert:
 		Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo("POST"));
@@ -133,7 +133,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(0);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY);
+		client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -142,7 +142,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		client.post(new URL(MALFORMED_URI), new MockSerializableEntity(), DEFAULT_STRATEGY);
+		client.post(new URL(MALFORMED_URI), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
 	}
 
 	//endregion
