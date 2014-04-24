@@ -726,23 +726,6 @@ public class BlockScorerTest {
 				parentBlock = block;
 				i++;
 			}
-
-			iter = blocks.iterator();
-			iter.next();
-			long scoreA = 0;
-			i = 0;
-			while (iter.hasNext()) {
-				Block block = iter.next();
-				parentBlock = new Block(block.getSigner(), block, block.getTimeStamp());
-				long score = scorer.calculateBlockScore(parentBlock, block);
-				if (i == 0) {
-					scoreA = score;
-				}
-				scoreA += score;
-				i++;
-			}
-			//LOGGER.info("scoreA " + scoreA + " vs sum: " + scoreSum + " diff: " + (scoreA -scoreSum) + " ratio: " + (scoreA/(1+scoreSum)));
-
 		}
 		return scoreSum;
 	}
