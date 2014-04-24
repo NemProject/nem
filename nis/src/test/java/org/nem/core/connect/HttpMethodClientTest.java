@@ -1,14 +1,15 @@
 package org.nem.core.connect;
 
-import org.eclipse.jetty.client.api.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.connect.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
 
-import java.io.IOException;
 import java.net.URL;
 
 public class HttpMethodClientTest {
@@ -28,7 +29,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		final Deserializer deserializer = client.get(new URL(GOOD_URL), DEFAULT_STRATEGY);
+		final Deserializer deserializer = client.get(new URL(GOOD_URL), DEFAULT_STRATEGY).get();
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -46,7 +47,7 @@ public class HttpMethodClientTest {
 		client.get(new URL(GOOD_URL), strategy);
 
 		// Assert:
-		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(Request.class), Mockito.any(Response.class));
+		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
 	}
 
 	@Test
@@ -60,7 +61,7 @@ public class HttpMethodClientTest {
 
 		// Assert:
 		Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo("GET"));
-		Assert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo(null));
+		Assert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
 	}
 
 	@Test(expected = InactivePeerException.class)
@@ -91,7 +92,7 @@ public class HttpMethodClientTest {
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
-		final Deserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY);
+		final Deserializer deserializer = client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
@@ -109,7 +110,7 @@ public class HttpMethodClientTest {
 		client.post(new URL(GOOD_URL), new MockSerializableEntity(), strategy);
 
 		// Assert:
-		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(Request.class), Mockito.any(Response.class));
+		Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
 	}
 
 	@Test
@@ -156,9 +157,10 @@ public class HttpMethodClientTest {
 		private String requestContentType;
 
 		@Override
-		public T coerce(Request request, Response response) throws IOException {
+		public T coerce(final HttpRequestBase request, final HttpResponse response) {
+			final HttpEntity entity = response.getEntity();
 			this.requestMethod = request.getMethod();
-			this.requestContentType = request.getHeaders().get("content-type");
+			this.requestContentType = null == entity ? null : ContentType.get(entity).getMimeType();
 			return null;
 		}
 

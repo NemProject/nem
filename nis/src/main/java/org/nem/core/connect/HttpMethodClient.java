@@ -1,17 +1,20 @@
 package org.nem.core.connect;
 
 import net.minidev.json.*;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.*;
-import org.eclipse.jetty.client.util.*;
-import org.eclipse.jetty.http.HttpMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.*;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.nio.client.*;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.serialization.*;
-import org.nem.core.utils.ExceptionUtils;
 
-import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
+import java.util.function.Function;
 
 /**
  * Helper class that wraps an HttpClient.
@@ -20,8 +23,7 @@ import java.util.concurrent.*;
  */
 public class HttpMethodClient<T> {
 
-	private final int timeout;
-	private final HttpClient httpClient;
+	private final CloseableHttpAsyncClient httpClient;
 
 	/**
 	 * Creates a new HTTP method client.
@@ -29,15 +31,16 @@ public class HttpMethodClient<T> {
 	 * @param timeout The timeout (in seconds) that should be used.
 	 */
 	public HttpMethodClient(final int timeout) {
-		this.timeout = timeout;
+		final RequestConfig config = RequestConfig.custom()
+				.setSocketTimeout(timeout)
+				.setConnectTimeout(timeout)
+				.setRedirectsEnabled(false)
+				.build();
 
-		try {
-			this.httpClient = new HttpClient();
-			this.httpClient.setFollowRedirects(false);
-			this.httpClient.start();
-		} catch (Exception ex) {
-			throw new FatalPeerException("HTTP client could not be started", ex);
-		}
+		this.httpClient = HttpAsyncClients.custom()
+				.setDefaultRequestConfig(config)
+				.build();
+		this.httpClient.start();
 	}
 
 	/**
@@ -47,13 +50,8 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, new RequestFactory() {
-			@Override
-			public Request createRequest(final HttpClient httpClient, final URI uri) {
-				return httpClient.newRequest(uri);
-			}
-		}, responseStrategy);
+	public CompletableFuture<T> get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
+		return sendRequest(url, HttpGet::new, responseStrategy);
 	}
 
 	/**
@@ -64,7 +62,10 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T post(final URL url, final SerializableEntity entity, final HttpResponseStrategy<T> responseStrategy) {
+	public CompletableFuture<T> post(
+			final URL url,
+			final SerializableEntity entity,
+			final HttpResponseStrategy<T> responseStrategy) {
 		return this.post(url, JsonSerializer.serializeToJson(entity), responseStrategy);
 	}
 
@@ -76,18 +77,19 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public T post(final URL url, final JSONObject requestData, final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, new RequestFactory() {
-			@Override
-			public Request createRequest(final HttpClient httpClient, final URI uri) {
-				Request req = httpClient.newRequest(uri);
-				req.method(HttpMethod.POST);
-				req.content(
-						new BytesContentProvider(requestData.toString().getBytes()),
-						MimeTypes.Type.APPLICATION_JSON.asString());
-				return req;
-			}
-		}, responseStrategy);
+	public CompletableFuture<T> post(
+			final URL url,
+			final JSONObject requestData,
+			final HttpResponseStrategy<T> responseStrategy) {
+		return sendRequest(url, uri -> createPostRequest(uri, requestData), responseStrategy);
+	}
+
+	private static HttpPost createPostRequest(final URI uri, final JSONObject requestData) {
+		final HttpPost request = new HttpPost(uri);
+		final ByteArrayEntity entity = new ByteArrayEntity(requestData.toString().getBytes()); // TODO: use UTF-8 charset
+		entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, MimeTypes.Type.APPLICATION_JSON.asString()));
+		request.setEntity(entity);
+		return request;
 	}
 
 	/**
@@ -97,27 +99,44 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	private T sendRequest(final URL url, final RequestFactory requestFactory, final HttpResponseStrategy<T> responseStrategy) {
+	private CompletableFuture<T> sendRequest(
+			final URL url,
+			final Function<URI, HttpRequestBase> requestFactory,
+			final HttpResponseStrategy<T> responseStrategy) {
 		try {
 			final URI uri = url.toURI();
-			final InputStreamResponseListener listener = new InputStreamResponseListener();
 
-			final Request req = requestFactory.createRequest(this.httpClient, uri);
-			req.send(listener);
+			final HttpMethodClientFutureCallback callback = new HttpMethodClientFutureCallback();
+			final HttpRequestBase request = requestFactory.apply(uri);
+			this.httpClient.execute(request, callback);
 
-			final Response res = listener.get(this.timeout, TimeUnit.SECONDS);
-			return responseStrategy.coerce(req, res);
-		} catch (TimeoutException e) {
-			throw new InactivePeerException(e);
-		} catch (URISyntaxException | ExecutionException | IOException e) {
+			return callback.getFuture().thenApply(response -> responseStrategy.coerce(request, response));
+
+		} catch (URISyntaxException e) {
 			throw new FatalPeerException(e);
-		} catch (InterruptedException e) {
-			throw ExceptionUtils.toUnchecked(e);
 		}
 	}
 
-	private static interface RequestFactory {
+	// TODO: move out of this file and test
+	private class HttpMethodClientFutureCallback implements FutureCallback<HttpResponse> {
 
-		public Request createRequest(final HttpClient httpClient, final URI uri);
+		private final CompletableFuture<HttpResponse> future = new CompletableFuture<>();
+
+		public CompletableFuture<HttpResponse> getFuture() { return this.future; }
+
+		@Override
+		public void completed(final HttpResponse httpResponse) {
+			this.future.complete(httpResponse);
+		}
+
+		@Override
+		public void failed(final Exception e) {
+			this.future.completeExceptionally(e);
+		}
+
+		@Override
+		public void cancelled() {
+			this.future.completeExceptionally(new CancellationException());
+		}
 	}
 }
