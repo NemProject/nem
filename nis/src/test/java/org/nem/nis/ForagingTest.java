@@ -50,15 +50,15 @@ public class ForagingTest {
 
 	@Test
 	public void processTransactionsDoesNotSaveDoubleSpendTransaction() throws InterruptedException {
-		// Arrange (category boost trust attack):
+		// Arrange (category boost trust attack, stop foraging attack):
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 		Account signer = createAccountWithBalance(1000);
 		Transaction tx = new TransferTransaction(now, signer, RECIPIENT1, Amount.fromNem(800), null);
 		Foraging foraging = new MockForaging();
-		tx.sign();
 		tx.setFee(Amount.fromNem(1));
 		tx.setDeadline(now.addMinutes(100));
+		tx.sign();
 
 		// Assert:
 		Assert.assertThat(tx.isValid(), IsEqual.equalTo(true));
@@ -66,6 +66,9 @@ public class ForagingTest {
 		// Act:
 		foraging.processTransaction(tx);
 		tx = new TransferTransaction(now.addSeconds(5), signer, RECIPIENT1, Amount.fromNem(800), null);
+		tx.setFee(Amount.fromNem(1));
+		tx.setDeadline(now.addMinutes(100));
+		tx.sign();
 		foraging.processTransaction(tx);
 
 		// Assert:
