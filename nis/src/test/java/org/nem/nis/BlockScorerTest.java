@@ -251,8 +251,8 @@ public class BlockScorerTest {
 		// Act
 		long selfishForagerWins = 0;
 
-		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100 * 60, 10, 1_000_000_000L, 1_000_000_000L);
-		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100 * 60, 10, 1_000_000_000L, 1_000_000_000L);
+		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
+		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
 
 		// Assert:
 		Assert.assertTrue("Selfish forager vs multiple normal: created better chain!", selfishForagerWins == 0);
@@ -265,8 +265,8 @@ public class BlockScorerTest {
 		// Then the selfish forager creates brand-new accounts and forages with them.
 		long selfishForagerWins = 0;
 
-		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 10 * 60, 100, 10, 1_000_000_000L, 1, 100_000_000);
-		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 10 * 60, 100, 10, 1_000_000_000L, 1, 100_000_000);
+		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish forager vs vs multiple normal: created better chain!", selfishForagerWins == 0);
