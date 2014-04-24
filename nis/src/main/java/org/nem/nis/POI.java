@@ -223,14 +223,14 @@ public class POI {
 //			currNodeOut = [i[2]['weight'] for i in G.edges(data=True) if i[0] == ndx]
 			
 			if (outlinks != null) {
-				double median = np.median(outlinks); //TODO: calc median of accountlink strength
+				double medianOutlinkStrength = np.median(outlinks); //TODO: calc median of accountlink strength
 				double outDegree = 0; //outDegree is the sum of strengths for outlinks
 				for (AccountLink outlink : outlinks){
 					outDegree += outlink.getStrength();
 				}
 				
 
-				double outlinkWeight = median*outDegree;
+				double outlinkWeight = medianOutlinkStrength*outDegree;
 				if (np.isnan(outlinkWeight)) {
 					outlinkWeight = 0;
 				}
