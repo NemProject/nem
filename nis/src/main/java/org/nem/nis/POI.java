@@ -11,6 +11,7 @@ import java.util.List;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
+import org.nem.core.utils.ArrayUtils;
 
 /**
  * This is a first draft of POI.
@@ -128,8 +129,8 @@ public class POI {
 		    
 		// normalize outlink weights
 		double maxRank          = importances.getMax();
-		double maxOutlinkWeight = np.max(outlinkWeights);
-		double maxBalance = np.max(balances); //XXX:balances need to be in coindays
+		double maxOutlinkWeight = ArrayUtils.max(outlinkWeights);
+		double maxBalance = ArrayUtils.max(balances); //XXX:balances need to be in coindays
 		
 		// We are going to calculate all of this now so we can use this for testing.
 		double[] pois = new double[numAccounts];
