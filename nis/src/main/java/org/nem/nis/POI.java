@@ -158,8 +158,8 @@ public class POI {
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			Account currAcct = accounts.get(ndx);
 			importances.setAt(ndx, currAcct.getBalance().getNumMicroNem()); //XXX:can we do this or will there be precision errors?
-			LinkedList<AccountLink> outLinks = currAcct.getOutLinks();
-			if (outLinks == null || outLinks.size() < 1) { //then we have a dangling account
+			LinkedList<AccountLink> outlinks = currAcct.getOutlinks();
+			if (outlinks == null || outlinks.size() < 1) { //then we have a dangling account
 				dangleIndices.add(ndx);
 			}
 		}
@@ -194,8 +194,8 @@ public class POI {
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
 				// doing a left multiply x^T=xlast^T*W
-				for (nbr in W[n]) { //W are edge weights in right-stochastic form
-					importances.getAt(nbr) += teleporations[n]*prevIterImportances[n]*W[n][nbr][weight];
+				for (int nbr = 0; nbr < numAccounts; nbr++) { //W are edge weights in right-stochastic form
+					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
 				}
 				    
 				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (1.0-teleporations[ndx]));
@@ -228,13 +228,8 @@ public class POI {
 				for (AccountLink outlink : outlinks){
 					outDegree += outlink.getStrength();
 				}
-				
 
 				double outlinkWeight = medianOutlinkStrength*outDegree;
-				if (np.isnan(outlinkWeight)) {
-					outlinkWeight = 0;
-				}
-				    
 				outlinkWeights[ndx] = outlinkWeight;
 			} else {
 				outlinkWeights[ndx] = 0;
@@ -243,8 +238,8 @@ public class POI {
 		    
 		// normalize outlink weights
 		double maxRank          = importances.getMax();
-		double maxOutlinkWeight = np.max(outlinkWeights.values());
-		double maxBalance = np.max(balances.values());
+		double maxOutlinkWeight = np.max(outlinkWeights);
+		double maxBalance = np.max(balances); //XXX:balances need to be in coindays
 		
 		// We are going to calculate all of this now so we can use this for testing.
 		double[] pois = new double[numAccounts];
@@ -253,16 +248,16 @@ public class POI {
 	    
 		// normalize importances
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
-			x[ndx] /= maxRank;
+			importances.setAt(ndx, importances.getAt(ndx)/maxRank);
 			
-			pois.append(importances.getAt(ndx));
-			ows.append((outlinkWeights[n] / maxOutlinkWeight));
+			pois[ndx] = importances.getAt(ndx);
+			ows[ndx] = outlinkWeights[ndx] / maxOutlinkWeight;
 			
 			importances.setAt(ndx, importances.getAt(ndx) + (outlinkWeights[ndx] / maxOutlinkWeight));
 	        
 			//weight by balance at the end
-			//TODO: XXX: weight this by coindays
-			importances[ndx] *= (balances[ndx] / maxBalance);
+			//TODO: XXX: balances should be in coindays
+			importances.setAt(ndx, importances.getAt(ndx)*balances[ndx] / maxBalance);
 			normBalances.append(balances[ndx] / maxBalance);
 		}   
 		
@@ -283,7 +278,6 @@ public class POI {
 	    weight : key (optional)
 	      Edge data key used for weight.  If None all weights are set to 1.
 	    """        */
-
         W=nx.DiGraph(G);
 
 	    degree=W.out_degree(weight=weight);
