@@ -1,6 +1,7 @@
 package org.nem.core.utils;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 /**
@@ -46,6 +47,10 @@ public class ExceptionUtils {
 	public static <T, E extends RuntimeException> T propagate(final Callable<T> callable, final Function<Exception, E> wrap) {
 		try {
 			return callable.call();
+		} catch (ExecutionException e) {
+			if (RuntimeException.class.isAssignableFrom(e.getCause().getClass()))
+				throw (RuntimeException)e.getCause();
+			throw wrap.apply(e);
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {

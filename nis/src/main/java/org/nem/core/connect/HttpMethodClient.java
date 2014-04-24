@@ -11,8 +11,10 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.concurrent.*;
 import java.util.function.Function;
 
@@ -22,6 +24,8 @@ import java.util.function.Function;
  * @param <T> The type of responses.
  */
 public class HttpMethodClient<T> {
+
+	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
 	private final CloseableHttpAsyncClient httpClient;
 
@@ -50,7 +54,7 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public CompletableFuture<T> get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
+	public AsyncToken<T> get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
 		return sendRequest(url, HttpGet::new, responseStrategy);
 	}
 
@@ -62,7 +66,7 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public CompletableFuture<T> post(
+	public AsyncToken<T> post(
 			final URL url,
 			final SerializableEntity entity,
 			final HttpResponseStrategy<T> responseStrategy) {
@@ -77,7 +81,7 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public CompletableFuture<T> post(
+	public AsyncToken<T> post(
 			final URL url,
 			final JSONObject requestData,
 			final HttpResponseStrategy<T> responseStrategy) {
@@ -86,7 +90,7 @@ public class HttpMethodClient<T> {
 
 	private static HttpPost createPostRequest(final URI uri, final JSONObject requestData) {
 		final HttpPost request = new HttpPost(uri);
-		final ByteArrayEntity entity = new ByteArrayEntity(requestData.toString().getBytes()); // TODO: use UTF-8 charset
+		final ByteArrayEntity entity = new ByteArrayEntity(requestData.toString().getBytes(ENCODING_CHARSET));
 		entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, MimeTypes.Type.APPLICATION_JSON.asString()));
 		request.setEntity(entity);
 		return request;
@@ -99,7 +103,7 @@ public class HttpMethodClient<T> {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	private CompletableFuture<T> sendRequest(
+	private AsyncToken<T> sendRequest(
 			final URL url,
 			final Function<URI, HttpRequestBase> requestFactory,
 			final HttpResponseStrategy<T> responseStrategy) {
@@ -110,15 +114,63 @@ public class HttpMethodClient<T> {
 			final HttpRequestBase request = requestFactory.apply(uri);
 			this.httpClient.execute(request, callback);
 
-			return callback.getFuture().thenApply(response -> responseStrategy.coerce(request, response));
+			return new AsyncToken<>(
+					request,
+					callback.getFuture().thenApply(response -> responseStrategy.coerce(request, response)));
 
 		} catch (URISyntaxException e) {
 			throw new FatalPeerException(e);
 		}
 	}
 
-	// TODO: move out of this file and test
-	private class HttpMethodClientFutureCallback implements FutureCallback<HttpResponse> {
+	public void close() {
+		ExceptionUtils.propagate(() -> { this.httpClient.close(); return 0; });
+	}
+
+	/**
+	 * The result of an HttpMethodClient operation. This type exposes a future
+	 * for chaining async operations as well as a method for aborting the operation.
+	 *
+	 * @param <T> The type of result.
+	 */
+	public static class AsyncToken<T> {
+
+		private final HttpRequestBase request;
+		private final CompletableFuture<T> future;
+
+		private AsyncToken(final HttpRequestBase request, final CompletableFuture<T> future) {
+			this.request = request;
+			this.future = future;
+		}
+
+		/**
+		 * Gets the future for the HTTP operation.
+		 *
+		 * @return The future.
+		 */
+		public CompletableFuture<T> getFuture() {
+			return this.future;
+		}
+
+		/**
+		 * Waits if necessary for the underlying future to complete, and then
+		 * returns its result.
+		 *
+		 * @return The result value.
+		 */
+		public T get()  {
+			return ExceptionUtils.propagate(() -> this.getFuture().get(), FatalPeerException::new);
+		}
+
+		/**
+		 * Aborts the HTTP operation.
+		 */
+		public void abort() {
+			this.request.abort();
+		}
+	}
+
+	private static class HttpMethodClientFutureCallback implements FutureCallback<HttpResponse> {
 
 		private final CompletableFuture<HttpResponse> future = new CompletableFuture<>();
 
@@ -131,12 +183,15 @@ public class HttpMethodClient<T> {
 
 		@Override
 		public void failed(final Exception e) {
-			this.future.completeExceptionally(e);
+			final Exception wrappedException = SocketTimeoutException.class == e.getClass()
+					? new InactivePeerException(e)
+					: new FatalPeerException(e);
+			this.future.completeExceptionally(wrappedException);
 		}
 
 		@Override
 		public void cancelled() {
-			this.future.completeExceptionally(new CancellationException());
+			this.future.cancel(true);
 		}
 	}
 }

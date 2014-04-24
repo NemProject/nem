@@ -6,6 +6,7 @@ import org.hamcrest.core.IsNot;
 import org.junit.*;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class ExceptionUtilsTest {
 
@@ -119,6 +120,34 @@ public class ExceptionUtilsTest {
 	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
 		// Act:
 		ExceptionUtils.propagate(() -> { throw new IOException(); }, EncodingException::new);
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateUnwrapsUncheckedExecutionExceptions() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new EncodingException()); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IOException()); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
+
+		// Act:
+		ExceptionUtils.propagate(
+				() -> { throw new MockExecutionException(new IOException()); },
+				EncodingException::new);
+	}
+
+	private class MockExecutionException extends ExecutionException {
+
+		public MockExecutionException(final Throwable cause) {
+			super(cause);
+		}
 	}
 
 	//endregion

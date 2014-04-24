@@ -11,10 +11,12 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
 
 import java.net.URL;
+import java.util.concurrent.CancellationException;
 
 public class HttpMethodClientTest {
 
 	private final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
+	private final String TIMEOUT_URL = "http://127.0.0.100/";
 	private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 	private final int GOOD_TIMEOUT = 5;
 
@@ -67,10 +69,21 @@ public class HttpMethodClientTest {
 	@Test(expected = InactivePeerException.class)
 	public void getThrowsInactivePeerExceptionOnTimeout() throws Exception {
 		// Arrange:
-		final HttpMethodClient<Deserializer> client = createClient(0);
+		final HttpMethodClient<Deserializer> client = createClient(1);
 
 		// Act:
-		client.get(new URL(GOOD_URL), DEFAULT_STRATEGY).get();
+		client.get(new URL(TIMEOUT_URL), DEFAULT_STRATEGY).get();
+	}
+
+	@Test(expected = CancellationException.class)
+	public void getThrowsCancellationExceptionOnCancel() throws Exception {
+		// Arrange:
+		final HttpMethodClient<Deserializer> client = createClient(1);
+
+		// Act:
+		final HttpMethodClient.AsyncToken<Deserializer> token = client.get(new URL(TIMEOUT_URL), DEFAULT_STRATEGY);
+		token.abort();
+		token.get();
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -130,10 +143,24 @@ public class HttpMethodClientTest {
 	@Test(expected = InactivePeerException.class)
 	public void postThrowsInactivePeerExceptionOnTimeout() throws Exception {
 		// Arrange:
-		final HttpMethodClient<Deserializer> client = createClient(0);
+		final HttpMethodClient<Deserializer> client = createClient(1);
 
 		// Act:
-		client.post(new URL(GOOD_URL), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
+		client.post(new URL(TIMEOUT_URL), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
+	}
+
+	@Test(expected = CancellationException.class)
+	public void postThrowsCancellationExceptionOnCancel() throws Exception {
+		// Arrange:
+		final HttpMethodClient<Deserializer> client = createClient(1);
+
+		// Act:
+		final HttpMethodClient.AsyncToken<Deserializer> token = client.post(
+				new URL(TIMEOUT_URL),
+				new MockSerializableEntity(),
+				DEFAULT_STRATEGY);
+		token.abort();
+		token.get();
 	}
 
 	@Test(expected = FatalPeerException.class)
