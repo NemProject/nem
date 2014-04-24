@@ -74,7 +74,7 @@ public class POI {
 		while (true) { // power iteration; do up to maxIter iterations
 			
 			prevIterImportances = importances.clone();// deep copy
-//			importances = dict.fromkeys(prevIterImportances.keys(),0); //XXX:not needed in java impl
+//			importances = dict.fromkeys(prevIterImportances.keys(),0); //XXX:probably not needed in java impl
 			
 			double dangleSum = 0;
 			for (Integer dangleNdx : dangleIndices) {
@@ -85,7 +85,7 @@ public class POI {
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				// this matrix multiply looks odd because it is
 				// doing a left multiply x^T=xlast^T*W
-				for (int nbr = 0; nbr < numAccounts; nbr++) { //W are edge weights in right-stochastic form
+				for (int nbr = 0; nbr < numAccounts; nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each nodes
 					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
 				}
 				    
@@ -149,7 +149,7 @@ public class POI {
 			//weight by balance at the end
 			//TODO: XXX: balances should be in coindays
 			importances.setAt(ndx, importances.getAt(ndx)*balances[ndx] / maxBalance);
-			normBalances.append(balances[ndx] / maxBalance);
+			normBalances[ndx] = accounts.get(ndx).getBalance().getNumMicroNem() / maxBalance;
 		}   
 		
 		return importances.getVector();//, pois, ows, normBalances
