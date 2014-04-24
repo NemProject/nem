@@ -18,6 +18,7 @@ public class HttpMethodClientTest {
 	private final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
 	private final String TIMEOUT_URL = "http://127.0.0.100/";
 	private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
+	private final String HOST_LESS_URI = "file:///~/calendar";
 	private final int GOOD_TIMEOUT = 5;
 
 
@@ -87,12 +88,21 @@ public class HttpMethodClientTest {
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void getThrowsFatalPeerExceptionOnOtherError() throws Exception {
+	public void getThrowsFatalPeerExceptionOnUriError() throws Exception {
 		// Arrange:
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
 		client.get(new URL(MALFORMED_URI), DEFAULT_STRATEGY).get();
+	}
+
+	@Test(expected = FatalPeerException.class)
+	public void getThrowsFatalPeerExceptionOnClientProtocolError() throws Exception {
+		// Arrange:
+		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+
+		// Act:
+		client.get(new URL(HOST_LESS_URI), DEFAULT_STRATEGY).get();
 	}
 
 	//endregion
@@ -164,12 +174,21 @@ public class HttpMethodClientTest {
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void postThrowsFatalPeerExceptionOnOtherError() throws Exception {
+	public void postThrowsFatalPeerExceptionOnUriError() throws Exception {
 		// Arrange:
 		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 		// Act:
 		client.post(new URL(MALFORMED_URI), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
+	}
+
+	@Test(expected = FatalPeerException.class)
+	public void postThrowsFatalPeerExceptionOnClientProtocolError() throws Exception {
+		// Arrange:
+		final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+
+		// Act:
+		client.post(new URL(HOST_LESS_URI), new MockSerializableEntity(), DEFAULT_STRATEGY).get();
 	}
 
 	//endregion
