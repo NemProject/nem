@@ -216,6 +216,12 @@ public class BlockScorerTest {
 	}
 
 	@Test
+	public void oneForagerIsNotBetterThanManyForagesWithSameCumulativeBalance() {
+		long OneForagerPercentageBlocks = oneForagersVersusManyForagers(2000*60, 10, 1_000_000_000L);
+		Assert.assertTrue("One forages creates too many/not enough blocks compared to many forages!", 45 < OneForagerPercentageBlocks && OneForagerPercentageBlocks < 55);
+	}
+	
+	@Test
 	public void selfishForagerCannotForageBetterChain() {
 		int selfishForagerWins = 0;
 		//  1% attack: 10 rounds with approximately 100 blocks each
@@ -241,7 +247,7 @@ public class BlockScorerTest {
 
 		//  45% attack: 10 rounds with approximately 100 blocks each
 		//  Due to variance the selfish forger sometimes wins
-		// selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_100_000_000L, 900_000_000L);
+		 selfishForagerWins += normalForagerVersusSelfishForager(10, 100*60, 1_100_000_000L, 900_000_000L);
 		
 		Assert.assertTrue("Selfish forager created better chain!", selfishForagerWins == 0);
 	}
@@ -252,7 +258,7 @@ public class BlockScorerTest {
 		long selfishForagerWins = 0;
 
 		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
-		selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
+		//selfishForagerWins += normalXForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
 
 		// Assert:
 		Assert.assertTrue("Selfish forager vs multiple normal: created better chain!", selfishForagerWins == 0);
@@ -266,7 +272,7 @@ public class BlockScorerTest {
 		long selfishForagerWins = 0;
 
 		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
-		selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+		//selfishForagerWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish forager vs vs multiple normal: created better chain!", selfishForagerWins == 0);
@@ -289,7 +295,7 @@ public class BlockScorerTest {
 		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100*60, 40, 10, 500_000_000L);
 
 		// 45%
-		//selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100*60, 45, 10, 500_000_000L);
+		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Time_Matters, 10, 100*60, 45, 10, 500_000_000L);
 
 		// Assert:
 		Assert.assertTrue("Selfish forager vs multiple normal (random): created better chain!", selfishForagerWins == 0);
@@ -301,19 +307,19 @@ public class BlockScorerTest {
 		long selfishForagerWins = 0;
 
 		// 5%
-		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 5, 10, 500_000_000L);
-
-		// 10%
-		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 10, 10, 500_000_000L);
-
-		// 20%
-		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 20, 10, 500_000_000L);
-
-		// 40%
-		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 40, 10, 500_000_000L);
-
-		// 45%
-		//selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 45, 10, 500_000_000L);
+//		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 5, 10, 500_000_000L);
+//
+//		// 10%
+//		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 10, 10, 500_000_000L);
+//
+//		// 20%
+//		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 20, 10, 500_000_000L);
+//
+//		// 40%
+//		selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 40, 10, 500_000_000L);
+//
+//		// 45%
+//		//selfishForagerWins += normalXRandomForagerVersusSelfishForager(GenerateStrategy.Score_Matters, 10, 100*60, 45, 10, 500_000_000L);
 
 		// Assert:
 		Assert.assertTrue("Selfish forager vs multiple normal (random): created better chain!", selfishForagerWins == 0);
@@ -480,7 +486,7 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
 		LOGGER.info(selfishCount + " selfish forager vs " + count + " (" + (selfishCount*selfishForgerBalance*100L)/(count*normalForgerBalance+selfishCount*selfishForgerBalance) + "% of all nem) wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
@@ -543,7 +549,7 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
 		LOGGER.info((strategy==GenerateStrategy.Time_Matters?"(time)":"(score)") + " selfish forager vs " + count + " (" + (selfishForgerBalance*100L)/(count*normalForgerBalance+selfishForgerBalance) + "% of all nem) wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
@@ -608,11 +614,53 @@ public class BlockScorerTest {
 			else {
 				normalForagersWins++;
 			}
-			LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
+			//LOGGER.info("score " + selfishForagerScore + " vs " + normalForagersScore + " " + ((selfishForagerScore>normalForagersScore)?"*":" "));
 		}
 
 		LOGGER.info("selfish forager (" + percentage + "% of all nems) vs x random wins in:   " + (selfishForagerWins*100)/(selfishForagerWins+normalForagersWins) + "%.");
 		return selfishForagerWins;
+	}
+
+	public long oneForagersVersusManyForagers(int maxTime, int count, long manyForagersBalance) {
+		// Arrange:
+
+		final BlockScorer scorer = new BlockScorer();
+		List<Block> blocks = new LinkedList<>();
+		SecureRandom sr = new SecureRandom();
+		byte[] rndBytes = new byte[32];
+		Block firstBlock;
+		Block lastBlock;
+
+		// Act: one forager vs. count foragers
+		Account[] foragers = new Account[count+1];
+		for (int j = 0; j < count; j++) {
+			foragers[j] = createAccountWithBalance(manyForagersBalance/count);
+		}
+		foragers[count] = createAccountWithBalance(manyForagersBalance);
+
+		sr.nextBytes(rndBytes);
+		Hash hash = new Hash(rndBytes);
+		firstBlock = new Block(foragers[0], hash, new TimeInstant(1), new BlockHeight(1));
+		firstBlock.setGenerationHash(HashUtils.nextHash(hash, foragers[0].getKeyPair().getPublicKey()));
+
+		blocks.clear();
+		blocks.add(firstBlock);
+		do {
+			Block block = generateNextBlockMultiple(GenerateStrategy.Time_Matters, foragers, blocks, scorer, false);
+			blocks.add(block);
+			block.getSigner().incrementForagedBlocks();
+			lastBlock = block;
+
+		} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
+
+		long manyForagersNumBlocks = 0;
+		for (int j=0; j<count; j++) {
+			manyForagersNumBlocks += foragers[j].getForagedBlocks().getRaw();
+		}
+
+		long percentage = (foragers[count].getForagedBlocks().getRaw()*100)/(foragers[count].getForagedBlocks().getRaw() + manyForagersNumBlocks);
+		LOGGER.info("One forager created  " + foragers[count].getForagedBlocks().getRaw() + " blocks (" + percentage + "%), " + count + " foragers created " + manyForagersNumBlocks + " blocks.");
+		return percentage;
 	}
 
 	private List<BlockDifficulty> createDifficultiesList(List<Block> blocks) {
