@@ -10,12 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NodeCollection implements SerializableEntity {
 
-	private static ObjectDeserializer<Node> NODE_DESERIALIZER = new ObjectDeserializer<Node>() {
-		@Override
-		public Node deserialize(final Deserializer deserializer) {
-			return new Node(deserializer);
-		}
-	};
+	private static ObjectDeserializer<Node> NODE_DESERIALIZER = Node::new;
 
 	final Set<Node> activeNodes;
 	final Set<Node> inactiveNodes;

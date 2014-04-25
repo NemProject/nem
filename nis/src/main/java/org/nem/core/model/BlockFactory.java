@@ -14,19 +14,11 @@ public class BlockFactory {
 	/**
 	 * An object deserializer that wraps this factory.
 	 */
-	public static final ObjectDeserializer<Block> VERIFIABLE = new ObjectDeserializer<Block>() {
-		@Override
-		public Block deserialize(Deserializer deserializer) {
-			return BlockFactory.deserialize(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
-		}
-	};
+	public static final ObjectDeserializer<Block> VERIFIABLE =
+			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
-	public static final ObjectDeserializer<Block> NON_VERIFIABLE = new ObjectDeserializer<Block>() {
-		@Override
-		public Block deserialize(Deserializer deserializer) {
-			return BlockFactory.deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
-		}
-	};
+	public static final ObjectDeserializer<Block> NON_VERIFIABLE =
+			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 
 	/**
 	 * Deserializes a block.

@@ -199,12 +199,7 @@ public class Block extends VerifiableEntity {
 	}
 
 	private Iterable<Transaction> getReverseTransactions() {
-		return new Iterable<Transaction>() {
-			@Override
-			public Iterator<Transaction> iterator() {
-				return new ReverseListIterator<>(transactions);
-			}
-		};
+		return () -> new ReverseListIterator<>(transactions);
 	}
 
 	@Override

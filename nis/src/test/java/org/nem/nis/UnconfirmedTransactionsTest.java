@@ -72,12 +72,7 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(Hash hash) {
-				return false;
-			}
-		});
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> false);
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
@@ -90,12 +85,7 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(Hash hash) {
-				return true;
-			}
-		});
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> true);
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(false));

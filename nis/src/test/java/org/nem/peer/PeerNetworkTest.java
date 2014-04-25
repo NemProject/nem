@@ -488,23 +488,16 @@ public class PeerNetworkTest {
 
 			public void run() throws InterruptedException {
 				// Act: trigger broadcast operation on a different thread
-				Thread broadcastThread = startThread(new Runnable() {
-					@Override
-					public void run() {
-						network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockTransaction(org.nem.core.test.Utils.generateRandomAccount()));
-					}
-				});
+				Thread broadcastThread = startThread(() ->
+						network.broadcast(
+						        NodeApiId.REST_PUSH_TRANSACTION,
+						        new MockTransaction(org.nem.core.test.Utils.generateRandomAccount())));
 
 				// Act: wait for the scheduler to partially iterate the collection
 				org.nem.core.test.Utils.monitorWait(this.schedulerPartialIterationMonitor);
 
 				// Act: trigger refresh on a different thread
-				Thread refreshThread = startThread(new Runnable() {
-					@Override
-					public void run() {
-						network.refresh();
-					}
-				});
+				Thread refreshThread = startThread(network::refresh);
 
 				// Act: wait for the refresh to complete
 				refreshThread.join();
