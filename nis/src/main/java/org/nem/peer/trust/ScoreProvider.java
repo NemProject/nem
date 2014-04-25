@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
 /**

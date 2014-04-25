@@ -4,9 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
-import org.nem.peer.test.MockPeerNetwork;
-import org.nem.peer.test.Utils;
-import org.nem.peer.trust.*;
+import org.nem.peer.node.*;
+import org.nem.peer.test.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;

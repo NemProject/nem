@@ -2,8 +2,7 @@ package org.nem.peer.test;
 
 import org.junit.Assert;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.Node;
-import org.nem.peer.NodeCollection;
+import org.nem.peer.node.*;
 
 import java.util.*;
 

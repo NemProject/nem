@@ -3,7 +3,8 @@ package org.nem.nis.controller;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.peer.*;
-import org.nem.peer.trust.NodeExperiencesPair;
+import org.nem.peer.node.*;
+import org.nem.peer.trust.score.NodeExperiencesPair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -5,12 +5,11 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.test.MockSerializableEntity;
-import org.nem.core.test.MockTransaction;
+import org.nem.core.test.*;
+import org.nem.peer.node.*;
 import org.nem.peer.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;

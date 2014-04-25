@@ -1,8 +1,7 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
 
 import org.nem.core.serialization.*;
-import org.nem.peer.Node;
-import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.node.Node;
 
 /**
  * A Node and NodeExperience pair.

@@ -1,7 +1,7 @@
 package org.nem.peer.trust.score;
 
 import org.nem.core.utils.AbstractTwoLevelMap;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.core.math.*;
 
 public abstract class Scores<T extends Score> {

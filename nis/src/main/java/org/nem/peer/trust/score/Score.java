@@ -1,7 +1,5 @@
 package org.nem.peer.trust.score;
 
-import org.nem.peer.trust.RealDouble;
-
 /**
  * Represents a basic score.
  */

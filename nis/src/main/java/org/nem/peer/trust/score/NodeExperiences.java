@@ -2,8 +2,7 @@ package org.nem.peer.trust.score;
 
 import org.nem.core.math.Matrix;
 import org.nem.core.utils.AbstractTwoLevelMap;
-import org.nem.peer.Node;
-import org.nem.peer.trust.*;
+import org.nem.peer.node.Node;
 
 import java.util.*;
 

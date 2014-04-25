@@ -1,7 +1,6 @@
 package org.nem.peer.trust.score;
 
 import org.nem.core.serialization.*;
-import org.nem.peer.trust.PositiveLong;
 
 /**
  * Represents experience one node has with another node.
