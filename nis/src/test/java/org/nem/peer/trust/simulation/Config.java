@@ -6,6 +6,7 @@ import org.nem.peer.node.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Network simulator configuration.
@@ -55,13 +56,7 @@ public class Config {
 	}
 
 	public Set<Node> getPreTrustedNodes() {
-		final Set<Node> preTrustedNodes = new HashSet<>();
-		for (final Entry entry : this.entries) {
-			if (entry.isPreTrusted())
-				preTrustedNodes.add(entry.getNode());
-		}
-
-		return preTrustedNodes;
+		return this.entries.stream().filter(Entry::isPreTrusted).map(Entry::getNode).collect(Collectors.toSet());
 	}
 
 	/**

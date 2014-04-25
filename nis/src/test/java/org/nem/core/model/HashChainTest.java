@@ -6,6 +6,7 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HashChainTest {
 
@@ -17,10 +18,7 @@ public class HashChainTest {
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash());
 
-		final List<byte[]> rawHashes = new ArrayList<>();
-		for (final Hash hash : hashes) {
-			rawHashes.add(hash.getRaw());
-		}
+		final List<byte[]> rawHashes = hashes.stream().map(Hash::getRaw).collect(Collectors.toList());
 
 		// Act:
 		final HashChain hashChain1 = HashChain.fromRawHashes(rawHashes);

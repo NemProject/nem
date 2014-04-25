@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class BlockScorerTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockScorerTest.class.getName());
@@ -579,19 +580,11 @@ public class BlockScorerTest {
 	}
 
 	private List<BlockDifficulty> createDifficultiesList(List<Block> blocks) {
-		List<BlockDifficulty> ret = new LinkedList<>();
-		for (Block block : blocks) {
-			ret.add(block.getDifficulty());
-		}
-		return ret;
+		return blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 	}
 
 	private List<TimeInstant> createTimestampsList(List<Block> blocks) {
-		List<TimeInstant> ret = new LinkedList<>();
-		for (Block block : blocks) {
-			ret.add(block.getTimeStamp());
-		}
-		return ret;
+		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
 	private Block generateNextBlock(Account forger, List<Block> blocks, BlockScorer scorer, boolean randomizeTime) {

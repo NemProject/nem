@@ -5,9 +5,9 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.Predicate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
 
@@ -173,13 +173,10 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	private static List<Integer> getCustomFieldValues(final Iterable<Transaction> transactions) {
-		final List<Integer> customFields = new ArrayList<>();
-		for (final Transaction transaction : transactions) {
-			customFields.add(((MockTransaction)transaction).getCustomField());
-		}
-
-		return customFields;
+	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
+		return transactions.stream()
+				.map(transaction -> ((MockTransaction)transaction).getCustomField())
+				.collect(Collectors.toList());
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions(int numTransactions) {

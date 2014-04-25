@@ -5,6 +5,7 @@ import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * A json serializer that supports forward-only serialization.
@@ -74,9 +75,9 @@ public class JsonSerializer implements Serializer {
 		if (null == objects)
 			return;
 
-		JSONArray jsonObjects = new JSONArray();
-		for (SerializableEntity object : objects)
-			jsonObjects.add(serializeObject(object));
+		final JSONArray jsonObjects = objects.stream()
+				.map(JsonSerializer::serializeObject)
+				.collect(Collectors.toCollection(JSONArray::new));
 
 		this.object.put(label, jsonObjects);
 	}

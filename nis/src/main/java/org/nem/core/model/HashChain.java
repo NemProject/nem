@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.
@@ -42,11 +43,6 @@ public class HashChain extends SerializableList<Hash> {
 	 * @param rawHashList The list of raw hashes.
 	 */
 	public static HashChain fromRawHashes(final List<byte[]> rawHashList) {
-		final List<Hash> hashList = new ArrayList<>(rawHashList.size());
-		for (final byte[] rawHash : rawHashList) {
-			hashList.add(new Hash(rawHash));
-		}
-
-		return new HashChain(hashList);
+		return new HashChain(rawHashList.stream().map(Hash::new).collect(Collectors.toList()));
 	}
 }

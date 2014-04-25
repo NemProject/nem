@@ -6,6 +6,7 @@ import org.nem.core.utils.Predicate;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
@@ -69,12 +70,9 @@ public class UnconfirmedTransactions {
 	 * @return All transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions = new ArrayList<>();
-		for (final Transaction tx : this.transactions.values()) {
-			if (tx.getTimeStamp().compareTo(time) < 0) {
-				transactions.add(tx);
-			}
-		}
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.collect(Collectors.toList());
 
 		Collections.sort(transactions, (lhs, rhs) -> {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
