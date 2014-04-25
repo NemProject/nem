@@ -463,7 +463,7 @@ public class PeerNetworkTest {
 							Mockito.mock(SyncConnectorPool.class),
 							this.schedulerFactory,
 							new MockBlockSynchronizer()));
-			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
+			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
 			// monitor that is signaled when MockScheduler.push is entered
 			final Object schedulerPartialIterationMonitor = new Object();

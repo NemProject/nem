@@ -48,9 +48,7 @@ public class Hashes {
 
 			return digest.digest();
 
-		} catch (NoSuchAlgorithmException e) {
-			throw new CryptoException(e);
-		} catch (NoSuchProviderException e) {
+		} catch (NoSuchAlgorithmException|NoSuchProviderException e) {
 			throw new CryptoException(e);
 		}
 	}

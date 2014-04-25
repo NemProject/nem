@@ -167,8 +167,8 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("from Block a where a.shortId = :id")
 				.setParameter("id", blockId);
 		final List<?> blockList = query.list();
-		for (int i = 0; i < blockList.size(); ++i) {
-			Block block = (Block)blockList.get(i);
+		for (final Object blockObject : blockList) {
+			final Block block = (Block)blockObject;
 			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
 				return block;
 			}

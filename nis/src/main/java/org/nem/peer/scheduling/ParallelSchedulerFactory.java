@@ -38,7 +38,7 @@ public class ParallelSchedulerFactory<T> implements SchedulerFactory<T> {
 					numThreads,
 					0L,
 					TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>());
+					new LinkedBlockingQueue<>());
 			this.action = action;
 			this.canPush = new AtomicBoolean(true);
 		}

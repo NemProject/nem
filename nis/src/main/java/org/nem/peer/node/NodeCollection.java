@@ -36,7 +36,7 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	private static Set<Node> createSet() {
-		return Collections.newSetFromMap(new ConcurrentHashMap<Node, Boolean>());
+		return Collections.newSetFromMap(new ConcurrentHashMap<>());
 	}
 
 	/**
