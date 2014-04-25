@@ -4,6 +4,9 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.serialization.DeserializationContext;
+import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
@@ -56,7 +59,8 @@ public class BlockChainValidatorTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = new ArrayList<>();
-		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		final Account signer = Utils.generateRandomAccount();
+		Block block = createBlock(signer, parentBlock);
 
 		// Bob likes to create nem out of thin air if he forages a block.
         try {
@@ -66,6 +70,16 @@ public class BlockChainValidatorTest {
         	field.set(block, Amount.fromNem(1000));
         }
         catch(Exception e){}
+        block.sign();
+
+        // The process of serialization/deserialization doesn't change the fee nor does it throw an exception
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		block.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		block = new Block(deserializer.readInt("type"), VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+ 
 		blocks.add(block);
 		signAllBlocks(blocks);
 

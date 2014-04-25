@@ -186,9 +186,20 @@ public class TransferTransactionTest {
 
 		// Bob prefers a more user friendly fee structure
 		transaction.setFee(Amount.fromMicroNem(0));
+		transaction.sign();
 
+		// Serialization modifies the fee and kills the attack
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		accountLookup.setMockAccount(recipient);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		transaction.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -234,7 +245,18 @@ public class TransferTransactionTest {
 		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
 		transaction.setDeadline(new TimeInstant(60));
 		transaction.setFee(Amount.fromMicroNem(1000000));
+		transaction.sign();
 
+		// Deserialization throws an exception thus the attack will not succeed
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		accountLookup.setMockAccount(recipient);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		transaction.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
 	}
