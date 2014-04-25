@@ -45,11 +45,8 @@ public class BlockScorer {
 	 */
 	public BigInteger calculateHit(final Block block) {
 		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
-		//System.out.println(val.toString());
 		double tmp = Math.abs(Math.log(val.doubleValue()/TWO_TO_THE_POWER_OF_256));
-		//System.out.println(tmp);
 		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
-		//System.out.println(val.toString());
 		return val;
 	}
 
@@ -87,9 +84,10 @@ public class BlockScorer {
 	}
 
 	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
-		return difficulty;
+		return difficulty - timeDiff;
 	}
 
+	
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 * 
