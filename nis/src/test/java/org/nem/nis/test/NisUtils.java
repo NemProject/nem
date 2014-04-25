@@ -28,7 +28,7 @@ public class NisUtils {
 		block.setTimestamp(timeStamp);
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
-		block.setBlockTransfers(new ArrayList<Transfer>());
+		block.setBlockTransfers(new ArrayList<>());
 		return block;
 	}
 

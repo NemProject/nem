@@ -4,9 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
-import org.nem.peer.test.MockPeerNetwork;
-import org.nem.peer.test.Utils;
-import org.nem.peer.trust.*;
+import org.nem.peer.node.*;
+import org.nem.peer.test.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
@@ -49,7 +48,7 @@ public class NodeControllerTest {
 		final NodeController controller = new NodeController(host);
 
 		final Node sourceNode = Utils.createNodeWithPort(111);
-		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<NodeExperiencePair>());
+		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
 
 		// Arrange: sanity
 		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));

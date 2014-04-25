@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.*;
-import org.nem.peer.*;
+import org.nem.peer.node.Node;
 
 /**
  * A BlockLookup implementation that looks up blocks from a remote node.

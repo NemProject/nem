@@ -47,27 +47,19 @@ public class ExceptionUtilsTest {
 		private Throwable unhandledException;
 
 		public TestRunner() {
-			this.blockingThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					isInterruptedPreRun = Thread.currentThread().isInterrupted();
+			this.blockingThread = new Thread(() -> {
+				isInterruptedPreRun = Thread.currentThread().isInterrupted();
 
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						throw ExceptionUtils.toUnchecked(e);
-					} finally {
-						isInterruptedPostRun = Thread.currentThread().isInterrupted();
-					}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					throw ExceptionUtils.toUnchecked(e);
+				} finally {
+					isInterruptedPostRun = Thread.currentThread().isInterrupted();
 				}
 			});
 
-			this.blockingThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-				@Override
-				public void uncaughtException(Thread t, Throwable e) {
-					unhandledException = e;
-				}
-			});
+			this.blockingThread.setUncaughtExceptionHandler((t, e) -> unhandledException = e);
 		}
 
 		public boolean isInterruptedPreRun() {

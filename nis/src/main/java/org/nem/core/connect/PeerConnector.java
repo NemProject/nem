@@ -1,10 +1,7 @@
 package org.nem.core.connect;
 
-import org.nem.core.connect.NodeApiId;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.peer.Node;
-import org.nem.peer.NodeCollection;
+import org.nem.peer.node.*;
 
 /**
  * A interface that is used to request information from nodes.

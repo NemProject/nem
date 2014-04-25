@@ -3,8 +3,7 @@ package org.nem.peer.trust.score;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.test.Utils;
-import org.nem.peer.Node;
-import org.nem.peer.trust.RealDouble;
+import org.nem.peer.node.Node;
 
 public class TrustScoresTest {
 

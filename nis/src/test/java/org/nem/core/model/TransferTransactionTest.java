@@ -62,11 +62,9 @@ public class TransferTransactionTest {
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 		final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 		final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, message);
-		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
-			public Account findByAddress(final Address address) {
-				return address.equals(signer.getAddress()) ? signer : recipient;
-			}
-		});
+		final TransferTransaction transaction = createRoundTrippedTransaction(
+				originalTransaction,
+				address -> address.equals(signer.getAddress()) ? signer : recipient);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -81,11 +79,9 @@ public class TransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 		final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, null);
-		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
-			public Account findByAddress(final Address address) {
-				return address.equals(signer.getAddress()) ? signer : recipient;
-			}
-		});
+		final TransferTransaction transaction = createRoundTrippedTransaction(
+				originalTransaction,
+				address -> address.equals(signer.getAddress()) ? signer : recipient);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));

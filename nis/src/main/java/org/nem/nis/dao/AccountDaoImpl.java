@@ -73,9 +73,7 @@ public class AccountDaoImpl implements AccountDao {
 		org.hibernate.Transaction tx = null;
 		try {
 			tx = sess.beginTransaction();
-			for (Account a : recipientsAccounts) {
-				sess.saveOrUpdate(a);
-			}
+			recipientsAccounts.forEach(sess::saveOrUpdate);
 			tx.commit();
 
 		} catch (RuntimeException e) {

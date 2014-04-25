@@ -6,6 +6,7 @@ import org.nem.core.utils.Predicate;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
@@ -30,12 +31,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction) {
-		return this.add(transaction, new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(final Hash hash) {
-				return false;
-			}
-		});
+		return this.add(transaction, hash -> false);
 	}
 
 	/**
@@ -74,25 +70,19 @@ public class UnconfirmedTransactions {
 	 * @return All transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions = new ArrayList<>();
-		for (final Transaction tx : this.transactions.values()) {
-			if (tx.getTimeStamp().compareTo(time) < 0) {
-				transactions.add(tx);
-			}
-		}
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.collect(Collectors.toList());
 
-		Collections.sort(transactions, new Comparator<Transaction>() {
-			@Override
-			public int compare(final Transaction lhs, final Transaction rhs) {
-				// should we just use Transaction.compare (it weights things other than fees more heavily) ?
-				// maybe we should change Transaction.compare? also it
-				// TODO: should fee or time be more important inside Transaction.compare
-				int result = -lhs.getFee().compareTo(rhs.getFee());
-				if (result == 0) {
-					result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
-				}
-				return result;
+		Collections.sort(transactions, (lhs, rhs) -> {
+			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
+			// maybe we should change Transaction.compare? also it
+			// TODO: should fee or time be more important inside Transaction.compare
+			int result = -lhs.getFee().compareTo(rhs.getFee());
+			if (result == 0) {
+				result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
 			}
+			return result;
 		});
 
 		return transactions;

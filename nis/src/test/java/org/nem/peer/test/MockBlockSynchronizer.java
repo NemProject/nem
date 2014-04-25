@@ -2,6 +2,7 @@ package org.nem.peer.test;
 
 import org.nem.core.connect.SyncConnectorPool;
 import org.nem.peer.*;
+import org.nem.peer.node.Node;
 
 /**
  * A mock BlockSynchronizer implementation.

@@ -3,9 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.peer.Node;
-import org.nem.peer.NodeCollection;
-import org.nem.peer.NodeStatus;
+import org.nem.peer.node.*;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.test.TestTrustContext;
 

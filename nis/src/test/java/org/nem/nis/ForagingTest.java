@@ -201,7 +201,7 @@ public class ForagingTest {
 		foraging.setAccountLookup(accountAnalyzer);
 		final Block block = foraging.createSignedBlock(
 				new TimeInstant(10),
-				new LinkedList<Transaction>(),
+				new LinkedList<>(),
 				parent,
 				account,
 				BlockDifficulty.INITIAL_DIFFICULTY);

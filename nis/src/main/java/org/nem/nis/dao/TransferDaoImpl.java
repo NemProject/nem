@@ -52,8 +52,8 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("from Transfer a where a.shortId = :id")
 				.setParameter("id", txId);
 		userList = query.list();
-		for (int i = 0; i < userList.size(); ++i) {
-			Transfer transfer = (Transfer)userList.get(i);
+		for (final Object transferObject : userList) {
+			Transfer transfer = (Transfer)transferObject;
 			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {
 				return transfer;
 			}

@@ -99,12 +99,9 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		return this.unconfirmedTransactions.add(transaction, new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(final Hash hash) {
-				synchronized (blockChain) {
-					return null != transferDao.findByHash(hash.getRaw());
-				}
+		return this.unconfirmedTransactions.add(transaction, hash -> {
+			synchronized (blockChain) {
+				return null != transferDao.findByHash(hash.getRaw());
 			}
 		});
 	}

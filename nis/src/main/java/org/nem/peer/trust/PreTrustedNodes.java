@@ -1,7 +1,7 @@
 package org.nem.peer.trust;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 
 import java.util.Set;
 

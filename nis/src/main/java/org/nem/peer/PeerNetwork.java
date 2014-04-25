@@ -2,9 +2,10 @@ package org.nem.peer;
 
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.node.*;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.score.*;
 
 import java.util.*;
 
@@ -147,21 +148,11 @@ public class PeerNetwork {
 	 * @param entity      The entity.
 	 */
 	public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-		this.forAllActiveNodes(new Action<Node>() {
-			@Override
-			public void execute(final Node element) {
-				peerConnector.announce(element.getEndpoint(), broadcastId, entity);
-			}
-		});
+		this.forAllActiveNodes(element -> peerConnector.announce(element.getEndpoint(), broadcastId, entity));
 	}
 
 	public void synchronize() {
-		this.forAllActiveNodes(new Action<Node>() {
-			@Override
-			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(syncConnectorPool, element);
-			}
-		});
+		this.forAllActiveNodes(element -> blockSynchronizer.synchronizeNode(syncConnectorPool, element));
 	}
 
 	private void forAllActiveNodes(final Action<Node> action) {
@@ -190,12 +181,7 @@ public class PeerNetwork {
 		}
 
 		public void refresh() {
-			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
-				@Override
-				public void execute(final Node element) {
-					refreshNode(element);
-				}
-			});
+			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(this::refreshNode);
 
 			scheduler.push(this.nodes.getActiveNodes());
 			scheduler.push(this.nodes.getInactiveNodes());

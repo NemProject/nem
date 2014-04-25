@@ -170,8 +170,7 @@ public class Block extends VerifiableEntity {
 	 * @param transactions The transactions to add.
 	 */
 	public void addTransactions(final Collection<Transaction> transactions) {
-		for (final Transaction transaction : transactions)
-			this.addTransaction(transaction);
+		transactions.forEach(this::addTransaction);
 	}
 
 	/**
@@ -199,12 +198,7 @@ public class Block extends VerifiableEntity {
 	}
 
 	private Iterable<Transaction> getReverseTransactions() {
-		return new Iterable<Transaction>() {
-			@Override
-			public Iterator<Transaction> iterator() {
-				return new ReverseListIterator<>(transactions);
-			}
-		};
+		return () -> new ReverseListIterator<>(transactions);
 	}
 
 	@Override

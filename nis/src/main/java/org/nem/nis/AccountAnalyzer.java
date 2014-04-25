@@ -62,14 +62,10 @@ public class AccountAnalyzer implements AccountLookup {
 	 * @return The account.
 	 */
 	public Account addAccountToCache(final Address address) {
-		return this.findByAddress(address, new Func<Account>() {
-
-			@Override
-			public Account evaluate() {
-				final Account account = new Account(address);
-				addressToAccountMap.put(address, account);
-				return account;
-			}
+		return this.findByAddress(address, () -> {
+			final Account account = new Account(address);
+			addressToAccountMap.put(address, account);
+			return account;
 		});
 	}
 
@@ -110,13 +106,7 @@ public class AccountAnalyzer implements AccountLookup {
 	public Account findByAddress(final Address address) {
 		LOGGER.finer("looking for [" + address + "]" + Integer.toString(addressToAccountMap.size()));
 
-		return this.findByAddress(address, new Func<Account>() {
-
-			@Override
-			public Account evaluate() {
-				return createAccount(address.getPublicKey(), address.getEncoded());
-			}
-		});
+		return this.findByAddress(address, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
 	private static Account createAccount(final PublicKey publicKey, final String encodedAddress) {

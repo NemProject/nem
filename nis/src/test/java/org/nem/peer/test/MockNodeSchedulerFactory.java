@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.peer.*;
+import org.nem.peer.node.Node;
 import org.nem.peer.scheduling.*;
 
 /**

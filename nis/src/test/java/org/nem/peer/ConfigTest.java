@@ -4,6 +4,7 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.connect.NodeEndpoint;
+import org.nem.peer.node.Node;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 

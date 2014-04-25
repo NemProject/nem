@@ -5,12 +5,11 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.test.MockSerializableEntity;
-import org.nem.core.test.MockTransaction;
+import org.nem.core.test.*;
+import org.nem.peer.node.*;
 import org.nem.peer.test.Utils;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
@@ -464,7 +463,7 @@ public class PeerNetworkTest {
 							Mockito.mock(SyncConnectorPool.class),
 							this.schedulerFactory,
 							new MockBlockSynchronizer()));
-			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
+			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
 			// monitor that is signaled when MockScheduler.push is entered
 			final Object schedulerPartialIterationMonitor = new Object();
@@ -489,23 +488,16 @@ public class PeerNetworkTest {
 
 			public void run() throws InterruptedException {
 				// Act: trigger broadcast operation on a different thread
-				Thread broadcastThread = startThread(new Runnable() {
-					@Override
-					public void run() {
-						network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockTransaction(org.nem.core.test.Utils.generateRandomAccount()));
-					}
-				});
+				Thread broadcastThread = startThread(() ->
+						network.broadcast(
+						        NodeApiId.REST_PUSH_TRANSACTION,
+						        new MockTransaction(org.nem.core.test.Utils.generateRandomAccount())));
 
 				// Act: wait for the scheduler to partially iterate the collection
 				org.nem.core.test.Utils.monitorWait(this.schedulerPartialIterationMonitor);
 
 				// Act: trigger refresh on a different thread
-				Thread refreshThread = startThread(new Runnable() {
-					@Override
-					public void run() {
-						network.refresh();
-					}
-				});
+				Thread refreshThread = startThread(network::refresh);
 
 				// Act: wait for the refresh to complete
 				refreshThread.join();

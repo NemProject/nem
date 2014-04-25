@@ -3,7 +3,7 @@ package org.nem.peer.test;
 import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.peer.*;
+import org.nem.peer.node.*;
 
 import java.net.URL;
 import java.util.*;

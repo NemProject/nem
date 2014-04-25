@@ -2,7 +2,7 @@ package org.nem.core.connect;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.*;
+import org.nem.peer.node.*;
 
 import java.net.*;
 import java.util.List;

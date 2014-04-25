@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.peer.node;
 
 /**
  * Possible statuses of a NEM node.

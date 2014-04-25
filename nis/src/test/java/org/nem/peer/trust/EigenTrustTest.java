@@ -3,7 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.peer.test.ScoreProviderTestContext;
 import org.nem.peer.test.TestTrustContext;
 import org.nem.peer.trust.score.*;
