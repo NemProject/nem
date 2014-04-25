@@ -135,10 +135,11 @@ public class POI {
 		double[] outlinkWeights = new double[numAccounts];
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
-//			currNodeOut = [i[2]['weight'] for i in G.edges(data=True) if i[0] == ndx]
 			
 			if (outlinks != null) {
-				double medianOutlinkStrength = np.median(outlinks); //TODO: calc median of accountlink strength
+				Median median = new Median();
+				
+				double medianOutlinkStrength = median.evaluate(weights);
 				double outDegree = 0; //outDegree is the sum of strengths for outlinks
 				for (AccountLink outlink : outlinks) {
 					outDegree += outlink.getStrength();
