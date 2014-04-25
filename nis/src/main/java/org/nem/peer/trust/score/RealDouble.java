@@ -1,4 +1,4 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
 
 /**
  * Simple class that wraps a double and constrains it to a real value.

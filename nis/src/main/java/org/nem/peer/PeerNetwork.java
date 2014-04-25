@@ -2,9 +2,10 @@ package org.nem.peer;
 
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.node.*;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.score.*;
 
 import java.util.*;
 

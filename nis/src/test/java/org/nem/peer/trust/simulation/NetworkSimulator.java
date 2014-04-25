@@ -5,13 +5,10 @@ import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.peer.Node;
-import org.nem.peer.NodeCollection;
-import org.nem.peer.NodeStatus;
+import org.nem.peer.node.*;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.score.*;
 
 public class NetworkSimulator {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulator.class.getName());

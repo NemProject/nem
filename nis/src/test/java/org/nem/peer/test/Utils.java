@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.core.connect.NodeEndpoint;
 import org.nem.peer.trust.score.NodeExperience;
 

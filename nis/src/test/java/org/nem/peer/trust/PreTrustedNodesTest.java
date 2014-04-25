@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.test.IsEquivalent;
 import org.nem.peer.test.Utils;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 
 import java.util.*;
 

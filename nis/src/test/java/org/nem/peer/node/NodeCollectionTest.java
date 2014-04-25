@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;

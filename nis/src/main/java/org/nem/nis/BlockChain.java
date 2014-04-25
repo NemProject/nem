@@ -13,6 +13,7 @@ import org.nem.nis.mappers.TransferMapper;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
+import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

@@ -3,10 +3,10 @@ package org.nem.peer.trust;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.test.TestTrustContext;
-import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.trust.score.*;
 
 public class BasicNodeSelectorTest {
 

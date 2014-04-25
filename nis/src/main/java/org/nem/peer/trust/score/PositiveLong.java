@@ -1,4 +1,4 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
 
 /**
  * Simple class that wraps a long and constrains it to a positive value.
