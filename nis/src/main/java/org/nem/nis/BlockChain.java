@@ -359,6 +359,10 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
+		for (final Block block : peerChain) {
+			block.execute();
+		}
+
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
 		return true;
 	}
