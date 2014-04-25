@@ -98,16 +98,19 @@ public class POI {
 					continue;
 				}
 				
+				//XXX: ideally we wouldn't do this every iteration, 
+				//     but it is a trade-off between computation and memory
+				double[] weights = getRightStochasticWeights(outlinks);
+				
 				//distribute importance to outlinking accounts
 				for (AccountLink outlink : outlinks) {
 					int otherAcctNdx = acctMap.get(outlink.getOtherAccount().toString());
-					importances.setAt(otherAcctNdx, importances.getAt(otherAcctNdx) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight])));
+					//not the prettiest code ever
+					importances.setAt(otherAcctNdx, 
+									  importances.getAt(otherAcctNdx) + 
+									  teleporations[ndx]*prevIterImportances.getAt(ndx)*weights[otherAcctNdx]);
 				}
 				
-//				for (int nbr = 0; nbr < outlinks.size(); nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each account's outlinks
-//					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
-//				}
-				    
 				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (1.0-teleporations[ndx]));
 			}
 
@@ -135,7 +138,7 @@ public class POI {
 			if (outlinks != null) {
 				double medianOutlinkStrength = np.median(outlinks); //TODO: calc median of accountlink strength
 				double outDegree = 0; //outDegree is the sum of strengths for outlinks
-				for (AccountLink outlink : outlinks){
+				for (AccountLink outlink : outlinks) {
 					outDegree += outlink.getStrength();
 				}
 
@@ -180,7 +183,7 @@ public class POI {
 	 * @param edges
 	 * @return array of weights in right-stochastic form
 	 */
-	private double[] getRightStochasticWeights(double sumOutWeights, List<AccountLink> edges) {
+	private double[] getRightStochasticWeights(List<AccountLink> edges) {
 
 		if (edges == null || edges.size() < 1) {
 			return null;
@@ -189,9 +192,18 @@ public class POI {
 		int numEdges = edges.size();
 		double[] weights = new double[numEdges];
 		
+		double sumOutWeights = 0;
 	    for (int edgeNDX = 0; edgeNDX < numEdges; edgeNDX++) {
-	    	weights[edgeNDX] = edges.get(edgeNDX).getStrength()/sumOutWeights;
+	    	double weight = edges.get(edgeNDX).getStrength();
+	    	sumOutWeights += weight;
+	    	weights[edgeNDX] = weight;
 	    }
+	    
+	    //now normalize to sum to 1
+	    for (int ndx = 0; ndx < weights.length; ndx++){
+	    	weights[ndx] /= sumOutWeights;
+	    }
+	    
 	    return weights;
 	}
 }
