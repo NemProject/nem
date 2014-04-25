@@ -291,42 +291,42 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Checks if passed block is correct, and if eligible adds it to db
+	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
-	 * @param block - block that's going to be processed
+	 * @param receivedBlock - receivedBlock that's going to be processed
 	 *
-	 * @return false if block was known or invalid, true if ok and added to db
+	 * @return false if receivedBlock was known or invalid, true if ok and added to db
 	 */
-	public boolean processBlock(Block block) {
-		final Hash blockHash = HashUtils.calculateHash(block);
-		final Hash parentHash = block.getPreviousBlockHash();
+	public boolean processBlock(Block receivedBlock) {
+		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
+		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
 		final org.nem.nis.dbmodel.Block parent;
 
 		// this method processes only blocks that have been sent directly (pushed)
 		// to us, so we can add quite strict rule here
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
+		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			return false;
 		}
 
-		// block already seen
+		// receivedBlock already seen
 		synchronized (this) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}
 
-			// check if we know previous block
+			// check if we know previous receivedBlock
 			parent = blockDao.findByHash(parentHash);
 		}
 
-		// if we don't have parent, we can't do anything with this block
+		// if we don't have parent, we can't do anything with this receivedBlock
 		if (parent == null) {
 			return false;
 		}
 
 		// TODO: we should have some time limit set
-//		if (block.getTimeStamp() > parent.getTimestamp() + 20*30) {
+//		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
 //			return false;
 //		}
 
@@ -340,7 +340,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
-		peerChain.add(block);
+		peerChain.add(receivedBlock);
 
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
 		if (! validatePeerChain(parentBlock, peerChain)) {
