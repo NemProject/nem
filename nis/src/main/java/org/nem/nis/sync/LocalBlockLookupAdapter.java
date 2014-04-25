@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 
 /**
@@ -10,7 +10,7 @@ import org.nem.nis.mappers.BlockMapper;
  */
 public class LocalBlockLookupAdapter implements BlockLookup {
 
-	private final BlockDao blockDao;
+	private final ReadOnlyBlockDao blockDao;
 	private final AccountLookup accountLookup;
 	private final Block lastBlock;
 	private final int maxHashesToReturn;
@@ -24,7 +24,7 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	 * @param maxHashesToReturn The maximum number of hashes to return.
 	 */
 	public LocalBlockLookupAdapter(
-			final BlockDao blockDao,
+			final ReadOnlyBlockDao blockDao,
 			final AccountLookup accountLookup,
 			final org.nem.nis.dbmodel.Block lastBlock,
 			final int maxHashesToReturn) {

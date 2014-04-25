@@ -1,4 +1,4 @@
-package org.nem.nis.config;
+package org.nem.deploy;
 
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;

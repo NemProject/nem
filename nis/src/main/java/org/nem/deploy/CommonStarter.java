@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.logging.Logger;
 
 import javax.servlet.*;
-import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.annotation.WebListener;
 
 import org.eclipse.jetty.server.*;
@@ -12,8 +11,10 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
-import org.nem.nis.config.JsonErrorHandler;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 /**
  * Did not find a better way of launching Jetty in combination with WebStart. The
@@ -35,11 +36,37 @@ public class CommonStarter implements ServletContextListener {
 		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
 		//JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
 
-		//Taken from Jetty doc 
-		QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMaxThreads(500);
-		Server server = new Server(threadPool);
+		//Taken from Jetty doc
+		Server server = new Server(createThreadPool());
 		server.addBean(new ScheduledExecutorScheduler());
+
+		server.addConnector(createConnector(server));
+		server.setHandler(createHandlers());
+
+		server.setDumpAfterStart(false);
+		server.setDumpBeforeStop(false);
+		server.setStopAtShutdown(true);
+
+		LOGGER.info("Calling start().");
+		server.start();
+		server.join();
+	}
+
+	private static Handler createHandlers() {
+		HandlerCollection handlers = new HandlerCollection();
+		ServletContextHandler servletContext = new ServletContextHandler();
+
+		//Special Listener to set-up the environment for Spring
+		servletContext.addEventListener(new CommonStarter());
+		servletContext.addEventListener(new ContextLoaderListener());
+		servletContext.setErrorHandler(new JsonErrorHandler());
+
+		handlers.setHandlers(new Handler[] { servletContext });
+
+		return handlers;
+	}
+
+	public static Connector createConnector(Server server) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
 		//PORT
@@ -50,27 +77,16 @@ public class CommonStarter implements ServletContextListener {
 		http_config.setSendServerVersion(true);
 		http_config.setSendDateHeader(false);
 
-		HandlerCollection handlers = new HandlerCollection();
-		ServletContextHandler servletContext = new ServletContextHandler();
-
-		//Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(new CommonStarter());
-		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(new JsonErrorHandler());
-
-		handlers.setHandlers(new Handler[] { servletContext });
-		server.setHandler(handlers);
-		server.setDumpAfterStart(false);
-		server.setDumpBeforeStop(false);
-		server.setStopAtShutdown(true);
 		ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
 		http.setPort(7890);
 		http.setIdleTimeout(30000);
-		server.addConnector(http);
+		return http;
+	}
 
-		LOGGER.info("Calling start().");
-		server.start();
-		server.join();
+	public static QueuedThreadPool createThreadPool() {
+		QueuedThreadPool threadPool = new QueuedThreadPool();
+		threadPool.setMaxThreads(500);
+		return threadPool;
 	}
 
 	@Override
@@ -82,13 +98,18 @@ public class CommonStarter implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 		// This is the replacement for the web.xml
 		// New with Servlet 3.0
+		AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(NisAppConfig.class);
+
+		AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+		webCtx.register(NisWebAppInitializer.class);
+		webCtx.setParent(appCtx);
+
 		ServletContext context = event.getServletContext();
-		//context.addListener(org.springframework.web.context.ContextLoaderListener.class);
-		//context.addListener("org.springframework.web.context.ContextLoaderListener");
-		context.setInitParameter("contextConfigLocation", "classpath:application-context.xml");
-		Dynamic springServlet = context.addServlet("Spring MVC Dispatcher Servlet", "org.springframework.web.servlet.DispatcherServlet");
-		springServlet.setInitParameter("contextConfigLocation", "classpath:web-context.xml");
-		springServlet.addMapping("/");
+		ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+		dispatcher.setLoadOnStartup(1);
+		dispatcher.addMapping("/");
+
+		context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
 		// Denial of server Filter
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");

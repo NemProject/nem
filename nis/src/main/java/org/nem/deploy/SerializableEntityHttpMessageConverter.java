@@ -1,4 +1,4 @@
-package org.nem.nis.config;
+package org.nem.deploy;
 
 import org.nem.core.serialization.*;
 import org.springframework.beans.factory.annotation.Autowired;

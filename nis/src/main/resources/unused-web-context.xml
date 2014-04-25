@@ -14,8 +14,8 @@
 <!-- Configures the @Controller programming model -->
 <mvc:annotation-driven>
     <mvc:message-converters register-defaults="true">
-        <bean class="org.nem.nis.config.SerializableEntityHttpMessageConverter" />
-        <bean class="org.nem.nis.config.DeserializerHttpMessageConverter" />
+        <bean class="org.nem.deploy.SerializableEntityHttpMessageConverter" />
+        <bean class="org.nem.deploy.DeserializerHttpMessageConverter" />
     </mvc:message-converters>
 </mvc:annotation-driven>
 

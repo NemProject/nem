@@ -1,4 +1,4 @@
-package org.nem.nis.config;
+package org.nem.deploy;
 
 import net.minidev.json.*;
 import org.eclipse.jetty.server.*;
