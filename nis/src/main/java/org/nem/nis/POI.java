@@ -40,8 +40,14 @@ public class POI {
 //		 maxIter=100, tol=1.0e-8, weight='weight'
 		
 		int numAccounts = accounts.size();
-		
 		double scale = 1.0 /numAccounts;
+		
+		//XXX: okay, it sucks that we have to do this, but let's just do this for now;
+		//eventually we should try to find a better structure for the graph
+		HashMap<String, Integer> acctMap = new HashMap<String, Integer>();
+		for (int acctNDX = 0; acctNDX < numAccounts; acctNDX++) {
+			acctMap.put(accounts.get(acctNDX).getAddress().toString(), acctNDX);
+		}
 		
 		ColumnVector importances = new ColumnVector(numAccounts);
 		
@@ -87,16 +93,17 @@ public class POI {
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				
-				LinkedList<AccountLink> inlinks = accounts.get(ndx).getInlinks();
+				LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
 				
-				for (AccountLink inlink : inlinks) {
-					
+				//distribute importance to outlinking accounts
+				for (AccountLink outlink : outlinks) {
+					int otherAcctNdx = acctMap.get(outlink.getOtherAccount().toString());
 				}
 				
 				
-				for (int nbr = 0; nbr < outlinks.size(); nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each account's outlinks
-					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
-				}
+//				for (int nbr = 0; nbr < outlinks.size(); nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each account's outlinks
+//					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
+//				}
 				    
 				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (1.0-teleporations[ndx]));
 			}
