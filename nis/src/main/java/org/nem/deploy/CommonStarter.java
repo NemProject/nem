@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -119,8 +120,8 @@ public class CommonStarter implements ServletContextListener {
 
 		// GZIP filter
 		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-		dosFilter.setInitParameter("mimeTypes",
-				"text/html,text/plain,text/xml,application/xhtml+xml,text/css,application/javascript,image/svg+xml");
+		//Zipping following MimeTypes
+		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 }
