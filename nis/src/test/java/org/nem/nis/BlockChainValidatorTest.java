@@ -4,11 +4,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.serialization.DeserializationContext;
+import org.nem.core.serialization.JsonDeserializer;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
 
-import java.util.ArrayList;
 import java.util.*;
 
 public class BlockChainValidatorTest {
@@ -31,6 +33,59 @@ public class BlockChainValidatorTest {
 	//endregion
 
 	//region block checks
+
+	@Test
+	public void allBlocksInChainMustHaveCorrectParentBlockHash() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = new ArrayList<>();
+		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		blocks.add(block);
+		blocks.add(createBlock(Utils.generateRandomAccount(), block));
+		signAllBlocks(blocks);
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void allBlocksInChainMustHaveCorrectTotalFee() {
+		// Arrange (category create nem attack):
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = new ArrayList<>();
+		final Account signer = Utils.generateRandomAccount();
+		Block block = createBlock(signer, parentBlock);
+
+		// Bob likes to create nem out of thin air if he forages a block.
+        try {
+	        final Class c = block.getClass();
+	        final java.lang.reflect.Field field = c.getDeclaredField("totalFee");
+	        field.setAccessible(true);
+        	field.set(block, Amount.fromNem(1000));
+        }
+        catch(Exception e){}
+        block.sign();
+
+        // The process of serialization/deserialization doesn't change the fee nor does it throw an exception
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		block.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		block = new Block(deserializer.readInt("type"), VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+ 
+		blocks.add(block);
+		signAllBlocks(blocks);
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
 
 	@Test
 	public void allBlocksInChainMustHaveCorrectHeight() {
@@ -224,6 +279,12 @@ public class BlockChainValidatorTest {
 
 	private static Block createBlock(final Account account, long height) {
 		Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		block.setGenerationHash(Hash.ZERO);
+		return block;
+	}
+
+	private static Block createBlock(final Account account, Block parentBlock) {
+		Block block = new Block(account, HashUtils.calculateHash(parentBlock), TimeInstant.ZERO, new BlockHeight(parentBlock.getHeight().getRaw() + 1));
 		block.setGenerationHash(Hash.ZERO);
 		return block;
 	}
