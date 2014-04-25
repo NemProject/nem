@@ -19,7 +19,10 @@ import org.nem.core.utils.ArrayUtils;
  * Because a lot of the infrastructure is not yet in place, I am making the
  * following assumptions in this code:
  * 
- * 1) 
+ * 1) This class is called with all the accounts.
+ * 2) POI is calculated by the forager after processing new transactions. 
+ *    This algorithm is not currently iterative, so importances are calculated from scratch every time. 
+ *    I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
  * 
  */
 public class POI {
@@ -83,9 +86,15 @@ public class POI {
 			dangleSum = dangleSum*scale; //normalize this
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
-				// this matrix multiply looks odd because it is
-				// doing a left multiply x^T=xlast^T*W
-				for (int nbr = 0; nbr < numAccounts; nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each nodes
+				
+				LinkedList<AccountLink> inlinks = accounts.get(ndx).getInlinks();
+				
+				for (AccountLink inlink : inlinks) {
+					
+				}
+				
+				
+				for (int nbr = 0; nbr < outlinks.size(); nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each account's outlinks
 					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
 				}
 				    
@@ -155,26 +164,26 @@ public class POI {
 		return importances.getVector();//, pois, ows, normBalances
 	}
 
-	private  getStochasticGraph(G, weight='weight') {
-	    /*"""Return a right-stochastic representation of G.
-
-	    A right-stochastic graph is a weighted graph in which all of
-	    the node (out) neighbors edge weights sum to 1.
-	    
-	    Parameters
-	    -----------
-	    G : graph
-	      A NetworkX graph, must have valid edge weights
-
-	    weight : key (optional)
-	      Edge data key used for weight.  If None all weights are set to 1.
-	    """        */
-        W=nx.DiGraph(G);
-
-	    degree=W.out_degree(weight=weight);
-	    for (u,v,d) in W.edges(data=True) {
-	        d[weight]=d.get(weight,1.0)/degree[u];
-	    }
-	    return W
-	}
+//	private  getStochasticGraph(G, weight='weight') {
+//	    /*"""Return a right-stochastic representation of G.
+//
+//	    A right-stochastic graph is a weighted graph in which all of
+//	    the node (out) neighbors edge weights sum to 1.
+//	    
+//	    Parameters
+//	    -----------
+//	    G : graph
+//	      A NetworkX graph, must have valid edge weights
+//
+//	    weight : key (optional)
+//	      Edge data key used for weight.  If None all weights are set to 1.
+//	    """        */
+//        W=nx.DiGraph(G);
+//
+//	    degree=W.out_degree(weight=weight);
+//	    for (u,v,d) in W.edges(data=True) {
+//	        d[weight]=d.get(weight,1.0)/degree[u];
+//	    }
+//	    return W
+//	}
 }
