@@ -48,6 +48,24 @@ public class BlockChainValidatorTest {
 		signAllBlocks(blocks);
 
 		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void invalidParentBlockHashInvalidatesChain() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = new ArrayList<>();
+		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		blocks.add(block);
+		blocks.add(createBlock(Utils.generateRandomAccount(), block));
+		block.setPreviousBlockHash(Hash.ZERO);
+		signAllBlocks(blocks);
+
+		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
@@ -214,13 +232,20 @@ public class BlockChainValidatorTest {
 		final BlockChainValidator validator = createValidator(scorer);
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
+		Block block;
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
-		final Block middleBlock = blocks.get(1);
+		final List<Block> blocks = new ArrayList<>();
+		final Account account = Utils.generateRandomAccount();
+		block = new Block(account, parentBlock, TimeInstant.ZERO);
+		blocks.add(block);
+
+		final Block middleBlock = new Block(account, block, TimeInstant.ZERO);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
+
+		final Block lastBlock = new Block(account, middleBlock, TimeInstant.ZERO);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -284,7 +309,7 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Block createBlock(final Account account, Block parentBlock) {
-		Block block = new Block(account, HashUtils.calculateHash(parentBlock), TimeInstant.ZERO, new BlockHeight(parentBlock.getHeight().getRaw() + 1));
+		Block block = new Block(account, parentBlock, TimeInstant.ZERO);
 		block.setGenerationHash(Hash.ZERO);
 		return block;
 	}

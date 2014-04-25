@@ -181,14 +181,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void calculatePeerChainGenerations(Block parentBlock, final List<Block> peerChain) {
-		for (Block block : peerChain) {
-			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash(), block.getSigner().getKeyPair().getPublicKey()));
-
-			parentBlock = block;
-		}
-	}
-
 	/**
 	 * Validates blocks in peerChain.
 	 *
@@ -200,7 +192,6 @@ public class BlockChain implements BlockSynchronizer {
 	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
-		calculatePeerChainGenerations(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
