@@ -83,7 +83,7 @@ public class POI {
 		while (true) { // power iteration; do up to maxIter iterations
 			
 			prevIterImportances = importances.clone();// deep copy
-//			importances = dict.fromkeys(prevIterImportances.keys(),0); //XXX:probably not needed in java impl
+			importances = new ColumnVector(numAccounts);//XXX:if we are just throwing away the old importances, we probably don't need a deep copy above
 			
 			double dangleSum = 0;
 			for (Integer dangleNdx : dangleIndices) {
@@ -94,12 +94,15 @@ public class POI {
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				
 				LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
+				if (outlinks == null || outlinks.size() < 1) {
+					continue;
+				}
 				
 				//distribute importance to outlinking accounts
 				for (AccountLink outlink : outlinks) {
 					int otherAcctNdx = acctMap.get(outlink.getOtherAccount().toString());
+					importances.setAt(otherAcctNdx, importances.getAt(otherAcctNdx) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight])));
 				}
-				
 				
 //				for (int nbr = 0; nbr < outlinks.size(); nbr++) { //W are edge weights in right-stochastic form, meaning they sum to 1 for each account's outlinks
 //					importances.setAt(nbr, importances.getAt(nbr) + teleporations[ndx]*prevIterImportances.getAt(ndx)*W[ndx][nbr][weight]);
@@ -171,26 +174,24 @@ public class POI {
 		return importances.getVector();//, pois, ows, normBalances
 	}
 
-//	private  getStochasticGraph(G, weight='weight') {
-//	    /*"""Return a right-stochastic representation of G.
-//
-//	    A right-stochastic graph is a weighted graph in which all of
-//	    the node (out) neighbors edge weights sum to 1.
-//	    
-//	    Parameters
-//	    -----------
-//	    G : graph
-//	      A NetworkX graph, must have valid edge weights
-//
-//	    weight : key (optional)
-//	      Edge data key used for weight.  If None all weights are set to 1.
-//	    """        */
-//        W=nx.DiGraph(G);
-//
-//	    degree=W.out_degree(weight=weight);
-//	    for (u,v,d) in W.edges(data=True) {
-//	        d[weight]=d.get(weight,1.0)/degree[u];
-//	    }
-//	    return W
-//	}
+	/**
+	 * Right-stochastic form means that all of the weights in the input list of edges sum to 1.
+	 * 
+	 * @param edges
+	 * @return array of weights in right-stochastic form
+	 */
+	private double[] getRightStochasticWeights(double sumOutWeights, List<AccountLink> edges) {
+
+		if (edges == null || edges.size() < 1) {
+			return null;
+		}
+		
+		int numEdges = edges.size();
+		double[] weights = new double[numEdges];
+		
+	    for (int edgeNDX = 0; edgeNDX < numEdges; edgeNDX++) {
+	    	weights[edgeNDX] = edges.get(edgeNDX).getStrength()/sumOutWeights;
+	    }
+	    return weights;
+	}
 }
