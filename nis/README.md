@@ -12,7 +12,7 @@ Blockchain is actually distributed transaction database, shared by all peers par
 
 ### Addresses
 
-To identify accounts, NEM uses addresses. Addresses are 40 characters long, consist of characters (A-Z, 2-7) and always begin with an **N**. (e.g. `NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW`)
+To identify accounts, NEM uses addresses. Addresses are 40 characters long, consist of characters (A-Z, 2-7) and always begin with an **N**. (e.g. `NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW`) or **T** in test network (`TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6`)
 
 You can think of an address as of bank account number.
 
