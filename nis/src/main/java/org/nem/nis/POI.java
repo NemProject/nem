@@ -65,6 +65,19 @@ public class POI {
 				dangleIndices.add(ndx);
 			}
 		}
+		
+		//Prepare outlink weights
+		double[][] outlinkWeights = new double[numAccounts][];
+		for (int ndx = 0; ndx < numAccounts; ndx++) {
+			
+			LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
+			if (outlinks == null || outlinks.size() < 1) {
+				continue;
+			}
+			
+			double[] weights = getRightStochasticWeights(outlinks);
+			outlinkWeights[ndx] = weights;
+		}
 
 		// normalize starting vector to sum to 1
 		importances.normalize();
@@ -100,9 +113,7 @@ public class POI {
 					continue;
 				}
 				
-				//XXX: ideally we wouldn't do this every iteration, 
-				//     but it is a trade-off between computation and memory
-				double[] weights = getRightStochasticWeights(outlinks);
+				double[] weights = outlinkWeights[ndx];
 				
 				//distribute importance to outlinking accounts
 				for (AccountLink outlink : outlinks) {
@@ -132,29 +143,29 @@ public class POI {
 		}
 		    
 		// normalize with outlinks degree and median outlinking trans amt, otherwise people will hoard NEM
-		double[] outlinkWeights = new double[numAccounts];
+		double[] outlinkScores = new double[numAccounts];
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			LinkedList<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
 			
 			if (outlinks != null) {
 				Median median = new Median();
 				
-				double medianOutlinkStrength = median.evaluate(weights);
+				double medianOutlinkStrength = median.evaluate(outlinkWeights[ndx]);
 				double outDegree = 0; //outDegree is the sum of strengths for outlinks
 				for (AccountLink outlink : outlinks) {
 					outDegree += outlink.getStrength();
 				}
 
-				double outlinkWeight = medianOutlinkStrength*outDegree;
-				outlinkWeights[ndx] = outlinkWeight;
+				double outlinkScore = medianOutlinkStrength*outDegree;
+				outlinkScores[ndx] = outlinkScore;
 			} else {
-				outlinkWeights[ndx] = 0;
+				outlinkScores[ndx] = 0;
 			}
 		}
 		    
 		// normalize outlink weights
 		double maxRank          = importances.getMax();
-		double maxOutlinkWeight = ArrayUtils.max(outlinkWeights);
+		double maxOutlinkScore = ArrayUtils.max(outlinkScores);
 		double maxBalance = ArrayUtils.max(balances); //XXX:balances need to be in coindays
 		
 		// We are going to calculate all of this now so we can use this for testing.
@@ -167,9 +178,9 @@ public class POI {
 			importances.setAt(ndx, importances.getAt(ndx)/maxRank);
 			
 			pois[ndx] = importances.getAt(ndx);
-			ows[ndx] = outlinkWeights[ndx] / maxOutlinkWeight;
+			ows[ndx] = outlinkScores[ndx] / maxOutlinkScore;
 			
-			importances.setAt(ndx, importances.getAt(ndx) + (outlinkWeights[ndx] / maxOutlinkWeight));
+			importances.setAt(ndx, importances.getAt(ndx) + (outlinkScores[ndx] / maxOutlinkScore));
 	        
 			//weight by balance at the end
 			//TODO: XXX: balances should be in coindays
