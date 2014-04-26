@@ -62,7 +62,7 @@ public class BlockScorer {
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = block.getSigner().getBalance().getNumNem();
+		long forgerBalance = block.getSigner().getBalance(new BlockHeight(Math.max(1, block.getHeight().getRaw() - BlockChain.ESTIMATED_BLOCKS_PER_DAY))).getNumNem();
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)
