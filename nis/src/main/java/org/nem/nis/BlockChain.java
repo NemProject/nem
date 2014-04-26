@@ -212,6 +212,11 @@ public class BlockChain implements BlockSynchronizer {
 
 
 	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
+
+		for (final Block block : peerChain) {
+			block.execute();
+		}
+
 		synchronized (this) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
@@ -272,9 +277,6 @@ public class BlockChain implements BlockSynchronizer {
 			return;
 		}
 
-		for (final Block block : peerChain) {
-			block.execute();
-		}
 		//endregion
 
 		// mind "not" consistent
@@ -348,10 +350,6 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (peerscore < ourScore) {
 			return false;
-		}
-
-		for (final Block block : peerChain) {
-			block.execute();
 		}
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
