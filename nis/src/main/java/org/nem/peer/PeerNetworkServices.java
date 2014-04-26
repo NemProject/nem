@@ -1,8 +1,6 @@
 package org.nem.peer;
 
 import org.nem.core.connect.*;
-import org.nem.peer.node.Node;
-import org.nem.peer.scheduling.SchedulerFactory;
 
 /**
  * Aggregate of PeerNetwork dependencies.
@@ -11,7 +9,6 @@ public class PeerNetworkServices {
 
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
-	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
 	/**
@@ -19,17 +16,14 @@ public class PeerNetworkServices {
 	 *
 	 * @param peerConnector     The peer connector to use.
 	 * @param syncConnectorPool     The sync connector pool to use.
-	 * @param schedulerFactory  The scheduler factory to use.
 	 * @param blockSynchronizer The block synchronizer to use.
 	 */
 	public PeerNetworkServices(
 			final PeerConnector peerConnector,
 			final SyncConnectorPool syncConnectorPool,
-			final SchedulerFactory<Node> schedulerFactory,
 			final BlockSynchronizer blockSynchronizer) {
 		this.peerConnector = peerConnector;
 		this.syncConnectorPool = syncConnectorPool;
-		this.schedulerFactory = schedulerFactory;
 		this.blockSynchronizer = blockSynchronizer;
 	}
 
@@ -46,13 +40,6 @@ public class PeerNetworkServices {
 	 * @return The sync connector pool.
 	 */
 	public SyncConnectorPool getSyncConnectorPool() { return this.syncConnectorPool; }
-
-	/**
-	 * Gets the scheduler factory.
-	 *
-	 * @return The scheduler factory.
-	 */
-	public SchedulerFactory<Node> getSchedulerFactory() { return this.schedulerFactory; }
 
 	/**
 	 * Gets the block synchronizer.

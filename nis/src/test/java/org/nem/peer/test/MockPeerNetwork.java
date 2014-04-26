@@ -120,7 +120,6 @@ public class MockPeerNetwork extends PeerNetwork {
 		return new PeerNetworkServices(
 				new MockConnector(),
 				Mockito.mock(SyncConnectorPool.class),
-				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
 }

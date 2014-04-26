@@ -564,7 +564,6 @@ public class PeerNetworkTest {
 		return new PeerNetworkServices(
 				new MockConnector(),
 				Mockito.mock(SyncConnectorPool.class),
-				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
 
@@ -574,7 +573,6 @@ public class PeerNetworkTest {
 				new PeerNetworkServices(
 						new MockConnector(),
 						Mockito.mock(SyncConnectorPool.class),
-						new MockNodeSchedulerFactory(),
 						synchronizer));
 	}
 
@@ -584,7 +582,6 @@ public class PeerNetworkTest {
 				new PeerNetworkServices(
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
-						new MockNodeSchedulerFactory(),
 						new MockBlockSynchronizer()));
 	}
 
@@ -594,7 +591,6 @@ public class PeerNetworkTest {
 				new PeerNetworkServices(
 						new MockConnector(),
 						Mockito.mock(SyncConnectorPool.class),
-						new MockNodeSchedulerFactory(),
 						new MockBlockSynchronizer()),
 				nodeExperiences);
 	}
