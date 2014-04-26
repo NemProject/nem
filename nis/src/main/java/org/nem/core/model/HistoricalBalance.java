@@ -14,8 +14,8 @@ public class HistoricalBalance implements Comparable<HistoricalBalance> {
 	 * @param height the block height.
 	 * @param balance the balance at that height
 	 */
-	public HistoricalBalance(final BlockHeight blockHeight, final Amount balance) {
-		this.height = blockHeight;
+	public HistoricalBalance(final BlockHeight height, final Amount balance) {
+		this.height = height;
 		this.balance = balance;
 	}
 
@@ -73,12 +73,6 @@ public class HistoricalBalance implements Comparable<HistoricalBalance> {
 	 */
 	@Override
 	public int compareTo(final HistoricalBalance rhs) {
-		if (this.height.getRaw() < rhs.height.getRaw()) {
-			return -1;
-		} 
-		else if (this.height.getRaw() > rhs.height.getRaw()) {
-			return 1;
-		}
-		return 0;
+		return this.height.compareTo(rhs.getHeight());
 	}
 }
