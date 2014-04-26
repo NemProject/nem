@@ -13,6 +13,7 @@ import org.nem.nis.mappers.TransferMapper;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
+import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -180,37 +181,25 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void calculatePeerChainGenerations(Block parentBlock, final List<Block> peerChain) {
-		for (Block block : peerChain) {
-			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash(), block.getSigner().getKeyPair().getPublicKey()));
-
-			parentBlock = block;
-		}
-	}
-
 	/**
 	 * Validates blocks in peerChain.
 	 *
-	 * @param contemporaryAccountAnalyzer AccountLookup upon which TXes from peerChain should be applied.
-	 * @param parentDbBlock parent db block
+	 * @param parentBlock parent block
 	 * @param peerChain analyzed fragment of peer's blockchain.
 	 *
 	 * @return score or -1 if chain is invalid
 	 */
-	private boolean validatePeerChain(AccountAnalyzer contemporaryAccountAnalyzer, org.nem.nis.dbmodel.Block parentDbBlock, List<Block> peerChain) {
-		final Block parentBlock = BlockMapper.toModel(parentDbBlock, contemporaryAccountAnalyzer);
-
+	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
-		calculatePeerChainGenerations(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
-	private long getPeerChainScore(List<Block> peerChain) {
+	private long getPeerChainScore(final Block parentBlock, final List<Block> peerChain) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 				this.scorer,
 				PartialWeightedScoreVisitor.BlockOrder.Forward);
-		BlockIterator.all(peerChain, scoreVisitor);
+		BlockIterator.all(parentBlock, peerChain, scoreVisitor);
 		return scoreVisitor.getScore();
 	}
 
@@ -262,13 +251,14 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		// do not trust peer, take first block from our db and convert it
-		if (! validatePeerChain(contemporaryAccountAnalyzer, ourDbBlock, peerChain)) {
+		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
+		if (! validatePeerChain(parentBlock, peerChain)) {
 			penalize(node);
 			return;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(peerChain);
+		long peerScore = getPeerChainScore(parentBlock, peerChain);
 		if (peerScore < 0L) {
 			penalize(node);
 			return;
@@ -292,42 +282,42 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Checks if passed block is correct, and if eligible adds it to db
+	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
-	 * @param block - block that's going to be processed
+	 * @param receivedBlock - receivedBlock that's going to be processed
 	 *
-	 * @return false if block was known or invalid, true if ok and added to db
+	 * @return false if receivedBlock was known or invalid, true if ok and added to db
 	 */
-	public boolean processBlock(Block block) {
-		final Hash blockHash = HashUtils.calculateHash(block);
-		final Hash parentHash = block.getPreviousBlockHash();
+	public boolean processBlock(Block receivedBlock) {
+		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
+		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
 		final org.nem.nis.dbmodel.Block parent;
 
 		// this method processes only blocks that have been sent directly (pushed)
 		// to us, so we can add quite strict rule here
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
+		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			return false;
 		}
 
-		// block already seen
+		// receivedBlock already seen
 		synchronized (this) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}
 
-			// check if we know previous block
+			// check if we know previous receivedBlock
 			parent = blockDao.findByHash(parentHash);
 		}
 
-		// if we don't have parent, we can't do anything with this block
+		// if we don't have parent, we can't do anything with this receivedBlock
 		if (parent == null) {
 			return false;
 		}
 
 		// TODO: we should have some time limit set
-//		if (block.getTimeStamp() > parent.getTimestamp() + 20*30) {
+//		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
 //			return false;
 //		}
 
@@ -341,15 +331,16 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
-		peerChain.add(block);
+		peerChain.add(receivedBlock);
 
-		if (! validatePeerChain(contemporaryAccountAnalyzer, parent, peerChain)) {
+		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
+		if (! validatePeerChain(parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerscore = getPeerChainScore(peerChain);
+		long peerscore = getPeerChainScore(parentBlock, peerChain);
 		if (peerscore < 0) {
 			// penalty?
 			return false;
@@ -357,6 +348,10 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (peerscore < ourScore) {
 			return false;
+		}
+
+		for (final Block block : peerChain) {
+			block.execute();
 		}
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);

@@ -2,9 +2,10 @@ package org.nem.peer;
 
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.node.*;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.score.*;
 
 import java.util.*;
 
@@ -100,7 +101,7 @@ public class PeerNetwork {
 
 	/**
 	 * Gets a communication partner node.
-	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested
+	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested.
 	 *
 	 * @return A communication partner node.
 	 */
@@ -114,7 +115,7 @@ public class PeerNetwork {
 				this.config.getPreTrustedNodes(),
 				this.config.getTrustParameters());
 
-		final NodeSelector basicNodeSelector = getNodeSelector();
+		final NodeSelector basicNodeSelector = this.getNodeSelector();
 		return basicNodeSelector.selectNode(context);
 	}
 
@@ -132,7 +133,11 @@ public class PeerNetwork {
 	 * Refreshes the network.
 	 */
 	public void refresh() {
-		final NodeRefresher refresher = new NodeRefresher(this.nodes, this.peerConnector, this.schedulerFactory);
+		final NodeRefresher refresher = new NodeRefresher(
+				this.getLocalNode(),
+				this.getNodes(),
+				this.peerConnector,
+				this.schedulerFactory);
 		refresher.refresh();
 	}
 
@@ -143,21 +148,11 @@ public class PeerNetwork {
 	 * @param entity      The entity.
 	 */
 	public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-		this.forAllActiveNodes(new Action<Node>() {
-			@Override
-			public void execute(final Node element) {
-				peerConnector.announce(element.getEndpoint(), broadcastId, entity);
-			}
-		});
+		this.forAllActiveNodes(element -> peerConnector.announce(element.getEndpoint(), broadcastId, entity));
 	}
 
 	public void synchronize() {
-		this.forAllActiveNodes(new Action<Node>() {
-			@Override
-			public void execute(final Node element) {
-				blockSynchronizer.synchronizeNode(syncConnectorPool, element);
-			}
-		});
+		this.forAllActiveNodes(element -> blockSynchronizer.synchronizeNode(syncConnectorPool, element));
 	}
 
 	private void forAllActiveNodes(final Action<Node> action) {
@@ -167,12 +162,18 @@ public class PeerNetwork {
 	}
 
 	private static class NodeRefresher {
+		final Node localNode;
 		final NodeCollection nodes;
 		final PeerConnector connector;
 		final SchedulerFactory<Node> schedulerFactory;
 		final Map<Node, NodeStatus> nodesToUpdate;
 
-		public NodeRefresher(final NodeCollection nodes, final PeerConnector connector, final SchedulerFactory<Node> schedulerFactory) {
+		public NodeRefresher(
+				final Node localNode,
+				final NodeCollection nodes,
+				final PeerConnector connector,
+				final SchedulerFactory<Node> schedulerFactory) {
+			this.localNode = localNode;
 			this.nodes = nodes;
 			this.connector = connector;
 			this.schedulerFactory = schedulerFactory;
@@ -180,12 +181,7 @@ public class PeerNetwork {
 		}
 
 		public void refresh() {
-			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(new Action<Node>() {
-				@Override
-				public void execute(final Node element) {
-					refreshNode(element);
-				}
-			});
+			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(this::refreshNode);
 
 			scheduler.push(this.nodes.getActiveNodes());
 			scheduler.push(this.nodes.getInactiveNodes());
@@ -193,7 +189,6 @@ public class PeerNetwork {
 
 			for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
 				this.nodes.update(entry.getKey(), entry.getValue());
-
 		}
 
 		private void refreshNode(final Node node) {
@@ -223,7 +218,7 @@ public class PeerNetwork {
 		}
 
 		private void update(final Node node, final NodeStatus status) {
-			if (status == this.nodes.getNodeStatus(node))
+			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
 			this.nodesToUpdate.put(node, status);

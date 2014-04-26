@@ -17,8 +17,8 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
-	private final Hash prevBlockHash;
 	private final BlockHeight height;
+	private Hash prevBlockHash;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
@@ -135,6 +135,15 @@ public class Block extends VerifiableEntity {
 	//region Setters
 
 	/**
+	 * Sets the hash of the previous block.
+	 *
+	 * @param hash The hash of the previous block.
+	 */
+	public void setPreviousBlockHash(Hash hash) {
+		this.prevBlockHash = hash;
+	}
+
+	/**
 	 * Sets the generation hash.
 	 *
 	 * @param generationHash the generation hash.
@@ -170,8 +179,7 @@ public class Block extends VerifiableEntity {
 	 * @param transactions The transactions to add.
 	 */
 	public void addTransactions(final Collection<Transaction> transactions) {
-		for (final Transaction transaction : transactions)
-			this.addTransaction(transaction);
+		transactions.forEach(this::addTransaction);
 	}
 
 	/**
@@ -199,12 +207,7 @@ public class Block extends VerifiableEntity {
 	}
 
 	private Iterable<Transaction> getReverseTransactions() {
-		return new Iterable<Transaction>() {
-			@Override
-			public Iterator<Transaction> iterator() {
-				return new ReverseListIterator<>(transactions);
-			}
-		};
+		return () -> new ReverseListIterator<>(transactions);
 	}
 
 	@Override

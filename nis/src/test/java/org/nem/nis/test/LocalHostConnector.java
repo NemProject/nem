@@ -1,17 +1,18 @@
 package org.nem.nis.test;
 
 import net.minidev.json.*;
-import org.eclipse.jetty.client.api.*;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.MockAccountLookup;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.controller.utils.ErrorResponse;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A helper class that connects to an NIS instance running on the local machine.
@@ -80,26 +81,20 @@ public class LocalHostConnector {
 	 * @return The result of the POST operation.
 	 */
 	public Result post(final String path, final JSONObject input) {
-		try {
+		return ExceptionUtils.propagate(() -> {
 			final URL url = new URL("http", "127.0.0.1", 7890, "/" + path);
-			return this.httpMethodClient.post(url, input, new HttpResultResponseStrategy());
-		} catch (MalformedURLException e) {
-			throw new UnsupportedOperationException(e);
-		}
+			return this.httpMethodClient.post(url, input, new HttpResultResponseStrategy()).get();
+		});
 	}
 
 	private static class HttpResultResponseStrategy implements HttpResponseStrategy<Result> {
 
 		@Override
-		public Result coerce(final Request request, final Response response) throws IOException {
-			final List<InputStreamResponseListener> listeners = response.getListeners(InputStreamResponseListener.class);
-			if (1 != listeners.size())
-				throw new UnsupportedOperationException(String.format("Unexpected number of listeners: %d", listeners.size()));
-
-			final InputStreamResponseListener listener = listeners.get(0);
-			try (final InputStream responseStream = listener.getInputStream()) {
-				return new Result(response.getStatus(), JSONValue.parse(responseStream));
-			}
+		public Result coerce(final HttpRequestBase request, final HttpResponse response) {
+			return ExceptionUtils.propagate(() ->
+				new Result(
+						response.getStatusLine().getStatusCode(),
+						JSONValue.parse(response.getEntity().getContent())));
 		}
 	}
 }

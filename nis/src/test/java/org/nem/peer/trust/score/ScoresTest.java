@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.Assert;
 import org.junit.*;
 import org.nem.peer.test.Utils;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 import org.nem.peer.test.*;
 import org.nem.core.math.*;
 

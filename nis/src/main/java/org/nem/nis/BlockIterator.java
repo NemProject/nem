@@ -21,23 +21,31 @@ public class BlockIterator {
 			final BlockVisitor visitor) {
 
 		Block currentBlock = lookup.getLastBlock();
+
+		BlockHeight currentHeight = currentBlock.getHeight();
+		if (currentHeight.equals(desiredHeight))
+			return;
+
+		Block parentBlock = lookup.getBlockAt(currentHeight.prev());
 		while (true) {
-			BlockHeight currentHeight = currentBlock.getHeight();
+			visitor.visit(parentBlock, currentBlock);
+			currentBlock = parentBlock;
+			currentHeight = currentBlock.getHeight();
+
 			if (currentHeight.equals(desiredHeight))
 				return;
 
-			visitor.visit(currentBlock);
-			currentHeight = currentHeight.prev();
-			currentBlock = lookup.getBlockAt(currentHeight);
+			parentBlock = lookup.getBlockAt(currentHeight.prev());
 		}
 	}
 
 	/**
 	 * Calls the visitor for all blocks.
 	 */
-	public static void all(final List<Block> blocks, final BlockVisitor visitor) {
+	public static void all(Block parentBlock, final List<Block> blocks, final BlockVisitor visitor) {
 		for (final Block block : blocks) {
-			visitor.visit(block);
+			visitor.visit(parentBlock, block);
+			parentBlock = block;
 		}
 	}
 }

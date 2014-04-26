@@ -16,12 +16,15 @@ public class AggregateBlockVisitorTest {
 		final TestContext context = new TestContext();
 
 		// Act:
+		final Block parentBlock = NisUtils.createRandomBlock();
 		final Block block = NisUtils.createRandomBlock();
-		context.visitor.visit(block);
+		context.visitor.visit(parentBlock, block);
 
 		// Assert:
 		Assert.assertThat(context.visitor1.lastBlock, IsEqual.equalTo(block));
+		Assert.assertThat(context.visitor1.lastParentBlock, IsEqual.equalTo(parentBlock));
 		Assert.assertThat(context.visitor2.lastBlock, IsEqual.equalTo(block));
+		Assert.assertThat(context.visitor2.lastParentBlock, IsEqual.equalTo(parentBlock));
 	}
 
 	@Test
@@ -31,7 +34,7 @@ public class AggregateBlockVisitorTest {
 
 		// Act:
 		final Block block = NisUtils.createRandomBlock();
-		context.visitor.visit(block);
+		context.visitor.visit(null, block);
 
 		// Assert:
 		Assert.assertThat(context.visitList, IsEquivalent.equivalentTo(new Integer[]{ 1, 2 }));
@@ -62,6 +65,7 @@ public class AggregateBlockVisitorTest {
 		private final int id;
 		private final List<Integer> visitList;
 		private Block lastBlock;
+		private Block lastParentBlock;
 
 		public MockVisitor(int id, final List<Integer> visitList) {
 			this.id = id;
@@ -69,8 +73,9 @@ public class AggregateBlockVisitorTest {
 		}
 
 		@Override
-		public void visit(final Block block) {
+		public void visit(final Block parentBlock, final Block block) {
 			this.visitList.add(this.id);
+			this.lastParentBlock = parentBlock;
 			this.lastBlock = block;
 		}
 	}

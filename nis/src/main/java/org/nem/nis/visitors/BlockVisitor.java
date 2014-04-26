@@ -10,7 +10,8 @@ public interface BlockVisitor {
 	/**
 	 * Visits a block.
 	 *
+	 * @param parentBlock The parent block, that is earlier in the chain.
 	 * @param block The block.
 	 */
-	public void visit(final Block block);
+	public void visit(final Block parentBlock, final Block block);
 }

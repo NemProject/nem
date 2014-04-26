@@ -1,22 +1,16 @@
 package org.nem.nis;
 
-import com.sun.java_cup.internal.runtime.lr_parser;
-import org.nem.core.crypto.Hashes;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
-	private static final Logger LOGGER = Logger.getLogger(BlockScorer.class.getName());
 
 	/**
 	 * The target time between two blocks in seconds.
@@ -51,11 +45,8 @@ public class BlockScorer {
 	 */
 	public BigInteger calculateHit(final Block block) {
 		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
-		//System.out.println(val.toString());
 		double tmp = Math.abs(Math.log(val.doubleValue()/TWO_TO_THE_POWER_OF_256));
-		//System.out.println(tmp);
 		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
-		//System.out.println(val.toString());
 		return val;
 	}
 
@@ -85,16 +76,18 @@ public class BlockScorer {
 	 *
 	 * @return The block score.
 	 */
-	public long calculateBlockScore(final Block currentBlock) {
+	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
+		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
 		final Account account = currentBlock.getSigner();
-		final long personalScore = -account.getForagedBlocks().getRaw();
-		return calculateBlockScoreImpl(personalScore, currentBlock.getDifficulty().getRaw());
+		final long foragedBlocks = account.getForagedBlocks().getRaw();
+		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
 	}
 
-	private long calculateBlockScoreImpl(long foragedBlocks, long difficulty) {
-		return difficulty + foragedBlocks;
+	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
+		return difficulty - timeDiff;
 	}
 
+	
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 * 

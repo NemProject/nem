@@ -21,9 +21,9 @@ public class AggregateBlockVisitor implements BlockVisitor {
 	}
 
 	@Override
-	public void visit(final Block block) {
+	public void visit(final Block parentBlock, final Block block) {
 		for (final BlockVisitor visitor : visitors) {
-			visitor.visit(block);
+			visitor.visit(parentBlock, block);
 		}
 	}
 }

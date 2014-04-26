@@ -99,12 +99,9 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		return this.unconfirmedTransactions.add(transaction, new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(final Hash hash) {
-				synchronized (blockChain) {
-					return null != transferDao.findByHash(hash.getRaw());
-				}
+		return this.unconfirmedTransactions.add(transaction, hash -> {
+			synchronized (blockChain) {
+				return null != transferDao.findByHash(hash.getRaw());
 			}
 		});
 	}
@@ -152,7 +149,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 		Block bestBlock = null;
-		long bestScore = Long.MAX_VALUE;
+		long bestScore = Long.MIN_VALUE;
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
@@ -179,7 +176,7 @@ public class Foraging implements AutoCloseable, Runnable {
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
 
-						final long score = scorer.calculateBlockScore(newBlock);
+						final long score = scorer.calculateBlockScore(lastBlock, newBlock);
 						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;

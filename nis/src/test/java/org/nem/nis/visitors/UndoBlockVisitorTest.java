@@ -13,7 +13,7 @@ public class UndoBlockVisitorTest {
 		final UndoBlockVisitor visitor = new UndoBlockVisitor();
 
 		// Act:
-		visitor.visit(block);
+		visitor.visit(null, block);
 
 		// Assert:
 		Mockito.verify(block, Mockito.times(1)).undo();

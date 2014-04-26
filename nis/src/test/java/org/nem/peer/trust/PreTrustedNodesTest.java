@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.test.IsEquivalent;
 import org.nem.peer.test.Utils;
-import org.nem.peer.Node;
+import org.nem.peer.node.Node;
 
 import java.util.*;
 
@@ -65,7 +65,7 @@ public class PreTrustedNodesTest {
 	@Test
 	public void preTrustVectorCorrectWhenThereAreNoPreTrustedNodes() {
 		// Arrange:
-		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
+		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());
 		final Node[] nodes = new Node[] {
 				Utils.createNodeWithPort(80),
 				Utils.createNodeWithPort(83),

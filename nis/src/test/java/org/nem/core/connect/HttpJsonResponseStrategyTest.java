@@ -1,7 +1,7 @@
 package org.nem.core.connect;
 
-import org.eclipse.jetty.client.api.*;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.apache.http.*;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -10,7 +10,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
 import java.io.*;
-import java.util.*;
 
 public class HttpJsonResponseStrategyTest {
 
@@ -20,41 +19,23 @@ public class HttpJsonResponseStrategyTest {
 	public void coerceThrowsInactivePeerExceptionOnHttpError() throws Exception {
 		// Arrange:
 		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(null);
-		final Response response = Mockito.mock(Response.class);
-		Mockito.when(response.getStatus()).thenReturn(500);
+		final HttpResponse response = Mockito.mock(HttpResponse.class);
+		mockStatusCode(response, 500);
 
 		// Act:
-		strategy.coerce(Mockito.mock(Request.class), response);
+		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfThereAreTooFewListeners() throws Exception {
+	public void coerceThrowsFatalPeerExceptionOnIoError() throws Exception {
 		// Arrange:
 		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(null);
-		final Response response = Mockito.mock(Response.class);
-		Mockito.when(response.getStatus()).thenReturn(200);
-
-		final List<InputStreamResponseListener> listeners = new ArrayList<>();
-		Mockito.when(response.getListeners(InputStreamResponseListener.class)).thenReturn(listeners);
+		final HttpResponse response = Mockito.mock(HttpResponse.class);
+		mockStatusCode(response, 200);
+		Mockito.when(response.getEntity()).thenThrow(new IOException());
 
 		// Act:
-		strategy.coerce(Mockito.mock(Request.class), response);
-	}
-
-	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfThereAreTooManyListeners() throws Exception {
-		// Arrange:
-		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(null);
-		final Response response = Mockito.mock(Response.class);
-		Mockito.when(response.getStatus()).thenReturn(200);
-
-		final List<InputStreamResponseListener> listeners = new ArrayList<>();
-		listeners.add(Mockito.mock(InputStreamResponseListener.class));
-		listeners.add(Mockito.mock(InputStreamResponseListener.class));
-		Mockito.when(response.getListeners(InputStreamResponseListener.class)).thenReturn(listeners);
-
-		// Act:
-		strategy.coerce(Mockito.mock(Request.class), response);
+		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
 	}
 
 	//endregion
@@ -128,17 +109,23 @@ public class HttpJsonResponseStrategyTest {
 			final byte[] serializedBytes,
 			final HttpJsonResponseStrategy<Deserializer> strategy) throws IOException {
 		// Arrange:
-		final Response response = Mockito.mock(Response.class);
-		Mockito.when(response.getStatus()).thenReturn(200);
+		final HttpResponse response = Mockito.mock(HttpResponse.class);
+		mockStatusCode(response, 200);
 
+		final HttpEntity entity = Mockito.mock(HttpEntity.class);
 		final ByteArrayInputStream inputStream = new ByteArrayInputStream(serializedBytes);
-		final List<InputStreamResponseListener> listeners = new ArrayList<>();
-		listeners.add(Mockito.mock(InputStreamResponseListener.class));
-		Mockito.when(listeners.get(0).getInputStream()).thenReturn(inputStream);
-		Mockito.when(response.getListeners(InputStreamResponseListener.class)).thenReturn(listeners);
+		Mockito.when(response.getEntity()).thenReturn(entity);
+		Mockito.when(entity.getContent()).thenReturn(inputStream);
 
 		// Act:
-		return strategy.coerce(Mockito.mock(Request.class), response);
+		return strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
+	}
+
+	private static void mockStatusCode(final HttpResponse response, final int statusCode) {
+		// Arrange:
+		final StatusLine statusLine = Mockito.mock(StatusLine.class);
+		Mockito.when(response.getStatusLine()).thenReturn(statusLine);
+		Mockito.when(statusLine.getStatusCode()).thenReturn(statusCode);
 	}
 
 	private static Deserializer coerceDeserializer(

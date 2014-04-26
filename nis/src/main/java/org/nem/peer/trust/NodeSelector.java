@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.peer.trust.score.NodeExperiencePair;
+
 /**
  * Interface for selecting a node.
  */

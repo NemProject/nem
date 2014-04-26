@@ -62,11 +62,9 @@ public class TransferTransactionTest {
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 		final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
 		final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, message);
-		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
-			public Account findByAddress(final Address address) {
-				return address.equals(signer.getAddress()) ? signer : recipient;
-			}
-		});
+		final TransferTransaction transaction = createRoundTrippedTransaction(
+				originalTransaction,
+				address -> address.equals(signer.getAddress()) ? signer : recipient);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -81,11 +79,9 @@ public class TransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 		final TransferTransaction originalTransaction = createTransferTransaction(signer, recipient, 123, null);
-		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, new AccountLookup() {
-			public Account findByAddress(final Address address) {
-				return address.equals(signer.getAddress()) ? signer : recipient;
-			}
-		});
+		final TransferTransaction transaction = createRoundTrippedTransaction(
+				originalTransaction,
+				address -> address.equals(signer.getAddress()) ? signer : recipient);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -170,6 +166,113 @@ public class TransferTransactionTest {
 	//endregion
 
 	//region Valid
+
+	@Test
+	public void isValidChecksForMinimumFee() {
+		// Arrange (category spam attack):
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(transaction.getMinimumFee());
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+		transaction.sign();
+
+		// Serialization modifies the fee and kills the attack
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		accountLookup.setMockAccount(recipient);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		transaction.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isValidChecksForMaximumFee() {
+		// Arrange: I might be be paranoid, is a overflow attack possible?
+		//          Checking for fee <= ALL_NEM is cheap.
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1_000_000_000_001L));
+		final Account recipient = Utils.generateRandomAccount();
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(Amount.fromNem(1_000_000_000_000L));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidChecksForNegativeAmount() {
+		// Arrange (category stealing attack):
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(Amount.fromNem(1000));
+
+		// Bob likes to steal money by sending negative amounts.
+		// He waits till he forages a block and includes the following transaction.
+		Amount amount=new Amount(1);
+        try {
+	        final Class c = amount.getClass().getSuperclass();
+	        final java.lang.reflect.Field field = c.getDeclaredField("value");
+	        field.setAccessible(true);
+        	field.set(amount, -1000000);
+        }
+        catch(Exception e){}
+		
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(Amount.fromMicroNem(1000000));
+		transaction.sign();
+
+		// Deserialization throws an exception thus the attack will not succeed
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(signer);
+		accountLookup.setMockAccount(recipient);
+		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		transaction.serialize(jsonSerializer);
+		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidChecksForMaximumAmount() {
+		// Arrange: I might be be paranoid, is a overflow attack possible?
+		//          Checking for amount <= ALL_NEM is cheap.
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1_000_000_000_001L));
+		final Account recipient = Utils.generateRandomAccount();
+		Amount amount=new Amount(1_000_000_000_001L);
+
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, amount, null);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setFee(transaction.getMinimumFee());
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+	}
 
 	@Test
 	public void isValidChecksSuperValidity() {

@@ -1,8 +1,7 @@
-package org.nem.peer.trust;
+package org.nem.peer.trust.score;
 
 import org.nem.core.serialization.*;
-import org.nem.peer.Node;
-import org.nem.peer.trust.score.NodeExperience;
+import org.nem.peer.node.Node;
 
 /**
  * A Node and NodeExperience pair.
@@ -29,19 +28,8 @@ public class NodeExperiencePair implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeExperiencePair(final Deserializer deserializer) {
-		this.node = deserializer.readObject("node", new ObjectDeserializer<Node>() {
-			@Override
-			public Node deserialize(final Deserializer deserializer) {
-				return new Node(deserializer);
-			}
-		});
-
-		this.experience = deserializer.readObject("experience", new ObjectDeserializer<NodeExperience>() {
-			@Override
-			public NodeExperience deserialize(final Deserializer deserializer) {
-				return new NodeExperience(deserializer);
-			}
-		});
+		this.node = deserializer.readObject("node", Node::new);
+		this.experience = deserializer.readObject("experience", NodeExperience::new);
 	}
 
 	/**

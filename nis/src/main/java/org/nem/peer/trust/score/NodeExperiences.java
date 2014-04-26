@@ -2,10 +2,10 @@ package org.nem.peer.trust.score;
 
 import org.nem.core.math.Matrix;
 import org.nem.core.utils.AbstractTwoLevelMap;
-import org.nem.peer.Node;
-import org.nem.peer.trust.*;
+import org.nem.peer.node.Node;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Contains experiences for a set of nodes.
@@ -76,8 +76,10 @@ public class NodeExperiences {
 	public List<NodeExperiencePair> getNodeExperiences(final Node node) {
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
 		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(node);
-		for (final Map.Entry<Node, NodeExperience> entry : experiences.entrySet())
-			pairs.add(new NodeExperiencePair(entry.getKey(), entry.getValue()));
+		pairs.addAll(
+				experiences.entrySet().stream()
+					.map(entry -> new NodeExperiencePair(entry.getKey(), entry.getValue()))
+					.collect(Collectors.toList()));
 
 		return pairs;
 	}

@@ -1,13 +1,11 @@
 package org.nem.core.connect;
 
 import net.minidev.json.*;
-import org.eclipse.jetty.client.api.*;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.http.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import java.io.*;
 
 /**
  * Strategy for coercing an HTTP JSON response.
@@ -17,17 +15,17 @@ import java.util.List;
 public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrategy<T> {
 
 	@Override
-	public T coerce(final Request request, final Response response) throws IOException {
-		if (response.getStatus() != HttpStatus.OK.value())
-			throw new InactivePeerException(String.format("Peer returned: %d", response.getStatus()));
+	public T coerce(final HttpRequestBase request, final HttpResponse response) {
+		try {
+			final int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != HttpStatus.OK.value())
+				throw new InactivePeerException(String.format("Peer returned: %d", statusCode));
 
-		final List<InputStreamResponseListener> listeners = response.getListeners(InputStreamResponseListener.class);
-		if (1 != listeners.size())
-			throw new FatalPeerException(String.format("Unexpected number of listeners: %d", listeners.size()));
-
-		final InputStreamResponseListener listener = listeners.get(0);
-		try (final InputStream responseStream = listener.getInputStream()) {
-			return this.coerce(JSONValue.parse(responseStream));
+			try (final InputStream responseStream = response.getEntity().getContent()) {
+				return this.coerce(JSONValue.parse(responseStream));
+			}
+		} catch (final IOException e) {
+			throw new FatalPeerException(e);
 		}
 	}
 

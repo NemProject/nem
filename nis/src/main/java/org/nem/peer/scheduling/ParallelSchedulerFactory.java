@@ -38,7 +38,7 @@ public class ParallelSchedulerFactory<T> implements SchedulerFactory<T> {
 					numThreads,
 					0L,
 					TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>());
+					new LinkedBlockingQueue<>());
 			this.action = action;
 			this.canPush = new AtomicBoolean(true);
 		}
@@ -49,12 +49,7 @@ public class ParallelSchedulerFactory<T> implements SchedulerFactory<T> {
 				throw new IllegalStateException("Cannot call push after block");
 
 			for (final T element : elements)
-				this.executor.execute(new Runnable() {
-					@Override
-					public void run() {
-						action.execute(element);
-					}
-				});
+				this.executor.execute(() -> action.execute(element));
 		}
 
 		@Override

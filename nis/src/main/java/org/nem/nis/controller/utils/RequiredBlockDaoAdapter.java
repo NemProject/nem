@@ -2,6 +2,7 @@ package org.nem.nis.controller.utils;
 
 import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.MissingResourceException;
@@ -9,11 +10,8 @@ import java.util.MissingResourceException;
 /**
  * Adapter around BlockDao that throws a MissingResourceException if a requested
  * Block is not found.
- *
- * TODO: it would be better to have this as a decorator around a ReadOnlyBlockDao interface (so BlockDao extends ReadOnlyBlockDao)
- * TODO: but I'm not sure how to wire up the beans correctly for that
  */
-public class RequiredBlockDaoAdapter {
+public class RequiredBlockDaoAdapter implements ReadOnlyBlockDao {
 
 	private final BlockDao blockDao;
 

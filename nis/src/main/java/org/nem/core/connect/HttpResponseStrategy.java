@@ -1,8 +1,7 @@
 package org.nem.core.connect;
 
-import org.eclipse.jetty.client.api.*;
-
-import java.io.IOException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 
 /**
  * Strategy for coercing an HTTP response into a specific type.
@@ -18,5 +17,5 @@ public interface HttpResponseStrategy<T> {
 	 * @param response The response.
 	 * @return The coerced result.
 	 */
-	public T coerce(final Request request, final Response response) throws IOException;
+	public T coerce(final HttpRequestBase request, final HttpResponse response);
 }

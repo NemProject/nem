@@ -101,7 +101,7 @@ public class ParallelSchedulerFactoryTest {
 
 		public BlockAction() {
 			this.monitor = new Object();
-			this.threadIds = Collections.synchronizedList(new ArrayList<Long>());
+			this.threadIds = Collections.synchronizedList(new ArrayList<>());
 			this.canBlock = true;
 		}
 
@@ -142,7 +142,7 @@ public class ParallelSchedulerFactoryTest {
 
 		public SleepAction(final int sleepMillis) {
 			this.sleepMillis = sleepMillis;
-			this.threadIds = Collections.synchronizedList(new ArrayList<Long>());
+			this.threadIds = Collections.synchronizedList(new ArrayList<>());
 		}
 
 		public List<Long> getThreadIds() {

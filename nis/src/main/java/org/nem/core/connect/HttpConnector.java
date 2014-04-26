@@ -2,7 +2,7 @@ package org.nem.core.connect;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.*;
+import org.nem.peer.node.*;
 
 import java.net.*;
 import java.util.List;
@@ -84,14 +84,14 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//endregion
 
 	private Deserializer get(final URL url) {
-		return this.httpMethodClient.get(url, this.responseStrategy);
+		return this.httpMethodClient.get(url, this.responseStrategy).get();
 	}
 
 	private Deserializer post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy);
+		return this.httpMethodClient.post(url, entity, this.responseStrategy).get();
 	}
 
 	private Deserializer postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
+		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).get();
 	}
 }
