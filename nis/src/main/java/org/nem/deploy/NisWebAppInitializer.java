@@ -19,9 +19,9 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	SerializableEntityHttpMessageConverter serializableEntityHttpMessageConverter;
 
 	@Override
-	protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		converters.add(deserializerHttpMessageConverter);
-		converters.add(serializableEntityHttpMessageConverter);
-		addDefaultHttpMessageConverters(converters);
+	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
+		converters.add(this.deserializerHttpMessageConverter);
+		converters.add(this.serializableEntityHttpMessageConverter);
+		this.addDefaultHttpMessageConverters(converters);
 	}
 }

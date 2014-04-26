@@ -15,7 +15,7 @@ public class HistoricalBalances {
 	 */
 	public final long MAX_HISTORY = BlockChain.ESTIMATED_BLOCKS_PER_DAY + BlockChain.REWRITE_LIMIT;
 	
-	private final ArrayList<HistoricalBalance> balances = new ArrayList<HistoricalBalance>();
+	private final ArrayList<HistoricalBalance> balances = new ArrayList<>();
 	
 	/**
 	 * The block chain
