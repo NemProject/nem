@@ -7,6 +7,12 @@ public class EncodingException extends RuntimeException {
 
 	/**
 	 * Creates a new encoding exception.
+	 */
+	public EncodingException() {
+	}
+
+	/**
+	 * Creates a new encoding exception.
 	 *
 	 * @param cause The original exception.
 	 */

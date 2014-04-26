@@ -5,7 +5,12 @@ import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.junit.*;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 public class ExceptionUtilsTest {
+
+	//region toUnchecked
 
 	@Test
 	public void toUncheckedReturnsAnUncheckedException() throws Exception {
@@ -77,4 +82,65 @@ public class ExceptionUtilsTest {
 			this.blockingThread.join();
 		}
 	}
+
+	//endregion
+
+	//region propagate
+
+	@Test
+	public void propagateReturnsResultOnSuccess() {
+		// Act:
+		final int result = ExceptionUtils.propagate(() -> 7);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(7));
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateAllowsRuntimeExceptionsToPropagate() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new EncodingException(); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new IOException(); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new IOException(); }, EncodingException::new);
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateUnwrapsUncheckedExecutionExceptions() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new EncodingException()); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IOException()); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
+
+		// Act:
+		ExceptionUtils.propagate(
+				() -> { throw new MockExecutionException(new IOException()); },
+				EncodingException::new);
+	}
+
+	private class MockExecutionException extends ExecutionException {
+
+		public MockExecutionException(final Throwable cause) {
+			super(cause);
+		}
+	}
+
+	//endregion
 }

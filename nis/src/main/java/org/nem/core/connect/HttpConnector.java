@@ -84,14 +84,14 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//endregion
 
 	private Deserializer get(final URL url) {
-		return this.httpMethodClient.get(url, this.responseStrategy);
+		return this.httpMethodClient.get(url, this.responseStrategy).get();
 	}
 
 	private Deserializer post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy);
+		return this.httpMethodClient.post(url, entity, this.responseStrategy).get();
 	}
 
 	private Deserializer postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
+		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).get();
 	}
 }
