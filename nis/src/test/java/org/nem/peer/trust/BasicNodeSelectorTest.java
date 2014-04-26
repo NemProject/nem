@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsSame;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.peer.node.Node;
@@ -22,10 +22,48 @@ public class BasicNodeSelectorTest {
 		assertSingleNodeWithNonZeroTrustValuesIsSelected(0.0001);
 	}
 
-	@Test(expected = TrustException.class)
-	public void selectorThrowsExceptionWhenAllNodesHaveZeroTrustValues() {
+	@Test
+	public void selectorSelectsNullWhenAllNodesHaveZeroTrustValues() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
+		final NodeSelector selector = new BasicNodeSelector(new MockTrustProvider(vector), context);
+
+		// Act:
+		final NodeExperiencePair pair = selector.selectNode();
+
 		// Assert:
-		assertSingleNodeWithNonZeroTrustValuesIsSelected(0);
+		Assert.assertThat(pair, IsNull.nullValue());
+	}
+
+	@Test
+	public void constructorRecalculatesTrustValues() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
+		final MockTrustProvider trustProvider = new MockTrustProvider(vector);
+
+		// Act:
+		new BasicNodeSelector(trustProvider, context);
+
+		// Assert:
+		Assert.assertThat(trustProvider.getNumTrustComputations(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void selectNodeDoesNotRecalculateTrustValues() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
+		final MockTrustProvider trustProvider = new MockTrustProvider(vector);
+		final NodeSelector selector = new BasicNodeSelector(trustProvider, context);
+
+		// Act:
+		for (int i = 0; i < 10; ++i)
+			selector.selectNode();
+
+		// Assert:
+		Assert.assertThat(trustProvider.getNumTrustComputations(), IsEqual.equalTo(1));
 	}
 
 	private static void assertSingleNodeWithNonZeroTrustValuesIsSelected(double value) {
