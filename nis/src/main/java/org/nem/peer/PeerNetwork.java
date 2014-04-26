@@ -25,6 +25,7 @@ public class PeerNetwork {
 	private final BlockSynchronizer blockSynchronizer;
 
 	private final NodeExperiences nodeExperiences;
+	private NodeSelector selector;
 
 	/**
 	 * Creates a new network with the specified configuration.
@@ -101,13 +102,11 @@ public class PeerNetwork {
 		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
 	}
 
-	/**
-	 * Gets a communication partner node.
-	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested.
-	 *
-	 * @return A communication partner node.
-	 */
-	public NodeExperiencePair getPartnerNode() {
+	private Node[] getNodeArray() {
+		return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
+	}
+
+	private void updateTrust() {
 		// create a new trust context each iteration in order to allow
 		// nodes to change in-between iterations.
 		final TrustContext context = new TrustContext(
@@ -117,30 +116,21 @@ public class PeerNetwork {
 				this.config.getPreTrustedNodes(),
 				this.config.getTrustParameters());
 
-		final NodeSelector basicNodeSelector = this.getNodeSelector();
-		return basicNodeSelector.selectNode(context);
-	}
-
-	private Node[] getNodeArray() {
-		return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
-	}
-
-	private NodeSelector getNodeSelector() {
-		// wrap the configured trust provider in an ActiveNodeTrustProvider to ensure that
-		// only active nodes are returned as communication partners
-		return new BasicNodeSelector(new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes));
+		this.selector = new BasicNodeSelector(
+				new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes),
+				context);
 	}
 
 	/**
 	 * Refreshes the network.
 	 */
-	public CompletableFuture refresh() {
+	public CompletableFuture<Void> refresh() {
 		final NodeRefresher refresher = new NodeRefresher(
 				this.getLocalNode(),
 				this.getNodes(),
 				this.peerConnector);
 
-		return refresher.refresh();
+		return refresher.refresh().whenComplete((v, e) -> this.updateTrust());
 	}
 
 	/**
@@ -149,7 +139,7 @@ public class PeerNetwork {
 	 * @param broadcastId The type of entity.
 	 * @param entity      The entity.
 	 */
-	public CompletableFuture broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
 				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
 				.collect(Collectors.toList());
@@ -158,7 +148,15 @@ public class PeerNetwork {
 	}
 
 	public void synchronize() {
-		this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, this.getPartnerNode().getNode());
+		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
+		if (null == partnerNodePair) {
+			LOGGER.warning("no suitable peers found to sync with");
+			return;
+		}
+
+		final Node partnerNode = partnerNodePair.getNode();
+		LOGGER.info("synchronizing with: " + partnerNode);
+		this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
 	}
 
 	private static class NodeRefresher {
@@ -177,7 +175,7 @@ public class PeerNetwork {
 			this.nodesToUpdate = new ConcurrentHashMap<>();
 		}
 
-		public CompletableFuture refresh() {
+		public CompletableFuture<Void> refresh() {
 			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream()
 					.map(this::refreshNodeAsync)
 					.collect(Collectors.toList());
@@ -189,7 +187,7 @@ public class PeerNetwork {
 					});
 		}
 
-		private CompletableFuture refreshNodeAsync(final Node node) {
+		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
 
 			return this.connector.getInfo(node.getEndpoint())
 					.thenApply(n -> {

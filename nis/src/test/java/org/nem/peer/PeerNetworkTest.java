@@ -4,12 +4,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.Utils;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.TrustException;
+import org.nem.peer.trust.TrustProvider;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
@@ -330,25 +331,21 @@ public class PeerNetworkTest {
 
 	//endregion
 
-	//endregion
-
-	//region getPartnerNode
-
 	@Test
-	public void getPartnerNodeReturnsActiveNode() {
+	public void refreshUpdatesTrustValues() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
+		final TrustProvider provider = Mockito.mock(TrustProvider.class);
+		final PeerNetwork network = createTestNetwork(provider);
 
-		network.refresh().join();
+		final ColumnVector trustVector = new ColumnVector(network.getNodes().getAllNodes().size() + 1);
+		trustVector.setAll(1);
+		Mockito.when(provider.computeTrust(Mockito.any())).thenReturn(trustVector);
 
 		// Act:
-		final NodeExperiencePair pair = network.getPartnerNode();
+		network.refresh().join();
 
 		// Assert:
-		Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("10.0.0.2"));
+		Mockito.verify(provider, Mockito.times(1)).computeTrust(Mockito.any());
 	}
 
 	//endregion
@@ -402,14 +399,22 @@ public class PeerNetworkTest {
 
 	//region synchronize
 
-	@Test(expected = TrustException.class)
+	@Test
 	public void synchronizeDoesNotCallSynchronizeNodeForAnyInactiveNode() {
 		// Arrange:
+		final MockConnector connector = new MockConnector();
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
-		final PeerNetwork network = createTestNetwork(synchronizer);
+		final PeerNetwork network = createTestNetwork(connector, synchronizer);
+		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.INACTIVE);
+		network.refresh().join();
 
 		// Act:
 		network.synchronize();
+
+		// Assert:
+		Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -438,6 +443,26 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Assert.assertThat(synchronizer.getLastConnectorPool(), IsNot.not(IsEqual.equalTo(null)));
+	}
+
+	@Test
+	public void synchronizeSyncsWithActiveNode() {
+		// Arrange:
+		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector, synchronizer);
+		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
+
+		network.refresh().join();
+
+		// Act:
+		network.synchronize();
+
+		// Assert:
+		Assert.assertThat(
+				synchronizer.getLastNode().getEndpoint().getBaseUrl().getHost(),
+				IsEqual.equalTo("10.0.0.2"));
 	}
 
 	//endregion
@@ -568,21 +593,20 @@ public class PeerNetworkTest {
 	}
 
 	private static PeerNetwork createTestNetwork(final MockBlockSynchronizer synchronizer) {
-		return new PeerNetwork(
-				ConfigFactory.createDefaultTestConfig(),
-				new PeerNetworkServices(
-						new MockConnector(),
-						Mockito.mock(SyncConnectorPool.class),
-						synchronizer));
+		return createTestNetwork(new MockConnector(), synchronizer);
 	}
 
-	private static PeerNetwork createTestNetwork(final MockConnector connector) {
+	private static PeerNetwork createTestNetwork(final MockConnector connector, final MockBlockSynchronizer synchronizer) {
 		return new PeerNetwork(
 				ConfigFactory.createDefaultTestConfig(),
 				new PeerNetworkServices(
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
-						new MockBlockSynchronizer()));
+						synchronizer));
+	}
+
+	private static PeerNetwork createTestNetwork(final MockConnector connector) {
+		return createTestNetwork(connector, new MockBlockSynchronizer());
 	}
 
 	private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
@@ -593,6 +617,15 @@ public class PeerNetworkTest {
 						Mockito.mock(SyncConnectorPool.class),
 						new MockBlockSynchronizer()),
 				nodeExperiences);
+	}
+
+	private static PeerNetwork createTestNetwork(final TrustProvider provider) {
+		return new PeerNetwork(
+				ConfigFactory.createConfig(provider),
+				new PeerNetworkServices(
+						new MockConnector(),
+						Mockito.mock(SyncConnectorPool.class),
+						new MockBlockSynchronizer()));
 	}
 
 	private static PeerNetwork createTestNetwork() {

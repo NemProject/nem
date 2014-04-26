@@ -95,20 +95,20 @@ public class MockPeerNetwork extends PeerNetwork {
 	}
 
 	@Override
-	public CompletableFuture refresh() {
+	public CompletableFuture<Void> refresh() {
 		if (null != this.refreshMonitor)
 			org.nem.core.test.Utils.monitorWait(this.refreshMonitor);
 
 		++this.numRefreshCalls;
-		return new CompletableFuture();
+		return new CompletableFuture<>();
 	}
 
 	@Override
-	public CompletableFuture broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		++this.numBroadcastCalls;
 		this.lastBroadcastId = broadcastId;
 		this.lastBroadcastEntity = entity;
-		return new CompletableFuture();
+		return new CompletableFuture<>();
 	}
 
 	@Override

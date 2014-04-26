@@ -39,10 +39,10 @@ public class BasicNodeSelectorTest {
 		final Node localNode = context.getLocalNode();
 		final Node otherNode = context.getNodes()[2];
 		final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, otherNode);
-		final NodeSelector selector = new BasicNodeSelector(new MockTrustProvider(vector));
+		final NodeSelector selector = new BasicNodeSelector(new MockTrustProvider(vector), context);
 
 		// Act:
-		final NodeExperiencePair pair = selector.selectNode(context);
+		final NodeExperiencePair pair = selector.selectNode();
 
 		// Assert:
 		Assert.assertThat(pair.getNode(), IsSame.sameInstance(otherNode));

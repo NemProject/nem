@@ -10,9 +10,8 @@ public interface NodeSelector {
 	/**
 	 * Selects a node.
 	 *
-	 * @param context The trust context.
-	 *
-	 * @return Information about the selected node.
+	 * @return Information about the selected node or null if
+	 * no suitable nodes could be found.
 	 */
-	public NodeExperiencePair selectNode(final TrustContext context);
+	public NodeExperiencePair selectNode();
 }
