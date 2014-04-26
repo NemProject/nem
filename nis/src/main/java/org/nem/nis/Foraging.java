@@ -149,7 +149,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 		Block bestBlock = null;
-		long bestScore = Long.MAX_VALUE;
+		long bestScore = Long.MIN_VALUE;
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
