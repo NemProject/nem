@@ -35,5 +35,5 @@ public interface PeerConnector {
 	 * @param announceId The type of announcement.
 	 * @param entity     The entity to announce.
 	 */
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
+	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity);
 }

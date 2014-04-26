@@ -48,9 +48,9 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
-		this.postVoid(url, entity);
+		return this.postVoidAsync(url, entity).getFuture();
 	}
 
 	//endregion
@@ -96,7 +96,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 		return this.httpMethodClient.post(url, entity, this.responseStrategy).get();
 	}
 
-	private CompletableFuture<Deserializer> postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).getFuture();
+	private HttpMethodClient.AsyncToken<Deserializer> postVoidAsync(final URL url, final SerializableEntity entity) {
+		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
 	}
 }

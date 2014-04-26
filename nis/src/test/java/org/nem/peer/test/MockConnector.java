@@ -28,6 +28,8 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	private NodeApiId lastAnnounceId;
 	private SerializableEntity lastAnnounceEntity;
 
+	private boolean shouldAnnounceDelay;
+
 	private NodeCollection knownPeers = new NodeCollection();
 
 	//region TriggerAction
@@ -139,6 +141,15 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		this.knownPeers = nodes;
 	}
 
+	/**
+	 * Sets a value indicating whether or not announce should simulate a delay by sleeping for a small period of time.
+	 *
+	 * @param delay true if a delay should be set.
+	 */
+	public void setAnnounceDelay(final boolean delay) {
+		this.shouldAnnounceDelay = delay;
+	}
+
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		return null;
@@ -193,10 +204,17 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		this.numAnnounceCalls.incrementAndGet();
-		this.lastAnnounceId = announceId;
-		this.lastAnnounceEntity = entity;
+
+		return CompletableFuture.supplyAsync(() -> {
+			if (this.shouldAnnounceDelay)
+				pauseThread();
+
+			this.lastAnnounceId = announceId;
+			this.lastAnnounceEntity = entity;
+			return null;
+		});
 	}
 
 	private static boolean shouldTriggerAction(final NodeEndpoint endpoint, final String trigger) {
@@ -205,12 +223,8 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private static void triggerGeneralAction(final TriggerAction action) {
 
-		if (action == TriggerAction.SLEEP_INACTIVE) {
-			ExceptionUtils.propagate(() -> {
-				Thread.sleep(300);
-				return null;
-			});
-		}
+		if (action == TriggerAction.SLEEP_INACTIVE)
+			pauseThread();
 
 		switch (action) {
 			case SLEEP_INACTIVE:
@@ -220,5 +234,12 @@ public class MockConnector implements PeerConnector, SyncConnector {
 			case FATAL:
 				throw new FatalPeerException("fatal peer");
 		}
+	}
+
+	private static void pauseThread() {
+		ExceptionUtils.propagate(() -> {
+			Thread.sleep(3000);
+			return null;
+		});
 	}
 }

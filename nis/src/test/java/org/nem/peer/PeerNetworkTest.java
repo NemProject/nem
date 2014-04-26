@@ -7,13 +7,13 @@ import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.peer.node.*;
-import org.nem.peer.scheduling.Scheduler;
-import org.nem.peer.scheduling.SchedulerFactory;
 import org.nem.peer.test.Utils;
 import org.nem.peer.test.*;
+import org.nem.peer.trust.TrustException;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
 
@@ -91,7 +91,7 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
@@ -104,8 +104,8 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
-		network.refresh(); // transition all nodes to active
-		network.refresh();
+		network.refresh().join(); // transition all nodes to active
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(6));
@@ -119,7 +119,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.NONE);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -134,7 +134,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -149,7 +149,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -164,7 +164,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -182,7 +182,7 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(3));
@@ -196,7 +196,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
@@ -210,7 +210,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
@@ -224,7 +224,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
@@ -238,7 +238,7 @@ public class PeerNetworkTest {
 		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -253,7 +253,7 @@ public class PeerNetworkTest {
 		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.FATAL);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -276,7 +276,7 @@ public class PeerNetworkTest {
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -297,7 +297,7 @@ public class PeerNetworkTest {
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -318,7 +318,7 @@ public class PeerNetworkTest {
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
-		network.refresh();
+		network.refresh().join();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
@@ -342,7 +342,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
 		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
 
-		network.refresh();
+		network.refresh().join();
 
 		// Act:
 		final NodeExperiencePair pair = network.getPartnerNode();
@@ -362,7 +362,7 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		// Act:
-		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
+		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity()).join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumAnnounceCalls(), IsEqual.equalTo(0));
@@ -373,10 +373,10 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		network.refresh(); // transition all nodes to active
+		network.refresh().join(); // transition all nodes to active
 
 		// Act:
-		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
+		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity()).join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumAnnounceCalls(), IsEqual.equalTo(3));
@@ -388,10 +388,10 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		final SerializableEntity entity = new MockSerializableEntity();
-		network.refresh(); // transition all nodes to active
+		network.refresh().join(); // transition all nodes to active
 
 		// Act:
-		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, entity);
+		network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, entity).join();
 
 		// Assert:
 		Assert.assertThat(connector.getLastAnnounceId(), IsEqual.equalTo(NodeApiId.REST_PUSH_TRANSACTION));
@@ -402,7 +402,7 @@ public class PeerNetworkTest {
 
 	//region synchronize
 
-	@Test
+	@Test(expected = TrustException.class)
 	public void synchronizeDoesNotCallSynchronizeNodeForAnyInactiveNode() {
 		// Arrange:
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
@@ -410,23 +410,20 @@ public class PeerNetworkTest {
 
 		// Act:
 		network.synchronize();
-
-		// Assert:
-		Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void synchronizeCallsSynchronizeNodeForAllActiveNodes() {
+	public void synchronizeCallsSynchronizeNodeForSingleCommunicationPartner() {
 		// Arrange:
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
 		final PeerNetwork network = createTestNetwork(synchronizer);
-		network.refresh(); // transition all nodes to active
+		network.refresh().join(); // transition all nodes to active
 
 		// Act:
 		network.synchronize();
 
 		// Assert:
-		Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(3));
+		Assert.assertThat(synchronizer.getNumSynchronizeNodeCalls(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -434,7 +431,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
 		final PeerNetwork network = createTestNetwork(synchronizer);
-		network.refresh(); // transition all nodes to active
+		network.refresh().join(); // transition all nodes to active
 
 		// Act:
 		network.synchronize();
@@ -447,114 +444,34 @@ public class PeerNetworkTest {
 
 	//region threading
 
-	// TODO: fix this test
-//	@Test
-//	public void broadcastAndRefreshCanBeAccessedConcurrently() throws Exception {
-//
-//		class TestRunner {
-//
-//			final MockConnector connector = new MockConnector();
-//
-//			// configure a MockScheduler to be returned by the second (broadcast) createScheduler request
-//			// (the first request is for the network call that initially makes everything active)
-//			final SchedulerFactory<Node> schedulerFactory = new MockNodeSchedulerFactory(new MockScheduler(), 1);
-//			final PeerNetwork network = new PeerNetwork(
-//					createTestConfig(),
-//					new PeerNetworkServices(
-//							this.connector,
-//							Mockito.mock(SyncConnectorPool.class),
-//							this.schedulerFactory,
-//							new MockBlockSynchronizer()));
-//			final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
-//
-//			// monitor that is signaled when MockScheduler.push is entered
-//			final Object schedulerPartialIterationMonitor = new Object();
-//
-//			// monitor that is signaled when the network refresh operation is complete
-//			final Object networkRefreshCompleteMonitor = new Object();
-//
-//			public TestRunner() {
-//				// Arrange: mark all nodes as active
-//				this.network.refresh();
-//
-//				// Arrange: configure the next network call to return new nodes (so the connector needs to be updated)
-//				NodeCollection knownPeers = new NodeCollection();
-//				knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
-//				knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
-//				connector.setKnownPeers(knownPeers);
-//			}
-//
-//			public List<Throwable> getExceptions() {
-//				return this.exceptions;
-//			}
-//
-//			public void run() throws InterruptedException {
-//				// Act: trigger broadcast operation on a different thread
-//				Thread broadcastThread = startThread(() ->
-//						network.broadcast(
-//						        NodeApiId.REST_PUSH_TRANSACTION,
-//						        new MockTransaction(org.nem.core.test.Utils.generateRandomAccount())));
-//
-//				// Act: wait for the scheduler to partially iterate the collection
-//				org.nem.core.test.Utils.monitorWait(this.schedulerPartialIterationMonitor);
-//
-//				// Act: trigger refresh on a different thread
-//				Thread refreshThread = startThread(network::refresh);
-//
-//				// Act: wait for the refresh to complete
-//				refreshThread.join();
-//
-//				// Act: signal the broadcast thread and let it complete
-//				org.nem.core.test.Utils.monitorSignal(this.networkRefreshCompleteMonitor);
-//				broadcastThread.join();
-//			}
-//
-//			Thread startThread(final Runnable runnable) {
-//				Thread t = new Thread(runnable);
-//				t.setUncaughtExceptionHandler(new UncaughtExceptionHandler());
-//				t.start();
-//				return t;
-//			}
-//
-//			class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-//				@Override
-//				public void uncaughtException(Thread t, Throwable e) {
-//					exceptions.add(e);
-//				}
-//			}
-//
-//			class MockScheduler implements Scheduler<Node> {
-//				@Override
-//				public void push(final Collection<Node> elements) {
-//					// Act: Perform a partial iteration and move to the first element
-//					final Iterator<Node> it = elements.iterator();
-//					it.next();
-//
-//					// Arrange: unblock the main thread since the mock scheduler has been created and used
-//					org.nem.core.test.Utils.monitorSignal(schedulerPartialIterationMonitor);
-//
-//					// Act:
-//					org.nem.core.test.Utils.monitorWait(networkRefreshCompleteMonitor);
-//
-//					// Act: move to the next element
-//					it.next();
-//				}
-//
-//				@Override
-//				public void block() {
-//				}
-//			}
-//		}
-//
-//		// Arrange:
-//		final TestRunner runner = new TestRunner();
-//
-//		// Act:
-//		runner.run();
-//
-//		// Assert:
-//		Assert.assertThat(0, IsEqual.equalTo(runner.getExceptions().size()));
-//	}
+	@Test
+	public void refreshIsAsync() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
+
+		// Act:
+		final CompletableFuture future = network.refresh();
+
+		// Assert:
+		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void broadcastIsAsync() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		connector.setAnnounceDelay(true);
+		final PeerNetwork network = createTestNetwork(connector);
+		network.refresh().join(); // transition all nodes to active
+
+		// Act:
+		final CompletableFuture future = network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, new MockSerializableEntity());
+
+		// Assert:
+		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+	}
 
 	//endregion
 

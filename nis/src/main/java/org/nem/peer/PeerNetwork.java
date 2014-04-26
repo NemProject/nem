@@ -2,9 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.node.*;
-import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
@@ -24,7 +22,6 @@ public class PeerNetwork {
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
-	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
 	private final NodeExperiences nodeExperiences;
@@ -45,7 +42,6 @@ public class PeerNetwork {
 		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
 		this.syncConnectorPool = services.getSyncConnectorPool();
-		this.schedulerFactory = services.getSchedulerFactory();
 		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
 
@@ -138,15 +134,13 @@ public class PeerNetwork {
 	/**
 	 * Refreshes the network.
 	 */
-	public void refresh() {
+	public CompletableFuture refresh() {
 		final NodeRefresher refresher = new NodeRefresher(
 				this.getLocalNode(),
 				this.getNodes(),
-				this.peerConnector,
-				this.schedulerFactory);
+				this.peerConnector);
 
-		// TODO: this should not block
-		refresher.refresh().join();
+		return refresher.refresh();
 	}
 
 	/**
@@ -155,36 +149,31 @@ public class PeerNetwork {
 	 * @param broadcastId The type of entity.
 	 * @param entity      The entity.
 	 */
-	public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-		this.forAllActiveNodes(element -> peerConnector.announce(element.getEndpoint(), broadcastId, entity));
+	public CompletableFuture broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
+				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
+				.collect(Collectors.toList());
+
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 	}
 
 	public void synchronize() {
-		this.forAllActiveNodes(element -> blockSynchronizer.synchronizeNode(syncConnectorPool, element));
-	}
-
-	private void forAllActiveNodes(final Action<Node> action) {
-		final Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(action);
-		scheduler.push(this.nodes.getActiveNodes());
-		scheduler.block();
+		this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, this.getPartnerNode().getNode());
 	}
 
 	private static class NodeRefresher {
 		final Node localNode;
 		final NodeCollection nodes;
 		final PeerConnector connector;
-		final SchedulerFactory<Node> schedulerFactory;
 		final Map<Node, NodeStatus> nodesToUpdate;
 
 		public NodeRefresher(
 				final Node localNode,
 				final NodeCollection nodes,
-				final PeerConnector connector,
-				final SchedulerFactory<Node> schedulerFactory) {
+				final PeerConnector connector) {
 			this.localNode = localNode;
 			this.nodes = nodes;
 			this.connector = connector;
-			this.schedulerFactory = schedulerFactory;
 			this.nodesToUpdate = new ConcurrentHashMap<>();
 		}
 
@@ -193,12 +182,11 @@ public class PeerNetwork {
 					.map(this::refreshNodeAsync)
 					.collect(Collectors.toList());
 
-
             return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
                     .whenComplete((o, e) -> {
-                        for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
-                            this.nodes.update(entry.getKey(), entry.getValue());
-                    });
+						for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+							this.nodes.update(entry.getKey(), entry.getValue());
+					});
 		}
 
 		private CompletableFuture refreshNodeAsync(final Node node) {
