@@ -27,7 +27,7 @@ public class HistoricalBalances {
 	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
-	
+		
 	/**
 	 * Gets the size of the list
 	 * 
@@ -35,6 +35,24 @@ public class HistoricalBalances {
 	 */
 	public int size() {
 		return balances.size();
+	}
+
+	/**
+	 * Makes a copy of this object
+	 * 
+	 * @return the copy
+	 */
+	public HistoricalBalances copy() {
+		HistoricalBalances historicalBalances = new HistoricalBalances();
+		historicalBalances.setblockChain(blockChain);
+		if (size() > 0) {
+			trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+			for (int i=0; i<size(); i++) {
+				historicalBalances.balances.add(i, new HistoricalBalance(balances.get(i).getHeight(), balances.get(i).getBalance()));
+			}
+		}
+		
+		return historicalBalances;
 	}
 
 	/**
@@ -71,6 +89,17 @@ public class HistoricalBalances {
 		}
 		HistoricalBalance balance = balances.get(index);
 		return new HistoricalBalance(balance.getHeight().getRaw(), balance.getBalance().getNumMicroNem());
+	}
+	
+	/**
+	 * Gets the amount at a given block height
+	 * 
+	 * @param height the height at which to retrieve the balance
+	 * 
+	 * @return the amount
+	 */
+	public Amount getBalance(final BlockHeight height) {
+		return getHistoricalBalance(height).getBalance();
 	}
 	
 	/**

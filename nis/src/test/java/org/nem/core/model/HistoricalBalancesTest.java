@@ -10,6 +10,35 @@ import static org.mockito.Mockito.when;
 
 public class HistoricalBalancesTest {
 
+	//region Copy
+	@Test
+	public void historicalBalanceCanBeCopied() {
+		// Arrange:
+		BlockChain blockChain = new MockBlockChain();
+		blockChain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances();
+		balances.setblockChain(blockChain);
+		
+		// Act:
+		balances.add(new BlockHeight(10L), new Amount(1L));
+		balances.add(new BlockHeight(20L), new Amount(2L));
+		balances.add(new BlockHeight(25L), new Amount(4L));
+		balances.add(new BlockHeight(30L), new Amount(8L));
+		HistoricalBalances balances2 = balances.copy();
+
+		// Assert:
+		Assert.assertThat(balances2.getBalance(new BlockHeight(31L)).getNumMicroNem(), IsEqual.equalTo(15L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(30L)).getNumMicroNem(), IsEqual.equalTo(15L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(29L)).getNumMicroNem(), IsEqual.equalTo(7L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(25L)).getNumMicroNem(), IsEqual.equalTo(7L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(24L)).getNumMicroNem(), IsEqual.equalTo(3L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(20L)).getNumMicroNem(), IsEqual.equalTo(3L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(19L)).getNumMicroNem(), IsEqual.equalTo(1L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(1L));
+		Assert.assertThat(balances2.getBalance(new BlockHeight(9L)).getNumMicroNem(), IsEqual.equalTo(0L));
+	}
+	//rendregion
+	
 	//region Retrieval
 	@Test
 	public void historicalBalanceCanBeRetrieved() {
@@ -33,6 +62,32 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(10L)).getBalance().getNumMicroNem(), IsEqual.equalTo(1L));
 		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(9L)).getBalance().getNumMicroNem(), IsEqual.equalTo(0L));
 	}
+
+	@Test
+	public void balanceCanBeRetrieved() {
+		// Arrange:
+		BlockChain blockChain = new MockBlockChain();
+		blockChain.getLastDbBlock().setHeight(40L);
+		final HistoricalBalances balances = new HistoricalBalances();
+		balances.setblockChain(blockChain);
+		
+		// Act:
+		balances.add(new BlockHeight(10L), new Amount(1L));
+		balances.add(new BlockHeight(20L), new Amount(2L));
+		balances.add(new BlockHeight(25L), new Amount(4L));
+		balances.add(new BlockHeight(30L), new Amount(8L));
+
+		// Assert:
+		Assert.assertThat(balances.getBalance(new BlockHeight(31L)).getNumMicroNem(), IsEqual.equalTo(15L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(30L)).getNumMicroNem(), IsEqual.equalTo(15L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(29L)).getNumMicroNem(), IsEqual.equalTo(7L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(25L)).getNumMicroNem(), IsEqual.equalTo(7L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(24L)).getNumMicroNem(), IsEqual.equalTo(3L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(20L)).getNumMicroNem(), IsEqual.equalTo(3L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(19L)).getNumMicroNem(), IsEqual.equalTo(1L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(1L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(9L)).getNumMicroNem(), IsEqual.equalTo(0L));
+	}
 	//endregion
 
 
@@ -51,11 +106,11 @@ public class HistoricalBalancesTest {
 		balances.add(new BlockHeight(30L), new Amount(400L));
 
 		// Assert:
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(31L)).getBalance().getNumMicroNem(), IsEqual.equalTo(707L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(30L)).getBalance().getNumMicroNem(), IsEqual.equalTo(707L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(20L)).getBalance().getNumMicroNem(), IsEqual.equalTo(303L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(10L)).getBalance().getNumMicroNem(), IsEqual.equalTo(101L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(5L)).getBalance().getNumMicroNem(), IsEqual.equalTo(0L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(31L)).getNumMicroNem(), IsEqual.equalTo(707L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(30L)).getNumMicroNem(), IsEqual.equalTo(707L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(20L)).getNumMicroNem(), IsEqual.equalTo(303L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(101L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(5L)).getNumMicroNem(), IsEqual.equalTo(0L));
 	
 	}
 
@@ -73,11 +128,11 @@ public class HistoricalBalancesTest {
 		balances.subtract(new BlockHeight(30L), new Amount(4L));
 
 		// Assert:
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(31L)).getBalance().getNumMicroNem(), IsEqual.equalTo(700L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(30L)).getBalance().getNumMicroNem(), IsEqual.equalTo(700L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(20L)).getBalance().getNumMicroNem(), IsEqual.equalTo(300L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(10L)).getBalance().getNumMicroNem(), IsEqual.equalTo(100L));
-		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(5L)).getBalance().getNumMicroNem(), IsEqual.equalTo(0L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(31L)).getNumMicroNem(), IsEqual.equalTo(700L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(30L)).getNumMicroNem(), IsEqual.equalTo(700L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(20L)).getNumMicroNem(), IsEqual.equalTo(300L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(100L));
+		Assert.assertThat(balances.getBalance(new BlockHeight(5L)).getNumMicroNem(), IsEqual.equalTo(0L));
 	
 	}
 
