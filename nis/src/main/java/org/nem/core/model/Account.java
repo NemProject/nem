@@ -21,6 +21,7 @@ public class Account implements SerializableEntity {
 	private LinkedList<AccountLink> outlinks;
 
 	private BlockAmount foragedBlocks;
+	private HistoricalBalances historicalBalances;
 
 	/**
 	 * Creates an account around a key pair.
@@ -52,6 +53,7 @@ public class Account implements SerializableEntity {
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
+		this.historicalBalances = new HistoricalBalances();
 	}
 
 	@Override
@@ -231,8 +233,35 @@ public class Account implements SerializableEntity {
 		this.outlinks = outlinks;
 	}
 	
+	/**
+	 * Gets the historical balance at a given height.
+	 *
+	 * @return The historical balance.
+	 */
+	public Amount getBalance(final BlockHeight height) {
+		return historicalBalances.getBalance(height);
+	}
 	
-
+	/**
+	 * Adds a given amount to the historical balances at a given height.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount to add
+	 */
+	public void addBalance(final BlockHeight height, final Amount amount) {
+		historicalBalances.add(height, amount);
+	}
+	
+	/**
+	 * Subtracts a given amount from the historical balances at a given height.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount to add
+	 */
+	public void subtractBalance(final BlockHeight height, final Amount amount) {
+		historicalBalances.subtract(height, amount);
+	}
+	
 	@Override
 	public int hashCode() {
 		return this.address.hashCode();
@@ -338,6 +367,7 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
+		//copy.historicalBalances = this.historicalBalances.copy();
 		return copy;
 	}
 }

@@ -188,10 +188,16 @@ public class Block extends VerifiableEntity {
 	public void execute() {
 		for (final Transaction transaction : this.transactions) {
 			transaction.execute();
+			if (transaction.getType() == TransactionTypes.TRANSFER) {
+				TransferTransaction tx = (TransferTransaction)transaction;
+				tx.getSigner().subtractBalance(this.height, tx.getAmount().add(tx.getFee()));
+				tx.getRecipient().addBalance(this.height, tx.getAmount());
+			}
 		}
 
 		this.getSigner().incrementForagedBlocks();
 		this.getSigner().incrementBalance(this.getTotalFee());
+		this.getSigner().addBalance(this.height, this.getTotalFee());
 	}
 
 	/**
@@ -200,9 +206,15 @@ public class Block extends VerifiableEntity {
 	public void undo() {
 		this.getSigner().decrementForagedBlocks();
 		this.getSigner().decrementBalance(this.getTotalFee());
+		this.getSigner().subtractBalance(this.height, this.getTotalFee());
 
 		for (final Transaction transaction : this.getReverseTransactions()) {
 			transaction.undo();
+			if (transaction.getType() == TransactionTypes.TRANSFER) {
+				TransferTransaction tx = (TransferTransaction)transaction;
+				tx.getSigner().addBalance(this.height, tx.getAmount().add(tx.getFee()));
+				tx.getRecipient().subtractBalance(this.height, tx.getAmount());
+			}
 		}
 	}
 

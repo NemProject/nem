@@ -20,13 +20,13 @@ public class HistoricalBalances {
 	/**
 	 * The block chain
 	 */
-	private BlockChain blockchain;
+	@Autowired
+	private BlockChain blockChain;
 
-	@Autowired(required = true)
-	HistoricalBalances(final BlockChain blockchain) {
-		this.blockchain = blockchain;
+	public void setblockChain(BlockChain blockChain) {
+		this.blockChain = blockChain;
 	}
-	
+		
 	/**
 	 * Gets the size of the list
 	 * 
@@ -37,6 +37,24 @@ public class HistoricalBalances {
 	}
 
 	/**
+	 * Makes a copy of this object
+	 * 
+	 * @return the copy
+	 */
+	public HistoricalBalances copy() {
+		HistoricalBalances historicalBalances = new HistoricalBalances();
+		historicalBalances.setblockChain(blockChain);
+		if (size() > 0) {
+			trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+			for (int i=0; i<size(); i++) {
+				historicalBalances.balances.add(i, new HistoricalBalance(balances.get(i).getHeight(), balances.get(i).getBalance()));
+			}
+		}
+		
+		return historicalBalances;
+	}
+
+	/**
 	 * Gets the historical balance at a given block height
 	 * 
 	 * @param height the height at which to retrieve the balance
@@ -44,7 +62,7 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
-		long lastBlockHeight = blockchain.getLastDbBlock().getHeight();
+		long lastBlockHeight = blockChain.getLastDbBlock().getHeight();
 		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
 		}
@@ -73,6 +91,17 @@ public class HistoricalBalances {
 	}
 	
 	/**
+	 * Gets the amount at a given block height
+	 * 
+	 * @param height the height at which to retrieve the balance
+	 * 
+	 * @return the amount
+	 */
+	public Amount getBalance(final BlockHeight height) {
+		return getHistoricalBalance(height).getBalance();
+	}
+	
+	/**
 	 * Add an amount at a given block height.
 	 * Add the amount to all historical balances with bigger height.
 	 * 
@@ -96,7 +125,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -123,7 +152,7 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
 	}
 	
 	/**
