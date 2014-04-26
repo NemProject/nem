@@ -232,6 +232,20 @@ public class NodeCollectionTest {
 
 	//endregion
 
+	//region collections
+
+	@Test
+	public void nodeCollectionsContainAllExpectedNodes() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+		// Assert:
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "B", "C", "D", "F" });
+	}
+
+	//endregion
+
 	private static Node createNode(final String platform) {
 		// Arrange:
 		return createNode(platform, platform.charAt(0));

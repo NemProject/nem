@@ -87,6 +87,19 @@ public class NodeCollectionAssert {
 		Assert.assertThat(getPlatforms(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
 	}
 
+	/**
+	 * Asserts that nodes have matching active and inactive platforms.
+	 *
+	 * @param nodes             The nodes.
+	 * @param expectedPlatforms The expected platforms (both active and inactive).
+	 */
+	public static void arePlatformsEquivalent(
+			final NodeCollection nodes,
+			final String[] expectedPlatforms) {
+		// Assert:
+		Assert.assertThat(getPlatforms(nodes.getAllNodes()), IsEquivalent.equivalentTo(expectedPlatforms));
+	}
+
 	private static List<String> getPlatforms(final Collection<Node> nodes) {
 		return nodes.stream().map(Node::getPlatform).collect(Collectors.toList());
 	}
