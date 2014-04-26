@@ -31,27 +31,23 @@ public class NisAppConfig {
 
 	@Bean
 	public DataSource dataSource() throws IOException {
-		Properties prop = new Properties();
+		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(
-				prop.getProperty("jdbc.driverClassName"));
-		dataSource.setUrl(
-				prop.getProperty("jdbc.url"));
-		dataSource.setUsername(
-				prop.getProperty("jdbc.username"));
-		dataSource.setPassword(
-				prop.getProperty("jdbc.password"));
+		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
+		dataSource.setUrl(prop.getProperty("jdbc.url"));
+		dataSource.setUsername(prop.getProperty("jdbc.username"));
+		dataSource.setPassword(prop.getProperty("jdbc.password"));
 		return dataSource;
 	}
 
 	@Bean(initMethod = "migrate")
 	public Flyway flyway() throws IOException {
-		Properties prop = new Properties();
+		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		Flyway flyway = new Flyway();
+		final Flyway flyway = new Flyway();
 		flyway.setDataSource(this.dataSource());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
 		return flyway;
@@ -60,7 +56,7 @@ public class NisAppConfig {
 	@Bean
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
-		LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
+		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
@@ -99,7 +95,7 @@ public class NisAppConfig {
 
 	@Bean
 	public RequiredBlockDaoAdapter requiredBlockDaoAdapter() {
-		return new RequiredBlockDaoAdapter(blockDao);
+		return new RequiredBlockDaoAdapter(this.blockDao);
 	}
 
 	@Bean

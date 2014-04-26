@@ -214,7 +214,6 @@ public class BlockChain implements BlockSynchronizer {
 
 
 	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
-		//region update our chain
 		synchronized (this) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
@@ -226,13 +225,7 @@ public class BlockChain implements BlockSynchronizer {
 			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
-		for (Block peerBlock : peerChain) {
-			if (addBlockToDb(peerBlock)) {
-				foraging.removeFromUnconfirmedTransactions(peerBlock);
-			}
-		}
-		//endregion
-
+		peerChain.stream().filter(this::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
