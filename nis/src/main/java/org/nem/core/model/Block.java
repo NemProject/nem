@@ -191,14 +191,14 @@ public class Block extends VerifiableEntity {
 			transaction.execute();
 			if (transaction.getType() == TransactionTypes.TRANSFER) {
 				TransferTransaction tx = (TransferTransaction)transaction;
-				tx.getSigner().subtractBalance(this.height, tx.getAmount().add(tx.getFee()));
-				tx.getRecipient().addBalance(this.height, tx.getAmount());
+				tx.getSigner().subtractHistoricalBalance(this.height, tx.getAmount().add(tx.getFee()));
+				tx.getRecipient().addHistoricalBalance(this.height, tx.getAmount());
 			}
 		}
 
 		this.getSigner().incrementForagedBlocks();
 		this.getSigner().incrementBalance(this.getTotalFee());
-		this.getSigner().addBalance(this.height, this.getTotalFee());
+		this.getSigner().addHistoricalBalance(this.height, this.getTotalFee());
 	}
 
 	/**
@@ -207,14 +207,14 @@ public class Block extends VerifiableEntity {
 	public void undo() {
 		this.getSigner().decrementForagedBlocks();
 		this.getSigner().decrementBalance(this.getTotalFee());
-		this.getSigner().subtractBalance(this.height, this.getTotalFee());
+		this.getSigner().subtractHistoricalBalance(this.height, this.getTotalFee());
 
 		for (final Transaction transaction : this.getReverseTransactions()) {
 			transaction.undo();
 			if (transaction.getType() == TransactionTypes.TRANSFER) {
 				TransferTransaction tx = (TransferTransaction)transaction;
-				tx.getSigner().addBalance(this.height, tx.getAmount().add(tx.getFee()));
-				tx.getRecipient().subtractBalance(this.height, tx.getAmount());
+				tx.getSigner().addHistoricalBalance(this.height, tx.getAmount().add(tx.getFee()));
+				tx.getRecipient().subtractHistoricalBalance(this.height, tx.getAmount());
 			}
 		}
 	}

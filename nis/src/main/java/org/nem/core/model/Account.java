@@ -223,7 +223,7 @@ public class Account implements SerializableEntity {
 	 * @param height The block height.
 	 * @param amount The amount to add
 	 */
-	public void addBalance(final BlockHeight height, final Amount amount) {
+	public void addHistoricalBalance(final BlockHeight height, final Amount amount) {
 		historicalBalances.add(height, amount);
 	}
 	
@@ -233,7 +233,7 @@ public class Account implements SerializableEntity {
 	 * @param height The block height.
 	 * @param amount The amount to add
 	 */
-	public void subtractBalance(final BlockHeight height, final Amount amount) {
+	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
 		historicalBalances.subtract(height, amount);
 	}
 	
