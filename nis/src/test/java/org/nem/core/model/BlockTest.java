@@ -156,6 +156,21 @@ public class BlockTest {
 	}
 
 	@Test
+	public void changingPreviousBlockHashInvalidatesBlock() {
+		// Arrange:
+		final Block block = createBlockForRoundTripTests(true, null);
+
+		// Act
+		boolean result = block.verify();
+		block.setPreviousBlockHash(Hash.ZERO);
+
+		// Assert:
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(block.verify(), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void blockAndTransactionsCanBeVerifiedAfterVerifiableRoundTrip() {
 		// Act:
 		final Block block = createBlockForRoundTripTests(true, null);

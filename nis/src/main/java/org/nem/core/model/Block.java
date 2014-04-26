@@ -17,8 +17,8 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
-	private final Hash prevBlockHash;
 	private final BlockHeight height;
+	private Hash prevBlockHash;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
@@ -133,6 +133,15 @@ public class Block extends VerifiableEntity {
 	//endregion
 
 	//region Setters
+
+	/**
+	 * Sets the hash of the previous block.
+	 *
+	 * @param hash The hash of the previous block.
+	 */
+	public void setPreviousBlockHash(Hash hash) {
+		this.prevBlockHash = hash;
+	}
 
 	/**
 	 * Sets the generation hash.
