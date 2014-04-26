@@ -3,6 +3,8 @@ package org.nem.core.connect;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.node.*;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * A interface that is used to request information from nodes.
  */
@@ -15,7 +17,7 @@ public interface PeerConnector {
 	 *
 	 * @return Information about the specified node.
 	 */
-	public Node getInfo(final NodeEndpoint endpoint);
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint);
 
 	/**
 	 * Requests information about all known peers from the specified node.
@@ -24,7 +26,7 @@ public interface PeerConnector {
 	 *
 	 * @return A collection of all known peers.
 	 */
-	public NodeCollection getKnownPeers(final NodeEndpoint endpoint);
+	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint);
 
 	/**
 	 * Announces a new entity to the target node.

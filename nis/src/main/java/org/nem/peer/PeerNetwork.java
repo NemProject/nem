@@ -2,17 +2,23 @@ package org.nem.peer;
 
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.node.*;
 import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Represents a collection of all known NEM nodes.
  */
 public class PeerNetwork {
+
+	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private final Config config;
 	private NodeCollection nodes;
@@ -138,7 +144,9 @@ public class PeerNetwork {
 				this.getNodes(),
 				this.peerConnector,
 				this.schedulerFactory);
-		refresher.refresh();
+
+		// TODO: this should not block
+		refresher.refresh().join();
 	}
 
 	/**
@@ -177,40 +185,44 @@ public class PeerNetwork {
 			this.nodes = nodes;
 			this.connector = connector;
 			this.schedulerFactory = schedulerFactory;
-			this.nodesToUpdate = new HashMap<>();
+			this.nodesToUpdate = new ConcurrentHashMap<>();
 		}
 
-		public void refresh() {
-			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(this::refreshNode);
+		public CompletableFuture refresh() {
+			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream()
+					.map(this::refreshNodeAsync)
+					.collect(Collectors.toList());
 
-			scheduler.push(this.nodes.getActiveNodes());
-			scheduler.push(this.nodes.getInactiveNodes());
-			scheduler.block();
 
-			for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
-				this.nodes.update(entry.getKey(), entry.getValue());
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+                    .whenComplete((o, e) -> {
+                        for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+                            this.nodes.update(entry.getKey(), entry.getValue());
+                    });
 		}
 
-		private void refreshNode(final Node node) {
-			Node refreshedNode = node;
-			NodeStatus updatedStatus = NodeStatus.ACTIVE;
-			try {
-				refreshedNode = this.connector.getInfo(node.getEndpoint());
+		private CompletableFuture refreshNodeAsync(final Node node) {
 
-				// if the node returned inconsistent information, drop it for this round
-				if (!areCompatible(node, refreshedNode)) {
-					updatedStatus = NodeStatus.FAILURE;
-					refreshedNode = node;
-				} else {
-					this.mergePeers(this.connector.getKnownPeers(node.getEndpoint()));
-				}
-			} catch (InactivePeerException e) {
-				updatedStatus = NodeStatus.INACTIVE;
-			} catch (FatalPeerException e) {
-				updatedStatus = NodeStatus.FAILURE;
-			}
+			return this.connector.getInfo(node.getEndpoint())
+					.thenApply(n -> {
+						// if the node returned inconsistent information, drop it for this round
+						if (!areCompatible(node, n))
+							throw new FatalPeerException("node response is not compatible with node identity");
 
-			this.update(refreshedNode, updatedStatus);
+						return NodeStatus.ACTIVE;
+					})
+					.thenCompose(ns -> this.connector.getKnownPeers(node.getEndpoint()))
+					.thenApply(nodes -> {
+						this.mergePeers(nodes);
+						return NodeStatus.ACTIVE;
+					})
+					.exceptionally(this::getNodeStatusFromException)
+					.thenAccept(ns -> this.update(node, ns));
+		}
+
+		private NodeStatus getNodeStatusFromException(Throwable ex) {
+			ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
+			return InactivePeerException.class == ex.getClass() ? NodeStatus.INACTIVE : NodeStatus.FAILURE;
 		}
 
 		private static boolean areCompatible(final Node lhs, final Node rhs) {
@@ -221,6 +233,7 @@ public class PeerNetwork {
 			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
+			LOGGER.info("Updating \"" + node + "\" -> " + status);
 			this.nodesToUpdate.put(node, status);
 		}
 
@@ -233,6 +246,7 @@ public class PeerNetwork {
 			for (final Node node : iterable) {
 				// nodes directly communicated with are already in this.nodes
 				// give their direct connection precedence over what peers report
+				LOGGER.fine("Merging Peer \"" + node + "\" -> " + status);
 				if (NodeStatus.FAILURE != this.nodes.getNodeStatus(node))
 					continue;
 

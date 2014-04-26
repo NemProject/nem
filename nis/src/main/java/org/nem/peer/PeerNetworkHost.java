@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  */
 public class PeerNetworkHost implements AutoCloseable {
 
-	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(PeerNetworkHost.class.getName());
 
 	private final PeerNetwork network;
 	private final ScheduledThreadPoolExecutor peerListRefresherExecutor;
