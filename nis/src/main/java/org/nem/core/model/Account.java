@@ -16,9 +16,10 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	
-	private LinkedList<AccountLink> inlinks;
+	private List<AccountLink> inlinks;
+	private List<AccountLink> outlinks;
 	
-	private LinkedList<AccountLink> outlinks;
+//	private List<CoinDay> coindayWeights;
 
 	private BlockAmount foragedBlocks;
 	private HistoricalBalances historicalBalances;
@@ -198,14 +199,14 @@ public class Account implements SerializableEntity {
 	/**
 	 * @return the inlinks
 	 */
-	public LinkedList<AccountLink> getInlinks() {
+	public List<AccountLink> getInlinks() {
 		return inlinks;
 	}
 
 	/**
 	 * @param inLinks the inLinks to set
 	 */
-	public void setInlinks(LinkedList<AccountLink> inlinks) {
+	public void setInlinks(List<AccountLink> inlinks) {
 		this.inlinks = inlinks;
 	}
 	
@@ -222,14 +223,14 @@ public class Account implements SerializableEntity {
 	/**
 	 * @return the outlinks
 	 */
-	public LinkedList<AccountLink> getOutlinks() {
+	public List<AccountLink> getOutlinks() {
 		return outlinks;
 	}
 
 	/**
 	 * @param outlinks the outlinks to set
 	 */
-	public void setOutlinks(LinkedList<AccountLink> outlinks) {
+	public void setOutlinks(List<AccountLink> outlinks) {
 		this.outlinks = outlinks;
 	}
 	
