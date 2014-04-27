@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 public class AsyncTimerTest {
 
 	private static int TimeUnit = 25;
-	private static int TimeHalfUnit = 25;
+	private static int TimeHalfUnit = TimeUnit / 2;
 
 	//region get/setName
 
@@ -108,7 +108,7 @@ public class AsyncTimerTest {
 
 			// Act: signal the monitor (one thread should be unblocked)
 			Utils.monitorSignal(refreshMonitor);
-			Thread.sleep(10 * TimeUnit);
+			Thread.sleep(TimeHalfUnit);
 
 			// Assert:
 			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(1));
@@ -149,7 +149,7 @@ public class AsyncTimerTest {
 		private final Runnable runnable;
 
 		public CountableFuture() {
-			this.runnable = () -> ++this.numCalls;
+			this.runnable = () -> { };
 		}
 
 		public CountableFuture(final Runnable runnable) {
@@ -161,7 +161,8 @@ public class AsyncTimerTest {
 		}
 
 		private CompletableFuture<Void> getFuture() {
-			return CompletableFuture.runAsync(this.runnable);
+			return CompletableFuture.runAsync(this.runnable)
+					.thenCompose(v -> CompletableFuture.runAsync(() -> ++this.numCalls));
 		}
 
 		public int getNumCalls() { return this.numCalls; }
