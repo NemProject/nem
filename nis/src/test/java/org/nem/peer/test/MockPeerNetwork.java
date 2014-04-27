@@ -8,6 +8,8 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * A mock PeerNetwork implementation.
  */
@@ -93,18 +95,20 @@ public class MockPeerNetwork extends PeerNetwork {
 	}
 
 	@Override
-	public void refresh() {
+	public CompletableFuture<Void> refresh() {
 		if (null != this.refreshMonitor)
 			org.nem.core.test.Utils.monitorWait(this.refreshMonitor);
 
 		++this.numRefreshCalls;
+		return new CompletableFuture<>();
 	}
 
 	@Override
-	public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		++this.numBroadcastCalls;
 		this.lastBroadcastId = broadcastId;
 		this.lastBroadcastEntity = entity;
+		return new CompletableFuture<>();
 	}
 
 	@Override
@@ -116,7 +120,6 @@ public class MockPeerNetwork extends PeerNetwork {
 		return new PeerNetworkServices(
 				new MockConnector(),
 				Mockito.mock(SyncConnectorPool.class),
-				new MockNodeSchedulerFactory(),
 				new MockBlockSynchronizer());
 	}
 }

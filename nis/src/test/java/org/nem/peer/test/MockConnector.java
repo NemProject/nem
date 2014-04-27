@@ -3,19 +3,22 @@ package org.nem.peer.test;
 import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.node.*;
 
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A mock PeerConnector and SyncConnector implementation.
  */
 public class MockConnector implements PeerConnector, SyncConnector {
 
-	private int numGetInfoCalls;
-	private int numGetKnownPeerCalls;
-	private int numAnnounceCalls;
+	private AtomicInteger numGetInfoCalls = new AtomicInteger();
+	private AtomicInteger numGetKnownPeerCalls = new AtomicInteger();
+	private AtomicInteger numAnnounceCalls = new AtomicInteger();
 
 	private Map<String, TriggerAction> getInfoTriggers = new HashMap<>();
 
@@ -24,6 +27,8 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private NodeApiId lastAnnounceId;
 	private SerializableEntity lastAnnounceEntity;
+
+	private boolean shouldAnnounceDelay;
 
 	private NodeCollection knownPeers = new NodeCollection();
 
@@ -51,7 +56,12 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		/*
 		 * Returns a node with a different address.
 		 */
-		CHANGE_ADDRESS
+		CHANGE_ADDRESS,
+
+		/**
+		 * Sleeps the thread for a small period of time and then throws an InactivePeerException.
+		 */
+		SLEEP_INACTIVE
 	}
 
 	//endregion
@@ -62,7 +72,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	 * @return The number of times getInfo was called.
 	 */
 	public int getNumGetInfoCalls() {
-		return this.numGetInfoCalls;
+		return this.numGetInfoCalls.get();
 	}
 
 	/**
@@ -71,7 +81,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	 * @return The number of times getKnownPeers was called.
 	 */
 	public int getNumGetKnownPeerCalls() {
-		return this.numGetKnownPeerCalls;
+		return this.numGetKnownPeerCalls.get();
 	}
 
 	/**
@@ -80,7 +90,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	 * @return The number of times announce was called.
 	 */
 	public int getNumAnnounceCalls() {
-		return this.numAnnounceCalls;
+		return this.numAnnounceCalls.get();
 	}
 
 	/**
@@ -131,6 +141,15 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		this.knownPeers = nodes;
 	}
 
+	/**
+	 * Sets a value indicating whether or not announce should simulate a delay by sleeping for a small period of time.
+	 *
+	 * @param delay true if a delay should be set.
+	 */
+	public void setAnnounceDelay(final boolean delay) {
+		this.shouldAnnounceDelay = delay;
+	}
+
 	@Override
 	public Block getLastBlock(final NodeEndpoint endpoint) {
 		return null;
@@ -152,38 +171,50 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public Node getInfo(NodeEndpoint endpoint) {
-		++this.numGetInfoCalls;
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
+		this.numGetInfoCalls.incrementAndGet();
 
-		final TriggerAction action = this.getInfoTriggers.get(endpoint.getBaseUrl().getHost());
-		if (null != action) {
-			triggerGeneralAction(action);
-			switch (action) {
-				case CHANGE_ADDRESS:
-					URL url = endpoint.getBaseUrl();
-					endpoint = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() + 1);
-					break;
+		return CompletableFuture.supplyAsync(() -> {
+			NodeEndpoint endpointAfterChange = endpoint;
+			final TriggerAction action = this.getInfoTriggers.get(endpoint.getBaseUrl().getHost());
+			if (null != action) {
+				triggerGeneralAction(action);
+				switch (action) {
+					case CHANGE_ADDRESS:
+						URL url = endpoint.getBaseUrl();
+						endpointAfterChange = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() + 1);
+						break;
+				}
 			}
-		}
 
-		return new Node(endpoint, "P", "A");
+			return new Node(endpointAfterChange, "P", "A");
+		});
 	}
 
 	@Override
-	public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
-		++this.numGetKnownPeerCalls;
+	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
+		this.numGetKnownPeerCalls.incrementAndGet();
 
-		if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
-			triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
+		return CompletableFuture.supplyAsync(() -> {
+			if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
+				triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
 
-		return this.knownPeers;
+			return this.knownPeers;
+		});
 	}
 
 	@Override
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
-		++this.numAnnounceCalls;
-		this.lastAnnounceId = announceId;
-		this.lastAnnounceEntity = entity;
+	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+		this.numAnnounceCalls.incrementAndGet();
+
+		return CompletableFuture.supplyAsync(() -> {
+			if (this.shouldAnnounceDelay)
+				pauseThread();
+
+			this.lastAnnounceId = announceId;
+			this.lastAnnounceEntity = entity;
+			return null;
+		});
 	}
 
 	private static boolean shouldTriggerAction(final NodeEndpoint endpoint, final String trigger) {
@@ -191,12 +222,24 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	private static void triggerGeneralAction(final TriggerAction action) {
+
+		if (action == TriggerAction.SLEEP_INACTIVE)
+			pauseThread();
+
 		switch (action) {
+			case SLEEP_INACTIVE:
 			case INACTIVE:
 				throw new InactivePeerException("inactive peer");
 
 			case FATAL:
 				throw new FatalPeerException("fatal peer");
 		}
+	}
+
+	private static void pauseThread() {
+		ExceptionUtils.propagate(() -> {
+			Thread.sleep(300);
+			return null;
+		});
 	}
 }

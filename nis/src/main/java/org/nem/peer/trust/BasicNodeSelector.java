@@ -10,36 +10,36 @@ import org.nem.peer.trust.score.NodeExperiencePair;
  */
 public class BasicNodeSelector implements NodeSelector {
 
-	private final TrustProvider trustProvider;
+	private final TrustContext context;
+	private final ColumnVector trustVector;
 
 	/**
 	 * Creates a new basic node selector.
 	 *
-	 * @param trustProvider The trust provider.
+	 * @param trustProvider The trust context.
 	 */
-	public BasicNodeSelector(final TrustProvider trustProvider) {
-		this.trustProvider = trustProvider;
+	public BasicNodeSelector(final TrustProvider trustProvider, final TrustContext context) {
+		this.context = context;
+		this.trustVector = trustProvider.computeTrust(context);
+		trustVector.normalize();
 	}
 
 	@Override
-	public NodeExperiencePair selectNode(final TrustContext context) {
-		final ColumnVector trustVector = this.trustProvider.computeTrust(context);
-		trustVector.normalize();
-
+	public NodeExperiencePair selectNode() {
 		double sum = 0;
 		double rand = Math.random();
 
-		final Node localNode = context.getLocalNode();
-		final Node[] nodes = context.getNodes();
+		final Node localNode = this.context.getLocalNode();
+		final Node[] nodes = this.context.getNodes();
 		for (int i = 0; i < nodes.length; ++i) {
-			sum += trustVector.getAt(i);
+			sum += this.trustVector.getAt(i);
 			if (sum < rand)
 				continue;
 
-			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
+			final NodeExperience experience = this.context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
 			return new NodeExperiencePair(nodes[i], experience);
 		}
 
-		throw new TrustException("No available peers found");
+		return null;
 	}
 }

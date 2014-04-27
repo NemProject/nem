@@ -2,13 +2,12 @@ package org.nem.peer.test;
 
 import net.minidev.json.*;
 import org.nem.peer.Config;
+import org.nem.peer.trust.TrustProvider;
 
 /**
  * Static class containing utility functions for creating Config objects.
  */
 public class ConfigFactory {
-
-	//region config
 
 	/**
 	 * Creates a JSONObject that represents an endpoint.
@@ -69,5 +68,26 @@ public class ConfigFactory {
 		return new Config(createTestJsonConfig());
 	}
 
-	//endregion
+
+	/**
+	 * Creates a Config object with the specified trust provider.
+	 *
+	 * @param trustProvider The trust provider.
+	 * @return A Config object.
+	 */
+	public static Config createConfig(final TrustProvider trustProvider) {
+
+		class MockConfig extends Config {
+			public MockConfig() {
+				super(createTestJsonConfig());
+			}
+
+			@Override
+			public TrustProvider getTrustProvider() {
+				return trustProvider;
+			}
+		}
+
+		return new MockConfig();
+	}
 }

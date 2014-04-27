@@ -208,9 +208,10 @@ public class NetworkSimulator {
 		final NodeSelector basicNodeSelector = new BasicNodeSelector(
 				new ActiveNodeTrustProvider(
 						new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
-						nodeCollection));
+						nodeCollection),
+				trustContext);
 
-		return basicNodeSelector.selectNode(trustContext).getNode();
+		return basicNodeSelector.selectNode().getNode();
 	}
 
 	/**

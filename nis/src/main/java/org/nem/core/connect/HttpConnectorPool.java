@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
  */
 public class HttpConnectorPool implements SyncConnectorPool {
 
-	private static final int DEFAULT_TIMEOUT = 30;
+	private static final int DEFAULT_TIMEOUT = 30000;
 
 	private final HttpMethodClient<Deserializer> httpMethodClient;
 

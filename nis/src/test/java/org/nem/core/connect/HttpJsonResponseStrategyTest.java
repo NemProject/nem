@@ -32,7 +32,10 @@ public class HttpJsonResponseStrategyTest {
 		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(null);
 		final HttpResponse response = Mockito.mock(HttpResponse.class);
 		mockStatusCode(response, 200);
-		Mockito.when(response.getEntity()).thenThrow(new IOException());
+
+		final HttpEntity entity = Mockito.mock(HttpEntity.class);
+		Mockito.when(response.getEntity()).thenReturn(entity);
+		Mockito.when(entity.getContent()).thenThrow(new IOException());
 
 		// Act:
 		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
