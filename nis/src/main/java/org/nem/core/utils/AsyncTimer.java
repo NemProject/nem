@@ -3,6 +3,7 @@ package org.nem.core.utils;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -12,7 +13,7 @@ public class AsyncTimer implements Closeable {
 
 	private static final Logger LOGGER = Logger.getLogger(AsyncTimer.class.getName());
 
-	private CompletableFuture<?> recurringFuture;
+	private Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final int delay;
 
 	private int numExecutions;
@@ -24,27 +25,27 @@ public class AsyncTimer implements Closeable {
 	/**
 	 * Creates a new async timer.
 	 *
-	 * @param recurringFuture The future that should be executed on an interval.
+	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param initialDelay The time (in milliseconds) to delay the first execution.
 	 * @param delay The delay (in milliseconds) between the termination of one execution and the
 	 *              commencement of the next.
 	 */
 	public AsyncTimer(
-			final CompletableFuture<?> recurringFuture,
+			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int initialDelay,
 			final int delay) {
 
-		this.recurringFuture = recurringFuture;
+		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
 		this.future = this.refresh(initialDelay);
 	}
 
 	private AsyncTimer(
 			final CompletableFuture<?> trigger,
-			final CompletableFuture<?> recurringFuture,
+			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int delay) {
 
-		this.recurringFuture = recurringFuture;
+		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
 		this.future = trigger.thenCompose(v -> this.getNextChainLink());
 	}
@@ -53,16 +54,16 @@ public class AsyncTimer implements Closeable {
 	 * Creates a new AsyncTimer that will start executing when the specified trigger is triggered.
 	 *
 	 * @param trigger The future that will trigger the first execution when fired.
-	 * @param recurringFuture The future that should be executed on an interval.
+	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param delay The delay (in milliseconds) between the termination of one execution and the
 	 *              commencement of the next.
 	 */
 	public static AsyncTimer After(
 			final CompletableFuture<?> trigger,
-			final CompletableFuture<?> recurringFuture,
+			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int delay) {
 
-		return new AsyncTimer(trigger, recurringFuture, delay);
+		return new AsyncTimer(trigger, recurringFutureSupplier, delay);
 	}
 
 	/**
@@ -115,13 +116,13 @@ public class AsyncTimer implements Closeable {
 
 		this.log("executing");
 		++this.numExecutions;
-		return this.recurringFuture
+		return this.recurringFutureSupplier.get()
 				.thenCompose(v -> this.refresh(this.delay));
 	}
 
 	private void sleep(int milliseconds) {
 		ExceptionUtils.propagate(() -> {
-			this.log("sleeping for " + delay + "ms");
+			this.log("sleeping for " + milliseconds + "ms");
 			Thread.sleep(milliseconds);
 			return null;
 		});
