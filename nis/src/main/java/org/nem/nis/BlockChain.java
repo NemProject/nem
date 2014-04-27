@@ -210,7 +210,17 @@ public class BlockChain implements BlockSynchronizer {
 		return scoreVisitor.getScore();
 	}
 
-
+	/*
+	 * 1. execute all blocks
+	 * 2. replace current accountAnalyzer with contemporaryAccountAnalyzer
+	 * 3. add unconfirmed transactions from "our" chain TODO: this might fail:
+	 *    we could try to add to unconfirmed TX, that has been in peer's chain,
+	 *    if his balance was too low, this could throw exception...
+	 *
+	 * 4. drop "our" blocks from the db
+	 *
+	 * 5. update db with "peer's" chain
+	 */
 	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
 
 		for (final Block block : peerChain) {
