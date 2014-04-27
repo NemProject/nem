@@ -2,12 +2,9 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.utils.BlockIo;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.BlockIo;
 
-import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
 import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class BlockController {
 
-	final BlockIo blockIo;
+	private final BlockIo blockIo;
 
 	@Autowired(required = true)
 	BlockController(final BlockIo blockIo) {

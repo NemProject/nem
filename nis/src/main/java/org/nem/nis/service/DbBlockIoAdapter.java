@@ -1,10 +1,10 @@
-package org.nem.nis.controller.utils;
+package org.nem.nis.service;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
