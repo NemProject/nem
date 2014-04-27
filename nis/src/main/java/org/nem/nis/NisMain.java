@@ -81,8 +81,6 @@ public class NisMain {
 
 		this.populateDb();
 
-		this.blockChain.bootup();
-
 		this.analyzeBlocks();
 
 		this.networkHost.boot();

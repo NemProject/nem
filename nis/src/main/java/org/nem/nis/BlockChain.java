@@ -2,6 +2,8 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
@@ -28,16 +30,12 @@ public class BlockChain implements BlockSynchronizer {
 
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
 
-	@Autowired
 	private AccountDao accountDao;
 
-	@Autowired
 	private BlockDao blockDao;
 
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-	@Autowired
 	private Foraging foraging;
 
 	// for now it's easier to keep it like this
@@ -48,9 +46,18 @@ public class BlockChain implements BlockSynchronizer {
 	public BlockChain() {
 	}
 
-	public void bootup() {
-		LOGGER.info("booting up block generator");
-	}
+	@Autowired
+	public void setAccountDao(AccountDao accountDao) { this.accountDao = accountDao; }
+
+	@Autowired
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
+
+	@Autowired
+	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
+
+	@Autowired
+	public void setForaging(Foraging foraging) { this.foraging = foraging; }
+
 
 	public org.nem.nis.dbmodel.Block getLastDbBlock() {
 		return lastBlock;

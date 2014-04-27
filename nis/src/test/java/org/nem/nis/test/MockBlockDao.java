@@ -5,14 +5,16 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A mock BlockDao implementation.
  */
 public class MockBlockDao implements BlockDao {
 
-	private final Block block;
 	private final HashChain chain;
 	private int numFindByIdCalls;
 	private int numFindByHashCalls;
@@ -24,6 +26,9 @@ public class MockBlockDao implements BlockDao {
 	private BlockHeight lastFindByHeightHeight;
 	private BlockHeight lastGetHashesFromHeight;
 	private int lastGetHashesFromLimit;
+	private Long lastId;
+
+	private final ArrayList<Block> blocks;
 
 	/**
 	 * Creates a mock block dao.
@@ -41,14 +46,22 @@ public class MockBlockDao implements BlockDao {
 	 * @param chain The hash chain to return from getHashesFrom.
 	 */
 	public MockBlockDao(final Block block, final HashChain chain) {
-		this.block = block;
 		this.chain = chain;
+		this.blocks = new ArrayList<>();
+		this.addBlock(block);
+		this.lastId = 1L;
 	}
 
+	public void addBlock(final Block block) {
+		this.blocks.add(block);
+	}
 
 	@Override
 	public void save(Block block) {
-
+		if (block.getId() == null) {
+			block.setId(this.lastId);
+			this.lastId++;
+		}
 	}
 
 	@Override
@@ -65,21 +78,36 @@ public class MockBlockDao implements BlockDao {
 	public Block findById(long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		return this.block;
+		for (Block block : blocks) {
+			if (block.getId() == id) {
+				return block;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public Block findByHash(Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;
-		return this.block;
+		for (Block block : blocks) {
+			if (block.getBlockHash().equals(blockHash)) {
+				return block;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public Block findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
-		return this.block;
+		for (Block block : blocks) {
+			if (block.getHeight() == height.getRaw()) {
+				return block;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -92,12 +120,18 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
-		return null;
+		return this.blocks.stream()
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.map(bl -> new BlockDifficulty(bl.getDifficulty()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
-		return null;
+		return this.blocks.stream()
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.map(bl -> new TimeInstant(bl.getTimestamp()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
