@@ -41,7 +41,6 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 */
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
 
-
 	/**
 	 * Retrieves list of at most limit timestamps for blocks starting at given height.
 	 *

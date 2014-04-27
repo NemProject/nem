@@ -87,7 +87,6 @@ public class BlockScorer {
 		return difficulty - timeDiff;
 	}
 
-	
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 * 
