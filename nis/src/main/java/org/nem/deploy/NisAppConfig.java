@@ -56,7 +56,17 @@ public class NisAppConfig {
 	@Bean
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
+		final Properties prop = new Properties();
+		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
+
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
+
+		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
+		localSessionFactoryBuilder.setProperty("hibernate.dialect", prop.getProperty("hibernate.dialect"));
+		localSessionFactoryBuilder.setProperty("hibernate.show_sql", prop.getProperty("hibernate.show_sql"));
+		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", prop.getProperty("hibernate.use_sql_comments"));
+		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", prop.getProperty("hibernate.jdbc.batch_size"));
+
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
