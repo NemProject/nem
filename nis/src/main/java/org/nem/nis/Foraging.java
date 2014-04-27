@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.utils.Predicate;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
@@ -192,7 +191,13 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 
 		if (bestBlock != null) {
-			addForagedBlock(bestBlock);
+			// make a full-blown analysis
+			// TODO: fix it
+			
+//			if (blockChain.processBlock(bestBlock)) {
+//				// TODO: should this be called by Foraging? or maybe somewhere in blockchain
+//				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
+//			}
 		}
 	}
 
@@ -221,21 +226,5 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		newBlock.signBy(virtualForger);
 		return newBlock;
-	}
-
-	private void addForagedBlock(Block bestBlock) {
-		//
-		// if we're here it means unconfirmed transactions haven't been
-		// seen in any block yet, so we can add this block to local db
-		//
-		// (if at some point later we receive better block,
-		// fork resolution will handle that)
-		//
-		if (blockChain.addBlockToDb(bestBlock)) {
-			removeFromUnconfirmedTransactions(bestBlock);
-
-			// TODO: should this be called by Foraging? or maybe somewhere in blockchain
-			host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-		}
 	}
 }
