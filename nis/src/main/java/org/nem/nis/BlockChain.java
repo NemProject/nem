@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
@@ -77,7 +78,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	}
 
-	private void addRevertedTransactionsAsUnconfirmed(final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
+	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
 		long currentHeight = getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
@@ -86,10 +87,11 @@ public class BlockChain implements BlockSynchronizer {
 			// if the transaction is in DB it means at some point
 			// isValid and verify had to be called on it, so we can safely add it
 			// as unconfirmed
-			for (Transfer transfer : block.getBlockTransfers()) {
-				// block is still in db
-				foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(transfer, accountAnalyzer));
-			}
+			block.getBlockTransfers().stream().filter(
+					tr -> ! transactionHashes.contains(tr)
+			).forEach(
+					tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(tr, accountAnalyzer))
+			);
 			currentHeight--;
 		}
 	}
@@ -213,9 +215,8 @@ public class BlockChain implements BlockSynchronizer {
 	/*
 	 * 1. execute all blocks
 	 * 2. replace current accountAnalyzer with contemporaryAccountAnalyzer
-	 * 3. add unconfirmed transactions from "our" chain TODO: this might fail:
-	 *    we could try to add to unconfirmed TX, that has been in peer's chain,
-	 *    if his balance was too low, this could throw exception...
+	 * 3. add unconfirmed transactions from "our" chain
+	 *    (except those transactions, that are included in peer's chain)
 	 *
 	 * 4. drop "our" blocks from the db
 	 *
@@ -232,7 +233,8 @@ public class BlockChain implements BlockSynchronizer {
 
 			if (hasOwnChain) {
 				// mind that we're using "new" (replaced) accountAnalyzer
-				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
+				Set<Hash> transactionHashes = peerChain.stream().flatMap(bl -> bl.getTransactions().stream()).map(HashUtils::calculateHash).collect(Collectors.toSet());
+				addRevertedTransactionsAsUnconfirmed(transactionHashes, commonBlockHeight, accountAnalyzer);
 			}
 
 			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
