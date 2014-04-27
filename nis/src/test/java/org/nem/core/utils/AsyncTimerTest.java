@@ -61,6 +61,23 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	public void refreshIntervalIsRespectedWhenRecurrenceThrowsException() throws InterruptedException {
+		// Arrange:
+		final CountableFuture cf = new CountableFuture(() -> () -> {
+			throw new RuntimeException("this shouldn't stop the timer");
+		});
+		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
+			// Arrange: (should fire at 1, 3, 5)
+			Thread.sleep(6 * TimeUnit);
+
+			// Assert:
+			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(3));
+			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
+			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+		}
+	}
+
+	@Test
 	public void refreshIntervalIsRespected() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
@@ -162,9 +179,9 @@ public class AsyncTimerTest {
 			return this::getFuture;
 		}
 
-		private CompletableFuture<Void> getFuture() {
-			return CompletableFuture.runAsync(this.runnableSupplier.get())
-					.thenCompose(v -> CompletableFuture.runAsync(() -> ++this.numCalls));
+		private CompletableFuture<?> getFuture() {
+			return CompletableFuture.runAsync(() -> ++this.numCalls)
+					.thenCompose(v -> CompletableFuture.runAsync(runnableSupplier.get()));
 		}
 
 		public int getNumCalls() { return this.numCalls; }

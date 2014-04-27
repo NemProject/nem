@@ -122,6 +122,10 @@ public class AsyncTimer implements Closeable {
 		this.log("executing");
 		++this.numExecutions;
 		return this.recurringFutureSupplier.get()
+				.exceptionally(e -> {
+					LOGGER.warning(String.format("Timer %s raised exception: %s", this.getName(), e.getMessage()));
+					return null;
+				})
 				.thenCompose(v -> {
 					this.firstRecurrenceFuture.complete(null);
 					return this.refresh(this.delay);
