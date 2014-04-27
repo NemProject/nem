@@ -188,11 +188,7 @@ public class AsyncTimerTest {
 
 		private static CountableFuture sleep(int milliseconds) {
 			return new CountableFuture(() ->
-					() -> {  try {
-						Thread.sleep(milliseconds);
-					} catch (InterruptedException ex) {
-						throw ExceptionUtils.toUnchecked(ex);
-					} });
+					() -> ExceptionUtils.propagateVoid(() -> Thread.sleep(milliseconds)));
 		}
 	}
 }

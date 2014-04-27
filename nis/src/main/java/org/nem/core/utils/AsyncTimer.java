@@ -133,10 +133,9 @@ public class AsyncTimer implements Closeable {
 	}
 
 	private void sleep(int milliseconds) {
-		ExceptionUtils.propagate(() -> {
+		ExceptionUtils.propagateVoid(() -> {
 			this.log("sleeping for " + milliseconds + "ms");
 			Thread.sleep(milliseconds);
-			return null;
 		});
 	}
 

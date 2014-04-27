@@ -245,11 +245,7 @@ public class Utils {
 	public static void monitorWait(final Object monitor) {
 		//noinspection SynchronizationOnLocalVariableOrMethodParameter
 		synchronized (monitor) {
-			try {
-				monitor.wait();
-			} catch (InterruptedException e) {
-				throw ExceptionUtils.toUnchecked(e);
-			}
+			ExceptionUtils.propagateVoid(monitor::wait);
 		}
 	}
 
