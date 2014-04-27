@@ -1,0 +1,34 @@
+package org.nem.nis.controller.utils;
+
+import org.nem.core.model.Block;
+import org.nem.core.model.BlockHeight;
+import org.nem.core.model.Hash;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.mappers.BlockMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class DbBlockIoAdapter implements BlockIo {
+	private final RequiredBlockDaoAdapter blockDao;
+	private final AccountLookup accountLookup;
+
+	@Autowired(required = true)
+	public DbBlockIoAdapter(final RequiredBlockDaoAdapter blockDao, final AccountLookup accountLookup) {
+		this.blockDao = blockDao;
+		this.accountLookup = accountLookup;
+	}
+
+	@Override
+	public Block getBlock(Hash blockHash) {
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(blockHash);
+		return BlockMapper.toModel(dbBlock, this.accountLookup);
+	}
+
+	@Override
+	public Block getBlockAt(BlockHeight blockHeight) {
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+		return BlockMapper.toModel(dbBlock, this.accountLookup);
+	}
+}

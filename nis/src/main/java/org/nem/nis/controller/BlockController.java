@@ -4,6 +4,7 @@ import org.nem.core.model.BlockHeight;
 import org.nem.core.model.Hash;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.utils.BlockIo;
 import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
 
 import org.nem.nis.mappers.BlockMapper;
@@ -18,13 +19,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class BlockController {
 
-	private final RequiredBlockDaoAdapter blockDao;
-	private final AccountLookup accountLookup;
+	final BlockIo blockIo;
 
 	@Autowired(required = true)
-	BlockController(final RequiredBlockDaoAdapter blockDao, final AccountLookup accountLookup) {
-		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
+	BlockController(final BlockIo blockIo) {
+		this.blockIo = blockIo;
 	}
 
 	/**
@@ -39,14 +38,12 @@ public class BlockController {
 	@PublicApi
 	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) {
 		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(blockHash);
-		return BlockMapper.toModel(dbBlock, this.accountLookup);
+		return blockIo.getBlock(blockHash);
 	}
 
 	@RequestMapping(value = "/block/at", method = RequestMethod.POST)
 	@P2PApi
 	public Block blockAt(@RequestBody final BlockHeight height) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
-		return BlockMapper.toModel(dbBlock, this.accountLookup);
+		return blockIo.getBlockAt(height);
 	}
 }
