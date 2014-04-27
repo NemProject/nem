@@ -29,16 +29,15 @@ public class AccountIoAdapter implements AccountIo {
 
 	@Override
 	public SerializableList<Transaction> getAccountTransfers(Address address) {
-//		final Account account = this.accountLookup.findByAddress(address);
-//
-//		Collection<Transfer> transfers = transferDao.getTransactionsForAccount(account, 25);
-//
-//		final SerializableList<Transaction> transactionList = new SerializableList<>(0);
-//		transfers.stream().map(tr -> TransferMapper.toModel(tr, this.accountLookup)).forEach(
-//				transaction -> transactionList.add(transaction)
-//		);
-//		return transactionList;
-		throw createMissingResourceException(address.getEncoded());
+		final Account account = this.accountLookup.findByAddress(address);
+
+		Collection<Transfer> transfers = transferDao.getTransactionsForAccount(account, 25);
+
+		final SerializableList<Transaction> transactionList = new SerializableList<>(0);
+		transfers.stream().map(tr -> TransferMapper.toModel(tr, this.accountLookup)).forEach(
+				transaction -> transactionList.add(transaction)
+		);
+		return transactionList;
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

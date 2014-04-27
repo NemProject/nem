@@ -1,7 +1,10 @@
 package org.nem.nis.dao;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 import org.nem.nis.dbmodel.Transfer;
 
 /**
@@ -39,4 +42,13 @@ public interface TransferDao {
 	 * @return Transfer having given hash or null.
 	 */
 	public Transfer findByHash(byte[] txHash);
+
+	/**
+	 * Retrieves latest limit Transfers from db for given account
+	 *
+	 * @param account The account.
+	 * @param limit The limit.
+	 * @return (sorted?) Collection of Transfers
+	 */
+	public Collection<Transfer> getTransactionsForAccount(final Account account, final int limit);
 }

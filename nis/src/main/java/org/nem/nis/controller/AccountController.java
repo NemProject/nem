@@ -1,11 +1,10 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Address;
-import org.nem.core.serialization.AccountLookup;
+import org.nem.core.model.*;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,20 +13,19 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class AccountController {
-
-	private final AccountLookup accountLookup;
 	private final Foraging foraging;
+	private final AccountIo accountIo;
 
 	@Autowired(required = true)
-	AccountController(final Foraging foraging, final AccountLookup accountLookup) {
+	AccountController(final Foraging foraging, final AccountIo accountIo) {
 		this.foraging = foraging;
-		this.accountLookup = accountLookup;
+		this.accountIo = accountIo;
 	}
 
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public Account accountGet(@RequestParam(value = "address") final String nemAddress) {
-		return this.accountLookup.findByAddress(Address.fromEncoded(nemAddress));
+		return this.accountIo.findByAddress(Address.fromEncoded(nemAddress));
 	}
 	/**
 	 * Unlocks an account for foraging.
@@ -39,5 +37,11 @@ public class AccountController {
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
 		this.foraging.addUnlockedAccount(account);
+	}
+
+	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Transaction> accountUnlock(@RequestParam(value = "address") final String nemAddress) {
+		return this.accountIo.getAccountTransfers(Address.fromEncoded(nemAddress));
 	}
 }
