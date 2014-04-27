@@ -121,7 +121,7 @@ public class BlockMapperTest {
 					new BlockHeight(17));
 
 			this.blockGenerationHash = Utils.generateRandomHash();
-			this.model.setDifficulty(new BlockDifficulty(77_777_777_777L));
+			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.model.setGenerationHash(this.blockGenerationHash);
 			this.signModel();
 
@@ -201,7 +201,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
 			Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
-			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(77_777_777_777L));
+			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
