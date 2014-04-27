@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
 	private final AccountLookup accountLookup;
 
@@ -57,9 +58,31 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
+		// TODO: is it ok? or better move try except inside the lambdas and return bool from lambdas?
+		try {
+			transaction.simulateExecute(
+					(Account sender, Amount balance) -> {
+						addToCache(sender);
+						Amount newBalance = this.unconfirmedBalances.get(sender).subtract(balance);
+						this.unconfirmedBalances.replace(sender, newBalance);
+					},
+					(Account recipient, Amount balance) -> {
+						addToCache(recipient);
+						Amount newBalance = this.unconfirmedBalances.get(recipient).add(balance);
+						this.unconfirmedBalances.replace(recipient, newBalance);
+					}
+			);
+		} catch (IllegalArgumentException ex) {
+			return false;
+		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	private void addToCache(Account account) {
+		// it's ok to put reference here, thanks to Account being non-mutable
+		this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
 	}
 
 	/**
