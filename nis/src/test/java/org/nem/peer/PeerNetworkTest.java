@@ -267,13 +267,17 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
+		connector.setGetInfoError("10.0.0.4", MockConnector.TriggerAction.FATAL);
+		connector.setGetInfoError("10.0.0.6", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetInfoError("10.0.0.7", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
-		// Arrange: set up a node peers list that indicates the reverse of direct communication
-		// (i.e. 10.0.0.2 is active and all other nodes are inactive)
+		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
+		// but the local node can only communicate with 10.0.0.5
 		final NodeCollection knownPeers = new NodeCollection();
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.1", 12), "p", "a"), NodeStatus.INACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.3", 12), "p", "a"), NodeStatus.INACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -281,11 +285,40 @@ public class PeerNetworkTest {
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { "10.0.0.2" });
+		NodeCollectionAssert.areHostsEquivalent(
+				nodes,
+				new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.5" },
+				new String[] { "10.0.0.2", "10.0.0.6" });
 	}
 
 	@Test
-	public void refreshMergesInKnownPeers() {
+	public void refreshCallsGetInfoOnceForEachUniqueEndpoint() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
+		connector.setGetInfoError("10.0.0.4", MockConnector.TriggerAction.FATAL);
+		connector.setGetInfoError("10.0.0.6", MockConnector.TriggerAction.INACTIVE);
+
+		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-6 are active
+		// but the local node can only communicate with 10.0.0.5
+		final NodeCollection knownPeers = new NodeCollection();
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
+		connector.setKnownPeers(knownPeers);
+
+		// Act:
+		network.refresh().join();
+		network.getNodes();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(6));
+	}
+
+	@Test
+	public void refreshOnlyMergesInRelayedActivePeers() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
@@ -305,7 +338,7 @@ public class PeerNetworkTest {
 		NodeCollectionAssert.areHostsEquivalent(
 				nodes,
 				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
-				new String[] { "10.0.0.7", "10.0.0.11" });
+				new String[] { });
 	}
 
 	@Test
@@ -442,7 +475,7 @@ public class PeerNetworkTest {
 		network.synchronize();
 
 		// Assert:
-		Assert.assertThat(synchronizer.getLastConnectorPool(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(synchronizer.getLastConnectorPool(), IsNull.notNullValue());
 	}
 
 	@Test

@@ -238,7 +238,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private static void pauseThread() {
 		ExceptionUtils.propagate(() -> {
-			Thread.sleep(3000);
+			Thread.sleep(300);
 			return null;
 		});
 	}

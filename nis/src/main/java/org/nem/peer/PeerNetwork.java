@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.node.*;
@@ -164,6 +165,7 @@ public class PeerNetwork {
 		final NodeCollection nodes;
 		final PeerConnector connector;
 		final Map<Node, NodeStatus> nodesToUpdate;
+		final ConcurrentHashSet<Node> connectedNodes;
 
 		public NodeRefresher(
 				final Node localNode,
@@ -173,6 +175,7 @@ public class PeerNetwork {
 			this.nodes = nodes;
 			this.connector = connector;
 			this.nodesToUpdate = new ConcurrentHashMap<>();
+			this.connectedNodes = new ConcurrentHashSet<>();
 		}
 
 		public CompletableFuture<Void> refresh() {
@@ -188,20 +191,37 @@ public class PeerNetwork {
 		}
 
 		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
+			return this.getNodeInfo(node, true);
+		}
 
-			return this.connector.getInfo(node.getEndpoint())
+		private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
+			if (!this.connectedNodes.add(node)) {
+				return CompletableFuture.completedFuture(null);
+			}
+
+			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
 					.thenApply(n -> {
 						// if the node returned inconsistent information, drop it for this round
 						if (!areCompatible(node, n))
 							throw new FatalPeerException("node response is not compatible with node identity");
 
 						return NodeStatus.ACTIVE;
-					})
-					.thenCompose(ns -> this.connector.getKnownPeers(node.getEndpoint()))
-					.thenApply(nodes -> {
-						this.mergePeers(nodes);
-						return NodeStatus.ACTIVE;
-					})
+					});
+
+			if (isDirectContact) {
+				future = future
+						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
+						.thenCompose(nodes -> {
+							final List<CompletableFuture> futures = nodes.getActiveNodes().stream()
+									.map(n -> this.getNodeInfo(n, false))
+									.collect(Collectors.toList());
+
+							return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+						})
+						.thenApply(v -> NodeStatus.ACTIVE);
+			}
+
+			return future
 					.exceptionally(this::getNodeStatusFromException)
 					.thenAccept(ns -> this.update(node, ns));
 		}
@@ -221,23 +241,6 @@ public class PeerNetwork {
 
 			LOGGER.info("Updating \"" + node + "\" -> " + status);
 			this.nodesToUpdate.put(node, status);
-		}
-
-		private void mergePeers(final NodeCollection nodes) {
-			this.mergePeers(nodes.getActiveNodes(), NodeStatus.ACTIVE);
-			this.mergePeers(nodes.getInactiveNodes(), NodeStatus.INACTIVE);
-		}
-
-		private void mergePeers(final Iterable<Node> iterable, final NodeStatus status) {
-			for (final Node node : iterable) {
-				// nodes directly communicated with are already in this.nodes
-				// give their direct connection precedence over what peers report
-				LOGGER.fine("Merging Peer \"" + node + "\" -> " + status);
-				if (NodeStatus.FAILURE != this.nodes.getNodeStatus(node))
-					continue;
-
-				this.update(node, status);
-			}
 		}
 	}
 }
