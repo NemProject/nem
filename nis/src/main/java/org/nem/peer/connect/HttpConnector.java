@@ -1,5 +1,6 @@
-package org.nem.core.connect;
+package org.nem.peer.connect;
 
+import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.node.*;

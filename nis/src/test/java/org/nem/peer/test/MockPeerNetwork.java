@@ -2,10 +2,10 @@ package org.nem.peer.test;
 
 
 import org.mockito.Mockito;
-import org.nem.core.connect.NodeApiId;
-import org.nem.core.connect.SyncConnectorPool;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.node.NodeApiId;
 import org.nem.peer.*;
+import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.concurrent.CompletableFuture;

@@ -4,6 +4,7 @@ import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 
 import java.net.URL;

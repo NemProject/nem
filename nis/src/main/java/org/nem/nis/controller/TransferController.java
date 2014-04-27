@@ -9,7 +9,7 @@ import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.core.connect.NodeApiId;
+import org.nem.peer.node.NodeApiId;
 import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

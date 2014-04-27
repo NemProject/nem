@@ -1,11 +1,10 @@
 package org.nem.nis;
 
-import org.nem.core.connect.NodeApiId;
-import org.nem.core.connect.PeerConnector;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.utils.AsyncTimer;
 import org.nem.peer.*;
-import org.nem.core.connect.HttpConnectorPool;
+import org.nem.peer.connect.*;
+import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.CompletableFuture;

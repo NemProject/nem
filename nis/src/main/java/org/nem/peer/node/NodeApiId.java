@@ -1,4 +1,4 @@
-package org.nem.core.connect;
+package org.nem.peer.node;
 
 /**
  * IDs of node-related APIs.

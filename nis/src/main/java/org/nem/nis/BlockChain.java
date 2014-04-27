@@ -2,8 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
@@ -15,6 +13,7 @@ import org.nem.nis.mappers.TransferMapper;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 

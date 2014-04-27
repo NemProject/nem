@@ -1,7 +1,7 @@
 package org.nem.peer.test;
 
-import org.nem.core.connect.SyncConnectorPool;
 import org.nem.peer.*;
+import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.node.Node;
 
 /**

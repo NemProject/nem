@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
