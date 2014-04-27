@@ -73,19 +73,21 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		public PeerNetworkHost(final PeerNetwork network) {
 			this.network = network;
 
-			final CompletableFuture<Void> refreshFuture = this.network.refresh();
-			this.refreshTimer = new AsyncTimer(refreshFuture, REFRESH_INITIAL_DELAY, REFRESH_INTERVAL);
+			this.refreshTimer = new AsyncTimer(
+					this.network::refresh,
+					REFRESH_INITIAL_DELAY,
+					REFRESH_INTERVAL);
 			this.refreshTimer.setName("REFRESH");
 
 			this.broadcastTimer = AsyncTimer.After(
-					refreshFuture,
-					this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+					this.refreshTimer,
+					() -> this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
 					BROADCAST_INTERVAL);
 			this.broadcastTimer.setName("BROADCAST");
 
 			this.syncTimer = AsyncTimer.After(
-					refreshFuture,
-					CompletableFuture.runAsync(this.network::synchronize),
+					this.refreshTimer,
+					() -> CompletableFuture.runAsync(this.network::synchronize),
 					SYNC_INTERVAL);
 			this.syncTimer.setName("SYNC");
 		}

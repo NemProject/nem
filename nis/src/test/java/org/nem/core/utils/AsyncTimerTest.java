@@ -101,7 +101,7 @@ public class AsyncTimerTest {
 	public void timerThrottlesExecutions() throws InterruptedException {
 		// Arrange:
 		final Object refreshMonitor = new Object();
-		final CountableFuture cf = new CountableFuture(() -> Utils.monitorWait(refreshMonitor));
+		final CountableFuture cf = new CountableFuture(() -> () -> Utils.monitorWait(refreshMonitor));
 		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
 			// Arrange: (expect calls at 1, 3, 5)
 			Thread.sleep(6 * TimeUnit);
@@ -119,41 +119,43 @@ public class AsyncTimerTest {
 
 	@Test
 	public void afterDelaysTimerUntilTriggerFires() throws InterruptedException {
-		//Arrange:
-		final CompletableFuture<Void> triggerFuture = CompletableFuture.supplyAsync(() ->
-				ExceptionUtils.propagate(() -> {
-					Thread.sleep(5 * TimeUnit);
-					return null;
-				}));
-		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = AsyncTimer.After(triggerFuture, cf.getFutureSupplier(), 10 * TimeUnit)) {
-			// Arrange:
-			Thread.sleep(5 * TimeHalfUnit);
+		// Arrange:
+		final CountableFuture cfTrigger = CountableFuture.sleep(3 * TimeUnit);
+		try (final AsyncTimer triggerTimer = new AsyncTimer(cfTrigger.getFutureSupplier(), 2 * TimeUnit, 10 * TimeUnit)) {
+			triggerTimer.setName("TRIGGER");
 
-			// Assert:
-			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(0));
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
+			final CountableFuture cf = new CountableFuture();
+			try (final AsyncTimer timer = AsyncTimer.After(triggerTimer, cf.getFutureSupplier(), 10 * TimeUnit)) {
+				timer.setName("SUB TIMER");
 
-			// Arrange:
-			Thread.sleep(15 * TimeHalfUnit);
+				// Arrange:
+				Thread.sleep(3 * TimeUnit);
 
-			// Assert:
-			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(1));
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+				// Assert:
+				Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(0));
+				Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
+
+				// Arrange:
+				Thread.sleep(4 * TimeUnit);
+
+				// Assert:
+				Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(1));
+				Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+				Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			}
 		}
 	}
 
 	private static class CountableFuture {
 		private int numCalls;
-		private final Runnable runnable;
+		private final Supplier<Runnable> runnableSupplier;
 
 		public CountableFuture() {
-			this.runnable = () -> { };
+			this.runnableSupplier = () -> () -> { };
 		}
 
-		public CountableFuture(final Runnable runnable) {
-			this.runnable = runnable;
+		public CountableFuture(final Supplier<Runnable> runnableSupplier) {
+			this.runnableSupplier = runnableSupplier;
 		}
 
 		public Supplier<CompletableFuture<?>> getFutureSupplier() {
@@ -161,10 +163,19 @@ public class AsyncTimerTest {
 		}
 
 		private CompletableFuture<Void> getFuture() {
-			return CompletableFuture.runAsync(this.runnable)
+			return CompletableFuture.runAsync(this.runnableSupplier.get())
 					.thenCompose(v -> CompletableFuture.runAsync(() -> ++this.numCalls));
 		}
 
 		public int getNumCalls() { return this.numCalls; }
+
+		private static CountableFuture sleep(int milliseconds) {
+			return new CountableFuture(() ->
+					() -> {  try {
+						Thread.sleep(milliseconds);
+					} catch (InterruptedException ex) {
+						throw ExceptionUtils.toUnchecked(ex);
+					} });
+		}
 	}
 }

@@ -13,13 +13,14 @@ public class AsyncTimer implements Closeable {
 
 	private static final Logger LOGGER = Logger.getLogger(AsyncTimer.class.getName());
 
-	private Supplier<CompletableFuture<?>> recurringFutureSupplier;
+	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final int delay;
+	private final CompletableFuture<?> future;
+
+	private final AtomicBoolean isStopped = new AtomicBoolean();
+	private final CompletableFuture<?> firstRecurrenceFuture = new CompletableFuture<>();
 
 	private int numExecutions;
-	private final AtomicBoolean isStopped = new AtomicBoolean();
-	private CompletableFuture<?> future;
-
 	private String name;
 
 	/**
@@ -37,7 +38,7 @@ public class AsyncTimer implements Closeable {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
-		this.future = this.refresh(initialDelay);
+		this.future = this.createFuture(CompletableFuture.runAsync(() -> sleep(initialDelay)));
 	}
 
 	private AsyncTimer(
@@ -47,23 +48,27 @@ public class AsyncTimer implements Closeable {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
-		this.future = trigger.thenCompose(v -> this.getNextChainLink());
+		this.future = this.createFuture(trigger);
+	}
+
+	private CompletableFuture<?> createFuture(final CompletableFuture<?> trigger) {
+		return trigger.thenCompose(v -> this.getNextChainLink());
 	}
 
 	/**
 	 * Creates a new AsyncTimer that will start executing when the specified trigger is triggered.
 	 *
-	 * @param trigger The future that will trigger the first execution when fired.
+	 * @param triggerTimer The timer that will trigger the first execution when it has completed a single recurrence.
 	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param delay The delay (in milliseconds) between the termination of one execution and the
 	 *              commencement of the next.
 	 */
 	public static AsyncTimer After(
-			final CompletableFuture<?> trigger,
+			final AsyncTimer triggerTimer,
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int delay) {
 
-		return new AsyncTimer(trigger, recurringFutureSupplier, delay);
+		return new AsyncTimer(triggerTimer.firstRecurrenceFuture, recurringFutureSupplier, delay);
 	}
 
 	/**
@@ -117,7 +122,10 @@ public class AsyncTimer implements Closeable {
 		this.log("executing");
 		++this.numExecutions;
 		return this.recurringFutureSupplier.get()
-				.thenCompose(v -> this.refresh(this.delay));
+				.thenCompose(v -> {
+					this.firstRecurrenceFuture.complete(null);
+					return this.refresh(this.delay);
+				});
 	}
 
 	private void sleep(int milliseconds) {
