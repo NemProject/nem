@@ -1,8 +1,12 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.Predicate;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -14,6 +18,12 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
+
+	private final AccountLookup accountLookup;
+
+	UnconfirmedTransactions(AccountLookup accountLookup) {
+		this.accountLookup = accountLookup;
+	}
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -46,6 +56,7 @@ public class UnconfirmedTransactions {
 		if (exists.evaluate(transactionHash)) {
 			return false;
 		}
+
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;

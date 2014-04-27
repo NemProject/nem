@@ -29,7 +29,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCanBeAddedIfTransactionWithSameHashHasNotAlreadyBeenAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		boolean isAdded = transactions.add(new MockTransaction(sender, 7));
@@ -42,7 +42,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCannotBeAddedIfTransactionWithSameHashHasAlreadyBeenAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		transactions.add(new MockTransaction(sender, 7));
 
 		// Act:
@@ -56,7 +56,7 @@ public class UnconfirmedTransactionsTest {
  	public void multipleTransactionsWithDifferentHashesCanBeAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		transactions.add(new MockTransaction(sender, 7));
@@ -70,7 +70,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCanBeAddedIfTransactionPredicateReturnsFalse() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> false);
@@ -83,7 +83,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCannotBeAddedIfTransactionPredicateReturnsTrue() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> true);
@@ -151,7 +151,7 @@ public class UnconfirmedTransactionsTest {
 	public void removeAllRemovesAllTransactionsInBlock() {
 		// Arrange:
 		final List<Transaction> transactions = new ArrayList<>();
-		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < 10; ++i) {
 			final Transaction transaction = new MockTransaction(i, new TimeInstant(100));
 			transactions.add(transaction);
@@ -181,7 +181,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions(int numTransactions) {
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			transactions.add(new MockTransaction(i, new TimeInstant(i * 10)));
 		}
@@ -189,9 +189,14 @@ public class UnconfirmedTransactionsTest {
 		return transactions;
 	}
 
+	private static UnconfirmedTransactions createUnconfirmedTransactionsInstance() {
+		MockAccountLookup mockAccountLookup = new MockAccountLookup(MockAccountLookup.UnknownAccountBehavior.REAL_ACCOUNT);
+		return new UnconfirmedTransactions(mockAccountLookup);
+	}
+
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(int numTransactions) {
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			final MockTransaction mockTransaction = new MockTransaction(i, new TimeInstant(i * 10));
 			mockTransaction.setFee(Amount.fromNem(i + 1));
