@@ -62,7 +62,6 @@ public class BlockChainValidatorTest {
 		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
-		block.setPreviousBlockHash(Hash.ZERO);
 		signAllBlocks(blocks);
 
 		// Assert:
@@ -303,14 +302,12 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Block createBlock(final Account account, long height) {
-		Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
-		block.setGenerationHash(Hash.ZERO);
+		Block block = new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		return block;
 	}
 
 	private static Block createBlock(final Account account, Block parentBlock) {
 		Block block = new Block(account, parentBlock, TimeInstant.ZERO);
-		block.setGenerationHash(Hash.ZERO);
 		return block;
 	}
 

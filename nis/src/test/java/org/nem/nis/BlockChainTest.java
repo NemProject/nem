@@ -51,6 +51,7 @@ public class BlockChainTest {
 		org.nem.core.model.Block b = new org.nem.core.model.Block(
 				SENDER,
 				Hash.ZERO,
+				Hash.ZERO,
 				time.getCurrentTime(),
 				BlockHeight.ONE);
 

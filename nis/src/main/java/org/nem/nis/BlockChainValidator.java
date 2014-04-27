@@ -34,11 +34,9 @@ public class BlockChainValidator {
 		if (blocks.size() > this.maxChainSize)
 			return false;
 
-		BlockChainFixer.calculatePeerChainGenerations(parentBlock, blocks);
-		BlockChainFixer.calculateChainParents(parentBlock, blocks);
-
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
+			block.setPrevious(parentBlock);
 			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
 				return false;
 

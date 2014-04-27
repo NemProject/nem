@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -157,7 +158,7 @@ public class UnconfirmedTransactionsTest {
 			unconfirmedTransactions.add(transaction);
 		}
 
-		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block block = NisUtils.createRandomBlock();
 		block.addTransaction(transactions.get(1));
 		block.addTransaction(transactions.get(7));
 		block.addTransaction(transactions.get(4));

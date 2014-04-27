@@ -114,15 +114,15 @@ public class BlockMapperTest {
 		private Hash hash;
 
 		public TestContext() {
+			this.blockGenerationHash = Utils.generateRandomHash();
 			this.model = new Block(
 					Utils.generateRandomAccount(),
 					Utils.generateRandomHash(),
+					this.blockGenerationHash,
 					new TimeInstant(721),
 					new BlockHeight(17));
 
-			this.blockGenerationHash = Utils.generateRandomHash();
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
-			this.model.setGenerationHash(this.blockGenerationHash);
 			this.signModel();
 
 			this.dbForager = new org.nem.nis.dbmodel.Account();

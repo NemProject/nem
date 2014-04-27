@@ -10,11 +10,8 @@ import java.util.*;
 
 public class BlockTest {
 
-	final static Hash DUMMY_PREVIOUS_HASH = new Hash(new byte[] {
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-			0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-			1, 2 });
+	final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
+	final static Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 
 	//region Constructors
 
@@ -38,7 +35,7 @@ public class BlockTest {
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(null));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(DUMMY_GENERATION_HASH));
 	}
 
 	@Test
@@ -46,7 +43,6 @@ public class BlockTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Block previousBlock = createBlock(signer);
-		previousBlock.setGenerationHash(Utils.generateRandomHash());
 
 		// Act:
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
@@ -74,6 +70,23 @@ public class BlockTest {
 	//region Setters
 
 	@Test
+	public void previousBlockCanSet() {
+		// Arrange:
+		final Block previousBlock = createBlock(Utils.generateRandomAccount());
+		final Block block = createBlock(Utils.generateRandomAccount());
+
+		// Act:
+		block.setPrevious(previousBlock);
+
+		// Assert:
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		final Hash expectedGenerationHash = HashUtils.nextHash(
+				previousBlock.getGenerationHash(),
+				block.getSigner().getKeyPair().getPublicKey());
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+	}
+
+	@Test
 	public void blockDifficultyCanBeSet() {
 		// Arrange:
 		final Block block = createBlock(Utils.generateRandomAccount());
@@ -84,19 +97,6 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
-	}
-
-	@Test
-	public void generationHashCanBeSet() {
-		// Arrange:
-		final Block block = createBlock(Utils.generateRandomAccount());
-		final Hash hash = Utils.generateRandomHash();
-
-		// Act:
-		block.setGenerationHash(hash);
-
-		// Assert:
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(hash));
 	}
 
 	//endregion
@@ -146,27 +146,28 @@ public class BlockTest {
 		final Block block = createBlockForRoundTripTests(true, null);
 
 		// Act
-		boolean result = block.verify();
+		boolean originalVerifyResult = block.verify();
 		block.setDifficulty(new BlockDifficulty(55_444_333_222_111L));
 
 		// Assert:
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(55_444_333_222_111L)));
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void changingPreviousBlockHashInvalidatesBlock() {
+	public void changingPreviousBlockInvalidatesBlock() {
 		// Arrange:
+		final Block previousBlock = createBlock(Utils.generateRandomAccount());
 		final Block block = createBlockForRoundTripTests(true, null);
 
 		// Act
-		boolean result = block.verify();
-		block.setPreviousBlockHash(Hash.ZERO);
+		boolean originalVerifyResult = block.verify();
+		block.setPrevious(previousBlock);
 
 		// Assert:
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		Assert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
 		Assert.assertThat(block.verify(), IsEqual.equalTo(false));
 	}
 
@@ -439,7 +440,7 @@ public class BlockTest {
 
 	private static Block createBlock(final Account forger) {
 		// Arrange:
-		return new Block(forger, DUMMY_PREVIOUS_HASH, new TimeInstant(7), new BlockHeight(3));
+		return new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, new TimeInstant(7), new BlockHeight(3));
 	}
 
 	private static Block createBlock() {

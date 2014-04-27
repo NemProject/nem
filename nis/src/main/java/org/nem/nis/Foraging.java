@@ -213,7 +213,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		// Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
-		newBlock.setGenerationHash(HashUtils.nextHash(lastBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 
 		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {

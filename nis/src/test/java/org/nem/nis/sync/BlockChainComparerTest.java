@@ -310,13 +310,13 @@ public class BlockChainComparerTest {
 	}
 
 	private static Block createVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.sign();
 		return block;
 	}
 
 	private static Block createNonVerifiableBlock(final Account account, final long height) {
-		final Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		block.setSignature(new Signature(Utils.generateRandomBytes(64)));
 		return block;
 	}
