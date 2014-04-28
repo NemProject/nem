@@ -5,7 +5,7 @@ import org.nem.core.model.HashChain;
 import org.nem.core.model.SerializableList;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.service.RequiredBlockDaoAdapter;
+import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockChain;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class ChainController {
 
 	private AccountLookup accountLookup;
-	private RequiredBlockDaoAdapter blockDao;
+	private RequiredBlockDao blockDao;
 	private BlockChain blockChain;
 
 	@Autowired(required = true)
-	ChainController(final RequiredBlockDaoAdapter blockDao, final AccountLookup accountLookup, BlockChain blockChain) {
+	ChainController(final RequiredBlockDao blockDao, final AccountLookup accountLookup, BlockChain blockChain) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
 		this.blockChain = blockChain;

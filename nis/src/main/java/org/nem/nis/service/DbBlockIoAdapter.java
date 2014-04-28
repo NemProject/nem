@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DbBlockIoAdapter implements BlockIo {
-	private final RequiredBlockDaoAdapter blockDao;
+	private final RequiredBlockDao blockDao;
 	private final AccountLookup accountLookup;
 
 	@Autowired(required = true)
-	public DbBlockIoAdapter(final RequiredBlockDaoAdapter blockDao, final AccountLookup accountLookup) {
+	public DbBlockIoAdapter(final RequiredBlockDao blockDao, final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
 	}
