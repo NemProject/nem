@@ -22,6 +22,11 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 		this.blockDao = blockDao;
 	}
 
+	@Override
+	public Long count() {
+		return this.blockDao.count();
+	}
+
 	/**
 	 * Retrieves Block from db given its id in the database.
 	 *
