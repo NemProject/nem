@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
+import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,7 +133,17 @@ public class Foraging implements AutoCloseable, Runnable {
 			return false;
 		}
 
-		return addUnconfirmedTransaction(transaction);
+		if (addUnconfirmedTransaction(transaction)) {
+			final PeerNetwork network = this.host.getNetwork();
+
+			// propagate transactions
+			// this returns immediately, so that client who
+			// actually has sent /transfer/announce won't wait for this...
+			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+
+			return true;
+		}
+		return false;
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
