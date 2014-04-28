@@ -335,6 +335,11 @@ public class BlockChain implements BlockSynchronizer {
 //		}
 
 		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
+		// EVIL hack, see issue#70
+		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
+		receivedBlock = BlockMapper.toModel(dbBlock, contemporaryAccountAnalyzer);
+		// EVIL hack end
+
 		long ourScore = 0L;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
