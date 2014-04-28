@@ -3,7 +3,7 @@ package org.nem.deploy;
 import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;

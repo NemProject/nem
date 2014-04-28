@@ -7,7 +7,7 @@ import org.nem.core.model.HashChain;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.test.*;
 
 public class ChainControllerTest {

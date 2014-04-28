@@ -5,7 +5,7 @@ import org.nem.core.model.HashChain;
 import org.nem.core.model.SerializableList;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockChain;

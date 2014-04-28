@@ -1,4 +1,4 @@
-package org.nem.nis.controller.utils;
+package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;

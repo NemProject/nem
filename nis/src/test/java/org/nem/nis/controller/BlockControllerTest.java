@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.service.DbBlockIoAdapter;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.test.*;
 
 public class BlockControllerTest {
