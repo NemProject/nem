@@ -1,8 +1,10 @@
 package org.nem.nis.test;
 
+import org.nem.core.model.Account;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 
+import java.util.Collection;
 import java.util.List;
 
 public class MockTransferDaoImpl implements TransferDao {
@@ -23,6 +25,11 @@ public class MockTransferDaoImpl implements TransferDao {
 
 	@Override
 	public Transfer findByHash(byte[] txHash) {
+		return null;
+	}
+
+	@Override
+	public Collection<Transfer> getTransactionsForAccount(Account account, int limit) {
 		return null;
 	}
 }

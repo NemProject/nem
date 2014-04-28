@@ -1,9 +1,10 @@
-package org.nem.nis.controller.utils;
+package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.MissingResourceException;
 
@@ -11,13 +12,19 @@ import java.util.MissingResourceException;
  * Adapter around BlockDao that throws a MissingResourceException if a requested
  * Block is not found.
  */
-public class RequiredBlockDaoAdapter implements ReadOnlyBlockDao {
+@Service
+public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 
 	private final BlockDao blockDao;
 
 	@Autowired(required = true)
 	public RequiredBlockDaoAdapter(final BlockDao blockDao) {
 		this.blockDao = blockDao;
+	}
+
+	@Override
+	public Long count() {
+		return this.blockDao.count();
 	}
 
 	/**
@@ -73,6 +80,7 @@ public class RequiredBlockDaoAdapter implements ReadOnlyBlockDao {
 	 * @return Chain of block hashes.
 	 */
 	public HashChain getHashesFrom(final BlockHeight height, int limit) {
+		// TODO: throw exception?
 		return this.blockDao.getHashesFrom(height, limit);
 	}
 

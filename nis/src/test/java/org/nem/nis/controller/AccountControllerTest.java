@@ -4,10 +4,14 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.test.MockAccountLookup;
-import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
+import org.nem.nis.service.AccountIoAdapter;
+import org.nem.nis.service.RequiredTransferDao;
+import org.nem.nis.test.MockTransferDaoImpl;
 
 import java.util.*;
+
+import static org.mockito.Mockito.mock;
 
 public class AccountControllerTest {
 
@@ -16,7 +20,9 @@ public class AccountControllerTest {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		try (final MockForaging foraging = new MockForaging()) {
-			final AccountController controller = new AccountController(foraging, new MockAccountLookup());
+			final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
+			final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+			final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
 			// Act:
 			controller.accountUnlock(account.getKeyPair().getPrivateKey());
@@ -32,7 +38,9 @@ public class AccountControllerTest {
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
 		try (final MockForaging foraging = new MockForaging()) {
-			final AccountController controller = new AccountController(foraging, new AccountAnalyzer());
+			final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
+			final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+			final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
 			// Act:
 			controller.accountGet("dummy");

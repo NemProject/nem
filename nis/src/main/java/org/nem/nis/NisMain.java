@@ -83,6 +83,8 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
+		this.blockChain.boot();
+
 		this.networkHost.boot();
 	}
 

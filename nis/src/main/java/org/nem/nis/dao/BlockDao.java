@@ -12,13 +12,6 @@ import java.util.List;
 public interface BlockDao extends ReadOnlyBlockDao {
 
 	/**
-	 * Returns number of blocks in the database.
-	 *
-	 * @return number of blocks in the database.
-	 */
-	public Long count();
-
-	/**
 	 * Saves full block in the database, along with associated transactions, forgers, signers, etc.
 	 *
 	 * @param block Block to save.
