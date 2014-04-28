@@ -130,7 +130,7 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
-		final BlockLookup localLookup = this.createLocalBlockLookup();
+		final BlockLookup localLookup = this.createLocalBlockLookup(this.accountAnalyzer);
 
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
@@ -141,8 +141,8 @@ public class BlockChain implements BlockSynchronizer {
 		return result;
 	}
 
-	private BlockLookup createLocalBlockLookup() {
-		return new LocalBlockLookupAdapter(this.blockDao, this.accountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
+	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return score for iterated blocks.
 	 */
-	private long undoTxesAndGetScore(long commonBlockHeight) {
+	private long undoTxesAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, long commonBlockHeight) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 				this.scorer,
 				PartialWeightedScoreVisitor.BlockOrder.Reverse);
@@ -164,7 +164,7 @@ public class BlockChain implements BlockSynchronizer {
 		visitors.add(new UndoBlockVisitor());
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
-		BlockIterator.unwindUntil(this.createLocalBlockLookup(), new BlockHeight(commonBlockHeight), visitor);
+		BlockIterator.unwindUntil(this.createLocalBlockLookup(contemporaryAccountAnalyzer), new BlockHeight(commonBlockHeight), visitor);
 
 		return scoreVisitor.getScore();
 	}
@@ -257,7 +257,7 @@ public class BlockChain implements BlockSynchronizer {
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
 
-			ourScore = undoTxesAndGetScore(commonBlockHeight.getRaw());
+			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
 		}
 		//endregion
 
@@ -344,7 +344,8 @@ public class BlockChain implements BlockSynchronizer {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
-			ourScore = undoTxesAndGetScore(parent.getHeight());
+			// warning: this changes number of foraged blocks
+			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, parent.getHeight());
 			hasOwnChain = true;
 		}
 
@@ -357,7 +358,6 @@ public class BlockChain implements BlockSynchronizer {
 			return false;
 		}
 
-		// warning: this changes number of foraged blocks
 		long peerscore = getPeerChainScore(parentBlock, peerChain);
 		if (peerscore < 0) {
 			// penalty?
