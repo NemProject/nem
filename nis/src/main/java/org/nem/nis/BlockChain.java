@@ -376,4 +376,8 @@ public class BlockChain implements BlockSynchronizer {
 
 		return true;
 	}
+
+	public void boot() {
+		this.foraging.bootup();
+	}
 }

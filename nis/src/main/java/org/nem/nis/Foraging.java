@@ -67,6 +67,9 @@ public class Foraging implements AutoCloseable, Runnable {
 		this.unconfirmedTransactions = new UnconfirmedTransactions();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
+	}
+
+	public void bootup() {
 		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
 	}
 
