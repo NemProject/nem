@@ -37,7 +37,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
-	@Autowired
 	private NisPeerNetworkHost host;
 
 	private AccountLookup accountLookup;
@@ -49,13 +48,16 @@ public class Foraging implements AutoCloseable, Runnable {
 	private TransferDao transferDao;
 
 	@Autowired
-	public void setAccountLookup(AccountLookup accountLookup) { this.accountLookup = accountLookup; }
+	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
 
 	@Autowired
-	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+	public void setAccountLookup(final AccountLookup accountLookup) { this.accountLookup = accountLookup; }
 
 	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
+	public void setBlockChain(final BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
