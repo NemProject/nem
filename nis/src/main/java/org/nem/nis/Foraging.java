@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
+import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,7 +37,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
-	@Autowired
 	private NisPeerNetworkHost host;
 
 	private AccountLookup accountLookup;
@@ -48,13 +48,16 @@ public class Foraging implements AutoCloseable, Runnable {
 	private TransferDao transferDao;
 
 	@Autowired
-	public void setAccountLookup(AccountLookup accountLookup) { this.accountLookup = accountLookup; }
+	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
 
 	@Autowired
-	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
+	public void setAccountLookup(final AccountLookup accountLookup) { this.accountLookup = accountLookup; }
 
 	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
+	public void setBlockChain(final BlockChain blockChain) { this.blockChain = blockChain; }
+
+	@Autowired
+	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
 	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
@@ -64,6 +67,9 @@ public class Foraging implements AutoCloseable, Runnable {
 		this.unconfirmedTransactions = new UnconfirmedTransactions();
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
+	}
+
+	public void bootup() {
 		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
 	}
 
@@ -132,7 +138,17 @@ public class Foraging implements AutoCloseable, Runnable {
 			return false;
 		}
 
-		return addUnconfirmedTransaction(transaction);
+		if (addUnconfirmedTransaction(transaction)) {
+			final PeerNetwork network = this.host.getNetwork();
+
+			// propagate transactions
+			// this returns immediately, so that client who
+			// actually has sent /transfer/announce won't wait for this...
+			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+
+			return true;
+		}
+		return false;
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
