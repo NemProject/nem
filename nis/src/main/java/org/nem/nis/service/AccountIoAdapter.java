@@ -13,11 +13,11 @@ import java.util.MissingResourceException;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
-	private final TransferDao transferDao;
+	private final RequiredTransferDao transferDao;
 	private final AccountLookup accountLookup;
 
 	@Autowired(required = true)
-	public AccountIoAdapter(final TransferDao transferDao, final AccountLookup accountLookup) {
+	public AccountIoAdapter(final RequiredTransferDao transferDao, final AccountLookup accountLookup) {
 		this.transferDao = transferDao;
 		this.accountLookup = accountLookup;
 	}

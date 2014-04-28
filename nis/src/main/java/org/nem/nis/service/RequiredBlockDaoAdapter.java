@@ -75,6 +75,7 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	 * @return Chain of block hashes.
 	 */
 	public HashChain getHashesFrom(final BlockHeight height, int limit) {
+		// TODO: throw exception?
 		return this.blockDao.getHashesFrom(height, limit);
 	}
 
