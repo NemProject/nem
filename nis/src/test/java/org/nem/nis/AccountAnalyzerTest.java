@@ -23,7 +23,7 @@ public class AccountAnalyzerTest {
 
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
-		Assert.assertThat(account, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(account, IsNull.notNullValue());
 	}
 
 	@Test
@@ -37,7 +37,7 @@ public class AccountAnalyzerTest {
 
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
-		Assert.assertThat(account, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(account, IsNull.notNullValue());
 	}
 
 	@Test
@@ -160,7 +160,7 @@ public class AccountAnalyzerTest {
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsNull.nullValue());
 	}
 
 	@Test

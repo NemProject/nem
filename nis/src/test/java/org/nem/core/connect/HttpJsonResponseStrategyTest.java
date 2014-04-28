@@ -2,7 +2,7 @@ package org.nem.core.connect;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -94,7 +94,7 @@ public class HttpJsonResponseStrategyTest {
 		final Deserializer deserializer = coerceDeserializer(new byte[] { }, strategy);
 
 		// Assert:
-		Assert.assertThat(deserializer, IsEqual.equalTo(null));
+		Assert.assertThat(deserializer, IsNull.nullValue());
 	}
 
 	@Test(expected = FatalPeerException.class)

@@ -32,7 +32,7 @@ public class BlockFactoryTest {
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(block.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -50,6 +50,6 @@ public class BlockFactoryTest {
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(block.getSignature(), IsNull.nullValue());
 	}
 }

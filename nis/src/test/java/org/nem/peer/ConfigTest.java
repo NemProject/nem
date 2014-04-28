@@ -93,7 +93,7 @@ public class ConfigTest {
 		final TrustProvider provider = config.getTrustProvider();
 
 		// Assert:
-		Assert.assertThat(provider, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(provider, IsNull.notNullValue());
 	}
 
 	//region Factories

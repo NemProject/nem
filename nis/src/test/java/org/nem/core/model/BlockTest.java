@@ -195,7 +195,7 @@ public class BlockTest {
 		final Block block = createBlockForRoundTripTests(false, null);
 
 		// Assert:
-		Assert.assertThat(block.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(block.getSignature(), IsNull.nullValue());
 
 		final List<Transaction> transactions = block.getTransactions();
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));

@@ -189,7 +189,7 @@ public class BlockMapperTest {
 		}
 
 		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final long expectedFee) {
-			Assert.assertThat(dbModel.getId(), IsEqual.equalTo(null));
+			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
@@ -200,7 +200,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
 			Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(expectedFee));
-			Assert.assertThat(dbModel.getNextBlockId(), IsEqual.equalTo(null));
+			Assert.assertThat(dbModel.getNextBlockId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 

@@ -18,7 +18,7 @@ public class AddressTest {
 
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("Sigma Gamma"));
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(null));
+		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
 	}
 
 	@Test
@@ -28,7 +28,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.getEncoded(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 

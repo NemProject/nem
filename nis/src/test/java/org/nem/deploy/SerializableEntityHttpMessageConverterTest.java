@@ -1,7 +1,7 @@
 package org.nem.deploy;
 
 import net.minidev.json.*;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -27,7 +27,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
 		Assert.assertThat(mediaTypes.get(0).getType(), IsEqual.equalTo("application"));
 		Assert.assertThat(mediaTypes.get(0).getSubtype(), IsEqual.equalTo("json"));
-		Assert.assertThat(mediaTypes.get(0).getCharSet(), IsEqual.equalTo(null));
+		Assert.assertThat(mediaTypes.get(0).getCharSet(), IsNull.nullValue());
 	}
 
 	@Test

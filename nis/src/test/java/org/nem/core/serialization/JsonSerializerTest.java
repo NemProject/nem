@@ -80,7 +80,7 @@ public class JsonSerializerTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("bytes"), IsEqual.equalTo(null));
+		Assert.assertThat(object.get("bytes"), IsNull.nullValue());
 	}
 
 	@Test
@@ -223,7 +223,7 @@ public class JsonSerializerTest {
 		final byte[] readBytes = deserializer.readBytes("bytes");
 
 		// Assert:
-		Assert.assertThat(readBytes, IsEqual.equalTo(null));
+		Assert.assertThat(readBytes, IsNull.nullValue());
 	}
 
 	@Test
@@ -285,7 +285,7 @@ public class JsonSerializerTest {
 		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
 
 		// Assert:
-		Assert.assertThat(object, IsEqual.equalTo(null));
+		Assert.assertThat(object, IsNull.nullValue());
 	}
 
 	@Test
@@ -324,7 +324,7 @@ public class JsonSerializerTest {
 
 		// Assert:
 		Assert.assertThat(objects.size(), IsEqual.equalTo(1));
-		Assert.assertThat(objects.get(0), IsEqual.equalTo(null));
+		Assert.assertThat(objects.get(0), IsNull.nullValue());
 	}
 
 	@Test
@@ -477,7 +477,7 @@ public class JsonSerializerTest {
 		JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
-		Assert.assertThat(orderArray, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(orderArray, IsNull.notNullValue());
 		Assert.assertThat(orderArray.size(), IsEqual.equalTo(2));
 		Assert.assertThat((String)orderArray.get(0), IsEqual.equalTo("Foo"));
 		Assert.assertThat((String)orderArray.get(1), IsEqual.equalTo("Bar"));

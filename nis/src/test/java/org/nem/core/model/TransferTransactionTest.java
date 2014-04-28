@@ -52,7 +52,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-		Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-		Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -561,7 +561,7 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 		// Assert:
-		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
 	}
 
 	//endregion

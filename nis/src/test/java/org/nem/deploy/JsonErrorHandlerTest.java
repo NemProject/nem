@@ -112,7 +112,7 @@ public class JsonErrorHandlerTest {
 
 		// Assert:
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(123));
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo(null));
+		Assert.assertThat(response.getMessage(), IsNull.nullValue());
 	}
 
 	//region MockServletOutputStream

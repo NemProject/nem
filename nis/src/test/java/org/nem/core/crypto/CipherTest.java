@@ -84,8 +84,8 @@ public class CipherTest {
 
 		// Assert:
 		Assert.assertThat(cipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-		Assert.assertThat(cipher1.decrypt(encryptedBytes2), IsEqual.equalTo(null));
-		Assert.assertThat(cipher2.decrypt(encryptedBytes1), IsEqual.equalTo(null));
+		Assert.assertThat(cipher1.decrypt(encryptedBytes2), IsNull.nullValue());
+		Assert.assertThat(cipher2.decrypt(encryptedBytes1), IsNull.nullValue());
 		Assert.assertThat(cipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
 	}
 }

@@ -35,7 +35,7 @@ public class TransactionFactoryTest {
 		// Assert:
 		Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
-		Assert.assertThat(transaction.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -54,6 +54,6 @@ public class TransactionFactoryTest {
 		// Assert:
 		Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
-		Assert.assertThat(transaction.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
 	}
 }
