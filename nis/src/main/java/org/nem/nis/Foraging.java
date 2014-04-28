@@ -208,12 +208,11 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		if (bestBlock != null) {
 			// make a full-blown analysis
-			// TODO: fix it
-			
-//			if (blockChain.processBlock(bestBlock)) {
-//				// TODO: should this be called by Foraging? or maybe somewhere in blockchain
-//				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-//			}
+			// TODO: we can call it thanks to the "hack" inside processBlock
+			if (blockChain.processBlock(bestBlock)) {
+				// TODO: this probably should be called directly inside processBlock()
+				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
+			}
 		}
 	}
 
