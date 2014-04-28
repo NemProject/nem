@@ -64,7 +64,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions();
+		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
 
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 	}
@@ -207,7 +207,13 @@ public class Foraging implements AutoCloseable, Runnable {
 		}
 
 		if (bestBlock != null) {
-			addForagedBlock(bestBlock);
+			// make a full-blown analysis
+			// TODO: fix it
+			
+//			if (blockChain.processBlock(bestBlock)) {
+//				// TODO: should this be called by Foraging? or maybe somewhere in blockchain
+//				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
+//			}
 		}
 	}
 
@@ -236,21 +242,5 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		newBlock.signBy(virtualForger);
 		return newBlock;
-	}
-
-	private void addForagedBlock(Block bestBlock) {
-		//
-		// if we're here it means unconfirmed transactions haven't been
-		// seen in any block yet, so we can add this block to local db
-		//
-		// (if at some point later we receive better block,
-		// fork resolution will handle that)
-		//
-		if (blockChain.addBlockToDb(bestBlock)) {
-			removeFromUnconfirmedTransactions(bestBlock);
-
-			// TODO: should this be called by Foraging? or maybe somewhere in blockchain
-			host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-		}
 	}
 }
