@@ -5,9 +5,8 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +28,23 @@ public class MockBlockDao implements BlockDao {
 	private Long lastId;
 
 	private final ArrayList<Block> blocks;
+	private final MockBlockDaoMode mockMode;
+
+	/**
+	 * Possible mocking modes.
+	 */
+	public enum MockBlockDaoMode {
+
+		/**
+		 * The DAO supports returning a single block from all findBy* methods.
+		 */
+		SingleBlock,
+
+		/**
+		 * The DAO supports multiple blocks and will search through them.
+		 */
+		MultipleBlocks
+	}
 
 	/**
 	 * Creates a mock block dao.
@@ -46,10 +62,22 @@ public class MockBlockDao implements BlockDao {
 	 * @param chain The hash chain to return from getHashesFrom.
 	 */
 	public MockBlockDao(final Block block, final HashChain chain) {
+		this(block, chain, MockBlockDaoMode.SingleBlock);
+	}
+
+	/**
+	 * Creates a mock block dao.
+	 *
+	 * @param block The block to return from findBy* methods.
+	 * @param chain The hash chain to return from getHashesFrom.
+	 * @param mode The mocking mode.
+	 */
+	public MockBlockDao(final Block block, final HashChain chain, final MockBlockDaoMode mode) {
 		this.chain = chain;
 		this.blocks = new ArrayList<>();
 		this.addBlock(block);
 		this.lastId = 1L;
+		this.mockMode = mode;
 	}
 
 	public void addBlock(final Block block) {
@@ -78,36 +106,27 @@ public class MockBlockDao implements BlockDao {
 	public Block findById(long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		for (Block block : blocks) {
-			if (block.getId() == id) {
-				return block;
-			}
-		}
-		return null;
+		return find(block -> block.getId() == id);
 	}
 
 	@Override
 	public Block findByHash(Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;
-		for (Block block : blocks) {
-			if (block.getBlockHash().equals(blockHash)) {
-				return block;
-			}
-		}
-		return null;
+		return find(block -> block.getBlockHash().equals(blockHash));
 	}
 
 	@Override
 	public Block findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
-		for (Block block : blocks) {
-			if (block.getHeight() == height.getRaw()) {
-				return block;
-			}
-		}
-		return null;
+		return find(block -> block.getHeight() == height.getRaw());
+	}
+
+	private Block find(final Predicate<Block> findPredicate) {
+		return MockBlockDaoMode.SingleBlock == this.mockMode
+				? this.blocks.get(0)
+				: this.blocks.stream().filter(findPredicate).findFirst().get();
 	}
 
 	@Override
