@@ -2,10 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.Func;
-
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
@@ -131,5 +127,5 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Amount getMinimumFee();
 
-	public abstract void simulateExecute(NemTransfer incrementHandler, NemTransfer decrementHandler);
+	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
 }

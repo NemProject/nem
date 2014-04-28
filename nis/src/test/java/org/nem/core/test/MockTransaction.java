@@ -149,8 +149,9 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public void simulateExecute(NemTransfer incrementHandler, NemTransfer decrementHandler) {
+	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
 		this.simulateExecuteList.add(this.customField);
+		return true;
 	}
 
 }

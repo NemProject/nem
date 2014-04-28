@@ -123,8 +123,11 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public void simulateExecute(NemTransfer incrementHandler, NemTransfer decrementHandler) {
-		incrementHandler.evaluate(this.getSigner(), this.amount.add(this.getFee()));
-		decrementHandler.evaluate(this.recipient, this.amount);
+	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
+		if (! nemTransferSimulate.sub(this.getSigner(), this.amount.add(this.getFee()))) {
+			return false;
+		}
+		nemTransferSimulate.add(this.recipient, this.amount);
+		return true;
 	}
 }

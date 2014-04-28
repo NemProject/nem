@@ -7,6 +7,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.Predicate;
 import org.nem.nis.dbmodel.*;
+import sun.management.Sensor;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -58,21 +59,27 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		// TODO: is it ok? or better move try except inside the lambdas and return bool from lambdas?
-		try {
-			transaction.simulateExecute(
-					(Account sender, Amount balance) -> {
+		if (! transaction.simulateExecute(
+				new NemTransferSimulate() {
+					@Override
+					public boolean sub(Account sender, Amount amount) {
 						addToCache(sender);
-						Amount newBalance = this.unconfirmedBalances.get(sender).subtract(balance);
-						this.unconfirmedBalances.replace(sender, newBalance);
-					},
-					(Account recipient, Amount balance) -> {
-						addToCache(recipient);
-						Amount newBalance = this.unconfirmedBalances.get(recipient).add(balance);
-						this.unconfirmedBalances.replace(recipient, newBalance);
+						if (unconfirmedBalances.get(sender).compareTo(amount) < 0) {
+							return false;
+						}
+						Amount newBalance = unconfirmedBalances.get(sender).subtract(amount);
+						unconfirmedBalances.replace(sender, newBalance);
+						return true;
 					}
-			);
-		} catch (IllegalArgumentException ex) {
+
+					@Override
+					public void add(Account recipient, Amount amount) {
+						addToCache(recipient);
+						Amount newBalance = unconfirmedBalances.get(recipient).add(amount);
+						unconfirmedBalances.replace(recipient, newBalance);
+					}
+				}
+		)) {
 			return false;
 		}
 
