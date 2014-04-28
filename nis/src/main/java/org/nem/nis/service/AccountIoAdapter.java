@@ -29,6 +29,10 @@ public class AccountIoAdapter implements AccountIo {
 
 	@Override
 	public SerializableList<Transaction> getAccountTransfers(Address address) {
+
+		// TODO: probably it'll be better to a) ask accountDao about account
+		// TODO: b) pass obtained db-account to getTransactionsForAccount
+
 		final Account account = this.accountLookup.findByAddress(address);
 
 		Collection<Transfer> transfers = transferDao.getTransactionsForAccount(account, 25);
