@@ -38,9 +38,9 @@ public class AccountIoAdapter implements AccountIo {
 		Collection<Transfer> transfers = transferDao.getTransactionsForAccount(account, 25);
 
 		final SerializableList<Transaction> transactionList = new SerializableList<>(0);
-		transfers.stream().map(tr -> TransferMapper.toModel(tr, this.accountLookup)).forEach(
-				transaction -> transactionList.add(transaction)
-		);
+		transfers.stream()
+				.map(tr -> TransferMapper.toModel(tr, this.accountLookup))
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 

@@ -18,19 +18,16 @@ public class HttpMethodClientTest {
 
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpDeserializerResponseStrategy(null);
 
-	private final TestRunner getTestRunner = new TestRunner("GET", new TestRunner.SendAsyncStrategy() {
-		@Override
-		public <T> HttpMethodClient.AsyncToken<T> send(HttpMethodClient<T> client, URL url, HttpResponseStrategy<T> responseStrategy) {
-			return client.get(url, responseStrategy);
-		}
-	});
+	private final TestRunner getTestRunner = new TestRunner("GET", HttpMethodClient::get);
 
-	private final TestRunner postTestRunner = new TestRunner("POST", new TestRunner.SendAsyncStrategy() {
-		@Override
-		public <T> HttpMethodClient.AsyncToken<T> send(HttpMethodClient<T> client, URL url, HttpResponseStrategy<T> responseStrategy) {
-			return client.post(url, new MockSerializableEntity(), responseStrategy);
-		}
-	});
+	private final TestRunner postTestRunner = new TestRunner("POST", HttpMethodClientTest::sendPost);
+
+	private static <T> HttpMethodClient.AsyncToken<T> sendPost(
+			final HttpMethodClient<T> client,
+			final URL url,
+			final HttpResponseStrategy<T> responseStrategy) {
+		return client.post(url, new MockSerializableEntity(), responseStrategy);
+	}
 
 	//region get
 

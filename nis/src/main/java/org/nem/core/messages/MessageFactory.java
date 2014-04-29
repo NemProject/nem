@@ -18,12 +18,7 @@ public class MessageFactory {
 	 * @return An object deserializer.
 	 */
 	public static ObjectDeserializer<Message> createDeserializer(final Account sender, final Account recipient) {
-		return new ObjectDeserializer<Message>() {
-			@Override
-			public Message deserialize(final Deserializer deserializer) {
-				return MessageFactory.deserialize(sender, recipient, deserializer);
-			}
-		};
+		return deserializer -> deserialize(sender, recipient, deserializer);
 	}
 
 	/**
