@@ -1,34 +1,90 @@
 package org.nem.core.utils;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
+import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 public class ExceptionUtilsTest {
 
-	//region toUnchecked
+	//region propagate
 
 	@Test
-	public void toUncheckedReturnsAnUncheckedException() throws Exception {
+	public void propagateReturnsResultOnSuccess() {
+		// Act:
+		final int result = ExceptionUtils.propagate(() -> 7);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(7));
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateAllowsRuntimeExceptionsToPropagate() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new EncodingException(); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new IOException(); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagate(
+				() -> { throw new IOException(); },
+				EncodingException::new);
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateUnwrapsUncheckedExecutionExceptions() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new EncodingException()); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IOException()); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagate(
+				() -> { throw new MockExecutionException(new IOException()); },
+				EncodingException::new);
+	}
+
+	@Test
+	public void propagateMapsInterruptedExceptionToIllegalStateException() throws InterruptedException {
 		// Arrange:
-		final TestRunner runner = new TestRunner();
+		final InterruptedExceptionTestRunner runner = new InterruptedExceptionTestRunner(() ->
+				ExceptionUtils.propagate(() -> {
+					Thread.sleep(1000);
+					return null;
+				}));
 
 		// Act:
 		runner.run();
 
 		// Assert:
-		Assert.assertThat(runner.getUnhandledException(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
 		Assert.assertThat(runner.getUnhandledException(), Is.is(IllegalStateException.class));
 	}
 
 	@Test
-	public void toUncheckedSetsThreadInterruptFlag() throws Exception {
+	public void propagateSetsThreadInterruptFlagWhenMappingInterruptedException() throws InterruptedException {
 		// Arrange:
-		final TestRunner runner = new TestRunner();
+		final InterruptedExceptionTestRunner runner = new InterruptedExceptionTestRunner(() ->
+				ExceptionUtils.propagate(() -> {
+					Thread.sleep(1000);
+					return null;
+				}));
 
 		// Act:
 		runner.run();
@@ -38,7 +94,93 @@ public class ExceptionUtilsTest {
 		Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
 	}
 
-	private class TestRunner {
+	//endregion
+
+	//region propagateVoid
+
+	@Test
+	public void propagateVoidDoesNotThrowExceptionOnSuccess() {
+		// Act:
+		ExceptionUtils.propagateVoid(() -> { });
+
+		// Assert: (no exception)
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateVoidAllowsRuntimeExceptionsToPropagate() {
+		// Act:
+		ExceptionUtils.propagateVoid(() -> { throw new EncodingException(); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateVoidWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagateVoid(() -> { throw new IOException(); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateVoidCanWrapCheckedExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagateVoid(
+				() -> { throw new IOException(); },
+				EncodingException::new);
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateVoidUnwrapsUncheckedExecutionExceptions() {
+		// Act:
+		ExceptionUtils.propagateVoid(() -> { throw new MockExecutionException(new EncodingException()); });
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void propagateVoidWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
+		// Act:
+		ExceptionUtils.propagateVoid(() -> { throw new MockExecutionException(new IOException()); });
+	}
+
+	@Test(expected = EncodingException.class)
+	public void propagateVoidCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
+		// Act:
+		ExceptionUtils.propagateVoid(
+				() -> { throw new MockExecutionException(new IOException()); },
+				EncodingException::new);
+	}
+
+	@Test
+	public void propagateVoidMapsInterruptedExceptionToIllegalStateException() throws InterruptedException {
+		// Arrange:
+		final InterruptedExceptionTestRunner runner = new InterruptedExceptionTestRunner(() -> {
+			ExceptionUtils.propagateVoid(() -> Thread.sleep(1000));
+			return null;
+		});
+
+		// Act:
+		runner.run();
+
+		// Assert:
+		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
+		Assert.assertThat(runner.getUnhandledException(), Is.is(IllegalStateException.class));
+	}
+
+	@Test
+	public void propagateVoidSetsThreadInterruptFlagWhenMappingInterruptedException() throws InterruptedException {
+		// Arrange:
+		final InterruptedExceptionTestRunner runner = new InterruptedExceptionTestRunner(() -> {
+			ExceptionUtils.propagateVoid(() -> Thread.sleep(1000));
+			return null;
+		});
+
+		// Act:
+		runner.run();
+
+		// Assert:
+		Assert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
+		Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	private class InterruptedExceptionTestRunner {
 
 		private final Thread blockingThread;
 
@@ -46,14 +188,12 @@ public class ExceptionUtilsTest {
 		private boolean isInterruptedPostRun;
 		private Throwable unhandledException;
 
-		public TestRunner() {
+		public InterruptedExceptionTestRunner(final Supplier<Void> supplier) {
 			this.blockingThread = new Thread(() -> {
 				isInterruptedPreRun = Thread.currentThread().isInterrupted();
 
 				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					throw ExceptionUtils.toUnchecked(e);
+					supplier.get();
 				} finally {
 					isInterruptedPostRun = Thread.currentThread().isInterrupted();
 				}
@@ -83,64 +223,10 @@ public class ExceptionUtilsTest {
 		}
 	}
 
-	//endregion
-
-	//region propagate
-
-	@Test
-	public void propagateReturnsResultOnSuccess() {
-		// Act:
-		final int result = ExceptionUtils.propagate(() -> 7);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(7));
-	}
-
-	@Test(expected = EncodingException.class)
-	public void propagateAllowsRuntimeExceptionsToPropagate() {
-		// Act:
-		ExceptionUtils.propagate(() -> { throw new EncodingException(); });
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void propagateWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
-		// Act:
-		ExceptionUtils.propagate(() -> { throw new IOException(); });
-	}
-
-	@Test(expected = EncodingException.class)
-	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
-		// Act:
-		ExceptionUtils.propagate(() -> { throw new IOException(); }, EncodingException::new);
-	}
-
-	@Test(expected = EncodingException.class)
-	public void propagateUnwrapsUncheckedExecutionExceptions() {
-		// Act:
-		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new EncodingException()); });
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void propagateWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
-		// Act:
-		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IOException()); });
-	}
-
-	@Test(expected = EncodingException.class)
-	public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
-
-		// Act:
-		ExceptionUtils.propagate(
-				() -> { throw new MockExecutionException(new IOException()); },
-				EncodingException::new);
-	}
-
 	private class MockExecutionException extends ExecutionException {
 
 		public MockExecutionException(final Throwable cause) {
 			super(cause);
 		}
 	}
-
-	//endregion
 }

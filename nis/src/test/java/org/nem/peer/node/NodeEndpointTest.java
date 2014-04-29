@@ -1,9 +1,7 @@
-package org.nem.core.connect;
+package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.connect.NodeApiId;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;

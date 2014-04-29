@@ -1,27 +1,33 @@
 package org.nem.peer;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
-import org.nem.peer.scheduling.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Represents a collection of all known NEM nodes.
  */
 public class PeerNetwork {
 
+	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
+
 	private final Config config;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
-	private final SchedulerFactory<Node> schedulerFactory;
 	private final BlockSynchronizer blockSynchronizer;
 
 	private final NodeExperiences nodeExperiences;
+	private NodeSelector selector;
 
 	/**
 	 * Creates a new network with the specified configuration.
@@ -39,7 +45,6 @@ public class PeerNetwork {
 		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
 		this.syncConnectorPool = services.getSyncConnectorPool();
-		this.schedulerFactory = services.getSchedulerFactory();
 		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
 
@@ -99,13 +104,11 @@ public class PeerNetwork {
 		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
 	}
 
-	/**
-	 * Gets a communication partner node.
-	 * TODO: with this model the EigenTrust trust will be calculated each time a partner is requested.
-	 *
-	 * @return A communication partner node.
-	 */
-	public NodeExperiencePair getPartnerNode() {
+	private Node[] getNodeArray() {
+		return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
+	}
+
+	private void updateTrust() {
 		// create a new trust context each iteration in order to allow
 		// nodes to change in-between iterations.
 		final TrustContext context = new TrustContext(
@@ -115,30 +118,21 @@ public class PeerNetwork {
 				this.config.getPreTrustedNodes(),
 				this.config.getTrustParameters());
 
-		final NodeSelector basicNodeSelector = this.getNodeSelector();
-		return basicNodeSelector.selectNode(context);
-	}
-
-	private Node[] getNodeArray() {
-		return TrustUtils.toNodeArray(this.nodes, this.getLocalNode());
-	}
-
-	private NodeSelector getNodeSelector() {
-		// wrap the configured trust provider in an ActiveNodeTrustProvider to ensure that
-		// only active nodes are returned as communication partners
-		return new BasicNodeSelector(new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes));
+		this.selector = new BasicNodeSelector(
+				new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes),
+				context);
 	}
 
 	/**
 	 * Refreshes the network.
 	 */
-	public void refresh() {
+	public CompletableFuture<Void> refresh() {
 		final NodeRefresher refresher = new NodeRefresher(
 				this.getLocalNode(),
 				this.getNodes(),
-				this.peerConnector,
-				this.schedulerFactory);
-		refresher.refresh();
+				this.peerConnector);
+
+		return refresher.refresh().whenComplete((v, e) -> this.updateTrust());
 	}
 
 	/**
@@ -147,70 +141,95 @@ public class PeerNetwork {
 	 * @param broadcastId The type of entity.
 	 * @param entity      The entity.
 	 */
-	public void broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-		this.forAllActiveNodes(element -> peerConnector.announce(element.getEndpoint(), broadcastId, entity));
+	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
+				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
+				.collect(Collectors.toList());
+
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 	}
 
 	public void synchronize() {
-		this.forAllActiveNodes(element -> blockSynchronizer.synchronizeNode(syncConnectorPool, element));
-	}
+		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
+		if (null == partnerNodePair) {
+			LOGGER.warning("no suitable peers found to sync with");
+			return;
+		}
 
-	private void forAllActiveNodes(final Action<Node> action) {
-		final Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(action);
-		scheduler.push(this.nodes.getActiveNodes());
-		scheduler.block();
+		final Node partnerNode = partnerNodePair.getNode();
+		LOGGER.info("synchronizing with: " + partnerNode);
+		this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
 	}
 
 	private static class NodeRefresher {
 		final Node localNode;
 		final NodeCollection nodes;
 		final PeerConnector connector;
-		final SchedulerFactory<Node> schedulerFactory;
 		final Map<Node, NodeStatus> nodesToUpdate;
+		final ConcurrentHashSet<Node> connectedNodes;
 
 		public NodeRefresher(
 				final Node localNode,
 				final NodeCollection nodes,
-				final PeerConnector connector,
-				final SchedulerFactory<Node> schedulerFactory) {
+				final PeerConnector connector) {
 			this.localNode = localNode;
 			this.nodes = nodes;
 			this.connector = connector;
-			this.schedulerFactory = schedulerFactory;
-			this.nodesToUpdate = new HashMap<>();
+			this.nodesToUpdate = new ConcurrentHashMap<>();
+			this.connectedNodes = new ConcurrentHashSet<>();
 		}
 
-		public void refresh() {
-			Scheduler<Node> scheduler = this.schedulerFactory.createScheduler(this::refreshNode);
+		public CompletableFuture<Void> refresh() {
+			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream()
+					.map(this::refreshNodeAsync)
+					.collect(Collectors.toList());
 
-			scheduler.push(this.nodes.getActiveNodes());
-			scheduler.push(this.nodes.getInactiveNodes());
-			scheduler.block();
-
-			for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
-				this.nodes.update(entry.getKey(), entry.getValue());
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+                    .whenComplete((o, e) -> {
+						for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+							this.nodes.update(entry.getKey(), entry.getValue());
+					});
 		}
 
-		private void refreshNode(final Node node) {
-			Node refreshedNode = node;
-			NodeStatus updatedStatus = NodeStatus.ACTIVE;
-			try {
-				refreshedNode = this.connector.getInfo(node.getEndpoint());
+		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
+			return this.getNodeInfo(node, true);
+		}
 
-				// if the node returned inconsistent information, drop it for this round
-				if (!areCompatible(node, refreshedNode)) {
-					updatedStatus = NodeStatus.FAILURE;
-					refreshedNode = node;
-				} else {
-					this.mergePeers(this.connector.getKnownPeers(node.getEndpoint()));
-				}
-			} catch (InactivePeerException e) {
-				updatedStatus = NodeStatus.INACTIVE;
-			} catch (FatalPeerException e) {
-				updatedStatus = NodeStatus.FAILURE;
+		private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
+			if (!this.connectedNodes.add(node)) {
+				return CompletableFuture.completedFuture(null);
 			}
 
-			this.update(refreshedNode, updatedStatus);
+			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
+					.thenApply(n -> {
+						// if the node returned inconsistent information, drop it for this round
+						if (!areCompatible(node, n))
+							throw new FatalPeerException("node response is not compatible with node identity");
+
+						return NodeStatus.ACTIVE;
+					});
+
+			if (isDirectContact) {
+				future = future
+						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
+						.thenCompose(nodes -> {
+							final List<CompletableFuture> futures = nodes.getActiveNodes().stream()
+									.map(n -> this.getNodeInfo(n, false))
+									.collect(Collectors.toList());
+
+							return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+						})
+						.thenApply(v -> NodeStatus.ACTIVE);
+			}
+
+			return future
+					.exceptionally(this::getNodeStatusFromException)
+					.thenAccept(ns -> this.update(node, ns));
+		}
+
+		private NodeStatus getNodeStatusFromException(Throwable ex) {
+			ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
+			return InactivePeerException.class == ex.getClass() ? NodeStatus.INACTIVE : NodeStatus.FAILURE;
 		}
 
 		private static boolean areCompatible(final Node lhs, final Node rhs) {
@@ -221,23 +240,8 @@ public class PeerNetwork {
 			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
+			LOGGER.info("Updating \"" + node + "\" -> " + status);
 			this.nodesToUpdate.put(node, status);
-		}
-
-		private void mergePeers(final NodeCollection nodes) {
-			this.mergePeers(nodes.getActiveNodes(), NodeStatus.ACTIVE);
-			this.mergePeers(nodes.getInactiveNodes(), NodeStatus.INACTIVE);
-		}
-
-		private void mergePeers(final Iterable<Node> iterable, final NodeStatus status) {
-			for (final Node node : iterable) {
-				// nodes directly communicated with are already in this.nodes
-				// give their direct connection precedence over what peers report
-				if (NodeStatus.FAILURE != this.nodes.getNodeStatus(node))
-					continue;
-
-				this.update(node, status);
-			}
 		}
 	}
 }

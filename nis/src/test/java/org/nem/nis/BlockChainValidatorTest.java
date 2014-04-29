@@ -60,9 +60,10 @@ public class BlockChainValidatorTest {
 
 		final List<Block> blocks = new ArrayList<>();
 		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		Block dummyPrevious = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
-		block.setPreviousBlockHash(Hash.ZERO);
+		blocks.get(blocks.size()-1).setPrevious(dummyPrevious);
 		signAllBlocks(blocks);
 
 		// Assert:
@@ -214,7 +215,7 @@ public class BlockChainValidatorTest {
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = createBlockList(parentBlock, 2);
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createInvalidSignedTransaction());
@@ -239,13 +240,17 @@ public class BlockChainValidatorTest {
 		block = new Block(account, parentBlock, TimeInstant.ZERO);
 		blocks.add(block);
 
+
 		final Block middleBlock = new Block(account, block, TimeInstant.ZERO);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
+		blocks.add(middleBlock);
 
 		final Block lastBlock = new Block(account, middleBlock, TimeInstant.ZERO);
+		blocks.add(lastBlock);
+
+		signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -303,14 +308,12 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Block createBlock(final Account account, long height) {
-		Block block = new Block(account, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
-		block.setGenerationHash(Hash.ZERO);
+		Block block = new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 		return block;
 	}
 
 	private static Block createBlock(final Account account, Block parentBlock) {
 		Block block = new Block(account, parentBlock, TimeInstant.ZERO);
-		block.setGenerationHash(Hash.ZERO);
 		return block;
 	}
 

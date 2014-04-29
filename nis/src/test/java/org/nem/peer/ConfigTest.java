@@ -3,8 +3,7 @@ package org.nem.peer;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.connect.NodeEndpoint;
-import org.nem.peer.node.Node;
+import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 
@@ -94,7 +93,7 @@ public class ConfigTest {
 		final TrustProvider provider = config.getTrustProvider();
 
 		// Assert:
-		Assert.assertThat(provider, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(provider, IsNull.notNullValue());
 	}
 
 	//region Factories

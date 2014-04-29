@@ -7,10 +7,7 @@ import org.nem.core.model.TransactionFactory;
 import org.nem.core.model.TransferTransaction;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
-import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.core.connect.NodeApiId;
-import org.nem.peer.PeerNetwork;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,16 +20,13 @@ public class TransferController {
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
-	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	TransferController(
 			final AccountAnalyzer accountAnalyzer,
-			final Foraging foraging,
-			final NisPeerNetworkHost host) {
+			final Foraging foraging) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.foraging = foraging;
-		this.host = host;
 	}
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
@@ -60,16 +54,8 @@ public class TransferController {
 		if (!transfer.isValid() || !transfer.verify())
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
 
-        final PeerNetwork network = this.host.getNetwork();
-
-        // add to unconfirmed transactions
-        if (foraging.processTransaction(transfer)) {
-
-            // propagate transactions
-            // TODO: this should queue request and return immediately, so that client who
-            // actually has sent /transfer/announce won't wait for this...
-            network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
-        }
+		// add to unconfirmed transactions
+        foraging.processTransaction(transfer);
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {

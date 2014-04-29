@@ -2,10 +2,10 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.Predicate;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +43,7 @@ public class UnconfirmedTransactions {
 	 */
 	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (exists.evaluate(transactionHash)) {
+		if (exists.test(transactionHash)) {
 			return false;
 		}
 

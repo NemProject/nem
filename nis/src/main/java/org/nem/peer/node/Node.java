@@ -1,6 +1,5 @@
 package org.nem.peer.node;
 
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.*;
 
 /**

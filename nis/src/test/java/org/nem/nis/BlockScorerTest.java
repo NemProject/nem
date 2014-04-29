@@ -39,8 +39,7 @@ public class BlockScorerTest {
 		final KeyPair keyPair = new KeyPair(new PublicKey(PUBKEY_BYTES));
 		final Account blockSigner = new Account(keyPair);
 		final BlockScorer scorer = new BlockScorer();
-		final Block previousBlock = new Block(blockSigner, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(11));
-		previousBlock.setGenerationHash(new Hash(HASH_BYTES));
+		final Block previousBlock = new Block(blockSigner, Hash.ZERO, new Hash(HASH_BYTES), TimeInstant.ZERO, new BlockHeight(11));
 
 		// Act:
 		final BigInteger hit = scorer.calculateHit(previousBlock);
@@ -158,10 +157,8 @@ public class BlockScorerTest {
 		Block block;
 		Block[] blocks = new Block[numRounds];
 		int[] secondsBetweenBlocks = new int[numRounds];
-		Hash hash = new Hash(HASH_BYTES);
-		blocks[0] = new Block(foragerAccounts[0], hash, new TimeInstant(1), new BlockHeight(1));
+		blocks[0] = createFirstBlock(foragerAccounts[0], new Hash(HASH_BYTES));
 		blocks[0].setDifficulty(BlockDifficulty.INITIAL_DIFFICULTY);
-		blocks[0].setGenerationHash(HashUtils.nextHash(hash, foragerAccounts[0].getKeyPair().getPublicKey()));
 
 		List<Block> historicalBlocks = new LinkedList<>();
 		historicalBlocks.add(blocks[0]);
@@ -336,9 +333,7 @@ public class BlockScorerTest {
 		final List<Block> blocks = new LinkedList<>();
 		byte[] rndBytes = new byte[32];
 
-		final Hash hash = new Hash(rndBytes);
-		Block firstBlock = new Block(foragerA, hash, new TimeInstant(1), new BlockHeight(1));
-		firstBlock.setGenerationHash(new Hash(HASH_BYTES));
+		Block firstBlock = new Block(foragerA, new Hash(rndBytes), new Hash(HASH_BYTES), new TimeInstant(1), new BlockHeight(1));
 		foragerA.incrementForagedBlocks();
 		Block block;
 
@@ -385,9 +380,7 @@ public class BlockScorerTest {
 			Account selfishForager = createAccountWithBalance(selfishForgerBalance);
 
 			sr.nextBytes(rndBytes);
-			Hash hash = new Hash(rndBytes);
-			firstBlock = new Block(normalForager, hash, new TimeInstant(1), new BlockHeight(1));
-			firstBlock.setGenerationHash(HashUtils.nextHash(hash, normalForager.getKeyPair().getPublicKey()));
+			firstBlock = createFirstBlock(normalForager, new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
@@ -455,9 +448,7 @@ public class BlockScorerTest {
 			}
 
 			sr.nextBytes(rndBytes);
-			Hash hash = new Hash(rndBytes);
-			firstBlock = new Block(foragers[i % count], hash, new TimeInstant(1), new BlockHeight(1));
-			firstBlock.setGenerationHash(HashUtils.nextHash(hash, foragers[i % count].getKeyPair().getPublicKey()));
+			firstBlock = createFirstBlock(foragers[i % count], new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
@@ -518,9 +509,7 @@ public class BlockScorerTest {
 			}
 
 			sr.nextBytes(rndBytes);
-			Hash hash = new Hash(rndBytes);
-			firstBlock = new Block(forargers[i % count], hash, new TimeInstant(1), new BlockHeight(1));
-			firstBlock.setGenerationHash(HashUtils.nextHash(hash, forargers[i % count].getKeyPair().getPublicKey()));
+			firstBlock = createFirstBlock(forargers[i % count], new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
@@ -583,9 +572,7 @@ public class BlockScorerTest {
 			Account selfishForager = createAccountWithBalance(selfishForgerBalance * percentage * 2 / 100);
 
 			sr.nextBytes(rndBytes);
-			Hash hash = new Hash(rndBytes);
-			firstBlock = new Block(forargers[i % count], hash, new TimeInstant(1), new BlockHeight(1));
-			firstBlock.setGenerationHash(HashUtils.nextHash(hash, forargers[i % count].getKeyPair().getPublicKey()));
+			firstBlock = createFirstBlock(forargers[i % count], new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
@@ -640,9 +627,7 @@ public class BlockScorerTest {
 		foragers[count] = createAccountWithBalance(manyForagersBalance);
 
 		sr.nextBytes(rndBytes);
-		Hash hash = new Hash(rndBytes);
-		firstBlock = new Block(foragers[0], hash, new TimeInstant(1), new BlockHeight(1));
-		firstBlock.setGenerationHash(HashUtils.nextHash(hash, foragers[0].getKeyPair().getPublicKey()));
+		firstBlock = createFirstBlock(foragers[0], new Hash(rndBytes));
 
 		blocks.clear();
 		blocks.add(firstBlock);
@@ -662,6 +647,11 @@ public class BlockScorerTest {
 		long percentage = (foragers[count].getForagedBlocks().getRaw()*100)/(foragers[count].getForagedBlocks().getRaw() + manyForagersNumBlocks);
 		LOGGER.info("One forager created  " + foragers[count].getForagedBlocks().getRaw() + " blocks (" + percentage + "%), " + count + " foragers created " + manyForagersNumBlocks + " blocks.");
 		return percentage;
+	}
+
+	private Block createFirstBlock(final Account account, final Hash previousHash) {
+		final Hash generationHash = HashUtils.nextHash(previousHash, account.getKeyPair().getPublicKey());
+		return new Block(account, previousHash, generationHash, new TimeInstant(1), new BlockHeight(1));
 	}
 
 	private List<BlockDifficulty> createDifficultiesList(List<Block> blocks) {
@@ -789,7 +779,7 @@ public class BlockScorerTest {
 //	}
 
 	private static Block createBlock(final Account account, int timeStamp, long height) {
-		return new Block(account, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
+		return new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 	}
 
 	private static Account createAccountWithBalance(long balance) {

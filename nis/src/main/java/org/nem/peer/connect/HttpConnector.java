@@ -1,11 +1,13 @@
-package org.nem.core.connect;
+package org.nem.peer.connect;
 
+import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 
 import java.net.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * An HTTP-based PeerConnector and SyncConnector implementation.
@@ -35,21 +37,21 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//region PeerConnector
 
 	@Override
-	public Node getInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_INFO);
-		return new Node(this.get(url));
+		return this.getAsync(url).getFuture().thenApply(Node::new);
 	}
 
 	@Override
-	public NodeCollection getKnownPeers(final NodeEndpoint endpoint) {
+	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
-		return new NodeCollection(this.get(url));
+		return this.getAsync(url).getFuture().thenApply(NodeCollection::new);
 	}
 
 	@Override
-	public void announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
-		this.postVoid(url, entity);
+		return this.postVoidAsync(url, entity).getFuture();
 	}
 
 	//endregion
@@ -84,14 +86,18 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//endregion
 
 	private Deserializer get(final URL url) {
-		return this.httpMethodClient.get(url, this.responseStrategy).get();
+		return this.getAsync(url).get();
+	}
+
+	private HttpMethodClient.AsyncToken<Deserializer> getAsync(final URL url) {
+		return this.httpMethodClient.get(url, this.responseStrategy);
 	}
 
 	private Deserializer post(final URL url, final SerializableEntity entity) {
 		return this.httpMethodClient.post(url, entity, this.responseStrategy).get();
 	}
 
-	private Deserializer postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).get();
+	private HttpMethodClient.AsyncToken<Deserializer> postVoidAsync(final URL url, final SerializableEntity entity) {
+		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
 	}
 }

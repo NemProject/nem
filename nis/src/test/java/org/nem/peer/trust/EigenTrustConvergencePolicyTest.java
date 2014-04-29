@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
 
@@ -13,7 +13,7 @@ public class EigenTrustConvergencePolicyTest {
 		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(null));
+		Assert.assertThat(result, IsNull.nullValue());
 		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
 	}
 

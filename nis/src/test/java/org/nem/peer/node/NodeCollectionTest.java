@@ -2,7 +2,6 @@ package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.peer.test.*;
 
 import java.util.Iterator;
@@ -228,6 +227,20 @@ public class NodeCollectionTest {
 		it.next();
 
 		// Assert: no ConcurrentModificationException is thrown
+	}
+
+	//endregion
+
+	//region collections
+
+	@Test
+	public void nodeCollectionsContainAllExpectedNodes() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+		// Assert:
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "D", "F" }, new String[] { "B", "C" });
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "B", "C", "D", "F" });
 	}
 
 	//endregion

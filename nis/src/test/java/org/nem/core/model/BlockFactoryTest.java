@@ -23,7 +23,7 @@ public class BlockFactoryTest {
 	public void canDeserializeVerifiableBlock() {
 		// Arrange:
 		final Account forger = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block originalBlock = new Block(forger, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, new MockAccountLookup());
 
 		// Act:
@@ -32,14 +32,14 @@ public class BlockFactoryTest {
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(block.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void canDeserializeNonVerifiableBlock() {
 		// Arrange:
 		final Account forger = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(forger, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block originalBlock = new Block(forger, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				originalBlock.asNonVerifiable(),
 				new MockAccountLookup());
@@ -50,6 +50,6 @@ public class BlockFactoryTest {
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(block.getSignature(), IsNull.nullValue());
 	}
 }

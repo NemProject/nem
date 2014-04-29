@@ -13,15 +13,38 @@ public class ExceptionUtils {
 	}
 
 	/**
-	 * Wraps a checked InterruptedException in an unchecked exception.
-	 *
-	 * @param e The checked exception.
-	 *
-	 * @return An unchecked exception.
+	 * Interface that mimics Runnable but can additionally throw checked exceptions.
 	 */
-	public static RuntimeException toUnchecked(final InterruptedException e) {
-		Thread.currentThread().interrupt();
-		return new IllegalStateException(e);
+	public interface CheckedRunnable {
+
+		/**
+		 * Executes the runnable.
+		 *
+		 * @throws Exception Any exception.
+		 */
+		public void call() throws Exception;
+	}
+
+	/**
+	 * Propagates checked exceptions as a runtime exception.
+	 *
+	 * @param runnable The checked runnable.
+	 */
+	public static void propagateVoid(final CheckedRunnable runnable) {
+		propagateVoid(runnable, RuntimeException::new);
+	}
+
+	/**
+	 * Propagates checked exceptions as a specific runtime exception.
+	 *
+	 * @param runnable The checked runnable.
+	 * @param wrap A function that wraps an exception in a runtime exception.
+	 * @param <E> The specific exception type.
+	 */
+	public static <E extends RuntimeException> void propagateVoid(
+			final CheckedRunnable runnable,
+			final Function<Exception, E> wrap) {
+		propagate(new CheckedRuntimeToCallableAdapter(runnable), wrap);
 	}
 
 	/**
@@ -44,7 +67,9 @@ public class ExceptionUtils {
 	 * @param <E> The specific exception type.
 	 * @return The function result.
 	 */
-	public static <T, E extends RuntimeException> T propagate(final Callable<T> callable, final Function<Exception, E> wrap) {
+	public static <T, E extends RuntimeException> T propagate(
+			final Callable<T> callable,
+			final Function<Exception, E> wrap) {
 		try {
 			return callable.call();
 		} catch (ExecutionException e) {
@@ -53,8 +78,26 @@ public class ExceptionUtils {
 			throw wrap.apply(e);
 		} catch (RuntimeException e) {
 			throw e;
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException(e);
+		}
+		catch (Exception e) {
 			throw wrap.apply(e);
+		}
+	}
+
+	private static class CheckedRuntimeToCallableAdapter implements Callable<Void> {
+		private final CheckedRunnable runnable;
+
+		public CheckedRuntimeToCallableAdapter(final CheckedRunnable runnable) {
+			this.runnable = runnable;
+		}
+
+		@Override
+		public Void call() throws Exception {
+			this.runnable.call();
+			return null;
 		}
 	}
 }

@@ -52,7 +52,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-		Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
-		Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -199,7 +199,12 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	@Ignore
 	public void isValidChecksForMaximumFee() {
+
+		// TODO: this is not an attack vector because any amount overflow will trigger an Amount exception
+		Amount a = new Amount(Long.MAX_VALUE).add(new Amount(1));
+
 		// Arrange: I might be be paranoid, is a overflow attack possible?
 		//          Checking for fee <= ALL_NEM is cheap.
 		final Account signer = Utils.generateRandomAccount();
@@ -220,7 +225,10 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	@Ignore
 	public void isValidChecksForNegativeAmount() {
+		// TODO: this is not an attack vector because Amount cannot be negative
+
 		// Arrange (category stealing attack):
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
@@ -258,7 +266,12 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	@Ignore
 	public void isValidChecksForMaximumAmount() {
+
+		// TODO: this is not an attack vector because any amount overflow will trigger an Amount exception
+		Amount a = new Amount(Long.MAX_VALUE).add(new Amount(1));
+
 		// Arrange: I might be be paranoid, is a overflow attack possible?
 		//          Checking for amount <= ALL_NEM is cheap.
 		final Account signer = Utils.generateRandomAccount();
@@ -548,7 +561,7 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 		// Assert:
-		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
 	}
 
 	//endregion

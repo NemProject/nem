@@ -1,9 +1,8 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.*;
-import org.nem.peer.node.Node;
+import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 
 import java.io.InputStream;

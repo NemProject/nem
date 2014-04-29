@@ -219,10 +219,10 @@ public class ForagingTest {
 		final Block parent = new Block(
 				signer,
 				Hash.ZERO,
+				Hash.ZERO,
 				parentTime,
 				BlockHeight.ONE);
 		parent.sign();
-		parent.setGenerationHash(Hash.ZERO);
 
 		// Act:
 		foraging.setAccountLookup(accountAnalyzer);

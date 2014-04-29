@@ -253,7 +253,7 @@ public class BinarySerializerTest {
 				final byte[] readBytes = deserializer.readBytes("bytes");
 
 				// Assert:
-				Assert.assertThat(readBytes, IsEqual.equalTo(null));
+				Assert.assertThat(readBytes, IsNull.nullValue());
 				Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(false));
 			}
 		}
@@ -323,7 +323,7 @@ public class BinarySerializerTest {
 				final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
 
 				// Assert:
-				Assert.assertThat(object, IsEqual.equalTo(null));
+				Assert.assertThat(object, IsNull.nullValue());
 			}
 		}
 	}
@@ -366,7 +366,7 @@ public class BinarySerializerTest {
 
 				// Assert:
 				Assert.assertThat(objects.size(), IsEqual.equalTo(1));
-				Assert.assertThat(objects.get(0), IsEqual.equalTo(null));
+				Assert.assertThat(objects.get(0), IsNull.nullValue());
 			}
 		}
 	}

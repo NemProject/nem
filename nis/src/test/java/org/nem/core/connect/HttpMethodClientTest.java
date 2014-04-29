@@ -161,7 +161,7 @@ public class HttpMethodClientTest {
 			final Deserializer deserializer = this.strategy.send(client, stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get();
 
 			// Assert:
-			Assert.assertThat(deserializer, IsNot.not(IsEqual.equalTo(null)));
+			Assert.assertThat(deserializer, IsNull.notNullValue());
 			Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 			Assert.assertThat(deserializer.readString("key"), IsEqual.equalTo("value"));
 		}

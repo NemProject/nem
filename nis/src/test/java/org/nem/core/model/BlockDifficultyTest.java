@@ -14,7 +14,7 @@ public class BlockDifficultyTest {
 		// Assert:
 		Assert.assertThat(
 				BlockDifficulty.INITIAL_DIFFICULTY,
-				IsEqual.equalTo(new BlockDifficulty(120_000_000_000L)));
+				IsEqual.equalTo(new BlockDifficulty(50_000_000_000_000L)));
 	}
 
 	//endregion
@@ -24,28 +24,28 @@ public class BlockDifficultyTest {
 	@Test
 	public void valueInDifficultyRangeIsNotChanged() {
 		// Arrange:
-		final BlockDifficulty difficulty = new BlockDifficulty(987_654_321_123L);
+		final BlockDifficulty difficulty = new BlockDifficulty(79_876_543_211_237L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(987_654_321_123L));
+		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(79_876_543_211_237L));
 	}
 
 	@Test
 	public void valueBelowMinDifficultyIsIncreasedToMinDifficulty() {
 		// Arrange:
-		final BlockDifficulty difficulty = new BlockDifficulty(7_654_321_123L);
+		final BlockDifficulty difficulty = new BlockDifficulty(1_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(12_000_000_000L));
+		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(5_000_000_000_000L));
 	}
 
 	@Test
 	public void valueAboveMaxDifficultyIsDecreasedToMaxDifficulty() {
 		// Arrange:
-		final BlockDifficulty difficulty = new BlockDifficulty(2_987_654_321_123L);
+		final BlockDifficulty difficulty = new BlockDifficulty(987_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(1_200_000_000_000L));
+		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(500_000_000_000_000L));
 	}
 
 	//endregion
@@ -53,9 +53,9 @@ public class BlockDifficultyTest {
 	@Test
 	public void valueCanBeReturnedAsBigInteger() {
 		// Arrange:
-		final BlockDifficulty difficulty = new BlockDifficulty(987_654_321_123L);
+		final BlockDifficulty difficulty = new BlockDifficulty(79_876_543_211_237L);
 
 		// Assert:
-		Assert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("987654321123")));
+		Assert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("79876543211237")));
 	}
 }

@@ -10,6 +10,13 @@ import org.nem.nis.dbmodel.Block;
 public interface ReadOnlyBlockDao {
 
 	/**
+	 * Returns number of blocks in the database.
+	 *
+	 * @return number of blocks in the database.
+	 */
+	public Long count();
+
+	/**
 	 * Retrieves Block from db given it's id in the database.
 	 *
 	 * @param id id of a block.

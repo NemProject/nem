@@ -5,7 +5,8 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.controller.utils.RequiredBlockDaoAdapter;
+import org.nem.nis.service.DbBlockIoAdapter;
+import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.test.*;
 
 public class BlockControllerTest {
@@ -17,7 +18,8 @@ public class BlockControllerTest {
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final MockBlockDao blockDao = new MockBlockDao(NisUtils.createBlockWithTimeStamp(27));
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
-		final BlockController controller = new BlockController(requiredBlockDao, accountLookup);
+		final DbBlockIoAdapter dbBlockIoAdapter = new DbBlockIoAdapter(requiredBlockDao, accountLookup);
+		final BlockController controller = new BlockController(dbBlockIoAdapter);
 
 		// Act:
 		final org.nem.core.model.Block block = controller.blockGet(hash.toString());
@@ -35,7 +37,8 @@ public class BlockControllerTest {
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final MockBlockDao blockDao = new MockBlockDao(NisUtils.createBlockWithTimeStamp(27));
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
-		final BlockController controller = new BlockController(requiredBlockDao, accountLookup);
+		final DbBlockIoAdapter dbBlockIoAdapter = new DbBlockIoAdapter(requiredBlockDao, accountLookup);
+		final BlockController controller = new BlockController(dbBlockIoAdapter);
 
 		// Act:
 		final org.nem.core.model.Block block = controller.blockAt(new BlockHeight(12));

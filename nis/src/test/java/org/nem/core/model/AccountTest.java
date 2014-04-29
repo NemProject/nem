@@ -29,7 +29,7 @@ public class AccountTest {
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
 	@Test
@@ -39,12 +39,12 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class AccountTest {
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo(null));
+		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -508,9 +508,9 @@ public class AccountTest {
 
 		// Assert:
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(null));
-		Assert.assertThat(copyAccount.getKeyPair(), IsEqual.equalTo(null));
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(copyAccount.getKeyPair(), IsNull.nullValue());
 	}
 
 	@Test
@@ -520,10 +520,10 @@ public class AccountTest {
 
 		// Assert:
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.nullValue());
 	}
 
 	@Test
@@ -533,10 +533,10 @@ public class AccountTest {
 
 		// Assert:
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {

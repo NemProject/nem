@@ -51,10 +51,22 @@ public class NodeCollection implements SerializableEntity {
 	/**
 	 * Gets a collection of inactive nodes.
 	 *
-	 * @return A collection of active nodes.
+	 * @return A collection of inactive nodes.
 	 */
 	public Collection<Node> getInactiveNodes() {
 		return this.inactiveNodes;
+	}
+
+	/**
+	 * Gets a collection of all nodes (both active and inactive).
+	 *
+	 * @return A collection of all nodes.
+	 */
+	public Collection<Node> getAllNodes() {
+		final List<Node> allNodes = new ArrayList<>();
+		allNodes.addAll(this.getActiveNodes());
+		allNodes.addAll(this.getInactiveNodes());
+		return allNodes;
 	}
 
 	/**

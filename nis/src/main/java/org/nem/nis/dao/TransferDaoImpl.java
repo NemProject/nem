@@ -1,13 +1,17 @@
 package org.nem.nis.dao;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
+import org.nem.core.model.Account;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +63,17 @@ public class TransferDaoImpl implements TransferDao {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	@Transactional
+	public Collection<Transfer> getTransactionsForAccount(final Account address, final int limit) {
+		// TODO: have no idea how to do it using Criteria...
+		Query query = getCurrentSession()
+				.createQuery("from Transfer t where t.recipient.printableKey = :pubkey or t.sender.printableKey = :pubkey")
+				.setParameter("pubkey", address.getAddress().getEncoded());
+		final List<Transfer> blockList = query.list();
+		return blockList;
 	}
 
 	@Override
