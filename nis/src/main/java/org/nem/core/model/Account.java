@@ -235,7 +235,7 @@ public class Account implements SerializableEntity {
 	}
 	
 	/**
-	 * This method applies the coindays to the balance and returns the result.
+	 * This method applies the <code>coindays</code> to the balance and returns the result.
 	 * 
 	 * @return
 	 */

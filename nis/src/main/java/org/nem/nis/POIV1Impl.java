@@ -60,13 +60,12 @@ public class POIV1Impl implements POI {
 		// start each node's importance as its balance
 		// also go through and find dangling accounts (with 0 outDegree)
 		// "dangling" nodes, no links out from them; maybe we can skip these later; we should look into that
-		//TODO: XXX: balances should be in coindays!!
 		long[] coindayBalances = new long[numAccounts];
 		ArrayList<Integer> dangleIndices = new ArrayList<Integer>();
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			Account currAcct = accounts.get(ndx);
 			
-			coindayBalances[ndx] = currAcct.getBalance().getNumMicroNem();//XXX:TODO:FIXME:this should be in coindays
+			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance().getNumMicroNem();
 			
 			importances.setAt(ndx, currAcct.getBalance().getNumMicroNem()); //XXX:can we do this or will there be precision errors?
 			List<AccountLink> outlinks = currAcct.getOutlinks();
