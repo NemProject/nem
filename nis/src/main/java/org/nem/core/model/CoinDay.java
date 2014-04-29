@@ -4,22 +4,25 @@ package org.nem.core.model;
  * 
  */
 public class CoinDay {
-	private long blockNum;
-	
+	public static final int MAX_BLOCKS_CONSIDERED = 144000;
+
+	private long blockHeight;
+
 	private Amount amount;
 
 	/**
-	 * @return the blockNum
+	 * @return the blockHeight
 	 */
-	public long getBlockNum() {
-		return blockNum;
+	public long getBlockHeight() {
+		return blockHeight;
 	}
 
 	/**
-	 * @param blockNum the blockNum to set
+	 * @param blockHeight
+	 *            the blockHeight to set
 	 */
-	public void setBlockNum(long blockNum) {
-		this.blockNum = blockNum;
+	public void setBlockHeight(long blockHeight) {
+		this.blockHeight = blockHeight;
 	}
 
 	/**
@@ -30,7 +33,8 @@ public class CoinDay {
 	}
 
 	/**
-	 * @param amount the amount to set
+	 * @param amount
+	 *            the amount to set
 	 */
 	public void setAmount(Amount amount) {
 		this.amount = amount;

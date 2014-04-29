@@ -240,14 +240,33 @@ public class Account implements SerializableEntity {
 	 * @return
 	 */
 	public Amount getCoinDayWeightedBalance() {
-		Amount coinDayBalance = Amount.ZERO; //XXX: we might want to cache this in the future
+		long coinDayBalance = 0; //XXX: we might want to cache this in the future
+		
+		long currentBlockHeight = 1337;//XXX:TODO:this is temporary until I figure out a good way to get the current height
+		
+		long runningBalance = 0;
 		
 		for (CoinDay coinDay : coindays) {
-//			coinDay.getAmount()
+			long blockDiff = currentBlockHeight - coinDay.getBlockHeight();
+			
+			if (blockDiff > CoinDay.MAX_BLOCKS_CONSIDERED) {
+				continue; //skip blocks over the max number of blocks considered
+			}
+			
+			double currAmount = coinDay.getAmount().getNumMicroNem(); 
+			
+			double weighting = 1d*blockDiff/CoinDay.MAX_BLOCKS_CONSIDERED;
+			
+			coinDayBalance += weighting*currAmount;
+					
+			runningBalance += currAmount;
 		}
 		
 		//Assume any remaining balance has the full weight
-		return null;
+		long remainder = this.getBalance().getNumMicroNem() - runningBalance;
+		coinDayBalance += remainder;
+		
+		return new Amount(coinDayBalance);
 	}
 	
 	/**
