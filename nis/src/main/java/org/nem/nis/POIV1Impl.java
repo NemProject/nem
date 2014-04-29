@@ -96,10 +96,12 @@ public class POIV1Impl implements POI {
 		// calculate teleportation probabilities based on normalized amount of NEM owned
 		double[] teleporations = new double[numAccounts];
 		for (int acctNdx = 0; acctNdx < importances.getSize(); acctNdx++) {
-	        // assign a value between .7 and .95 based on the amount of NEM in an account
-			// more NEM = higher teleportation seems to work better
-			// NOTE: importances were initialized with acct balances, so this is why this works
-			teleporations[acctNdx] = MIN_TELEPORTATION_PROB + ADDITIVE_TELEPORTATION*(importances.getAt(acctNdx)/maxImportance); // the importance vector was already normalized to sum to 1 in the code above
+	        // Assign a value between .7 and .95 based on the amount of NEM in an account.
+			// It seems that more NEM = higher teleportation seems to work better.
+			// NOTE: importances were initialized with acct balances, so this is why this works;
+			// also, the importance vector was already normalized to sum to 1 in the code above.
+			teleporations[acctNdx] = MIN_TELEPORTATION_PROB 
+					+ ADDITIVE_TELEPORTATION*(importances.getAt(acctNdx)/maxImportance);
 		}
 		
 		int iterCount = 0;
@@ -113,7 +115,7 @@ public class POIV1Impl implements POI {
 			for (Integer dangleNdx : dangleIndices) {
 				dangleSum += prevIterImportances.getAt(dangleNdx)*teleporations[dangleNdx];
 			}
-			dangleSum = dangleSum*scale; //normalize this
+			dangleSum *= scale; //normalize this
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				
@@ -161,7 +163,7 @@ public class POIV1Impl implements POI {
 				Median median = new Median();
 				
 				double medianOutlinkStrength = median.evaluate(outlinkWeights[ndx]);
-				double outDegree = 0; //outDegree is the sum of strengths for outlinks
+				double outDegree = 0; //outDegree is the sum of strengths for outlinks, not the graphical degree
 				for (AccountLink outlink : outlinks) {
 					outDegree += outlink.getStrength();
 				}
@@ -178,7 +180,8 @@ public class POIV1Impl implements POI {
 		double maxOutlinkScore  = ArrayUtils.max(outlinkScores);
 		long maxBalance         = ArrayUtils.max(coindayBalances);
 		
-		// We are going to calculate all of this now so we can use this for testing.
+		// We are going to calculate all of this now so we can use these for testing.
+		//TODO: take out unused arrays later
 		double[] pois         = new double[numAccounts];
 		double[] ows          = new double[numAccounts];
 		double[] normBalances = new double[numAccounts];
@@ -201,9 +204,9 @@ public class POIV1Impl implements POI {
 	}
 
 	/**
-	 * Right-stochastic form means that all of the weights in the input list of edges sum to 1.
+	 * Right-stochastic form means that all of the weights in <code>edges</code> sum to 1.
 	 * 
-	 * @param edges
+	 * @param edges - list of <code>AccountLink</code>s, defining edges linking accounts
 	 * @return array of weights in right-stochastic form
 	 */
 	private double[] getRightStochasticWeights(List<AccountLink> edges) {
