@@ -25,7 +25,7 @@ public class GenesisBlockTest {
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(8));
 
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-		Assert.assertThat(block.getGenerationHash(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(block.getGenerationHash(), IsNull.notNullValue());
 	}
 
 	@Test

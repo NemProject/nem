@@ -5,9 +5,10 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.Predicate;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
 
@@ -28,7 +29,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCanBeAddedIfTransactionWithSameHashHasNotAlreadyBeenAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		boolean isAdded = transactions.add(new MockTransaction(sender, 7));
@@ -41,7 +42,7 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCannotBeAddedIfTransactionWithSameHashHasAlreadyBeenAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		transactions.add(new MockTransaction(sender, 7));
 
 		// Act:
@@ -55,7 +56,7 @@ public class UnconfirmedTransactionsTest {
  	public void multipleTransactionsWithDifferentHashesCanBeAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
 		transactions.add(new MockTransaction(sender, 7));
@@ -69,15 +70,10 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCanBeAddedIfTransactionPredicateReturnsFalse() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(Hash hash) {
-				return false;
-			}
-		});
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> false);
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
@@ -87,15 +83,10 @@ public class UnconfirmedTransactionsTest {
 	public void transactionCannotBeAddedIfTransactionPredicateReturnsTrue() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(Hash hash) {
-				return true;
-			}
-		});
+		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> true);
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(false));
@@ -160,14 +151,14 @@ public class UnconfirmedTransactionsTest {
 	public void removeAllRemovesAllTransactionsInBlock() {
 		// Arrange:
 		final List<Transaction> transactions = new ArrayList<>();
-		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < 10; ++i) {
 			final Transaction transaction = new MockTransaction(i, new TimeInstant(100));
 			transactions.add(transaction);
 			unconfirmedTransactions.add(transaction);
 		}
 
-		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block block = NisUtils.createRandomBlock();
 		block.addTransaction(transactions.get(1));
 		block.addTransaction(transactions.get(7));
 		block.addTransaction(transactions.get(4));
@@ -183,17 +174,14 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	private static List<Integer> getCustomFieldValues(final Iterable<Transaction> transactions) {
-		final List<Integer> customFields = new ArrayList<>();
-		for (final Transaction transaction : transactions) {
-			customFields.add(((MockTransaction)transaction).getCustomField());
-		}
-
-		return customFields;
+	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
+		return transactions.stream()
+				.map(transaction -> ((MockTransaction)transaction).getCustomField())
+				.collect(Collectors.toList());
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions(int numTransactions) {
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			transactions.add(new MockTransaction(i, new TimeInstant(i * 10)));
 		}
@@ -201,9 +189,14 @@ public class UnconfirmedTransactionsTest {
 		return transactions;
 	}
 
+	private static UnconfirmedTransactions createUnconfirmedTransactionsInstance() {
+		MockAccountLookup mockAccountLookup = new MockAccountLookup(MockAccountLookup.UnknownAccountBehavior.REAL_ACCOUNT);
+		return new UnconfirmedTransactions(mockAccountLookup);
+	}
+
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(int numTransactions) {
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			final MockTransaction mockTransaction = new MockTransaction(i, new TimeInstant(i * 10));
 			mockTransaction.setFee(Amount.fromNem(i + 1));

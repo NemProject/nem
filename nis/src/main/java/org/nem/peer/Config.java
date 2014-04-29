@@ -1,13 +1,13 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.*;
-import org.nem.peer.node.Node;
+import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents peer configuration.
@@ -107,9 +107,9 @@ public class Config {
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
 		final List<NodeEndpoint> wellKnownEndpoints = deserializer.readObjectArray("knownPeers", NodeEndpoint.DESERIALIZER);
 
-		final Set<Node> wellKnownNodes = new HashSet<>();
-		for (final NodeEndpoint endpoint : wellKnownEndpoints)
-			wellKnownNodes.add(new Node(endpoint, DEFAULT_PLATFORM, DEFAULT_APPLICATION));
+		final Set<Node> wellKnownNodes = wellKnownEndpoints.stream()
+				.map(endpoint -> new Node(endpoint, DEFAULT_PLATFORM, DEFAULT_APPLICATION))
+				.collect(Collectors.toSet());
 
 		return new PreTrustedNodes(wellKnownNodes);
 	}

@@ -68,12 +68,12 @@ public class BlockMapper {
 		final Block block = new org.nem.core.model.Block(
 				forager,
 				dbBlock.getPrevBlockHash(),
+				dbBlock.getGenerationHash(),
 				new TimeInstant(dbBlock.getTimestamp()),
 				new BlockHeight(dbBlock.getHeight()));
 
 		final Long difficulty = dbBlock.getDifficulty();
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
-		block.setGenerationHash(dbBlock.getGenerationHash());
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

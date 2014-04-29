@@ -3,6 +3,7 @@ package org.nem.nis.dao;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -96,22 +97,14 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
 		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit);
-		final List<BlockDifficulty> difficulties = new ArrayList<>(rawDifficulties.size());
-		for (final Long difficulty : rawDifficulties)
-			difficulties.add(new BlockDifficulty(difficulty));
-
-		return difficulties;
+		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
 		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
-		final List<TimeInstant> timestamps = new ArrayList<>(rawTimestamps.size());
-		for (final Integer timestamp : rawTimestamps)
-			timestamps.add(new TimeInstant(timestamp));
-
-		return timestamps;
+		return rawTimestamps.stream().map(TimeInstant::new).collect(Collectors.toList());
 	}
 
 	@Override
@@ -167,8 +160,8 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("from Block a where a.shortId = :id")
 				.setParameter("id", blockId);
 		final List<?> blockList = query.list();
-		for (int i = 0; i < blockList.size(); ++i) {
-			Block block = (Block)blockList.get(i);
+		for (final Object blockObject : blockList) {
+			final Block block = (Block)blockObject;
 			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
 				return block;
 			}

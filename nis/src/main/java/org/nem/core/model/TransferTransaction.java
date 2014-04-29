@@ -121,4 +121,13 @@ public class TransferTransaction extends Transaction {
 			this.recipient.removeMessage(this.message);
 
 	}
+
+	@Override
+	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
+		if (! nemTransferSimulate.sub(this.getSigner(), this.amount.add(this.getFee()))) {
+			return false;
+		}
+		nemTransferSimulate.add(this.recipient, this.amount);
+		return true;
+	}
 }

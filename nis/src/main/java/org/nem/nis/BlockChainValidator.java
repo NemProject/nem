@@ -36,6 +36,7 @@ public class BlockChainValidator {
 
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
+			block.setPrevious(parentBlock);
 			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
 				return false;
 

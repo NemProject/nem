@@ -16,7 +16,7 @@ public class TrustContextTest {
 		final Node localNode = Utils.createNodeWithPort(80);
 		final Node[] nodes = new Node[] { localNode };
 		final NodeExperiences nodeExperiences = new NodeExperiences();
-		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
+		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());
 		final TrustParameters params = new TrustParameters();
 
 		// Act:

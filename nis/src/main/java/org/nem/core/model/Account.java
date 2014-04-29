@@ -283,10 +283,7 @@ public class Account implements SerializableEntity {
 		copy.balance = this.getBalance();
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
-
-		for (final Message message : this.getMessages())
-			copy.messages.add(message);
-
+		copy.messages.addAll(this.getMessages());
 		return copy;
 	}
 }

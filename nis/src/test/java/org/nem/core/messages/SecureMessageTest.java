@@ -120,7 +120,7 @@ public class SecureMessageTest {
 
 		// Assert:
 		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
 		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 

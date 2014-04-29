@@ -10,19 +10,11 @@ public class TransactionFactory {
 	/**
 	 * An object deserializer that wraps this factory.
 	 */
-	public static final ObjectDeserializer<Transaction> VERIFIABLE = new ObjectDeserializer<Transaction>() {
-		@Override
-		public Transaction deserialize(Deserializer deserializer) {
-			return TransactionFactory.deserialize(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
-		}
-	};
+	public static final ObjectDeserializer<Transaction> VERIFIABLE =
+			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
-	public static final ObjectDeserializer<Transaction> NON_VERIFIABLE = new ObjectDeserializer<Transaction>() {
-		@Override
-		public Transaction deserialize(Deserializer deserializer) {
-			return TransactionFactory.deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
-		}
-	};
+	public static final ObjectDeserializer<Transaction> NON_VERIFIABLE =
+			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 
 	/**
 	 * Deserializes a transaction.

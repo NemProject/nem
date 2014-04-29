@@ -23,7 +23,7 @@ public class AccountDaoLookupAdapterTest {
 		final Account dbAccount = accountDaoLookup.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(dbAccount, IsNull.notNullValue());
 		Assert.assertThat(dbAccount.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
 		Assert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
@@ -61,7 +61,7 @@ public class AccountDaoLookupAdapterTest {
 
 		// Assert:
 		Assert.assertThat(dbAccount, IsSame.sameInstance(dbAccountFromDao));
-		Assert.assertThat(dbAccount.getPrintableKey(), IsEqual.equalTo(null));
+		Assert.assertThat(dbAccount.getPrintableKey(), IsNull.nullValue());
 		Assert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
@@ -99,7 +99,7 @@ public class AccountDaoLookupAdapterTest {
 		final Account dbAccount1 = accountDaoLookup.findByAddress(addressWithoutPublicKey);
 
 		// Assert: the returned account should not have a public key
-		Assert.assertThat(dbAccount1.getPublicKey(), IsEqual.equalTo(null));
+		Assert.assertThat(dbAccount1.getPublicKey(), IsNull.nullValue());
 
 		// Act: request the account with an address that has the public key
 		final Account dbAccount2 = accountDaoLookup.findByAddress(addressWithPublicKey);

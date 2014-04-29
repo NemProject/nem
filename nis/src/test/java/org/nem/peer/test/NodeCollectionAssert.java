@@ -5,6 +5,7 @@ import org.nem.core.test.IsEquivalent;
 import org.nem.peer.node.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Static class containing asserts that are used to validate NodeCollection objects.
@@ -28,10 +29,9 @@ public class NodeCollectionAssert {
 	}
 
 	private static List<String> getHosts(final Collection<Node> nodes) {
-		final List<String> hosts = new ArrayList<>();
-		for (final Node node : nodes)
-			hosts.add(node.getEndpoint().getBaseUrl().getHost());
-		return hosts;
+		return nodes.stream()
+				.map(node -> node.getEndpoint().getBaseUrl().getHost())
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -68,10 +68,7 @@ public class NodeCollectionAssert {
 	}
 
 	private static List<Integer> getPorts(final Collection<Node> nodes) {
-		final List<Integer> posts = new ArrayList<>();
-		for (final Node node : nodes)
-			posts.add(node.getEndpoint().getBaseUrl().getPort());
-		return posts;
+		return nodes.stream().map(node -> node.getEndpoint().getBaseUrl().getPort()).collect(Collectors.toList());
 	}
 
 	/**
@@ -90,10 +87,20 @@ public class NodeCollectionAssert {
 		Assert.assertThat(getPlatforms(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
 	}
 
+	/**
+	 * Asserts that nodes have matching active and inactive platforms.
+	 *
+	 * @param nodes             The nodes.
+	 * @param expectedPlatforms The expected platforms (both active and inactive).
+	 */
+	public static void arePlatformsEquivalent(
+			final NodeCollection nodes,
+			final String[] expectedPlatforms) {
+		// Assert:
+		Assert.assertThat(getPlatforms(nodes.getAllNodes()), IsEquivalent.equivalentTo(expectedPlatforms));
+	}
+
 	private static List<String> getPlatforms(final Collection<Node> nodes) {
-		final List<String> platforms = new ArrayList<>();
-		for (final Node node : nodes)
-			platforms.add(node.getPlatform());
-		return platforms;
+		return nodes.stream().map(Node::getPlatform).collect(Collectors.toList());
 	}
 }

@@ -3,7 +3,6 @@ package org.nem.peer.node;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.connect.NodeEndpoint;
 import org.nem.core.serialization.JsonDeserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
@@ -81,7 +80,7 @@ public class NodeTest {
 		Node node = new Node(DEFAULT_ENDPOINT, "plat", null);
 
 		// Assert:
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo(null));
+		Assert.assertThat(node.getApplication(), IsNull.nullValue());
 	}
 
 	//region equals / hashCode

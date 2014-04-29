@@ -10,12 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NodeCollection implements SerializableEntity {
 
-	private static ObjectDeserializer<Node> NODE_DESERIALIZER = new ObjectDeserializer<Node>() {
-		@Override
-		public Node deserialize(final Deserializer deserializer) {
-			return new Node(deserializer);
-		}
-	};
+	private static ObjectDeserializer<Node> NODE_DESERIALIZER = Node::new;
 
 	final Set<Node> activeNodes;
 	final Set<Node> inactiveNodes;
@@ -41,7 +36,7 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	private static Set<Node> createSet() {
-		return Collections.newSetFromMap(new ConcurrentHashMap<Node, Boolean>());
+		return Collections.newSetFromMap(new ConcurrentHashMap<>());
 	}
 
 	/**
@@ -56,10 +51,22 @@ public class NodeCollection implements SerializableEntity {
 	/**
 	 * Gets a collection of inactive nodes.
 	 *
-	 * @return A collection of active nodes.
+	 * @return A collection of inactive nodes.
 	 */
 	public Collection<Node> getInactiveNodes() {
 		return this.inactiveNodes;
+	}
+
+	/**
+	 * Gets a collection of all nodes (both active and inactive).
+	 *
+	 * @return A collection of all nodes.
+	 */
+	public Collection<Node> getAllNodes() {
+		final List<Node> allNodes = new ArrayList<>();
+		allNodes.addAll(this.getActiveNodes());
+		allNodes.addAll(this.getInactiveNodes());
+		return allNodes;
 	}
 
 	/**

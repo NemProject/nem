@@ -48,7 +48,7 @@ public class NodeControllerTest {
 		final NodeController controller = new NodeController(host);
 
 		final Node sourceNode = Utils.createNodeWithPort(111);
-		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<NodeExperiencePair>());
+		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
 
 		// Arrange: sanity
 		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));

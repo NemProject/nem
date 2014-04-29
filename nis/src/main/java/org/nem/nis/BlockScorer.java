@@ -23,9 +23,19 @@ public class BlockScorer {
     public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
 
 	/**
+	 * BigInteger constant 2^56
+	 */
+    public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
+
+	/**
 	 * Number of blocks which the calculation of difficulty should include 
 	 */
     public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
+
+    /**
+     * Helper constant calculating the logarithm of BigInteger
+     */
+    private static final double TWO_TO_THE_POWER_OF_256 = Math.pow(2.0, 256.0);
 
     /**
 	 * Calculates the hit score for block.
@@ -34,7 +44,10 @@ public class BlockScorer {
 	 * @return the hit score.
 	 */
 	public BigInteger calculateHit(final Block block) {
-		return new BigInteger(1, Arrays.copyOfRange(block.getGenerationHash().getRaw(), 10, 18));
+		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
+		double tmp = Math.abs(Math.log(val.doubleValue()/TWO_TO_THE_POWER_OF_256));
+		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
+		return val;
 	}
 
 	/**
@@ -56,15 +69,22 @@ public class BlockScorer {
 						 .divide(block.getDifficulty().asBigInteger());
 	}
 
+	/**
+	 * Calculates the block score for the specified block.
+	 *
+	 * @param currentBlock The currently analyzed block.
+	 *
+	 * @return The block score.
+	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
 		final Account account = currentBlock.getSigner();
 		final long foragedBlocks = account.getForagedBlocks().getRaw();
-		return calculateBlockScoreImpl(timeDiff, foragedBlocks, currentBlock.getDifficulty().getRaw());
+		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
 	}
 
-	private long calculateBlockScoreImpl(int timeDiff, long foragedBlocks, long difficulty) {
-		return difficulty / (timeDiff + 4 * foragedBlocks);
+	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
+		return difficulty - timeDiff;
 	}
 
 	/**
@@ -95,6 +115,15 @@ public class BlockScorer {
 															   .multiply(BigInteger.valueOf(heightDiff))
 															   .divide(BigInteger.valueOf(timeDiff))
 															   .longValue();
+
+		long oldDifficulty = difficulties.get(difficulties.size()-1).getRaw();
+		if (19L * oldDifficulty > 20L * difficulty) {
+			difficulty = (19L * oldDifficulty)/20L;
+		} else {
+			if (21L * oldDifficulty < 20L * difficulty) {
+				difficulty = (21L * oldDifficulty)/20L;
+			}
+		}
 
 		return new BlockDifficulty(difficulty);
 	}

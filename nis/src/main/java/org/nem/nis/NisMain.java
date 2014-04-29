@@ -19,7 +19,6 @@ public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
-	public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
 	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
@@ -82,9 +81,9 @@ public class NisMain {
 
 		this.populateDb();
 
-		this.blockChain.bootup();
-
 		this.analyzeBlocks();
+
+		this.blockChain.boot();
 
 		this.networkHost.boot();
 	}

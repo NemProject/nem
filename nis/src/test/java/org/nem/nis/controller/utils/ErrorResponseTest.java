@@ -43,7 +43,7 @@ public class ErrorResponseTest {
 
 		// Assert:
 		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
-		Assert.assertThat(response.getError(), IsEqual.equalTo(null));
+		Assert.assertThat(response.getError(), IsNull.nullValue());
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(-123));
 	}

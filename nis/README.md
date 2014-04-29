@@ -1,126 +1,59 @@
-Flyway and H2
--------------
+# NEM
 
-I've added Flyway, so tables in db should be created automagically upon startup
-This is done via dependency on session manager:
+NEM is a movement centered around NEM crypto-currency. Basis for NEM is **first** Proof-of-Importance / Proof-of-Stake system.
 
-```
-<bean id="sessionFactory"
-          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
-          depends-on="flyway">
-```
+As other crypto-coins, NEM secures transactions in the blockchain.
 
-```
-Db settings are in:
-src\main\webapp\WEB-INF\dbh2.properties
-```
+Blockchain is actually distributed transaction database, shared by all peers participating in NEM network.
 
-maria DB setup
---------------
+[more Blockchain](Blockchain)
 
-mariadb setup
-```
-> mysql.exe -u root --password=rootpass
+## Basics
 
-MariaDB [(none)]> CREATE DATABASE `nis`;
-MariaDB [(none)]> GRANT CREATE, ALTER, INDEX, INSERT, SELECT, UPDATE, DELETE, DROP ON `nis`.* to 'nisuser'@'localhost' identified by 'nispass';
-```
+### Addresses
 
-```
-Db settings are in:
-src\main\webapp\WEB-INF\dbmaria.properties
+To identify accounts, NEM uses addresses. Addresses are 40 characters long, consist of characters (A-Z, 2-7) and always begin with an **N**. (e.g. `NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW`) or **T** in test network (`TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6`)
 
-to switch, one must change (in application-context.xml)
-<property name="location">
-    <value>classpath:dbh2.properties</value>
-</property>
+You can think of an address as of bank account number.
 
-(to "classpath:dbmaria.properties"
-```
+[more Addresses](Addresses)
 
-WebStart added
---------------
-Try it out:
+### Confirmations and foraging.
 
-Point your browser to http://nem.pucchiwerk.eu/nem/install.html
+Every transaction is confirmed by the network. Multiple transactions are packed together in blocks.
+Creating a block is called **foraging**. In contrast with Proof-of-Work (PoW) coins like bitcoin, litecoin, etc., foraging is **NOT calculation-heavy** process. 
 
-IMPORTANT: Java 7 u51 or newer should be installed due to the self-signed certificate issue
-and also place the server name in the exception list of the Java Security Settings within the Java console.
-If there is no Java at all, on Windows an aut-install of the latest Java 7 should happen, all other plattforms should see the
-download page of Java.
+Every transaction have associated fee. **Forager** is rewarded with the fees from a block.
 
-In order to use Java WebStart for deploying the application, I required a few adaptations
+### Zero-inflation
 
-- Jetty must be run as embedded server
-- Configuration of web settings (i.e. web.xml) had to move to programmatical configuration
-  which is possible since Servlet API 3.0/3.1
-- Configuration is done during start-up of ServletContext Lifecycle event (=>org.nem.deploy.WebStarter)
-- Any new or up-coming changes towards Jetty configuration have to go there
-- All jars have to be signed with the same certificate!
-  bouncy csatle provides already a signed jar which has to be unpacked, packed and then signed again with our certificate
-  otherwise our application will not be started by WebStart
+As in NXT there is no inflation in NEM. The rewards for *foragers* come ONLY from fees.
 
-Current operational model:
+## Security
 
-- WebStart downloads the code (everything is signed!)
-- NEM Wallet/Server is installed on Desktop
-- Can be launched either via Web-Page / from Desktop
-- Jetty server started and listens at 7890
-- org.nem.deploy.CommonStarter kicks-up the local WebBrowser and points it to "127.0.0.1:7890/nem/peer"
-  but this is only for demonstration purposes.
+### Signing transactions
 
-  Two future client options are available
+Security of NEM relies on [public key cryptography](http://en.wikipedia.org/wiki/Public-key_cryptography).
+More specifically on [Elliptic Curve Digital Signature Algorithm](https://en.wikipedia.org/wiki/Elliptic_Curve_DSA) (ECDSA).
 
-  A)	a Java SWT Client, That client uses server code directly, no process communication in-between.
-  B) 	a HTML client, Browser uses port 7890 to communicate with the server. JSON objects are returned which are rendered using JavaScript/whatever JS framework
+The curve that NEM uses {secp256k1 | ed25519}
 
+### Transaction Malleability
 
-To Discuss
-----------
+To deal with signature malleability NEM uses **canonical signatures**
 
-**I've tried adding bouncycastle to pom.xml, but with that JETTY seems to be hanging for 2 minutes before starting**
-No idea why...
+### Secure addresses
 
+NXT has been criticized many times, for it's "short" addresses, which are only 2^64 long.
+Due to due to [Birthday attack](http://en.wikipedia.org/wiki/Birthday_attack)
+probability of hitting random "unconfirmed" address is bigger than 50% with as few as **2^33** trials. 
 
-In the block and transfer tables I've left "shortId" fields, that nxt uses (8 bytes of sha of block).
+As stated earlier NEM uses addresses which are much longer 40 characters (36 bytes).
 
-Do we want it need it?
-*pro*: it be easier to find blocks/transactions in db
-*con*: collisions might happen...
+## advanced topics
 
-Maybe it'd be better to keep block height / transaction height in db?
+### Timestamp service
 
+Every transaction can contain 1024-byte "message". This means, that you can easily timestamp your data and have verifiable PROOF.
 
-I claimed many times on bct forums, that (since peer is sending us blocks in order)
-in case of talking to peer, we can meet only two situations:
- * (verify and) append what he set us to the chain
- * we're on fork, if his chain is "better", drop our "tail", and append his
-
-I was thinking, that when talking to peer, we should keep his chain on
-a "VirtualChain", and if it passes verifications, and indeed is better than what we have now
-it would be added to db.
-Take a look at mentioned commented `unusedThread` and classes `org.nem.nis.virtual`.
-(There's not much there, but I'm wondering, what will you think about the idea itself).
-
-
-Fun
----
-
-I've used 0x69 as network and 0x18 as version to get NEM at the beginning after base32 ;)
-
-Sample from startup:
-```
-starting analysis...
-analyzing block: 1311768467294899695
-9
-1 0 1 NEMLBAG7WBMB44MW3OUJCCZT3KXPHJLCGRRIGBD2K3DP5GVB
-2 1 2 NEMMYOYNMMETMPY6CNVPXKO2LWNQLF2IXBHUTAAGLAGWALRP
-3 2 3 NEMDHJ4U77NUSUC2VQL3UY2FJ2EW5J4DUFVJBFURH6ZI7DSR
-4 3 4 NEMMBNE2MFCOQLLTK22DSOABYYD7PJXWPK4MBGCP743SEQ3G
-5 4 5 NEMMSN6IWSEGCCI6HTWKEWGAAJATJQAN7PDYBK7ZL3RT5RCD
-6 5 6 NEMFKKG5WD5H3WOZCSHJHTGUI6JSA3B5FYLNJF2HO6QXBUPN
-7 6 7 NEMCXJINROIZJOFSA3DCTPY2IUMQKYZHOKSFEF3Q7OPHSQEA
-8 7 8 NEMOZ6TSMHTGUTCJHJWWO4IPJGLP5VSHACT4BOBW5M4R35KJ
-9 8 9 NEMDDIT4WCPIGKG7HYJWCZY4EEEU4BPCUUAU43EO7DOWURLE
-```
-
+Let's assume you have created document, that you don't want publish yet. You can calculate it's hash (i.e. SHA-3-512) and include the hash as a message in some transaction. Once the transaction will be included in the blockchain, you have a proof, that the hash - and therefore document itself - was created before timestamp of block including it.
