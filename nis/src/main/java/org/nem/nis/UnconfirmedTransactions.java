@@ -1,7 +1,12 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.*;
+import sun.management.Sensor;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -14,6 +19,13 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
+
+	private final AccountLookup accountLookup;
+
+	UnconfirmedTransactions(AccountLookup accountLookup) {
+		this.accountLookup = accountLookup;
+	}
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -47,8 +59,37 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
+		if (! transaction.simulateExecute(
+				new NemTransferSimulate() {
+					@Override
+					public boolean sub(Account sender, Amount amount) {
+						addToCache(sender);
+						if (unconfirmedBalances.get(sender).compareTo(amount) < 0) {
+							return false;
+						}
+						Amount newBalance = unconfirmedBalances.get(sender).subtract(amount);
+						unconfirmedBalances.replace(sender, newBalance);
+						return true;
+					}
+
+					@Override
+					public void add(Account recipient, Amount amount) {
+						addToCache(recipient);
+						Amount newBalance = unconfirmedBalances.get(recipient).add(amount);
+						unconfirmedBalances.replace(recipient, newBalance);
+					}
+				}
+		)) {
+			return false;
+		}
+
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	private void addToCache(Account account) {
+		// it's ok to put reference here, thanks to Account being non-mutable
+		this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
 	}
 
 	/**
