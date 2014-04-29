@@ -19,7 +19,7 @@ public class Account implements SerializableEntity {
 	private List<AccountLink> inlinks;
 	private List<AccountLink> outlinks;
 	
-//	private List<CoinDay> coindayWeights;
+	private LinkedList<CoinDay> coindays;
 
 	private BlockAmount foragedBlocks;
 	private HistoricalBalances historicalBalances;
@@ -232,6 +232,22 @@ public class Account implements SerializableEntity {
 	 */
 	public void setOutlinks(List<AccountLink> outlinks) {
 		this.outlinks = outlinks;
+	}
+	
+	/**
+	 * This method applies the coindays to the balance and returns the result.
+	 * 
+	 * @return
+	 */
+	public Amount getCoinDayWeightedBalance() {
+		Amount coinDayBalance = Amount.ZERO; //XXX: we might want to cache this in the future
+		
+		for (CoinDay coinDay : coindays) {
+//			coinDay.getAmount()
+		}
+		
+		//Assume any remaining balance has the full weight
+		return null;
 	}
 	
 	/**
