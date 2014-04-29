@@ -72,8 +72,7 @@ public class TransferDaoImpl implements TransferDao {
 		Query query = getCurrentSession()
 				.createQuery("from Transfer t where t.recipient.printableKey = :pubkey or t.sender.printableKey = :pubkey")
 				.setParameter("pubkey", address.getAddress().getEncoded());
-		final List<Transfer> blockList = query.list();
-		return blockList;
+		return listAndCast(query);
 	}
 
 	@Override
@@ -104,5 +103,10 @@ public class TransferDaoImpl implements TransferDao {
 		} finally {
 			sess.close();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query q) {
+		return q.list();
 	}
 }
