@@ -335,6 +335,52 @@ public class AccountTest {
 		assertAccountSerialization(address, null);
 	}
 
+	@Test
+	public void accountWithPublicKeyCanBeRoundTripped() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Assert:
+		assertAccountRoundTrip(address, address.getPublicKey());
+	}
+
+	@Test
+	public void accountWithoutPublicKeyCanBeRoundTripped() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		assertAccountRoundTrip(address, null);
+	}
+
+	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
+		// Arrange:
+		final Account originalAccount = createAccountForSerializationTests(address);
+
+		// Act:
+		final Account account = new Account(Utils.roundtripSerializableEntity(originalAccount, null));
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+
+		if (null == expectedPublicKey) {
+			Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
+		} else {
+			Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
+			Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+		}
+
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(747L)));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
+		Assert.assertThat(account.getLabel(), IsEqual.equalTo("alpha gamma"));
+
+		final List<Message> messages = account.getMessages();
+		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
+		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+	}
+
 	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
 		// Arrange:
 		final Account originalAccount = createAccountForSerializationTests(address);
@@ -391,7 +437,7 @@ public class AccountTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(address.getEncoded()));
+		Assert.assertThat(object.get("Account"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test
@@ -443,7 +489,7 @@ public class AccountTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((String)object.get("Account"), IsEqual.equalTo(expectedSerializedString));
+		Assert.assertThat(object.get("Account"), IsEqual.equalTo(expectedSerializedString));
 	}
 
 	@Test
