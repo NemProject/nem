@@ -29,6 +29,7 @@ public class MockBlockDao implements BlockDao {
 
 	private final ArrayList<Block> blocks;
 	private final MockBlockDaoMode mockMode;
+	private Block lastSavedBlock;
 
 	/**
 	 * Possible mocking modes.
@@ -89,6 +90,7 @@ public class MockBlockDao implements BlockDao {
 		if (block.getId() == null) {
 			block.setId(this.lastId);
 			this.lastId++;
+			this.lastSavedBlock = block;
 		}
 	}
 
@@ -124,9 +126,13 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	private Block find(final Predicate<Block> findPredicate) {
-		return MockBlockDaoMode.SingleBlock == this.mockMode
-				? this.blocks.get(0)
-				: this.blocks.stream().filter(findPredicate).findFirst().get();
+		try {
+			return MockBlockDaoMode.SingleBlock == this.mockMode
+					? this.blocks.get(0)
+					: this.blocks.stream().filter(findPredicate).findFirst().get();
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -220,4 +226,11 @@ public class MockBlockDao implements BlockDao {
 	 * @return The last limit passed to getHashesFrom.
 	 */
 	public int getLastGetHashesFromLimit() { return this.lastGetHashesFromLimit; }
+
+	/**
+	 * Returns last saved block.
+	 *
+	 * @return last saved block.
+	 */
+	public Block getLastSavedBlock() { return lastSavedBlock; }
 }

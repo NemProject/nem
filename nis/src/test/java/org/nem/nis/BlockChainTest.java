@@ -4,9 +4,11 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockAccount;
@@ -22,9 +24,7 @@ import org.nem.nis.test.MockTransferDaoImpl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
@@ -74,44 +74,84 @@ public class BlockChainTest {
 		Assert.assertThat(blockChain.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
-	@Test
-	public void canSuccessfullyProcessBlock() {
-		// Arrange:
-		Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1_000_000_000));
+	private Vector<Account> prepareSigners(AccountAnalyzer accountAnalyzer) {
+		Vector<Account> accounts = new Vector<>();
 
+		Account a;
+		Account temp;
+
+		a = Utils.generateRandomAccount();
+		accounts.add(a);
+		a.incrementBalance(Amount.fromNem(1_000_000_000));
+		temp = accountAnalyzer.addAccountToCache(a.getAddress());
+		temp.incrementBalance(Amount.fromNem(1_000_000_000));
+
+		a = Utils.generateRandomAccount();
+		accounts.add(a);
+		a.incrementBalance(Amount.fromNem(1_000));
+		temp = accountAnalyzer.addAccountToCache(a.getAddress());
+		temp.incrementBalance(Amount.fromNem(1_000));
+
+		a = Utils.generateRandomAccount();
+		accounts.add(a);
+		accountAnalyzer.addAccountToCache(a.getAddress());
+
+		a = Utils.generateRandomAccount();
+		accounts.add(a);
+		a.incrementBalance(Amount.fromNem(1_000));
+		temp = accountAnalyzer.addAccountToCache(a.getAddress());
+		temp.incrementBalance(Amount.fromNem(1_000));
+
+		a = Utils.generateRandomAccount();
+		accounts.add(a);
+		accountAnalyzer.addAccountToCache(a.getAddress());
+
+		return accounts;
+	}
+
+	@Test
+	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final List<Account> accounts = prepareSigners(accountAnalyzer);
+		final Account signer = accounts.get(0);
+
+		final Block parentBlock = createBlock(signer, accountAnalyzer);
 		final BlockScorer scorer = new BlockScorer();
-		final Block parentBlock = createBlock(signer);
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
-		final Block block = createBlockForTests(signer, blocks, scorer);
-		BlockChain blockChain = new BlockChain();
+		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
 
-		AccountDao accountDao = mock(AccountDao.class);
+		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
 				retriveAccount(1, parentBlock.getSigner())
 		);
 		AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
-
 		org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
-		BlockDao blockDao = new MockBlockDao(parent);
 
-		MockTransferDaoImpl mockTransferDao = new MockTransferDaoImpl();
-		MockForaging mockForaging = new MockForaging(mockTransferDao, blockChain);
-
+		final BlockChain blockChain = new BlockChain();
 		blockChain.analyzeLastBlock(parent);
+
 		blockChain.setAccountDao(accountDao);
-		blockChain.setBlockDao(blockDao);
-		blockChain.setAccountAnalyzer(new AccountAnalyzer());
-		blockChain.setForaging(mockForaging);
+		MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
+		blockChain.setBlockDao(mockBlockDao);
+		blockChain.setAccountAnalyzer(accountAnalyzer);
+		blockChain.setForaging(new MockForaging(new MockTransferDaoImpl(), blockChain));
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));
-		blockChain.processBlock(block);
+		boolean result = blockChain.processBlock(block);
+		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer);
+		TransferTransaction transaction;
 
 		// Assert:
 		// TODO: clean up all the accounts and check amount of nems
 		// TODO: add all sorts of different checks
+		Assert.assertTrue(result);
+		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
+		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
+		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
 	}
 
 	private org.nem.nis.dbmodel.Account retriveAccount(long i, Account signer) {
@@ -121,23 +161,42 @@ public class BlockChainTest {
 	}
 
 
-	private static Block createBlock(final Account forger) {
+	private static Block createBlock(final Account forger, final AccountLookup accountLookup) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime(), new BlockHeight(3));
 		block.sign();
-		return block;
+
+		return roundTripBlock(accountLookup, block);
 	}
 
-	private TransferTransaction createSignedTransactionWithAmount(long amount, TimeInstant timeInstant) {
+	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
+		final SerializableEntity entity = block;
+		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
+
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
+		Block b = new Block(deserializer.readInt("type"), options, deserializer);
+
+		Field field = b.getClass().getDeclaredField("generationHash");
+		field.setAccessible(true);
+		field.set(b, block.getGenerationHash());
+
+		field = b.getClass().getDeclaredField("prevBlockHash");
+		field.setAccessible(true);
+		field.set(b, block.getPreviousBlockHash());
+
+		return b;
+	}
+
+	private TransferTransaction createSignedTransactionWithAmount(List<Account> accounts, int i, AccountAnalyzer accountAnalyzer, long amount, TimeInstant timeInstant) {
 		final TransferTransaction transaction = new TransferTransaction(
 				timeInstant,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
+				accounts.get(i),
+				accounts.get(i + 1),
 				Amount.fromNem(amount),
 				null);
 		transaction.setDeadline(timeInstant.addHours(2));
-		transaction.getSigner().incrementBalance(Amount.fromNem(1000));
 		transaction.sign();
+
 		return transaction;
 	}
 
@@ -149,9 +208,10 @@ public class BlockChainTest {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block createBlockForTests(final Account forger, final List<Block> blocks, final BlockScorer scorer) {
+	private Block createBlockForTests(List<Account> accounts, final AccountAnalyzer accountAnalyzer, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final Block lastBlock = blocks.get(blocks.size()-1);
+		final Account forger = accounts.get(0);
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
 		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
@@ -168,15 +228,15 @@ public class BlockChainTest {
 		block = new Block(forger, lastBlock, blockTime);
 		block.setDifficulty(difficulty);
 
-		final TransferTransaction transaction1 = createSignedTransactionWithAmount(17, blockTime.addMinutes(-2));
+		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, accountAnalyzer, 17, blockTime.addMinutes(-2));
 		block.addTransaction(transaction1);
 
-		final TransferTransaction transaction2 = createSignedTransactionWithAmount(290, blockTime.addMinutes(-5));
+		final TransferTransaction transaction2 = createSignedTransactionWithAmount(accounts, 3, accountAnalyzer, 290, blockTime.addMinutes(-5));
 		block.addTransaction(transaction2);
 		block.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		block.sign();
 
-		return block;
+		return roundTripBlock(accountAnalyzer, block);
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
