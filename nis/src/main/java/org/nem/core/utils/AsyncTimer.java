@@ -1,7 +1,7 @@
 package org.nem.core.utils;
 
 import java.io.Closeable;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -19,6 +19,7 @@ public class AsyncTimer implements Closeable {
 
 	private final AtomicBoolean isStopped = new AtomicBoolean();
 	private final CompletableFuture<?> firstRecurrenceFuture = new CompletableFuture<>();
+	private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
 	private int numExecutions;
 	private String name;
@@ -38,7 +39,7 @@ public class AsyncTimer implements Closeable {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
-		this.future = this.createFuture(CompletableFuture.runAsync(() -> sleep(initialDelay)));
+		this.future = this.refresh(initialDelay);
 	}
 
 	private AsyncTimer(
@@ -102,8 +103,10 @@ public class AsyncTimer implements Closeable {
 	}
 
 	private CompletableFuture<?> refresh(int delay) {
-		return CompletableFuture.runAsync(() -> sleep(delay))
-				.thenCompose(v -> getNextChainLink());
+		this.log("sleeping for " + delay + "ms");
+		final SleepRunnable sleepRunnable = new SleepRunnable();
+		this.scheduler.schedule(sleepRunnable, delay, TimeUnit.MILLISECONDS);
+		return sleepRunnable.getFuture().thenCompose(v -> this.getNextChainLink());
 	}
 
 	@Override
@@ -132,13 +135,6 @@ public class AsyncTimer implements Closeable {
 				});
 	}
 
-	private void sleep(int milliseconds) {
-		ExceptionUtils.propagateVoid(() -> {
-			this.log("sleeping for " + milliseconds + "ms");
-			Thread.sleep(milliseconds);
-		});
-	}
-
 	private void log(final String message) {
 		LOGGER.info(String.format(
 				"[%d] Timer %s: %s (%d)",
@@ -146,5 +142,22 @@ public class AsyncTimer implements Closeable {
 				this.getName(),
 				message,
 				this.numExecutions));
+	}
+
+	private static class SleepRunnable implements Runnable {
+		private final CompletableFuture<Void> future;
+
+		public SleepRunnable() {
+			this.future = new CompletableFuture<>();
+		}
+
+		@Override
+		public void run() {
+			this.future.complete(null);
+		}
+
+		public CompletableFuture<Void> getFuture() {
+			return this.future;
+		}
 	}
 }
