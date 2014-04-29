@@ -266,6 +266,11 @@ public class Account implements SerializableEntity {
 		long remainder = this.getBalance().getNumMicroNem() - runningBalance;
 		coinDayBalance += remainder;
 		
+		if (coinDayBalance > this.getBalance().getNumMicroNem()) {
+			coinDayBalance = this.getBalance().getNumMicroNem(); //XXX:or should we throw an exception?
+			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
+		}
+		
 		return new Amount(coinDayBalance);
 	}
 	
