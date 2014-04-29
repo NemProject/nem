@@ -1,8 +1,10 @@
-package org.nem.core.utils;
+package org.nem.core.async;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.ExceptionUtils;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 

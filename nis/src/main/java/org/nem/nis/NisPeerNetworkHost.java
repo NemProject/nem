@@ -1,7 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.utils.AsyncTimer;
+import org.nem.core.async.AsyncTimer;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeApiId;

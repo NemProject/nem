@@ -1,4 +1,4 @@
-package org.nem.core.utils;
+package org.nem.core.async;
 
 import java.io.Closeable;
 import java.util.concurrent.*;
