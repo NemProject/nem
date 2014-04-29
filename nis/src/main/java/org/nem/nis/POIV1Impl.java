@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -25,15 +24,19 @@ import org.nem.core.utils.ArrayUtils;
  */
 public class POIV1Impl implements POI {
 
-	private int DEFAULT_MAX_ITERS = 100;
+	public static final int DEFAULT_MAX_ITERS = 100;
 	
 	public static final double EPSILON = .00000001;
 
 	public static final double WEIGHT = .99;
 	
-	public static final double MIN_TELEPORTATION_PROB = .7;	
+	public static final double MIN_TELEPORTATION_PROB = .7;
 	
-	private double DEFAULT_POWER_ITERATION_TOL = 1.0e-8;
+	public static final double ADDITIVE_TELEPORTATION = .25;
+	
+	public static final double MAX_PROB = 1.0;
+	
+	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-8;
 
 	public double[] getAccountImportances(List<Account> accounts) {
 		return calculateImportancesImpl(accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
@@ -43,7 +46,7 @@ public class POIV1Impl implements POI {
 	private double[] calculateImportancesImpl(List<Account> accounts, int maxIters, double tol) {
 		
 		int numAccounts = accounts.size();
-		double scale = 1.0 /numAccounts;
+		double scale = MAX_PROB /numAccounts;
 		
 		//XXX: okay, it sucks that we have to do this, but let's just do this for now;
 		//eventually we should try to create a better structure for the graph
@@ -92,11 +95,11 @@ public class POIV1Impl implements POI {
 
 		// calculate teleportation probabilities based on normalized amount of NEM owned
 		double[] teleporations = new double[numAccounts];
-		for (int acctNdx=0; acctNdx < importances.getSize(); acctNdx++) {
+		for (int acctNdx = 0; acctNdx < importances.getSize(); acctNdx++) {
 	        // assign a value between .7 and .95 based on the amount of NEM in an account
 			// more NEM = higher teleportation seems to work better
 			// NOTE: importances were initialized with acct balances, so this is why this works
-			teleporations[acctNdx] = MIN_TELEPORTATION_PROB + .25*(importances.getAt(acctNdx)/maxImportance); // the importance vector was already normalized to sum to 1 in the code above
+			teleporations[acctNdx] = MIN_TELEPORTATION_PROB + ADDITIVE_TELEPORTATION*(importances.getAt(acctNdx)/maxImportance); // the importance vector was already normalized to sum to 1 in the code above
 		}
 		
 		int iterCount = 0;
@@ -130,7 +133,7 @@ public class POIV1Impl implements POI {
 									  teleporations[ndx]*prevIterImportances.getAt(ndx)*weights[otherAcctNdx]);
 				}
 				
-				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (1.0-teleporations[ndx]));
+				importances.setAt(ndx, importances.getAt(ndx) + dangleSum + (MAX_PROB-teleporations[ndx]));
 			}
 
 			// normalize vector
