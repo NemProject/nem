@@ -74,7 +74,7 @@ public class ExceptionUtilsTest {
 
 		// Assert:
 		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-		Assert.assertThat(runner.getUnhandledException(), Is.is(IllegalStateException.class));
+		Assert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
 	}
 
 	@Test
@@ -159,7 +159,7 @@ public class ExceptionUtilsTest {
 
 		// Assert:
 		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-		Assert.assertThat(runner.getUnhandledException(), Is.is(IllegalStateException.class));
+		Assert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
 	}
 
 	@Test
