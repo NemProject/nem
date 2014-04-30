@@ -207,7 +207,7 @@ public class BlockChain implements BlockSynchronizer {
 			block.execute();
 		}
 
-		synchronized (this) {
+		synchronized (blockChainDbLayer) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
 			if (hasOwnChain) {
@@ -295,7 +295,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		// receivedBlock already seen
-		synchronized (this) {
+		synchronized (blockChainDbLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}

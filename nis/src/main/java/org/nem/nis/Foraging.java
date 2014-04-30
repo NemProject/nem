@@ -109,7 +109,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction, hash -> {
-			synchronized (blockChain) {
+			synchronized (blockChainDbLayer) {
 				return null != transferDao.findByHash(hash.getRaw());
 			}
 		});
@@ -175,7 +175,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {
-			synchronized (blockChain) {
+			synchronized (blockChainDbLayer) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainDbLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
