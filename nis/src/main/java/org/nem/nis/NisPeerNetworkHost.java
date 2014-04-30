@@ -7,6 +7,7 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -75,7 +76,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.refreshTimer = new AsyncTimer(
 					this.network::refresh,
 					REFRESH_INITIAL_DELAY,
-					new UniformDelayStrategy(REFRESH_INTERVAL));
+					getRefreshDelayStrategy());
 			this.refreshTimer.setName("REFRESH");
 
 			this.broadcastTimer = AsyncTimer.After(
@@ -89,6 +90,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					() -> CompletableFuture.runAsync(this.network::synchronize),
 					new UniformDelayStrategy(SYNC_INTERVAL));
 			this.syncTimer.setName("SYNC");
+		}
+
+		private static AbstractDelayStrategy getRefreshDelayStrategy() {
+			// initially refresh at 1/6 of the desired rate, gradually increase to the desired rate
+			// over 60 iterations, and then plateau at that rate forever
+			final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
+					new LinearDelayStrategy(REFRESH_INTERVAL / 6, REFRESH_INTERVAL, 60),
+					new UniformDelayStrategy(REFRESH_INTERVAL));
+			return new AggregateDelayStrategy(subStrategies);
 		}
 
 		/**
