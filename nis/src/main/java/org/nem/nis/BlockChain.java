@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -32,14 +31,13 @@ public class BlockChain implements BlockSynchronizer {
 
 	private AccountDao accountDao;
 
+	private BlockChainDbLayer blockChainDbLayer;
+
 	private BlockDao blockDao;
 
 	private AccountAnalyzer accountAnalyzer;
 
 	private Foraging foraging;
-
-	// for now it's easier to keep it like this
-	private org.nem.nis.dbmodel.Block lastBlock;
 
 	private final BlockScorer scorer = new BlockScorer();
 
@@ -58,27 +56,15 @@ public class BlockChain implements BlockSynchronizer {
 	@Autowired
 	public void setForaging(Foraging foraging) { this.foraging = foraging; }
 
-
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		return lastBlock;
-	}
-
-	private Long getLastBlockHeight() {
-		return lastBlock.getHeight();
-	}
-
-
-	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
-		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-		lastBlock = curBlock;
-	}
+	@Autowired
+	public void setBlockChainDbLayer(BlockChainDbLayer blockChainDbLayer) { this.blockChainDbLayer = blockChainDbLayer; }
 
 	private void penalize(Node node) {
 
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
-		long currentHeight = getLastBlockHeight();
+		long currentHeight = blockChainDbLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
@@ -93,12 +79,6 @@ public class BlockChain implements BlockSynchronizer {
 			);
 			currentHeight--;
 		}
-	}
-
-	private void dropDbBlocksAfter(final BlockHeight height) {
-		blockDao.deleteBlocksAfterHeight(height);
-
-		lastBlock = blockDao.findByHeight(height);
 	}
 
 	/**
@@ -142,7 +122,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
-		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainDbLayer.getLastDbBlock(), BLOCKS_LIMIT);
 	}
 
 	/**
@@ -236,10 +216,10 @@ public class BlockChain implements BlockSynchronizer {
 				addRevertedTransactionsAsUnconfirmed(transactionHashes, commonBlockHeight, accountAnalyzer);
 			}
 
-			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
+			blockChainDbLayer.dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
-		peerChain.stream().filter(this::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
+		peerChain.stream().filter(blockChainDbLayer::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
@@ -369,26 +349,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
-		return true;
-	}
-
-	public boolean addBlockToDb(Block bestBlock) {
-		synchronized (this) {
-
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
-
-			// hibernate will save both block AND transactions
-			// as there is cascade in Block
-			// mind that there is NO cascade in transaction (near block field)
-			blockDao.save(dbBlock);
-
-			lastBlock.setNextBlockId(dbBlock.getId());
-			blockDao.updateLastBlockId(lastBlock);
-
-			lastBlock = dbBlock;
-
-		} // synchronized
-
 		return true;
 	}
 

@@ -38,6 +38,9 @@ public class NisMain {
 	@Autowired
 	private NisPeerNetworkHost networkHost;
 
+	@Autowired
+	private BlockChainDbLayer blockChainDbLayer;
+
 	private void analyzeBlocks() {
 		Long curBlockId;
 		System.out.println("starting analysis...");
@@ -59,12 +62,12 @@ public class NisMain {
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
-				this.blockChain.analyzeLastBlock(dbBlock);
+				this.blockChainDbLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			if (dbBlock == null && this.blockChain.getLastDbBlock() == null) {
+			if (dbBlock == null && this.blockChainDbLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
 				System.exit(-1);
 			}

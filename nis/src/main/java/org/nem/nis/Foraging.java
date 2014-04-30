@@ -44,6 +44,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	private BlockChain blockChain;
 
 	private BlockDao blockDao;
+	private BlockChainDbLayer blockChainDbLayer;
 
 	private TransferDao transferDao;
 
@@ -60,7 +61,10 @@ public class Foraging implements AutoCloseable, Runnable {
 	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
-	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
+	public void setTransferDao(final TransferDao transferDao) { this.transferDao = transferDao; }
+
+	@Autowired
+	public void setBlockChainDbLayer(final BlockChainDbLayer blockChainDbLayer) { this.blockChainDbLayer = blockChainDbLayer; }
 
 	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
@@ -157,7 +161,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	@Override
 	public void run() {
-		if (blockChain.getLastDbBlock() == null) {
+		if (blockChainDbLayer.getLastDbBlock() == null) {
 			return;
 		}
 
@@ -172,7 +176,7 @@ public class Foraging implements AutoCloseable, Runnable {
 		final BlockScorer scorer = new BlockScorer();
 		try {
 			synchronized (blockChain) {
-				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
+				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainDbLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 

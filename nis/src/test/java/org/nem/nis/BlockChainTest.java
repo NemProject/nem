@@ -17,6 +17,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.model.TransferTransaction;
+import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
 import org.nem.nis.test.MockForaging;
 import org.nem.nis.test.MockTransferDaoImpl;
@@ -65,13 +66,13 @@ public class BlockChainTest {
 	public void analyzeSavesResults() {
 		// Arrange:
 		org.nem.nis.dbmodel.Block block = createDummyDbBlock();
-		BlockChain blockChain = new BlockChain();
+		BlockChainDbLayer blockChainDbLayer = new BlockChainDbLayer(new MockAccountDao(), new MockBlockDao(null));
 
 		// Act:
-		blockChain.analyzeLastBlock(block);
+		blockChainDbLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(blockChain.getLastDbBlock(), IsSame.sameInstance(block));
+		Assert.assertThat(blockChainDbLayer.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
 	private Vector<Account> prepareSigners(AccountAnalyzer accountAnalyzer) {
@@ -80,28 +81,33 @@ public class BlockChainTest {
 		Account a;
 		Account temp;
 
+		// 0 = signer
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		a.incrementBalance(Amount.fromNem(1_000_000_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000_000_000));
 
+		// 1st sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
 
+		// 1st recipient
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		accountAnalyzer.addAccountToCache(a.getAddress());
 
+		// 2nd sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
 
+		// 2nd recipient
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		accountAnalyzer.addAccountToCache(a.getAddress());
@@ -130,13 +136,14 @@ public class BlockChainTest {
 		org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
 
 		final BlockChain blockChain = new BlockChain();
-		blockChain.analyzeLastBlock(parent);
 
 		blockChain.setAccountDao(accountDao);
 		MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		blockChain.setBlockDao(mockBlockDao);
 		blockChain.setAccountAnalyzer(accountAnalyzer);
 		blockChain.setForaging(new MockForaging(new MockTransferDaoImpl(), blockChain));
+		final BlockChainDbLayer blockChainDbLayer = new BlockChainDbLayer(accountDao, mockBlockDao);
+		blockChain.setBlockChainDbLayer(blockChainDbLayer);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));

@@ -4,6 +4,7 @@ import org.nem.core.model.BlockHeight;
 import org.nem.core.model.HashChain;
 import org.nem.core.model.SerializableList;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.BlockChainDbLayer;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.mappers.BlockMapper;
@@ -17,20 +18,20 @@ public class ChainController {
 
 	private AccountLookup accountLookup;
 	private RequiredBlockDao blockDao;
-	private BlockChain blockChain;
+	private BlockChainDbLayer blockChainDbLayer;
 
 	@Autowired(required = true)
-	ChainController(final RequiredBlockDao blockDao, final AccountLookup accountLookup, BlockChain blockChain) {
+	ChainController(final RequiredBlockDao blockDao, final AccountLookup accountLookup, final BlockChainDbLayer blockChainDbLayer) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
-		this.blockChain = blockChain;
+		this.blockChainDbLayer = blockChainDbLayer;
 	}
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
 	public Block blockLast() {
-		return BlockMapper.toModel(this.blockChain.getLastDbBlock(), this.accountLookup);
+		return BlockMapper.toModel(this.blockChainDbLayer.getLastDbBlock(), this.accountLookup);
 	}
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
