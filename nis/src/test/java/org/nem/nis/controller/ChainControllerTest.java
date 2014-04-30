@@ -7,7 +7,7 @@ import org.nem.core.model.HashChain;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
-import org.nem.nis.BlockChainDbLayer;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.test.*;
 
@@ -22,9 +22,9 @@ public class ChainControllerTest {
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final MockBlockDao blockDao = new MockBlockDao(null);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
-		final BlockChainDbLayer blockChainDbLayer = mock(BlockChainDbLayer.class);
-		when(blockChainDbLayer.getLastDbBlock()).thenReturn(NisUtils.createBlockWithTimeStamp(443));
-		final ChainController controller = new ChainController(requiredBlockDao, accountLookup, blockChainDbLayer);
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		when(blockChainLastBlockLayer.getLastDbBlock()).thenReturn(NisUtils.createBlockWithTimeStamp(443));
+		final ChainController controller = new ChainController(requiredBlockDao, accountLookup, blockChainLastBlockLayer);
 
 		// Act:
 		final org.nem.core.model.Block block = controller.blockLast();

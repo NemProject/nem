@@ -9,6 +9,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
@@ -31,7 +32,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	private AccountDao accountDao;
 
-	private BlockChainDbLayer blockChainDbLayer;
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private BlockDao blockDao;
 
@@ -57,14 +58,14 @@ public class BlockChain implements BlockSynchronizer {
 	public void setForaging(Foraging foraging) { this.foraging = foraging; }
 
 	@Autowired
-	public void setBlockChainDbLayer(BlockChainDbLayer blockChainDbLayer) { this.blockChainDbLayer = blockChainDbLayer; }
+	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
 
 	private void penalize(Node node) {
 
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
-		long currentHeight = blockChainDbLayer.getLastBlockHeight();
+		long currentHeight = blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
@@ -72,11 +73,10 @@ public class BlockChain implements BlockSynchronizer {
 			// if the transaction is in DB it means at some point
 			// isValid and verify had to be called on it, so we can safely add it
 			// as unconfirmed
-			block.getBlockTransfers().stream().filter(
-					tr -> ! transactionHashes.contains(tr)
-			).forEach(
-					tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(tr, accountAnalyzer))
-			);
+			block.getBlockTransfers().stream()
+					.filter(tr -> ! transactionHashes.contains(tr))
+					.map(tr -> TransferMapper.toModel(tr, accountAnalyzer))
+					.forEach(tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
 			currentHeight--;
 		}
 	}
@@ -122,7 +122,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
-		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainDbLayer.getLastDbBlock(), BLOCKS_LIMIT);
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainLastBlockLayer.getLastDbBlock(), BLOCKS_LIMIT);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class BlockChain implements BlockSynchronizer {
 			block.execute();
 		}
 
-		synchronized (blockChainDbLayer) {
+		synchronized (blockChainLastBlockLayer) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
 			if (hasOwnChain) {
@@ -216,10 +216,10 @@ public class BlockChain implements BlockSynchronizer {
 				addRevertedTransactionsAsUnconfirmed(transactionHashes, commonBlockHeight, accountAnalyzer);
 			}
 
-			blockChainDbLayer.dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
+			blockChainLastBlockLayer.dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
-		peerChain.stream().filter(blockChainDbLayer::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
+		peerChain.stream().filter(blockChainLastBlockLayer::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
@@ -295,7 +295,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		// receivedBlock already seen
-		synchronized (blockChainDbLayer) {
+		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}

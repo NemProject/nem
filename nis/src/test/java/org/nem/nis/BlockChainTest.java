@@ -17,6 +17,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.model.TransferTransaction;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
 import org.nem.nis.test.MockForaging;
@@ -66,13 +67,13 @@ public class BlockChainTest {
 	public void analyzeSavesResults() {
 		// Arrange:
 		org.nem.nis.dbmodel.Block block = createDummyDbBlock();
-		BlockChainDbLayer blockChainDbLayer = new BlockChainDbLayer(new MockAccountDao(), new MockBlockDao(null));
+		BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(new MockAccountDao(), new MockBlockDao(null));
 
 		// Act:
-		blockChainDbLayer.analyzeLastBlock(block);
+		blockChainLastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(blockChainDbLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		Assert.assertThat(blockChainLastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
 	private Vector<Account> prepareSigners(AccountAnalyzer accountAnalyzer) {
@@ -142,8 +143,8 @@ public class BlockChainTest {
 		blockChain.setBlockDao(mockBlockDao);
 		blockChain.setAccountAnalyzer(accountAnalyzer);
 		blockChain.setForaging(new MockForaging(new MockTransferDaoImpl(), blockChain));
-		final BlockChainDbLayer blockChainDbLayer = new BlockChainDbLayer(accountDao, mockBlockDao);
-		blockChain.setBlockChainDbLayer(blockChainDbLayer);
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
+		blockChain.setBlockChainLastBlockLayer(blockChainLastBlockLayer);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));

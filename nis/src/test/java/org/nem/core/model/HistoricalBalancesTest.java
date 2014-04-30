@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.nis.BlockChainDbLayer;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -110,9 +110,9 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeTrimmed() {
 		// Arrange:
-		final BlockChainDbLayer blockChainDbLayer = mock(BlockChainDbLayer.class);
-		when(blockChainDbLayer.getLastBlockHeight()).thenReturn(1000L);
-		final HistoricalBalances balances = new HistoricalBalances(blockChainDbLayer);
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1000L);
+		final HistoricalBalances balances = new HistoricalBalances(blockChainLastBlockLayer);
 		
 		// Act:
 		balances.add(new BlockHeight(100L), new Amount(1L));
@@ -123,7 +123,7 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.size(), IsEqual.equalTo(3));
 
 		// Act:
-		when(blockChainDbLayer.getLastBlockHeight()).thenReturn(3000L);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(3000L);
 		balances.add(new BlockHeight(2500L), new Amount(8L));
 
 		// Assert:
@@ -134,8 +134,8 @@ public class HistoricalBalancesTest {
 	//endregion
 
 	private static HistoricalBalances createTestHistoricalBalances(long l) {
-		final BlockChainDbLayer blockChainDbLayer = mock(BlockChainDbLayer.class);
-		when(blockChainDbLayer.getLastBlockHeight()).thenReturn(40L);
-		return new HistoricalBalances(blockChainDbLayer);
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(40L);
+		return new HistoricalBalances(blockChainLastBlockLayer);
 	}
 }

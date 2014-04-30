@@ -13,6 +13,7 @@ import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -39,7 +40,7 @@ public class NisMain {
 	private NisPeerNetworkHost networkHost;
 
 	@Autowired
-	private BlockChainDbLayer blockChainDbLayer;
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private void analyzeBlocks() {
 		Long curBlockId;
@@ -62,12 +63,12 @@ public class NisMain {
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
-				this.blockChainDbLayer.analyzeLastBlock(dbBlock);
+				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			if (dbBlock == null && this.blockChainDbLayer.getLastDbBlock() == null) {
+			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
 				System.exit(-1);
 			}

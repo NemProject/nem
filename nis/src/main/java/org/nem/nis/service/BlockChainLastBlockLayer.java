@@ -1,7 +1,8 @@
-package org.nem.nis;
+package org.nem.nis.service;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.BlockHeight;
+import org.nem.nis.BlockChain;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -12,15 +13,16 @@ import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
 
 @Service
-public class BlockChainDbLayer {
+public class BlockChainLastBlockLayer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	final private AccountDao accountDao;
 	final private BlockDao blockDao;
+
 	private org.nem.nis.dbmodel.Block lastBlock;
 
 	@Autowired(required = true)
-	BlockChainDbLayer(final AccountDao accountDao, final BlockDao blockDao) {
+	BlockChainLastBlockLayer(final AccountDao accountDao, final BlockDao blockDao) {
 		this.accountDao = accountDao;
 		this.blockDao = blockDao;
 	}
