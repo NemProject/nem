@@ -95,6 +95,23 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	public void refreshIntervalIsDerivedFromDelayStrategy() throws InterruptedException {
+		// Arrange:
+		final CountableFuture cf = new CountableFuture();
+		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2*TimeUnit, TimeUnit, 2*TimeUnit });
+		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy)) {
+			// Arrange: (should fire at 1, 2, 4, 5)
+			Thread.sleep(6 * TimeUnit);
+
+			// Assert:
+			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(4));
+			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(4));
+			Assert.assertThat(strategy.getNumNextCalls(), IsEqual.equalTo(4));
+			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+		}
+	}
+
+	@Test
 	public void closeStopsRefreshing() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
@@ -107,6 +124,28 @@ public class AsyncTimerTest {
 
 			// Act:
 			timer.close();
+			Thread.sleep(9 * TimeHalfUnit);
+
+			// Assert:
+			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(1));
+			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(true));
+		}
+	}
+
+	@Test
+	public void stoppedDelayStrategyStopsRefreshing() throws InterruptedException {
+		// Arrange:
+		final CountableFuture cf = new CountableFuture();
+		final AbstractDelayStrategy strategy = new UniformDelayStrategy(2 * TimeUnit, 1);
+		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy)) {
+			// Arrange:
+			Thread.sleep(3 * TimeHalfUnit);
+
+			// Assert:
+			Assert.assertThat(timer.getNumExecutions(), IsEqual.equalTo(1));
+
+			// Act:
 			Thread.sleep(9 * TimeHalfUnit);
 
 			// Assert:
@@ -199,6 +238,26 @@ public class AsyncTimerTest {
 		private static CountableFuture sleep(int milliseconds) {
 			return new CountableFuture(() ->
 					() -> ExceptionUtils.propagateVoid(() -> Thread.sleep(milliseconds)));
+		}
+	}
+
+	private static class MockDelayStrategy extends AbstractDelayStrategy {
+
+		private final int[] delays;
+		private int numNextCalls;
+
+		public MockDelayStrategy(final int[] delays) {
+			this.delays = delays;
+		}
+
+		public int getNumNextCalls() {
+			return this.numNextCalls;
+		}
+
+		@Override
+		protected int nextInternal(int iteration) {
+			this.numNextCalls = iteration;
+			return this.delays[iteration - 1];
 		}
 	}
 }
