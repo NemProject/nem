@@ -14,7 +14,7 @@ public class AsyncTimer implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(AsyncTimer.class.getName());
 
 	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
-	private final int delay;
+	private final AbstractDelayStrategy delay;
 	private final CompletableFuture<?> future;
 
 	private final AtomicBoolean isStopped = new AtomicBoolean();
@@ -29,13 +29,12 @@ public class AsyncTimer implements Closeable {
 	 *
 	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param initialDelay The time (in milliseconds) to delay the first execution.
-	 * @param delay The delay (in milliseconds) between the termination of one execution and the
-	 *              commencement of the next.
+	 * @param delay The delay strategy.
 	 */
 	public AsyncTimer(
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int initialDelay,
-			final int delay) {
+			final AbstractDelayStrategy delay) {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
@@ -45,7 +44,7 @@ public class AsyncTimer implements Closeable {
 	private AsyncTimer(
 			final CompletableFuture<?> trigger,
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final int delay) {
+			final AbstractDelayStrategy delay) {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
@@ -61,13 +60,12 @@ public class AsyncTimer implements Closeable {
 	 *
 	 * @param triggerTimer The timer that will trigger the first execution when it has completed a single recurrence.
 	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
-	 * @param delay The delay (in milliseconds) between the termination of one execution and the
-	 *              commencement of the next.
+	 * @param delay The delay strategy.
 	 */
 	public static AsyncTimer After(
 			final AsyncTimer triggerTimer,
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final int delay) {
+			final AbstractDelayStrategy delay) {
 
 		return new AsyncTimer(triggerTimer.firstRecurrenceFuture, recurringFutureSupplier, delay);
 	}
@@ -115,7 +113,7 @@ public class AsyncTimer implements Closeable {
 	}
 
 	private CompletableFuture<?> getNextChainLink() {
-		if (this.isStopped.get()) {
+		if (this.isStopped.get() || this.delay.shouldStop()) {
 			this.log("stopped");
 			final CompletableFuture<Void> terminatingFuture = new CompletableFuture<>();
 			terminatingFuture.complete(null);
@@ -131,7 +129,7 @@ public class AsyncTimer implements Closeable {
 				})
 				.thenCompose(v -> {
 					this.firstRecurrenceFuture.complete(null);
-					return this.refresh(this.delay);
+					return this.refresh(this.delay.next());
 				});
 	}
 

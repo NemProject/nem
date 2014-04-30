@@ -19,7 +19,7 @@ public class AsyncTimerTest {
 	public void timerNameIsInitiallyUnset() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, TimeUnit)) {
 			// Assert:
 			Assert.assertThat(timer.getName(), IsNull.nullValue());
 		}
@@ -29,7 +29,7 @@ public class AsyncTimerTest {
 	public void timerNameCanBeSet() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, TimeUnit)) {
 			// Act:
 			timer.setName("AlphaGamma");
 
@@ -44,7 +44,7 @@ public class AsyncTimerTest {
 	public void initialDelayIsRespected() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 10 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 10 * TimeUnit)) {
 			// Arrange:
 			Thread.sleep(TimeHalfUnit);
 
@@ -68,7 +68,7 @@ public class AsyncTimerTest {
 		final CountableFuture cf = new CountableFuture(() -> () -> {
 			throw new RuntimeException("this shouldn't stop the timer");
 		});
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
 			// Arrange: (should fire at 1, 3, 5)
 			Thread.sleep(6 * TimeUnit);
 
@@ -83,7 +83,7 @@ public class AsyncTimerTest {
 	public void refreshIntervalIsRespected() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
 			// Arrange: (should fire at 1, 3, 5)
 			Thread.sleep(6 * TimeUnit);
 
@@ -98,7 +98,7 @@ public class AsyncTimerTest {
 	public void closeStopsRefreshing() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
 			// Arrange:
 			Thread.sleep(3 * TimeHalfUnit);
 
@@ -121,7 +121,7 @@ public class AsyncTimerTest {
 		// Arrange:
 		final Object refreshMonitor = new Object();
 		final CountableFuture cf = new CountableFuture(() -> () -> Utils.monitorWait(refreshMonitor));
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
 			// Arrange: (expect calls at 1, 3, 5)
 			Thread.sleep(6 * TimeUnit);
 
@@ -140,11 +140,11 @@ public class AsyncTimerTest {
 	public void afterDelaysTimerUntilTriggerFires() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cfTrigger = CountableFuture.sleep(3 * TimeUnit);
-		try (final AsyncTimer triggerTimer = new AsyncTimer(cfTrigger.getFutureSupplier(), 2 * TimeUnit, 10 * TimeUnit)) {
+		try (final AsyncTimer triggerTimer = createTimer(cfTrigger, 2 * TimeUnit, 10 * TimeUnit)) {
 			triggerTimer.setName("TRIGGER");
 
 			final CountableFuture cf = new CountableFuture();
-			try (final AsyncTimer timer = AsyncTimer.After(triggerTimer, cf.getFutureSupplier(), 10 * TimeUnit)) {
+			try (final AsyncTimer timer = createTimerAfter(triggerTimer, cf, 10 * TimeUnit)) {
 				timer.setName("SUB TIMER");
 
 				// Arrange:
@@ -163,6 +163,14 @@ public class AsyncTimerTest {
 				Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 			}
 		}
+	}
+
+	private static AsyncTimer createTimer(final CountableFuture cf, final int initialDelay, final int delay) {
+		return new AsyncTimer(cf.getFutureSupplier(), initialDelay, new UniformDelayStrategy(delay));
+	}
+
+	private static AsyncTimer createTimerAfter(final AsyncTimer triggerTimer, final CountableFuture cf, final int delay) {
+		return AsyncTimer.After(triggerTimer, cf.getFutureSupplier(), new UniformDelayStrategy(delay));
 	}
 
 	private static class CountableFuture {

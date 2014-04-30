@@ -35,9 +35,9 @@ public abstract class AbstractDelayStrategy {
 	}
 
 	/**
-	 * Gets the current delay.
+	 * Gets the next delay (in milliseconds).
 	 *
-	 * @return The current delay.
+	 * @return The next delay.
 	 */
 	public final int next() {
 		if (this.shouldStop())
@@ -47,7 +47,7 @@ public abstract class AbstractDelayStrategy {
 	}
 
 	/**
-	 * Gets the next delay.
+	 * Gets the next delay (in milliseconds).
 	 *
 	 * @param iteration The 1-based call count.
 	 * @return The next delay.

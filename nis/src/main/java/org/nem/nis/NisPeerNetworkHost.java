@@ -1,7 +1,7 @@
 package org.nem.nis;
 
+import org.nem.core.async.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.async.AsyncTimer;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeApiId;
@@ -75,19 +75,19 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.refreshTimer = new AsyncTimer(
 					this.network::refresh,
 					REFRESH_INITIAL_DELAY,
-					REFRESH_INTERVAL);
+					new UniformDelayStrategy(REFRESH_INTERVAL));
 			this.refreshTimer.setName("REFRESH");
 
 			this.broadcastTimer = AsyncTimer.After(
 					this.refreshTimer,
 					() -> this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
-					BROADCAST_INTERVAL);
+					new UniformDelayStrategy(BROADCAST_INTERVAL));
 			this.broadcastTimer.setName("BROADCAST");
 
 			this.syncTimer = AsyncTimer.After(
 					this.refreshTimer,
 					() -> CompletableFuture.runAsync(this.network::synchronize),
-					SYNC_INTERVAL);
+					new UniformDelayStrategy(SYNC_INTERVAL));
 			this.syncTimer.setName("SYNC");
 		}
 
