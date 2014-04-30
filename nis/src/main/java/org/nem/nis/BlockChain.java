@@ -236,42 +236,15 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
-
 			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
 		}
 		//endregion
-
 
 		//region verify peer's chain
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		// do not trust peer, take first block from our db and convert it
-		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
-			penalize(node);
-			return;
-		}
-
-		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(parentBlock, peerChain);
-		if (peerScore < 0L) {
-			penalize(node);
-			return;
-		}
-
-		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
-
-		if (peerScore < ourScore) {
-			// we could get peer's score upfront, if it mismatches with
-			// what we calculated, we could penalize peer.
-			return;
-		}
-
-		//endregion
-
-		// mind "not" consistent
-		updateOurChain(commonBlockHeight.getRaw(), contemporaryAccountAnalyzer, peerChain, ! result.areChainsConsistent());
+		updateOurChain(ourDbBlock, contemporaryAccountAnalyzer, peerChain, ourScore, !result.areChainsConsistent());
 	}
 
 	/**
@@ -332,19 +305,34 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
+		return updateOurChain(parent, contemporaryAccountAnalyzer, peerChain, ourScore, hasOwnChain);
+	}
+
+	private boolean updateOurChain(
+			final org.nem.nis.dbmodel.Block parent,
+			final AccountAnalyzer contemporaryAccountAnalyzer,
+			final List<Block> peerChain,
+			final long ourScore,
+			final boolean hasOwnChain) {
+
+		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
+		if (!validatePeerChain(parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
-		long peerscore = getPeerChainScore(parentBlock, peerChain);
-		if (peerscore < 0) {
+		// warning: this changes number of foraged blocks
+		long peerScore = getPeerChainScore(parentBlock, peerChain);
+		if (peerScore < 0) {
 			// penalty?
 			return false;
 		}
 
-		if (peerscore < ourScore) {
+		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
+		if (peerScore < ourScore) {
+			// we could get peer's score upfront, if it mismatches with
+			// what we calculated, we could penalize peer.
 			return false;
 		}
 
