@@ -55,7 +55,8 @@ public class Account implements SerializableEntity {
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
-		this.historicalBalances = new HistoricalBalances();
+		// TODO: this is broken and needs to be fixed!!!
+		this.historicalBalances = new HistoricalBalances(null);
 	}
 
 	/**
@@ -225,7 +226,7 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * @param inLinks the inLinks to set
+	 * @param inlinks the inLinks to set
 	 */
 	public void setInlinks(List<AccountLink> inlinks) {
 		this.inlinks = inlinks;
@@ -286,7 +287,7 @@ public class Account implements SerializableEntity {
 	 * @return The historical balance.
 	 */
 	public Amount getBalance(final BlockHeight height) {
-		return historicalBalances.getBalance(height);
+		return historicalBalances.getHistoricalBalance(height).getBalance();
 	}
 	
 	/**
