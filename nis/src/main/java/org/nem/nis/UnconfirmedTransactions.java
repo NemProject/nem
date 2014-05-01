@@ -5,8 +5,6 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
-import sun.management.Sensor;
 
 import java.util.*;
 import java.util.concurrent.*;

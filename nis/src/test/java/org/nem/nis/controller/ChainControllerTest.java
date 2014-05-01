@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.model.HashChain;
 import org.nem.core.test.*;
@@ -32,7 +33,7 @@ public class ChainControllerTest {
 		// Assert:
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(443)));
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-		//Assert.assertThat(blockChain.getNumGetLastDbBlockCalls(), IsEqual.equalTo(1));
+		Mockito.verify(blockChainLastBlockLayer, Mockito.times(1)).getLastDbBlock();
 	}
 
 	@Test

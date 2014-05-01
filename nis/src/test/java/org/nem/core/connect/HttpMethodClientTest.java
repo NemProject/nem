@@ -131,7 +131,7 @@ public class HttpMethodClientTest {
 		private final String TIMEOUT_URL = "http://127.0.0.100/";
 		private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private final String HOST_LESS_URI = "file:///~/calendar";
-		private final int GOOD_TIMEOUT = 5;
+		private final int GOOD_TIMEOUT = 10000;
 
 		public interface SendAsyncStrategy {
 
