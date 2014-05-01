@@ -8,8 +8,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.trust.*;
 
-public class NetworkSimulatorTest {
-	private static final Logger LOGGER = Logger.getLogger(NetworkSimulatorTest.class.getName());
+public class NetworkSimulatorITCase {
+	private static final Logger LOGGER = Logger.getLogger(NetworkSimulatorITCase.class.getName());
 
 	@Test
 	public void simulateEigenTrust() {
