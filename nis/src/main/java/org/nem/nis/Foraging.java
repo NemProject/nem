@@ -9,8 +9,8 @@ import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.NodeApiId;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;

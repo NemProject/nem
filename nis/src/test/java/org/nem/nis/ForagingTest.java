@@ -1,23 +1,46 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.test.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.model.TransferTransaction;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ForagingTest {
-	private static org.nem.core.model.Account SENDER = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+
+	static void setFinalStatic(Field field, Object newValue) throws Exception {
+		field.setAccessible(true);
+
+		// remove final modifier from field
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+		field.set(null, newValue);
+	}
+
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		// TODO: is there some way to use mockito for this?
+		setFinalStatic(NisMain.class.getField("TIME_PROVIDER"), new SystemTimeProvider());
+	}
 
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
@@ -41,10 +64,12 @@ public class ForagingTest {
 		tx.sign();
 
 		// Act:
-		foraging.processTransaction(tx);
-		foraging.processTransaction(tx);
+		boolean result1 = foraging.processTransaction(tx);
+		boolean result2 = foraging.processTransaction(tx);
 
 		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(true));
+		Assert.assertThat(result2, IsEqual.equalTo(false));
 		Assert.assertThat(foraging.getNumUnconfirmedTransactions(), IsEqual.equalTo(1));
 	}
 
@@ -78,13 +103,13 @@ public class ForagingTest {
 	@Test
 	public void canProcessTransaction() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
+		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = new MockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, Amount.fromNem(123), null);
 		transaction.sign();
 		boolean result = foraging.processTransaction(transaction);
 
@@ -96,13 +121,13 @@ public class ForagingTest {
 	@Test
 	public void cannotProcessSameTransaction() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
+		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = new MockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, new Amount(123), null);
+		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, Amount.fromNem(123), null);
 		transaction.sign();
 
 		boolean result1 = foraging.processTransaction(transaction);
@@ -117,16 +142,16 @@ public class ForagingTest {
 	@Test
 	public void transactionsForNewBlockHappenedBeforeBlock() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
+		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = new MockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, new Amount(123), null);
+		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
 		transaction1.sign();
-		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, new Amount(123), null);
+		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, Amount.fromNem(123), null);
 		transaction2.sign();
 
 		boolean result1 = foraging.processTransaction(transaction1);
@@ -145,19 +170,22 @@ public class ForagingTest {
 	@Test
 	public void transactionsForNewBlockAreSortedByFee() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
+		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = new MockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction1.setFee(new Amount(5));
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
+		transaction1.setFee(Amount.fromNem(5));
 		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
-		transaction2.setFee(new Amount(10));
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
+		transaction2.setFee(Amount.fromNem(10));
 		transaction2.sign();
+
+		final Hash transactionHash1 = HashUtils.calculateHash(transaction1);
+		final Hash transactionHash2 = HashUtils.calculateHash(transaction2);
 
 		boolean result1 = foraging.processTransaction(transaction1);
 		boolean result2 = foraging.processTransaction(transaction2);
@@ -165,6 +193,9 @@ public class ForagingTest {
 		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
 
 		// Assert
+		// this indicates wrong amounts or fees
+		Assert.assertThat(transactionHash1, IsNot.not(IsEqual.equalTo(transactionHash2)));
+
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
@@ -176,17 +207,17 @@ public class ForagingTest {
 	@Test
 	public void transactionsForNewBlockAreSortedByTime() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
+		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = new MockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, new Amount(123), null);
+		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
 		transaction1.setFee(new Amount(5));
 		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, new Amount(123), null);
+		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, Amount.fromNem(123), null);
 		transaction2.setFee(new Amount(5));
 		transaction2.sign();
 
@@ -240,7 +271,12 @@ public class ForagingTest {
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), SENDER, recipient, new Amount(amount), null);
+		return new TransferTransaction(
+				(new SystemTimeProvider()).getCurrentTime(),
+				createAccountWithBalance(amount*3),
+				recipient,
+				new Amount(amount),
+				null);
 	}
 
 	private static Account createAccountWithBalance(long balance) {
