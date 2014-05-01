@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -10,6 +9,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
@@ -32,14 +32,13 @@ public class BlockChain implements BlockSynchronizer {
 
 	private AccountDao accountDao;
 
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+
 	private BlockDao blockDao;
 
 	private AccountAnalyzer accountAnalyzer;
 
 	private Foraging foraging;
-
-	// for now it's easier to keep it like this
-	private org.nem.nis.dbmodel.Block lastBlock;
 
 	private final BlockScorer scorer = new BlockScorer();
 
@@ -58,27 +57,15 @@ public class BlockChain implements BlockSynchronizer {
 	@Autowired
 	public void setForaging(Foraging foraging) { this.foraging = foraging; }
 
-
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		return lastBlock;
-	}
-
-	private Long getLastBlockHeight() {
-		return lastBlock.getHeight();
-	}
-
-
-	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
-		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-		lastBlock = curBlock;
-	}
+	@Autowired
+	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
 
 	private void penalize(Node node) {
 
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
-		long currentHeight = getLastBlockHeight();
+		long currentHeight = blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
@@ -86,19 +73,12 @@ public class BlockChain implements BlockSynchronizer {
 			// if the transaction is in DB it means at some point
 			// isValid and verify had to be called on it, so we can safely add it
 			// as unconfirmed
-			block.getBlockTransfers().stream().filter(
-					tr -> ! transactionHashes.contains(tr)
-			).forEach(
-					tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(tr, accountAnalyzer))
-			);
+			block.getBlockTransfers().stream()
+					.filter(tr -> ! transactionHashes.contains(tr))
+					.map(tr -> TransferMapper.toModel(tr, accountAnalyzer))
+					.forEach(tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
 			currentHeight--;
 		}
-	}
-
-	private void dropDbBlocksAfter(final BlockHeight height) {
-		blockDao.deleteBlocksAfterHeight(height);
-
-		lastBlock = blockDao.findByHeight(height);
 	}
 
 	/**
@@ -142,7 +122,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
-		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainLastBlockLayer.getLastDbBlock(), BLOCKS_LIMIT);
 	}
 
 	/**
@@ -227,7 +207,7 @@ public class BlockChain implements BlockSynchronizer {
 			block.execute();
 		}
 
-		synchronized (this) {
+		synchronized (blockChainLastBlockLayer) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
 			if (hasOwnChain) {
@@ -236,10 +216,10 @@ public class BlockChain implements BlockSynchronizer {
 				addRevertedTransactionsAsUnconfirmed(transactionHashes, commonBlockHeight, accountAnalyzer);
 			}
 
-			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
+			blockChainLastBlockLayer.dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
-		peerChain.stream().filter(this::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
+		peerChain.stream().filter(blockChainLastBlockLayer::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
@@ -256,42 +236,15 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
-
 			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
 		}
 		//endregion
-
 
 		//region verify peer's chain
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		// do not trust peer, take first block from our db and convert it
-		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
-			penalize(node);
-			return;
-		}
-
-		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(parentBlock, peerChain);
-		if (peerScore < 0L) {
-			penalize(node);
-			return;
-		}
-
-		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
-
-		if (peerScore < ourScore) {
-			// we could get peer's score upfront, if it mismatches with
-			// what we calculated, we could penalize peer.
-			return;
-		}
-
-		//endregion
-
-		// mind "not" consistent
-		updateOurChain(commonBlockHeight.getRaw(), contemporaryAccountAnalyzer, peerChain, ! result.areChainsConsistent());
+		updateOurChain(ourDbBlock, contemporaryAccountAnalyzer, peerChain, ourScore, !result.areChainsConsistent());
 	}
 
 	/**
@@ -315,7 +268,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		// receivedBlock already seen
-		synchronized (this) {
+		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}
@@ -352,43 +305,38 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
+		return updateOurChain(parent, contemporaryAccountAnalyzer, peerChain, ourScore, hasOwnChain);
+	}
+
+	private boolean updateOurChain(
+			final org.nem.nis.dbmodel.Block parent,
+			final AccountAnalyzer contemporaryAccountAnalyzer,
+			final List<Block> peerChain,
+			final long ourScore,
+			final boolean hasOwnChain) {
+
+		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
+		if (!validatePeerChain(parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
-		long peerscore = getPeerChainScore(parentBlock, peerChain);
-		if (peerscore < 0) {
+		// warning: this changes number of foraged blocks
+		long peerScore = getPeerChainScore(parentBlock, peerChain);
+		if (peerScore < 0) {
 			// penalty?
 			return false;
 		}
 
-		if (peerscore < ourScore) {
+		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
+		if (peerScore < ourScore) {
+			// we could get peer's score upfront, if it mismatches with
+			// what we calculated, we could penalize peer.
 			return false;
 		}
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
-		return true;
-	}
-
-	public boolean addBlockToDb(Block bestBlock) {
-		synchronized (this) {
-
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
-
-			// hibernate will save both block AND transactions
-			// as there is cascade in Block
-			// mind that there is NO cascade in transaction (near block field)
-			blockDao.save(dbBlock);
-
-			lastBlock.setNextBlockId(dbBlock.getId());
-			blockDao.updateLastBlockId(lastBlock);
-
-			lastBlock = dbBlock;
-
-		} // synchronized
-
 		return true;
 	}
 

@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class Foraging implements AutoCloseable, Runnable {
 	private BlockChain blockChain;
 
 	private BlockDao blockDao;
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private TransferDao transferDao;
 
@@ -60,7 +62,10 @@ public class Foraging implements AutoCloseable, Runnable {
 	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
 
 	@Autowired
-	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
+	public void setTransferDao(final TransferDao transferDao) { this.transferDao = transferDao; }
+
+	@Autowired
+	public void setBlockChainLastBlockLayer(final BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
 
 	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
@@ -105,7 +110,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction, hash -> {
-			synchronized (blockChain) {
+			synchronized (blockChainLastBlockLayer) {
 				return null != transferDao.findByHash(hash.getRaw());
 			}
 		});
@@ -157,7 +162,7 @@ public class Foraging implements AutoCloseable, Runnable {
 
 	@Override
 	public void run() {
-		if (blockChain.getLastDbBlock() == null) {
+		if (blockChainLastBlockLayer.getLastDbBlock() == null) {
 			return;
 		}
 
@@ -171,8 +176,8 @@ public class Foraging implements AutoCloseable, Runnable {
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {
-			synchronized (blockChain) {
-				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
+			synchronized (blockChainLastBlockLayer) {
+				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainLastBlockLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 
