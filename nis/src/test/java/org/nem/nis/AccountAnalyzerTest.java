@@ -4,9 +4,10 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class AccountAnalyzerTest {
 
@@ -313,6 +314,27 @@ public class AccountAnalyzerTest {
 		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(copyAccount1, IsSame.sameInstance(account1));
 		Assert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
+	}
+
+	//endregion
+
+	//region iterator
+
+	@Test
+	public void iteratorReturnsAllAccounts() {
+		// Arrange:
+		final AccountAnalyzer analyzer = new AccountAnalyzer();
+
+		final List<Account> accounts = new ArrayList<>();
+		for (int i = 0; i < 3; ++i)
+			accounts.add(analyzer.addAccountToCache(Utils.generateRandomAddress()));
+
+		// Act:
+		final List<Account> iteratedAccounts = StreamSupport.stream(analyzer.spliterator(), false).collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(iteratedAccounts.size(), IsEqual.equalTo(3));
+		Assert.assertThat(iteratedAccounts, IsEquivalent.equivalentTo(accounts));
 	}
 
 	//endregion

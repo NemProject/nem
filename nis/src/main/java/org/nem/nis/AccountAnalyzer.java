@@ -5,8 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 
@@ -14,7 +13,7 @@ import org.nem.core.serialization.AccountLookup;
  * Account cache that implements AccountLookup and provides the lookup of accounts
  * by their addresses.
  */
-public class AccountAnalyzer implements AccountLookup {
+public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
@@ -127,6 +126,11 @@ public class AccountAnalyzer implements AccountLookup {
 		}
 
 		return copy;
+	}
+
+	@Override
+	public Iterator<Account> iterator() {
+		return this.addressToAccountMap.values().iterator();
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {
