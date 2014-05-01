@@ -13,12 +13,10 @@ public class MockForaging extends Foraging {
 	public MockForaging(TransferDao transferDao, BlockChain blockChain) {
 		super();
 		this.setTransferDao(transferDao);
-		this.setBlockChain(blockChain);
 
 		NisPeerNetworkHost mockedNisPeerNetworkHost = mock(NisPeerNetworkHost.class);
 		PeerNetwork peerNetwork = mock(PeerNetwork.class);
 		when(mockedNisPeerNetworkHost.getNetwork()).thenReturn(peerNetwork);
-		this.setNetworkHost(mockedNisPeerNetworkHost);
 	}
 
 	public MockForaging() {

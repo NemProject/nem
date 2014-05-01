@@ -15,13 +15,17 @@ import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
+import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Closeable;
 import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class BlockChain implements BlockSynchronizer {
+public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
@@ -40,9 +44,37 @@ public class BlockChain implements BlockSynchronizer {
 
 	private Foraging foraging;
 
+	private NisPeerNetworkHost host;
+
 	private final BlockScorer scorer = new BlockScorer();
 
+	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
+
+
 	public BlockChain() {
+		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
+	}
+
+	public void boot() {
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public void close() {
+		this.blockGeneratorExecutor.shutdownNow();
+	}
+
+	@Override
+	public void run() {
+		Block block = this.foraging.forageBlock();
+		if (block != null) {
+			// make a full-blown analysis
+			// TODO: we can call it thanks to the "hack" inside processBlock
+			if (this.processBlock(block)) {
+				// TODO: this probably should be called directly inside processBlock()
+				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+			}
+		}
 	}
 
 	@Autowired
@@ -59,6 +91,9 @@ public class BlockChain implements BlockSynchronizer {
 
 	@Autowired
 	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
+
+	@Autowired
+	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
 
 	private void penalize(Node node) {
 
@@ -338,9 +373,5 @@ public class BlockChain implements BlockSynchronizer {
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
 		return true;
-	}
-
-	public void boot() {
-		this.foraging.bootup();
 	}
 }

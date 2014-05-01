@@ -19,32 +19,30 @@ public class AccountControllerTest {
 	public void unlockAddsAccountToForaging() throws Exception {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		try (final MockForaging foraging = new MockForaging()) {
-			final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
-			final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
-			final AccountController controller = new AccountController(foraging, accountIoAdapter);
+		final MockForaging foraging = new MockForaging();
+		final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+		final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
-			// Act:
-			controller.accountUnlock(account.getKeyPair().getPrivateKey());
+		// Act:
+		controller.accountUnlock(account.getKeyPair().getPrivateKey());
 
-			// Assert:
-			Assert.assertThat(foraging.getUnlockedAccounts().size(), IsEqual.equalTo(1));
-			Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsEqual.equalTo(account));
-			Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsNot.not(IsSame.sameInstance(account)));
-		}
+		// Assert:
+		Assert.assertThat(foraging.getUnlockedAccounts().size(), IsEqual.equalTo(1));
+		Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsEqual.equalTo(account));
+		Assert.assertThat(foraging.getUnlockedAccounts().get(0), IsNot.not(IsSame.sameInstance(account)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void accountGetReturnsError() throws Exception {
 		// Arrange:
-		try (final MockForaging foraging = new MockForaging()) {
-			final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
-			final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
-			final AccountController controller = new AccountController(foraging, accountIoAdapter);
+		final MockForaging foraging = new MockForaging();
+		final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+		final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
-			// Act:
-			controller.accountGet("dummy");
-		}
+		// Act:
+		controller.accountGet("dummy");
 	}
 
 	private static class MockForaging extends Foraging {
