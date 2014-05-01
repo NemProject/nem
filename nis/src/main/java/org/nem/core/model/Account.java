@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
+import org.nem.core.messages.MessageFactory;
 import org.nem.core.serialization.*;
 
 import java.util.*;
@@ -57,15 +58,35 @@ public class Account implements SerializableEntity {
 		this.historicalBalances = new HistoricalBalances();
 	}
 
+	/**
+	 * Deserializes an account.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public Account(final Deserializer deserializer) {
+		this(deserializeAddress(deserializer));
+
+		this.balance = Amount.readFrom(deserializer, "balance");
+		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
+		this.label = deserializer.readString("label");
+		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.createDeserializer(this, this)));
+	}
+
+	private static Address deserializeAddress(final Deserializer deserializer) {
+		final Address addressWithoutPublicKey = readAddress(deserializer, "address", AccountEncoding.ADDRESS);
+		final Address addressWithPublicKey = readAddress(deserializer, "publicKey", AccountEncoding.PUBLIC_KEY);
+		return null != addressWithPublicKey ? addressWithPublicKey : addressWithoutPublicKey;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		writeTo(serializer, "address", this, AccountEncoding.ADDRESS);
 		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
 
-		serializer.writeLong("balance", getBalance().getNumMicroNem());
-		BlockAmount.writeTo(serializer, "foragedBlocks", getForagedBlocks());
-		serializer.writeString("label", getLabel());
-		serializer.writeObjectArray("messages", getMessages());
+		Amount.writeTo(serializer, "balance", this.getBalance());
+		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
+		serializer.writeString("label", this.getLabel());
+		serializer.writeObjectArray("messages", this.getMessages());
 	}
 
 	/**
@@ -381,20 +402,25 @@ public class Account implements SerializableEntity {
 			final Deserializer deserializer,
 			final String label,
 			final AccountEncoding encoding) {
-		Address address;
+		final Address address = readAddress(deserializer, label, encoding);
+		return deserializer.getContext().findAccountByAddress(address);
+	}
+
+	private static Address readAddress(
+			final Deserializer deserializer,
+			final String label,
+			final AccountEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
-				address = Address.fromPublicKey(new PublicKey(deserializer.readBytes(label)));
-				break;
+				final byte[] publicKeyBytes = deserializer.readBytes(label);
+				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
 
 			case ADDRESS:
 			default:
-				address = Address.readFrom(deserializer, label);
-				break;
+				return Address.readFrom(deserializer, label);
 		}
-
-		return deserializer.getContext().findAccountByAddress(address);
 	}
+
 	//endregion
 
 	/**

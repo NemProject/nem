@@ -233,11 +233,10 @@ public class BlockChainValidatorTest {
 		final BlockChainValidator validator = createValidator(scorer);
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
-		Block block;
 
 		final List<Block> blocks = new ArrayList<>();
 		final Account account = Utils.generateRandomAccount();
-		block = new Block(account, parentBlock, TimeInstant.ZERO);
+		final Block block = new Block(account, parentBlock, TimeInstant.ZERO);
 		blocks.add(block);
 
 
