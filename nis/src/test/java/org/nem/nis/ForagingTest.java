@@ -11,6 +11,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
@@ -21,6 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 public class ForagingTest {
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -45,8 +48,8 @@ public class ForagingTest {
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
 		// Arrange:
-		Transaction tx = dummyTransaction(RECIPIENT1, 12345);
-		Foraging foraging = new MockForaging();
+		final Transaction tx = dummyTransaction(RECIPIENT1, 12345);
+		final Foraging foraging = createMockForaging();
 		tx.sign();
 
 		// Act:
@@ -59,8 +62,8 @@ public class ForagingTest {
 	@Test
 	public void processTransactionsDoesNotSaveDuplicates() throws InterruptedException {
 		// Arrange:
-		Transaction tx = dummyTransaction(RECIPIENT1, 12345);
-		Foraging foraging = new MockForaging();
+		final Transaction tx = dummyTransaction(RECIPIENT1, 12345);
+		final Foraging foraging = createMockForaging();
 		tx.sign();
 
 		// Act:
@@ -78,9 +81,9 @@ public class ForagingTest {
 		// Arrange (category boost trust attack, stop foraging attack):
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
-		Account signer = createAccountWithBalance(1000);
+		final Account signer = createAccountWithBalance(1000);
+		final Foraging foraging = createMockForaging();
 		Transaction tx = new TransferTransaction(now, signer, RECIPIENT1, Amount.fromNem(800), null);
-		Foraging foraging = new MockForaging();
 		tx.setFee(Amount.fromNem(1));
 		tx.setDeadline(now.addMinutes(100));
 		tx.sign();
@@ -105,7 +108,7 @@ public class ForagingTest {
 		// Arrange:
 		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
-		final Foraging foraging = new MockForaging();
+		final Foraging foraging = createMockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
@@ -123,7 +126,7 @@ public class ForagingTest {
 		// Arrange:
 		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
-		final Foraging foraging = new MockForaging();
+		final Foraging foraging = createMockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
@@ -144,7 +147,7 @@ public class ForagingTest {
 		// Arrange:
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
-		final Foraging foraging = new MockForaging();
+		final Foraging foraging = createMockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
@@ -172,7 +175,7 @@ public class ForagingTest {
 		// Arrange:
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
-		final Foraging foraging = new MockForaging();
+		final Foraging foraging = createMockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
@@ -209,7 +212,7 @@ public class ForagingTest {
 		// Arrange:
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
-		final Foraging foraging = new MockForaging();
+		final Foraging foraging = createMockForaging();
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant now = systemTimeProvider.getCurrentTime();
 
@@ -238,8 +241,9 @@ public class ForagingTest {
 	@Test
 	public void canSignBlock() {
 		// Arrange:
-		final MockForaging foraging = new MockForaging();
+		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final MockForaging foraging = new MockForaging(accountAnalyzer, lastBlockLayer);
 		final Account account = Utils.generateRandomAccount();
 		accountAnalyzer.addAccountToCache(account.getAddress());
 		final Account accountWithoutSecret = accountAnalyzer.findByAddress(account.getAddress());
@@ -256,7 +260,6 @@ public class ForagingTest {
 		parent.sign();
 
 		// Act:
-		foraging.setAccountLookup(accountAnalyzer);
 		final Block block = foraging.createSignedBlock(
 				new TimeInstant(10),
 				new LinkedList<>(),
@@ -283,5 +286,10 @@ public class ForagingTest {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(Amount.fromNem(balance));
 		return account;
+	}
+
+	private Foraging createMockForaging() {
+		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		return new MockForaging(null, lastBlockLayer);
 	}
 }

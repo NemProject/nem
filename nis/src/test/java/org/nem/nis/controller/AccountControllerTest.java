@@ -46,8 +46,11 @@ public class AccountControllerTest {
 	}
 
 	private static class MockForaging extends Foraging {
-
 		private final List<Account> unlockedAccounts = new ArrayList<>();
+
+		MockForaging() {
+			super(null, null, null, null);
+		}
 
 		@Override
 		public void addUnlockedAccount(final Account account) {

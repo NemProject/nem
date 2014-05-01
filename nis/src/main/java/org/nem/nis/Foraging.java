@@ -41,23 +41,15 @@ public class Foraging  {
 
 	private TransferDao transferDao;
 
-	@Autowired
-	public void setAccountLookup(final AccountLookup accountLookup) { this.accountLookup = accountLookup; }
+	@Autowired(required = true)
+	public Foraging(final AccountLookup accountLookup, final BlockDao blockDao, final BlockChainLastBlockLayer blockChainLastBlockLayer, final TransferDao transferDao) {
+		this.accountLookup = accountLookup;
+		this.blockDao = blockDao;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.transferDao = transferDao;
 
-	@Autowired
-	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
-
-	@Autowired
-	public void setTransferDao(final TransferDao transferDao) { this.transferDao = transferDao; }
-
-	@Autowired
-	public void setBlockChainLastBlockLayer(final BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
-
-	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
-
-
 	}
 
 	public void addUnlockedAccount(Account account) {
