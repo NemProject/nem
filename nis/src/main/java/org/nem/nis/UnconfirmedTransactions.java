@@ -59,6 +59,10 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
+		if (this.transactions.containsKey(transactionHash)) {
+			return false;
+		}
+
 		if (! transaction.simulateExecute(
 				new NemTransferSimulate() {
 					@Override

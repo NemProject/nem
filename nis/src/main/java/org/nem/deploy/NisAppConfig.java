@@ -4,9 +4,11 @@ import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -27,6 +29,12 @@ public class NisAppConfig {
 
 	@Autowired
 	private BlockDao blockDao;
+
+	@Autowired
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+
+	@Autowired
+	private TransferDao transferDao;
 
 	@Bean
 	public DataSource dataSource() throws IOException {
@@ -79,7 +87,7 @@ public class NisAppConfig {
 
 	@Bean
 	public Foraging foraging() {
-		return new Foraging();
+		return new Foraging(this.accountAnalyzer(), this.blockDao, this.blockChainLastBlockLayer, this.transferDao);
 	}
 
 	@Bean

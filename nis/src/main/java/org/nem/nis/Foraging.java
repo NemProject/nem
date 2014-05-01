@@ -9,14 +9,12 @@ import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.NodeApiId;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 //
@@ -29,60 +27,30 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class Foraging implements AutoCloseable, Runnable {
+public class Foraging  {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 
-	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
-
-	private NisPeerNetworkHost host;
-
 	private AccountLookup accountLookup;
-
-	private BlockChain blockChain;
 
 	private BlockDao blockDao;
 	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private TransferDao transferDao;
 
-	@Autowired
-	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
+	@Autowired(required = true)
+	public Foraging(final AccountLookup accountLookup, final BlockDao blockDao, final BlockChainLastBlockLayer blockChainLastBlockLayer, final TransferDao transferDao) {
+		this.accountLookup = accountLookup;
+		this.blockDao = blockDao;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.transferDao = transferDao;
 
-	@Autowired
-	public void setAccountLookup(final AccountLookup accountLookup) { this.accountLookup = accountLookup; }
-
-	@Autowired
-	public void setBlockChain(final BlockChain blockChain) { this.blockChain = blockChain; }
-
-	@Autowired
-	public void setBlockDao(final BlockDao blockDao) { this.blockDao = blockDao; }
-
-	@Autowired
-	public void setTransferDao(final TransferDao transferDao) { this.transferDao = transferDao; }
-
-	@Autowired
-	public void setBlockChainLastBlockLayer(final BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
-
-	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
-
-		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 	}
-
-	public void bootup() {
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
-	}
-
-	@Override
-	public void close() {
-		this.blockGeneratorExecutor.shutdownNow();
-	}
-
 
 	public void addUnlockedAccount(Account account) {
 		unlockedAccounts.add(account);
@@ -143,27 +111,20 @@ public class Foraging implements AutoCloseable, Runnable {
 			return false;
 		}
 
-		if (addUnconfirmedTransaction(transaction)) {
-			final PeerNetwork network = this.host.getNetwork();
-
-			// propagate transactions
-			// this returns immediately, so that client who
-			// actually has sent /transfer/announce won't wait for this...
-			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
-
-			return true;
-		}
-		return false;
+		return addUnconfirmedTransaction(transaction);
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
 		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
 	}
 
-	@Override
-	public void run() {
+	/**
+	 * returns foraged block or null
+	 * @return
+	 */
+	public Block forageBlock() {
 		if (blockChainLastBlockLayer.getLastDbBlock() == null) {
-			return;
+			return null;
 		}
 
 		LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
@@ -211,14 +172,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			LOGGER.warning(e.toString());
 		}
 
-		if (bestBlock != null) {
-			// make a full-blown analysis
-			// TODO: we can call it thanks to the "hack" inside processBlock
-			if (blockChain.processBlock(bestBlock)) {
-				// TODO: this probably should be called directly inside processBlock()
-				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-			}
-		}
+		return bestBlock;
 	}
 
 	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {

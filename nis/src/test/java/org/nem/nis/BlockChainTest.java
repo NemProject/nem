@@ -142,7 +142,8 @@ public class BlockChainTest {
 		MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		blockChain.setBlockDao(mockBlockDao);
 		blockChain.setAccountAnalyzer(accountAnalyzer);
-		blockChain.setForaging(new MockForaging(new MockTransferDaoImpl(), blockChain));
+		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		blockChain.setForaging(new MockForaging(accountAnalyzer, lastBlockLayer));
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		blockChain.setBlockChainLastBlockLayer(blockChainLastBlockLayer);
 
