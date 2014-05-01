@@ -20,7 +20,7 @@ public class Account implements SerializableEntity {
 	private List<AccountLink> inlinks;
 	private List<AccountLink> outlinks;
 	
-	private LinkedList<CoinDay> coindays;
+	private CoinDays coindays;
 
 	private BlockAmount foragedBlocks;
 	private HistoricalBalances historicalBalances;
@@ -261,30 +261,15 @@ public class Account implements SerializableEntity {
 	 * @return
 	 */
 	public Amount getCoinDayWeightedBalance() {
-		long coinDayBalance = 0; //XXX: we might want to cache this in the future
 		
 		long currentBlockHeight = 1337;//XXX:TODO:this is temporary until I figure out a good way to get the current height
 		
-		long runningBalance = 0;
+		long getUnweightedBalance = coindays.getUnweightedBalance();
 		
-		for (CoinDay coinDay : coindays) {
-			long blockDiff = currentBlockHeight - coinDay.getBlockHeight();
-			
-			if (blockDiff > CoinDay.MAX_BLOCKS_CONSIDERED) {
-				continue; //skip blocks over the max number of blocks considered
-			}
-			
-			double currAmount = coinDay.getAmount().getNumMicroNem(); 
-			
-			double weighting = 1d*blockDiff/CoinDay.MAX_BLOCKS_CONSIDERED;
-			
-			coinDayBalance += weighting*currAmount;
-					
-			runningBalance += currAmount;
-		}
+		long coinDayBalance = coindays.getCoinDayWeightedBalance(currentBlockHeight);
 		
 		//Assume any remaining balance has the full weight
-		long remainder = this.getBalance().getNumMicroNem() - runningBalance;
+		long remainder = this.getBalance().getNumMicroNem() - getUnweightedBalance;
 		coinDayBalance += remainder;
 		
 		if (coinDayBalance > this.getBalance().getNumMicroNem()) {
