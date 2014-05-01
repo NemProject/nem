@@ -27,12 +27,6 @@ public class MockBlockChain extends BlockChain {
 		this.lastDbBlock = lastBlock;
 	}
 
-	@Override
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		++this.numGetLastDbBlockCalls;
-		return this.lastDbBlock;
-	}
-
 	/**
 	 * Gets the number of times getLastDbBlock was called.
 	 *

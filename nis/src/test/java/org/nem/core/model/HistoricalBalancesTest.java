@@ -3,10 +3,17 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+<<<<<<< HEAD
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.test.Utils;
 import org.nem.nis.BlockChain;
 import org.nem.nis.test.MockBlockChain;
+=======
+import org.nem.nis.service.BlockChainLastBlockLayer;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+>>>>>>> integration/20140501
 
 public class HistoricalBalancesTest {
 
@@ -43,10 +50,14 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeRetrieved() {
 		// Arrange:
+<<<<<<< HEAD
 		BlockChain blockChain = new MockBlockChain();
 		blockChain.getLastDbBlock().setHeight(40L);
 		final HistoricalBalances balances = new HistoricalBalances();
 		balances.setblockChain(blockChain);
+=======
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+>>>>>>> integration/20140501
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -98,11 +109,16 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeAdded() {
 		// Arrange:
+<<<<<<< HEAD
 		BlockChain blockChain = new MockBlockChain();
 		blockChain.getLastDbBlock().setHeight(40L);
 		final HistoricalBalances balances = new HistoricalBalances();
 		balances.setblockChain(blockChain);
 		
+=======
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+
+>>>>>>> integration/20140501
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
 		balances.add(new BlockHeight(20L), new Amount(2L));
@@ -123,10 +139,14 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted() {
 		// Arrange:
+<<<<<<< HEAD
 		BlockChain blockChain = new MockBlockChain();
 		blockChain.getLastDbBlock().setHeight(40L);
 		final HistoricalBalances balances = new HistoricalBalances();
 		balances.setblockChain(blockChain);
+=======
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+>>>>>>> integration/20140501
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -148,10 +168,14 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted2() {
 		// Arrange:
+<<<<<<< HEAD
 		BlockChain blockChain = new MockBlockChain();
 		blockChain.getLastDbBlock().setHeight(40L);
 		final HistoricalBalances balances = new HistoricalBalances();
 		balances.setblockChain(blockChain);
+=======
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+>>>>>>> integration/20140501
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -177,10 +201,16 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeTrimmed() {
 		// Arrange:
+<<<<<<< HEAD
 		BlockChain blockChain = new MockBlockChain();
 		blockChain.getLastDbBlock().setHeight(1000L);
 		final HistoricalBalances balances = new HistoricalBalances();
 		balances.setblockChain(blockChain);
+=======
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1000L);
+		final HistoricalBalances balances = new HistoricalBalances(blockChainLastBlockLayer);
+>>>>>>> integration/20140501
 		
 		// Act:
 		balances.add(new BlockHeight(100L), new Amount(1L));
@@ -191,7 +221,11 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.size(), IsEqual.equalTo(3));
 
 		// Act:
+<<<<<<< HEAD
 		blockChain.getLastDbBlock().setHeight(3000L);
+=======
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(3000L);
+>>>>>>> integration/20140501
 		balances.add(new BlockHeight(2500L), new Amount(8L));
 
 		// Assert:
@@ -200,4 +234,14 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.size(), IsEqual.equalTo(2));
 	}
 	//endregion
+<<<<<<< HEAD
 }
+=======
+
+	private static HistoricalBalances createTestHistoricalBalances(long l) {
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(40L);
+		return new HistoricalBalances(blockChainLastBlockLayer);
+	}
+}
+>>>>>>> integration/20140501

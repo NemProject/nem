@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.nem.nis.BlockChain;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalBalances {
@@ -20,11 +21,19 @@ public class HistoricalBalances {
 	/**
 	 * The block chain
 	 */
+<<<<<<< HEAD
 	@Autowired
 	private BlockChain blockChain;
 
 	public void setblockChain(BlockChain blockChain) {
 		this.blockChain = blockChain;
+=======
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+
+	@Autowired(required = true)
+	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+>>>>>>> integration/20140501
 	}
 		
 	/**
@@ -62,7 +71,11 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
+<<<<<<< HEAD
 		long lastBlockHeight = blockChain.getLastDbBlock().getHeight();
+=======
+		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
+>>>>>>> integration/20140501
 		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
 		}
@@ -125,7 +138,11 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
+<<<<<<< HEAD
 		trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+=======
+		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
+>>>>>>> integration/20140501
 	}
 	
 	/**
@@ -152,7 +169,11 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
+<<<<<<< HEAD
 		trim(new BlockHeight(Math.max(1, blockChain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+=======
+		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
+>>>>>>> integration/20140501
 	}
 	
 	/**
