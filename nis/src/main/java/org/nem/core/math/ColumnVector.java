@@ -3,15 +3,16 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.function.DoubleFunction;
 
 /**
  * Represents a linear algebra vector.
  */
-public class ColumnVector {
+public class ColumnVector implements Cloneable {
 
-	final int size;
-	final double[] vector;
+	private final int size;
+	private final double[] vector;
 
 	/**
 	 * Creates a new vector of the specified size.
@@ -282,7 +283,8 @@ public class ColumnVector {
 	}
 	
 	@Override
-	public ColumnVector clone() {
+	public ColumnVector clone() throws CloneNotSupportedException {
+		super.clone();
 		double [] clonedVector = new double[this.vector.length];
 		System.arraycopy(this.vector, 0, clonedVector, 0, this.vector.length);
 		return new ColumnVector(clonedVector);
@@ -301,5 +303,19 @@ public class ColumnVector {
 		}
 
 		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(this.vector);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof ColumnVector))
+			return false;
+
+		final ColumnVector rhs = (ColumnVector)obj;
+		return Arrays.equals(this.vector, rhs.vector);
 	}
 }

@@ -430,7 +430,7 @@ public class ColumnVectorTest {
 	//region clone
 
 	@Test
-	public void cloneCreatesCopyOfVector() {
+	public void cloneCreatesCopyOfVector() throws CloneNotSupportedException {
 		// Arrange:
 		final ColumnVector a = new ColumnVector(2, -4, 1);
 
@@ -459,6 +459,37 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(vector.toString(), IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(2, -4, 1);
+
+		// Assert:
+		Assert.assertThat(new ColumnVector(2, -4, 1), IsEqual.equalTo(vector));
+		Assert.assertThat(new ColumnVector(1, -4, 1), IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(new ColumnVector(2, 8, 1), IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(new ColumnVector(2, -4, 2), IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(new double[] { 2, -4, 1 }, IsNot.not(IsEqual.equalTo((Object)vector)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(2, -4, 1);
+		int hashCode = vector.hashCode();
+
+		// Assert:
+		Assert.assertThat(new ColumnVector(2, -4, 1).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new ColumnVector(1, -4, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new ColumnVector(2, 8, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new ColumnVector(2, -4, 2).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
