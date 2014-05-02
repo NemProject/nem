@@ -3,6 +3,7 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.function.DoubleFunction;
 
 /**
  * Represents a linear algebra vector.
@@ -18,16 +19,22 @@ public class ColumnVector {
 	 * @param size The desired size.
 	 */
 	public ColumnVector(final int size) {
+		if (0 == size)
+			throw new IllegalArgumentException("cannot create a vector of zero size");
+
 		this.size = size;
 		this.vector = new double[this.size];
 	}
-	
+
 	/**
-	 * Creates a new vector from the specified vector.
+	 * Creates a new vector around a raw vector.
 	 *
 	 * @param vector The vector of data.
 	 */
-	public ColumnVector(final double[] vector) {
+	public ColumnVector(final double... vector) {
+		if (null == vector || 0 == vector.length)
+			throw new IllegalArgumentException("vector must not be null and have a non-zero size");
+
 		this.size = vector.length;
 		this.vector = vector;
 	}
@@ -39,16 +46,6 @@ public class ColumnVector {
 	 */
 	public int getSize() {
 		return this.size;
-	}
-
-	
-	/**
-	 * TODO: I see no reason not to include this too. Is there a reason to leave it out?
-	 * 
-	 * @return the vector
-	 */
-	public double[] getVector() {
-		return vector;
 	}
 
 	/**
@@ -163,19 +160,10 @@ public class ColumnVector {
 	 *
 	 * @return The maximum value in of this vector.
 	 */
-	public double getMax() {
-		//TODO: do some error checking here
-//		if (this.vector.length < 1){
-			//Throw a not-1337 exception or something?
-		//This is Java, so let's call our Not1337ExceptionFactoryFactory.initializeNot1337ExceptionFactory().createNewFactory().not1337().thisIsJavaSoLetsDoAnotherFactoryInitializerFactory().oRly().yArly();
-//		}
-		
+	public double max() {
 		double maxVal = this.vector[0];
-		
 		for (double val : this.vector) {
-			if (val > maxVal) {
-				maxVal = val;
-			}
+			maxVal = Math.max(maxVal, val);
 		}
 		
 		return maxVal;
@@ -266,47 +254,35 @@ public class ColumnVector {
 	 * @return The Manhattan distance (L1-norm).
 	 */
 	public double l1Distance(final ColumnVector vector) {
-		if (this.size != vector.size)
-			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
-
-		double distance = 0;
-		for (int i = 0; i < this.size; i++) {
-			double difference = Math.abs(this.vector[i] - vector.vector[i]);
-			distance += difference;
-		}
-
-		return distance;
+		return this.distance(vector, d -> d);
 	}
 	
 	/**
 	 * Calculates the Euclidean distance (L2-norm) between the specified vector and this vector.
 	 *
 	 * @param vector The specified vector.
-	 *
 	 * @return The Euclidean distance.
 	 */
 	public double l2Distance(final ColumnVector vector) {
+		double distance = this.distance(vector, d -> d * d);
+		return Math.sqrt(distance);
+	}
+
+	private double distance(final ColumnVector vector, final DoubleFunction<Double> aggregate) {
 		if (this.size != vector.size)
 			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
 
 		double distance = 0;
 		for (int i = 0; i < this.size; ++i) {
 			double difference = this.vector[i] - vector.vector[i];
-			distance += difference * difference;
+			distance += aggregate.apply(difference);
 		}
 
-		return Math.sqrt(distance);
+		return distance;
 	}
 	
 	@Override
-	/**
-	 * Do a deep clone (copy) of this object here.
-	 */
-	public ColumnVector clone() throws CloneNotSupportedException {
-		if (this.vector == null || this.vector.length < 1) {
-			return new ColumnVector(0); //XXX:is this the best way to do this?
-		}
-		
+	public ColumnVector clone() {
 		double [] clonedVector = new double[this.vector.length];
 		System.arraycopy(this.vector, 0, clonedVector, 0, this.vector.length);
 		return new ColumnVector(clonedVector);

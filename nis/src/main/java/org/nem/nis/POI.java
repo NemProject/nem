@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import java.util.List;
 
+import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 
 /**
@@ -9,5 +10,5 @@ import org.nem.core.model.Account;
  * implementations, so I moved this out to make that easier.
  */
 public interface POI {
-	public double[] getAccountImportances(List<Account> accounts);
+	public ColumnVector getAccountImportances(List<Account> accounts);
 }

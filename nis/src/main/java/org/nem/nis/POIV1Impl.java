@@ -38,12 +38,12 @@ public class POIV1Impl implements POI {
 	
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-8;
 
-	public double[] getAccountImportances(List<Account> accounts) {
+	public ColumnVector getAccountImportances(List<Account> accounts) {
 		return calculateImportancesImpl(accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
-	private double[] calculateImportancesImpl(List<Account> accounts, int maxIters, double tol) {
+	private ColumnVector calculateImportancesImpl(List<Account> accounts, int maxIters, double tol) {
 		
 		int numAccounts = accounts.size();
 		double scale = MAX_PROB /numAccounts;
@@ -90,7 +90,7 @@ public class POIV1Impl implements POI {
 		// normalize starting vector to sum to 1
 		importances.normalize();
 		
-		double maxImportance = importances.getMax();
+		double maxImportance = importances.max();
 
 		// calculate teleportation probabilities based on normalized amount of NEM owned
 		double[] teleporations = new double[numAccounts];
@@ -175,7 +175,7 @@ public class POIV1Impl implements POI {
 		}
 		    
 		// normalize outlink weights
-		double maxRank          = importances.getMax();
+		double maxRank          = importances.max();
 		double maxOutlinkScore  = ArrayUtils.max(outlinkScores);
 		long maxBalance         = ArrayUtils.max(coindayBalances);
 		
@@ -199,7 +199,7 @@ public class POIV1Impl implements POI {
 			normBalances[ndx] = accounts.get(ndx).getBalance().getNumMicroNem() / maxBalance;
 		}   
 		
-		return importances.getVector();//, pois, ows, normBalances
+		return importances;//, pois, ows, normBalances
 	}
 
 	/**

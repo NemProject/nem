@@ -2,6 +2,7 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.ExceptionAssert;
 
 public class ColumnVectorTest {
 
@@ -17,6 +18,26 @@ public class ColumnVectorTest {
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.0));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+	}
+
+	@Test
+	public void vectorCanBeInitializedAroundRawVector() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
+
+		// Assert:
+		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(9.0));
+		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(3.2));
+		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(5.4));
+	}
+
+	@Test
+	public void vectorMustHaveNonZeroSize() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new ColumnVector(0), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new ColumnVector(null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new ColumnVector(), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -43,17 +64,13 @@ public class ColumnVectorTest {
 	}
 
 	private static void assertOutOfBounds(final int size, final int index) {
-		try {
+		ExceptionAssert.assertThrows(v -> {
 			// Arrange:
 			final ColumnVector vector = new ColumnVector(size);
 
 			// Act:
 			vector.getAt(index);
-
-			// Assert:
-			Assert.fail("expected exception was not thrown");
-		} catch (ArrayIndexOutOfBoundsException ex) {
-		}
+		}, ArrayIndexOutOfBoundsException.class);
 	}
 
 	//endregion
@@ -81,10 +98,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorSumCanBeCalculated() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 7);
-		vector.setAt(1, -3);
-		vector.setAt(2, 5);
+		final ColumnVector vector = new ColumnVector(7, -3, 5);
 
 		// Assert:
 		Assert.assertThat(vector.sum(), IsEqual.equalTo(9.0));
@@ -93,13 +107,23 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorAbsSumCanBeCalculated() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 7);
-		vector.setAt(1, -3);
-		vector.setAt(2, 5);
+		final ColumnVector vector = new ColumnVector(7, -3, 5);
 
 		// Assert:
 		Assert.assertThat(vector.absSum(), IsEqual.equalTo(15.0));
+	}
+
+	//endregion
+
+	//region max
+
+	@Test
+	public void vectorMaxCanBeCalculated() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(7, 11, 5);
+
+		// Assert:
+		Assert.assertThat(vector.max(), IsEqual.equalTo(11.0));
 	}
 
 	//endregion
@@ -109,10 +133,7 @@ public class ColumnVectorTest {
 	@Test
 	public void cannotAlignVectorWithNonZeroInFirstPosition() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 0);
-		vector.setAt(1, -6);
-		vector.setAt(2, 14);
+		final ColumnVector vector = new ColumnVector(0, -6, 14);
 
 		// Act:
 		boolean result = vector.align();
@@ -127,10 +148,7 @@ public class ColumnVectorTest {
 	@Test
 	public void canAlignVectorWithNonZeroValueInFirstPosition() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, -4);
-		vector.setAt(1, -6);
-		vector.setAt(2, 14);
+		final ColumnVector vector = new ColumnVector(-4, -6, 14);
 
 		// Act:
 		boolean result = vector.align();
@@ -149,10 +167,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorCanBeScaledByArbitraryFactor() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 2);
-		vector.setAt(1, -4);
-		vector.setAt(2, 1);
+		final ColumnVector vector = new ColumnVector(2, -4, 1);
 
 		// Act:
 		vector.scale(8);
@@ -170,10 +185,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorWithNonZeroSumCanBeNormalized() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 3);
-		vector.setAt(1, 5);
-		vector.setAt(2, 2);
+		final ColumnVector vector = new ColumnVector(3, 5, 2);
 
 		// Act:
 		vector.normalize();
@@ -187,10 +199,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorWithNegativeValuesCanBeNormalized() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 3);
-		vector.setAt(1, -5);
-		vector.setAt(2, 2);
+		final ColumnVector vector = new ColumnVector(3, -5, 2);
 
 		// Act:
 		vector.normalize();
@@ -222,15 +231,8 @@ public class ColumnVectorTest {
 	@Test
 	public void twoVectorsOfSameSizeCanBeAddedTogether() {
 		// Arrange:
-		final ColumnVector a = new ColumnVector(3);
-		a.setAt(0, 7);
-		a.setAt(1, 5);
-		a.setAt(2, 11);
-
-		final ColumnVector b = new ColumnVector(3);
-		b.setAt(0, 2);
-		b.setAt(1, -4);
-		b.setAt(2, 1);
+		final ColumnVector a = new ColumnVector(7, 5, 11);
+		final ColumnVector b = new ColumnVector(2, -4, 1);
 
 		// Act:
 		final ColumnVector result = a.add(b);
@@ -243,24 +245,15 @@ public class ColumnVectorTest {
 		Assert.assertThat(result.getAt(2), IsEqual.equalTo(12.0));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void smallerVectorCannotBeAddedToLargerVector() {
+	@Test
+	public void differentSizedVectorsCannotBeAddedTogether() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		largerVector.add(smallerVector);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void largerVectorCannotBeAddedToSmallerVector() {
-		// Arrange:
-		final ColumnVector largerVector = new ColumnVector(8);
-		final ColumnVector smallerVector = new ColumnVector(7);
-
-		// Act:
-		smallerVector.add(largerVector);
+		ExceptionAssert.assertThrows(v -> largerVector.add(smallerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> smallerVector.add(largerVector), IllegalArgumentException.class);
 	}
 
 	//endregion
@@ -270,15 +263,8 @@ public class ColumnVectorTest {
 	@Test
 	public void l1DistanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
 		// Arrange:
-		final ColumnVector a = new ColumnVector(3);
-		a.setAt(0, 7);
-		a.setAt(1, 5);
-		a.setAt(2, 11);
-
-		final ColumnVector b = new ColumnVector(3);
-		b.setAt(0, 2);
-		b.setAt(1, -4);
-		b.setAt(2, 1);
+		final ColumnVector a = new ColumnVector(7, 5, 11);
+		final ColumnVector b = new ColumnVector(2, -4, 1);
 
 		// Act:
 		final double distance = a.l1Distance(b);
@@ -287,38 +273,22 @@ public class ColumnVectorTest {
 		Assert.assertEquals(24.0, distance, 0.0000001);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void l1DistanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
+	@Test
+	public void l1DistanceCannotBeCalculatedForDifferentSizedVectors() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		largerVector.l1Distance(smallerVector);
+		ExceptionAssert.assertThrows(v -> largerVector.l1Distance(smallerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> smallerVector.l1Distance(largerVector), IllegalArgumentException.class);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void l1DistanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
-		// Arrange:
-		final ColumnVector largerVector = new ColumnVector(8);
-		final ColumnVector smallerVector = new ColumnVector(7);
-
-		// Act:
-		smallerVector.l1Distance(largerVector);
-	}
-	
 	@Test
 	public void l2DistanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
 		// Arrange:
-		final ColumnVector a = new ColumnVector(3);
-		a.setAt(0, 7);
-		a.setAt(1, 5);
-		a.setAt(2, 11);
-
-		final ColumnVector b = new ColumnVector(3);
-		b.setAt(0, 2);
-		b.setAt(1, -4);
-		b.setAt(2, 1);
+		final ColumnVector a = new ColumnVector(7, 5, 11);
+		final ColumnVector b = new ColumnVector(2, -4, 1);
 
 		// Act:
 		final double distance = a.l2Distance(b);
@@ -327,33 +297,21 @@ public class ColumnVectorTest {
 		Assert.assertEquals(14.3527, distance, 0.0000001);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void l2DistanceCannotBeCalculatedFromSmallerVectorToLargerVector() {
+	@Test
+	public void l2DistanceCannotBeCalculatedForDifferentSizedVectors() {
 		// Arrange:
 		final ColumnVector largerVector = new ColumnVector(8);
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		largerVector.l2Distance(smallerVector);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void l2DistanceCannotBeCalculatedFromLargerVectorToSmallerVector() {
-		// Arrange:
-		final ColumnVector largerVector = new ColumnVector(8);
-		final ColumnVector smallerVector = new ColumnVector(7);
-
-		// Act:
-		smallerVector.l2Distance(largerVector);
+		ExceptionAssert.assertThrows(v -> largerVector.l2Distance(smallerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> smallerVector.l2Distance(largerVector), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void magnitudeCanBeCalculatedForVector() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(3);
-		vector.setAt(0, 7);
-		vector.setAt(1, 5);
-		vector.setAt(2, 11);
+		final ColumnVector vector = new ColumnVector(7, 5, 11);
 
 		// Act:
 		final double magnitude = vector.getMagnitude();
@@ -369,10 +327,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorCanBeMultipliedByScalar() {
 		// Arrange:
-		final ColumnVector a = new ColumnVector(3);
-		a.setAt(0, 2);
-		a.setAt(1, -4);
-		a.setAt(2, 1);
+		final ColumnVector a = new ColumnVector(2, -4, 1);
 
 		// Act:
 		final ColumnVector result = a.multiply(8);
@@ -387,9 +342,7 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorCanBeMultipliedByMatrix() {
 		// Arrange:
-		final ColumnVector v = new ColumnVector(2);
-		v.setAt(0, 3);
-		v.setAt(1, 2);
+		final ColumnVector v = new ColumnVector(3, 2);
 
 		final Matrix matrix = new Matrix(3, 2);
 		matrix.setAt(0, 0, 2);
@@ -437,15 +390,8 @@ public class ColumnVectorTest {
 	@Test
 	public void vectorCanBeMultipliedByVectorElementWise() {
 		// Arrange:
-		final ColumnVector v1 = new ColumnVector(3);
-		v1.setAt(0, 3);
-		v1.setAt(1, 7);
-		v1.setAt(2, 2);
-
-		final ColumnVector v2 = new ColumnVector(3);
-		v2.setAt(0, 1);
-		v2.setAt(1, 5);
-		v2.setAt(2, 3);
+		final ColumnVector v1 = new ColumnVector(3, 7, 2);
+		final ColumnVector v2 = new ColumnVector(1, 5, 3);
 
 		// Act:
 		final ColumnVector result = v1.multiplyElementWise(v2);
@@ -481,25 +427,38 @@ public class ColumnVectorTest {
 
 	//endregion
 
+	//region clone
+
+	@Test
+	public void cloneCreatesCopyOfVector() {
+		// Arrange:
+		final ColumnVector a = new ColumnVector(2, -4, 1);
+
+		// Act:
+		final ColumnVector result = a.clone();
+		a.setAt(0, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
+		Assert.assertThat(result.getAt(0), IsEqual.equalTo(2.0));
+		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-4.0));
+		Assert.assertThat(result.getAt(2), IsEqual.equalTo(1.0));
+	}
+
+	//endregion
+
 	//region toString
 
 	@Test
 	public void vectorStringRepresentationIsCorrect() {
 		// Arrange:
-		final ColumnVector vector = new ColumnVector(6);
-		vector.setAt(0, 2.1234);
-		vector.setAt(1, 3.2345);
-		vector.setAt(2, 5012.0126);
-		vector.setAt(3, 11.1234);
-		vector.setAt(4, 1);
-		vector.setAt(5, 8);
+		final ColumnVector vector = new ColumnVector(2.1234, 3.2345, 5012.0126, 11.1234, 1, 8);
 
 		// Assert:
 		final String expectedResult = "2.123 3.235 5012.013 11.123 1.000 8.000";
 
 		// Assert:
 		Assert.assertThat(vector.toString(), IsEqual.equalTo(expectedResult));
-
 	}
 
 	//endregion
