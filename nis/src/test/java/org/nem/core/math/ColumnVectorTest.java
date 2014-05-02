@@ -51,9 +51,7 @@ public class ColumnVectorTest {
 		vector.setAt(2, 5);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(7.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(3.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(5.0));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(7, 3, 5)));
 	}
 
 	@Test
@@ -86,9 +84,7 @@ public class ColumnVectorTest {
 		vector.setAll(4);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(4.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(4.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(4, 4, 4)));
 	}
 
 	//endregion
@@ -140,9 +136,7 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(-6.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(14.0));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0, -6, 14)));
 	}
 
 	@Test
@@ -155,9 +149,7 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(1.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(1.5));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(-3.5));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(1, 1.5, -3.5)));
 	}
 
 	//endregion
@@ -173,9 +165,7 @@ public class ColumnVectorTest {
 		vector.scale(8);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.25));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(-0.50));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.125));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.25, -0.50, 0.125)));
 	}
 
 	//endregion
@@ -191,9 +181,7 @@ public class ColumnVectorTest {
 		vector.normalize();
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.3));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.5));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.3, 0.5, 0.2)));
 	}
 
 	@Test
@@ -205,9 +193,7 @@ public class ColumnVectorTest {
 		vector.normalize();
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.3));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(-0.5));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.3, -0.5, 0.2)));
 	}
 
 	@Test
@@ -219,9 +205,7 @@ public class ColumnVectorTest {
 		vector.normalize();
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0, 0, 0)));
 	}
 
 	//endregion
@@ -240,9 +224,7 @@ public class ColumnVectorTest {
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(b)));
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(9.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(1.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(12.0));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(9, 1, 12)));
 	}
 
 	@Test
@@ -334,9 +316,7 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(16.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-32.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(8.0));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(16, -32, 8)));
 	}
 
 	@Test
@@ -358,9 +338,7 @@ public class ColumnVectorTest {
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v)));
 		Assert.assertThat(result.getSize(), IsEqual.equalTo(3));
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(28.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(11.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(31.0));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(28, 11, 31)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -399,10 +377,7 @@ public class ColumnVectorTest {
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v1)));
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v2)));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(3));
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(3.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(35.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(6.0));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(3, 35, 6)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -440,9 +415,7 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(2.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-4.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(1.0));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(2, -4, 1)));
 	}
 
 	//endregion
