@@ -9,6 +9,10 @@ import java.util.List;
 public class CoinDays {
 	
 	public static final long BLOCK_HEIGHT_GROUPING  = 1440;
+	
+	public static final long MIN_BLOCK_WAIT = 2160; //1.5 days
+	
+	public static final long MAX_BLOCKS_CONSIDERED = 144000; //100 days
 
 	private long unweightedBalance = 0l;
 
@@ -69,14 +73,14 @@ public class CoinDays {
 		for (CoinDay coinDay : coinDays) {
 			long blockDiff = currentBlockHeight - coinDay.getBlockHeight();
 
-			if (blockDiff > CoinDay.MAX_BLOCKS_CONSIDERED) {
+			if (blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
 				continue; // skip blocks over the max number of blocks
 							// considered
 			}
 
 			double currAmount = coinDay.getAmount().getNumMicroNem();
 
-			double weighting = 1d * blockDiff / CoinDay.MAX_BLOCKS_CONSIDERED;
+			double weighting = 1d * blockDiff / MAX_BLOCKS_CONSIDERED;
 
 			coinDayBalance += weighting * currAmount;
 

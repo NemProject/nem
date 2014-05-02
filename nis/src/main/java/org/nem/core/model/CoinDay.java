@@ -4,7 +4,6 @@ package org.nem.core.model;
  * 
  */
 public class CoinDay {
-	public static final int MAX_BLOCKS_CONSIDERED = 144000; //100 days
 
 	private long blockHeight;
 
