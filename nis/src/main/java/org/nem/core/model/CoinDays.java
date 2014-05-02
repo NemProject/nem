@@ -74,13 +74,14 @@ public class CoinDays {
 			long blockDiff = currentBlockHeight - coinDay.getBlockHeight();
 
 			if (blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
-				continue; // skip blocks over the max number of blocks
-							// considered
+				continue; // skip blocks younger than MIN_BLOCK_WAIT or over the max number of blocks
+							// considered, then skip it
 			}
 
 			double currAmount = coinDay.getAmount().getNumMicroNem();
 
-			double weighting = 1d * blockDiff / MAX_BLOCKS_CONSIDERED;
+			//We want to lower the weight so that the first MIN_BLOCK_WAIT don't count
+			double weighting = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
 
 			coinDayBalance += weighting * currAmount;
 
