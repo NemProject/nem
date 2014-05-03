@@ -14,9 +14,9 @@ public class CoinDays {
 	
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
-	private long unweightedBalance = 0l;
+	private Amount unweightedBalance = Amount.ZERO;
 
-	private List<CoinDay> coinDays;
+	private List<CoinDay> coinDays = new ArrayList<>();
 
 	/**
 	 * Add a new coinday to the coindays.
@@ -62,10 +62,8 @@ public class CoinDays {
 	 * 
 	 * @return
 	 */
-	public long getCoinDayWeightedBalance(BlockHeight currentBlockHeight) {
-		long coinDayBalance = 0; // XXX: we might want to cache this in the
-									// future
-
+	public Amount getCoinDayWeightedBalance(BlockHeight currentBlockHeight) {
+		long coinDayBalance = 0L; // XXX: we might want to cache this in the future
 		long runningBalance = 0;
 
 		for (CoinDay coinDay : coinDays) {
@@ -76,25 +74,24 @@ public class CoinDays {
 							// considered, then skip it
 			}
 
-			double currAmount = coinDay.getAmount().getNumMicroNem();
-
 			//We want to lower the weight so that the first MIN_BLOCK_WAIT don't count
+			// TODO: that must be redone, we definitelly don't want to have that double here....
 			double weighting = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
 
-			coinDayBalance += weighting * currAmount;
-
-			runningBalance += currAmount;
+			long currentBalance = coinDay.getAmount().getNumMicroNem();
+			coinDayBalance += weighting * currentBalance;
+			runningBalance += currentBalance;
 		}
 
 		setUnweightedBalance(runningBalance);
 
-		return coinDayBalance;
+		return Amount.fromMicroNem(coinDayBalance);
 	}
 
 	/**
 	 * @return the unweightedBalance
 	 */
-	public long getUnweightedBalance() {
+	public Amount getUnweightedBalance() {
 		return unweightedBalance;
 	}
 
@@ -102,8 +99,8 @@ public class CoinDays {
 	 * @param unweightedBalance
 	 *            the unweightedBalance to set
 	 */
-	public void setUnweightedBalance(long unweightedBalance) {
-		this.unweightedBalance = unweightedBalance;
+	private void setUnweightedBalance(long unweightedBalance) {
+		this.unweightedBalance = Amount.fromMicroNem(unweightedBalance);
 	}
 
 }
