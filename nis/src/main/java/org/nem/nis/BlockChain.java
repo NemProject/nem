@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
+public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	private AccountDao accountDao;
+	private final AccountDao accountDao;
 
 	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
@@ -38,56 +38,32 @@ public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 
 	private Foraging foraging;
 
-	private NisPeerNetworkHost host;
-
 	private final BlockScorer scorer = new BlockScorer();
 
-	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
-
-
-	public BlockChain() {
-		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
+	@Autowired(required = true)
+	public BlockChain(
+			final AccountAnalyzer accountAnalyzer,
+			final AccountDao accountDao,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao,
+			final Foraging foraging) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.accountDao = accountDao;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.blockDao = blockDao;
+		this.foraging = foraging;
 	}
 
-	public void boot() {
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
-	}
-
-	@Override
-	public void close() {
-		this.blockGeneratorExecutor.shutdownNow();
-	}
-
-	@Override
-	public void run() {
+	public Block forageBlock() {
 		Block block = this.foraging.forageBlock();
-		if (block != null) {
-			// make a full-blown analysis
-			// TODO: we can call it thanks to the "hack" inside processBlock
-			if (this.processBlock(block)) {
-				// TODO: this probably should be called directly inside processBlock()
-				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
-			}
+
+		// make a full-blown analysis
+		// TODO: we can call it thanks to the "hack" inside processBlock
+		if (block != null && this.processBlock(block)) {
+			return block;
 		}
+		return null;
 	}
-
-	@Autowired
-	public void setAccountDao(AccountDao accountDao) { this.accountDao = accountDao; }
-
-	@Autowired
-	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
-
-	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
-
-	@Autowired
-	public void setForaging(Foraging foraging) { this.foraging = foraging; }
-
-	@Autowired
-	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
-
-	@Autowired
-	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
 
 	private void penalize(Node node) {
 
