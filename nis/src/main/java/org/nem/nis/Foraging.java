@@ -135,6 +135,8 @@ public class Foraging  {
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		unconfirmedTransactions.dropExpiredTransactions(blockTime);
+
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {

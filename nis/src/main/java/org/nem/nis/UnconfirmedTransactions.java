@@ -64,7 +64,7 @@ public class UnconfirmedTransactions {
 		if (! transaction.simulateExecute(
 				new NemTransferSimulate() {
 					@Override
-					public boolean sub(Account sender, Amount amount) {
+					public boolean sub(final Account sender, final Amount amount) {
 						addToCache(sender);
 						if (unconfirmedBalances.get(sender).compareTo(amount) < 0) {
 							return false;
@@ -75,7 +75,7 @@ public class UnconfirmedTransactions {
 					}
 
 					@Override
-					public void add(Account recipient, Amount amount) {
+					public void add(final Account recipient, final Amount amount) {
 						addToCache(recipient);
 						Amount newBalance = unconfirmedBalances.get(recipient).add(amount);
 						unconfirmedBalances.replace(recipient, newBalance);
@@ -87,6 +87,35 @@ public class UnconfirmedTransactions {
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	boolean remove(final Transaction transaction) {
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		if (! this.transactions.containsKey(transactionHash)) {
+			return false;
+		}
+
+		if (! transaction.simulateUndo(
+				new NemTransferSimulate() {
+					@Override
+					public boolean sub(final Account recipient, final Amount amount) {
+						Amount newBalance = unconfirmedBalances.get(recipient).subtract(amount);
+						unconfirmedBalances.replace(recipient, newBalance);
+						return true;
+					}
+
+					@Override
+					public void add(final Account sender, final Amount amount) {
+						Amount newBalance = unconfirmedBalances.get(sender).add(amount);
+						unconfirmedBalances.replace(sender, newBalance);
+					}
+				}
+		)) {
+			return false;
+		}
+
+		this.transactions.remove(transactionHash);
+		return true;
 	}
 
 	private void addToCache(Account account) {
@@ -129,5 +158,16 @@ public class UnconfirmedTransactions {
 		});
 
 		return transactions;
+	}
+
+	/**
+	 * drops transactions for which we are after the deadline already
+	 *
+	 * @param time
+	 */
+	public void dropExpiredTransactions(TimeInstant time) {
+		this.transactions.values().stream()
+				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
+				.forEach(tx -> this.remove(tx));
 	}
 }
