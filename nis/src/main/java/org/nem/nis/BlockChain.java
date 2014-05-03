@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	private AccountDao accountDao;
+	private final AccountDao accountDao;
 
 	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
@@ -40,6 +40,20 @@ public class BlockChain implements BlockSynchronizer {
 
 	private final BlockScorer scorer = new BlockScorer();
 
+	@Autowired(required = true)
+	public BlockChain(
+			final AccountAnalyzer accountAnalyzer,
+			final AccountDao accountDao,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao,
+			final Foraging foraging) {
+		this.accountAnalyzer = accountAnalyzer;
+		this.accountDao = accountDao;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.blockDao = blockDao;
+		this.foraging = foraging;
+	}
+
 	public Block forageBlock() {
 		Block block = this.foraging.forageBlock();
 
@@ -50,21 +64,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 		return null;
 	}
-
-	@Autowired
-	public void setAccountDao(AccountDao accountDao) { this.accountDao = accountDao; }
-
-	@Autowired
-	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
-
-	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
-
-	@Autowired
-	public void setForaging(Foraging foraging) { this.foraging = foraging; }
-
-	@Autowired
-	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
 
 	private void penalize(Node node) {
 
