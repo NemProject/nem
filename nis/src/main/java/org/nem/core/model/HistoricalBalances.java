@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -62,13 +63,12 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
-//		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
-//		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
-//			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
-//		}
-//		if (lastBlockHeight < height.getRaw()) {
-//			throw new InvalidParameterException("Future historical balances are not known.");
-//		}
+		if (lastBlockHeight.subtract(height) > MAX_HISTORY || height.getRaw() < 1) {
+			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
+		}
+		if (lastBlockHeight.compareTo(height) < 0) {
+			throw new InvalidParameterException("Future historical balances are not known.");
+		}
 
 		if (balances.size() == 0) {
 			return new HistoricalBalance(new BlockHeight(height.getRaw()), Amount.ZERO);

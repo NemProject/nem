@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
+import java.security.InvalidParameterException;
 
 public class HistoricalBalancesTest {
 
@@ -82,6 +82,35 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.getBalance(lastBlockHeight, new BlockHeight(19L)).getNumMicroNem(), IsEqual.equalTo(1L));
 		Assert.assertThat(balances.getBalance(lastBlockHeight, new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(1L));
 		Assert.assertThat(balances.getBalance(lastBlockHeight, new BlockHeight(9L)).getNumMicroNem(), IsEqual.equalTo(0L));
+	}
+
+	@Test(expected = InvalidParameterException.class)
+	public void retrivingFromThePastThrowsException() {
+		// Arrange:
+		final HistoricalBalances balances = createTestHistoricalBalances();
+		final BlockHeight lastBlockHeight = new BlockHeight(4000);
+
+		// Act:
+		balances.add(new BlockHeight(4000L), new Amount(123L));
+
+		// Assert:
+		Assert.assertThat(balances.getBalance(lastBlockHeight, new BlockHeight(4000L)).getNumMicroNem(), IsEqual.equalTo(123L));
+
+		balances.getBalance(lastBlockHeight, new BlockHeight(1000L));
+	}
+
+	@Test(expected = InvalidParameterException.class)
+	public void retrivingFromTheFutureThrowsException() {
+		// Arrange:
+		final HistoricalBalances balances = createTestHistoricalBalances();
+		final BlockHeight lastBlockHeight = new BlockHeight(4000);
+
+		// Act:
+		balances.add(new BlockHeight(4000L), new Amount(123L));
+
+		// Assert:
+		Assert.assertThat(balances.getBalance(lastBlockHeight, new BlockHeight(4000L)).getNumMicroNem(), IsEqual.equalTo(123L));
+		balances.getBalance(lastBlockHeight, new BlockHeight(4001L));
 	}
 	//endregion
 
