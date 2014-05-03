@@ -87,7 +87,7 @@ public class HistoricalBalances {
 			index = -index - 2;
 		}
 		HistoricalBalance balance = balances.get(index);
-		return new HistoricalBalance(balance.getHeight().getRaw(), balance.getBalance().getNumMicroNem());
+		return new HistoricalBalance(balance.getHeight(), balance.getBalance());
 	}
 	
 	/**
@@ -112,8 +112,8 @@ public class HistoricalBalances {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
-			long numMicroNem = index == -1? 0 : balances.get(-index-2).getBalance().getNumMicroNem();
-			balances.add(-index-1, new HistoricalBalance(height.getRaw(), numMicroNem + amount.getNumMicroNem()));
+			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index-2).getBalance();
+			balances.add(-index-1, new HistoricalBalance(height, numMicroNem.add(amount)));
 			startIndex = -index;
 		} else {
 			balances.get(index).add(amount);
@@ -139,8 +139,8 @@ public class HistoricalBalances {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
-			long numMicroNem = index == -1? 0 : balances.get(-index-2).getBalance().getNumMicroNem();
-			balances.add(-index-1, new HistoricalBalance(height.getRaw(), numMicroNem - amount.getNumMicroNem()));
+			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index-2).getBalance();
+			balances.add(-index-1, new HistoricalBalance(height, numMicroNem.subtract(amount)));
 			startIndex = -index;
 		} else {
 			balances.get(index).subtract(amount);

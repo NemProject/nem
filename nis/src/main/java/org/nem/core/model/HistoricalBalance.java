@@ -20,17 +20,6 @@ public class HistoricalBalance implements Comparable<HistoricalBalance> {
 	}
 
 	/**
-	 * Creates a historical balance.
-	 *
-	 * @param height the block height as long.
-	 * @param amount the amount at that height as long
-	 */
-	public HistoricalBalance(final long height, final long amount) {
-		this.height = new BlockHeight(height);
-		this.balance = Amount.fromMicroNem(amount);
-	}
-
-	/**
 	 * Returns the block height
 	 * 
 	 * @return the block height object
