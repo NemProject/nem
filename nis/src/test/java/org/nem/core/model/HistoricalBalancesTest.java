@@ -14,11 +14,8 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeCopied() {
 		// Arrange:
-		BlockChain blockChain = new MockBlockChain();
-		blockChain.getLastDbBlock().setHeight(40L);
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setblockChain(blockChain);
-		
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
 		balances.add(new BlockHeight(20L), new Amount(2L));
@@ -66,10 +63,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void balanceCanBeRetrieved() {
 		// Arrange:
-		BlockChain blockChain = new MockBlockChain();
-		blockChain.getLastDbBlock().setHeight(40L);
-		final HistoricalBalances balances = new HistoricalBalances();
-		balances.setblockChain(blockChain);
+		final HistoricalBalances balances = createTestHistoricalBalances(40L);
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -190,7 +184,7 @@ public class HistoricalBalancesTest {
 
 	private static HistoricalBalances createTestHistoricalBalances(long l) {
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(40L);
+		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(l);
 		return new HistoricalBalances(blockChainLastBlockLayer);
 	}
 }

@@ -236,7 +236,8 @@ public class Account implements SerializableEntity {
 	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
 		historicalBalances.subtract(height, amount);
 	}
-	
+
+	/**
 	 * @param acctLink - an inLink to add
 	 */
 	public void addInlink(AccountLink acctLink) {
@@ -307,35 +308,6 @@ public class Account implements SerializableEntity {
 		}
 		
 		return new Amount(coinDayBalance);
-	}
-	
-	/**
-	 * Gets the historical balance at a given height.
-	 *
-	 * @return The historical balance.
-	 */
-	public Amount getBalance(final BlockHeight height) {
-		return historicalBalances.getHistoricalBalance(height).getBalance();
-	}
-	
-	/**
-	 * Adds a given amount to the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void addBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.add(height, amount);
-	}
-	
-	/**
-	 * Subtracts a given amount from the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void subtractBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.subtract(height, amount);
 	}
 	
 	@Override
