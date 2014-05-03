@@ -27,7 +27,6 @@ import org.nem.core.test.Utils;
  */
 public class POIV1ImplTest {
 
-	@Test
 	/**
 	 * Four nodes (A, B, C, D) are owned by one person with 400 NEM who distributed the NEM 
 	between the nodes and cycled the NEM around. The other three nodes are independent and have 400 NEM each.
@@ -39,6 +38,7 @@ public class POIV1ImplTest {
 	E starts with 400 NEM and sends 100 to G.
 	G starts with 400 NEM, gets 100 from E, and sends 100 to F.
 	 */
+	@Test
 	public void fourNodeSimpleLoopAttack() {
 
 		// Arrange:
@@ -63,10 +63,11 @@ public class POIV1ImplTest {
 	/**
 	 * Super quick
 	 */
+	@Test
 	public void superQuickHowToRunPOIHack() {
 
 		// Arrange:
-		List<Account> accts = getAccountsWithSameBalance(1337, 1337);
+		List<Account> accts = getAccountsWithSameBalance(100, 1337);
 
 		// acct 0 sends 100 NEM to acct 2
 
@@ -87,12 +88,11 @@ public class POIV1ImplTest {
 
 		// Assert:
 		// TODO: how can I assert greaterthan/lesserthan relations?
-		// Assert.assertThat(importances.getAt(0)),
+		Assert.assertTrue(importances.getAt(0) < importances.getAt(1));
 		// IsEqual.equalTo(originalHashes));
 	}
 
-	private List<Account> getAccountsWithSameBalance(int numAccounts,
-			long numNEM) {
+	private List<Account> getAccountsWithSameBalance(int numAccounts, long numNEM) {
 		List<Account> accounts = new ArrayList<Account>();
 
 		for (int ndx = 0; ndx < numAccounts; ndx++) {

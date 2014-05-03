@@ -56,6 +56,8 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		this.historicalBalances = new HistoricalBalances();
+
+		this.coindays = new CoinDays();
 	}
 
 	/**

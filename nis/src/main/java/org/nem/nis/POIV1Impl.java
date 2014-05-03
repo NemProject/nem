@@ -25,11 +25,7 @@ import org.nem.core.utils.ArrayUtils;
 public class POIV1Impl implements POI {
 
 	public static final int DEFAULT_MAX_ITERS = 100;
-	
-	public static final double EPSILON = .00000001;
 
-	public static final double WEIGHT = .99;
-	
 	public static final double MIN_TELEPORTATION_PROB = .7;
 	
 	public static final double ADDITIVE_TELEPORTATION = .25;
@@ -50,7 +46,7 @@ public class POIV1Impl implements POI {
 		
 		//XXX: okay, it sucks that we have to do this, but let's just do this for now;
 		//eventually we should try to create a better structure for the graph
-		HashMap<String, Integer> acctMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> acctMap = new HashMap<>();
 		for (int acctNDX = 0; acctNDX < numAccounts; acctNDX++) {
 			acctMap.put(accounts.get(acctNDX).getAddress().toString(), acctNDX);
 		}
@@ -61,7 +57,7 @@ public class POIV1Impl implements POI {
 		// also go through and find dangling accounts (with 0 outDegree)
 		// "dangling" nodes, no links out from them; maybe we can skip these later; we should look into that
 		long[] coindayBalances = new long[numAccounts];
-		ArrayList<Integer> dangleIndices = new ArrayList<Integer>();
+		ArrayList<Integer> dangleIndices = new ArrayList<>();
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			Account currAcct = accounts.get(ndx);
 			
