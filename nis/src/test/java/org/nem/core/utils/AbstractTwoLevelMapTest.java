@@ -16,7 +16,7 @@ public class AbstractTwoLevelMapTest {
 		final MockValue value = map.getItem("foo", "bar");
 
 		// Assert:
-		Assert.assertThat(value, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(value, IsNull.notNullValue());
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class AbstractTwoLevelMapTest {
 		final Map<String, MockValue> values = map.getItems("foo");
 
 		// Assert:
-		Assert.assertThat(values, IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(values, IsNull.notNullValue());
 	}
 
 	@Test

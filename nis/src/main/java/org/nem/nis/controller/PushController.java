@@ -1,6 +1,5 @@
 package org.nem.nis.controller;
 
-import org.nem.core.connect.NodeApiId;
 import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.model.TransactionFactory;
@@ -10,6 +9,7 @@ import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.peer.*;
+import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,8 +62,12 @@ public class PushController {
 		final PeerNetwork network = this.host.getNetwork();
 
 		// add to unconfirmed transactions
-		if (this.foraging.processTransaction(transaction))
+		if (this.foraging.processTransaction(transaction)) {
+			// propagate transactions
+			// this returns immediately, so that client who
+			// actually has sent /transfer/announce won't wait for this...
 			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+		}
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)

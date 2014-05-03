@@ -9,11 +9,12 @@ import java.util.List;
 /**
  * DAO for accessing db Block objects.
  */
-public interface BlockDao {
+public interface BlockDao extends ReadOnlyBlockDao {
+
 	/**
 	 * Saves full block in the database, along with associated transactions, forgers, signers, etc.
 	 *
-	 * @param block
+	 * @param block Block to save.
 	 */
 	public void save(Block block);
 
@@ -25,50 +26,6 @@ public interface BlockDao {
 	public void updateLastBlockId(Block block);
 
 	/**
-	 * Returns number of blocks in the database.
-	 *
-	 * @return number of blocks in the database.
-	 */
-	public Long count();
-
-	/**
-	 * Retrieves Block from db given it's id in the database.
-	 *
-	 * @param id id of a block.
-	 *
-	 * @return associated Block or null if there's no block with such id.
-	 */
-	public Block findById(long id);
-
-    /**
-	 * Retrieves Block from db given it's hash.
-	 *
-	 * @param blockHash hash of a block to retrieve.
-	 *
-	 * @return Block having given hash or null.
-	 */
-	public Block findByHash(final Hash blockHash);
-
-	/**
-	 * Retrieves Block from db at given height.
-	 *
-	 * @param height height of a block to retrieve.
-	 *
-	 * @return Block at given height or null.
-	 */
-	public Block findByHeight(final BlockHeight height);
-
-    /**
-     * Retrieves list of at most limit hashes for blocks starting at given height.
-     * This should be used, not to pull whole block from the db.
-     *
-	 * @param height height of a first block.
-	 * @param limit maximal number of elements to return.
-	 * @return HashChain.
-     */
-    public HashChain getHashesFrom(final BlockHeight height, int limit);
-
-	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.
 	 *
 	 * @param height height of a first block.
@@ -76,7 +33,6 @@ public interface BlockDao {
 	 * @return list of block's difficulties.
 	 */
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
-
 
 	/**
 	 * Retrieves list of at most limit timestamps for blocks starting at given height.

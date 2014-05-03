@@ -5,14 +5,15 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A mock BlockDao implementation.
  */
 public class MockBlockDao implements BlockDao {
 
-	private final Block block;
 	private final HashChain chain;
 	private int numFindByIdCalls;
 	private int numFindByHashCalls;
@@ -24,6 +25,27 @@ public class MockBlockDao implements BlockDao {
 	private BlockHeight lastFindByHeightHeight;
 	private BlockHeight lastGetHashesFromHeight;
 	private int lastGetHashesFromLimit;
+	private Long lastId;
+
+	private final ArrayList<Block> blocks;
+	private final MockBlockDaoMode mockMode;
+	private Block lastSavedBlock;
+
+	/**
+	 * Possible mocking modes.
+	 */
+	public enum MockBlockDaoMode {
+
+		/**
+		 * The DAO supports returning a single block from all findBy* methods.
+		 */
+		SingleBlock,
+
+		/**
+		 * The DAO supports multiple blocks and will search through them.
+		 */
+		MultipleBlocks
+	}
 
 	/**
 	 * Creates a mock block dao.
@@ -41,14 +63,35 @@ public class MockBlockDao implements BlockDao {
 	 * @param chain The hash chain to return from getHashesFrom.
 	 */
 	public MockBlockDao(final Block block, final HashChain chain) {
-		this.block = block;
-		this.chain = chain;
+		this(block, chain, MockBlockDaoMode.SingleBlock);
 	}
 
+	/**
+	 * Creates a mock block dao.
+	 *
+	 * @param block The block to return from findBy* methods.
+	 * @param chain The hash chain to return from getHashesFrom.
+	 * @param mode The mocking mode.
+	 */
+	public MockBlockDao(final Block block, final HashChain chain, final MockBlockDaoMode mode) {
+		this.chain = chain;
+		this.blocks = new ArrayList<>();
+		this.addBlock(block);
+		this.lastId = 1L;
+		this.mockMode = mode;
+	}
+
+	public void addBlock(final Block block) {
+		this.blocks.add(block);
+	}
 
 	@Override
 	public void save(Block block) {
-
+		if (block.getId() == null) {
+			block.setId(this.lastId);
+			this.lastId++;
+			this.lastSavedBlock = block;
+		}
 	}
 
 	@Override
@@ -65,21 +108,31 @@ public class MockBlockDao implements BlockDao {
 	public Block findById(long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		return this.block;
+		return find(block -> block.getId() == id);
 	}
 
 	@Override
 	public Block findByHash(Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;
-		return this.block;
+		return find(block -> block.getBlockHash().equals(blockHash));
 	}
 
 	@Override
 	public Block findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
-		return this.block;
+		return find(block -> block.getHeight() == height.getRaw());
+	}
+
+	private Block find(final Predicate<Block> findPredicate) {
+		try {
+			return MockBlockDaoMode.SingleBlock == this.mockMode
+					? this.blocks.get(0)
+					: this.blocks.stream().filter(findPredicate).findFirst().get();
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -92,12 +145,18 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
-		return null;
+		return this.blocks.stream()
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.map(bl -> new BlockDifficulty(bl.getDifficulty()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
-		return null;
+		return this.blocks.stream()
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.map(bl -> new TimeInstant(bl.getTimestamp()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -167,4 +226,11 @@ public class MockBlockDao implements BlockDao {
 	 * @return The last limit passed to getHashesFrom.
 	 */
 	public int getLastGetHashesFromLimit() { return this.lastGetHashesFromLimit; }
+
+	/**
+	 * Returns last saved block.
+	 *
+	 * @return last saved block.
+	 */
+	public Block getLastSavedBlock() { return lastSavedBlock; }
 }

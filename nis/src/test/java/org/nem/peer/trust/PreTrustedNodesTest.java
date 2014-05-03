@@ -65,7 +65,7 @@ public class PreTrustedNodesTest {
 	@Test
 	public void preTrustVectorCorrectWhenThereAreNoPreTrustedNodes() {
 		// Arrange:
-		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<Node>());
+		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());
 		final Node[] nodes = new Node[] {
 				Utils.createNodeWithPort(80),
 				Utils.createNodeWithPort(83),

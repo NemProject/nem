@@ -13,13 +13,13 @@ import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
-	public static final EntityFactory ENTITY_FACTORY = new EntityFactory(TIME_PROVIDER);
 
 	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
 	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
@@ -38,6 +38,9 @@ public class NisMain {
 
 	@Autowired
 	private NisPeerNetworkHost networkHost;
+
+	@Autowired
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private void analyzeBlocks() {
 		Long curBlockId;
@@ -60,12 +63,12 @@ public class NisMain {
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
-				this.blockChain.analyzeLastBlock(dbBlock);
+				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			if (dbBlock == null && this.blockChain.getLastDbBlock() == null) {
+			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
 				System.exit(-1);
 			}
@@ -82,9 +85,9 @@ public class NisMain {
 
 		this.populateDb();
 
-		this.blockChain.bootup();
-
 		this.analyzeBlocks();
+
+		this.blockChain.boot();
 
 		this.networkHost.boot();
 	}

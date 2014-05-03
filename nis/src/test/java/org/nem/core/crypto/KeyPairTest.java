@@ -12,9 +12,9 @@ public class KeyPairTest {
 
 		// Assert:
 		Assert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
-		Assert.assertThat(kp.getPrivateKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
 		Assert.assertThat(kp.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(kp.getPublicKey(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class KeyPairTest {
 
 		// Assert:
 		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(kp2.getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(kp2.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}

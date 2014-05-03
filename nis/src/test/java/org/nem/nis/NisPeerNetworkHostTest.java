@@ -7,9 +7,9 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void defaultHostCanBeBooted() {
 		// Arrange:
-		final NisPeerNetworkHost host = new NisPeerNetworkHost();
-
-		// Act:
-		host.boot();
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost()) {
+			// Act:
+			host.boot();
+		}
 	}
 }

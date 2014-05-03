@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.model.Block;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -10,16 +9,23 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
+import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Closeable;
 import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-public class BlockChain implements BlockSynchronizer {
+public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
@@ -28,50 +34,73 @@ public class BlockChain implements BlockSynchronizer {
 
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
 
-	@Autowired
 	private AccountDao accountDao;
 
-	@Autowired
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+
 	private BlockDao blockDao;
 
-	@Autowired
 	private AccountAnalyzer accountAnalyzer;
 
-	@Autowired
 	private Foraging foraging;
 
-	// for now it's easier to keep it like this
-	private org.nem.nis.dbmodel.Block lastBlock;
+	private NisPeerNetworkHost host;
 
 	private final BlockScorer scorer = new BlockScorer();
 
+	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
+
+
 	public BlockChain() {
+		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 	}
 
-	public void bootup() {
-		LOGGER.info("booting up block generator");
+	public void boot() {
+		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
 	}
 
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		return lastBlock;
+	@Override
+	public void close() {
+		this.blockGeneratorExecutor.shutdownNow();
 	}
 
-	private Long getLastBlockHeight() {
-		return lastBlock.getHeight();
+	@Override
+	public void run() {
+		Block block = this.foraging.forageBlock();
+		if (block != null) {
+			// make a full-blown analysis
+			// TODO: we can call it thanks to the "hack" inside processBlock
+			if (this.processBlock(block)) {
+				// TODO: this probably should be called directly inside processBlock()
+				host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+			}
+		}
 	}
 
+	@Autowired
+	public void setAccountDao(AccountDao accountDao) { this.accountDao = accountDao; }
 
-	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
-		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-		lastBlock = curBlock;
-	}
+	@Autowired
+	public void setAccountAnalyzer(AccountAnalyzer accountAnalyzer) { this.accountAnalyzer = accountAnalyzer; }
+
+	@Autowired
+	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
+
+	@Autowired
+	public void setForaging(Foraging foraging) { this.foraging = foraging; }
+
+	@Autowired
+	public void setBlockChainLastBlockLayer(BlockChainLastBlockLayer blockChainLastBlockLayer) { this.blockChainLastBlockLayer = blockChainLastBlockLayer; }
+
+	@Autowired
+	public void setNetworkHost(final NisPeerNetworkHost host) { this.host = host; }
 
 	private void penalize(Node node) {
 
 	}
 
-	private void addRevertedTransactionsAsUnconfirmed(final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
-		long currentHeight = getLastBlockHeight();
+	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
+		long currentHeight = blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
 			org.nem.nis.dbmodel.Block block = blockDao.findByHeight(new BlockHeight(currentHeight));
@@ -79,18 +108,12 @@ public class BlockChain implements BlockSynchronizer {
 			// if the transaction is in DB it means at some point
 			// isValid and verify had to be called on it, so we can safely add it
 			// as unconfirmed
-			for (Transfer transfer : block.getBlockTransfers()) {
-				// block is still in db
-				foraging.addUnconfirmedTransactionWithoutDbCheck(TransferMapper.toModel(transfer, accountAnalyzer));
-			}
+			block.getBlockTransfers().stream()
+					.filter(tr -> ! transactionHashes.contains(tr))
+					.map(tr -> TransferMapper.toModel(tr, accountAnalyzer))
+					.forEach(tr -> foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
 			currentHeight--;
 		}
-	}
-
-	private void dropDbBlocksAfter(final BlockHeight height) {
-		blockDao.deleteBlocksAfterHeight(height);
-
-		lastBlock = blockDao.findByHeight(height);
 	}
 
 	/**
@@ -122,7 +145,7 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
-		final BlockLookup localLookup = this.createLocalBlockLookup();
+		final BlockLookup localLookup = this.createLocalBlockLookup(this.accountAnalyzer);
 
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
@@ -133,8 +156,8 @@ public class BlockChain implements BlockSynchronizer {
 		return result;
 	}
 
-	private BlockLookup createLocalBlockLookup() {
-		return new LocalBlockLookupAdapter(this.blockDao, this.accountAnalyzer, this.lastBlock, BLOCKS_LIMIT);
+	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainLastBlockLayer.getLastDbBlock(), BLOCKS_LIMIT);
 	}
 
 	/**
@@ -145,7 +168,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return score for iterated blocks.
 	 */
-	private long undoTxesAndGetScore(long commonBlockHeight) {
+	private long undoTxesAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, long commonBlockHeight) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 				this.scorer,
 				PartialWeightedScoreVisitor.BlockOrder.Reverse);
@@ -156,7 +179,7 @@ public class BlockChain implements BlockSynchronizer {
 		visitors.add(new UndoBlockVisitor());
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
-		BlockIterator.unwindUntil(this.createLocalBlockLookup(), new BlockHeight(commonBlockHeight), visitor);
+		BlockIterator.unwindUntil(this.createLocalBlockLookup(contemporaryAccountAnalyzer), new BlockHeight(commonBlockHeight), visitor);
 
 		return scoreVisitor.getScore();
 	}
@@ -181,14 +204,6 @@ public class BlockChain implements BlockSynchronizer {
 		}
 	}
 
-	private void calculatePeerChainGenerations(Block parentBlock, final List<Block> peerChain) {
-		for (Block block : peerChain) {
-			block.setGenerationHash(HashUtils.nextHash(parentBlock.getGenerationHash(), block.getSigner().getKeyPair().getPublicKey()));
-
-			parentBlock = block;
-		}
-	}
-
 	/**
 	 * Validates blocks in peerChain.
 	 *
@@ -200,7 +215,6 @@ public class BlockChain implements BlockSynchronizer {
 	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
 		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
-		calculatePeerChainGenerations(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
@@ -212,27 +226,35 @@ public class BlockChain implements BlockSynchronizer {
 		return scoreVisitor.getScore();
 	}
 
-
+	/*
+	 * 1. execute all blocks
+	 * 2. replace current accountAnalyzer with contemporaryAccountAnalyzer
+	 * 3. add unconfirmed transactions from "our" chain
+	 *    (except those transactions, that are included in peer's chain)
+	 *
+	 * 4. drop "our" blocks from the db
+	 *
+	 * 5. update db with "peer's" chain
+	 */
 	private void updateOurChain(long commonBlockHeight, AccountAnalyzer contemporaryAccountAnalyzer, List<Block> peerChain, boolean hasOwnChain) {
-		//region update our chain
-		synchronized (this) {
+
+		for (final Block block : peerChain) {
+			block.execute();
+		}
+
+		synchronized (blockChainLastBlockLayer) {
 			contemporaryAccountAnalyzer.shallowCopyTo(this.accountAnalyzer);
 
 			if (hasOwnChain) {
 				// mind that we're using "new" (replaced) accountAnalyzer
-				addRevertedTransactionsAsUnconfirmed(commonBlockHeight, accountAnalyzer);
+				Set<Hash> transactionHashes = peerChain.stream().flatMap(bl -> bl.getTransactions().stream()).map(HashUtils::calculateHash).collect(Collectors.toSet());
+				addRevertedTransactionsAsUnconfirmed(transactionHashes, commonBlockHeight, accountAnalyzer);
 			}
 
-			dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
+			blockChainLastBlockLayer.dropDbBlocksAfter(new BlockHeight(commonBlockHeight));
 		}
 
-		for (Block peerBlock : peerChain) {
-			if (addBlockToDb(peerBlock)) {
-				foraging.removeFromUnconfirmedTransactions(peerBlock);
-			}
-		}
-		//endregion
-
+		peerChain.stream().filter(blockChainLastBlockLayer::addBlockToDb).forEach(foraging::removeFromUnconfirmedTransactions);
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
@@ -249,137 +271,107 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
-
-			ourScore = undoTxesAndGetScore(commonBlockHeight.getRaw());
+			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
 		}
 		//endregion
-
 
 		//region verify peer's chain
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		// do not trust peer, take first block from our db and convert it
-		final Block parentBlock = BlockMapper.toModel(ourDbBlock, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
-			penalize(node);
-			return;
-		}
-
-		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(parentBlock, peerChain);
-		if (peerScore < 0L) {
-			penalize(node);
-			return;
-		}
-
-		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
-
-		if (peerScore < ourScore) {
-			// we could get peer's score upfront, if it mismatches with
-			// what we calculated, we could penalize peer.
-			return;
-		}
-
-		for (final Block block : peerChain) {
-			block.execute();
-		}
-		//endregion
-
-		// mind "not" consistent
-		updateOurChain(commonBlockHeight.getRaw(), contemporaryAccountAnalyzer, peerChain, ! result.areChainsConsistent());
+		updateOurChain(ourDbBlock, contemporaryAccountAnalyzer, peerChain, ourScore, !result.areChainsConsistent());
 	}
 
 	/**
-	 * Checks if passed block is correct, and if eligible adds it to db
+	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
-	 * @param block - block that's going to be processed
+	 * @param receivedBlock - receivedBlock that's going to be processed
 	 *
-	 * @return false if block was known or invalid, true if ok and added to db
+	 * @return false if receivedBlock was known or invalid, true if ok and added to db
 	 */
-	public boolean processBlock(Block block) {
-		final Hash blockHash = HashUtils.calculateHash(block);
-		final Hash parentHash = block.getPreviousBlockHash();
+	public boolean processBlock(Block receivedBlock) {
+		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
+		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
 		final org.nem.nis.dbmodel.Block parent;
 
 		// this method processes only blocks that have been sent directly (pushed)
 		// to us, so we can add quite strict rule here
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (block.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
+		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			return false;
 		}
 
-		// block already seen
-		synchronized (this) {
+		// receivedBlock already seen
+		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
 				return false;
 			}
 
-			// check if we know previous block
+			// check if we know previous receivedBlock
 			parent = blockDao.findByHash(parentHash);
 		}
 
-		// if we don't have parent, we can't do anything with this block
+		// if we don't have parent, we can't do anything with this receivedBlock
 		if (parent == null) {
 			return false;
 		}
 
 		// TODO: we should have some time limit set
-//		if (block.getTimeStamp() > parent.getTimestamp() + 20*30) {
+//		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
 //			return false;
 //		}
 
 		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
+		// EVIL hack, see issue#70
+		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
+		receivedBlock = BlockMapper.toModel(dbBlock, contemporaryAccountAnalyzer);
+		// EVIL hack end
+
 		long ourScore = 0L;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
-			ourScore = undoTxesAndGetScore(parent.getHeight());
+			// warning: this changes number of foraged blocks
+			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, parent.getHeight());
 			hasOwnChain = true;
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
-		peerChain.add(block);
+		peerChain.add(receivedBlock);
 
+		return updateOurChain(parent, contemporaryAccountAnalyzer, peerChain, ourScore, hasOwnChain);
+	}
+
+	private boolean updateOurChain(
+			final org.nem.nis.dbmodel.Block parent,
+			final AccountAnalyzer contemporaryAccountAnalyzer,
+			final List<Block> peerChain,
+			final long ourScore,
+			final boolean hasOwnChain) {
+
+		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
-		if (! validatePeerChain(parentBlock, peerChain)) {
+		if (!validatePeerChain(parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerscore = getPeerChainScore(parentBlock, peerChain);
-		if (peerscore < 0) {
+		long peerScore = getPeerChainScore(parentBlock, peerChain);
+		if (peerScore < 0) {
 			// penalty?
 			return false;
 		}
 
-		if (peerscore < ourScore) {
+		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
+		if (peerScore < ourScore) {
+			// we could get peer's score upfront, if it mismatches with
+			// what we calculated, we could penalize peer.
 			return false;
 		}
 
 		updateOurChain(parent.getHeight(), contemporaryAccountAnalyzer, peerChain, hasOwnChain);
-		return true;
-	}
-
-	public boolean addBlockToDb(Block bestBlock) {
-		synchronized (this) {
-
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(bestBlock, new AccountDaoLookupAdapter(this.accountDao));
-
-			// hibernate will save both block AND transactions
-			// as there is cascade in Block
-			// mind that there is NO cascade in transaction (near block field)
-			blockDao.save(dbBlock);
-
-			lastBlock.setNextBlockId(dbBlock.getId());
-			blockDao.updateLastBlockId(lastBlock);
-
-			lastBlock = dbBlock;
-
-		} // synchronized
-
 		return true;
 	}
 }

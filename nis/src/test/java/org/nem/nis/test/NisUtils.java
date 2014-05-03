@@ -3,7 +3,6 @@ package org.nem.nis.test;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class NisUtils {
 		block.setTimestamp(timeStamp);
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
-		block.setBlockTransfers(new ArrayList<Transfer>());
+		block.setBlockTransfers(new ArrayList<>());
 		return block;
 	}
 
@@ -38,6 +37,7 @@ public class NisUtils {
 	public static Block createRandomBlock() {
 		return new Block(
 				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
 				BlockHeight.ONE);
@@ -49,6 +49,7 @@ public class NisUtils {
 	public static Block createRandomBlock(long height) {
 		return new Block(
 				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
 				new BlockHeight(height));

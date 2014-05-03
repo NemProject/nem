@@ -17,8 +17,8 @@ public class Block extends VerifiableEntity {
 	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
-	private final Hash prevBlockHash;
 	private final BlockHeight height;
+	private Hash prevBlockHash;
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
@@ -31,15 +31,22 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Creates a new block.
 	 *
-	 * @param forger        The forger.
-	 * @param prevBlockHash The hash of the previous block.
-	 * @param timestamp     The block timestamp.
-	 * @param height        The block height.
+	 * @param forger         The forger.
+	 * @param prevBlockHash  The hash of the previous block.
+	 * @param generationHash The generation hash.
+	 * @param timestamp      The block timestamp.
+	 * @param height         The block height.
 	 */
-	public Block(final Account forger, final Hash prevBlockHash, final TimeInstant timestamp, final BlockHeight height) {
+	public Block(
+			final Account forger,
+			final Hash prevBlockHash,
+			final Hash generationHash,
+			final TimeInstant timestamp,
+			final BlockHeight height) {
 		super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
+		this.generationHash = generationHash;
 		this.height = height;
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
@@ -53,9 +60,8 @@ public class Block extends VerifiableEntity {
 	 * @param timestamp The block timestamp.
 	 */
 	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
-		this(forger, HashUtils.calculateHash(prevBlock), timestamp, prevBlock.getHeight().next());
-
-		this.setGenerationHash(HashUtils.nextHash(prevBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
+		this(forger, Hash.ZERO, Hash.ZERO, timestamp, prevBlock.getHeight().next());
+		this.setPrevious(prevBlock);
 	}
 
 	/**
@@ -135,12 +141,16 @@ public class Block extends VerifiableEntity {
 	//region Setters
 
 	/**
-	 * Sets the generation hash.
+	 * Sets the previous block.
 	 *
-	 * @param generationHash the generation hash.
+	 * @param prevBlock The previous block.
 	 */
-	public void setGenerationHash(final Hash generationHash) {
-		this.generationHash = generationHash;
+	public void setPrevious(final Block prevBlock) {
+		this.generationHash = HashUtils.nextHash(
+				prevBlock.getGenerationHash(),
+				this.getSigner().getKeyPair().getPublicKey());
+
+		this.prevBlockHash = HashUtils.calculateHash(prevBlock);
 	}
 
 	/**
@@ -170,8 +180,7 @@ public class Block extends VerifiableEntity {
 	 * @param transactions The transactions to add.
 	 */
 	public void addTransactions(final Collection<Transaction> transactions) {
-		for (final Transaction transaction : transactions)
-			this.addTransaction(transaction);
+		transactions.forEach(this::addTransaction);
 	}
 
 	/**
@@ -199,12 +208,7 @@ public class Block extends VerifiableEntity {
 	}
 
 	private Iterable<Transaction> getReverseTransactions() {
-		return new Iterable<Transaction>() {
-			@Override
-			public Iterator<Transaction> iterator() {
-				return new ReverseListIterator<>(transactions);
-			}
-		};
+		return () -> new ReverseListIterator<>(transactions);
 	}
 
 	@Override

@@ -126,4 +126,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The minimum fee.
 	 */
 	protected abstract Amount getMinimumFee();
+
+	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
 }

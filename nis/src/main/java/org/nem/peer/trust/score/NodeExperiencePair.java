@@ -28,19 +28,8 @@ public class NodeExperiencePair implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeExperiencePair(final Deserializer deserializer) {
-		this.node = deserializer.readObject("node", new ObjectDeserializer<Node>() {
-			@Override
-			public Node deserialize(final Deserializer deserializer) {
-				return new Node(deserializer);
-			}
-		});
-
-		this.experience = deserializer.readObject("experience", new ObjectDeserializer<NodeExperience>() {
-			@Override
-			public NodeExperience deserialize(final Deserializer deserializer) {
-				return new NodeExperience(deserializer);
-			}
-		});
+		this.node = deserializer.readObject("node", Node::new);
+		this.experience = deserializer.readObject("experience", NodeExperience::new);
 	}
 
 	/**

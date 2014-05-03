@@ -2,19 +2,18 @@ package org.nem.nis;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.utils.Func;
 
 /**
  * Account cache that implements AccountLookup and provides the lookup of accounts
  * by their addresses.
  */
-public class AccountAnalyzer implements AccountLookup {
+public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
@@ -62,24 +61,20 @@ public class AccountAnalyzer implements AccountLookup {
 	 * @return The account.
 	 */
 	public Account addAccountToCache(final Address address) {
-		return this.findByAddress(address, new Func<Account>() {
-
-			@Override
-			public Account evaluate() {
-				final Account account = new Account(address);
-				addressToAccountMap.put(address, account);
-				return account;
-			}
+		return this.findByAddress(address, () -> {
+			final Account account = new Account(address);
+			addressToAccountMap.put(address, account);
+			return account;
 		});
 	}
 
-	private Account findByAddress(final Address address, final Func<Account> notFoundHandler) {
+	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
 		if (!address.isValid()) {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
 		}
 
 		final Account account = findByAddressImpl(address);
-		return null != account ? account : notFoundHandler.evaluate();
+		return null != account ? account : notFoundHandler.get();
 	}
 
 	private Account findByAddressImpl(final Address address) {
@@ -110,13 +105,7 @@ public class AccountAnalyzer implements AccountLookup {
 	public Account findByAddress(final Address address) {
 		LOGGER.finer("looking for [" + address + "]" + Integer.toString(addressToAccountMap.size()));
 
-		return this.findByAddress(address, new Func<Account>() {
-
-			@Override
-			public Account evaluate() {
-				return createAccount(address.getPublicKey(), address.getEncoded());
-			}
-		});
+		return this.findByAddress(address, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
 	private static Account createAccount(final PublicKey publicKey, final String encodedAddress) {
@@ -137,6 +126,11 @@ public class AccountAnalyzer implements AccountLookup {
 		}
 
 		return copy;
+	}
+
+	@Override
+	public Iterator<Account> iterator() {
+		return this.addressToAccountMap.values().iterator();
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {

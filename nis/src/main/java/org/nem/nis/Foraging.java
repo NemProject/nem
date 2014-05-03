@@ -2,20 +2,19 @@ package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.utils.Predicate;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.core.connect.NodeApiId;
+import org.nem.nis.service.BlockChainLastBlockLayer;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 //
@@ -28,51 +27,30 @@ import java.util.logging.Logger;
 //
 // fork resolution should solve the rest
 //
-public class Foraging implements AutoCloseable, Runnable {
+public class Foraging  {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 
-	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
-
-	@Autowired
-	private NisPeerNetworkHost host;
-
 	private AccountLookup accountLookup;
 
-	private BlockChain blockChain;
-
 	private BlockDao blockDao;
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	private TransferDao transferDao;
 
-	@Autowired
-	public void setAccountLookup(AccountLookup accountLookup) { this.accountLookup = accountLookup; }
+	@Autowired(required = true)
+	public Foraging(final AccountLookup accountLookup, final BlockDao blockDao, final BlockChainLastBlockLayer blockChainLastBlockLayer, final TransferDao transferDao) {
+		this.accountLookup = accountLookup;
+		this.blockDao = blockDao;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.transferDao = transferDao;
 
-	@Autowired
-	public void setBlockChain(BlockChain blockChain) { this.blockChain = blockChain; }
-
-	@Autowired
-	public void setBlockDao(BlockDao blockDao) { this.blockDao = blockDao; }
-
-	@Autowired
-	public void setTransferDao(TransferDao transferDao) { this.transferDao = transferDao; }
-
-	public Foraging() {
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions();
-
-		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
-		this.blockGeneratorExecutor.scheduleWithFixedDelay(this, 5, 3, TimeUnit.SECONDS);
+		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
 	}
-
-	@Override
-	public void close() {
-		this.blockGeneratorExecutor.shutdownNow();
-	}
-
 
 	public void addUnlockedAccount(Account account) {
 		unlockedAccounts.add(account);
@@ -99,12 +77,9 @@ public class Foraging implements AutoCloseable, Runnable {
 	}
 
 	private boolean addUnconfirmedTransaction(Transaction transaction) {
-		return this.unconfirmedTransactions.add(transaction, new Predicate<Hash>() {
-			@Override
-			public boolean evaluate(final Hash hash) {
-				synchronized (blockChain) {
-					return null != transferDao.findByHash(hash.getRaw());
-				}
+		return this.unconfirmedTransactions.add(transaction, hash -> {
+			synchronized (blockChainLastBlockLayer) {
+				return null != transferDao.findByHash(hash.getRaw());
 			}
 		});
 	}
@@ -143,24 +118,27 @@ public class Foraging implements AutoCloseable, Runnable {
 		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
 	}
 
-	@Override
-	public void run() {
-		if (blockChain.getLastDbBlock() == null) {
-			return;
+	/**
+	 * returns foraged block or null
+	 * @return
+	 */
+	public Block forageBlock() {
+		if (blockChainLastBlockLayer.getLastDbBlock() == null) {
+			return null;
 		}
 
 		LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 		Block bestBlock = null;
-		long bestScore = Long.MAX_VALUE;
+		long bestScore = Long.MIN_VALUE;
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {
-			synchronized (blockChain) {
-				final org.nem.nis.dbmodel.Block dbLastBlock = blockChain.getLastDbBlock();
+			synchronized (blockChainLastBlockLayer) {
+				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainLastBlockLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
 
@@ -194,9 +172,7 @@ public class Foraging implements AutoCloseable, Runnable {
 			LOGGER.warning(e.toString());
 		}
 
-		if (bestBlock != null) {
-			addForagedBlock(bestBlock);
-		}
+		return bestBlock;
 	}
 
 	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {
@@ -216,7 +192,6 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		// Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
-		newBlock.setGenerationHash(HashUtils.nextHash(lastBlock.getGenerationHash(), forger.getKeyPair().getPublicKey()));
 
 		newBlock.setDifficulty(difficulty);
 		if (!transactionList.isEmpty()) {
@@ -225,21 +200,5 @@ public class Foraging implements AutoCloseable, Runnable {
 
 		newBlock.signBy(virtualForger);
 		return newBlock;
-	}
-
-	private void addForagedBlock(Block bestBlock) {
-		//
-		// if we're here it means unconfirmed transactions haven't been
-		// seen in any block yet, so we can add this block to local db
-		//
-		// (if at some point later we receive better block,
-		// fork resolution will handle that)
-		//
-		if (blockChain.addBlockToDb(bestBlock)) {
-			removeFromUnconfirmedTransactions(bestBlock);
-
-			// TODO: should this be called by Foraging? or maybe somewhere in blockchain
-			host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, bestBlock);
-		}
 	}
 }

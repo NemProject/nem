@@ -26,7 +26,7 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(null));
+		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test(expected = SerializationException.class)
@@ -152,7 +152,7 @@ public class VerifiableEntityTest {
 		entity.sign();
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
@@ -167,7 +167,7 @@ public class VerifiableEntityTest {
 		entity.signBy(signer);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
@@ -182,7 +182,7 @@ public class VerifiableEntityTest {
 		entity.setCustomField(12);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNot.not(IsEqual.equalTo(null)));
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
 	}
 
