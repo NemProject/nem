@@ -15,7 +15,7 @@ public class CoinDay {
 	 * @param blockHeight height of a block
 	 * @param amount the amount to set
 	 */
-	public CoinDay(final BlockHeight blockHeight, final Amount amount) {
+	CoinDay(final BlockHeight blockHeight, final Amount amount) {
 		this.blockHeight = blockHeight;
 		this.amount = amount;
 	}
@@ -37,7 +37,7 @@ public class CoinDay {
 	/**
 	 * @param amount the amount to set
 	 */
-	public void setAmount(final Amount amount) {
-		this.amount = amount;
+	public void addAmount(final Amount amount) {
+		this.amount = this.amount.add(amount);
 	}
 }

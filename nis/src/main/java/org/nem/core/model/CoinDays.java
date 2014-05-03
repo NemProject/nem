@@ -51,9 +51,7 @@ public class CoinDays {
 			
 			//Add the Amount in coinDayToAdd to the closest CoinDay, if it is within 1440 blocks.
 			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
-				Amount currAmt = coinDays.get(closestCoinDayIndex).getAmount();
-				Amount addedAmt = currAmt.add(coinDayToAdd.getAmount());
-				coinDays.get(closestCoinDayIndex).setAmount(addedAmt);
+				coinDays.get(closestCoinDayIndex).addAmount(coinDayToAdd.getAmount());
 			}
 		}
 	}
