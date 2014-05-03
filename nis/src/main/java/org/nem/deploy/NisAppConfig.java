@@ -111,7 +111,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost();
+		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
 	}
 
 	@Bean

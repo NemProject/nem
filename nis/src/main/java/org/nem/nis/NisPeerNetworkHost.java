@@ -23,17 +23,15 @@ public class NisPeerNetworkHost implements Runnable, AutoCloseable {
 	private static final int SYNC_INTERVAL = 1000;
 	private static final int BROADCAST_INTERVAL = 5 * 60 * 1000;
 
-	@Autowired
-	private AccountLookup accountLookup;
-
-	@Autowired
-	private BlockChain blockChain;
-
+	private final AccountLookup accountLookup;
+	private final BlockChain blockChain;
+	private PeerNetworkHost host;
 	private final ScheduledThreadPoolExecutor blockGeneratorExecutor;
 
-	private PeerNetworkHost host;
-
-	public NisPeerNetworkHost() {
+	@Autowired(required = true)
+	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
+		this.accountLookup = accountLookup;
+		this.blockChain = blockChain;
 		this.blockGeneratorExecutor = new ScheduledThreadPoolExecutor(1);
 	}
 

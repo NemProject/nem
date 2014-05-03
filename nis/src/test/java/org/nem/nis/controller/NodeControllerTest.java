@@ -108,6 +108,7 @@ public class NodeControllerTest {
 		 * @param peerNetwork The peer network to host.
 		 */
 		public MockNisPeerNetworkHost(final PeerNetwork peerNetwork) {
+			super(null, null);
 			this.peerNetwork = peerNetwork;
 		}
 
