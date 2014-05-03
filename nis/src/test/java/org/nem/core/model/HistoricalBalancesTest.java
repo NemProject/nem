@@ -177,6 +177,25 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.getHistoricalBalance(new BlockHeight(2000L)).getBalance().getNumMicroNem(), IsEqual.equalTo(7L));
 		Assert.assertThat(balances.size(), IsEqual.equalTo(2));
 	}
+
+	@Test
+	public void trimmingReturnsCorrectResults() {
+		// Arrange:
+		final HistoricalBalances balances = new HistoricalBalances();
+		final BlockHeight lastBlockHeight = new BlockHeight(10000);
+
+		// Act:
+		balances.add(new BlockHeight(100L), Amount.fromNem(1));
+		balances.add(new BlockHeight(3100L), Amount.fromNem(1));
+		balances.add(new BlockHeight(6100L), Amount.fromNem(1));
+		balances.add(new BlockHeight(9100L), Amount.fromNem(1));
+
+		// Assert:
+		Assert.assertThat(balances.getHistoricalBalance( new BlockHeight(9000)).getBalance(), IsEqual.equalTo(Amount.fromNem(3)));
+		Assert.assertThat(balances.getHistoricalBalance( new BlockHeight(9100)).getBalance(), IsEqual.equalTo(Amount.fromNem(4)));
+		Assert.assertThat(balances.getHistoricalBalance( new BlockHeight(10000)).getBalance(), IsEqual.equalTo(Amount.fromNem(4)));
+		Assert.assertThat(balances.size(), IsEqual.equalTo(2));
+	}
 	//endregion
 
 	private static HistoricalBalances createTestHistoricalBalances() {
