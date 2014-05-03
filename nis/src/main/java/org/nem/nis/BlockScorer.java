@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ public class BlockScorer {
 	/**
 	 * The target time between two blocks in seconds.
 	 */
-	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * BigInteger constant 2^64
@@ -62,7 +61,7 @@ public class BlockScorer {
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = block.getSigner().getBalance(new BlockHeight(Math.max(1, block.getHeight().getRaw() - BlockChain.ESTIMATED_BLOCKS_PER_DAY))).getNumNem();
+		long forgerBalance = block.getSigner().getBalance(prevBlock.getHeight(), new BlockHeight(Math.max(1, block.getHeight().getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY))).getNumNem();
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)

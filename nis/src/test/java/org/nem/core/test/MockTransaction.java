@@ -20,6 +20,7 @@ public class MockTransaction extends Transaction {
 	private long minimumFee;
 
 	private List<Integer> simulateExecuteList = new ArrayList<>();
+	private List<Integer> simulateUndoList = new ArrayList<>();
 	private List<Integer> executeList = new ArrayList<>();
 	private List<Integer> undoList = new ArrayList<>();
 
@@ -154,4 +155,9 @@ public class MockTransaction extends Transaction {
 		return true;
 	}
 
+	@Override
+	public boolean simulateUndo(NemTransferSimulate nemTransferSimulate) {
+		this.simulateUndoList.add(this.customField);
+		return true;
+	}
 }
