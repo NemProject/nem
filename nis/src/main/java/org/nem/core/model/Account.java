@@ -213,8 +213,8 @@ public class Account implements SerializableEntity {
 	 *
 	 * @return The historical balance.
 	 */
-	public Amount getBalance(final BlockHeight height) {
-		return historicalBalances.getBalance(height);
+	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
+		return historicalBalances.getBalance(lastBlockHeight, height);
 	}
 	
 	/**

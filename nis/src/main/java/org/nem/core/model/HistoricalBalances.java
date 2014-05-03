@@ -1,13 +1,10 @@
 package org.nem.core.model;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
 import org.nem.nis.BlockChain;
-import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalBalances {
 
@@ -58,11 +55,13 @@ public class HistoricalBalances {
 	/**
 	 * Gets the historical balance at a given block height
 	 * 
+	 *
+	 * @param lastBlockHeight height of last block known to us
 	 * @param height the height at which to retrieve the balance
-	 * 
+	 *
 	 * @return the historical balance
 	 */
-	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
+	public HistoricalBalance getHistoricalBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
 //		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
 //		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 //			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
@@ -99,8 +98,8 @@ public class HistoricalBalances {
 	 * 
 	 * @return the amount
 	 */
-	public Amount getBalance(final BlockHeight height) {
-		return getHistoricalBalance(height).getBalance();
+	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
+		return getHistoricalBalance(lastBlockHeight, height).getBalance();
 	}
 	
 	/**
@@ -168,7 +167,7 @@ public class HistoricalBalances {
 			return;
 		}
 		// Remember the historical balance at the point we start deleting entries
-		HistoricalBalance balance = getHistoricalBalance(height);
+		HistoricalBalance balance = getHistoricalBalance(height, height);
 		boolean insertBalance = false;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
