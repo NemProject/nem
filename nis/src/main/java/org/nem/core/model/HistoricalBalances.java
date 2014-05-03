@@ -41,8 +41,8 @@ public class HistoricalBalances {
 	public HistoricalBalances copy() {
 		HistoricalBalances historicalBalances = new HistoricalBalances();
 
-		BlockHeight height = balances.get(balances.size() - 1).getHeight();
 		if (size() > 0) {
+			BlockHeight height = balances.get(balances.size() - 1).getHeight();
 			// TODO: do we need trimming here at all?
 			trim(new BlockHeight(Math.max(1, height.getRaw() - MAX_HISTORY)));
 			for (int i=0; i<size(); i++) {

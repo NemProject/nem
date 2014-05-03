@@ -1,6 +1,8 @@
 package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
+import org.hamcrest.core.IsSame;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,6 +34,19 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances2.getBalance(lastBlockHeight, new BlockHeight(19L)).getNumMicroNem(), IsEqual.equalTo(1L));
 		Assert.assertThat(balances2.getBalance(lastBlockHeight, new BlockHeight(10L)).getNumMicroNem(), IsEqual.equalTo(1L));
 		Assert.assertThat(balances2.getBalance(lastBlockHeight, new BlockHeight(9L)).getNumMicroNem(), IsEqual.equalTo(0L));
+	}
+
+	@Test
+	public void copyingEmptyReturnsEmpty() {
+		// Arrange:
+		final HistoricalBalances balances = createTestHistoricalBalances();
+
+		// Act:
+		final HistoricalBalances result = balances.copy();
+
+		// Assert:
+		Assert.assertThat(result.size(), IsEqual.equalTo(0));
+		Assert.assertThat(result, IsNot.not(IsSame.sameInstance(balances)));
 	}
 	//endregion
 	
