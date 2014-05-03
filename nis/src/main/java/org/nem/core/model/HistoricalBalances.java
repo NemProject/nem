@@ -39,16 +39,18 @@ public class HistoricalBalances {
 	 * @return the copy
 	 */
 	public HistoricalBalances copy() {
-//		HistoricalBalances historicalBalances = new HistoricalBalances(blockChainLastBlockLayer);
-//		if (size() > 0) {
-//			trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
-//			for (int i=0; i<size(); i++) {
-//				historicalBalances.balances.add(i, new HistoricalBalance(balances.get(i).getHeight(), balances.get(i).getBalance()));
-//			}
-//		}
-//
-//		return historicalBalances;
-		return null;
+		HistoricalBalances historicalBalances = new HistoricalBalances();
+
+		BlockHeight height = balances.get(balances.size() - 1).getHeight();
+		if (size() > 0) {
+			// TODO: do we need trimming here at all?
+			trim(new BlockHeight(Math.max(1, height.getRaw() - MAX_HISTORY)));
+			for (int i=0; i<size(); i++) {
+				historicalBalances.balances.add(i, new HistoricalBalance(balances.get(i).getHeight(), balances.get(i).getBalance()));
+			}
+		}
+
+		return historicalBalances;
 	}
 
 	/**

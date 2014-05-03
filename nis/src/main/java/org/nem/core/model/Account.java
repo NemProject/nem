@@ -419,7 +419,7 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
-		//copy.historicalBalances = this.historicalBalances.copy();
+		copy.historicalBalances = this.historicalBalances.copy();
 		return copy;
 	}
 }

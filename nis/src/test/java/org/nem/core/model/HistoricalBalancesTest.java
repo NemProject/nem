@@ -13,7 +13,7 @@ public class HistoricalBalancesTest {
 	public void historicalBalanceCanBeCopied() {
 		// Arrange:
 		final HistoricalBalances balances = createTestHistoricalBalances();
-		final BlockHeight lastBlockHeight = new BlockHeight(10000);
+		final BlockHeight lastBlockHeight = new BlockHeight(40);
 
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
