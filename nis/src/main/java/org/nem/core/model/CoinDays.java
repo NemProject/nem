@@ -3,16 +3,16 @@ package org.nem.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.nem.nis.BlockChain;
+
 /**
  *
  */
 public class CoinDays {
 	
-	public static final long BLOCK_HEIGHT_GROUPING  = 1440;
-	
 	public static final long MIN_BLOCK_WAIT = 2160; //1.5 days
 	
-	public static final long MAX_BLOCKS_CONSIDERED = 144000; //100 days
+	public static final long MAX_BLOCKS_CONSIDERED = BlockChain.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
 	private long unweightedBalance = 0l;
 
@@ -50,7 +50,7 @@ public class CoinDays {
 			}
 			
 			//Add the Amount in coinDayToAdd to the closest CoinDay, if it is within 1440 blocks.
-			if (closestCoinDay <= BLOCK_HEIGHT_GROUPING && closestCoinDayIndex >= 0) {
+			if (closestCoinDay <= BlockChain.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
 				Amount currAmt = coinDays.get(closestCoinDayIndex).getAmount();
 				Amount addedAmt = currAmt.add(coinDayToAdd.getAmount());
 				coinDays.get(closestCoinDayIndex).setAmount(addedAmt);

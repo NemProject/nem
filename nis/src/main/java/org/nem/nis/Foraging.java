@@ -103,6 +103,7 @@ public class Foraging  {
 	 */
 	public boolean processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		//TODO: 30 seconds should probably be a constant instead of a magic number, below
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
 			return false;
