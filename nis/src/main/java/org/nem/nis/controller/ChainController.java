@@ -1,15 +1,11 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.BlockHeight;
-import org.nem.core.model.HashChain;
-import org.nem.core.model.SerializableList;
+import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.core.model.Block;
-import org.nem.nis.BlockChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +35,8 @@ public class ChainController {
 	public SerializableList<Block> blocksAfter(@RequestBody final BlockHeight height) {
 		// TODO: add tests for this action
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHeight(height);
-		final SerializableList<Block> blockList = new SerializableList<>(BlockChain.BLOCKS_LIMIT);
-		for (int i = 0; i < BlockChain.BLOCKS_LIMIT; ++i) {
+		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
+		for (int i = 0; i < BlockChainConstants.BLOCKS_LIMIT; ++i) {
 			Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				break;
@@ -56,6 +52,6 @@ public class ChainController {
 	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)
 	@P2PApi
 	public HashChain hashesFrom(@RequestBody final BlockHeight height) {
-		return this.blockDao.getHashesFrom(height, BlockChain.BLOCKS_LIMIT);
+		return this.blockDao.getHashesFrom(height, BlockChainConstants.BLOCKS_LIMIT);
 	}
 }

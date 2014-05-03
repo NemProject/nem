@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.nem.nis.BlockChain;
-
 public class HistoricalBalances {
 
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
 	 */
-	public final long MAX_HISTORY = BlockChain.ESTIMATED_BLOCKS_PER_DAY + BlockChain.REWRITE_LIMIT;
+	public final long MAX_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + BlockChainConstants.REWRITE_LIMIT;
 	
 	private final ArrayList<HistoricalBalance> balances = new ArrayList<>();
 	
