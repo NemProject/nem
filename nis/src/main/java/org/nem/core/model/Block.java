@@ -189,11 +189,20 @@ public class Block extends VerifiableEntity {
 	public void execute() {
 		for (final Transaction transaction : this.transactions) {
 			transaction.execute();
-			if (transaction.getType() == TransactionTypes.TRANSFER) {
-				TransferTransaction tx = (TransferTransaction)transaction;
-				tx.getSigner().subtractHistoricalBalance(this.height, tx.getAmount().add(tx.getFee()));
-				tx.getRecipient().addHistoricalBalance(this.height, tx.getAmount());
-			}
+
+			BlockHeight blockHeight = this.getHeight();
+			transaction.simulateExecute(new NemTransferSimulate() {
+				@Override
+				public boolean sub(Account account, Amount amount) {
+					account.subtractHistoricalBalance(blockHeight, amount);
+					return true;
+				}
+
+				@Override
+				public void add(Account account, Amount amount) {
+					account.addHistoricalBalance(blockHeight, amount);
+				}
+			});
 		}
 
 		this.getSigner().incrementForagedBlocks();
