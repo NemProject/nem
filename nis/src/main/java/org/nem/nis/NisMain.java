@@ -87,9 +87,9 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
-		this.blockChain.boot();
-
 		this.networkHost.boot();
+
+		this.networkHost.bootForaging();
 	}
 
 	private static void logGenesisInformation() {
