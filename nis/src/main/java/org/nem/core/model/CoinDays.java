@@ -12,7 +12,7 @@ public class CoinDays {
 	
 	public static final long MIN_BLOCK_WAIT = 2160; //1.5 days
 	
-	public static final long MAX_BLOCKS_CONSIDERED = BlockChain.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
+	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
 	private long unweightedBalance = 0l;
 
@@ -50,7 +50,7 @@ public class CoinDays {
 			}
 			
 			//Add the Amount in coinDayToAdd to the closest CoinDay, if it is within 1440 blocks.
-			if (closestCoinDay <= BlockChain.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
+			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
 				Amount currAmt = coinDays.get(closestCoinDayIndex).getAmount();
 				Amount addedAmt = currAmt.add(coinDayToAdd.getAmount());
 				coinDays.get(closestCoinDayIndex).setAmount(addedAmt);
