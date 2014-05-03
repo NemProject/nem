@@ -10,7 +10,7 @@ import org.nem.nis.BlockChain;
  */
 public class CoinDays {
 	
-	public static final long MIN_BLOCK_WAIT = 2160; //1.5 days
+	public static final long MIN_BLOCK_WAIT = BlockChainConstants.REWRITE_LIMIT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY; //1.5 days
 	
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
