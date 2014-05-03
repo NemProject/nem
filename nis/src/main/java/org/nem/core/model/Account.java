@@ -56,6 +56,8 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		this.historicalBalances = new HistoricalBalances();
+
+		this.coindays = new CoinDays();
 	}
 
 	/**
@@ -291,22 +293,21 @@ public class Account implements SerializableEntity {
 	 */
 	public Amount getCoinDayWeightedBalance() {
 		
-		long currentBlockHeight = 1337;//XXX:TODO:this is temporary until I figure out a good way to get the current height
+		final BlockHeight currentBlockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
 		
-		long getUnweightedBalance = coindays.getUnweightedBalance();
+		final Amount unweightedBalance = coindays.getUnweightedBalance();
 		
-		long coinDayBalance = coindays.getCoinDayWeightedBalance(currentBlockHeight);
+		Amount coinDayBalance = coindays.getCoinDayWeightedBalance(currentBlockHeight);
 		
 		//Assume any remaining balance has the full weight
-		long remainder = this.getBalance().getNumMicroNem() - getUnweightedBalance;
-		coinDayBalance += remainder;
+		coinDayBalance = coinDayBalance.add(this.getBalance().subtract(unweightedBalance));
 		
-		if (coinDayBalance > this.getBalance().getNumMicroNem()) {
-			coinDayBalance = this.getBalance().getNumMicroNem(); //XXX:or should we throw an exception?
+		if (coinDayBalance.compareTo(this.getBalance()) < 0) {
+			coinDayBalance = this.getBalance(); //XXX:or should we throw an exception?
 			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
 		}
 		
-		return new Amount(coinDayBalance);
+		return coinDayBalance;
 	}
 	
 	@Override

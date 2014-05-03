@@ -10,13 +10,13 @@ import org.nem.nis.BlockChain;
  */
 public class CoinDays {
 	
-	public static final long MIN_BLOCK_WAIT = 2160; //1.5 days
+	public static final long MIN_BLOCK_WAIT = BlockChainConstants.REWRITE_LIMIT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY; //1.5 days
 	
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
-	private long unweightedBalance = 0l;
+	private Amount unweightedBalance = Amount.ZERO;
 
-	private List<CoinDay> coinDays;
+	private List<CoinDay> coinDays = new ArrayList<>();
 
 	/**
 	 * Add a new coinday to the coindays.
@@ -29,7 +29,7 @@ public class CoinDays {
 					"Coinday is null or contains a null amount.");
 		}
 		
-		long addingBlockHeight = coinDayToAdd.getBlockHeight();
+		BlockHeight addingBlockHeight = coinDayToAdd.getHeight();
 
 		if (coinDays == null || coinDays.size() < 1) {
 			// ain't got no coindays
@@ -43,7 +43,7 @@ public class CoinDays {
 			for (int coinDayNdx = 0; coinDayNdx < this.coinDays.size(); coinDayNdx++) {
 				CoinDay coinDay = coinDays.get(coinDayNdx);
 				
-				long blockHeightDiff = Math.abs(coinDay.getBlockHeight() - addingBlockHeight);
+				long blockHeightDiff = Math.abs(coinDay.getHeight().subtract(addingBlockHeight));
 				if (blockHeightDiff > closestCoinDay) {
 					closestCoinDayIndex = coinDayNdx;
 				}
@@ -51,9 +51,7 @@ public class CoinDays {
 			
 			//Add the Amount in coinDayToAdd to the closest CoinDay, if it is within 1440 blocks.
 			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
-				Amount currAmt = coinDays.get(closestCoinDayIndex).getAmount();
-				Amount addedAmt = currAmt.add(coinDayToAdd.getAmount());
-				coinDays.get(closestCoinDayIndex).setAmount(addedAmt);
+				coinDays.get(closestCoinDayIndex).addAmount(coinDayToAdd.getAmount());
 			}
 		}
 	}
@@ -64,39 +62,36 @@ public class CoinDays {
 	 * 
 	 * @return
 	 */
-	public long getCoinDayWeightedBalance(long currentBlockHeight) {
-		long coinDayBalance = 0; // XXX: we might want to cache this in the
-									// future
-
+	public Amount getCoinDayWeightedBalance(BlockHeight currentBlockHeight) {
+		long coinDayBalance = 0L; // XXX: we might want to cache this in the future
 		long runningBalance = 0;
 
 		for (CoinDay coinDay : coinDays) {
-			long blockDiff = currentBlockHeight - coinDay.getBlockHeight();
+			long blockDiff = currentBlockHeight.subtract(coinDay.getHeight());
 
 			if (blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
 				continue; // skip blocks younger than MIN_BLOCK_WAIT or over the max number of blocks
 							// considered, then skip it
 			}
 
-			double currAmount = coinDay.getAmount().getNumMicroNem();
-
 			//We want to lower the weight so that the first MIN_BLOCK_WAIT don't count
+			// TODO: that must be redone, we definitelly don't want to have that double here....
 			double weighting = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
 
-			coinDayBalance += weighting * currAmount;
-
-			runningBalance += currAmount;
+			long currentBalance = coinDay.getAmount().getNumMicroNem();
+			coinDayBalance += weighting * currentBalance;
+			runningBalance += currentBalance;
 		}
 
 		setUnweightedBalance(runningBalance);
 
-		return coinDayBalance;
+		return Amount.fromMicroNem(coinDayBalance);
 	}
 
 	/**
 	 * @return the unweightedBalance
 	 */
-	public long getUnweightedBalance() {
+	public Amount getUnweightedBalance() {
 		return unweightedBalance;
 	}
 
@@ -104,8 +99,8 @@ public class CoinDays {
 	 * @param unweightedBalance
 	 *            the unweightedBalance to set
 	 */
-	public void setUnweightedBalance(long unweightedBalance) {
-		this.unweightedBalance = unweightedBalance;
+	private void setUnweightedBalance(long unweightedBalance) {
+		this.unweightedBalance = Amount.fromMicroNem(unweightedBalance);
 	}
 
 }
