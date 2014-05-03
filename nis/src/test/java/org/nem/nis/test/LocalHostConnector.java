@@ -71,7 +71,7 @@ public class LocalHostConnector {
 		}
 	}
 
-	private final HttpMethodClient<Result> httpMethodClient = new HttpMethodClient<>(30);
+	private final HttpMethodClient<Result> httpMethodClient = new HttpMethodClient<>(10000);
 
 	/**
 	 * Returns the result of a POST operation to the specified path on the local host.

@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.nis.Foraging;
@@ -25,8 +26,9 @@ public class AccountController {
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public Account accountGet(@RequestParam(value = "address") final String nemAddress) {
-		return this.accountIo.findByAddress(Address.fromEncoded(nemAddress));
+		return this.accountIo.findByAddress(getAddress(nemAddress));
 	}
+
 	/**
 	 * Unlocks an account for foraging.
 	 *
@@ -42,6 +44,14 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Transaction> accountUnlock(@RequestParam(value = "address") final String nemAddress) {
-		return this.accountIo.getAccountTransfers(Address.fromEncoded(nemAddress));
+		return this.accountIo.getAccountTransfers(getAddress(nemAddress));
+	}
+
+	private Address getAddress(String nemAddress) {
+		Address address = Address.fromEncoded(nemAddress);
+		if (! address.isValid()) {
+			return null;
+		}
+		return address;
 	}
 }

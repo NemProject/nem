@@ -62,8 +62,12 @@ public class PushController {
 		final PeerNetwork network = this.host.getNetwork();
 
 		// add to unconfirmed transactions
-		if (this.foraging.processTransaction(transaction))
+		if (this.foraging.processTransaction(transaction)) {
+			// propagate transactions
+			// this returns immediately, so that client who
+			// actually has sent /transfer/announce won't wait for this...
 			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
+		}
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)

@@ -5,8 +5,6 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
-import sun.management.Sensor;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -56,6 +54,10 @@ public class UnconfirmedTransactions {
 	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (exists.test(transactionHash)) {
+			return false;
+		}
+
+		if (this.transactions.containsKey(transactionHash)) {
 			return false;
 		}
 

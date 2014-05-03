@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.nem.nis.BlockChain;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalBalances {
@@ -20,11 +21,11 @@ public class HistoricalBalances {
 	/**
 	 * The block chain
 	 */
-	private BlockChain blockchain;
+	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired(required = true)
-	HistoricalBalances(final BlockChain blockchain) {
-		this.blockchain = blockchain;
+	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 	
 	/**
@@ -44,7 +45,7 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
-		long lastBlockHeight = blockchain.getLastDbBlock().getHeight();
+		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
 		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
 			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
 		}
@@ -96,7 +97,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -123,7 +124,7 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockchain.getLastDbBlock().getHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
 	}
 	
 	/**
