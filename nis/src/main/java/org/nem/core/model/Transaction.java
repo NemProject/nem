@@ -111,6 +111,22 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	public abstract void undo();
 
 	/**
+	 * Simulates execution of transaction. Passes proper accounts and amounts into simulator.
+	 *
+	 * @param nemTransferSimulate execute simulator
+	 * @return true if succeeded, false otherwise
+	 */
+	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
+
+	/**
+	 * Simulates undoing of transaction. Passes proper accounts and amounts into simulator.
+	 *
+	 * @param nemTransferSimulate undo simulator
+	 * @return true if succeeded, false otherwise
+	 */
+	public abstract boolean simulateUndo(NemTransferSimulate nemTransferSimulate);
+
+	/**
 	 * Determines if this transaction is valid.
 	 *
 	 * @return true if this transaction is valid.
@@ -126,6 +142,4 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The minimum fee.
 	 */
 	protected abstract Amount getMinimumFee();
-
-	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
 }

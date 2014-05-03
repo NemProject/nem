@@ -28,12 +28,6 @@ import java.util.stream.Collectors;
 public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
-
-	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
-
-	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
-
 	private AccountDao accountDao;
 
 	private BlockChainLastBlockLayer blockChainLastBlockLayer;
@@ -141,7 +135,7 @@ public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final Node node) {
-		final ComparisonContext context = new ComparisonContext(BLOCKS_LIMIT, REWRITE_LIMIT);
+		final ComparisonContext context = new ComparisonContext(BlockChainConstants.BLOCKS_LIMIT, BlockChainConstants.REWRITE_LIMIT);
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
@@ -157,7 +151,7 @@ public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	}
 
 	private BlockLookup createLocalBlockLookup(final AccountAnalyzer currentAccountAnalyzer) {
-		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainLastBlockLayer.getLastDbBlock(), BLOCKS_LIMIT);
+		return new LocalBlockLookupAdapter(this.blockDao, currentAccountAnalyzer, this.blockChainLastBlockLayer.getLastDbBlock(), BlockChainConstants.BLOCKS_LIMIT);
 	}
 
 	/**
@@ -213,7 +207,7 @@ public class BlockChain implements BlockSynchronizer, Runnable, Closeable {
 	 * @return score or -1 if chain is invalid
 	 */
 	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
-		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BLOCKS_LIMIT);
+		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BlockChainConstants.BLOCKS_LIMIT);
 		calculatePeerChainDifficulties(parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}

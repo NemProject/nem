@@ -187,18 +187,27 @@ public class Block extends VerifiableEntity {
 	 * Executes all transactions in the block.
 	 */
 	public void execute() {
+		BlockHeight blockHeight = this.getHeight();
 		for (final Transaction transaction : this.transactions) {
 			transaction.execute();
-			if (transaction.getType() == TransactionTypes.TRANSFER) {
-				TransferTransaction tx = (TransferTransaction)transaction;
-				tx.getSigner().subtractBalance(this.height, tx.getAmount().add(tx.getFee()));
-				tx.getRecipient().addBalance(this.height, tx.getAmount());
-			}
+
+			transaction.simulateExecute(new NemTransferSimulate() {
+				@Override
+				public boolean sub(Account account, Amount amount) {
+					account.subtractHistoricalBalance(blockHeight, amount);
+					return true;
+				}
+
+				@Override
+				public void add(Account account, Amount amount) {
+					account.addHistoricalBalance(blockHeight, amount);
+				}
+			});
 		}
 
 		this.getSigner().incrementForagedBlocks();
 		this.getSigner().incrementBalance(this.getTotalFee());
-		this.getSigner().addBalance(this.height, this.getTotalFee());
+		this.getSigner().addHistoricalBalance(this.height, this.getTotalFee());
 	}
 
 	/**
@@ -207,15 +216,23 @@ public class Block extends VerifiableEntity {
 	public void undo() {
 		this.getSigner().decrementForagedBlocks();
 		this.getSigner().decrementBalance(this.getTotalFee());
-		this.getSigner().subtractBalance(this.height, this.getTotalFee());
+		this.getSigner().subtractHistoricalBalance(this.height, this.getTotalFee());
 
+		BlockHeight blockHeight = this.getHeight();
 		for (final Transaction transaction : this.getReverseTransactions()) {
 			transaction.undo();
-			if (transaction.getType() == TransactionTypes.TRANSFER) {
-				TransferTransaction tx = (TransferTransaction)transaction;
-				tx.getSigner().addBalance(this.height, tx.getAmount().add(tx.getFee()));
-				tx.getRecipient().subtractBalance(this.height, tx.getAmount());
-			}
+			transaction.simulateUndo(new NemTransferSimulate() {
+				@Override
+				public boolean sub(Account account, Amount amount) {
+					account.subtractHistoricalBalance(blockHeight, amount);
+					return true;
+				}
+
+				@Override
+				public void add(Account account, Amount amount) {
+					account.addHistoricalBalance(blockHeight, amount);
+				}
+			});
 		}
 	}
 

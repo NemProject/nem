@@ -55,8 +55,7 @@ public class Account implements SerializableEntity {
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
-		// TODO: this is broken and needs to be fixed!!!
-		this.historicalBalances = new HistoricalBalances(null);
+		this.historicalBalances = new HistoricalBalances();
 	}
 
 	/**
@@ -209,6 +208,35 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the historical balance at a given height.
+	 *
+	 * @return The historical balance.
+	 */
+	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
+		return historicalBalances.getBalance(lastBlockHeight, height);
+	}
+	
+	/**
+	 * Adds a given amount to the historical balances at a given height.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount to add
+	 */
+	public void addHistoricalBalance(final BlockHeight height, final Amount amount) {
+		historicalBalances.add(height, amount);
+	}
+	
+	/**
+	 * Subtracts a given amount from the historical balances at a given height.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount to add
+	 */
+	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
+		historicalBalances.subtract(height, amount);
+	}
+
+	/**
 	 * @param acctLink - an inLink to add
 	 */
 	public void addInlink(AccountLink acctLink) {
@@ -279,35 +307,6 @@ public class Account implements SerializableEntity {
 		}
 		
 		return new Amount(coinDayBalance);
-	}
-	
-	/**
-	 * Gets the historical balance at a given height.
-	 *
-	 * @return The historical balance.
-	 */
-	public Amount getBalance(final BlockHeight height) {
-		return historicalBalances.getHistoricalBalance(height).getBalance();
-	}
-	
-	/**
-	 * Adds a given amount to the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void addBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.add(height, amount);
-	}
-	
-	/**
-	 * Subtracts a given amount from the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void subtractBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.subtract(height, amount);
 	}
 	
 	@Override
@@ -420,7 +419,7 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
-		//copy.historicalBalances = this.historicalBalances.copy();
+		copy.historicalBalances = this.historicalBalances.copy();
 		return copy;
 	}
 }
