@@ -5,23 +5,26 @@ package org.nem.core.model;
  */
 public class CoinDay {
 
-	private long blockHeight;
+	private BlockHeight blockHeight;
 
 	private Amount amount;
 
 	/**
-	 * @return the blockHeight
+	 * Creates CoinDay given height of a block and amount.
+	 *
+	 * @param blockHeight height of a block
+	 * @param amount the amount to set
 	 */
-	public long getBlockHeight() {
-		return blockHeight;
+	public CoinDay(final BlockHeight blockHeight, final Amount amount) {
+		this.blockHeight = blockHeight;
+		this.amount = amount;
 	}
 
 	/**
-	 * @param blockHeight
-	 *            the blockHeight to set
+	 * @return the blockHeight
 	 */
-	public void setBlockHeight(long blockHeight) {
-		this.blockHeight = blockHeight;
+	public BlockHeight getHeight() {
+		return blockHeight;
 	}
 
 	/**
@@ -32,10 +35,9 @@ public class CoinDay {
 	}
 
 	/**
-	 * @param amount
-	 *            the amount to set
+	 * @param amount the amount to set
 	 */
-	public void setAmount(Amount amount) {
+	public void setAmount(final Amount amount) {
 		this.amount = amount;
 	}
 }
