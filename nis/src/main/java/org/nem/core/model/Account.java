@@ -56,7 +56,7 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		// TODO: this is broken and needs to be fixed!!!
-		this.historicalBalances = new HistoricalBalances(null);
+		this.historicalBalances = new HistoricalBalances();
 	}
 
 	/**

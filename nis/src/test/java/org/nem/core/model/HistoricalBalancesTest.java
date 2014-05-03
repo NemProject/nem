@@ -14,7 +14,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeCopied() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -40,7 +40,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeRetrieved() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -63,7 +63,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void balanceCanBeRetrieved() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -89,7 +89,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeAdded() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(1L));
@@ -111,7 +111,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -133,7 +133,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeSubtracted2() {
 		// Arrange:
-		final HistoricalBalances balances = createTestHistoricalBalances(40L);
+		final HistoricalBalances balances = createTestHistoricalBalances();
 		
 		// Act:
 		balances.add(new BlockHeight(10L), new Amount(101L));
@@ -159,9 +159,7 @@ public class HistoricalBalancesTest {
 	@Test
 	public void historicalBalanceCanBeTrimmed() {
 		// Arrange:
-		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1000L);
-		final HistoricalBalances balances = new HistoricalBalances(blockChainLastBlockLayer);
+		final HistoricalBalances balances = new HistoricalBalances();
 		
 		// Act:
 		balances.add(new BlockHeight(100L), new Amount(1L));
@@ -172,7 +170,6 @@ public class HistoricalBalancesTest {
 		Assert.assertThat(balances.size(), IsEqual.equalTo(3));
 
 		// Act:
-		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(3000L);
 		balances.add(new BlockHeight(2500L), new Amount(8L));
 
 		// Assert:
@@ -182,9 +179,7 @@ public class HistoricalBalancesTest {
 	}
 	//endregion
 
-	private static HistoricalBalances createTestHistoricalBalances(long l) {
-		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		when(blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(l);
-		return new HistoricalBalances(blockChainLastBlockLayer);
+	private static HistoricalBalances createTestHistoricalBalances() {
+		return new HistoricalBalances();
 	}
 }

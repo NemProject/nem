@@ -18,15 +18,15 @@ public class HistoricalBalances {
 	
 	private final ArrayList<HistoricalBalance> balances = new ArrayList<>();
 	
-	/**
-	 * The block chain
-	 */
-	private BlockChainLastBlockLayer blockChainLastBlockLayer;
-
-	@Autowired(required = true)
-	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
-		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-	}
+//	/**
+//	 * The block chain
+//	 */
+//	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+//
+//	@Autowired(required = true)
+//	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
+//		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+//	}
 		
 	/**
 	 * Gets the size of the list
@@ -63,13 +63,14 @@ public class HistoricalBalances {
 	 * @return the historical balance
 	 */
 	public HistoricalBalance getHistoricalBalance(final BlockHeight height) {
-		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
-		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
-			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
-		}
-		if (lastBlockHeight < height.getRaw()) {
-			throw new InvalidParameterException("Future historical balances are not known.");
-		}
+//		long lastBlockHeight = blockChainLastBlockLayer.getLastBlockHeight();
+//		if (lastBlockHeight - height.getRaw() > MAX_HISTORY || height.getRaw() < 1) {
+//			throw new InvalidParameterException("Historical balances are only available for the last " + MAX_HISTORY + " blocks.");
+//		}
+//		if (lastBlockHeight < height.getRaw()) {
+//			throw new InvalidParameterException("Future historical balances are not known.");
+//		}
+
 		if (balances.size() == 0) {
 			return new HistoricalBalance(new BlockHeight(height.getRaw()), Amount.ZERO);
 		}
@@ -126,7 +127,7 @@ public class HistoricalBalances {
 				iter.next().add(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, height.getRaw() - MAX_HISTORY)));
 	}
 	
 	/**
@@ -153,7 +154,7 @@ public class HistoricalBalances {
 				iter.next().subtract(amount);
 			}
 		}
-		trim(new BlockHeight(Math.max(1, blockChainLastBlockLayer.getLastBlockHeight() - MAX_HISTORY)));
+		trim(new BlockHeight(Math.max(1, height.getRaw() - MAX_HISTORY)));
 	}
 	
 	/**
