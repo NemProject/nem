@@ -3,8 +3,12 @@ package org.nem.nis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.core.IsEqual;
+import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
+import org.nem.core.model.AccountLink;
 import org.nem.core.model.Amount;
 import org.nem.core.test.Utils;
 
@@ -14,11 +18,9 @@ import org.nem.core.test.Utils;
  * Thus the tests considered here focus on verifying that a user cannot
  * arbitrarily manipulate their importance to cause them to be chosen to forage.
  * 
- * some tests we should consider: 
- * - Sybil attack (master node creates a ton of
+ * some tests we should consider: - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
- * boost score)</br> 
- * - infinite loop attack<br/>
+ * boost score)</br> - infinite loop attack<br/>
  * - closed loop attack<br/>
  * - small transaction spam attack<br/>
  * -
@@ -49,12 +51,44 @@ public class POIV1ImplTest {
 		Account f = createAccountWithBalance(400);
 		Account g = createAccountWithBalance(400);
 
-		// Act:
 		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
 		// to D, who sends 100 to A.
 
+		// Act: calculate importances
+
 		// Assert:
 		// G > E > F >> A > others
+	}
+
+	/**
+	 * Super quick
+	 */
+	public void superQuickHowToRunPOIHack() {
+
+		// Arrange:
+		List<Account> accts = getAccountsWithSameBalance(1337, 1337);
+
+		// acct 0 sends 100 NEM to acct 2
+
+		// TODO: This is the type of thing we need to do to hook transactions up
+		// into
+		// POI. The "strengths" need to be coinday-weighted, meaning that if you
+		// send 100 NEM to someone, you better have at least 100 coindays in
+		// your account. If not, then some fraction is sent. After sending NEM
+		// to someone, your own coindays need to be recalculated.
+		accts.get(0).addOutlink(new AccountLink(100, accts.get(2)));
+		accts.get(2).addInlink(new AccountLink(100, accts.get(0)));
+
+		// Act:
+		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
+		// to D, who sends 100 to A.
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi.getAccountImportances(accts);
+
+		// Assert:
+		// TODO: how can I assert greaterthan/lesserthan relations?
+		// Assert.assertThat(importances.getAt(0)),
+		// IsEqual.equalTo(originalHashes));
 	}
 
 	private List<Account> getAccountsWithSameBalance(int numAccounts,
