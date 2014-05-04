@@ -17,7 +17,6 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	
-	private List<AccountLink> inlinks;
 	private List<AccountLink> outlinks;
 	
 	private CoinDays coindays;
@@ -238,30 +237,6 @@ public class Account implements SerializableEntity {
 		historicalBalances.subtract(height, amount);
 	}
 
-	/**
-	 * @param acctLink - an inLink to add
-	 */
-	public void addInlink(AccountLink acctLink) {
-		if (this.inlinks == null) {
-			this.inlinks = new LinkedList<AccountLink>();
-		}
-		this.inlinks.add(acctLink);
-	}
-	
-	/**
-	 * @return the inlinks
-	 */
-	public List<AccountLink> getInlinks() {
-		return inlinks;
-	}
-
-	/**
-	 * @param inlinks the inLinks to set
-	 */
-	public void setInlinks(List<AccountLink> inlinks) {
-		this.inlinks = inlinks;
-	}
-	
 	/**
 	 * @param acctLink - an outlink to add
 	 */

@@ -51,7 +51,10 @@ public class POIV1ImplTest {
 		Account f = createAccountWithBalance(400);
 		Account g = createAccountWithBalance(400);
 
-		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
+		// A sends all 400 NEM to B
+		a.addOutlink(new AccountLink(100, b));
+		
+		//, who sends 300 NEM to C, who sends 200 NEM
 		// to D, who sends 100 to A.
 
 		// Act: calculate importances
@@ -78,7 +81,6 @@ public class POIV1ImplTest {
 		// your account. If not, then some fraction is sent. After sending NEM
 		// to someone, your own coindays need to be recalculated.
 		accts.get(0).addOutlink(new AccountLink(100, accts.get(2)));
-		accts.get(2).addInlink(new AccountLink(100, accts.get(0)));
 
 		// Act:
 		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
@@ -87,9 +89,8 @@ public class POIV1ImplTest {
 		ColumnVector importances = poi.getAccountImportances(accts);
 
 		// Assert:
-		// TODO: how can I assert greaterthan/lesserthan relations?
-		Assert.assertTrue(importances.getAt(0) < importances.getAt(1));
-		// IsEqual.equalTo(originalHashes));
+		Assert.assertTrue(importances.getAt(0) < importances.getAt(2));
+		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));
 	}
 
 	private List<Account> getAccountsWithSameBalance(int numAccounts, long numNEM) {
