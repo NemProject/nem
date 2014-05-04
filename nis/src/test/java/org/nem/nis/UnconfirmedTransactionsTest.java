@@ -259,8 +259,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsInstance() {
-		MockAccountLookup mockAccountLookup = new MockAccountLookup(MockAccountLookup.UnknownAccountBehavior.REAL_ACCOUNT);
-		return new UnconfirmedTransactions(mockAccountLookup);
+		return new UnconfirmedTransactions();
 	}
 
 

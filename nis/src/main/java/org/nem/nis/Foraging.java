@@ -49,7 +49,7 @@ public class Foraging  {
 		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
+		this.unconfirmedTransactions = new UnconfirmedTransactions();
 	}
 
 	public void addUnlockedAccount(Account account) {

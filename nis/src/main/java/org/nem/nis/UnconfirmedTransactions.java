@@ -19,12 +19,6 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-	private final AccountLookup accountLookup;
-
-	UnconfirmedTransactions(AccountLookup accountLookup) {
-		this.accountLookup = accountLookup;
-	}
-
 	/**
 	 * Gets the number of unconfirmed transactions.
 	 *
