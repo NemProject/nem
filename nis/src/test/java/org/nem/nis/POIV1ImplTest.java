@@ -3,13 +3,13 @@ package org.nem.nis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
 import org.nem.core.model.Amount;
+import org.nem.core.model.BlockHeight;
 import org.nem.core.test.Utils;
 
 /**
@@ -93,8 +93,10 @@ public class POIV1ImplTest {
 		// Act:
 		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
 		// to D, who sends 100 to A.
+		
+		final BlockHeight blockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
 		POI poi = new POIV1Impl();
-		ColumnVector importances = poi.getAccountImportances(accts);
+		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 
 		// Assert:
 		Assert.assertTrue(importances.getAt(0) < importances.getAt(2));

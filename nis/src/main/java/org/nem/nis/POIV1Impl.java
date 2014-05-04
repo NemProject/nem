@@ -35,12 +35,12 @@ public class POIV1Impl implements POI {
 	
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-8;
 
-	public ColumnVector getAccountImportances(List<Account> accounts) {
-		return calculateImportancesImpl(accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
+	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
-	private ColumnVector calculateImportancesImpl(List<Account> accounts, int maxIters, double tol) {
+	private ColumnVector calculateImportancesImpl(final BlockHeight blockHeight, List<Account> accounts, int maxIters, double tol) {
 		
 		int numAccounts = accounts.size();
 		double scale = MAX_PROB /numAccounts;
@@ -62,8 +62,7 @@ public class POIV1Impl implements POI {
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			Account currAcct = accounts.get(ndx);
 			
-			final BlockHeight currentBlockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
-			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance(currentBlockHeight).getNumMicroNem();
+			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance(blockHeight).getNumMicroNem();
 			
 			importances.setAt(ndx, currAcct.getBalance().getNumMicroNem()); //XXX:can we do this or will there be precision errors?
 			List<AccountLink> outlinks = currAcct.getOutlinks();
