@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -50,9 +51,10 @@ public class POIV1ImplTest {
 		Account e = createAccountWithBalance(400);
 		Account f = createAccountWithBalance(400);
 		Account g = createAccountWithBalance(400);
+		
+		final BlockHeight blockHeight = new BlockHeight(1337);
 
-		//TODO: we really need the infrastructure for adding coinday-weighted links and updating balances
-		//Account.subtractHistoricalBalance() seems to be the correct place for this.
+		//TODO: we really need the infrastructure for adding coinday-weighted links and updating balances.
 		// A sends all 400 NEM to B,
 		a.addOutlink(new AccountLink(400, b));
 		
@@ -64,12 +66,21 @@ public class POIV1ImplTest {
 				
 		// who sends 100 to A.
 		d.addOutlink(new AccountLink(100, a));
+		
+		List<Account> accts = Arrays.asList(new Account[]{a, b, c, d, e, f, g});
 
 		// Act: calculate importances
-		final BlockHeight blockHeight = new BlockHeight(1337);
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 
 		// Assert:
 		// G > E > F >> A > others
+		Assert.assertTrue(importances.getAt(6) > importances.getAt(4));// g>e
+		Assert.assertTrue(importances.getAt(4) > importances.getAt(5));// e>f
+		Assert.assertTrue(importances.getAt(5) > importances.getAt(0));// f>a
+		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));// a>b
+		Assert.assertTrue(importances.getAt(0) > importances.getAt(2));// a>c
+		Assert.assertTrue(importances.getAt(0) > importances.getAt(3));// a>d
 	}
 
 	/**
