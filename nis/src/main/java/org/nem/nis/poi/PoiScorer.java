@@ -9,27 +9,18 @@ import java.util.List;
  */
 public class PoiScorer {
 
-	// TODO: might make sense to drop the PoiContext dependency
-	private final PoiContext context;
-
-	/**
-	 * Creates a new scorer.
-	 *
-	 * @param context The poi context.
-	 */
-	public PoiScorer(final PoiContext context) {
-		this.context = context;
-	}
-
 	/**
 	 * Calculates the weighted teleporation sum of all dangling accounts.
 	 *
+	 * @param dangleIndexes The indexes of dangling accounts.
+	 * @param teleportationVector The teleportation vector.
 	 * @param importanceVector The importance (weights).
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
-	public double calculateDangleSum(final ColumnVector importanceVector) {
-		final List<Integer> dangleIndexes = this.context.getDangleIndexes();
-		final ColumnVector teleportationVector = this.context.getTeleportationVector();
+	public double calculateDangleSum(
+			final List<Integer> dangleIndexes,
+			final ColumnVector teleportationVector,
+			final ColumnVector importanceVector) {
 
 		double dangleSum = 0;
 		for (final int i : dangleIndexes)
@@ -43,13 +34,13 @@ public class PoiScorer {
 	 *
 	 * @param importanceVector The importances sub-scores.
 	 * @param outLinkVector The out-link sub-scores.
+	 * @param coinDaysVector The coin-day sub-scores.
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
 	public ColumnVector calculateFinalScore(
 			final ColumnVector importanceVector,
-			final ColumnVector outLinkVector) {
-		final ColumnVector coinDaysVector = this.context.getCoinDaysVector();
-
+			final ColumnVector outLinkVector,
+			final ColumnVector coinDaysVector) {
 		final double maxImportance = importanceVector.max();
 		final double maxOutLink = outLinkVector.max();
 		final double maxCoinDays = coinDaysVector.max();
@@ -58,7 +49,7 @@ public class PoiScorer {
 		// TODO: making all these copies is definitely NOT efficient
 		final ColumnVector finalScoreVector = importanceVector
 				.multiplyElementWise(outLinkVector)
-				.multiplyElementWise(this.context.getCoinDaysVector());
+				.multiplyElementWise(coinDaysVector);
 
 		finalScoreVector.scale(scale);
 		return finalScoreVector;
