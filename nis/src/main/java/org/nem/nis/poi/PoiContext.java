@@ -1,10 +1,13 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
+import org.nem.core.math.Matrix;
 import org.nem.core.model.Account;
+import org.nem.core.model.AccountLink;
 import org.nem.core.model.Address;
 import org.nem.core.model.BlockHeight;
 
+import javax.persistence.Column;
 import java.util.*;
 
 /**
@@ -15,13 +18,14 @@ public class PoiContext {
 	private static final double MIN_TELEPORTATION_PROB = .7;
 	private static final double MAX_TELEPORTATION_PROB = .95;
 
-	private final List<PoiAccountInfo> accountInfos;
-	private final Map<Address, Integer> addressToIndexMap;
 	private final List<Integer> dangleIndexes;
+	private final ColumnVector dangleVector;
 	private final ColumnVector coinDaysVector;
 	private final ColumnVector importanceVector;
 	private final ColumnVector teleportationVector;
+	private final ColumnVector inverseTeleportationVector;
 	private final ColumnVector outLinkScoreVector;
+	private final Matrix outLinkMatrix;
 
 	/**
 	 * Creates a new context.
@@ -31,15 +35,19 @@ public class PoiContext {
 	 * @param height The current block height.
 	 */
 	public PoiContext(final Iterable<Account> accounts, final int numAccounts, final BlockHeight height) {
-		this.accountInfos = new ArrayList<>();
-		this.addressToIndexMap = new HashMap<>();
+		// TODO: this function should be broken up a bit
+		List<PoiAccountInfo> accountInfos = new ArrayList<>();
+		Map<Address, Integer> addressToIndexMap = new HashMap<>();
 		this.dangleIndexes = new ArrayList<>();
+
+		this.dangleVector = new ColumnVector(numAccounts);
+		this.dangleVector.setAll(1);
 
 		this.coinDaysVector = new ColumnVector(numAccounts);
 		this.importanceVector = new ColumnVector(numAccounts);
 		this.outLinkScoreVector = new ColumnVector(numAccounts);
 
-		// go through all accounts and initialize everything
+		// (1) go through all accounts and initialize all vectors
 		int i = 0;
 		for (final Account account : accounts) {
 			final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
@@ -48,25 +56,47 @@ public class PoiContext {
 			//	 if (!accountInfo.canForage())
 			//	 continue;
 
-			this.addressToIndexMap.put(account.getAddress(), i);
+			addressToIndexMap.put(account.getAddress(), i);
 
-			this.accountInfos.add(accountInfo);
+			accountInfos.add(accountInfo);
 			this.coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
 			this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
 
 			// initially set importance to account balance
 			this.importanceVector.setAt(i, account.getBalance().getNumNem());
 
-			if (!accountInfo.hasOutLinks())
+			if (!accountInfo.hasOutLinks()) {
 				this.dangleIndexes.add(i);
+				this.dangleVector.setAt(i, 0);
+			}
 
 			++i;
 		}
 
-		// normalize the importance vector
+		// (2) normalize the importance vector
 		this.importanceVector.normalize();
 
+		// (3) build the teleportation vector
 		this.teleportationVector = createTeleportationVector();
+		final ColumnVector onesVector = new ColumnVector(numAccounts);
+		onesVector.setAll(1.0);
+		this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+
+		// (4) build the out-link matrix
+		this.outLinkMatrix = new Matrix(numAccounts, numAccounts);
+		for (final PoiAccountInfo accountInfo : accountInfos) {
+
+			if (!accountInfo.hasOutLinks())
+				continue;
+
+			final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
+			for (int j = 0; j < outLinkWeights.getSize(); ++j) {
+				// TODO: using a hash-map for this will be slow
+				final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
+				int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
+				this.outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+			}
+		}
 	}
 
 	/**
@@ -106,12 +136,39 @@ public class PoiContext {
 	}
 
 	/**
+	 * Gets the inverse teleportation vector.
+	 *
+	 * @return The inverse teleportation vector.
+	 */
+	public ColumnVector getInverseTeleportationVector() {
+		return this.inverseTeleportationVector;
+	}
+
+	/**
 	 * Gets the dangle indexes.
 	 *
 	 * @return The dangle indexes.
 	 */
 	public List<Integer> getDangleIndexes() {
 		return this.dangleIndexes;
+	}
+
+	/**
+	 * Gets the dangle vector, where an element has a 0 value if the corresponding account is dangling.
+	 *
+	 * @return The dangle vector.
+	 */
+	public ColumnVector getDangleVector() {
+		return this.dangleVector;
+	}
+
+	/**
+	 * Gets the out-link matrix.
+	 *
+	 * @return The out-link matrix.
+	 */
+	public Matrix getOutLinkMatrix() {
+		return this.outLinkMatrix;
 	}
 
 	private ColumnVector createTeleportationVector() {
