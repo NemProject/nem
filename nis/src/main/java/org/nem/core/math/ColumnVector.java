@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
@@ -168,6 +169,16 @@ public class ColumnVector implements Cloneable {
 		}
 		
 		return maxVal;
+	}
+
+	/**
+	 * Gets the median value of all elements in this vector.
+	 *
+	 * @return The median value of all elements in this vector.
+	 */
+	public double median() {
+		final Median median = new Median();
+		return median.evaluate(this.vector);
 	}
 
 	/**

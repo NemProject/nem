@@ -1,8 +1,7 @@
 package org.nem.nis.poi;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.Amount;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.math.ColumnVector;
+import org.nem.core.model.*;
 
 import java.util.List;
 
@@ -15,6 +14,8 @@ public class PoiAccountInfo {
 
 	private final int index;
 	private final Account account;
+	private final ColumnVector outLinkWeightsVector;
+	private final double weightsSum;
 
 	/**
 	 * Creates a new POI account info.
@@ -25,6 +26,25 @@ public class PoiAccountInfo {
 	public PoiAccountInfo(final int index, final Account account) {
 		this.index = index;
 		this.account = account;
+
+		if (!this.hasOutLinks()) {
+			this.outLinkWeightsVector = null;
+			this.weightsSum = 0;
+			return;
+		}
+
+		final List<AccountLink> outLinks = this.account.getOutlinks();
+		this.outLinkWeightsVector = new ColumnVector(outLinks.size());
+
+		double weightsSum = 0;
+		for (int i = 0; i < outLinks.size(); ++i) {
+			double strength = outLinks.get(i).getStrength();
+			outLinkWeightsVector.setAt(i, strength);
+			weightsSum += strength;
+		}
+
+		outLinkWeightsVector.normalize();
+		this.weightsSum = weightsSum;
 	}
 
 	/**
@@ -60,5 +80,27 @@ public class PoiAccountInfo {
 	public boolean hasOutLinks() {
 		final List<?> outLinks = this.account.getOutlinks();
 		return null != outLinks && !outLinks.isEmpty();
+	}
+
+	/**
+	 * Gets the out-links weights vector.
+	 *
+	 * @return The out-links weight vector.
+	 */
+	public ColumnVector getOutLinkWeights() {
+		return this.outLinkWeightsVector;
+	}
+
+	/**
+	 * Calculates the out-link score.
+	 *
+	 * @return The out-link score.
+	 */
+	public double getOutLinkScore() {
+		if (!this.hasOutLinks())
+			return 0;
+
+		final double weightsMedian = this.outLinkWeightsVector.median();
+		return weightsMedian * this.weightsSum;
 	}
 }

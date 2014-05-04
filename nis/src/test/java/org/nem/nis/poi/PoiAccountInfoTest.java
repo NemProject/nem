@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.MockAccount;
@@ -42,12 +43,54 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void hasOutLinksIsOnlyTrueWhenAnAccountHasAtLeastOneOutLink() {
+	public void hasOutLinksIsOnlyTrueWhenAccountHasAtLeastOneOutLink() {
 		// Assert:
-		Assert.assertThat(createAccountInfoWithOutLinks(null).hasOutLinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutLinks(0).hasOutLinks(), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithNullOutLinks().hasOutLinks(), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithOutLinks().hasOutLinks(), IsEqual.equalTo(false));
 		Assert.assertThat(createAccountInfoWithOutLinks(1).hasOutLinks(), IsEqual.equalTo(true));
-		Assert.assertThat(createAccountInfoWithOutLinks(2).hasOutLinks(), IsEqual.equalTo(true));
+		Assert.assertThat(createAccountInfoWithOutLinks(2, 4).hasOutLinks(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void outLinkWeightsAreNullWhenAccountHasNoOutLinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
+
+		// Assert:
+		Assert.assertThat(info.getOutLinkWeights(), IsNull.nullValue());
+	}
+
+	@Test
+	public void outLinkScoreIsZeroWhenAccountHasNoOutLinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
+
+		// Assert:
+		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(0.0));
+	}
+
+	@Test
+	public void outLinkWeightsAreNormalizedInOrderWhenAccountHasOutLinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
+
+		// Assert:
+		Assert.assertThat(
+				info.getOutLinkWeights(),
+				IsEqual.equalTo(new ColumnVector(0.10, 0.15, 0.05, 0.25, 0.45)));
+	}
+
+	@Test
+	public void outLinkScoreIsComputedCorrectlyWhenAccountHasOutLinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
+
+		// Assert:
+		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(3.0));
+	}
+
+	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
+		return createAccountInfoWithOutLinks((List<AccountLink>)null);
 	}
 
 	private static PoiAccountInfo createAccountInfoWithOutLinks(final List<AccountLink> outLinks) {
@@ -56,12 +99,15 @@ public class PoiAccountInfoTest {
 		return new PoiAccountInfo(11, account);
 	}
 
-	private static PoiAccountInfo createAccountInfoWithOutLinks(final int numOutLinks) {
+	private static PoiAccountInfo createAccountInfoWithOutLinks(final int... strengths) {
 		final Account account = Utils.generateRandomAccount();
 
 		final List<AccountLink> outLinks = new ArrayList<>();
-		for (int i = 0; i < numOutLinks; ++i)
-			outLinks.add(new AccountLink());
+		for (int strength : strengths) {
+			final AccountLink link = new AccountLink();
+			link.setStrength(strength);
+			outLinks.add(link);
+		}
 
 		account.setOutlinks(outLinks);
 		return new PoiAccountInfo(11, account);

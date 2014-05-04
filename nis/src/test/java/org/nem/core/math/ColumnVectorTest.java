@@ -111,7 +111,7 @@ public class ColumnVectorTest {
 
 	//endregion
 
-	//region max
+	//region max / median
 
 	@Test
 	public void vectorMaxCanBeCalculated() {
@@ -120,6 +120,15 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(vector.max(), IsEqual.equalTo(11.0));
+	}
+
+	@Test
+	public void vectorMedianCanBeCalculated() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(7, 11, 5);
+
+		// Assert:
+		Assert.assertThat(vector.median(), IsEqual.equalTo(7.0));
 	}
 
 	//endregion
