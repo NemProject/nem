@@ -60,15 +60,13 @@ public class MockAccountLookup implements AccountLookup {
 			return account;
 
 		switch (unknownAccountBehavior) {
-			case REAL_ACCOUNT:
-				return new Account(id);
-
 			case NULL:
 				return null;
 
+			case REAL_ACCOUNT:
 			case MOCK_ACCOUNT:
 			default:
-				return new MockAccount(id);
+				return new Account(id);
 		}
 	}
 

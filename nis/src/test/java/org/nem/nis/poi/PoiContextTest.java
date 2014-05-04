@@ -12,8 +12,6 @@ import org.nem.core.model.AccountLink;
 import org.nem.core.model.Amount;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.test.IsEquivalent;
-import org.nem.core.test.MockAccount;
-import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 
 import java.util.*;

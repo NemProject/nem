@@ -432,7 +432,7 @@ public class AccountTest {
 		final Address address = Address.fromEncoded("MockAcc");
 
 		// Act:
-		Account.writeTo(serializer, "Account", new MockAccount(address));
+		Account.writeTo(serializer, "Account", new Account(address));
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
@@ -447,7 +447,7 @@ public class AccountTest {
 
 		// Assert:
 		assertCanWriteAccountWithEncoding(
-				new MockAccount(address),
+				new Account(address),
 				AccountEncoding.ADDRESS,
 				address.getEncoded());
 	}
@@ -500,7 +500,7 @@ public class AccountTest {
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 
 		// Act:
-		Account.writeTo(serializer, "Account", new MockAccount(address));
+		Account.writeTo(serializer, "Account", new Account(address));
 
 		final JsonDeserializer deserializer = new JsonDeserializer(
 				serializer.getObject(),
