@@ -18,6 +18,7 @@ public class Account implements SerializableEntity {
 	private Amount balance = Amount.ZERO;
 	
 	private List<AccountLink> outlinks;
+	private HistoricalOutlinks historicalOutlinks;
 	
 	private CoinDays coindays;
 
@@ -256,9 +257,17 @@ public class Account implements SerializableEntity {
 
 	/**
 	 * @param outlinks the outlinks to set
+	 *TODO: should probably be addOutlink
 	 */
 	public void setOutlinks(List<AccountLink> outlinks) {
 		this.outlinks = outlinks;
+	}
+	
+	/**
+	 * @return the outlinks
+	 */
+	public List<AccountLink> getOutlinks(final BlockHeight blockHeight) {
+		return null; //TODO:
 	}
 	
 	/**
