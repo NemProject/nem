@@ -21,6 +21,7 @@ public class PoiContext {
 	private final ColumnVector coinDaysVector;
 	private final ColumnVector importanceVector;
 	private final ColumnVector teleportationVector;
+	private final ColumnVector outLinkScoreVector;
 
 	/**
 	 * Creates a new context.
@@ -36,6 +37,7 @@ public class PoiContext {
 
 		this.coinDaysVector = new ColumnVector(numAccounts);
 		this.importanceVector = new ColumnVector(numAccounts);
+		this.outLinkScoreVector = new ColumnVector(numAccounts);
 
 		// go through all accounts and initialize everything
 		int i = 0;
@@ -48,20 +50,21 @@ public class PoiContext {
 
 			this.addressToIndexMap.put(account.getAddress(), i);
 
-			this.accountInfos.add(new PoiAccountInfo(i, account));
-			coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
+			this.accountInfos.add(accountInfo);
+			this.coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
+			this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
 
 			// initially set importance to account balance
-			importanceVector.setAt(i, account.getBalance().getNumNem());
+			this.importanceVector.setAt(i, account.getBalance().getNumNem());
 
 			if (!accountInfo.hasOutLinks())
-				dangleIndexes.add(i);
+				this.dangleIndexes.add(i);
 
 			++i;
 		}
 
 		// normalize the importance vector
-		importanceVector.normalize();
+		this.importanceVector.normalize();
 
 		this.teleportationVector = createTeleportationVector();
 	}
@@ -73,6 +76,15 @@ public class PoiContext {
 	 */
 	public ColumnVector getCoinDaysVector() {
 		return this.coinDaysVector;
+	}
+
+	/**
+	 * Gets the out-link score vector.
+	 *
+	 * @return The out-link vector.
+	 */
+	public ColumnVector getOutLinkScoreVector() {
+		return this.outLinkScoreVector;
 	}
 
 	/**
@@ -117,47 +129,4 @@ public class PoiContext {
 		final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
 		return teleportationVector.add(this.importanceVector.multiply(teleportationDelta / maxImportance));
 	}
-
-	/**
-	 * Calculates the weighted teleporation sum of all dangling accounts.
-	 *
-	 * @return The weighted teleporation sum of all dangling accounts.
-	 */
-	public double calculateDangleSum() {
-		double dangleSum = 0;
-		for (final int i : this.dangleIndexes)
-			dangleSum += this.importanceVector.getAt(i)*teleportationVector.getAt(i);
-
-		return dangleSum / this.importanceVector.getSize();
-	}
-
-//	//Prepare outlink weights
-//	double[][] outlinkWeights = new double[numAccounts][];
-//	for (int ndx = 0; ndx < numAccounts; ndx++) {
-//
-//	 List<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
-//	 if (outlinks == null || outlinks.size() < 1) {
-//	 continue;
-//	 }
-//
-//	 double[] weights = getRightStochasticWeights(outlinks);
-//	 outlinkWeights[ndx] = weights;
-//	}
-//
-//	// normalize starting vector to sum to 1
-//	importances.normalize();
-//
-//	double maxImportance = importances.max();
-//
-//	// calculate teleportation probabilities based on normalized amount of NEM owned
-//	double[] teleporations = new double[numAccounts];
-//	for (int acctNdx = 0; acctNdx < importances.getSize(); acctNdx++) {
-//	 // Assign a value between .7 and .95 based on the amount of NEM in an account.
-//	 // It seems that more NEM = higher teleportation seems to work better.
-//	 // NOTE: importances were initialized with acct balances, so this is why this works;
-//	 // also, the importance vector was already normalized to sum to 1 in the code above.
-//	 teleporations[acctNdx] = MIN_TELEPORTATION_PROB
-//	 + ADDITIVE_TELEPORTATION*(importances.getAt(acctNdx)/maxImportance);
-//	}
-
 }

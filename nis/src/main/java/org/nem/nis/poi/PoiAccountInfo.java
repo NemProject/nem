@@ -39,11 +39,11 @@ public class PoiAccountInfo {
 		double weightsSum = 0;
 		for (int i = 0; i < outLinks.size(); ++i) {
 			double strength = outLinks.get(i).getStrength();
-			outLinkWeightsVector.setAt(i, strength);
+			this.outLinkWeightsVector.setAt(i, strength);
 			weightsSum += strength;
 		}
 
-		outLinkWeightsVector.normalize();
+		this.outLinkWeightsVector.normalize();
 		this.weightsSum = weightsSum;
 	}
 

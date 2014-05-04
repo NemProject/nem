@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.MockAccount;
 
@@ -22,6 +23,19 @@ public class PoiContextTest {
 		Assert.assertThat(
 				context.getCoinDaysVector(),
 				IsEqual.equalTo(new ColumnVector(3, 2, 0, 1, 0, 4)));
+	}
+
+	@Test
+	public void outLinkScoreVectorIsInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContext();
+
+		// Assert:
+		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
+		// (2) calculation delegates to PoiAccountInfo
+		Assert.assertThat(
+				context.getOutLinkScoreVector(),
+				IsEqual.equalTo(new ColumnVector(1, 0, 3, 0, 5, 2)));
 	}
 
 	@Test
@@ -59,27 +73,18 @@ public class PoiContextTest {
 		// (1) accounts without out-links are dangling
 		Assert.assertThat(
 				context.getDangleIndexes(),
-				IsEquivalent.equivalentTo(new Integer[] { 1, 3 }));
+				IsEquivalent.equivalentTo(new Integer[]{ 1, 3 }));
 	}
 
-	@Test
-	public void dangleSumIsCalculatedCorrectly() {
-		// Act:
-		final PoiContext context = createTestPoiContext();
-
-		// Assert:
-		Assert.assertThat(0.5450 / 6, IsEqual.equalTo(context.calculateDangleSum()));
-	}
-
-	public static PoiContext createTestPoiContext() {
+	private static PoiContext createTestPoiContext() {
 		final int umInNem = Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		true),
-				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		false),
-				new TestAccountInfo(5, 					umInNem,			true),
-				new TestAccountInfo(umInNem,			3 * umInNem - 1,	false),
-				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	true),
-				new TestAccountInfo(4 * umInNem,		5,					true));
+				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		1),
+				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		0),
+				new TestAccountInfo(5, 					umInNem,			3),
+				new TestAccountInfo(umInNem,			3 * umInNem - 1,	0),
+				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	5),
+				new TestAccountInfo(4 * umInNem,		5,					2));
 
 		final List<Account> accounts = new ArrayList<>();
 		final BlockHeight height = new BlockHeight(21);
@@ -88,10 +93,12 @@ public class PoiContextTest {
 			account.incrementBalance(Amount.fromMicroNem(info.balance));
 			account.setCoinDaysAt(Amount.fromMicroNem(info.coinDays), height);
 
-			if (info.hasOutLinks) {
+			if (0 != info.outLinkStrength) {
 				// TODO: addOutLinks probably makes more sense
 				final List<AccountLink> outLinks = new ArrayList<>();
-				outLinks.add(new AccountLink());
+				final AccountLink link = new AccountLink();
+				link.setStrength(info.outLinkStrength);
+				outLinks.add(link);
 				account.setOutlinks(outLinks);
 			}
 
@@ -105,23 +112,12 @@ public class PoiContextTest {
 
 		public final int coinDays;
 		public final int balance;
-		public final boolean hasOutLinks;
+		public final int outLinkStrength;
 
-		public TestAccountInfo(int coinDays, int balance, boolean hasOutLinks) {
+		public TestAccountInfo(int coinDays, int balance, int outLinkStrength) {
 			this.coinDays = coinDays;
 			this.balance = balance;
-			this.hasOutLinks = hasOutLinks;
+			this.outLinkStrength = outLinkStrength;
 		}
 	}
-
-//
-//	// TODO: move to somewhere more general, maybe ColumnVector
-//	private static ColumnVector round(final ColumnVector vector, int numPlaces) {
-//		final double multiplier = Math.pow(10, numPlaces);
-//		final ColumnVector roundedVector = new ColumnVector(vector.getSize());
-//		for (int i = 0; i < vector.getSize(); ++i)
-//			roundedVector.setAt(i, Math.round(vector.getAt(i) * multiplier) / multiplier);
-//
-//		return roundedVector;
-//	}
 }
