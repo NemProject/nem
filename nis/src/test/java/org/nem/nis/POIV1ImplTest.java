@@ -94,7 +94,7 @@ public class POIV1ImplTest {
 		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
 		// to D, who sends 100 to A.
 		
-		final BlockHeight blockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
+		final BlockHeight blockHeight = new BlockHeight(1337);
 		POI poi = new POIV1Impl();
 		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 
