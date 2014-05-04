@@ -7,7 +7,6 @@ import org.nem.core.model.AccountLink;
 import org.nem.core.model.Address;
 import org.nem.core.model.BlockHeight;
 
-import javax.persistence.Column;
 import java.util.*;
 
 /**
@@ -22,10 +21,11 @@ public class PoiContext {
 	private final ColumnVector dangleVector;
 	private final ColumnVector coinDaysVector;
 	private final ColumnVector importanceVector;
-	private final ColumnVector teleportationVector;
-	private final ColumnVector inverseTeleportationVector;
 	private final ColumnVector outLinkScoreVector;
 	private final Matrix outLinkMatrix;
+
+	private final ColumnVector teleportationVector;
+	private final ColumnVector inverseTeleportationVector;
 
 	/**
 	 * Creates a new context.
@@ -35,69 +35,23 @@ public class PoiContext {
 	 * @param height The current block height.
 	 */
 	public PoiContext(final Iterable<Account> accounts, final int numAccounts, final BlockHeight height) {
-		// TODO: this function should be broken up a bit
-		List<PoiAccountInfo> accountInfos = new ArrayList<>();
-		Map<Address, Integer> addressToIndexMap = new HashMap<>();
-		this.dangleIndexes = new ArrayList<>();
+		// (1) build the account vectors and matricies
+		final AccountProcessor ap = new AccountProcessor(numAccounts);
+		ap.process(accounts, height);
+		this.dangleIndexes = ap.dangleIndexes;
+		this.dangleVector = ap.dangleVector;
+		this.coinDaysVector = ap.coinDaysVector;
+		this.outLinkScoreVector = ap.outLinkScoreVector;
+		this.importanceVector = ap.importanceVector;
+		this.outLinkMatrix = ap.createOutLinkMatrix();
 
-		this.dangleVector = new ColumnVector(numAccounts);
-		this.dangleVector.setAll(1);
-
-		this.coinDaysVector = new ColumnVector(numAccounts);
-		this.importanceVector = new ColumnVector(numAccounts);
-		this.outLinkScoreVector = new ColumnVector(numAccounts);
-
-		// (1) go through all accounts and initialize all vectors
-		int i = 0;
-		for (final Account account : accounts) {
-			final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
-			// TODO: to simplify the calculation, should we exclude accounts that can't forage?
-			// TODO: (this should shrink the matrix size)
-			//	 if (!accountInfo.canForage())
-			//	 continue;
-
-			addressToIndexMap.put(account.getAddress(), i);
-
-			accountInfos.add(accountInfo);
-			this.coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
-			this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
-
-			// initially set importance to account balance
-			this.importanceVector.setAt(i, account.getBalance().getNumNem());
-
-			if (!accountInfo.hasOutLinks()) {
-				this.dangleIndexes.add(i);
-				this.dangleVector.setAt(i, 0);
-			}
-
-			++i;
-		}
-
-		// (2) normalize the importance vector
-		this.importanceVector.normalize();
-
-		// (3) build the teleportation vector
-		this.teleportationVector = createTeleportationVector();
-		final ColumnVector onesVector = new ColumnVector(numAccounts);
-		onesVector.setAll(1.0);
-		this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
-
-		// (4) build the out-link matrix
-		this.outLinkMatrix = new Matrix(numAccounts, numAccounts);
-		for (final PoiAccountInfo accountInfo : accountInfos) {
-
-			if (!accountInfo.hasOutLinks())
-				continue;
-
-			final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
-			for (int j = 0; j < outLinkWeights.getSize(); ++j) {
-				// TODO: using a hash-map for this will be slow
-				final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
-				int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
-				this.outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
-			}
-		}
+		// (2) build the teleportation vectors
+		final TeleportationBuilder tb = new TeleportationBuilder(this.importanceVector);
+		this.teleportationVector = tb.teleportationVector;
+		this.inverseTeleportationVector = tb.inverseTeleportationVector;
 	}
+
+	//region Getters
 
 	/**
 	 * Gets the coin days vector.
@@ -171,19 +125,109 @@ public class PoiContext {
 		return this.outLinkMatrix;
 	}
 
-	private ColumnVector createTeleportationVector() {
-		// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
+	//endregion
 
-		// Assign a value between .7 and .95 based on the amount of NEM in an account
-		// It seems that more NEM = higher teleportation seems to work better
-		// NOTE: at this point the importance vector contains normalized account balances
-		final double maxImportance = this.importanceVector.max();
+	private static class AccountProcessor {
 
-		// calculate teleportation probabilities based on normalized amount of NEM owned
-		final ColumnVector teleportationVector = new ColumnVector(this.importanceVector.getSize());
-		teleportationVector.setAll(MIN_TELEPORTATION_PROB);
+		private final List<Integer> dangleIndexes;
+		private final ColumnVector dangleVector;
+		private final ColumnVector coinDaysVector;
+		private final ColumnVector importanceVector;
+		private final ColumnVector outLinkScoreVector;
 
-		final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
-		return teleportationVector.add(this.importanceVector.multiply(teleportationDelta / maxImportance));
+		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
+		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
+
+		public AccountProcessor(final int numAccounts) {
+			this.dangleIndexes = new ArrayList<>();
+
+			this.dangleVector = new ColumnVector(numAccounts);
+			this.dangleVector.setAll(1);
+
+			this.coinDaysVector = new ColumnVector(numAccounts);
+			this.importanceVector = new ColumnVector(numAccounts);
+			this.outLinkScoreVector = new ColumnVector(numAccounts);
+		}
+
+		public void process(final Iterable<Account> accounts, final BlockHeight height) {
+			// (1) go through all accounts and initialize all vectors
+			int i = 0;
+			for (final Account account : accounts) {
+				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
+				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
+				// TODO: (this should shrink the matrix size)
+				//	 if (!accountInfo.canForage())
+				//	 continue;
+
+				this.addressToIndexMap.put(account.getAddress(), i);
+
+				this.accountInfos.add(accountInfo);
+				this.coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
+				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
+
+				// initially set importance to account balance
+				this.importanceVector.setAt(i, account.getBalance().getNumNem());
+
+				if (!accountInfo.hasOutLinks()) {
+					this.dangleIndexes.add(i);
+					this.dangleVector.setAt(i, 0);
+				}
+
+				++i;
+			}
+
+			// (2) normalize the importance vector
+			this.importanceVector.normalize();
+		}
+
+		private Matrix createOutLinkMatrix() {
+			final int numAccounts = this.importanceVector.getSize();
+			final Matrix outLinkMatrix = new Matrix(numAccounts, numAccounts);
+			for (final PoiAccountInfo accountInfo : accountInfos) {
+
+				if (!accountInfo.hasOutLinks())
+					continue;
+
+				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
+				for (int j = 0; j < outLinkWeights.getSize(); ++j) {
+					// TODO: using a hash-map for this will be slow
+					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
+					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
+					outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+				}
+			}
+
+			return outLinkMatrix;
+		}
+	}
+
+	private static class TeleportationBuilder {
+
+		private final ColumnVector teleportationVector;
+		private final ColumnVector inverseTeleportationVector;
+
+		public TeleportationBuilder(final ColumnVector importanceVector) {
+			// (1) build the teleportation vector
+			final int numAccounts = importanceVector.getSize();
+
+			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
+
+			// Assign a value between .7 and .95 based on the amount of NEM in an account
+			// It seems that more NEM = higher teleportation seems to work better
+			// NOTE: at this point the importance vector contains normalized account balances
+			final double maxImportance = importanceVector.max();
+
+			// calculate teleportation probabilities based on normalized amount of NEM owned
+			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
+			minProbVector.setAll(MIN_TELEPORTATION_PROB);
+
+			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
+			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
+
+			// (2) build the inverse teleportation vector: 1 - V(teleportation)
+			final ColumnVector onesVector = new ColumnVector(numAccounts);
+			onesVector.setAll(1.0);
+			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+		}
 	}
 }
