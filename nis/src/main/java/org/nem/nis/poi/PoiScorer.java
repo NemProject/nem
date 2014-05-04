@@ -46,7 +46,6 @@ public class PoiScorer {
 		final double maxCoinDays = coinDaysVector.max();
 		final double scale = maxImportance * maxOutLink * maxCoinDays;
 
-		// TODO: making all these copies is definitely NOT efficient
 		final ColumnVector finalScoreVector = importanceVector
 				.multiplyElementWise(outLinkVector)
 				.multiplyElementWise(coinDaysVector);

@@ -41,10 +41,8 @@ public class POIV1Impl implements POI {
 		iterator.run();
 
 		if (!iterator.hasConverged()) {
-			throw new IllegalStateException(
-					String.format(
-							"POI: power iteration failed to converge in %s iterations",
-							DEFAULT_MAX_ITERS));
+			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);
+			throw new IllegalStateException(message);
 		}
 
 		// (3) merge all sub-scores
@@ -68,20 +66,20 @@ public class POIV1Impl implements POI {
 		@Override
 		protected ColumnVector stepImpl(final ColumnVector prevIterImportances) {
 
-			double dangleSum = scorer.calculateDangleSum(
-					context.getDangleIndexes(),
-					context.getTeleportationVector(),
+			double dangleSum = this.scorer.calculateDangleSum(
+					this.context.getDangleIndexes(),
+					this.context.getTeleportationVector(),
 					prevIterImportances);
 
 			// V(dangle-indexes) * dangle-sum + V(1.0) - V(teleportation)
-			final ColumnVector poiAdjustmentVector = context
-					.getDangleVector().multiply(dangleSum)
-					.add(context.getInverseTeleportationVector());
+			final ColumnVector poiAdjustmentVector = this.context.getDangleVector()
+					.multiply(dangleSum)
+					.add(this.context.getInverseTeleportationVector());
 
 			// M(out-link) * V(importance) .* V(teleportation)
 			final ColumnVector importances = prevIterImportances
-					.multiply(context.getOutLinkMatrix())
-					.multiplyElementWise(context.getTeleportationVector());
+					.multiply(this.context.getOutLinkMatrix())
+					.multiplyElementWise(this.context.getTeleportationVector());
 
 			return importances.add(poiAdjustmentVector);
 		}
