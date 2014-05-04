@@ -6,6 +6,7 @@ import org.nem.core.model.Address;
 
 /**
  * A mock Account implementation.
+ * TODO: remove this?
  */
 public class MockAccount extends Account {
 	private final Address address;

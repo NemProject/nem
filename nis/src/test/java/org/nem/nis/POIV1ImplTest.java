@@ -67,7 +67,7 @@ public class POIV1ImplTest {
 		// who sends 100 to A.
 		d.addOutlink(new AccountLink(100, a));
 		
-		List<Account> accts = Arrays.asList(new Account[]{a, b, c, d, e, f, g});
+		List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
 		POI poi = new POIV1Impl();
