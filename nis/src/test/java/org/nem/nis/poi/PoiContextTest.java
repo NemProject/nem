@@ -31,7 +31,7 @@ public class PoiContextTest {
 		// (2) coin days are not normalized
 		Assert.assertThat(
 				context.getCoinDaysVector(),
-				IsEqual.equalTo(new ColumnVector(2, 3, 0, 1, 0, 4)));
+				IsEqual.equalTo(new ColumnVector(3, 2, 0, 1, 0, 4)));
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class PoiContextTest {
 		// (3) importance are normalized
 		Assert.assertThat(
 				context.getImportanceVector(),
-				IsEqual.equalTo(new ColumnVector(0.4, 0, 0.1, 0.2, 0.3, 0)));
+				IsEqual.equalTo(new ColumnVector(0, 0.4, 0.1, 0.2, 0.3, 0)));
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class PoiContextTest {
 		// (1) accounts without out-links are dangling
 		Assert.assertThat(
 				context.getTeleportationVector(),
-				IsEqual.equalTo(new ColumnVector(0.9500, 0.7000, 0.7625, 0.8250, 0.8875, 0.7000)));
+				IsEqual.equalTo(new ColumnVector(0.7000, 0.9500, 0.7625, 0.8250, 0.8875, 0.7000)));
 	}
 
 	@Test
@@ -72,11 +72,20 @@ public class PoiContextTest {
 				IsEquivalent.equivalentTo(new Integer[] { 1, 3 }));
 	}
 
+	@Test
+	public void dangleSumIsCalculatedCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContext();
+
+		// Assert:
+		Assert.assertThat(0.5450 / 6, IsEqual.equalTo(context.calculateDangleSum()));
+	}
+
 	public static PoiContext createTestPoiContext() {
 		final int umInNem = Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		true),
-				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		false),
+				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		true),
+				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		false),
 				new TestAccountInfo(5, 					umInNem,			true),
 				new TestAccountInfo(umInNem,			3 * umInNem - 1,	false),
 				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	true),

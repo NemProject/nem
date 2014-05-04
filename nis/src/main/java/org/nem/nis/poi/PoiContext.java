@@ -118,6 +118,19 @@ public class PoiContext {
 		return teleportationVector.add(this.importanceVector.multiply(teleportationDelta / maxImportance));
 	}
 
+	/**
+	 * Calculates the weighted teleporation sum of all dangling accounts.
+	 *
+	 * @return The weighted teleporation sum of all dangling accounts.
+	 */
+	public double calculateDangleSum() {
+		double dangleSum = 0;
+		for (final int i : this.dangleIndexes)
+			dangleSum += this.importanceVector.getAt(i)*teleportationVector.getAt(i);
+
+		return dangleSum / this.importanceVector.getSize();
+	}
+
 //	//Prepare outlink weights
 //	double[][] outlinkWeights = new double[numAccounts][];
 //	for (int ndx = 0; ndx < numAccounts; ndx++) {
