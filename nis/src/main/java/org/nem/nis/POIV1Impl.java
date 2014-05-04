@@ -65,7 +65,7 @@ public class POIV1Impl implements POI {
 			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance(blockHeight).getNumMicroNem();
 			
 			importances.setAt(ndx, currAcct.getBalance().getNumMicroNem()); //XXX:can we do this or will there be precision errors?
-			List<AccountLink> outlinks = currAcct.getOutlinks();
+			List<AccountLink> outlinks = currAcct.getOutlinks(blockHeight);
 			if (outlinks == null || outlinks.size() < 1) { //then we have a dangling account
 				dangleIndices.add(ndx);
 			}
@@ -75,7 +75,7 @@ public class POIV1Impl implements POI {
 		double[][] outlinkWeights = new double[numAccounts][];
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			
-			List<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
+			List<AccountLink> outlinks = accounts.get(ndx).getOutlinks(blockHeight);
 			if (outlinks == null || outlinks.size() < 1) {
 				continue;
 			}
@@ -115,7 +115,7 @@ public class POIV1Impl implements POI {
 			
 			for (int ndx = 0; ndx < numAccounts; ndx++) {
 				
-				List<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
+				List<AccountLink> outlinks = accounts.get(ndx).getOutlinks(blockHeight);
 				if (outlinks == null || outlinks.size() < 1) {
 					continue;
 				}
@@ -153,7 +153,7 @@ public class POIV1Impl implements POI {
 		// normalize with outlinks degree and median outlinking trans amt, otherwise people will hoard NEM
 		double[] outlinkScores = new double[numAccounts];
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
-			List<AccountLink> outlinks = accounts.get(ndx).getOutlinks();
+			List<AccountLink> outlinks = accounts.get(ndx).getOutlinks(blockHeight);
 			
 			if (outlinks != null) {
 				Median median = new Median();
