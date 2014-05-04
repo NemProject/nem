@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
+import org.nem.core.model.BlockHeight;
 import org.nem.core.utils.ArrayUtils;
 
 /**
@@ -61,7 +62,8 @@ public class POIV1Impl implements POI {
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			Account currAcct = accounts.get(ndx);
 			
-			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance().getNumMicroNem();
+			final BlockHeight currentBlockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
+			coindayBalances[ndx] = currAcct.getCoinDayWeightedBalance(currentBlockHeight).getNumMicroNem();
 			
 			importances.setAt(ndx, currAcct.getBalance().getNumMicroNem()); //XXX:can we do this or will there be precision errors?
 			List<AccountLink> outlinks = currAcct.getOutlinks();

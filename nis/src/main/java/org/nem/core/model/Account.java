@@ -266,13 +266,11 @@ public class Account implements SerializableEntity {
 	 * 
 	 * @return
 	 */
-	public Amount getCoinDayWeightedBalance() {
-		
-		final BlockHeight currentBlockHeight = new BlockHeight(1337);//XXX:TODO:this is temporary until I figure out a good way to get the current height
+	public Amount getCoinDayWeightedBalance(final BlockHeight blockHeight) {
 		
 		final Amount unweightedBalance = coindays.getUnweightedBalance();
 		
-		Amount coinDayBalance = coindays.getCoinDayWeightedBalance(currentBlockHeight);
+		Amount coinDayBalance = coindays.getCoinDayWeightedBalance(blockHeight);
 		
 		//Assume any remaining balance has the full weight
 		coinDayBalance = coinDayBalance.add(this.getBalance().subtract(unweightedBalance));
