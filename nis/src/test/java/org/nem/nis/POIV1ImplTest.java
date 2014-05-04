@@ -66,6 +66,7 @@ public class POIV1ImplTest {
 		d.addOutlink(new AccountLink(100, a));
 
 		// Act: calculate importances
+		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// Assert:
 		// G > E > F >> A > others

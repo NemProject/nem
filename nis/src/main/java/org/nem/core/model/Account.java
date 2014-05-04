@@ -249,6 +249,20 @@ public class Account implements SerializableEntity {
 	}
 	
 	/**
+	 * @param acctLink - an outlink to add
+	 */
+	public void addHistoricalOutlink(final BlockHeight height, AccountLink acctLink) {
+		historicalOutlinks.add(height, acctLink);
+	}
+	
+	/**
+	 * @param acctLink - an outlink to remove
+	 */
+	public void removeHistoricalOutlink(final BlockHeight height, AccountLink acctLink) {
+		historicalOutlinks.remove(height, acctLink);
+	}
+	
+	/**
 	 * @return the outlinks
 	 */
 	public List<AccountLink> getOutlinks() {
