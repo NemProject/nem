@@ -134,26 +134,25 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = createSenderWithAmount(100);
 		final Account recipient = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
+		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant txTime = systemTimeProvider.getCurrentTime();
 		Transaction temp;
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
-		temp = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(8));
-		temp.setDeadline(txTime.addSeconds(-2));
+		transactions.add(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7)));
+		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(8));
+		temp.setDeadline(currentTime.addSeconds(-2));
 		transactions.add(temp);
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
-		temp = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(10));
-		temp.setDeadline(txTime.addHours(-3));
+		transactions.add(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(9)));
+		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(10));
+		temp.setDeadline(currentTime.addHours(-3));
 		transactions.add(temp);
-		temp = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(11));
-		temp.setDeadline(txTime.addSeconds(1));
+		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(11));
+		temp.setDeadline(currentTime.addSeconds(1));
 		transactions.add(temp);
 
 
-		transactions.dropExpiredTransactions(txTime);
-		final List<Transaction> transactionList = transactions.getTransactionsBefore(txTime.addSeconds(1));
+		transactions.dropExpiredTransactions(currentTime);
+		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
 
 		// Assert:
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(3));
@@ -183,7 +182,6 @@ public class UnconfirmedTransactionsTest {
 	//endregion
 
 	//region getTransactionsBefore
-
 	@Test
 	public void getTransactionsBeforeReturnsAllTransactionsBeforeTheSpecifiedTime() {
 		// Arrange:
@@ -212,6 +210,32 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactionsBefore2.size(), IsEqual.equalTo(3));
 	}
 
+	@Test
+	public void filteringOutConflictingTransactions() {
+		// Arrange:
+		final Account sender = createSenderWithAmount(100);
+		final Account recipient = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
+		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
+
+		// Act:
+		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
+		transactions.add(first);
+		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));
+		second.setFee(Amount.fromNem(1));
+		transactions.add(second);
+
+		transactions.dropExpiredTransactions(currentTime);
+		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
+		final List<Transaction> filtered = transactions.removeConflictingTransactions(transactionList);
+
+		// Assert:
+		Assert.assertThat(transactionList.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transactionList.get(0), IsEqual.equalTo(second));
+		Assert.assertThat(transactionList.get(1), IsEqual.equalTo(first));
+		Assert.assertThat(filtered.size(), IsEqual.equalTo(1));
+		Assert.assertThat(filtered.get(0), IsEqual.equalTo(first));
+	}
 	//endregion
 
 	//region removeAll

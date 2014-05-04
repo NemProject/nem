@@ -129,17 +129,8 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	/**
-	 * Gets all transactions before the specified time.
-	 *
-	 * @param time The specified time.
-	 * @return All transactions before the specified time.
-	 */
-	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions =  this.transactions.values().stream()
-				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-				.collect(Collectors.toList());
 
+	private List<Transaction> sortTransactions(List<Transaction> transactions) {
 		Collections.sort(transactions, (lhs, rhs) -> {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
 			// maybe we should change Transaction.compare? also it
@@ -152,6 +143,50 @@ public class UnconfirmedTransactions {
 		});
 
 		return transactions;
+	}
+
+	/**
+	 * Gets all transactions before the specified time.
+	 *
+	 * @param time The specified time.
+	 * @return All transactions before the specified time.
+	 */
+	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.collect(Collectors.toList());
+
+		return sortTransactions(transactions);
+	}
+
+	/**
+	 * Gets all transactions.
+	 * @return All transaction from this unconfirmed transactions.
+	 */
+	public List<Transaction> getAll() {
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.collect(Collectors.toList());
+
+		return sortTransactions(transactions);
+	}
+
+
+	/**
+	 * There might be conflicting transactions on the list of unconfirmed transactions.
+	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.
+	 * Currently conflicting transactions are NOT removed from main list of unconfirmed transactions.
+	 *
+	 * @param unconfirmedTransactions sorted list of unconfirmed transactions.
+	 * @return filtered out list of unconfirmed transactions.
+	 */
+	public List<Transaction> removeConflictingTransactions(List<Transaction> unconfirmedTransactions) {
+		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions();
+
+		// TODO: should we remove those that .add() failed?
+		unconfirmedTransactions.stream()
+				.forEach(tx -> filteredTxes.add(tx));
+
+		return filteredTxes.getAll();
 	}
 
 	/**

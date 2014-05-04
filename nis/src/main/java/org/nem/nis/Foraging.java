@@ -116,7 +116,9 @@ public class Foraging  {
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
-		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
+		return this.unconfirmedTransactions.removeConflictingTransactions(
+				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
+		);
 	}
 
 	/**
@@ -136,7 +138,6 @@ public class Foraging  {
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		unconfirmedTransactions.dropExpiredTransactions(blockTime);
-
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {
