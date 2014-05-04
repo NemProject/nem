@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.test.MockAccount;
 
 import java.util.*;
 
@@ -22,26 +23,22 @@ public class PoiAccountInfoTest {
 
 	@Test
 	public void foragingRequiresPositiveBalanceAndPositiveCoinDays() {
-		// Arrange
-		final BlockHeight height = new BlockHeight(21);
-
 		// Assert:
-		Assert.assertThat(createAccountInfo(0, 0).canForage(height), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfo(0, 1).canForage(height), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfo(1, 0).canForage(height), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfo(1, 1).canForage(height), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(0, 0), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(0, 1), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(1, 0), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(1, 1), IsEqual.equalTo(true));
 	}
 
-	private static PoiAccountInfo createAccountInfo(int balance, int coinDays) {
-		final Account account = Utils.generateRandomAccount();
+	private static boolean canForage(int balance, int coinDays) {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(33);
+		final MockAccount account = new MockAccount();
 		account.incrementBalance(Amount.fromNem(balance));
+		account.setCoinDaysAt(Amount.fromNem(coinDays), height);
 
-		// TODO: how can I set coin days?
-		final AccountLink accountLink = new AccountLink();
-//		account.setOutlinks();
-//		account.getCoinDays().addCoinDay(new CoinDay(new BlockHeight(1200), Amount.fromNem(coinDays)));
-//	 account.getCoinDays(.
-		return new PoiAccountInfo(11, account);
+		// Act:
+		return new PoiAccountInfo(11, account).canForage(height);
 	}
 
 	@Test

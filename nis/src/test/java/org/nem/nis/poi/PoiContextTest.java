@@ -1,21 +1,13 @@
-
-
-
 package org.nem.nis.poi;
 
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.Account;
-import org.nem.core.model.AccountLink;
-import org.nem.core.model.Amount;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.core.test.Utils;
+import org.nem.nis.test.MockAccount;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PoiContextTest {
 
@@ -122,25 +114,6 @@ public class PoiContextTest {
 		}
 	}
 
-	// TODO: we need a better way to set coin days
-	private static class MockAccount extends Account {
-
-		private final Map<BlockHeight, Amount> heightToCoinDaysMap;
-
-		public MockAccount(){
-			super(Utils.generateRandomAddress());
-			this.heightToCoinDaysMap = new HashMap<>();
-		}
-
-		private void setCoinDaysAt(final Amount coinDays, final BlockHeight blockHeight) {
-			this.heightToCoinDaysMap.put(blockHeight, coinDays);
-		}
-
-		@Override
-		public Amount getCoinDayWeightedBalance(final BlockHeight blockHeight) {
-			return this.heightToCoinDaysMap.getOrDefault(blockHeight, null);
-		}
-	}
 //
 //	// TODO: move to somewhere more general, maybe ColumnVector
 //	private static ColumnVector round(final ColumnVector vector, int numPlaces) {
