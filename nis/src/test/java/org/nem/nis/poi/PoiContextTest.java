@@ -71,9 +71,8 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) accounts without out-links are dangling
-		// TODO: test is failing because column vectors need to be rounded
 		Assert.assertThat(
-				context.getInverseTeleportationVector(),
+				context.getInverseTeleportationVector().roundTo(5),
 				IsEqual.equalTo(new ColumnVector(0.3000, 0.0500, 0.2375, 0.1750, 0.1125, 0.3000)));
 	}
 

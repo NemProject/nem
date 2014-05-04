@@ -411,6 +411,23 @@ public class ColumnVectorTest {
 
 	//endregion
 
+	//region roundTo
+
+	@Test
+	public void vectorCanBeRounded() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(0.00024452, -0.123, 0.577);
+
+		// Act:
+		final ColumnVector result = vector.roundTo(2);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(0.00, -0.12, 0.58)));
+	}
+
+	//endregion
+
 	//region clone
 
 	@Test

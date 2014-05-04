@@ -234,6 +234,22 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
+	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
+	 *
+	 * @param numPlaces The number of places to round.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector roundTo(final int numPlaces) {
+		double multipler = Math.pow(10, numPlaces);
+		final ColumnVector result = new ColumnVector(this.size);
+		for (int i = 0; i < this.size; ++i)
+			result.vector[i] = Math.round(this.vector[i] * multipler) / multipler;
+
+		return result;
+	}
+
+	/**
 	 * Creates a new ColumnVector by multiplying this vector by a matrix.
 	 *
 	 * @param matrix The matrix.
