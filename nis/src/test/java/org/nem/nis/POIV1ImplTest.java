@@ -51,11 +51,19 @@ public class POIV1ImplTest {
 		Account f = createAccountWithBalance(400);
 		Account g = createAccountWithBalance(400);
 
-		// A sends all 400 NEM to B
-		a.addOutlink(new AccountLink(100, b));
+		//TODO: we really need the infrastructure for adding coinday-weighted links and updating balances
+		//Account.subtractHistoricalBalance() seems to be the correct place for this.
+		// A sends all 400 NEM to B,
+		a.addOutlink(new AccountLink(400, b));
 		
-		//, who sends 300 NEM to C, who sends 200 NEM
-		// to D, who sends 100 to A.
+		//who sends 300 NEM to C,
+		b.addOutlink(new AccountLink(300, c));
+		
+		//who sends 200 NEM to D,
+		c.addOutlink(new AccountLink(200, d));
+				
+		// who sends 100 to A.
+		d.addOutlink(new AccountLink(100, a));
 
 		// Act: calculate importances
 
