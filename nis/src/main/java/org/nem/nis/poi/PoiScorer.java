@@ -47,10 +47,15 @@ public class PoiScorer {
 		final double scale = maxImportance * maxOutLink * maxCoinDays;
 
 		final ColumnVector finalScoreVector = importanceVector
-				.multiplyElementWise(outLinkVector)
+				.multiplyElementWise(outLinkVector) 
+				// TODO: in the latest Python prototype, I added outLinkVector instead of multiplying, 
+				// because I was concerned that otherwise people could boost their importance too easily.
+				// Weighting by CoinDays should make this safe enough, though, and multiplying will make the 
+				// importance more fair to people with less NEM.
+				// TODO: write unit tests to study the effect of adding outLinkVector vs. multiplying here.
 				.multiplyElementWise(coinDaysVector);
 
-		finalScoreVector.scale(scale);
+		finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
 		return finalScoreVector;
 	}
 }

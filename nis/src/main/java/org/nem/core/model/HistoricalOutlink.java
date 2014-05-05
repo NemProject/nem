@@ -3,7 +3,7 @@ package org.nem.core.model;
 import java.util.ArrayList;
 
 /**
- *
+ *TODO: still trying to decide if this class is needed
  */
 public class HistoricalOutlink implements Comparable<HistoricalOutlink> {
 	private final BlockHeight height;

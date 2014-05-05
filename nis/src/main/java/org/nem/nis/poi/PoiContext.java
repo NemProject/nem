@@ -156,6 +156,7 @@ public class PoiContext {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
+				// TODO: I would recommend playing around with this after we get POI working initially
 				//	 if (!accountInfo.canForage())
 				//	 continue;
 
@@ -166,6 +167,7 @@ public class PoiContext {
 				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
 
 				// initially set importance to account balance
+				//TODO: wouldn't the coinday-weighted balance be better here?
 				this.importanceVector.setAt(i, account.getBalance().getNumNem());
 
 				if (!accountInfo.hasOutLinks()) {
@@ -191,6 +193,8 @@ public class PoiContext {
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
 				for (int j = 0; j < outLinkWeights.getSize(); ++j) {
 					// TODO: using a hash-map for this will be slow
+					// TODO: true, a hashMap should be slow, but I was concerned about using Matrix 
+					// here because this should be a very sparse matrix. We can optimize later, though.
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
 					outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
@@ -211,6 +215,7 @@ public class PoiContext {
 			final int numAccounts = importanceVector.getSize();
 
 			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
+			// TODO: After POI is up and running, we should try pruning accounts that can't forage
 
 			// Assign a value between .7 and .95 based on the amount of NEM in an account
 			// It seems that more NEM = higher teleportation seems to work better

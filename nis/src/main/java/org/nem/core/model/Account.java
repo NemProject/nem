@@ -271,7 +271,7 @@ public class Account implements SerializableEntity {
 
 	/**
 	 * @param outlinks the outlinks to set
-	 *TODO: should probably be addOutlink
+	 * TODO: should probably have addOutlink
 	 */
 	public void setOutlinks(List<AccountLink> outlinks) {
 		this.outlinks = outlinks;
@@ -299,7 +299,7 @@ public class Account implements SerializableEntity {
 		coinDayBalance = coinDayBalance.add(this.getBalance().subtract(unweightedBalance));
 		
 		if (coinDayBalance.compareTo(this.getBalance()) < 0) {
-			coinDayBalance = this.getBalance(); //XXX:or should we throw an exception?
+			coinDayBalance = this.getBalance(); // TODO: XXX:or should we throw an exception?
 			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
 		}
 		
