@@ -28,10 +28,17 @@ public class CoinDaysTest {
 	@Test
 	public void canSubtractCoinDay() {
 		// Arrange:
+		BlockHeight height = BlockHeight.ONE;
+		Amount amount = new Amount(1337);
 		final CoinDays coindays = new CoinDays();
+		coindays.addCoinDay(new CoinDay(height, amount));
 		
 		// Act:
-		
+		coindays.subtractCoinDay(new CoinDay(height, new Amount(7)));
+
 		// Assert:
+		Assert.assertThat(coindays.getCoinDayWeightedBalance(height).getUnweightedAmount(), IsEqual.equalTo(new Amount(0)));
+		Assert.assertThat(coindays.getCoinDayWeightedBalance(height).getWeightedAmount(), IsEqual.equalTo(new Amount(1337)));
 	}
+	
 }

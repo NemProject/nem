@@ -16,14 +16,14 @@ public class CoinDays {
 	private List<CoinDay> coindays = new ArrayList<CoinDay>();
 
 	/**
-	 * Add a new historical balance to the coindays.
-	 * This method automatically groups coindays into 1440 block spans.
+	 * Add a new coinday to the coindays.
+	 * This method automatically groups coindays into BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY block spans.
 	 */
 	public void addCoinDay(CoinDay coinDay) {
 
 		if (coinDay == null || coinDay.getBalance() == null) {
 			throw new IllegalArgumentException(
-					"CoinDayis null or contains a null amount.");
+					"Input CoinDay is null or contains a null amount.");
 		}
 
 		if (coindays == null || coindays.size() < 1) {
@@ -39,6 +39,30 @@ public class CoinDays {
 			} else {
 				coindays.add(coinDay);
 			}
+		}
+	}
+	
+	/**
+	 * Subtract a new coinday from the coindays.
+	 * This method automatically groups coindays into BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY block spans.
+	 */
+	public void subtractCoinDay(CoinDay coinDay) {
+
+		if (coinDay == null || coinDay.getBalance() == null) {
+			throw new IllegalArgumentException(
+					"Input CoinDay is null or contains a null amount.");
+		}
+
+		if (coindays == null || coindays.size() < 1) {
+			return; // Our coinDays list is empty and so we can't subtract anything
+			
+		} else {
+			int insertionIndex = findClosestCoinDayBucket(coinDay); // find the closest index
+			
+			// Subtract the Amount to the closest coinday
+			if (insertionIndex >= 0) {
+				coindays.get(insertionIndex).subtract(coinDay.getBalance());
+			} // Else there is nothing to do if we can't find a bucket to subtract from
 		}
 	}
 
