@@ -44,6 +44,37 @@ public class MatrixTest {
 		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(1.0));
 		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(9.0));
 	}
+	
+	@Test
+	public void matrixValuesCanBeIncremented() {
+		// Arrange:
+		final Matrix matrix = new Matrix(3, 2);
+		
+		// Set some initial values
+		matrix.setAt(0, 0, 7);
+		matrix.setAt(0, 1, 3);
+		matrix.setAt(1, 0, 5);
+		matrix.setAt(1, 1, 11);
+		matrix.setAt(2, 0, 1);
+		matrix.setAt(2, 1, 9);
+
+		// Act:
+		// Increment values
+		matrix.setAt(0, 0, 1);
+		matrix.setAt(0, 1, 2);
+		matrix.setAt(1, 0, 3);
+		matrix.setAt(1, 1, 4);
+		matrix.setAt(2, 0, 5);
+		matrix.setAt(2, 1, 6);
+
+		// Assert:
+		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(8.0));
+		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0));
+		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(8.0));
+		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(15.0));
+		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(6.0));
+		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(15.0));
+	}
 
 	@Test
 	public void matrixGetCannotBeIndexedOutOfBounds() {

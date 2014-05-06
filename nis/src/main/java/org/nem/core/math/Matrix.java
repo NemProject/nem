@@ -67,6 +67,17 @@ public class Matrix {
 	public void setAt(final int row, final int col, final double val) {
 		this.columns[col].setAt(row, val);
 	}
+	
+	/**
+	 * Increments a value at the specified row and column by the given val.
+	 * 
+	 * @param row The row.
+	 * @param col The column.
+	 * @param val The value to increment by.
+	 */
+	public void incrementAt(final int row, final int col, final double val) {
+		this.columns[col].setAt(row, this.columns[col].getAt(row) + val);
+	}
 
 	/**
 	 * Transposes this matrix.

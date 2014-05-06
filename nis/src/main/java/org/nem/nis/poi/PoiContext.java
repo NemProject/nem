@@ -197,7 +197,8 @@ public class PoiContext {
 					// here because this should be a very sparse matrix. We can optimize later, though.
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
-					outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkMatrix.getAt(rowIndex, accountInfo.getIndex()) + outLinkWeights.getAt(j));
+					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+//					outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkMatrix.getAt(rowIndex, accountInfo.getIndex()) + outLinkWeights.getAt(j));
 				}
 			}
 
