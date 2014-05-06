@@ -108,6 +108,7 @@ public class CoinDays {
 	
 	/**
 	 * Method for finding the closest bucket of coindays (1440 blocks), if it exists in <code>coinDays</code>.
+	 * TODO: keep this.coinDays sorted and use binary search.
 	 * 
 	 * @param input - CoinDay we are trying to find a bucket for 
 	 * @return the index in <code>coinDays</code> of the closest coinday, -1 otherwise.
@@ -119,7 +120,7 @@ public class CoinDays {
 		BlockHeight inputBlockHeight = input.getHeight();
 
 		for (int coinDayNdx = 0; coinDayNdx < this.coindays.size(); coinDayNdx++) {
-			CoinDay currCoinDay = coindays.get(coinDayNdx);
+			CoinDay currCoinDay = this.coindays.get(coinDayNdx);
 			
 			long blockHeightDiff = Math.abs(currCoinDay.getHeight().subtract(inputBlockHeight));
 			if (blockHeightDiff > closestCoinDay && closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
