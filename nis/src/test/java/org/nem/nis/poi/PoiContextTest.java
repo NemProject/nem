@@ -34,8 +34,8 @@ public class PoiContextTest {
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
-				context.getOutLinkScoreVector(),
-				IsEqual.equalTo(new ColumnVector(1, 0, 3, 0, 5, 2)));
+				context.getOutLinkScoreVector().roundTo(5),
+				IsEqual.equalTo(new ColumnVector(1.0, 0.0, 0.6, 0.0, 0.5, 1.0)));
 	}
 
 	@Test
@@ -106,10 +106,10 @@ public class PoiContextTest {
 		// Arrange: create 4 accounts
 		final int umInNem = Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(umInNem, umInNem, 0),
-				new TestAccountInfo(umInNem, umInNem, 0),
-				new TestAccountInfo(umInNem, umInNem, 0),
-				new TestAccountInfo(umInNem, umInNem, 0));
+				new TestAccountInfo(umInNem, umInNem, null),
+				new TestAccountInfo(umInNem, umInNem, null),
+				new TestAccountInfo(umInNem, umInNem, null),
+				new TestAccountInfo(umInNem, umInNem, null));
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
@@ -165,16 +165,16 @@ public class PoiContextTest {
 			account.incrementBalance(Amount.fromMicroNem(info.balance));
 			account.setCoinDaysAt(Amount.fromMicroNem(info.coinDays), height);
 
-			if (0 != info.outLinkStrength) {
+			final List<AccountLink> outLinks = new ArrayList<>();
+			for (final int strength : info.outLinkStrengths) {
 				// TODO: addOutLinks probably makes more sense
-				final List<AccountLink> outLinks = new ArrayList<>();
 				final AccountLink link = new AccountLink();
-				link.setStrength(info.outLinkStrength);
+				link.setStrength(strength);
 				link.setOtherAccount(account);
 				outLinks.add(link);
-				account.setOutlinks(outLinks);
 			}
 
+			account.setOutlinks(outLinks);
 			accounts.add(account);
 		}
 
@@ -184,12 +184,12 @@ public class PoiContextTest {
 	private static PoiContext createTestPoiContext() {
 		final int umInNem = Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		1),
-				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		0),
-				new TestAccountInfo(5, 					umInNem,			3),
-				new TestAccountInfo(umInNem,			3 * umInNem - 1,	0),
-				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	5),
-				new TestAccountInfo(4 * umInNem,		5,					2));
+				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		new int[] { 1 }), // 1 * 1
+				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		null),
+				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2, 7 }), // .2 * 3
+				new TestAccountInfo(umInNem,			3 * umInNem - 1,	null),
+				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // .1 * 5
+				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7, 3 })); // .5 * 2
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
@@ -200,12 +200,12 @@ public class PoiContextTest {
 
 		public final int coinDays;
 		public final int balance;
-		public final int outLinkStrength;
+		public final int[] outLinkStrengths;
 
-		public TestAccountInfo(int coinDays, int balance, int outLinkStrength) {
+		public TestAccountInfo(int coinDays, int balance, int[] outLinkStrengths) {
 			this.coinDays = coinDays;
 			this.balance = balance;
-			this.outLinkStrength = outLinkStrength;
+			this.outLinkStrengths = null == outLinkStrengths ? new int[] { } : outLinkStrengths;
 		}
 	}
 }
