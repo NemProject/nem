@@ -183,7 +183,7 @@ public class PoiContext {
 		}
 
 		private Matrix createOutLinkMatrix() {
-			final int numAccounts = this.importanceVector.getSize();
+			final int numAccounts = this.importanceVector.size();
 			final Matrix outLinkMatrix = new Matrix(numAccounts, numAccounts);
 			for (final PoiAccountInfo accountInfo : accountInfos) {
 
@@ -191,7 +191,7 @@ public class PoiContext {
 					continue;
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
-				for (int j = 0; j < outLinkWeights.getSize(); ++j) {
+				for (int j = 0; j < outLinkWeights.size(); ++j) {
 					// TODO: using a hash-map for this will be slow
 					// TODO: true, a hashMap would be slow, but I was concerned about using Matrix 
 					// here because this should be a very sparse matrix. We can optimize later, though.
@@ -212,7 +212,7 @@ public class PoiContext {
 
 		public TeleportationBuilder(final ColumnVector importanceVector) {
 			// (1) build the teleportation vector
-			final int numAccounts = importanceVector.getSize();
+			final int numAccounts = importanceVector.size();
 
 			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
 			// TODO: After POI is up and running, we should try pruning accounts that can't forage
@@ -223,7 +223,7 @@ public class PoiContext {
 			final double maxImportance = importanceVector.max();
 
 			// calculate teleportation probabilities based on normalized amount of NEM owned
-			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
+			final ColumnVector minProbVector = new ColumnVector(importanceVector.size());
 			minProbVector.setAll(MIN_TELEPORTATION_PROB);
 
 			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;

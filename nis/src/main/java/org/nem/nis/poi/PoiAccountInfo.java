@@ -103,6 +103,6 @@ public class PoiAccountInfo {
 		final double weightsMedian = this.outLinkWeightsVector.median();
 //		return weightsMedian * this.weightsSum;
 		//TODO was median*outDegree in the Python prototype. We can also add a term representing the outlink sum if it is needed. That could be a good idea.
-		return weightsMedian * this.outLinkWeightsVector.getSize();
+		return weightsMedian * this.outLinkWeightsVector.size();
 	}
 }

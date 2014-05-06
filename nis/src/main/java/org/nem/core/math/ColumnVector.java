@@ -46,7 +46,7 @@ public class ColumnVector implements Cloneable {
 	 *
 	 * @return The size of the vector.
 	 */
-	public int getSize() { //TODO: can we change this to just be size() ?
+	public int size() {
 		return this.size;
 	}
 
@@ -232,7 +232,7 @@ public class ColumnVector implements Cloneable {
 
 		return result;
 	}
-	
+
 	/**
 	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
 	 *

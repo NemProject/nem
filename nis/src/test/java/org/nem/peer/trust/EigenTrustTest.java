@@ -59,7 +59,7 @@ public class EigenTrustTest {
 
 		// Assert:
 		Assert.assertThat(sum.get(), IsEqual.equalTo(3.0));
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(5));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(5));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(1.0 / 3)); // pre-trusted
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.0));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
@@ -88,7 +88,7 @@ public class EigenTrustTest {
 
 		// Assert:
 		Assert.assertThat(sum.get(), IsEqual.equalTo(32.0));
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(5));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(5));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(2.0 / 32)); // pre-trusted
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(4.0 / 32));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(9.0 / 32));
