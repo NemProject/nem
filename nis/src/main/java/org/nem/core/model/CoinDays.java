@@ -25,29 +25,17 @@ public class CoinDays {
 			throw new IllegalArgumentException(
 					"CoinDayis null or contains a null amount.");
 		}
-		
-		BlockHeight addingBlockHeight = coinDay.getHeight();
 
 		if (coindays == null || coindays.size() < 1) {
 			coindays = new ArrayList<CoinDay>();
 			coindays.add(coinDay);
 			
 		} else {
-			int closestCoinDayIndex = -1;
-			long closestCoinDay = Long.MAX_VALUE;
-
-			for (int coinDayNdx = 0; coinDayNdx < this.coindays.size(); coinDayNdx++) {
-				CoinDay currCoinDay = coindays.get(coinDayNdx);
-				
-				long blockHeightDiff = Math.abs(currCoinDay.getHeight().subtract(addingBlockHeight));
-				if (blockHeightDiff > closestCoinDay) {
-					closestCoinDayIndex = coinDayNdx;
-				}
-			}
+			int insertionIndex = findClosestCoinDayBucket(coinDay); // find the closest index
 			
-			//Add the Amount to the closest coinday, if it is within 1440 blocks.
-			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
-				coindays.get(closestCoinDayIndex).add(coinDay.getBalance());
+			// Add the Amount to the closest coinday
+			if (insertionIndex >= 0) {
+				coindays.get(insertionIndex).add(coinDay.getBalance());
 			} else {
 				coindays.add(coinDay);
 			}
@@ -92,5 +80,29 @@ public class CoinDays {
 	 */
 	public int size() {
 		return coindays.size();
+	}
+	
+	/**
+	 * Method for finding the closest bucket of coindays (1440 blocks), if it exists in <code>coinDays</code>.
+	 * 
+	 * @param input - CoinDay we are trying to find a bucket for 
+	 * @return the index in <code>coinDays</code> of the closest coinday, -1 otherwise.
+	 */
+	private int findClosestCoinDayBucket(CoinDay input) {
+		int closestCoinDayIndex = -1;
+		long closestCoinDay = Long.MAX_VALUE;
+		
+		BlockHeight inputBlockHeight = input.getHeight();
+
+		for (int coinDayNdx = 0; coinDayNdx < this.coindays.size(); coinDayNdx++) {
+			CoinDay currCoinDay = coindays.get(coinDayNdx);
+			
+			long blockHeightDiff = Math.abs(currCoinDay.getHeight().subtract(inputBlockHeight));
+			if (blockHeightDiff > closestCoinDay && closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+				closestCoinDayIndex = coinDayNdx;
+			}
+		}
+		
+		return closestCoinDayIndex;
 	}
 }

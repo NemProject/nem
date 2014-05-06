@@ -11,7 +11,7 @@ import org.junit.Test;
  */
 public class CoinDaysTest {
 	@Test
-	public void canAddHistoricalBalance() {
+	public void canAddCoinDay() {
 		// Arrange:
 		final CoinDays coindays = new CoinDays();
 		BlockHeight height = BlockHeight.ONE;
@@ -26,7 +26,7 @@ public class CoinDaysTest {
 	}
 	
 	@Test
-	public void canSubtractHistoricalBalance() {
+	public void canSubtractCoinDay() {
 		// Arrange:
 		final CoinDays coindays = new CoinDays();
 		
