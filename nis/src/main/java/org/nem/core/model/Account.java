@@ -298,7 +298,7 @@ public class Account implements SerializableEntity {
 		//Assume any remaining balance has the full weight
 		coinDayBalance = coinDayBalance.add(this.getBalance().subtract(unweightedBalance));
 		
-		if (coinDayBalance.compareTo(this.getBalance()) < 0) {
+		if (coinDayBalance.compareTo(this.getBalance()) > 0) {
 			coinDayBalance = this.getBalance(); // TODO: XXX:or should we throw an exception?
 			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
 		}
