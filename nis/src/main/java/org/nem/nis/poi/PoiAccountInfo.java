@@ -43,7 +43,7 @@ public class PoiAccountInfo {
 			weightsSum += strength;
 		}
 
-		this.outLinkWeightsVector.normalize();
+		//this.outLinkWeightsVector.normalize();
 		this.weightsSum = weightsSum;
 	}
 

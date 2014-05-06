@@ -197,11 +197,13 @@ public class PoiContext {
 					// here because this should be a very sparse matrix. We can optimize later, though.
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
-					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+					//outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+					outLinkMatrix.incrementAt(accountInfo.getIndex(), rowIndex, outLinkWeights.getAt(j));
 				}
 			}
+			outLinkMatrix.normalizeColumns();
 
-			return outLinkMatrix;
+			return outLinkMatrix.transpose();
 		}
 	}
 
@@ -211,34 +213,41 @@ public class PoiContext {
 		private final ColumnVector inverseTeleportationVector;
 
 		public TeleportationBuilder(final ColumnVector importanceVector) {
-			// (1) build the teleportation vector
-			final int numAccounts = importanceVector.getSize();
+//			// (1) build the teleportation vector
+//			final int numAccounts = importanceVector.getSize();
+//
+//			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
+//			// TODO: After POI is up and running, we should try pruning accounts that can't forage
+//
+//			// Assign a value between .7 and .95 based on the amount of NEM in an account
+//			// It seems that more NEM = higher teleportation seems to work better
+//			// NOTE: at this point the importance vector contains normalized account balances
+//			final double maxImportance = importanceVector.max();
+//
+//			// calculate teleportation probabilities based on normalized amount of NEM owned
+//			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
+//			minProbVector.setAll(MIN_TELEPORTATION_PROB);
+//
+//			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
+//			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
+//
+//			// (2) build the inverse teleportation vector: 1 - V(teleportation)
+//			final ColumnVector onesVector = new ColumnVector(numAccounts);
+//			onesVector.setAll(1.0);
+//			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+//			
+//			// (3) Normalize by the number of accounts (1/N)
+//			final double numAccountNorm =  1d / numAccounts;
+//			
+//			this.teleportationVector.multiply(numAccountNorm);
+//			this.inverseTeleportationVector.multiply(numAccountNorm);
 
-			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
-			// TODO: After POI is up and running, we should try pruning accounts that can't forage
-
-			// Assign a value between .7 and .95 based on the amount of NEM in an account
-			// It seems that more NEM = higher teleportation seems to work better
-			// NOTE: at this point the importance vector contains normalized account balances
-			final double maxImportance = importanceVector.max();
-
-			// calculate teleportation probabilities based on normalized amount of NEM owned
-			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
-			minProbVector.setAll(MIN_TELEPORTATION_PROB);
-
-			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
-			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
-
-			// (2) build the inverse teleportation vector: 1 - V(teleportation)
-			final ColumnVector onesVector = new ColumnVector(numAccounts);
+			ColumnVector vector = new ColumnVector(importanceVector.getSize());
+			vector.setAll(MIN_TELEPORTATION_PROB);
+			this.teleportationVector = vector;
+			final ColumnVector onesVector = new ColumnVector(importanceVector.getSize());
 			onesVector.setAll(1.0);
 			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
-			
-			// (3) Normalize by the number of accounts (1/N)
-			final double numAccountNorm =  1d / numAccounts;
-			
-			this.teleportationVector.multiply(numAccountNorm);
-			this.inverseTeleportationVector.multiply(numAccountNorm);
 		}
 	}
 }
