@@ -66,6 +66,9 @@ public class MatrixTest {
 		matrix.setAt(1, 1, 4);
 		matrix.setAt(2, 0, 5);
 		matrix.setAt(2, 1, 6);
+		
+		// Double increment
+		matrix.setAt(2, 1, 6);
 
 		// Assert:
 		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(8.0));
@@ -73,7 +76,7 @@ public class MatrixTest {
 		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(8.0));
 		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(15.0));
 		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(6.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(15.0));
+		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(21.0));
 	}
 
 	@Test

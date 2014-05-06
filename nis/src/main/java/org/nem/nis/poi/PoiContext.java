@@ -193,12 +193,11 @@ public class PoiContext {
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
 				for (int j = 0; j < outLinkWeights.getSize(); ++j) {
 					// TODO: using a hash-map for this will be slow
-					// TODO: true, a hashMap should be slow, but I was concerned about using Matrix 
+					// TODO: true, a hashMap would be slow, but I was concerned about using Matrix 
 					// here because this should be a very sparse matrix. We can optimize later, though.
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
 					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
-//					outLinkMatrix.setAt(rowIndex, accountInfo.getIndex(), outLinkMatrix.getAt(rowIndex, accountInfo.getIndex()) + outLinkWeights.getAt(j));
 				}
 			}
 

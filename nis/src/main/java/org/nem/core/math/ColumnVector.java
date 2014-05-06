@@ -46,7 +46,7 @@ public class ColumnVector implements Cloneable {
 	 *
 	 * @return The size of the vector.
 	 */
-	public int getSize() {
+	public int getSize() { //TODO: can we change this to just be size() ?
 		return this.size;
 	}
 
