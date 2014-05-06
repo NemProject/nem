@@ -233,6 +233,10 @@ public class PoiContext {
 			final ColumnVector onesVector = new ColumnVector(numAccounts);
 			onesVector.setAll(1.0);
 			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+			
+			// (3) Normalize by the number of accounts (1/N)
+			this.teleportationVector.multiply(1d / numAccounts);
+			this.inverseTeleportationVector.multiply(1d / numAccounts);
 		}
 	}
 }

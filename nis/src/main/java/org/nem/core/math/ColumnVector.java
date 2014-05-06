@@ -232,7 +232,7 @@ public class ColumnVector implements Cloneable {
 
 		return result;
 	}
-
+	
 	/**
 	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
 	 *

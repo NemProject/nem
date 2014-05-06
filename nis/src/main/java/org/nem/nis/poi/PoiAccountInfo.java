@@ -78,7 +78,7 @@ public class PoiAccountInfo {
 	 * @return true if the account has any out-links.
 	 */
 	public boolean hasOutLinks() {
-		final List<?> outLinks = this.account.getOutlinks(); //TODO: not sure I understand the purpose of this final List. Syncronization?
+		final List<?> outLinks = this.account.getOutlinks(); //TODO: not sure I understand the purpose of this final List. I mean, why is it "final"?
 		return null != outLinks && !outLinks.isEmpty();
 	}
 
