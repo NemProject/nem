@@ -124,6 +124,7 @@ public class CoinDays {
 			long blockHeightDiff = Math.abs(currCoinDay.getHeight().subtract(inputBlockHeight));
 			if (blockHeightDiff > closestCoinDay && closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				closestCoinDayIndex = coinDayNdx;
+				closestCoinDay = blockHeightDiff;
 			}
 		}
 		
