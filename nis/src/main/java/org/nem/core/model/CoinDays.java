@@ -13,41 +13,43 @@ public class CoinDays {
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
 
-	private List<HistoricalBalance> historicalBalances = new ArrayList<>();
+	private List<CoinDay> coindays = new ArrayList<CoinDay>();
 
 	/**
 	 * Add a new historical balance to the coindays.
 	 * This method automatically groups coindays into 1440 block spans.
 	 */
-	public void addHistoricalBalance(HistoricalBalance historicalBalance) {
+	public void addCoinDay(CoinDay coinDay) {
 
-		if (historicalBalance == null || historicalBalance.getBalance() == null) {
+		if (coinDay == null || coinDay.getBalance() == null) {
 			throw new IllegalArgumentException(
-					"Coinday is null or contains a null amount.");
+					"CoinDayis null or contains a null amount.");
 		}
 		
-		BlockHeight addingBlockHeight = historicalBalance.getHeight();
+		BlockHeight addingBlockHeight = coinDay.getHeight();
 
-		if (historicalBalances == null || historicalBalances.size() < 1) {
-			historicalBalances = new ArrayList<HistoricalBalance>();
-			historicalBalances.add(historicalBalance);
+		if (coindays == null || coindays.size() < 1) {
+			coindays = new ArrayList<CoinDay>();
+			coindays.add(coinDay);
 			
 		} else {
 			int closestCoinDayIndex = -1;
 			long closestCoinDay = Long.MAX_VALUE;
 
-			for (int coinDayNdx = 0; coinDayNdx < this.historicalBalances.size(); coinDayNdx++) {
-				HistoricalBalance coinDay = historicalBalances.get(coinDayNdx);
+			for (int coinDayNdx = 0; coinDayNdx < this.coindays.size(); coinDayNdx++) {
+				CoinDay currCoinDay = coindays.get(coinDayNdx);
 				
-				long blockHeightDiff = Math.abs(coinDay.getHeight().subtract(addingBlockHeight));
+				long blockHeightDiff = Math.abs(currCoinDay.getHeight().subtract(addingBlockHeight));
 				if (blockHeightDiff > closestCoinDay) {
 					closestCoinDayIndex = coinDayNdx;
 				}
 			}
 			
-			//Add the Amount in historicalBalance to the closest HistoricalBalance, if it is within 1440 blocks.
+			//Add the Amount to the closest coinday, if it is within 1440 blocks.
 			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
-				historicalBalances.get(closestCoinDayIndex).add(historicalBalance.getBalance());
+				coindays.get(closestCoinDayIndex).add(coinDay.getBalance());
+			} else {
+				coindays.add(coinDay);
 			}
 		}
 	}
@@ -61,8 +63,8 @@ public class CoinDays {
 		long coinDayBalance = 0l;
 		long runningBalance = 0l;
 
-		for (HistoricalBalance historicalBalance : historicalBalances) {
-			long blockDiff = blockHeight.subtract(historicalBalance.getHeight());
+		for (CoinDay coinDay: coindays) {
+			long blockDiff = blockHeight.subtract(coinDay.getHeight());
 
 			if (blockDiff < 0 || blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
 				continue; // skip blocks younger than the given blockHeight, 
@@ -75,7 +77,7 @@ public class CoinDays {
 			// TODO: weight this a different way that doesn't require a double 
 			double weight = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
 
-			long currentBalance = historicalBalance.getBalance().getNumMicroNem();
+			long currentBalance = coinDay.getBalance().getNumMicroNem();
 			coinDayBalance += weight * currentBalance;
 			runningBalance += currentBalance;
 		}
@@ -89,6 +91,6 @@ public class CoinDays {
 	 * @return the size of the list
 	 */
 	public int size() {
-		return historicalBalances.size();
+		return coindays.size();
 	}
 }
