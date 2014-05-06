@@ -85,8 +85,8 @@ public class PoiAccountInfoTest {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
 
-		// Assert:
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(3.0));
+		// Assert: (normalized median * num out-links)
+		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(0.75));
 	}
 
 	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {

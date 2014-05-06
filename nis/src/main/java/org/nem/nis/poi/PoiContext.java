@@ -235,8 +235,7 @@ public class PoiContext {
 			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
 			
 			// (3) Normalize by the number of accounts (1/N)
-			final double numAccountNorm =  1d / numAccounts;
-			
+			final double numAccountNorm = 1.0 / numAccounts;
 			this.teleportationVector.multiply(numAccountNorm);
 			this.inverseTeleportationVector.multiply(numAccountNorm);
 		}

@@ -87,7 +87,7 @@ public class Amount extends AbstractPrimitive<Amount> {
 	public long getNumNem() {
 		return this.getValue() / MICRONEMS_IN_NEM;
 	}
-	
+
 	//region inline serialization
 
 	/**
