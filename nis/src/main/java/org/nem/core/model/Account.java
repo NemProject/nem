@@ -285,25 +285,23 @@ public class Account implements SerializableEntity {
 	}
 	
 	/**
-	 * This method applies the <code>coindays</code> to the balance and returns the result.
+	 * This method applies the <code>coindays</code> to the balance at the given blockHeight and returns the result.
 	 * 
-	 * @return
+	 * @return coinday-weighted balance for the given blockheight
 	 */
 	public Amount getCoinDayWeightedBalance(final BlockHeight blockHeight) {
 		
-		final Amount unweightedBalance = coindays.getUnweightedBalance();
-		
-		Amount coinDayBalance = coindays.getCoinDayWeightedBalance(blockHeight);
+		CoinDayAmount coinDayBalance = coindays.getCoinDayWeightedBalance(blockHeight);
 		
 		//Assume any remaining balance has the full weight
-		coinDayBalance = coinDayBalance.add(this.getBalance().subtract(unweightedBalance));
+		coinDayBalance.addWeightedAmount(this.getBalance().subtract(coinDayBalance.getUnweightedAmount()));
 		
-		if (coinDayBalance.compareTo(this.getBalance()) > 0) {
-			coinDayBalance = this.getBalance(); // TODO: XXX:or should we throw an exception?
+		if (coinDayBalance.getWeightedAmount().compareTo(this.getBalance()) > 0) {
+//			coinDayBalance = this.getBalance(); // TODO: XXX:or should we throw an exception?
 			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
 		}
 		
-		return coinDayBalance;
+		return coinDayBalance.getWeightedAmount();
 	}
 	
 	@Override

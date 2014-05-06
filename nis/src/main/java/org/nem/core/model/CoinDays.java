@@ -12,34 +12,32 @@ public class CoinDays {
 	
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
-	private Amount unweightedBalance = Amount.ZERO;
 
-	private List<CoinDay> coinDays = new ArrayList<>();
+	private List<HistoricalBalance> historicalBalances = new ArrayList<>();
 
 	/**
-	 * Add a new coinday to the coindays.
+	 * Add a new historical balance to the coindays.
 	 * This method automatically groups coindays into 1440 block spans.
 	 */
-	public void addCoinDay(CoinDay coinDayToAdd) {
+	public void addHistoricalBalance(HistoricalBalance historicalBalance) {
 
-		if (coinDayToAdd == null || coinDayToAdd.getAmount() == null) {
+		if (historicalBalance == null || historicalBalance.getBalance() == null) {
 			throw new IllegalArgumentException(
 					"Coinday is null or contains a null amount.");
 		}
 		
-		BlockHeight addingBlockHeight = coinDayToAdd.getHeight();
+		BlockHeight addingBlockHeight = historicalBalance.getHeight();
 
-		if (coinDays == null || coinDays.size() < 1) {
-			// ain't got no coindays
-			coinDays = new ArrayList<CoinDay>();
-			coinDays.add(coinDayToAdd);
+		if (historicalBalances == null || historicalBalances.size() < 1) {
+			historicalBalances = new ArrayList<HistoricalBalance>();
+			historicalBalances.add(historicalBalance);
 			
 		} else {
 			int closestCoinDayIndex = -1;
 			long closestCoinDay = Long.MAX_VALUE;
 
-			for (int coinDayNdx = 0; coinDayNdx < this.coinDays.size(); coinDayNdx++) {
-				CoinDay coinDay = coinDays.get(coinDayNdx);
+			for (int coinDayNdx = 0; coinDayNdx < this.historicalBalances.size(); coinDayNdx++) {
+				HistoricalBalance coinDay = historicalBalances.get(coinDayNdx);
 				
 				long blockHeightDiff = Math.abs(coinDay.getHeight().subtract(addingBlockHeight));
 				if (blockHeightDiff > closestCoinDay) {
@@ -47,58 +45,50 @@ public class CoinDays {
 				}
 			}
 			
-			//Add the Amount in coinDayToAdd to the closest CoinDay, if it is within 1440 blocks.
+			//Add the Amount in historicalBalance to the closest HistoricalBalance, if it is within 1440 blocks.
 			if (closestCoinDay <= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY && closestCoinDayIndex >= 0) {
-				coinDays.get(closestCoinDayIndex).addAmount(coinDayToAdd.getAmount());
+				historicalBalances.get(closestCoinDayIndex).add(historicalBalance.getBalance());
 			}
 		}
 	}
 
 	/**
-	 * This method applies the <code>coindays</code> to the balance and returns
-	 * the result.
+	 * This method applies the calculates the weighted balance in historicalBalances for the currentBlockHeight
 	 * 
 	 * @return
 	 */
-	public Amount getCoinDayWeightedBalance(BlockHeight currentBlockHeight) {
-		long coinDayBalance = 0L; // XXX: we might want to cache this in the future
-		long runningBalance = 0;
+	public CoinDayAmount getCoinDayWeightedBalance(BlockHeight blockHeight) {
+		long coinDayBalance = 0l;
+		long runningBalance = 0l;
 
-		for (CoinDay coinDay : coinDays) {
-			long blockDiff = currentBlockHeight.subtract(coinDay.getHeight());
+		for (HistoricalBalance historicalBalance : historicalBalances) {
+			long blockDiff = blockHeight.subtract(historicalBalance.getHeight());
 
-			if (blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
-				continue; // skip blocks younger than MIN_BLOCK_WAIT or over the max number of blocks
-							// considered, then skip it
+			if (blockDiff < 0 || blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
+				continue; // skip blocks younger than the given blockHeight, 
+						  // younger than MIN_BLOCK_WAIT,
+						  // or older than the max number of block considered
 			}
 
 			//We want to lower the weight so that the first MIN_BLOCK_WAIT don't count
 			// TODO: that must be redone, we definitelly don't want to have that double here....
-			double weighting = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
+			// TODO: weight this a different way that doesn't require a double 
+			double weight = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
 
-			long currentBalance = coinDay.getAmount().getNumMicroNem();
-			coinDayBalance += weighting * currentBalance;
+			long currentBalance = historicalBalance.getBalance().getNumMicroNem();
+			coinDayBalance += weight * currentBalance;
 			runningBalance += currentBalance;
 		}
 
-		setUnweightedBalance(runningBalance);
-
-		return Amount.fromMicroNem(coinDayBalance);
+		return new CoinDayAmount(Amount.fromMicroNem(runningBalance), Amount.fromMicroNem(coinDayBalance));
 	}
 
 	/**
-	 * @return the unweightedBalance
+	 * Gets the size of the list
+	 * 
+	 * @return the size of the list
 	 */
-	public Amount getUnweightedBalance() {
-		return unweightedBalance;
+	public int size() {
+		return historicalBalances.size();
 	}
-
-	/**
-	 * @param unweightedBalance
-	 *            the unweightedBalance to set
-	 */
-	private void setUnweightedBalance(long unweightedBalance) {
-		this.unweightedBalance = Amount.fromMicroNem(unweightedBalance);
-	}
-
 }
