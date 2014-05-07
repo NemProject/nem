@@ -1,6 +1,8 @@
 package org.nem.core.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,57 +14,36 @@ public class CoinDays {
 	
 	public static final long MAX_BLOCKS_CONSIDERED = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 100; //100 days
 
-
-	private List<CoinDay> coindays = new ArrayList<CoinDay>();
+	private final List<CoinDay> coindays = new ArrayList<>();
 
 	/**
 	 * Add a new coinday to the coindays.
 	 * This method automatically groups coindays into BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY block spans.
+	 *
+	 * note: this assumes that coindays are added IN ORDER
 	 */
-	public void addCoinDay(CoinDay coinDay) {
+	public void addCoinDay(final CoinDay rawCoinDay) {
+		long h = calculateBucket(rawCoinDay.getHeight());
+		final CoinDay coinDay = new CoinDay(new BlockHeight(h), rawCoinDay.getBalance());
 
-		if (coinDay == null || coinDay.getBalance() == null) {
-			throw new IllegalArgumentException(
-					"Input CoinDay is null or contains a null amount.");
-		}
-
-		if (coindays == null || coindays.size() < 1) {
-			coindays = new ArrayList<CoinDay>();
-			coindays.add(coinDay);
-			
+		int index = Collections.binarySearch(coindays, coinDay);
+		if (index >= 0) {
+			coindays.get(index).add(coinDay.getBalance());
 		} else {
-			int insertionIndex = findClosestCoinDayBucket(coinDay); // find the closest index
-			
-			// Add the Amount to the closest coinday
-			if (insertionIndex >= 0) {
-				coindays.get(insertionIndex).add(coinDay.getBalance());
-			} else {
-				coindays.add(coinDay);
-			}
+			coindays.add(-index-1, coinDay);
 		}
 	}
-	
-	/**
-	 * Subtract a new coinday from the coindays.
-	 * This method automatically groups coindays into BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY block spans.
-	 */
-	public void subtractCoinDay(CoinDay coinDay) {
 
-		if (coinDay == null || coinDay.getBalance() == null) {
-			throw new IllegalArgumentException(
-					"Input CoinDay is null or contains a null amount.");
-		}
+	// "sub" is a wrong name, this will mostly be used in "undoing" so I've temporarily choosen revert
+	public void revertCoinDay(CoinDay rawCoinDay) {
+		long h = calculateBucket(rawCoinDay.getHeight());
+		final CoinDay coinDay = new CoinDay(new BlockHeight(h), rawCoinDay.getBalance());
 
-		if (coindays == null || coindays.size() < 1) {
-			return; // Our coinDays list is empty and so we can't subtract anything
-			
+		int index = Collections.binarySearch(coindays, coinDay);
+		if (index >= 0) {
+			coindays.get(index).subtract(coinDay.getBalance());
 		} else {
-			int insertionIndex = findClosestCoinDayBucket(coinDay); // find the closest index
-			
-			// Subtract the Amount to the closest coinday
-			if (insertionIndex >= 0) {
-				coindays.get(insertionIndex).subtract(coinDay.getBalance());
-			} // Else there is nothing to do if we can't find a bucket to subtract from
+			throw new IllegalArgumentException("Trying to revert unknown coinday");
 		}
 	}
 
@@ -71,30 +52,33 @@ public class CoinDays {
 	 * 
 	 * @return
 	 */
-	public CoinDayAmount getCoinDayWeightedBalance(BlockHeight blockHeight) {
+	public CoinDayAmount getCoinDayWeightedBalance(final BlockHeight blockHeight) {
 		long coinDayBalance = 0l;
-		long runningBalance = 0l;
+		long fullBalance = 0l;
 
-		for (CoinDay coinDay: coindays) {
-			long blockDiff = blockHeight.subtract(coinDay.getHeight());
+		long h = calculateBucket(blockHeight);
+		for (final CoinDay coinDay: coindays) {
+			if (coinDay.getHeight().getRaw() >= h) {
+				break;
+			}
+			long blockDiff =  h - coinDay.getHeight().getRaw();
 
-			if (blockDiff < 0 || blockDiff < MIN_BLOCK_WAIT || blockDiff > MAX_BLOCKS_CONSIDERED) {
-				continue; // skip blocks younger than the given blockHeight, 
-						  // younger than MIN_BLOCK_WAIT,
-						  // or older than the max number of block considered
+			if (blockDiff > MAX_BLOCKS_CONSIDERED) {
+				break;
 			}
 
-			//We want to lower the weight so that the first MIN_BLOCK_WAIT don't count
-			// TODO: that must be redone, we definitelly don't want to have that double here....
-			// TODO: weight this a different way that doesn't require a double 
-			double weight = (1d * blockDiff - MIN_BLOCK_WAIT) / MAX_BLOCKS_CONSIDERED;
+			final long weight = blockDiff / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 			long currentBalance = coinDay.getBalance().getNumMicroNem();
 			coinDayBalance += weight * currentBalance;
-			runningBalance += currentBalance;
+			fullBalance += currentBalance;
 		}
 
-		return new CoinDayAmount(Amount.fromMicroNem(runningBalance), Amount.fromMicroNem(coinDayBalance));
+		return new CoinDayAmount(Amount.fromMicroNem(fullBalance), Amount.fromMicroNem(coinDayBalance / 100));
+	}
+
+	private long calculateBucket(BlockHeight blockHeight) {
+		return  ((blockHeight.getRaw() + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1) / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
 	/**
