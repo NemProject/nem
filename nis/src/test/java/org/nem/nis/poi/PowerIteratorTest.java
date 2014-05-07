@@ -93,7 +93,6 @@ public class PowerIteratorTest {
 			// TODO: this makes sure the vectors are always pointing in the same direction
 			// TODO: but i'm not sure why it's needed
 			// TODO: if removed, the unit tests fail
-			// TODO: Does the power iteration fail to converge in time without align()?
 			updatedVector.align();
 			return updatedVector;
 		}

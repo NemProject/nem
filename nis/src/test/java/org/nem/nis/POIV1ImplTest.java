@@ -26,7 +26,8 @@ import org.nem.nis.test.MockAccount;
  * 
  * some tests we should consider: - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
- * boost score)</br> - infinite loop attack<br/>
+ * boost score)</br> 
+ * - infinite loop attack<br/>
  * - closed loop attack<br/>
  * - small transaction spam attack<br/>
  * -
@@ -92,38 +93,6 @@ public class POIV1ImplTest {
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));// a>b
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(2));// a>c
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(3));// a>d
-	}
-
-	/**
-	 * Super quick
-	 */
-	@Test
-	public void superQuickHowToRunPOIHack() {
-
-		// Arrange:
-		List<Account> accts = getAccountsWithSameBalance(100, 1337);
-
-		// acct 0 sends 100 NEM to acct 2
-
-		// TODO: This is the type of thing we need to do to hook transactions up
-		// into
-		// POI. The "strengths" need to be coinday-weighted, meaning that if you
-		// send 100 NEM to someone, you better have at least 100 coindays in
-		// your account. If not, then some fraction is sent. After sending NEM
-		// to someone, your own coindays need to be recalculated.
-		accts.get(0).addOutlink(new AccountLink(100, accts.get(2)));
-
-		// Act:
-		// A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM
-		// to D, who sends 100 to A.
-		
-		final BlockHeight blockHeight = new BlockHeight(1337);
-		POI poi = new POIV1Impl();
-		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
-
-		// Assert:
-		Assert.assertTrue(importances.getAt(0) < importances.getAt(2));
-		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));
 	}
 
 	@Test
@@ -285,7 +254,7 @@ public class POIV1ImplTest {
 		return accounts;
 	}
 	
-	private List<Account> getAccountsWithSameBalance(int numAccounts, long numNEM) {
+	private List<Account> createAccountsWithSameBalance(int numAccounts, long numNEM) {
 		List<Account> accounts = new ArrayList<Account>();
 
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
