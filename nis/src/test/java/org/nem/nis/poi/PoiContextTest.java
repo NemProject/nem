@@ -35,7 +35,7 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
 				context.getOutLinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(1.0, 0.0, 0.6, 0.0, 0.5, 1.0)));
+				IsEqual.equalTo(new ColumnVector(1, 0, 6, 0, 5, 10)));
 	}
 
 	@Test
@@ -186,10 +186,10 @@ public class PoiContextTest {
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		new int[] { 1 }), // 1 * 1
 				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		null),
-				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2, 7 }), // .2 * 3
+				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2, 7 }), // 2 * 3
 				new TestAccountInfo(umInNem,			3 * umInNem - 1,	null),
-				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // .1 * 5
-				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7, 3 })); // .5 * 2
+				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // 1 * 5
+				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7, 3 })); // 5 * 2
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
