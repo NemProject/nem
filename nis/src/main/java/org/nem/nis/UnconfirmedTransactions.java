@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
+ * TODO: consider a private internal class that implements TransferObserver instead
  */
-public class UnconfirmedTransactions {
+public class UnconfirmedTransactions implements TransferObserver {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
@@ -55,30 +56,13 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		if (! transaction.simulateExecute(
-				new NemTransferSimulate() {
-					@Override
-					public boolean sub(final Account sender, final Amount amount) {
-						addToCache(sender);
-						if (unconfirmedBalances.get(sender).compareTo(amount) < 0) {
-							return false;
-						}
-						Amount newBalance = unconfirmedBalances.get(sender).subtract(amount);
-						unconfirmedBalances.replace(sender, newBalance);
-						return true;
-					}
-
-					@Override
-					public void add(final Account recipient, final Amount amount) {
-						addToCache(recipient);
-						Amount newBalance = unconfirmedBalances.get(recipient).add(amount);
-						unconfirmedBalances.replace(recipient, newBalance);
-					}
-				}
-		)) {
+		// isValid checks the sender balance
+		if (!transaction.isValid()) {
 			return false;
 		}
 
+		transaction.subscribe(this);
+		transaction.execute(false);
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
 	}
@@ -89,25 +73,8 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		if (! transaction.simulateUndo(
-				new NemTransferSimulate() {
-					@Override
-					public boolean sub(final Account recipient, final Amount amount) {
-						Amount newBalance = unconfirmedBalances.get(recipient).subtract(amount);
-						unconfirmedBalances.replace(recipient, newBalance);
-						return true;
-					}
-
-					@Override
-					public void add(final Account sender, final Amount amount) {
-						Amount newBalance = unconfirmedBalances.get(sender).add(amount);
-						unconfirmedBalances.replace(sender, newBalance);
-					}
-				}
-		)) {
-			return false;
-		}
-
+		transaction.undo(false);
+		transaction.unsubscribe(this);
 		this.transactions.remove(transactionHash);
 		return true;
 	}
@@ -125,6 +92,8 @@ public class UnconfirmedTransactions {
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
+
+			// TODO: need to unsubscribe
 			this.transactions.remove(transactionHash);
 		}
 	}
@@ -184,7 +153,7 @@ public class UnconfirmedTransactions {
 
 		// TODO: should we remove those that .add() failed?
 		unconfirmedTransactions.stream()
-				.forEach(tx -> filteredTxes.add(tx));
+				.forEach(filteredTxes::add);
 
 		return filteredTxes.getAll();
 	}
@@ -197,6 +166,24 @@ public class UnconfirmedTransactions {
 	public void dropExpiredTransactions(TimeInstant time) {
 		this.transactions.values().stream()
 				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
-				.forEach(tx -> this.remove(tx));
+				.forEach(this::remove);
+	}
+
+	@Override
+	public void notifyTransfer(Account sender, Account recipient, Amount amount) {
+		this.notifyDebit(sender, amount);
+		this.notifyCredit(recipient, amount);
+	}
+
+	@Override
+	public void notifyCredit(Account account, Amount amount) {
+		final Amount newBalance = this.unconfirmedBalances.get(account).add(amount);
+		this.unconfirmedBalances.replace(account, newBalance);
+	}
+
+	@Override
+	public void notifyDebit(Account account, Amount amount) {
+		final Amount newBalance = this.unconfirmedBalances.get(account).subtract(amount);
+		this.unconfirmedBalances.replace(account, newBalance);
 	}
 }

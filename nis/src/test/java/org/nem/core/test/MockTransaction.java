@@ -140,24 +140,12 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(boolean commit) {
 		this.executeList.add(this.customField);
 	}
 
 	@Override
-	public void undo() {
+	public void undo(boolean commit) {
 		this.undoList.add(this.customField);
-	}
-
-	@Override
-	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
-		this.simulateExecuteList.add(this.customField);
-		return true;
-	}
-
-	@Override
-	public boolean simulateUndo(NemTransferSimulate nemTransferSimulate) {
-		this.simulateUndoList.add(this.customField);
-		return true;
 	}
 }
