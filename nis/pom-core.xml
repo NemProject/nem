@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.core</groupId>
 	<artifactId>nem-core</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.5-ALPHA</version>
 	<name>NEM Core</name>
 
 	<properties>
@@ -62,16 +62,16 @@
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>4.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpasyncclient</artifactId>
+			<version>4.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -90,14 +90,21 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<includes>
 						<include>org/nem/core/**/*.java</include>
 					</includes>
+					<excludes>
+						<exclude>org/nem/core/model/HistoricalBalances.java</exclude>
+
+					</excludes>
 					<testIncludes>
 						<include>org/nem/core/**/*.java</include>
 					</testIncludes>
+					<testExcludes>
+						<exclude>org/nem/core/model/HistoricalBalancesTest.java</exclude>
+					</testExcludes>
 				</configuration>
 			</plugin>
 
