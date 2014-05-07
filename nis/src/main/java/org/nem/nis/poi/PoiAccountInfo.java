@@ -101,6 +101,6 @@ public class PoiAccountInfo {
 			return 0;
 
 		final double weightsMedian = this.outLinkWeightsVector.median();
-		return weightsMedian * this.outLinkWeightsVector.size();
+		return weightsMedian * this.outLinkWeightsVector.size() * this.weightsSum;
 	}
 }
