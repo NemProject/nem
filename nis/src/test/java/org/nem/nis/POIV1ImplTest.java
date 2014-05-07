@@ -38,6 +38,7 @@ public class POIV1ImplTest {
 	static private final int OUTLINK_STRATEGY_RANDOM = 1;
 	static private final int OUTLINK_STRATEGY_LOOP = 2;
 	static private final int OUTLINK_STRATEGY_LOOP_SELF = 3;
+	static private final int OUTLINK_STRATEGY_ALL_TO_ONE = 4;
 	
 	/**
 	 * Four nodes (A, B, C, D) are owned by one person with 400 NEM who distributed the NEM 
@@ -184,7 +185,7 @@ public class POIV1ImplTest {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
 			accounts.addAll(createUserAccounts(1, 8, 800, 1, 400, OUTLINK_STRATEGY_LOOP));
-			accounts.addAll(createUserAccounts(1, i, i*20, 0, 0, OUTLINK_STRATEGY_NONE));
+			accounts.addAll(createUserAccounts(1, i, i*800, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
@@ -254,6 +255,68 @@ public class POIV1ImplTest {
 		System.out.println("");
 	}
 	
+	@Test
+	public void twoAccountsLoopVersusTwoAccountsLoopWithLessOutLinkStrength() {
+		LOGGER.info("High outlink strength vs. low outlink strength");
+		
+		// Arrange:
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
+		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 5, OUTLINK_STRATEGY_LOOP));
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		System.out.print("High outlink strength vs. low outlink strength: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
+		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
+		System.out.println(", ratio is " + format.format((importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3))));
+		System.out.println("");
+	}
+	
+	@Test
+	public void twoAccountsLoopVersusTwoAccountsLoopWithLowerBalance() { 
+		LOGGER.info("High balance vs. low balance");
+		
+		// Arrange:
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.addAll(createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
+		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
+		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
+		System.out.println(", ratio is " + format.format((importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3))));
+		System.out.println("");
+	}
+	
+	@Test
+	public void pushOneAccountInfluencesImportanceDistribution() {
+		LOGGER.info("1 account with 1 outlink vs. many accounts with outlinks to one account (same cumulative strength)");
+
+		// Arrange 1 vs many, the latter concentrate the strength to one account:
+		List<Account> accounts = new ArrayList<Account>();
+		for (int i=4; i<40; i++) {
+			accounts.clear();
+			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
+			accounts.addAll(createUserAccounts(1, i, 800, 1, 400, OUTLINK_STRATEGY_ALL_TO_ONE));
+	
+			// Act: calculate importances
+			POI poi = new POIV1Impl();
+			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(0)));
+			System.out.print(", User 2 cumulative importance is " + format.format(importances.sum() - importances.getAt(0)));
+			System.out.println(", ratio is " + format.format(importances.getAt(0)/(importances.sum() - importances.getAt(0))));
+		}
+		System.out.println("");
+	}
+	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
 		List<MockAccount> accounts = new ArrayList<MockAccount>();
 		
@@ -268,23 +331,25 @@ public class POIV1ImplTest {
 			account.setCoinDaysAt(account.getBalance(), new BlockHeight(blockHeight));
 			for (int j=0; j< numOutLinksPerAccount; j++) {
 				switch (outLinkStrategy) {
-				case OUTLINK_STRATEGY_RANDOM:
-					otherAccount = accounts.get(sr.nextInt(numAccounts));
-					break;
-				case OUTLINK_STRATEGY_LOOP:
-					otherAccount = accounts.get((i+1) % numAccounts);
-					break;
-				case OUTLINK_STRATEGY_LOOP_SELF:
-					otherAccount = account;
-					break;
+					case OUTLINK_STRATEGY_RANDOM:
+						otherAccount = accounts.get(sr.nextInt(numAccounts));
+						break;
+					case OUTLINK_STRATEGY_LOOP:
+						otherAccount = accounts.get((i+1) % numAccounts);
+						break;
+					case OUTLINK_STRATEGY_LOOP_SELF:
+						otherAccount = account;
+						break;
+					case OUTLINK_STRATEGY_ALL_TO_ONE:
+						otherAccount = accounts.get(0);
+						break;
 				}
-				account.addOutlink(new AccountLink(Amount.fromNem(totalOutLinkStrength/(numAccounts*numOutLinksPerAccount)).getNumMicroNem(), otherAccount));
+				account.addOutlink(new AccountLink(Amount.fromNem(totalOutLinkStrength/(numAccounts*numOutLinksPerAccount)).getNumNem(), otherAccount));
 			}
 		}
 		
 		return accounts;
 	}
-	
 	private List<Account> getAccountsWithSameBalance(int numAccounts, long numNEM) {
 		List<Account> accounts = new ArrayList<Account>();
 
