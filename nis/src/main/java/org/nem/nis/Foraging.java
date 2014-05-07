@@ -49,7 +49,7 @@ public class Foraging  {
 		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
+		this.unconfirmedTransactions = new UnconfirmedTransactions();
 	}
 
 	public void addUnlockedAccount(Account account) {
@@ -116,7 +116,9 @@ public class Foraging  {
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
-		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
+		return this.unconfirmedTransactions.removeConflictingTransactions(
+				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
+		);
 	}
 
 	/**
@@ -135,6 +137,7 @@ public class Foraging  {
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		unconfirmedTransactions.dropExpiredTransactions(blockTime);
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
 		final BlockScorer scorer = new BlockScorer();
 		try {
