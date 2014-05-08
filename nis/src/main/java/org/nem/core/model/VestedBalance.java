@@ -35,6 +35,20 @@ public class VestedBalance implements Comparable<VestedBalance> {
 				this.vestedBalance - move);
 	}
 
+	public void send(final Amount amount) {
+		// I guess we shouldn't care about possible div by zero here,
+		// as this func shouldn't be called if Account's balance is 0
+		double vested = amount.getNumMicroNem()*this.vestedBalance / (this.vestedBalance + this.unvestedBalance);;
+		this.vestedBalance = this.vestedBalance - vested;
+		this.unvestedBalance = this.unvestedBalance - (amount.getNumMicroNem() - vested);
+	}
+
+	public void undoSend(final Amount amount) {
+		double vested = amount.getNumMicroNem()*this.vestedBalance / (this.vestedBalance + this.unvestedBalance);;
+		this.vestedBalance = this.vestedBalance + vested;
+		this.unvestedBalance = this.unvestedBalance + (amount.getNumMicroNem() - vested);
+	}
+
 	public void receive(final Amount amount) {
 		this.unvestedBalance = this.unvestedBalance + amount.getNumMicroNem();
 	}

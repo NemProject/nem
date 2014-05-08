@@ -71,6 +71,23 @@ public class VestedBalanceTest {
 	}
 
 	@Test
+	public void vestedBalanceAfter50Days() {
+		// Arrange:
+		final VestedBalance initialBalance = new VestedBalance(BlockHeight.ONE, Amount.fromMicroNem(1000));
+
+		// Act
+		VestedBalance vestedBalance = initialBalance;
+		for (int i=0; i<50; ++i) {
+			vestedBalance = vestedBalance.next();
+		}
+
+		// Assert:
+		Assert.assertThat(vestedBalance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY*50 + 1)));
+		Assert.assertThat(vestedBalance.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(545)));
+		Assert.assertThat(vestedBalance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(455)));
+	}
+
+	@Test
 	public void nemsAreNotLostDuringIterationOfTinyAmounts() {
 		// Arrange:
 		final VestedBalance initialBalance = new VestedBalance(BlockHeight.ONE, Amount.fromMicroNem(75));
@@ -104,8 +121,78 @@ public class VestedBalanceTest {
 		Assert.assertThat(vestedBalance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(amount)));
 		Assert.assertThat(vestedBalance.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(0)));
 	}
-
 	//endregion
+
+	//region send/undoSend
+	@Test
+	public void sendingKeepsRatio() {
+		// Arrange:
+		final VestedBalance vestedBalance = prepareVestedForSending(10_000);
+
+		// Act:
+		double ratio1 = vestedBalance.getVestedBalance().getNumMicroNem() / (0d + vestedBalance.getVestedBalance().getNumMicroNem() + vestedBalance.getUnvestedBalance().getNumMicroNem());
+		vestedBalance.send(Amount.fromMicroNem(2_000));
+		double ratio2 = vestedBalance.getVestedBalance().getNumMicroNem() / (0d + vestedBalance.getVestedBalance().getNumMicroNem() + vestedBalance.getUnvestedBalance().getNumMicroNem());
+
+		// Assert:
+		Assert.assertTrue((ratio1 - ratio2) < Double.MIN_NORMAL);
+	}
+
+	@Test
+	public void undoSendRestoresValues() {
+		// Arrange:
+		final VestedBalance vestedBalance = prepareVestedForSending(100_000);
+
+		// Act:
+		final Amount vested1 = vestedBalance.getVestedBalance();
+		final Amount unvested1 = vestedBalance.getUnvestedBalance();
+		vestedBalance.send(Amount.fromMicroNem(20_000));
+		vestedBalance.undoSend(Amount.fromMicroNem(20_000));
+		final Amount vested2 = vestedBalance.getVestedBalance();
+		final Amount unvested2 = vestedBalance.getUnvestedBalance();
+
+		// Assert:
+		Assert.assertThat(vested2, IsEqual.equalTo(vested1));
+		Assert.assertThat(unvested2, IsEqual.equalTo(unvested1));
+	}
+
+	@Test
+	public void undoSendRestoresValuesMultipleSends() {
+		// Arrange:
+		for (int i = 1; i <= 10; ++i) {
+			final VestedBalance vestedBalance = prepareVestedForSending(1_000_000);
+
+			// Act:
+			final Amount vested1 = vestedBalance.getVestedBalance();
+			final Amount unvested1 = vestedBalance.getUnvestedBalance();
+			for (int j = 0; j < i; ++j) {
+				vestedBalance.send(Amount.fromMicroNem(20_000 + j));
+			}
+			for (int j = 0; j < i; ++j) {
+				vestedBalance.undoSend(Amount.fromMicroNem(20_000 + (i - j - 1)));
+			}
+			final Amount vested2 = vestedBalance.getVestedBalance();
+			final Amount unvested2 = vestedBalance.getUnvestedBalance();
+
+			// Assert:
+			Assert.assertThat(vested2, IsEqual.equalTo(vested1));
+			Assert.assertThat(unvested2, IsEqual.equalTo(unvested1));
+		}
+	}
+
+	private VestedBalance prepareVestedForSending(long amount) {
+		// Arrange:
+		final VestedBalance initialBalance = new VestedBalance(BlockHeight.ONE, Amount.fromMicroNem(amount));
+
+		// Act:
+		VestedBalance vestedBalance = initialBalance;
+		for (int i=0; i<30; ++i) {
+			vestedBalance = vestedBalance.next();
+		}
+		return vestedBalance;
+	}
+	//endregion
+
 
 	@Test
 	public void vestedBalanceCanBeCompared() {
@@ -118,4 +205,6 @@ public class VestedBalanceTest {
 		Assert.assertThat(vestedBalance1.compareTo(vestedBalance2), IsEqual.equalTo(-1));
 		Assert.assertThat(vestedBalance2.compareTo(vestedBalance1), IsEqual.equalTo(1));
 	}
+
+
 }
