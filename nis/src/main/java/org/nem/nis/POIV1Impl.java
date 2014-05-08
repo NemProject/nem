@@ -21,12 +21,12 @@ import java.util.List;
  */
 public class POIV1Impl implements POI {
 
-	public static final int DEFAULT_MAX_ITERS = 100;
+	public static final int DEFAULT_MAX_ITERS = 200;
 	
-	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-8;
+	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size());
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
@@ -37,7 +37,7 @@ public class POIV1Impl implements POI {
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm
-		final PowerIterator iterator = new PoiPowerIterator(context, scorer);
+		final PowerIterator iterator = new PoiPowerIterator(context, scorer, maxIters, tol);
 		iterator.run();
 
 		if (!iterator.hasConverged()) {
@@ -57,8 +57,8 @@ public class POIV1Impl implements POI {
 		private final PoiContext context;
 		private final PoiScorer scorer;
 
-		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer) {
-			super(context.getImportanceVector(), DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL);
+		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int maxIters, final double tol) {
+			super(context.getImportanceVector(), maxIters, tol);
 			this.context = context;
 			this.scorer = scorer;
 		}

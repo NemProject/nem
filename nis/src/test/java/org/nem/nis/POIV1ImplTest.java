@@ -132,8 +132,7 @@ public class POIV1ImplTest {
 		LOGGER.info("Self loop vs. normal loop");
 		
 		// Arrange:
-		// Sending nem to your own account should not be considered as real transaction,
-		// i.e. the account should not collect coin days.
+		// TODO: Loops should be detected.
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP_SELF));
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
@@ -143,19 +142,22 @@ public class POIV1ImplTest {
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
 		System.out.print("Self loop vs. normal loop: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
-		System.out.println(", ratio is " + format.format((importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3))));
+		System.out.println(", ratio is " + format.format(ratio));
 		System.out.println("");
+		
+		// Assert
+		Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 	}
 	
 	@Test
-	public void oneAccountLoopSelfVersusManyAccountsLoop() {
+	public void accountSplittingDoesNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account vs. many accounts");
 
 		// Arrange 1 vs many:
-		// Many accounts have a high importance after the power iteration due to the large inverse teleportation coefficient
-		// but get crushed in the final calculation.
+		// Splitting of one account into many small accounts should have no influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		for (int i=2; i<10; i++) {
 			accounts.clear();
@@ -166,26 +168,29 @@ public class POIV1ImplTest {
 			POI poi = new POIV1Impl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ": User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(importances.sum() - importances.getAt(0)));
-			System.out.println(", ratio is " + format.format(importances.getAt(0)/(importances.sum() - importances.getAt(0))));
+			System.out.println(", ratio is " + format.format(ratio));
+			
+			// Assert
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
 	
 	@Test
-	public void manySmallLazyAcountsInfluenceImportanceDistribution() {
+	public void manySmallLazyAcountsDoNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account vs. 8 accounts with many lazy accounts");
 
 		// Arrange 1 vs 8, with lazy accounts:
-		// The presence of many small lazy accounts has some influence on the importance distribution
-		// but less than I expected.
+		// The presence of many small lazy accounts should have no influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		for (int i=0; i<400; i=i+40) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
 			accounts.addAll(createUserAccounts(1, 8, 800, 1, 400, OUTLINK_STRATEGY_LOOP));
-			accounts.addAll(createUserAccounts(1, i, i*800, 0, 0, OUTLINK_STRATEGY_NONE));
+			accounts.addAll(createUserAccounts(1, i, i*50, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
@@ -195,26 +200,29 @@ public class POIV1ImplTest {
 			for (int j=1; j<9; j++) {
 				user2Importance += importances.getAt(j);
 			}
+			double ratio = importances.getAt(0)/user2Importance;
 			System.out.print("1 vs. 8 with " + i + " small lazy accounts: User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-			System.out.println(", ratio is " + format.format(importances.getAt(0)/user2Importance));
+			System.out.println(", ratio is " + format.format(ratio));
+			
+			// Assert
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
 	
 	@Test
-	public void oneBigLazyAcountInfluencesImportanceDistribution() {
+	public void oneBigLazyAcountDoesNotInfluencesImportanceDistribution() {
 		LOGGER.info("1 account vs. 8 accounts with 0 or 1 big lazy account");
 
-		// Arrange 1 vs 8, with 0 or 1 lazy account:
-		// The presence of a big lazy account has huge influence on the importance distribution,
-		// Account 1's inverse teleportation vector gets boosted.
+		// Arrange 1 vs 8, with 0 or 1 big lazy account:
+		// The presence of a big lazy account should have no influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		for (int i=0; i<2; i++) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
-			accounts.addAll(createUserAccounts(1, 8, 800, 1, 400, OUTLINK_STRATEGY_LOOP));
-			accounts.addAll(createUserAccounts(1, i, i*800, 0, 0, OUTLINK_STRATEGY_NONE));
+			accounts.addAll(createUserAccounts(1, 8, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
+			accounts.addAll(createUserAccounts(1, i, i*8000, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
@@ -224,20 +232,23 @@ public class POIV1ImplTest {
 			for (int j=1; j<9; j++) {
 				user2Importance += importances.getAt(j);
 			}
+			double ratio = importances.getAt(0)/user2Importance;
 			System.out.print("1 vs. 8 with " + i + " big lazy account: User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-			System.out.println(", ratio is " + format.format(importances.getAt(0)/user2Importance));
+			System.out.println(", ratio is " + format.format(ratio));
+			
+			// Assert
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
 	
 	@Test
-	public void numberOfOutlinksInfluencesImportanceDistribution() {
+	public void outlinkStrengthSplittingDoesNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account with 1 outlink vs. 1 account many outlinks (same cumulative strength)");
 
 		// Arrange 1 vs 1, the latter distributes the strength to many outlinks:
-		// One big transaction (1 outlink) is much better than many small transactions (many outlinks),
-		// this is due to using the median in the outlink score calculation.
+		// Splitting one transaction into many small transactions should have no influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		for (int i=1; i<10; i++) {
 			accounts.clear();
@@ -248,38 +259,48 @@ public class POIV1ImplTest {
 			POI poi = new POIV1Impl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+			double ratio = importances.getAt(0)/importances.getAt(1);
 			System.out.print("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(1)));
-			System.out.println(", ratio is " + format.format(importances.getAt(0)/importances.getAt(1)));
+			System.out.println(", ratio is " + format.format(ratio));
+			
+			// Assert
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
 	
 	@Test
-	public void twoAccountsLoopVersusTwoAccountsLoopWithLessOutLinkStrength() {
+	public void outlinkStrengthDoesInfluenceImportanceDistribution() {
 		LOGGER.info("High outlink strength vs. low outlink strength");
 		
 		// Arrange:
+		// The strength of an outlink should have influence on the importance distribution (but how much?).
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
-		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 5, OUTLINK_STRATEGY_LOOP));
+		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 50, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
 		POI poi = new POIV1Impl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
 		System.out.print("High outlink strength vs. low outlink strength: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
-		System.out.println(", ratio is " + format.format((importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3))));
+		System.out.println(", ratio is " + format.format(ratio));
 		System.out.println("");
+		
+		// Assert
+		Assert.assertTrue(ratio > 1.0);
 	}
 	
 	@Test
-	public void twoAccountsLoopVersusTwoAccountsLoopWithLowerBalance() { 
+	public void vestedBalanceDoesInfluenceImportanceDistribution() { 
 		LOGGER.info("High balance vs. low balance");
 		
 		// Arrange:
+		// The vested balance of an account should have influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.addAll(createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
@@ -289,17 +310,22 @@ public class POIV1ImplTest {
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
 		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
-		System.out.println(", ratio is " + format.format((importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3))));
+		System.out.println(", ratio is " + format.format(ratio));
 		System.out.println("");
+		
+		// Assert
+		Assert.assertTrue(ratio > 500.0);
 	}
 	
 	@Test
-	public void pushOneAccountInfluencesImportanceDistribution() {
+	public void pushOneAccountDoesNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account with 1 outlink vs. many accounts with outlinks to one account (same cumulative strength)");
 
 		// Arrange 1 vs many, the latter concentrate the strength to one account:
+		// Colluding accounts that try to push one account with many links should have influence on the importance distribution.
 		List<Account> accounts = new ArrayList<Account>();
 		for (int i=4; i<40; i++) {
 			accounts.clear();
@@ -310,18 +336,22 @@ public class POIV1ImplTest {
 			POI poi = new POIV1Impl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(importances.sum() - importances.getAt(0)));
-			System.out.println(", ratio is " + format.format(importances.getAt(0)/(importances.sum() - importances.getAt(0))));
+			System.out.println(", ratio is " + format.format(ratio));
+			
+			// Assert
+			Assert.assertTrue(0.95 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
 	
-	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
+	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
 		List<MockAccount> accounts = new ArrayList<MockAccount>();
 		
 		for (int i=0; i<numAccounts; i++) {
-			accounts.add(createMockAccountWithBalance((totalBalance - totalOutLinkStrength)/numAccounts));
+			accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutLinkStrength)/numAccounts));
 		}
 		
 		SecureRandom sr = new SecureRandom();

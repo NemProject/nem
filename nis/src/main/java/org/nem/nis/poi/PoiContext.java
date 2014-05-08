@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class PoiContext {
 
-	private static final double MIN_TELEPORTATION_PROB = .7;
+	private static final double MIN_TELEPORTATION_PROB = .85;
 	private static final double MAX_TELEPORTATION_PROB = .95;
 
 	private final List<Integer> dangleIndexes;
@@ -43,7 +43,7 @@ public class PoiContext {
 		this.coinDaysVector = ap.coinDaysVector;
 		this.outLinkScoreVector = ap.outLinkScoreVector;
 		this.importanceVector = ap.importanceVector;
-		this.outLinkMatrix = ap.createOutLinkMatrix();
+		this.outLinkMatrix = ap.outLinkMatrix;
 
 		// (2) build the teleportation vectors
 		final TeleportationBuilder tb = new TeleportationBuilder(this.importanceVector);
@@ -134,6 +134,7 @@ public class PoiContext {
 		private final ColumnVector coinDaysVector;
 		private final ColumnVector importanceVector;
 		private final ColumnVector outLinkScoreVector;
+		private final Matrix outLinkMatrix;
 
 		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
@@ -147,6 +148,7 @@ public class PoiContext {
 			this.coinDaysVector = new ColumnVector(numAccounts);
 			this.importanceVector = new ColumnVector(numAccounts);
 			this.outLinkScoreVector = new ColumnVector(numAccounts);
+			this.outLinkMatrix = new Matrix(numAccounts, numAccounts);
 		}
 
 		public void process(final Iterable<Account> accounts, final BlockHeight height) {
@@ -168,8 +170,8 @@ public class PoiContext {
 
 				// initially set importance to account balance
 				//TODO: wouldn't the coinday-weighted balance be better here?
-				this.importanceVector.setAt(i, account.getBalance().getNumNem());
-
+				// BR: The initial importance vector should be calculated from the outLinkMatrix,
+				//     the power iteration has nothing to do with balance/coinday balance/vested balance
 				if (!accountInfo.hasOutLinks()) {
 					this.dangleIndexes.add(i);
 					this.dangleVector.setAt(i, 0);
@@ -177,14 +179,22 @@ public class PoiContext {
 
 				++i;
 			}
-
+			
+			createOutLinkMatrix();
+			createImportanceVector();
+		}
+		
+		private void createImportanceVector() {
+			// (1) Assign the row sum of the outLinkMatrix to the components
+			for (int i=0; i<importanceVector.getSize(); i++) {
+				importanceVector.setAt(i, outLinkMatrix.rowSum(i));
+			}
+			
 			// (2) normalize the importance vector
-			this.importanceVector.normalize();
+			this.importanceVector.normalize();			
 		}
 
-		private Matrix createOutLinkMatrix() {
-			final int numAccounts = this.importanceVector.getSize();
-			final Matrix outLinkMatrix = new Matrix(numAccounts, numAccounts);
+		private void createOutLinkMatrix() {
 			for (final PoiAccountInfo accountInfo : accountInfos) {
 
 				if (!accountInfo.hasOutLinks())
@@ -198,12 +208,9 @@ public class PoiContext {
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
 					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
-					//outLinkMatrix.incrementAt(accountInfo.getIndex(), rowIndex, outLinkWeights.getAt(j));
 				}
 			}
 			outLinkMatrix.normalizeColumns();
-
-			return outLinkMatrix;
 		}
 	}
 
@@ -247,7 +254,9 @@ public class PoiContext {
 			this.teleportationVector = vector;
 			final ColumnVector onesVector = new ColumnVector(importanceVector.getSize());
 			onesVector.setAll(1.0);
-			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+			vector = onesVector.add(this.teleportationVector.multiply(-1));
+			vector.scale(importanceVector.getSize());
+			this.inverseTeleportationVector = vector;
 		}
 	}
 }

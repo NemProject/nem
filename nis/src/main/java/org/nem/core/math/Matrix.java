@@ -130,6 +130,28 @@ public class Matrix {
 	}
 
 	/**
+	 * Gets the sum of all the matrix's elements in a row.
+	 *
+	 * @return The sum of all the matrix's elements of a row.
+	 */
+	public double rowSum(int row) {
+		double sum = 0.0;
+		for (int i = 0; i < this.cols; ++i)
+			sum += this.columns[i].getAt(row);
+
+		return sum;
+	}
+
+	/**
+	 * Gets the sum of all the matrix's elements in a column.
+	 *
+	 * @return The sum of all the matrix's elements of a column.
+	 */
+	public double columnSum(int column) {
+		return this.columns[column].sum();
+	}
+
+	/**
 	 * Creates a new Matrix by multiplying this matrix element-wise with
 	 * another matrix.
 	 *
