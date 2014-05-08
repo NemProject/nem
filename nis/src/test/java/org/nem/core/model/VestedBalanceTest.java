@@ -18,12 +18,12 @@ public class VestedBalanceTest {
 
 	//region add/sub
 	@Test
-	public void canAddToVestedBalance() {
+	public void canReceiveToVestedBalance() {
 		// Arrange:
 		final VestedBalance vestedBalance = new VestedBalance(BlockHeight.ONE, Amount.fromNem(1_000_000));
 
 		// Act:
-		vestedBalance.add(Amount.fromNem(100_000));
+		vestedBalance.receive(Amount.fromNem(100_000));
 
 		// Assert:
 		Assert.assertThat(vestedBalance.getBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
@@ -32,12 +32,12 @@ public class VestedBalanceTest {
 	}
 
 	@Test
-	public void canSubFromVestedBalance() {
+	public void canUndoReceiveFromVestedBalance() {
 		// Arrange:
 		final VestedBalance vestedBalance = new VestedBalance(BlockHeight.ONE, Amount.fromNem(1_000_000));
 
 		// Act:
-		vestedBalance.sub(Amount.fromNem(100_000));
+		vestedBalance.undoReceive(Amount.fromNem(100_000));
 
 		// Assert:
 		Assert.assertThat(vestedBalance.getBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
@@ -46,12 +46,12 @@ public class VestedBalanceTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void subWontThrow() {
+	public void undoReceiveMightThrow() {
 		// Arrange:
 		final VestedBalance vestedBalance = new VestedBalance(BlockHeight.ONE, Amount.fromNem(100_000));
 
 		// Act:
-		vestedBalance.sub(Amount.fromNem(100_001));
+		vestedBalance.undoReceive(Amount.fromNem(100_001));
 	}
 	//endregion
 

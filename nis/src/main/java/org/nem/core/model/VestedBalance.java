@@ -35,11 +35,11 @@ public class VestedBalance implements Comparable<VestedBalance> {
 				this.vestedBalance - move);
 	}
 
-	public void add(final Amount amount) {
+	public void receive(final Amount amount) {
 		this.unvestedBalance = this.unvestedBalance + amount.getNumMicroNem();
 	}
 
-	public void sub(final Amount amount) {
+	public void undoReceive(final Amount amount) {
 		if (amount.getNumMicroNem() > this.unvestedBalance)
 			throw new IllegalArgumentException("amount must be non-negative");
 
