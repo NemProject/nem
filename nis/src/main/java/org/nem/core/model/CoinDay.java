@@ -14,6 +14,9 @@ public class CoinDay implements Comparable<CoinDay> {
 	 * @param balance the balance at that height
 	 */
 	public CoinDay(final BlockHeight height, final Amount balance) {
+		if (balance == null) {
+			throw new IllegalArgumentException("CoinDay balance is null");
+		}
 		this.height = height;
 		this.balance = balance;
 	}

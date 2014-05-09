@@ -78,7 +78,7 @@ public class PoiAccountInfo {
 	 * @return true if the account has any out-links.
 	 */
 	public boolean hasOutLinks() {
-		final List<?> outLinks = this.account.getOutlinks(); //TODO: not sure I understand the purpose of this final List. I mean, why is it "final"?
+		final List<?> outLinks = this.account.getOutlinks();
 		return null != outLinks && !outLinks.isEmpty();
 	}
 
@@ -101,8 +101,6 @@ public class PoiAccountInfo {
 			return 0;
 
 		final double weightsMedian = this.outLinkWeightsVector.median();
-//		return weightsMedian * this.weightsSum;
-		//TODO was median*outDegree in the Python prototype. We can also add a term representing the outlink sum if it is needed. That could be a good idea.
-		return weightsMedian * this.outLinkWeightsVector.getSize();
+		return weightsMedian * this.outLinkWeightsVector.size() * this.weightsSum;
 	}
 }

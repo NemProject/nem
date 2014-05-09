@@ -104,39 +104,34 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public void execute() {
-		this.getSigner().decrementBalance(this.amount.add(this.getFee()));
-		this.recipient.incrementBalance(this.amount);
+	public void execute(boolean commit) {
+		// TODO: this is a hack for now and will most likely be replaced with the template method pattern
+		final TransferObserver observer = this.getObserver();
+		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		observer.notifyDebit(this.getSigner(), this.getFee());
 
-		if (0 != this.getMessageLength())
-			this.recipient.addMessage(this.message);
-	}
+		if (commit) {
+			this.getSigner().decrementBalance(this.amount.add(this.getFee()));
+			this.recipient.incrementBalance(this.amount);
 
-	@Override
-	public void undo() {
-		this.getSigner().incrementBalance(this.amount.add(this.getFee()));
-		this.recipient.decrementBalance(this.amount);
-
-		if (0 != this.getMessageLength())
-			this.recipient.removeMessage(this.message);
-
-	}
-
-	@Override
-	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
-		if (! nemTransferSimulate.sub(this.getSigner(), this.amount.add(this.getFee()))) {
-			return false;
+			if (0 != this.getMessageLength())
+				this.recipient.addMessage(this.message);
 		}
-		nemTransferSimulate.add(this.getRecipient(), this.amount);
-		return true;
 	}
 
 	@Override
-	public boolean simulateUndo(NemTransferSimulate nemTransferSimulate) {
-		if (! nemTransferSimulate.sub(this.getRecipient(), this.amount)) {
-			return false;
+	public void undo(boolean commit) {
+		// TODO: this is a hack for now and will most likely be replaced with the template method pattern
+		final TransferObserver observer = this.getObserver();
+		observer.notifyTransfer(this.recipient, this.getSigner(), this.amount);
+		observer.notifyCredit(this.getSigner(), this.getFee());
+
+		if (commit) {
+			this.getSigner().incrementBalance(this.amount.add(this.getFee()));
+			this.recipient.decrementBalance(this.amount);
+
+			if (0 != this.getMessageLength())
+				this.recipient.removeMessage(this.message);
 		}
-		nemTransferSimulate.add(this.getSigner(), this.amount.add(this.getFee()));
-		return true;
 	}
 }

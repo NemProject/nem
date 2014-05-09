@@ -22,6 +22,8 @@ public class Block extends VerifiableEntity {
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
+	private final TransferObserver transferObserver = new TransferObserverToBlockTransferObserverAdapter();
+	private final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
 
 	// these are helper fields and shouldn't be serialized
 	private BlockDifficulty difficulty;
@@ -171,6 +173,7 @@ public class Block extends VerifiableEntity {
 	 */
 	public void addTransaction(final Transaction transaction) {
 		this.transactions.add(transaction);
+		transaction.subscribe(this.transferObserver);
 		this.totalFee = this.totalFee.add(transaction.getFee());
 	}
 
@@ -187,52 +190,27 @@ public class Block extends VerifiableEntity {
 	 * Executes all transactions in the block.
 	 */
 	public void execute() {
-		BlockHeight blockHeight = this.getHeight();
 		for (final Transaction transaction : this.transactions) {
-			transaction.execute();
-
-			transaction.simulateExecute(new NemTransferSimulate() {
-				@Override
-				public boolean sub(Account account, Amount amount) {
-					account.subtractHistoricalBalance(blockHeight, amount);
-					return true;
-				}
-
-				@Override
-				public void add(Account account, Amount amount) {
-					account.addHistoricalBalance(blockHeight, amount);
-				}
-			});
+			transaction.execute(true);
 		}
 
-		this.getSigner().incrementForagedBlocks();
-		this.getSigner().incrementBalance(this.getTotalFee());
-		this.getSigner().addHistoricalBalance(this.height, this.getTotalFee());
+		final Account signer = this.getSigner();
+		signer.incrementForagedBlocks();
+		signer.incrementBalance(this.getTotalFee());
+		signer.addHistoricalBalance(this.height, this.getTotalFee());
 	}
 
 	/**
 	 * Undoes all transactions in the block.
 	 */
 	public void undo() {
-		this.getSigner().decrementForagedBlocks();
-		this.getSigner().decrementBalance(this.getTotalFee());
-		this.getSigner().subtractHistoricalBalance(this.height, this.getTotalFee());
+		final Account signer = this.getSigner();
+		signer.decrementForagedBlocks();
+		signer.decrementBalance(this.getTotalFee());
+		signer.subtractHistoricalBalance(this.height, this.getTotalFee());
 
-		BlockHeight blockHeight = this.getHeight();
 		for (final Transaction transaction : this.getReverseTransactions()) {
-			transaction.undo();
-			transaction.simulateUndo(new NemTransferSimulate() {
-				@Override
-				public boolean sub(Account account, Amount amount) {
-					account.subtractHistoricalBalance(blockHeight, amount);
-					return true;
-				}
-
-				@Override
-				public void add(Account account, Amount amount) {
-					account.addHistoricalBalance(blockHeight, amount);
-				}
-			});
+			transaction.undo(true);
 		}
 	}
 
@@ -252,5 +230,41 @@ public class Block extends VerifiableEntity {
 	@Override
 	public String toString() {
 		return String.format("height: %d, #tx: %d", this.height.getRaw(), this.transactions.size());
+	}
+
+	/**
+	 * Subscribes the observer to transfers initiated by this block.
+	 *
+	 * @param observer The observer.
+	 */
+	public void subscribe(final BlockTransferObserver observer) {
+		this.blockTransferObservers.add(observer);
+	}
+
+	/**
+	 * Unsubscribes the observer from transfers initiated by this block.
+	 *
+	 * @param observer The observer.
+	 */
+	public void unsubscribe(final BlockTransferObserver observer) {
+		this.blockTransferObservers.remove(observer);
+	}
+
+	private class TransferObserverToBlockTransferObserverAdapter implements TransferObserver {
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			blockTransferObservers.stream().forEach(o -> o.notifyTransfer(height, sender, recipient, amount));
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			blockTransferObservers.stream().forEach(o -> o.notifyCredit(height, account, amount));
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			blockTransferObservers.stream().forEach(o -> o.notifyDebit(height, account, amount));
+		}
 	}
 }

@@ -42,7 +42,7 @@ public class ActiveNodeTrustProviderTest {
 		final ColumnVector vector = getFilteredTrustVector(NodeStatus.ACTIVE);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(vector.getSize() - 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(vector.getAt(vector.size() - 1), IsEqual.equalTo(0.0));
 	}
 
 	private static ColumnVector getFilteredTrustVector(final NodeStatus status) {

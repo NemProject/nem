@@ -67,7 +67,7 @@ public class Matrix {
 	public void setAt(final int row, final int col, final double val) {
 		this.columns[col].setAt(row, val);
 	}
-	
+
 	/**
 	 * Increments a value at the specified row and column by the given val.
 	 * 

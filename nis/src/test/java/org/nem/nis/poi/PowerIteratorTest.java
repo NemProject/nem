@@ -30,7 +30,7 @@ public class PowerIteratorTest {
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
+		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.1);
 		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.1);
 	}
@@ -46,7 +46,7 @@ public class PowerIteratorTest {
 
 		// Assert:
 		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
+		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.001);
 	}
@@ -93,7 +93,6 @@ public class PowerIteratorTest {
 			// TODO: this makes sure the vectors are always pointing in the same direction
 			// TODO: but i'm not sure why it's needed
 			// TODO: if removed, the unit tests fail
-			// TODO: Does the power iteration fail to converge in time without align()?
 			updatedVector.align();
 			return updatedVector;
 		}

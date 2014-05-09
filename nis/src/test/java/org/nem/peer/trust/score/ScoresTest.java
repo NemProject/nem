@@ -66,7 +66,7 @@ public class ScoresTest {
 		final ColumnVector vector = context.scores.getScoreVector(context.nodes[0], context.nodes);
 
 		// Assert:
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(MockScore.INITIAL_SCORE));
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(2.0));
@@ -109,7 +109,7 @@ public class ScoresTest {
 		final ColumnVector vector = context.scores.getScoreVector(context.nodes[1], context.nodes);
 
 		// Assert:
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(3.0));
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));

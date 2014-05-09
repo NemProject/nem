@@ -26,7 +26,7 @@ public class PoiScorer {
 		for (final int i : dangleIndexes)
 			dangleSum += importanceVector.getAt(i) * teleportationVector.getAt(i);
 
-		return dangleSum / importanceVector.getSize();
+		return dangleSum / importanceVector.size();
 	}
 
 	/**

@@ -201,7 +201,7 @@ public class PoiContext {
 					continue;
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
-				for (int j = 0; j < outLinkWeights.getSize(); ++j) {
+				for (int j = 0; j < outLinkWeights.size(); ++j) {
 					// TODO: using a hash-map for this will be slow
 					// TODO: true, a hashMap would be slow, but I was concerned about using Matrix 
 					// here because this should be a very sparse matrix. We can optimize later, though.

@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
+
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
@@ -10,6 +12,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
+	private final List<TransferObserver> transferObservers = new ArrayList<>();
+	private final TransferObserver transferObserver = new TransferObserverToBlockTransferObserverAdapter();
 
 	/**
 	 * Creates a new transaction.
@@ -102,29 +106,17 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	/**
 	 * Executes the transaction.
+	 *
+	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract void execute();
+	public abstract void execute(boolean commit);
 
 	/**
 	 * Undoes the transaction.
-	 */
-	public abstract void undo();
-
-	/**
-	 * Simulates execution of transaction. Passes proper accounts and amounts into simulator.
 	 *
-	 * @param nemTransferSimulate execute simulator
-	 * @return true if succeeded, false otherwise
+	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
-
-	/**
-	 * Simulates undoing of transaction. Passes proper accounts and amounts into simulator.
-	 *
-	 * @param nemTransferSimulate undo simulator
-	 * @return true if succeeded, false otherwise
-	 */
-	public abstract boolean simulateUndo(NemTransferSimulate nemTransferSimulate);
+	public abstract void undo(boolean commit);
 
 	/**
 	 * Determines if this transaction is valid.
@@ -142,4 +134,49 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The minimum fee.
 	 */
 	protected abstract Amount getMinimumFee();
+
+	/**
+	 * Subscribes the observer to transfers initiated by this transaction.
+	 *
+	 * @param observer The observer.
+	 */
+	public void subscribe(final TransferObserver observer) {
+		this.transferObservers.add(observer);
+	}
+
+	/**
+	 * Unsubscribes the observer from transfers initiated by this transaction.
+	 *
+	 * @param observer The observer.
+	 */
+	public void unsubscribe(final TransferObserver observer) {
+		this.transferObservers.remove(observer);
+	}
+
+	/**
+	 * Gets the transfer observer.
+	 *
+	 * @return the transfer observer.
+	 */
+	protected TransferObserver getObserver() {
+		return this.transferObserver;
+	}
+
+	private class TransferObserverToBlockTransferObserverAdapter implements TransferObserver {
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			transferObservers.stream().forEach(o -> o.notifyTransfer(sender, recipient, amount));
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			transferObservers.stream().forEach(o -> o.notifyCredit(account, amount));
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			transferObservers.stream().forEach(o -> o.notifyDebit(account, amount));
+		}
+	}
 }

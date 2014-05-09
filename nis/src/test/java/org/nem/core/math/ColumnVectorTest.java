@@ -14,7 +14,7 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(3);
 
 		// Assert:
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.0));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
@@ -26,7 +26,7 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
 
 		// Assert:
-		Assert.assertThat(vector.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
 		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(9.0));
 		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(3.2));
 		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(5.4));
@@ -346,7 +346,7 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v)));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(3));
+		Assert.assertThat(result.size(), IsEqual.equalTo(3));
 		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(28, 11, 31)));
 	}
 

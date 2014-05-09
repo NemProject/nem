@@ -77,7 +77,7 @@ public class PreTrustedNodesTest {
 		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
-		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
+		Assert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
 		Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.25));
 		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.25));
 		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.25));
@@ -99,7 +99,7 @@ public class PreTrustedNodesTest {
 		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
-		Assert.assertThat(preTrustVector.getSize(), IsEqual.equalTo(4));
+		Assert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
 		Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.00));
 		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(1.0 / 3.0));
 		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(1.0 / 3.0));
