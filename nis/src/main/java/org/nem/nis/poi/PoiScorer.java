@@ -46,6 +46,7 @@ public class PoiScorer {
 //		final double maxOutLink = outLinkVector.max();
 //		final double maxCoinDays = coinDaysVector.max();
 //		final double scale = maxImportance * maxOutLink * maxCoinDays;
+		//TODO: we might want to normalize outlinkvector and coindaysvector before this
 		ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
 		vector.normalize();
 		final ColumnVector finalScoreVector = importanceVector

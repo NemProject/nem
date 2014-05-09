@@ -35,7 +35,7 @@ public class PoiContext {
 	 * @param height The current block height.
 	 */
 	public PoiContext(final Iterable<Account> accounts, final int numAccounts, final BlockHeight height) {
-		// (1) build the account vectors and matricies
+		// (1) build the account vectors and matrices
 		final AccountProcessor ap = new AccountProcessor(numAccounts);
 		ap.process(accounts, height);
 		this.dangleIndexes = ap.dangleIndexes;

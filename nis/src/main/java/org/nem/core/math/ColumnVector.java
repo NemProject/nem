@@ -282,7 +282,8 @@ public class ColumnVector implements Cloneable {
 	 * @return The Manhattan distance (L1-norm).
 	 */
 	public double l1Distance(final ColumnVector vector) {
-		return this.distance(vector, d -> d); //TODO: make return this.distance(vector, d -> Math.abs(d));
+//		return this.distance(vector, d -> d); //TODO: make return this.distance(vector, d -> Math.abs(d));
+		return this.distance(vector, d -> Math.abs(d));
 	}
 	
 	/**

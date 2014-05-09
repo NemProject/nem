@@ -77,6 +77,7 @@ public abstract class PowerIterator {
 		// TODO: L2 is fine, but I was thinking that L1 would be faster. 
 		// TODO: We could always take the abs val of L1 if we need to speed this up.
 		// TODO: If we go with L2, we should verify that our epsilon for convergence is a suitable value 
-		return vector1.l2Distance(vector2) <= this.epsilon;
+//		return vector1.l2Distance(vector2) <= this.epsilon;
+		return vector1.l1Distance(vector2) <= this.epsilon; //TODO: switched to L1
 	}
 }
