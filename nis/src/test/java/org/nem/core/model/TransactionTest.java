@@ -205,7 +205,7 @@ public class TransactionTest {
 		transaction.execute(true);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumExecuteTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(2));
 		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(1));
 	}
 
@@ -218,7 +218,7 @@ public class TransactionTest {
 		transaction.execute(false);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumExecuteTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(0));
 	}
 
@@ -231,7 +231,7 @@ public class TransactionTest {
 		transaction.undo(true);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumUndoTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(2));
 		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(1));
 	}
 
@@ -244,7 +244,7 @@ public class TransactionTest {
 		transaction.undo(false);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumUndoTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(0));
 	}
 
@@ -263,10 +263,10 @@ public class TransactionTest {
 	private static void assertUndoNotifiesAllObservers(boolean commit) {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
+		account2.incrementBalance(Amount.fromNem(25));
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setUndoTransferAction(to -> {
+		transaction.setTransferAction(to -> {
 			to.notifyTransfer(account1, account2, Amount.fromNem(12));
 			to.notifyCredit(account1, Amount.fromNem(9));
 			to.notifyDebit(account1, Amount.fromNem(11));
@@ -280,19 +280,19 @@ public class TransactionTest {
 		transaction.undo(commit);
 
 		// Assert:
-		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(account1, account2, Amount.fromNem(12));
-		Mockito.verify(observer, Mockito.times(3)).notifyCredit(account1, Amount.fromNem(9));
-		Mockito.verify(observer, Mockito.times(3)).notifyDebit(account1, Amount.fromNem(11));
+		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(account2, account1, Amount.fromNem(12));
+		Mockito.verify(observer, Mockito.times(3)).notifyDebit(account1, Amount.fromNem(9));
+		Mockito.verify(observer, Mockito.times(3)).notifyCredit(account1, Amount.fromNem(11));
 	}
 
 	@Test
 	public void undoCommitChangesAccountBalances() {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
+		account2.incrementBalance(Amount.fromNem(25));
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setUndoTransferAction(to -> {
+		transaction.setTransferAction(to -> {
 			to.notifyTransfer(account1, account2, Amount.fromNem(12));
 			to.notifyCredit(account1, Amount.fromNem(9));
 			to.notifyDebit(account1, Amount.fromNem(11));
@@ -302,8 +302,8 @@ public class TransactionTest {
 		transaction.undo(true);
 
 		// Assert:
-		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(11)));
-		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
+		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(14)));
+		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(13)));
 	}
 
 	@Test
@@ -324,7 +324,7 @@ public class TransactionTest {
 		account1.incrementBalance(Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setExecuteTransferAction(to -> {
+		transaction.setTransferAction(to -> {
 			to.notifyTransfer(account1, account2, Amount.fromNem(12));
 			to.notifyCredit(account1, Amount.fromNem(9));
 			to.notifyDebit(account1, Amount.fromNem(11));
@@ -350,7 +350,7 @@ public class TransactionTest {
 		account1.incrementBalance(Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setExecuteTransferAction(to -> {
+		transaction.setTransferAction(to -> {
 			to.notifyTransfer(account1, account2, Amount.fromNem(12));
 			to.notifyCredit(account1, Amount.fromNem(9));
 			to.notifyDebit(account1, Amount.fromNem(11));

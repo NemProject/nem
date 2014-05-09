@@ -104,26 +104,20 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void executeTransfer(final TransferObserver observer) {
-		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		observer.notifyDebit(this.getSigner(), this.getFee());
-	}
-
-	@Override
 	protected void executeCommit() {
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);
 	}
 
 	@Override
-	protected void undoTransfer(final TransferObserver observer) {
-		observer.notifyTransfer(this.recipient, this.getSigner(), this.amount);
-		observer.notifyCredit(this.getSigner(), this.getFee());
-	}
-
-	@Override
 	protected void undoCommit() {
 		if (0 != this.getMessageLength())
 			this.recipient.removeMessage(this.message);
+	}
+
+	@Override
+	protected void transfer(final TransferObserver observer) {
+		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		observer.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

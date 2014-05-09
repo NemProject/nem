@@ -110,20 +110,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param commit true if changes should be committed by the default action.
 	 */
 	public final void execute(boolean commit) {
-		this.executeTransfer(this.transferObserver);
+		this.transfer(this.transferObserver);
 		if (!commit)
 			return;
 
-		this.executeTransfer(new CommitTransferObserver());
+		this.transfer(new CommitTransferObserver());
 		this.executeCommit();
 	}
-
-	/**
-	 * Executes all transfers using the specified observer.
-	 *
-	 * @param observer The transfer observer.
-	 */
-	protected abstract void executeTransfer(final TransferObserver observer);
 
 	/**
 	 * Performs any other actions required to commit the transaction.
@@ -136,23 +129,25 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param commit true if changes should be committed by the default action.
 	 */
 	public final void undo(boolean commit) {
-		this.undoTransfer(this.transferObserver);
+		this.transfer(new ReverseTransferObserver(this.transferObserver));
 		if (!commit)
 			return;
 
-		this.undoTransfer(new CommitTransferObserver());
+		this.transfer(new ReverseTransferObserver(new CommitTransferObserver()));
 		this.undoCommit();
 	}
-
-	/**
-	 * Undoes all transfers using the specified observer.
-	 */
-	protected abstract void undoTransfer(final TransferObserver observer);
 
 	/**
 	 * Performs any other actions required to undo the transaction.
 	 */
 	protected abstract void undoCommit();
+
+	/**
+	 * Executes all transfers using the specified observer.
+	 *
+	 * @param observer The transfer observer.
+	 */
+	protected abstract void transfer(final TransferObserver observer);
 
 	/**
 	 * Determines if this transaction is valid.
@@ -187,6 +182,30 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public void unsubscribe(final TransferObserver observer) {
 		this.transferObservers.remove(observer);
+	}
+
+	private static class ReverseTransferObserver implements TransferObserver {
+
+		private final TransferObserver observer;
+
+		public ReverseTransferObserver(final TransferObserver observer) {
+			this.observer = observer;
+		}
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.observer.notifyTransfer(recipient, sender, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			this.observer.notifyDebit(account, amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			this.observer.notifyCredit(account, amount);
+		}
 	}
 
 	private static class CommitTransferObserver implements TransferObserver {
