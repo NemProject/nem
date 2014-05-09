@@ -67,6 +67,16 @@ public class UnconfirmedTransactions {
 		return null == previousTransaction;
 	}
 
+	/**
+	 * Gets a value indicated whether or not this object is subscribed to the specified transaction.
+	 *
+	 * @param transaction The transaction.
+	 * @return true if the this object is subscribed to this transaction.
+	 */
+	boolean isSubscribed(final Transaction transaction) {
+		return transaction.isSubscribed(this.transferObserver);
+	}
+
 	boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (! this.transactions.containsKey(transactionHash)) {

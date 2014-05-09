@@ -16,6 +16,7 @@ public class MockTransaction extends Transaction {
 	public static final int TYPE = 124;
 	public static final int VERSION = 758;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
+	public static final TimeInstant DEADLINE = TIMESTAMP.addHours(2);
 
 	private int customField;
 	private long minimumFee;
@@ -53,7 +54,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
 		this.customField = customField;
-		this.setDeadline(TIMESTAMP.addHours(2));
+		this.setDeadline(DEADLINE);
 	}
 
 	/**

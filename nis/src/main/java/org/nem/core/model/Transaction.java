@@ -167,6 +167,16 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract Amount getMinimumFee();
 
 	/**
+	 * Gets a value indicated whether or not the specified observer is subscribed to this object.
+	 *
+	 * @param observer The observer.
+	 * @return true if the observer is subscribed to this object.
+	 */
+	public boolean isSubscribed(final TransferObserver observer) {
+		return this.transferObservers.contains(observer);
+	}
+
+	/**
 	 * Subscribes the observer to transfers initiated by this transaction.
 	 *
 	 * @param observer The observer.

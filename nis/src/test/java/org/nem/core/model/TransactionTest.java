@@ -25,7 +25,7 @@ public class TransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
 		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
 	}
 
@@ -42,7 +42,7 @@ public class TransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(new Amount(130L)));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(TimeInstant.ZERO));
+		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
 		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
 	}
 
@@ -366,6 +366,52 @@ public class TransactionTest {
 		// Assert:
 		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(11)));
 		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
+	}
+
+	//endregion
+
+	//region isSubscribed
+
+	@Test
+	public void isSubscribedInitiallyReturnsFalse() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+
+		// Assert:
+		Assert.assertThat(transaction.isSubscribed(observer), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isSubscribedReturnsTrueAfterSubscribe() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+
+		// Act:
+		transaction.subscribe(Mockito.mock(TransferObserver.class));
+		transaction.subscribe(observer);
+		transaction.subscribe(Mockito.mock(TransferObserver.class));
+
+		// Assert:
+		Assert.assertThat(transaction.isSubscribed(observer), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isSubscribedReturnsFalseAfterUnsubscribe() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+
+		// Act:
+		transaction.subscribe(Mockito.mock(TransferObserver.class));
+		transaction.subscribe(observer);
+		transaction.subscribe(Mockito.mock(TransferObserver.class));
+		transaction.unsubscribe(observer);
+		transaction.subscribe(Mockito.mock(TransferObserver.class));
+
+		// Assert:
+		Assert.assertThat(transaction.isSubscribed(observer), IsEqual.equalTo(false));
 	}
 
 	//endregion
