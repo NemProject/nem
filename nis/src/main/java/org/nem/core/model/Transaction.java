@@ -13,7 +13,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
 	private final List<TransferObserver> transferObservers = new ArrayList<>();
-	private final TransferObserver transferObserver = new TransferObserverToBlockTransferObserverAdapter();
+	private final TransferObserver transferObserver = new TransferObserverAggregate();
 
 	/**
 	 * Creates a new transaction.
@@ -109,14 +109,50 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract void execute(boolean commit);
+	public final void execute(boolean commit) {
+		this.executeTransfer(this.transferObserver);
+		if (!commit)
+			return;
+
+		this.executeTransfer(new CommitTransferObserver());
+		this.executeCommit();
+	}
 
 	/**
-	 * Undoes the transaction.
+	 * Executes all transfers using the specified observer.
+	 *
+	 * @param observer The transfer observer.
+	 */
+	protected abstract void executeTransfer(final TransferObserver observer);
+
+	/**
+	 * Performs any other actions required to commit the transaction.
+	 */
+	protected abstract void executeCommit();
+
+	/**
+	 * Performs any other actions required to undo the transaction
 	 *
 	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract void undo(boolean commit);
+	public final void undo(boolean commit) {
+		this.undoTransfer(this.transferObserver);
+		if (!commit)
+			return;
+
+		this.undoTransfer(new CommitTransferObserver());
+		this.undoCommit();
+	}
+
+	/**
+	 * Undoes all transfers using the specified observer.
+	 */
+	protected abstract void undoTransfer(final TransferObserver observer);
+
+	/**
+	 * Performs any other actions required to undo the transaction.
+	 */
+	protected abstract void undoCommit();
 
 	/**
 	 * Determines if this transaction is valid.
@@ -153,16 +189,26 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		this.transferObservers.remove(observer);
 	}
 
-	/**
-	 * Gets the transfer observer.
-	 *
-	 * @return the transfer observer.
-	 */
-	protected TransferObserver getObserver() {
-		return this.transferObserver;
+	private static class CommitTransferObserver implements TransferObserver {
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.notifyDebit(sender, amount);
+			this.notifyCredit(recipient, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			account.incrementBalance(amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			account.decrementBalance(amount);
+		}
 	}
 
-	private class TransferObserverToBlockTransferObserverAdapter implements TransferObserver {
+	private class TransferObserverAggregate implements TransferObserver {
 
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {

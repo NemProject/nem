@@ -436,6 +436,23 @@ public class TransferTransactionTest {
 		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
 	}
 
+	@Test
+	public void executeNonCommitDoesNotAppendNonEmptyMessageToRecipientAccount() {
+		// Arrange:
+		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.execute(false);
+
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
+	}
+
 	//endregion
 
 	//region undo
@@ -522,92 +539,29 @@ public class TransferTransactionTest {
 		Assert.assertThat(recipient.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(messageInput2));
 	}
 
-	//endregion
+	@Test
+	public void undoNonCommitDoesNotRemoveNonEmptyMessageFromAccount() {
+		// Arrange:
+		final byte[] messageInput1 = Utils.generateRandomBytes();
+		final byte[] messageInput2 = Utils.generateRandomBytes();
+		final Message message = new PlainMessage(messageInput1);
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		transaction.setFee(new Amount(10));
 
+		// Act:
+		transaction.undo(false);
 
-	//region Simulate Execut
-
-// TODO: need to fix these and test block and transaction observers!!!
-//	@Test
-//	public void simulateExecuteTransferPassesProperValues() {
-//		// Arrange:
-//		final Account signer = Utils.generateRandomAccount();
-//		signer.incrementBalance(new Amount(1000));
-//		final Account recipient = Utils.generateRandomAccount();
-//		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-//		transaction.setFee(new Amount(10));
-//
-//		// Act:
-//		final MockSimulateTransfer simulate = new MockSimulateTransfer();
-//		boolean result = transaction.simulateExecute(simulate);
-//
-//		// Assert:
-//		Assert.assertTrue(result);
-//		Assert.assertThat(simulate.getSimulateSubAccount(), IsEqual.equalTo(signer));
-//		Assert.assertThat(simulate.getSimulateSubAmount(), IsEqual.equalTo(new Amount(109L)));
-//		Assert.assertThat(simulate.getSimulateAddAccount(), IsEqual.equalTo(recipient));
-//		Assert.assertThat(simulate.getSimulateAddAmount(), IsEqual.equalTo(new Amount(99L)));
-//	}
-//
-//	@Test
-//	public void simulateExecuteTransferFailsIfSubFails() {
-//		// Arrange:
-//		final Account signer = Utils.generateRandomAccount();
-//		signer.incrementBalance(new Amount(1000));
-//		final Account recipient = Utils.generateRandomAccount();
-//		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-//		transaction.setFee(new Amount(10));
-//
-//		// Act:
-//		final NemTransferSimulate simulate = mock(NemTransferSimulate.class);
-//		when(simulate.sub(signer, new Amount(109L))).thenReturn(false);
-//		boolean result = transaction.simulateExecute(simulate);
-//
-//		// Assert:
-//		Assert.assertFalse(result);
-//	}
-	//endregion
-
-	//region Simulate Undo
-//	@Test
-//	public void simulateUndoTransferPassesProperValues() {
-//		// Arrange:
-//		final Account signer = Utils.generateRandomAccount();
-//		signer.incrementBalance(new Amount(1000));
-//		final Account recipient = Utils.generateRandomAccount();
-//		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-//		transaction.setFee(new Amount(10));
-//
-//		// Act:
-//		transaction.execute();
-//		final MockSimulateTransfer simulate = new MockSimulateTransfer();
-//		boolean result = transaction.simulateUndo(simulate);
-//
-//		// Assert:
-//		Assert.assertTrue(result);
-//		Assert.assertThat(simulate.getSimulateSubAccount(), IsEqual.equalTo(recipient));
-//		Assert.assertThat(simulate.getSimulateSubAmount(), IsEqual.equalTo(new Amount(99L)));
-//		Assert.assertThat(simulate.getSimulateAddAccount(), IsEqual.equalTo(signer));
-//		Assert.assertThat(simulate.getSimulateAddAmount(), IsEqual.equalTo(new Amount(109L)));
-//	}
-//
-//	@Test
-//	public void simulateUndoTransferFailsIfSubFails() {
-//		// Arrange:
-//		final Account signer = Utils.generateRandomAccount();
-//		signer.incrementBalance(new Amount(1000));
-//		final Account recipient = Utils.generateRandomAccount();
-//		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-//		transaction.setFee(new Amount(10));
-//
-//		// Act:
-//		final NemTransferSimulate simulate = mock(NemTransferSimulate.class);
-//		when(simulate.sub(recipient, new Amount(99L))).thenReturn(false);
-//		boolean result = transaction.simulateExecute(simulate);
-//
-//		// Assert:
-//		Assert.assertFalse(result);
-//	}
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));
+	}
 
 	//endregion
 

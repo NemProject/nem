@@ -104,34 +104,26 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public void execute(boolean commit) {
-		// TODO: this is a hack for now and will most likely be replaced with the template method pattern
-		final TransferObserver observer = this.getObserver();
+	protected void executeTransfer(final TransferObserver observer) {
 		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
 		observer.notifyDebit(this.getSigner(), this.getFee());
-
-		if (commit) {
-			this.getSigner().decrementBalance(this.amount.add(this.getFee()));
-			this.recipient.incrementBalance(this.amount);
-
-			if (0 != this.getMessageLength())
-				this.recipient.addMessage(this.message);
-		}
 	}
 
 	@Override
-	public void undo(boolean commit) {
-		// TODO: this is a hack for now and will most likely be replaced with the template method pattern
-		final TransferObserver observer = this.getObserver();
+	protected void executeCommit() {
+		if (0 != this.getMessageLength())
+			this.recipient.addMessage(this.message);
+	}
+
+	@Override
+	protected void undoTransfer(final TransferObserver observer) {
 		observer.notifyTransfer(this.recipient, this.getSigner(), this.amount);
 		observer.notifyCredit(this.getSigner(), this.getFee());
+	}
 
-		if (commit) {
-			this.getSigner().incrementBalance(this.amount.add(this.getFee()));
-			this.recipient.decrementBalance(this.amount);
-
-			if (0 != this.getMessageLength())
-				this.recipient.removeMessage(this.message);
-		}
+	@Override
+	protected void undoCommit() {
+		if (0 != this.getMessageLength())
+			this.recipient.removeMessage(this.message);
 	}
 }

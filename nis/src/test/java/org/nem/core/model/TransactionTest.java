@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -47,7 +48,7 @@ public class TransactionTest {
 
 	//endregion
 
-	// Deadline
+	//region Deadline
 
 	@Test
 	public void transactionDeadlineCanBeSet() {
@@ -189,6 +190,178 @@ public class TransactionTest {
 		transaction.setMinimumFee(minimumFee);
 		transaction.setFee(new Amount(fee));
 		return transaction.getFee().getNumMicroNem();
+	}
+
+	//endregion
+
+	//region Execute and Undo
+
+	@Test
+	public void executeCommitDelegatesToDerivedClass() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		transaction.execute(true);
+
+		// Assert:
+		Assert.assertThat(transaction.getNumExecuteTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void executeNonCommitDelegatesToDerivedClass() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		transaction.execute(false);
+
+		// Assert:
+		Assert.assertThat(transaction.getNumExecuteTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void undoCommitDelegatesToDerivedClass() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		transaction.undo(true);
+
+		// Assert:
+		Assert.assertThat(transaction.getNumUndoTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void undoNonCommitDelegatesToDerivedClass() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		transaction.undo(false);
+
+		// Assert:
+		Assert.assertThat(transaction.getNumUndoTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void undoCommitNotifiesAllObservers() {
+		// Assert:
+		assertUndoNotifiesAllObservers(true);
+	}
+
+	@Test
+	public void undoNonCommitNotifiesAllObservers() {
+		// Assert:
+		assertUndoNotifiesAllObservers(false);
+	}
+
+	private static void assertUndoNotifiesAllObservers(boolean commit) {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setUndoTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		transaction.subscribe(observer);
+		transaction.subscribe(observer);
+		transaction.subscribe(observer);
+
+		// Act:
+		transaction.undo(commit);
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(account1, account2, Amount.fromNem(12));
+		Mockito.verify(observer, Mockito.times(3)).notifyCredit(account1, Amount.fromNem(9));
+		Mockito.verify(observer, Mockito.times(3)).notifyDebit(account1, Amount.fromNem(11));
+	}
+
+	@Test
+	public void undoCommitChangesAccountBalances() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setUndoTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		// Act:
+		transaction.undo(true);
+
+		// Assert:
+		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(11)));
+		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
+	}
+
+	@Test
+	public void executeCommitNotifiesAllObservers() {
+		// Assert:
+		assertExecuteNotifiesAllObservers(true);
+	}
+
+	@Test
+	public void executeNonCommitNotifiesAllObservers() {
+		// Assert:
+		assertExecuteNotifiesAllObservers(false);
+	}
+
+	private static void assertExecuteNotifiesAllObservers(boolean commit) {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setExecuteTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		transaction.subscribe(observer);
+		transaction.subscribe(observer);
+		transaction.subscribe(observer);
+
+		// Act:
+		transaction.execute(commit);
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(account1, account2, Amount.fromNem(12));
+		Mockito.verify(observer, Mockito.times(3)).notifyCredit(account1, Amount.fromNem(9));
+		Mockito.verify(observer, Mockito.times(3)).notifyDebit(account1, Amount.fromNem(11));
+	}
+
+	@Test
+	public void executeCommitChangesAccountBalances() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setExecuteTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		// Act:
+		transaction.execute(true);
+
+		// Assert:
+		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(11)));
+		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
 	}
 
 	//endregion
