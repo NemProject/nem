@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
- * TODO: consider a private internal class that implements TransferObserver instead
  */
-public class UnconfirmedTransactions implements TransferObserver {
+public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
+	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -61,10 +61,20 @@ public class UnconfirmedTransactions implements TransferObserver {
 			return false;
 		}
 
-		transaction.subscribe(this);
+		transaction.subscribe(this.transferObserver);
 		transaction.execute(false);
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	/**
+	 * Gets a value indicated whether or not this object is subscribed to the specified transaction.
+	 *
+	 * @param transaction The transaction.
+	 * @return true if the this object is subscribed to this transaction.
+	 */
+	boolean isSubscribed(final Transaction transaction) {
+		return transaction.isSubscribed(this.transferObserver);
 	}
 
 	boolean remove(final Transaction transaction) {
@@ -74,7 +84,7 @@ public class UnconfirmedTransactions implements TransferObserver {
 		}
 
 		transaction.undo(false);
-		transaction.unsubscribe(this);
+		transaction.unsubscribe(this.transferObserver);
 		this.transactions.remove(transactionHash);
 		return true;
 	}
@@ -92,9 +102,8 @@ public class UnconfirmedTransactions implements TransferObserver {
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-
-			// TODO: need to unsubscribe
-			this.transactions.remove(transactionHash);
+			final Transaction removedTransaction = this.transactions.remove(transactionHash);
+			removedTransaction.unsubscribe(this.transferObserver);
 		}
 	}
 
@@ -169,21 +178,25 @@ public class UnconfirmedTransactions implements TransferObserver {
 				.forEach(this::remove);
 	}
 
-	@Override
-	public void notifyTransfer(Account sender, Account recipient, Amount amount) {
-		this.notifyDebit(sender, amount);
-		this.notifyCredit(recipient, amount);
-	}
+	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.notifyDebit(sender, amount);
+			this.notifyCredit(recipient, amount);
+		}
 
-	@Override
-	public void notifyCredit(Account account, Amount amount) {
-		final Amount newBalance = this.unconfirmedBalances.get(account).add(amount);
-		this.unconfirmedBalances.replace(account, newBalance);
-	}
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			addToCache(account);
+			final Amount newBalance = unconfirmedBalances.get(account).add(amount);
+			unconfirmedBalances.replace(account, newBalance);
+		}
 
-	@Override
-	public void notifyDebit(Account account, Amount amount) {
-		final Amount newBalance = this.unconfirmedBalances.get(account).subtract(amount);
-		this.unconfirmedBalances.replace(account, newBalance);
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			addToCache(account);
+			final Amount newBalance = unconfirmedBalances.get(account).subtract(amount);
+			unconfirmedBalances.replace(account, newBalance);
+		}
 	}
 }

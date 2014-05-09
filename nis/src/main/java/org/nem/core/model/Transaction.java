@@ -13,7 +13,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
 	private final List<TransferObserver> transferObservers = new ArrayList<>();
-	private final TransferObserver transferObserver = new TransferObserverToBlockTransferObserverAdapter();
+	private final TransferObserver transferObserver = new TransferObserverAggregate();
 
 	/**
 	 * Creates a new transaction.
@@ -109,14 +109,45 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract void execute(boolean commit);
+	public final void execute(boolean commit) {
+		this.transfer(this.transferObserver);
+		if (!commit)
+			return;
+
+		this.transfer(new CommitTransferObserver());
+		this.executeCommit();
+	}
 
 	/**
-	 * Undoes the transaction.
+	 * Performs any other actions required to commit the transaction.
+	 */
+	protected abstract void executeCommit();
+
+	/**
+	 * Performs any other actions required to undo the transaction
 	 *
 	 * @param commit true if changes should be committed by the default action.
 	 */
-	public abstract void undo(boolean commit);
+	public final void undo(boolean commit) {
+		this.transfer(new ReverseTransferObserver(this.transferObserver));
+		if (!commit)
+			return;
+
+		this.transfer(new ReverseTransferObserver(new CommitTransferObserver()));
+		this.undoCommit();
+	}
+
+	/**
+	 * Performs any other actions required to undo the transaction.
+	 */
+	protected abstract void undoCommit();
+
+	/**
+	 * Executes all transfers using the specified observer.
+	 *
+	 * @param observer The transfer observer.
+	 */
+	protected abstract void transfer(final TransferObserver observer);
 
 	/**
 	 * Determines if this transaction is valid.
@@ -136,6 +167,16 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract Amount getMinimumFee();
 
 	/**
+	 * Gets a value indicated whether or not the specified observer is subscribed to this object.
+	 *
+	 * @param observer The observer.
+	 * @return true if the observer is subscribed to this object.
+	 */
+	public boolean isSubscribed(final TransferObserver observer) {
+		return this.transferObservers.contains(observer);
+	}
+
+	/**
 	 * Subscribes the observer to transfers initiated by this transaction.
 	 *
 	 * @param observer The observer.
@@ -153,16 +194,50 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		this.transferObservers.remove(observer);
 	}
 
-	/**
-	 * Gets the transfer observer.
-	 *
-	 * @return the transfer observer.
-	 */
-	protected TransferObserver getObserver() {
-		return this.transferObserver;
+	private static class ReverseTransferObserver implements TransferObserver {
+
+		private final TransferObserver observer;
+
+		public ReverseTransferObserver(final TransferObserver observer) {
+			this.observer = observer;
+		}
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.observer.notifyTransfer(recipient, sender, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			this.observer.notifyDebit(account, amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			this.observer.notifyCredit(account, amount);
+		}
 	}
 
-	private class TransferObserverToBlockTransferObserverAdapter implements TransferObserver {
+	private static class CommitTransferObserver implements TransferObserver {
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.notifyDebit(sender, amount);
+			this.notifyCredit(recipient, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			account.incrementBalance(amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			account.decrementBalance(amount);
+		}
+	}
+
+	private class TransferObserverAggregate implements TransferObserver {
 
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {

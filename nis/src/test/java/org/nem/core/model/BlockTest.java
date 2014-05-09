@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -299,7 +300,7 @@ public class BlockTest {
 
 	//endregion
 
- 	//region execute / undo
+ 	//region execute
 
 	@Test
 	public void executeIncrementsForagedBlocks() {
@@ -337,12 +338,45 @@ public class BlockTest {
 		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
 	}
 
+	@Test
+	public void executeNotifiesAllObservers() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithHeight(height);
+		block.addTransaction(transaction);
+
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+		block.subscribe(observer);
+		block.subscribe(observer);
+		block.unsubscribe(observer);
+		block.subscribe(observer);
+		block.subscribe(observer);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(height, account1, account2, Amount.fromNem(12));
+		Mockito.verify(observer, Mockito.times(3)).notifyCredit(height, account1, Amount.fromNem(9));
+		Mockito.verify(observer, Mockito.times(3)).notifyDebit(height, account1, Amount.fromNem(11));
+	}
+
 	//endregion
 
 	//region undo
 
 	@Test
-	public void executeDecrementsForagedBlocks() {
+	public void undoDecrementsForagedBlocks() {
 		// Arrange: initial foraged blocks = 3
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
@@ -354,7 +388,7 @@ public class BlockTest {
 	}
 
 	@Test
-	public void executeDecrementsForagerBalanceByTotalFee() {
+	public void undoDecrementsForagerBalanceByTotalFee() {
 		// Arrange: initial balance = 100, total fee = 28
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
@@ -377,6 +411,39 @@ public class BlockTest {
 		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
 	}
 
+	@Test
+	public void undoNotifiesAllObservers() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		account2.incrementBalance(Amount.fromNem(25));
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithHeight(height);
+		block.addTransaction(transaction);
+
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+		block.subscribe(observer);
+		block.subscribe(observer);
+		block.unsubscribe(observer);
+		block.subscribe(observer);
+		block.subscribe(observer);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(3)).notifyTransfer(height, account2, account1, Amount.fromNem(12));
+		Mockito.verify(observer, Mockito.times(3)).notifyDebit(height, account1, Amount.fromNem(9));
+		Mockito.verify(observer, Mockito.times(3)).notifyCredit(height, account1, Amount.fromNem(11));
+	}
+
 	private final class UndoExecuteTestContext {
 
 		private final Account account;
@@ -388,16 +455,18 @@ public class BlockTest {
 
 		public UndoExecuteTestContext() {
 			this.account = Utils.generateRandomAccount();
-			account.incrementBalance(new Amount(100));
+			this.account.incrementBalance(new Amount(100));
 			for (int i = 0; i < 3; ++i)
-				account.incrementForagedBlocks();
+				this.account.incrementForagedBlocks();
 
 			this.transaction1 = createTransaction(1, 17);
 			this.transaction2 = createTransaction(2, 11);
 
-			this.block = createBlock(account);
-			block.addTransaction(this.transaction1);
-			block.addTransaction(this.transaction2);
+			this.block = createBlock(this.account);
+			this.block.addTransaction(this.transaction1);
+			this.block.addTransaction(this.transaction2);
+
+			this.account.addHistoricalBalance(this.block.getHeight(), new Amount(100));
 		}
 
 		private MockTransaction createTransaction(final int customField, final long fee) {
@@ -407,6 +476,8 @@ public class BlockTest {
 			return transaction;
 		}
 	}
+
+	//endregion
 
 	//endregion
 
@@ -441,6 +512,19 @@ public class BlockTest {
 	private static Block createBlock(final Account forger) {
 		// Arrange:
 		return new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, new TimeInstant(7), new BlockHeight(3));
+	}
+
+	private static Block createBlockWithHeight(final BlockHeight height) {
+		// Arrange:
+		final Account forger = Utils.generateRandomAccount();
+		final Block block = new Block(
+				forger,
+				DUMMY_PREVIOUS_HASH,
+				DUMMY_GENERATION_HASH,
+				new TimeInstant(7),
+				height);
+		forger.incrementForagedBlocks();
+		return block;
 	}
 
 	private static Block createBlock() {

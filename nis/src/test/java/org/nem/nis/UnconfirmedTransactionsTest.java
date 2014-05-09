@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactionsTest {
 	public static TransferTransaction createTransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount) {
 		TransferTransaction transferTransaction = new TransferTransaction(timestamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timestamp);
+		transferTransaction.setDeadline(timestamp.addSeconds(1));
 		return transferTransaction;
 	}
 
@@ -40,10 +40,12 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7));
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		boolean isAdded = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertTrue(isAdded);
+		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -54,10 +56,12 @@ public class UnconfirmedTransactionsTest {
 		transactions.add(new MockTransaction(sender, 7));
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7));
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		boolean isAdded = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertFalse(isAdded);
+		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -68,10 +72,13 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		transactions.add(new MockTransaction(sender, 7));
-		boolean isAdded = transactions.add(new MockTransaction(sender, 8));
+
+		final MockTransaction transaction = new MockTransaction(sender, 8);
+		boolean isAdded = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertTrue(isAdded);
+		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -81,10 +88,12 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> false);
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		boolean isAdded = transactions.add(transaction, hash -> false);
 
 		// Assert:
-		Assert.assertTrue(isAdded);
+		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -94,10 +103,12 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
 		// Act:
-		boolean isAdded = transactions.add(new MockTransaction(sender, 7), hash -> true);
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		boolean isAdded = transactions.add(transaction, hash -> true);
 
 		// Assert:
-		Assert.assertFalse(isAdded);
+		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -124,8 +135,9 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertTrue(result);
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
-		Assert.assertThat(((TransferTransaction )transactionList.get(0)).getAmount(), IsEqual.equalTo(Amount.fromNem(9)));
-		Assert.assertThat(((TransferTransaction )transactionList.get(1)).getAmount(), IsEqual.equalTo(Amount.fromNem(7)));
+		Assert.assertThat(((TransferTransaction)transactionList.get(0)).getAmount(), IsEqual.equalTo(Amount.fromNem(9)));
+		Assert.assertThat(((TransferTransaction)transactionList.get(1)).getAmount(), IsEqual.equalTo(Amount.fromNem(7)));
+		Assert.assertThat(transactions.isSubscribed(toRemove), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -214,7 +226,7 @@ public class UnconfirmedTransactionsTest {
 	public void filteringOutConflictingTransactions() {
 		// Arrange:
 		final Account sender = createSenderWithAmount(100);
-		final Account recipient = Utils.generateRandomAccount();
+		final Account recipient = createSenderWithAmount(100);
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
 
@@ -251,10 +263,12 @@ public class UnconfirmedTransactionsTest {
 			unconfirmedTransactions.add(transaction);
 		}
 
+		final List<Transaction> blockTransactions = Arrays.asList(
+				transactions.get(1),
+				transactions.get(7),
+				transactions.get(4));
 		final Block block = NisUtils.createRandomBlock();
-		block.addTransaction(transactions.get(1));
-		block.addTransaction(transactions.get(7));
-		block.addTransaction(transactions.get(4));
+		blockTransactions.stream().forEach(block::addTransaction);
 
 		// Act:
 		unconfirmedTransactions.removeAll(block);
@@ -263,6 +277,9 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(
 				getCustomFieldValues(unconfirmedTransactions.getTransactionsBefore(new TimeInstant(101))),
 				IsEquivalent.equivalentTo(new Integer[] { 0, 2, 3, 5, 6, 8, 9 }));
+		Assert.assertThat(
+				blockTransactions.stream().anyMatch(unconfirmedTransactions::isSubscribed),
+				IsEqual.equalTo(false));
 	}
 
 	//endregion
