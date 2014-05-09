@@ -53,6 +53,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
 		this.customField = customField;
+		this.setDeadline(TIMESTAMP.addHours(2));
 	}
 
 	/**
@@ -65,6 +66,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final int customField, final TimeInstant timeStamp) {
 		super(TYPE, VERSION, timeStamp, Utils.generateRandomAccount());
 		this.customField = customField;
+		this.setDeadline(timeStamp.addHours(2));
 	}
 
 	/**
@@ -79,6 +81,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final long fee) {
 		super(type, version, timeStamp, Utils.generateRandomAccount());
 		this.setFee(new Amount(fee));
+		this.setDeadline(timeStamp.addHours(2));
 	}
 
 	/**

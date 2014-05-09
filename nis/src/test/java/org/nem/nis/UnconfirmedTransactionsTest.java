@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactionsTest {
 	public static TransferTransaction createTransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount) {
 		TransferTransaction transferTransaction = new TransferTransaction(timestamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timestamp);
+		transferTransaction.setDeadline(timestamp.addSeconds(1));
 		return transferTransaction;
 	}
 
@@ -214,7 +214,7 @@ public class UnconfirmedTransactionsTest {
 	public void filteringOutConflictingTransactions() {
 		// Arrange:
 		final Account sender = createSenderWithAmount(100);
-		final Account recipient = Utils.generateRandomAccount();
+		final Account recipient = createSenderWithAmount(100);
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
 
