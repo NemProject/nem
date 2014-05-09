@@ -274,6 +274,8 @@ public class TransactionTest {
 		final TransferObserver observer = Mockito.mock(TransferObserver.class);
 		transaction.subscribe(observer);
 		transaction.subscribe(observer);
+		transaction.unsubscribe(observer);
+		transaction.subscribe(observer);
 		transaction.subscribe(observer);
 
 		// Act:
@@ -331,6 +333,8 @@ public class TransactionTest {
 		});
 		final TransferObserver observer = Mockito.mock(TransferObserver.class);
 		transaction.subscribe(observer);
+		transaction.subscribe(observer);
+		transaction.unsubscribe(observer);
 		transaction.subscribe(observer);
 		transaction.subscribe(observer);
 
