@@ -186,7 +186,7 @@ public class PoiContext {
 		
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outLinkMatrix to the components
-			for (int i=0; i<importanceVector.getSize(); i++) {
+			for (int i=0; i<importanceVector.size(); i++) {
 				importanceVector.setAt(i, outLinkMatrix.rowSum(i));
 			}
 			
@@ -249,13 +249,13 @@ public class PoiContext {
 //			this.teleportationVector.multiply(numAccountNorm);
 //			this.inverseTeleportationVector.multiply(numAccountNorm);
 
-			ColumnVector vector = new ColumnVector(importanceVector.getSize());
+			ColumnVector vector = new ColumnVector(importanceVector.size());
 			vector.setAll(MIN_TELEPORTATION_PROB);
 			this.teleportationVector = vector;
-			final ColumnVector onesVector = new ColumnVector(importanceVector.getSize());
+			final ColumnVector onesVector = new ColumnVector(importanceVector.size());
 			onesVector.setAll(1.0);
 			vector = onesVector.add(this.teleportationVector.multiply(-1));
-			vector.scale(importanceVector.getSize());
+			vector.scale(importanceVector.size());
 			this.inverseTeleportationVector = vector;
 		}
 	}
