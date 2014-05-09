@@ -195,6 +195,7 @@ public class Block extends VerifiableEntity {
 		}
 
 		final Account signer = this.getSigner();
+		transferObserver.notifyCredit(this.getSigner(), this.getTotalFee());
 		signer.incrementForagedBlocks();
 		signer.incrementBalance(this.getTotalFee());
 		signer.addHistoricalBalance(this.height, this.getTotalFee());
@@ -205,6 +206,7 @@ public class Block extends VerifiableEntity {
 	 */
 	public void undo() {
 		final Account signer = this.getSigner();
+		transferObserver.notifyDebit(this.getSigner(), this.getTotalFee());
 		signer.decrementForagedBlocks();
 		signer.decrementBalance(this.getTotalFee());
 		signer.subtractHistoricalBalance(this.height, this.getTotalFee());
