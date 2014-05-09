@@ -30,6 +30,25 @@ public class Block extends VerifiableEntity {
 
 	private Hash generationHash;
 
+
+	private static class HistoricalBalancesObserver implements BlockTransferObserver {
+		@Override
+		public void notifyTransfer(BlockHeight height, Account sender, Account recipient, Amount amount) {
+			sender.subtractHistoricalBalance(height, amount);
+			recipient.addHistoricalBalance(height, amount);
+		}
+
+		@Override
+		public void notifyCredit(BlockHeight height, Account account, Amount amount) {
+			account.addHistoricalBalance(height, amount);
+		}
+
+		@Override
+		public void notifyDebit(BlockHeight height, Account account, Amount amount) {
+			account.subtractHistoricalBalance(height, amount);
+		}
+	}
+
 	/**
 	 * Creates a new block.
 	 *
@@ -52,6 +71,8 @@ public class Block extends VerifiableEntity {
 		this.height = height;
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+
+		this.blockTransferObservers.add(new HistoricalBalancesObserver());
 	}
 
 	/**
@@ -82,6 +103,8 @@ public class Block extends VerifiableEntity {
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+
+		this.blockTransferObservers.add(new HistoricalBalancesObserver());
 	}
 
 	//region Getters
@@ -198,7 +221,6 @@ public class Block extends VerifiableEntity {
 		transferObserver.notifyCredit(this.getSigner(), this.getTotalFee());
 		signer.incrementForagedBlocks();
 		signer.incrementBalance(this.getTotalFee());
-		signer.addHistoricalBalance(this.height, this.getTotalFee());
 	}
 
 	/**
@@ -209,7 +231,6 @@ public class Block extends VerifiableEntity {
 		transferObserver.notifyDebit(this.getSigner(), this.getTotalFee());
 		signer.decrementForagedBlocks();
 		signer.decrementBalance(this.getTotalFee());
-		signer.subtractHistoricalBalance(this.height, this.getTotalFee());
 
 		for (final Transaction transaction : this.getReverseTransactions()) {
 			transaction.undo(true);

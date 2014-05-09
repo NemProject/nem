@@ -343,6 +343,7 @@ public class BlockTest {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
 		account1.incrementBalance(Amount.fromNem(25));
+		account1.addHistoricalBalance(BlockHeight.ONE, Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setTransferAction(to -> {
@@ -417,6 +418,7 @@ public class BlockTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		account2.incrementBalance(Amount.fromNem(25));
+		account2.addHistoricalBalance(BlockHeight.ONE, Amount.fromNem(25));
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setTransferAction(to -> {
 			to.notifyTransfer(account1, account2, Amount.fromNem(12));
