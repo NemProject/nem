@@ -11,12 +11,8 @@ import org.nem.core.time.TimeInstant;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 1000;
 
-	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER = new TransactionValidator() {
-		@Override
-		public boolean validateTransfer(Account signer, Account recipient, Amount amount) {
-			return signer.getBalance().compareTo(amount) >= 0;
-		}
-	};
+	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER =
+			(final Account sender, final Account recipient, final Amount amount) -> sender.getBalance().compareTo(amount) >= 0;
 
 	private Amount amount;
 	private Message message;

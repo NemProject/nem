@@ -306,12 +306,7 @@ public class TransferTransactionTest {
 	public void isValidFailsWithFailingValidator() {
 		// Arrange:
 		final Transaction transaction = createTransaction(2, 1, 1);
-		final TransactionValidator failingTransactionValidator = new TransactionValidator() {
-			@Override
-			public boolean validateTransfer(Account signer, Account recipient, Amount amount) {
-				return false;
-			}
-		};
+		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> false;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
@@ -322,12 +317,7 @@ public class TransferTransactionTest {
 	public void isValidSucceedsWithSuceedingValidator() {
 		// Arrange:
 		final Transaction transaction = createTransaction(2, 2, 1);
-		final TransactionValidator failingTransactionValidator = new TransactionValidator() {
-			@Override
-			public boolean validateTransfer(Account signer, Account recipient, Amount amount) {
-				return true;
-			}
-		};
+		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> true;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));

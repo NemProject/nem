@@ -167,8 +167,8 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid(TransactionValidator transactionValidator) {
-		return false;
+	public boolean isValid(final TransactionValidator transactionValidator) {
+		return true;
 	}
 
 	@Override
