@@ -5,6 +5,7 @@ import java.util.List;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.BlockHeight;
+import org.nem.nis.poi.PoiScorer;
 
 /**
  * This is the interface for POI. We may want to try different specific
@@ -12,4 +13,5 @@ import org.nem.core.model.BlockHeight;
  */
 public interface POI {
 	public ColumnVector getAccountImportances(BlockHeight blockHeight, List<Account> accounts);
+	public ColumnVector getAccountImportances(BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg);
 }

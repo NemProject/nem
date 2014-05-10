@@ -86,6 +86,8 @@ public class PoiScorer {
 
 			finalScoreVector = vector.multiplyElementWise(
 					coinDaysVector).add(sqrtcoindays);
+		} else if (scoringAlg == ScoringAlg.MAKOTO) {
+			// TODO:
 		}
 		
 		finalScoreVector.normalize();
