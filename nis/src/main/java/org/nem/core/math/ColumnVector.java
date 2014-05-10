@@ -198,6 +198,20 @@ public class ColumnVector implements Cloneable {
 
 		return result;
 	}
+	
+	/**
+	 * Creates a new ColumnVector by taking the square root of each element in this vector.
+	 * We take the absolute value of each element and then take its square root.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector sqrt() {
+		final ColumnVector result = new ColumnVector(this.size);
+		for (int i = 0; i < this.size; ++i)
+			result.vector[i] = Math.sqrt(Math.abs(this.vector[i]));
+
+		return result;
+	}
 
 	/**
 	 * Creates a new ColumnVector by multiplying this vector element-wise with

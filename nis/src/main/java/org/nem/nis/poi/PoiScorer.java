@@ -42,25 +42,51 @@ public class PoiScorer {
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
+		System.out.println("outLinkVector" + outLinkVector);
+		System.out.println("importanceVector" + importanceVector);
+		System.out.println("coinDaysVector" + coinDaysVector);
 //		final double maxImportance = importanceVector.max();
 //		final double maxOutLink = outLinkVector.max();
 //		final double maxCoinDays = coinDaysVector.max();
 //		final double scale = maxImportance * maxOutLink * maxCoinDays;
 		//TODO: we might want to normalize outlinkvector and coindaysvector before this
-		ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
-		vector.normalize();
-		final ColumnVector finalScoreVector = importanceVector
-				.multiplyElementWise(vector); 
-				// TODO: in the latest Python prototype, I added outLinkVector instead of multiplying, 
-				// because I was concerned that otherwise people could boost their importance too easily.
-				// Weighting by CoinDays should make this safe enough, though, and multiplying will make the 
-				// importance more fair to people with less NEM.
-				// TODO: write unit tests to study the effect of adding outLinkVector vs. multiplying here.
-				//.multiplyElementWise(coinDaysVector);
+		
+		//Try some different scoring methods. This code is temporary so I can quickly try out many things.
+		int scoringAlg = 0;
+		
+		if (scoringAlg == 0) {
+		
+			ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
+			vector.normalize();
+			final ColumnVector finalScoreVector = importanceVector
+					.multiplyElementWise(vector); 
+					// TODO: in the latest Python prototype, I added outLinkVector instead of multiplying, 
+					// because I was concerned that otherwise people could boost their importance too easily.
+					// Weighting by CoinDays should make this safe enough, though, and multiplying will make the 
+					// importance more fair to people with less NEM.
+					// TODO: write unit tests to study the effect of adding outLinkVector vs. multiplying here.
+					//.multiplyElementWise(coinDaysVector);
+	
+			// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
+			//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
+			finalScoreVector.normalize();
+			return finalScoreVector;
+		} else if (scoringAlg == 1) {
 
-		// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
-		//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
-		finalScoreVector.normalize();
-		return finalScoreVector;
+			// Try utopian scorer
+			// (outlink 2 + PR) stake + sqrt (stake)
+			outLinkVector.normalize();
+			ColumnVector vector = outLinkVector.multiply(2.0).add(
+					importanceVector);
+			vector.normalize();
+
+			ColumnVector sqrtcoindays = coinDaysVector.sqrt();
+
+			final ColumnVector finalScoreVector = vector.multiplyElementWise(
+					coinDaysVector).add(sqrtcoindays);
+			finalScoreVector.normalize();
+			return finalScoreVector;
+		}
+		return null;//TODO: compile hack. This will be taken out
 	}
 }

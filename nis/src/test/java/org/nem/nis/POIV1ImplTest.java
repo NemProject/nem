@@ -97,7 +97,7 @@ public class POIV1ImplTest {
 		// G > E > F >> A > others
 		Assert.assertTrue(importances.getAt(6) > importances.getAt(4));// g>e
 		Assert.assertTrue(importances.getAt(4) > importances.getAt(5));// e>f
-//		Assert.assertTrue(importances.getAt(5) > importances.getAt(0));// f>a
+//		Assert.assertTrue(importances.getAt(5) > importances.getAt(0));// f>a // accts with no outlinks have 0 importance as currently designed
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));// a>b
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(2));// a>c
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(3));// a>d
@@ -321,6 +321,29 @@ public class POIV1ImplTest {
 			Assert.assertTrue(0.95 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
+	}
+	
+	@Test
+	public void threeSimpleAccounts() {
+		// Arrange:
+		Account a = createAccountWithBalance(100);
+		Account b = createAccountWithBalance(100);
+		Account c = createAccountWithBalance(100);
+
+		final BlockHeight blockHeight = new BlockHeight(1337);
+
+		// TODO: we really need the infrastructure for adding coinday-weighted
+		// links and updating balances.
+		// A sends all 400 NEM to B,
+		a.addOutlink(new AccountLink(100, b));
+
+		List<Account> accts = Arrays.asList(a, b, c);
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi
+				.getAccountImportances(blockHeight, accts);
+		System.out.println(importances);
 	}
 	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {

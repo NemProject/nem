@@ -301,7 +301,8 @@ public class Account implements SerializableEntity {
 			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
 		}
 		
-		return coinDayBalance.getWeightedAmount();
+//		return coinDayBalance.getWeightedAmount();
+		return getBalance();
 	}
 	
 	@Override
