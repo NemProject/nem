@@ -45,7 +45,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -225,8 +225,8 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void filteringOutConflictingTransactions() {
 		// Arrange:
-		final Account sender = createSenderWithAmount(100);
-		final Account recipient = createSenderWithAmount(100);
+		final Account sender = createSenderWithAmount(3);
+		final Account recipient = createSenderWithAmount(0);
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
 

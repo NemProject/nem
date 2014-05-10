@@ -11,6 +11,9 @@ import org.nem.core.time.TimeInstant;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 1000;
 
+	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER =
+			(final Account sender, final Account recipient, final Amount amount) -> sender.getBalance().compareTo(amount) >= 0;
+
 	private Amount amount;
 	private Message message;
 	private Account recipient;
@@ -78,9 +81,15 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isValid()
+	{
+		return this.isValid(DEFAULT_TRANSFER_VERIFIER);
+	}
+
+	@Override
+	public boolean isValid(final TransactionValidator transactionValidator) {
 		return super.isValid()
-				&& this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
+				&& transactionValidator.validateTransfer(this.getSigner(), this.getRecipient(), this.amount.add(this.getFee()))
 				&& this.getMessageLength() <= MAX_MESSAGE_SIZE;
 	}
 

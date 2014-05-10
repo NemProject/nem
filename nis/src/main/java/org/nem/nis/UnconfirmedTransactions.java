@@ -19,6 +19,8 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
+	private final TransactionValidator UNCONFIRMED_TRANSACTION_VALIDATOR =
+			(final Account sender, final Account recipient, final Amount amount) -> unconfirmedBalances.get(sender).compareTo(amount) >= 0;
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -56,13 +58,16 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		// isValid checks the sender balance
-		if (!transaction.isValid()) {
+		// not sure if adding to cache here is a good idea...
+		addToCache(transaction.getSigner());
+		if (!transaction.isValid(UNCONFIRMED_TRANSACTION_VALIDATOR)) {
 			return false;
 		}
 
 		transaction.subscribe(this.transferObserver);
 		transaction.execute(false);
+		transaction.unsubscribe(this.transferObserver);
+
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
 	}
@@ -83,8 +88,10 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
+		transaction.subscribe(this.transferObserver);
 		transaction.undo(false);
 		transaction.unsubscribe(this.transferObserver);
+
 		this.transactions.remove(transactionHash);
 		return true;
 	}
@@ -102,8 +109,7 @@ public class UnconfirmedTransactions {
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			final Transaction removedTransaction = this.transactions.remove(transactionHash);
-			removedTransaction.unsubscribe(this.transferObserver);
+			this.transactions.remove(transactionHash);
 		}
 	}
 
