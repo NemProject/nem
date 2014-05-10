@@ -150,6 +150,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract void transfer(final TransferObserver observer);
 
 	/**
+	 * Determine if transaction is valid using given transaction validator
+	 * @param transactionValidator transaction validator to use for validation
+	 * @return true if transaction is valid
+	 */
+	public abstract boolean isValid(final TransactionValidator transactionValidator);
+
+	/**
 	 * Determines if this transaction is valid.
 	 *
 	 * @return true if this transaction is valid.

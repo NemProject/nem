@@ -303,6 +303,38 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	public void isValidFailsWithFailingValidator() {
+		// Arrange:
+		final Transaction transaction = createTransaction(2, 1, 1);
+		final TransactionValidator failingTransactionValidator = new TransactionValidator() {
+			@Override
+			public boolean validateTransfer(Account signer, Account recipient, Amount amount) {
+				return false;
+			}
+		};
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidSucceedsWithSuceedingValidator() {
+		// Arrange:
+		final Transaction transaction = createTransaction(2, 2, 1);
+		final TransactionValidator failingTransactionValidator = new TransactionValidator() {
+			@Override
+			public boolean validateTransfer(Account signer, Account recipient, Amount amount) {
+				return true;
+			}
+		};
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void transactionsWithNonNegativeAmountAreValid() {
 		// Assert:
 		Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));
@@ -326,7 +358,8 @@ public class TransferTransactionTest {
 		Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(false));
 	}
 
-	private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+
+	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(senderBalance));
@@ -334,6 +367,13 @@ public class TransferTransactionTest {
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
 		transaction.setFee(new Amount(fee));
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
+
+		return transaction;
+	}
+
+	private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+		// Arrange:
+		TransferTransaction transaction = createTransaction(senderBalance, amount, fee);
 
 		// Act:
 		return transaction.isValid();
