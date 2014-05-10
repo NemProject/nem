@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Container for vested balances.
+ *
+ * Methods of this class, assume, that they are called in paired order
+ */
 public class VestedBalances {
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
@@ -19,8 +24,7 @@ public class VestedBalances {
 	 * @param amount The amount.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
-		long h = calculateBucket(height);
-		final VestedBalance vestedBalance = new VestedBalance(new BlockHeight(h), amount);
+		final VestedBalance vestedBalance = createVestedBalance(height, amount);
 
 		int index = Collections.binarySearch(balances, vestedBalance);
 		if (index >= 0) {
@@ -38,9 +42,19 @@ public class VestedBalances {
 		}
 	}
 
-	public void undoReceive(final BlockHeight height, final Amount amount) {
+	private VestedBalance createVestedBalance(final BlockHeight height, final Amount amount) {
 		long h = calculateBucket(height);
-		final VestedBalance vestedBalance = new VestedBalance(new BlockHeight(h), amount);
+		return new VestedBalance(new BlockHeight(h), amount);
+	}
+
+	/**
+	 * Undoes receive operation of amount at height
+	 *
+	 * @param height The height.
+	 * @param amount The amount.
+	 */
+	public void undoReceive(final BlockHeight height, final Amount amount) {
+		final VestedBalance vestedBalance = createVestedBalance(height, amount);
 
 		int index = Collections.binarySearch(balances, vestedBalance);
 		if (index >= 0) {
@@ -51,9 +65,52 @@ public class VestedBalances {
 		}
 	}
 
+	/**
+	 * Adds send operation of amount at height
+	 *
+	 * @param height The height.
+	 * @param amount The amount.
+	 */
+	public void addSend(final BlockHeight height, final Amount amount) {
+		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+
+		int index = Collections.binarySearch(balances, vestedBalance);
+		if (index >= 0) {
+			balances.get(index).send(amount);
+
+		} else {
+			int newIndex = -index-1;
+			if (newIndex == 0) {
+				throw new IllegalArgumentException("trying to send from empty account");
+
+			} else {
+				newIndex = iterateBalances(height, newIndex);
+				balances.get(newIndex).send(amount);
+			}
+		}
+	}
+
+	/**
+	 * Undoes send operation of amount at height
+	 *
+	 * @param height The height.
+	 * @param amount The amount.
+	 */
+	public void undoSend(final BlockHeight height, final Amount amount) {
+		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+
+		int index = Collections.binarySearch(balances, vestedBalance);
+		if (index >= 0) {
+			index = undoIterateBalances(index);
+			balances.get(index).undoSend(amount);
+
+		} else {
+			throw new IllegalArgumentException("trying to undo non-existent send or too far in past");
+		}
+	}
+
 	public Amount getUnvested(final BlockHeight height) {
-		long h = calculateBucket(height);
-		final VestedBalance vestedBalance = new VestedBalance(new BlockHeight(h), Amount.ZERO);
+		final VestedBalance vestedBalance = createVestedBalance(height, Amount.ZERO);
 		int index = Collections.binarySearch(balances, vestedBalance);
 		if (index < 0) {
 			index = -index-1;
