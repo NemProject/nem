@@ -26,11 +26,15 @@ public class POIV1Impl implements POI {
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size());
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIE);
+	}
+	
+	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), scoringAlg);
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
-	private ColumnVector calculateImportancesImpl(final BlockHeight blockHeight, List<Account> accounts, int maxIters, double tol) {
+	private ColumnVector calculateImportancesImpl(final BlockHeight blockHeight, List<Account> accounts, int maxIters, double tol, PoiScorer.ScoringAlg scoringAlg) {
 
 		// (1) set up the matrices and vectors
 		final PoiContext context = new PoiContext(accounts, accounts.size(), blockHeight);
@@ -49,7 +53,7 @@ public class POIV1Impl implements POI {
 		return scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutLinkScoreVector(),
-				context.getCoinDaysVector());
+				context.getCoinDaysVector(), scoringAlg);
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {

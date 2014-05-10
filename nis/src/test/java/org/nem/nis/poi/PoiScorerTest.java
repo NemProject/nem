@@ -28,7 +28,7 @@ public class PoiScorerTest {
 		final ColumnVector finalScoresVector = scorer.calculateFinalScore(
 				new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30),
 				new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00),
-				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0));
+				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0), PoiScorer.ScoringAlg.BLOODYROOKIE);
 
 		// Assert:
 		final double scale = 1 * 9 * 140;

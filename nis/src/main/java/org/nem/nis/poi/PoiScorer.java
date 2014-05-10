@@ -9,6 +9,9 @@ import java.util.List;
  */
 public class PoiScorer {
 
+	public enum ScoringAlg { BLOODYROOKIE, UTOPIAN, MAKOTO }
+	
+	
 	/**
 	 * Calculates the weighted teleporation sum of all dangling accounts.
 	 *
@@ -41,7 +44,9 @@ public class PoiScorer {
 	public ColumnVector calculateFinalScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector coinDaysVector,
+			final ScoringAlg scoringAlg) {
+		
 		System.out.println("outLinkVector" + outLinkVector);
 		System.out.println("importanceVector" + importanceVector);
 		System.out.println("coinDaysVector" + coinDaysVector);
@@ -51,14 +56,13 @@ public class PoiScorer {
 //		final double scale = maxImportance * maxOutLink * maxCoinDays;
 		//TODO: we might want to normalize outlinkvector and coindaysvector before this
 		
-		//Try some different scoring methods. This code is temporary so I can quickly try out many things.
-		int scoringAlg = 0;
+		ColumnVector finalScoreVector = null;
 		
-		if (scoringAlg == 0) {
+		if (scoringAlg == ScoringAlg.BLOODYROOKIE) {
 		
 			ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
 			vector.normalize();
-			final ColumnVector finalScoreVector = importanceVector
+			finalScoreVector = importanceVector
 					.multiplyElementWise(vector); 
 					// TODO: in the latest Python prototype, I added outLinkVector instead of multiplying, 
 					// because I was concerned that otherwise people could boost their importance too easily.
@@ -69,12 +73,10 @@ public class PoiScorer {
 	
 			// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
 			//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
-			finalScoreVector.normalize();
-			return finalScoreVector;
-		} else if (scoringAlg == 1) {
-
-			// Try utopian scorer
-			// (outlink 2 + PR) stake + sqrt (stake)
+			
+		} else if (scoringAlg == ScoringAlg.UTOPIAN) {
+			// norm(outlink 2 + PR)*stake + sqrt(stake)
+			
 			outLinkVector.normalize();
 			ColumnVector vector = outLinkVector.multiply(2.0).add(
 					importanceVector);
@@ -82,11 +84,11 @@ public class PoiScorer {
 
 			ColumnVector sqrtcoindays = coinDaysVector.sqrt();
 
-			final ColumnVector finalScoreVector = vector.multiplyElementWise(
+			finalScoreVector = vector.multiplyElementWise(
 					coinDaysVector).add(sqrtcoindays);
-			finalScoreVector.normalize();
-			return finalScoreVector;
 		}
-		return null;//TODO: compile hack. This will be taken out
+		
+		finalScoreVector.normalize();
+		return finalScoreVector;
 	}
 }
