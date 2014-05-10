@@ -45,7 +45,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(true));
+		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test

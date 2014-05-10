@@ -66,6 +66,8 @@ public class UnconfirmedTransactions {
 
 		transaction.subscribe(this.transferObserver);
 		transaction.execute(false);
+		transaction.unsubscribe(this.transferObserver);
+
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
 	}
@@ -86,8 +88,10 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
+		transaction.subscribe(this.transferObserver);
 		transaction.undo(false);
 		transaction.unsubscribe(this.transferObserver);
+
 		this.transactions.remove(transactionHash);
 		return true;
 	}
@@ -105,8 +109,7 @@ public class UnconfirmedTransactions {
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			final Transaction removedTransaction = this.transactions.remove(transactionHash);
-			removedTransaction.unsubscribe(this.transferObserver);
+			this.transactions.remove(transactionHash);
 		}
 	}
 
