@@ -1,27 +1,20 @@
 package org.nem.nis.dao;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.nem.core.model.BlockDifficulty;
-import org.nem.core.model.BlockHeight;
-import org.nem.core.model.Hash;
-import org.nem.core.model.HashChain;
+import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {
@@ -71,10 +64,14 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Block findById(long id) {
-		Query query = getCurrentSession()
-				.createQuery("from Block a where a.id = :id")
-				.setParameter("id", id);
-		return executeSingleQuery(query);
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.add(Restrictions.eq("id", id));
+
+//		Query query = getCurrentSession()
+//				.createQuery("from Block a where a.id = :id")
+//				.setParameter("id", id);
+		return executeSingleQuery(criteria);
 	}
 
 	@Override
@@ -87,21 +84,34 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
     @Override
-    @Transactional
+	@Transactional(readOnly = true)
     public HashChain getHashesFrom(final BlockHeight height, int limit) {
 		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit);
         return HashChain.fromRawHashes(blockList);
     }
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
+	public Collection<Block> getBlocksForAccount(final Account account, int limit) {
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("forger", FetchMode.JOIN)
+				.setFetchMode("blockTransfers", FetchMode.SELECT)
+				.setMaxResults(limit)
+				// nested criteria
+				.createCriteria("forger", "f")
+					.add(Restrictions.eq("f.printableKey", account.getAddress().getEncoded()));
+		return listAndCast(criteria);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
 		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit);
 		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
 		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
 		return rawTimestamps.stream().map(TimeInstant::new).collect(Collectors.toList());
@@ -139,6 +149,11 @@ public class BlockDaoImpl implements BlockDao {
 		return blockList.size() > 0 ? blockList.get(0) : null;
 	}
 
+	private <T> T executeSingleQuery(final Criteria criteria) {
+		final List<T> blockList = listAndCast(criteria);
+		return blockList.size() > 0 ? blockList.get(0) : null;
+	}
+
 	private <T> List<T> prepareCriteriaGetFor(String name, BlockHeight height, int limit) {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setMaxResults(limit)
@@ -156,10 +171,16 @@ public class BlockDaoImpl implements BlockDao {
 	public Block findByHash(final Hash blockHash) {
 		final byte[] blockHashBytes = blockHash.getRaw();
 		long blockId = ByteUtils.bytesToLong(blockHashBytes);
-		Query query = getCurrentSession()
-				.createQuery("from Block a where a.shortId = :id")
-				.setParameter("id", blockId);
-		final List<?> blockList = query.list();
+
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.add(Restrictions.eq("shortId", blockId));
+		final  List<Block> blockList = listAndCast(criteria);
+
+//		Query query = getCurrentSession()
+//				.createQuery("from Block a where a.shortId = :id")
+//				.setParameter("id", blockId);
+//		final List<?> blockList = query.list();
 		for (final Object blockObject : blockList) {
 			final Block block = (Block)blockObject;
 			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {

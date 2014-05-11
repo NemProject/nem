@@ -43,8 +43,14 @@ public class AccountController {
 
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Transaction> accountUnlock(@RequestParam(value = "address") final String nemAddress) {
+	public SerializableList<Transaction> accountTransfers(@RequestParam(value = "address") final String nemAddress) {
 		return this.accountIo.getAccountTransfers(getAddress(nemAddress));
+	}
+
+	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Block> accountBlocks(@RequestParam(value = "address") final String nemAddress) {
+		return this.accountIo.getAccountBlocks(getAddress(nemAddress));
 	}
 
 	private Address getAddress(String nemAddress) {
