@@ -157,24 +157,6 @@ public class VestedBalanceTest {
 	}
 
 	@Test
-	public void undoSendDoesNotFail() {
-		// Arrange:
-		final VestedBalance vestedBalance = prepareVestedForSending(100_000);
-
-		// Act:
-		final Amount vested1 = vestedBalance.getVestedBalance();
-		final Amount unvested1 = vestedBalance.getUnvestedBalance();
-		vestedBalance.send(Amount.fromMicroNem(100_000));
-		vestedBalance.undoSend(Amount.fromMicroNem(100_000));
-		final Amount vested2 = vestedBalance.getVestedBalance();
-		final Amount unvested2 = vestedBalance.getUnvestedBalance();
-
-		// Assert:
-		Assert.assertThat(vested2, IsEqual.equalTo(vested1));
-		Assert.assertThat(unvested2, IsEqual.equalTo(unvested1));
-	}
-
-	@Test
 	public void undoSendRestoresValuesMultipleSends() {
 		// Arrange:
 		for (int i = 1; i <= 10; ++i) {

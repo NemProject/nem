@@ -137,6 +137,22 @@ public class VestedBalancesTest {
 		assertUnvested(vestedBalances, 1440, Amount.fromNem(123));
 	}
 
+
+	@Test
+	public void canUndoSendWholeBalance() {
+		// Arrange:
+		final VestedBalances vestedBalances = new VestedBalances();
+
+		// Act:
+		vestedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
+		vestedBalances.addSend(BlockHeight.ONE, Amount.fromNem(123));
+		vestedBalances.undoSend(BlockHeight.ONE, Amount.fromNem(123));
+
+		// Assert:
+		assertUnvested(vestedBalances, 1, Amount.fromNem(123));
+		assertUnvested(vestedBalances, 1440, Amount.fromNem(123));
+	}
+
 	@Test
 	public void canUndoAfterTimeSendBalance() {
 		// Arrange:

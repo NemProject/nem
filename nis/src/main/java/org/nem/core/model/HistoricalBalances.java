@@ -29,7 +29,7 @@ public class HistoricalBalances {
 	 * @return the copy
 	 */
 	public HistoricalBalances copy() {
-		HistoricalBalances historicalBalances = new HistoricalBalances();
+		final HistoricalBalances historicalBalances = new HistoricalBalances();
 
 		if (size() > 0) {
 			BlockHeight height = balances.get(balances.size() - 1).getHeight();

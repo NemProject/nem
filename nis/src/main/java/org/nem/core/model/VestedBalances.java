@@ -15,7 +15,20 @@ public class VestedBalances {
 	 */
 	public final long MAX_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + BlockChainConstants.REWRITE_LIMIT;
 
-	private final List<VestedBalance> balances = new ArrayList<>();
+	private final List<VestedBalance> balances;
+	public final HistoricalBalances historicalBalances;
+
+	private VestedBalances(final HistoricalBalances historicalBalances) {
+		this.balances = new ArrayList<>();
+		this.historicalBalances = historicalBalances;
+	}
+	public  VestedBalances() {
+		this(new HistoricalBalances());
+	}
+
+	public VestedBalances copy() {
+		return new VestedBalances(this.historicalBalances.copy());
+	}
 
 	/**
 	 * Adds receive operation of amount at height.
