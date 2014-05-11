@@ -81,7 +81,7 @@ public class PoiScorer {
 			outLinkVector.normalize();
 			
 			double c1 = 0.5;
-			double c2 = 0.1;
+			double c2 = 0.05;
 			
 			ColumnVector weightedOutlinks = outLinkVector.multiply(c1); 
 			ColumnVector weightImportances = importanceVector.multiply(c2); 

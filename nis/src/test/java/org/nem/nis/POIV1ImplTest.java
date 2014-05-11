@@ -151,7 +151,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.05); //TODO:0.9 ratio is probably OK. Many accounts helps to harden the network, right, so this shouldn't be too bad.
+			Assert.assertTrue(0.9 < ratio && ratio < 1.05); //TODO:0.9 ratio is probably OK.
 		}
 		System.out.println("");
 	}
@@ -182,8 +182,10 @@ public class POIV1ImplTest {
 			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
 			System.out.println(", ratio is " + format.format(ratio));
 			
+			System.out.println(importances);
+			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.05); //TODO: having any PR at all will make it so that more accounts will have more importance than fewer accounts (because of teleportation, PR will always be non-zero)
 		}
 		System.out.println("");
 	}
