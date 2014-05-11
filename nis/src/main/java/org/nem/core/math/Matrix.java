@@ -134,7 +134,7 @@ public class Matrix {
 	 *
 	 * @return The sum of all the matrix's elements of a row.
 	 */
-	public double rowSum(int row) {
+	public double rowSum(final int row) {
 		double sum = 0.0;
 		for (int i = 0; i < this.cols; ++i)
 			sum += this.columns[i].getAt(row);
@@ -147,7 +147,7 @@ public class Matrix {
 	 *
 	 * @return The sum of all the matrix's elements of a column.
 	 */
-	public double columnSum(int column) {
+	public double columnSum(final int column) {
 		return this.columns[column].sum();
 	}
 
