@@ -350,6 +350,7 @@ public class POIV1ImplTest {
 		
 	}
 
+	@Test
 	public void poiCalculationIsPerformantEnough() {
 		LOGGER.info("Testing performance of the poi calculation");
 		
