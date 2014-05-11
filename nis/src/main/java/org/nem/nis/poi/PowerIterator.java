@@ -39,6 +39,10 @@ public abstract class PowerIterator {
 		return this.result;
 	}
 
+	public int getMaxIterations() {
+		return this.maxIterations;
+	}
+
 	/**
 	 * Runs the power iteration algorithm until convergence is reached
 	 * or the maximum number of iterations have occurred.
