@@ -348,6 +348,31 @@ public class POIV1ImplTest {
 		System.out.println("");
 	}
 	
+	@Test
+	public void poiCalculationIsPerformantEnough() {
+		LOGGER.info("Testing performance of the poi calculation");
+		
+		// Arrange:
+		// The poi calculation should take no more than a second even for MANY accounts (~ million)
+		System.out.println("Setting up accounts.");
+		int numAccounts = 5000;
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		System.out.println("Starting poi calculation.");
+		long start = System.currentTimeMillis();
+		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		long stop = System.currentTimeMillis();
+		System.out.println("Finished poi calculation.");
+
+		System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop-start) + "ms.");
+		
+		// Assert
+		Assert.assertTrue(stop-start < 1000);
+	}
+	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
 		List<MockAccount> accounts = new ArrayList<MockAccount>();
 		

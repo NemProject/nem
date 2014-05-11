@@ -41,7 +41,7 @@ public class POIV1Impl implements POI {
 		iterator.run();
 
 		if (!iterator.hasConverged()) {
-			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);
+			final String message = String.format("POI: power iteration failed to converge in %s iterations", iterator.getMaxIterations());
 			throw new IllegalStateException(message);
 		}
 
