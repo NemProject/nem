@@ -80,8 +80,8 @@ public class PoiScorer {
 			coinDaysVector.normalize();
 			outLinkVector.normalize();
 			
-			double c1 = 0.01;
-			double c2 = 0.01;
+			double c1 = 0.5;
+			double c2 = 0.2;
 			
 			ColumnVector weightedOutlinks = outLinkVector.multiply(c1); 
 			ColumnVector weightImportances = importanceVector.multiply(c2); 
