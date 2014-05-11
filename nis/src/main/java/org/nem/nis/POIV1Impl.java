@@ -26,7 +26,7 @@ public class POIV1Impl implements POI {
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIE);
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIENEW);
 	}
 	
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {

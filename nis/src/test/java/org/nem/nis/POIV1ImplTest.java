@@ -311,14 +311,13 @@ public class POIV1ImplTest {
 	
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.UTOPIAN);
+			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
 			System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(0)));
 			System.out.print(", User 2 cumulative importance is " + format.format(importances.sum() - importances.getAt(0)));
 			System.out.println(", ratio is " + format.format(ratio));
-			
 			
 			// Assert
 			// Temporary changed the assert so it doesn't fail although the sybil attack succeeds

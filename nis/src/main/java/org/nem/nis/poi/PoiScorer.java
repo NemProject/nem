@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class PoiScorer {
 
-	public enum ScoringAlg { BLOODYROOKIE, UTOPIAN, MAKOTO }
+	public enum ScoringAlg { BLOODYROOKIEOLD, BLOODYROOKIENEW, UTOPIAN, MAKOTO }
 	
 	
 	/**
@@ -58,7 +58,7 @@ public class PoiScorer {
 		
 		ColumnVector finalScoreVector = null;
 		
-		if (scoringAlg == ScoringAlg.BLOODYROOKIE) {
+		if (scoringAlg == ScoringAlg.BLOODYROOKIEOLD) {
 		
 			ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
 			vector.normalize();
@@ -74,6 +74,20 @@ public class PoiScorer {
 			// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
 			//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
 			
+		} else if (scoringAlg == ScoringAlg.BLOODYROOKIENEW) {
+//		final score = l1norm(stakes) + c1 * l1norm(outlinkstrengths) + c2 * l1norm(PR)
+
+			coinDaysVector.normalize();
+			outLinkVector.normalize();
+			
+			double c1 = 0.01;
+			double c2 = 0.01;
+			
+			ColumnVector weightedOutlinks = outLinkVector.multiply(c1); 
+			ColumnVector weightImportances = importanceVector.multiply(c2); 
+			
+			finalScoreVector = coinDaysVector.add(weightedOutlinks).add(weightImportances);
+			
 		} else if (scoringAlg == ScoringAlg.UTOPIAN) {
 			// norm(outlink 2 + PR)*stake + sqrt(stake)
 			
@@ -87,7 +101,11 @@ public class PoiScorer {
 			finalScoreVector = vector.multiplyElementWise(
 					coinDaysVector).add(sqrtcoindays);
 		} else if (scoringAlg == ScoringAlg.MAKOTO) {
-			// TODO:
+			// from the original python prototype
+			outLinkVector.normalize();
+			coinDaysVector.normalize();
+			finalScoreVector = importanceVector.add(outLinkVector)
+					                           .multiplyElementWise(coinDaysVector);
 		}
 		
 		finalScoreVector.normalize();
