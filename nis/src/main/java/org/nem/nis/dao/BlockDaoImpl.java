@@ -77,10 +77,10 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Block findByHeight(final BlockHeight height) {
-		Query query = getCurrentSession()
-				.createQuery("from Block a where a.height = :height")
-				.setParameter("height", height.getRaw());
-		return executeSingleQuery(query);
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.add(Restrictions.eq("height", height.getRaw()));
+		return executeSingleQuery(criteria);
 	}
 
     @Override
