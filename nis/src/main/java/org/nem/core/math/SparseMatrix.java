@@ -1,5 +1,8 @@
 package org.nem.core.math;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Represents a linear algebra matrix which is sparsely populated.
@@ -12,22 +15,19 @@ public class SparseMatrix {
 	/**
 	 * The rows of the matrix
 	 */
-	final private SparseRowVector[] rows;
+	final private HashMap<Long, Double> entries;
 
 	/**
 	 * Creates a new matrix of the specified size which has a given capacity for each row.
 	 *
-	 * @param numRows The desired number of rows.
-	 * @param numCols The desired number of columns.
-	 * @param initialCapacityPerRow The initial capacity for a row's hash map.
+	 * @param numRows The desired number of rows to represent.
+	 * @param numCols The desired number of columns to represen.
+	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
 	 */
-	public SparseMatrix(final int numRows, final int numCols, final int initialCapacityPerRow) {
+	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
 		this.numRows = numRows;
 		this.numCols = numCols;
-		rows = new SparseRowVector[numRows];
-		for (int i=0; i<numRows; i++) {
-			rows[i] = new SparseRowVector(numCols, initialCapacityPerRow);
-		}
+		entries = new HashMap<Long, Double>(initialCapacity);
 	}
 	
 	/**
@@ -56,8 +56,16 @@ public class SparseMatrix {
 	 *
 	 * @return The value.
 	 */
-	public double getAt(final int row, final int col) {
-		return this.rows[row].getAt(col);
+	public double getAt(final long row, final long col) {
+		if (row < 0 || row >= numRows) {
+			throw new IllegalArgumentException("Row index out of bounds");
+		}
+		if (col < 0 || col >= numCols) {
+			throw new IllegalArgumentException("Column index out of bounds");
+		}
+		long index = (row << 32) + col;
+		Double value = this.entries.get(index);
+		return value == null? 0 : value;
 	}
 
 	/**
@@ -67,8 +75,19 @@ public class SparseMatrix {
 	 * @param col The column.
 	 * @param val The value.
 	 */
-	public void setAt(final int row, final int col, final double val) {
-		this.rows[row].setAt(col, val);
+	public void setAt(final long row, final long col, final double value) {
+		if (row < 0 || row >= numRows) {
+			throw new IllegalArgumentException("Row index out of bounds");
+		}
+		if (col < 0 || col >= numCols) {
+			throw new IllegalArgumentException("Column index out of bounds");
+		}
+		long index = (row << 32) + col;
+		if (value == 0.0) {
+			this.entries.remove(index);
+		} else {
+			this.entries.put(index, value);
+		}
 	}
 
 	/**
@@ -78,54 +97,48 @@ public class SparseMatrix {
 	 * @param col The column.
 	 * @param val The value to increment by.
 	 */
-	public void incrementAt(final int row, final int col, final double val) {
-		this.rows[row].incrementAt(col, val);
+	public void incrementAt(final long row, final long col, final double val) {
+		if (row < 0 || row >= numRows) {
+			throw new IllegalArgumentException("Row index out of bounds");
+		}
+		if (col < 0 || col >= numCols) {
+			throw new IllegalArgumentException("Column index out of bounds");
+		}
+		long index = (row << 32) + col;
+		double value = getAt(row, col) + val;
+		if (value == 0.0) {
+			this.entries.remove(index);
+		} else {
+			this.entries.put(index, value);
+		}
 	}
 
 	/**
 	 * Normalizes each column of the matrix.
 	 */
 	public void normalizeColumns() {
-		for (int i = 0; i < this.numCols; ++i) {
-			double sum = 0.0;
-			for (int j=0; j<this.numRows; j++) {
-				sum += Math.abs(this.rows[j].getAt(i));
-			}
-			for (int j=0; j<this.numRows; j++) {
-				this.rows[j].setAt(i, this.rows[j].getAt(i)/sum);
+		ColumnVector vector = new ColumnVector(numRows);
+		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+			vector.incrementAt((int)(entry.getKey() & 0xffffffff), Math.abs(entry.getValue()));
+		}
+		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+			if (entry.getValue() != 0.0) {
+				this.entries.put(entry.getKey(), entry.getValue()/vector.getAt((int)(entry.getKey() & 0xffffffff)));
 			}
 		}
 	}
 
 	/**
-	 * Normalizes each column of the matrix.
-	 */
-	public void normalizeRows() {
-		for (int i = 0; i < this.numRows; ++i)
-			this.rows[i].normalize();
-	}
-
-	/**
-	 * Gets the sum of all the matrix's elements in a row.
+	 * Sum of all the matrix's elements in each row thus forming a vector
 	 *
-	 * @return The sum of all the matrix's elements of a row.
+	 * @return The row sum vector.
 	 */
-	public double rowSum(final int row) {
-		return this.rows[row].sum();
-	}
-
-	/**
-	 * Gets the sum of all the matrix's elements in a column.
-	 *
-	 * @return The sum of all the matrix's elements of a column.
-	 */
-	public double columnSum(final int column) {
-		double sum = 0.0;
-		for (int i=0; i<this.numCols; i++) {
-			sum += this.rows[i].getAt(column);
+	public ColumnVector getRowSumVector() {
+		ColumnVector result = new ColumnVector(numRows);
+		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+			result.incrementAt((int)(entry.getKey() >> 32), entry.getValue());
 		}
-		
-		return sum;
+		return result;
 	}
 
 	/**
@@ -141,10 +154,9 @@ public class SparseMatrix {
 		}
 		
 		final ColumnVector result = new ColumnVector(this.numRows);
-		for (int i = 0; i<this.numRows; i++) {
-			result.setAt(i, this.rows[i].multiply(vector));
+		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+			result.incrementAt((int)(entry.getKey() >> 32), entry.getValue() * vector.getAt((int)(entry.getKey() & 0xffffffff)));
 		}
 		return result;
-	}
-		
+	}	
 }

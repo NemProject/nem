@@ -55,6 +55,23 @@ public class ColumnVectorTest {
 	}
 
 	@Test
+	public void vectorValuesCanBeIncremented() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(3);
+
+		// Act:
+		vector.setAt(0, 7);
+		vector.setAt(1, 3);
+		vector.setAt(2, 5);
+		vector.incrementAt(0, 6);
+		vector.incrementAt(1, 4);
+		vector.incrementAt(2, 1);
+
+		// Assert:
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(13, 7, 6)));
+	}
+
+	@Test
 	public void vectorCannotBeIndexedOutOfBounds() {
 		// Assert:
 		assertOutOfBounds(3, -1);
