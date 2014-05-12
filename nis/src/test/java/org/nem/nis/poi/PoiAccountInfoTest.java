@@ -77,7 +77,7 @@ public class PoiAccountInfoTest {
 		// Assert:
 		Assert.assertThat(
 				info.getOutLinkWeights(),
-				IsEqual.equalTo(new ColumnVector(0.10, 0.15, 0.05, 0.25, 0.45)));
+				IsEqual.equalTo(new ColumnVector(2., 3., 1., 5., 9.)));
 	}
 
 	@Test

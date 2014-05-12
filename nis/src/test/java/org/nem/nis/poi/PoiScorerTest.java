@@ -39,6 +39,7 @@ public class PoiScorerTest {
 				0.5 * 9 * 45 / scale,
 				0.6 * 2 * 40 / scale,
 				0.3 * 5 * 25 / scale);
+		//TODO: this assert fails, but we are still playing around with the scoring alg, so let's wait on this
 		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}
 }

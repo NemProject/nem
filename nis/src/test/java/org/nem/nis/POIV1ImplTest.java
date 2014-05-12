@@ -377,7 +377,7 @@ public class POIV1ImplTest {
 		System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop-start) + "ms.");
 		
 		// Assert
-		Assert.assertTrue(stop-start < 1000);
+		Assert.assertTrue(stop-start < 1000);//TODO: this takes slightly over 2s on my 3 year old macbook air
 	}
 	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
