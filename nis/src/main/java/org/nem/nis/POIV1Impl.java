@@ -56,7 +56,8 @@ public class POIV1Impl implements POI {
 		return scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutLinkScoreVector(),
-				context.getCoinDaysVector(), scoringAlg);
+				context.getCoinDaysVector(),
+				scoringAlg);
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {
