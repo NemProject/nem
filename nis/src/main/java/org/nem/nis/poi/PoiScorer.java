@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class PoiScorer {
 
-	public enum ScoringAlg { BLOODYROOKIEOLD, BLOODYROOKIENEW, UTOPIAN, MAKOTO }
+	public enum ScoringAlg { BLOODYROOKIEOLD, BLOODYROOKIENEW, UTOPIAN, PYTHON, MAKOTO }
 	
 	
 	/**
@@ -84,9 +84,9 @@ public class PoiScorer {
 			double c2 = 0.05;
 			
 			ColumnVector weightedOutlinks = outLinkVector.multiply(c1); 
-			ColumnVector weightImportances = importanceVector.multiply(c2); 
+			ColumnVector weightedImportances = importanceVector.multiply(c2); 
 			
-			finalScoreVector = coinDaysVector.add(weightedOutlinks).add(weightImportances);
+			finalScoreVector = coinDaysVector.add(weightedOutlinks).add(weightedImportances);
 			
 		} else if (scoringAlg == ScoringAlg.UTOPIAN) {
 			// norm(outlink 2 + PR)*stake + sqrt(stake)
@@ -100,12 +100,26 @@ public class PoiScorer {
 
 			finalScoreVector = vector.multiplyElementWise(
 					coinDaysVector).add(sqrtcoindays);
-		} else if (scoringAlg == ScoringAlg.MAKOTO) {
+		} else if (scoringAlg == ScoringAlg.PYTHON) {
 			// from the original python prototype
 			outLinkVector.normalize();
 			coinDaysVector.normalize();
 			finalScoreVector = importanceVector.add(outLinkVector)
 					                           .multiplyElementWise(coinDaysVector);
+		} else if (scoringAlg == ScoringAlg.MAKOTO) {
+
+			coinDaysVector.normalize();
+			outLinkVector.normalize();
+			
+			double c1 = 0.5;
+			double c2 = 0.05;
+			
+			ColumnVector weightedOutlinks = outLinkVector.multiply(c1); 
+			ColumnVector weightedImportances = importanceVector.multiply(c2); 
+			
+			finalScoreVector = coinDaysVector.add(
+									weightedOutlinks.multiplyElementWise(weightedImportances)
+								);
 		}
 		
 		finalScoreVector.normalize();
