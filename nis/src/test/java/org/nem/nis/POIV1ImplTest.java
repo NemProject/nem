@@ -42,6 +42,31 @@ public class POIV1ImplTest {
 	static private final int OUTLINK_STRATEGY_LOOP_SELF = 3;
 	static private final int OUTLINK_STRATEGY_ALL_TO_ONE = 4;
 	
+	@Test
+	public void threeSimpleAccounts() {
+		// Arrange:
+		Account a = createAccountWithBalance(100);
+		Account b = createAccountWithBalance(100);
+		Account c = createAccountWithBalance(100);
+
+		final BlockHeight blockHeight = new BlockHeight(1337);
+
+		// A sends all 100 NEM to B,
+		a.addOutlink(new AccountLink(100, b));
+
+		List<Account> accts = Arrays.asList(a, b, c);
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi
+				.getAccountImportances(blockHeight, accts);
+		System.out.println(importances);
+		
+		// Assert
+		//a > b > c
+		Assert.assertTrue(importances.getAt(0) > importances.getAt(1)  && importances.getAt(1) > importances.getAt(2));
+	}
+	
 	/**
 	 * Four nodes (A, B, C, D) are owned by one person with 400 NEM who distributed the NEM 
 	between the nodes and cycled the NEM around. The other three nodes are independent and have 400 NEM each.
@@ -329,33 +354,6 @@ public class POIV1ImplTest {
 	}
 	
 	@Test
-	public void threeSimpleAccounts() {
-		// Arrange:
-		Account a = createAccountWithBalance(100);
-		Account b = createAccountWithBalance(100);
-		Account c = createAccountWithBalance(100);
-
-		final BlockHeight blockHeight = new BlockHeight(1337);
-
-		// TODO: we really need the infrastructure for adding coinday-weighted
-		// links and updating balances.
-		// A sends all 400 NEM to B,
-		a.addOutlink(new AccountLink(100, b));
-
-		List<Account> accts = Arrays.asList(a, b, c);
-
-		// Act: calculate importances
-		POI poi = new POIV1Impl();
-		ColumnVector importances = poi
-				.getAccountImportances(blockHeight, accts);
-		System.out.println(importances);
-		
-		// Assert
-		//a > b > c
-		Assert.assertTrue(importances.getAt(0) > importances.getAt(1)  && importances.getAt(1) > importances.getAt(2));
-	}
-
-	@Test
 	public void poiCalculationIsPerformantEnough() {
 		LOGGER.info("Testing performance of the poi calculation");
 		
@@ -379,6 +377,47 @@ public class POIV1ImplTest {
 		
 		// Assert
 		Assert.assertTrue(stop-start < 1000);//TODO: this takes slightly over 2s on my 3 year old macbook air
+	}
+	
+	@Test
+	/**
+	 * Test to see if the calculation time grows approximately linearly with the input.
+	 */
+	public void poiCalculationHasLinearPerformance() {
+		LOGGER.info("Testing linear performance of the poi calculation");
+		
+		// The poi calculation should take no more than a second even for MANY accounts (~ million)
+		
+		final BlockHeight height = new BlockHeight(1);
+		long prevTimeDiff = -1;
+		for (int numAccounts = 5; numAccounts < 10000; numAccounts*=10) {
+			// Arrange:
+			List<Account> accounts = new ArrayList<Account>();
+			accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
+
+			// Act: calculate importances
+			POI poi = new POIV1Impl();
+			System.out.println("Starting poi calculation.");
+			long start = System.currentTimeMillis();
+			ColumnVector importances = poi.getAccountImportances(height, accounts);
+			long stop = System.currentTimeMillis();
+			System.out.println("Finished poi calculation.");
+
+			System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop-start) + "ms.");
+			
+			// Assert
+			long currTimeDiff = stop-start;
+			
+			if (prevTimeDiff > 0) {
+				double ratio = prevTimeDiff * 10. / currTimeDiff;
+				System.out.println("Prev time: " + prevTimeDiff
+								 + "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
+				
+				Assert.assertTrue(ratio > .9);
+			}
+			
+			prevTimeDiff = currTimeDiff;
+		}
 	}
 	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
