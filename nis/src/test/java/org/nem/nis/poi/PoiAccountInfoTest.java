@@ -70,14 +70,14 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void outLinkWeightsAreNormalizedInOrderWhenAccountHasOutLinks() {
+	public void outLinkWeightsAreOrderedWhenAccountHasOutLinks() {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
 
 		// Assert:
 		Assert.assertThat(
 				info.getOutLinkWeights(),
-				IsEqual.equalTo(new ColumnVector(2., 3., 1., 5., 9.)));
+				IsEqual.equalTo(new ColumnVector(2.0, 3.0, 1.0, 5.0, 9.0)));
 	}
 
 	@Test

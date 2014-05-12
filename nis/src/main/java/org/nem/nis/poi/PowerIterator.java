@@ -39,10 +39,6 @@ public abstract class PowerIterator {
 		return this.result;
 	}
 
-	public int getMaxIterations() {
-		return this.maxIterations;
-	}
-
 	/**
 	 * Runs the power iteration algorithm until convergence is reached
 	 * or the maximum number of iterations have occurred.
@@ -76,12 +72,6 @@ public abstract class PowerIterator {
 	}
 
 	private boolean hasConverged(final ColumnVector vector1, final ColumnVector vector2) {
-		// TODO: i changed this to l2 distance because the l1 distance was returning negative values,
-		// TODO: so nothing was converging
-		// TODO: L2 is fine, but I was thinking that L1 would be faster. 
-		// TODO: We could always take the abs val of L1 if we need to speed this up.
-		// TODO: If we go with L2, we should verify that our epsilon for convergence is a suitable value 
-//		return vector1.l2Distance(vector2) <= this.epsilon;
-		return vector1.l1Distance(vector2) <= this.epsilon; //TODO: switched to L1
+		return vector1.l1Distance(vector2) <= this.epsilon;
 	}
 }

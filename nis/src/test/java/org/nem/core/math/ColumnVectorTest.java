@@ -428,6 +428,23 @@ public class ColumnVectorTest {
 
 	//endregion
 
+	//region roundTo
+
+	@Test
+	public void vectorCanBeSquareRooted() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(625, 36, 121);
+
+		// Act:
+		final ColumnVector result = vector.sqrt();
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(25.0, 6.0, 11.0)));
+	}
+
+	//endregion
+
 	//region clone
 
 	@Test

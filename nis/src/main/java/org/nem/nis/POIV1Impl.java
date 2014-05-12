@@ -26,26 +26,29 @@ public class POIV1Impl implements POI {
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIENEW);
+		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
 	}
 	
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), scoringAlg);
+		return calculateImportancesImpl(blockHeight, accounts, scoringAlg);
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
-	private ColumnVector calculateImportancesImpl(final BlockHeight blockHeight, List<Account> accounts, int maxIters, double tol, PoiScorer.ScoringAlg scoringAlg) {
+	private ColumnVector calculateImportancesImpl(
+			final BlockHeight blockHeight,
+			final List<Account> accounts,
+			final PoiScorer.ScoringAlg scoringAlg) {
 
 		// (1) set up the matrices and vectors
 		final PoiContext context = new PoiContext(accounts, accounts.size(), blockHeight);
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm
-		final PowerIterator iterator = new PoiPowerIterator(context, scorer, maxIters, tol);
+		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accounts.size());
 		iterator.run();
 
 		if (!iterator.hasConverged()) {
-			final String message = String.format("POI: power iteration failed to converge in %s iterations", iterator.getMaxIterations());
+			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);
 			throw new IllegalStateException(message);
 		}
 
@@ -61,8 +64,8 @@ public class POIV1Impl implements POI {
 		private final PoiContext context;
 		private final PoiScorer scorer;
 
-		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int maxIters, final double tol) {
-			super(context.getImportanceVector(), maxIters, tol);
+		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int numAccounts) {
+			super(context.getImportanceVector(), DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.scorer = scorer;
 		}

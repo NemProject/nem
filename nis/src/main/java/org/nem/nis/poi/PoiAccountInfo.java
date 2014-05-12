@@ -15,7 +15,6 @@ public class PoiAccountInfo {
 	private final int index;
 	private final Account account;
 	private final ColumnVector outLinkWeightsVector;
-	private final double weightsSum;
 
 	/**
 	 * Creates a new POI account info.
@@ -29,22 +28,16 @@ public class PoiAccountInfo {
 
 		if (!this.hasOutLinks()) {
 			this.outLinkWeightsVector = null;
-			this.weightsSum = 0;
 			return;
 		}
 
 		final List<AccountLink> outLinks = this.account.getOutlinks();
 		this.outLinkWeightsVector = new ColumnVector(outLinks.size());
 
-		double weightsSum = 0;
 		for (int i = 0; i < outLinks.size(); ++i) {
 			double strength = outLinks.get(i).getStrength();
 			this.outLinkWeightsVector.setAt(i, strength);
-			weightsSum += strength;
 		}
-
-		//this.outLinkWeightsVector.normalize();
-		this.weightsSum = weightsSum;
 	}
 
 	/**
@@ -101,7 +94,6 @@ public class PoiAccountInfo {
 			return 0;
 
 		final double weightsMedian = this.outLinkWeightsVector.median();
-		return weightsMedian * this.outLinkWeightsVector.size();// * this.weightsSum;
-		//TODO: we shouldn't need weightsSum here because we no longer normalize outlinkWeightsVector
+		return weightsMedian * this.outLinkWeightsVector.size();
 	}
 }
