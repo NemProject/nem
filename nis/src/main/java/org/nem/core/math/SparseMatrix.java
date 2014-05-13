@@ -17,7 +17,8 @@ public class SparseMatrix {
 	 */
 	final private HashMap<Long, Double> entries;
 	private double[] values=null;
-	private long[] indices=null;
+	private int[] rowIndices=null;
+	private int[] colIndices=null;
 	private boolean converted = false;
 
 	/**
@@ -38,11 +39,13 @@ public class SparseMatrix {
 	 */
 	public void convert() {
 		values = new double[entries.size()];
-		indices = new long[entries.size()];
+		rowIndices = new int[entries.size()];
+		colIndices = new int[entries.size()];
 		int i=0;
 		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
 			values[i] = entry.getValue();
-			indices[i++] = entry.getKey();
+			rowIndices[i] = (int)(entry.getKey() >> 32);
+			colIndices[i++] = (int)(entry.getKey() & 0xffffffff);
 		}
 		converted = true;
 	}
@@ -174,19 +177,20 @@ public class SparseMatrix {
 	 *
 	 * @return The resulting vector.
 	 */
-	public ColumnVector multiply(final ColumnVector vector) {
+	public double[] multiply(final ColumnVector vector) {
 		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
-		final ColumnVector result = new ColumnVector(this.numRows);
+		double[] result = new double[this.numRows];
+		double[] rawVector = vector.getVector(); 
 		if (converted) {
-			int arraySize = indices.length;
+			int arraySize = rowIndices.length;
 			for (int i=0; i<arraySize; i++) {
-				result.incrementAt((int)(indices[i] >> 32), values[i] * vector.getAt((int)(indices[i] & 0xffffffff)));
+				result[rowIndices[i]] += this.values[i] * rawVector[colIndices[i]];
 			}
 		} else {
 			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				result.incrementAt((int)(entry.getKey() >> 32), entry.getValue() * vector.getAt((int)(entry.getKey() & 0xffffffff)));
+				result[(int)(entry.getKey() >> 32)] += entry.getValue() * rawVector[(int)(entry.getKey() & 0xffffffff)];
 			}
 		}
 		return result;

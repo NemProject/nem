@@ -51,6 +51,15 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
+	 * Gets the value vector.
+	 *
+	 * @return The value vector.
+	 */
+	public double[] getVector() {
+		return this.vector;
+	}
+
+	/**
 	 * Gets the value at the specified index.
 	 *
 	 * @param index The index.
