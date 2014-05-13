@@ -9,25 +9,25 @@ import java.util.List;
  *
  * Methods of this class, assume, that they are called in paired order
  */
-public class VestedBalances {
+public class WeightedBalances {
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
 	 */
 	public final long MAX_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + BlockChainConstants.REWRITE_LIMIT;
 
-	private final List<VestedBalance> balances;
+	private final List<WeightedBalance> balances;
 	public final HistoricalBalances historicalBalances;
 
-	private VestedBalances(final HistoricalBalances historicalBalances) {
+	private WeightedBalances(final HistoricalBalances historicalBalances) {
 		this.balances = new ArrayList<>();
 		this.historicalBalances = historicalBalances;
 	}
-	public  VestedBalances() {
+	public WeightedBalances() {
 		this(new HistoricalBalances());
 	}
 
-	public VestedBalances copy() {
-		return new VestedBalances(this.historicalBalances.copy());
+	public WeightedBalances copy() {
+		return new WeightedBalances(this.historicalBalances.copy());
 	}
 
 	/**
@@ -37,16 +37,16 @@ public class VestedBalances {
 	 * @param amount The amount.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
-		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
-		int index = Collections.binarySearch(balances, vestedBalance);
+		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
 			balances.get(index).receive(amount);
 
 		} else {
 			int newIndex = -index-1;
 			if (newIndex == 0) {
-				balances.add(newIndex, vestedBalance);
+				balances.add(newIndex, weightedBalance);
 
 			} else {
 				newIndex = iterateBalances(height, newIndex);
@@ -55,9 +55,9 @@ public class VestedBalances {
 		}
 	}
 
-	private VestedBalance createVestedBalance(final BlockHeight height, final Amount amount) {
+	private WeightedBalance createVestedBalance(final BlockHeight height, final Amount amount) {
 		long h = calculateBucket(height);
-		return new VestedBalance(new BlockHeight(h), amount);
+		return new WeightedBalance(new BlockHeight(h), amount);
 	}
 
 	/**
@@ -67,9 +67,9 @@ public class VestedBalances {
 	 * @param amount The amount.
 	 */
 	public void undoReceive(final BlockHeight height, final Amount amount) {
-		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
-		int index = Collections.binarySearch(balances, vestedBalance);
+		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
 			index = undoIterateBalances(index);
 			balances.get(index).undoReceive(amount);
@@ -85,9 +85,9 @@ public class VestedBalances {
 	 * @param amount The amount.
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
-		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
-		int index = Collections.binarySearch(balances, vestedBalance);
+		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
 			balances.get(index).send(amount);
 
@@ -110,9 +110,9 @@ public class VestedBalances {
 	 * @param amount The amount.
 	 */
 	public void undoSend(final BlockHeight height, final Amount amount) {
-		final VestedBalance vestedBalance = createVestedBalance(height, amount);
+		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
-		int index = Collections.binarySearch(balances, vestedBalance);
+		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
 			index = undoIterateBalances(index);
 			balances.get(index).undoSend(amount);
@@ -123,8 +123,8 @@ public class VestedBalances {
 	}
 
 	public Amount getUnvested(final BlockHeight height) {
-		final VestedBalance vestedBalance = createVestedBalance(height, Amount.ZERO);
-		int index = Collections.binarySearch(balances, vestedBalance);
+		final WeightedBalance weightedBalance = createVestedBalance(height, Amount.ZERO);
+		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index < 0) {
 			index = -index-1;
 			index = iterateBalances(height, index);

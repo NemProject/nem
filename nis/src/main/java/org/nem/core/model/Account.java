@@ -23,7 +23,7 @@ public class Account implements SerializableEntity {
 	private CoinDays coindays;
 
 	private BlockAmount foragedBlocks;
-	private VestedBalances vestedBalances;
+	private WeightedBalances weightedBalances;
 
 	/**
 	 * Creates an account around a key pair.
@@ -55,7 +55,7 @@ public class Account implements SerializableEntity {
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
-		this.vestedBalances = new VestedBalances();
+		this.weightedBalances = new WeightedBalances();
 
 		this.coindays = new CoinDays();
 	}
@@ -215,7 +215,7 @@ public class Account implements SerializableEntity {
 	 * @return The historical balance.
 	 */
 	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
-		return this.vestedBalances.historicalBalances.getBalance(lastBlockHeight, height);
+		return this.weightedBalances.historicalBalances.getBalance(lastBlockHeight, height);
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public class Account implements SerializableEntity {
 	 * @param amount The amount to add
 	 */
 	public void addHistoricalBalance(final BlockHeight height, final Amount amount) {
-		this.vestedBalances.historicalBalances.add(height, amount);
+		this.weightedBalances.historicalBalances.add(height, amount);
 	}
 	
 	/**
@@ -235,7 +235,7 @@ public class Account implements SerializableEntity {
 	 * @param amount The amount to add
 	 */
 	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
-		this.vestedBalances.historicalBalances.subtract(height, amount);
+		this.weightedBalances.historicalBalances.subtract(height, amount);
 	}
 
 	/**
@@ -414,7 +414,7 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
-		copy.vestedBalances = this.vestedBalances.copy();
+		copy.weightedBalances = this.weightedBalances.copy();
 		return copy;
 	}
 }

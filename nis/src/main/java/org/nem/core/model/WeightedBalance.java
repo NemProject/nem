@@ -1,35 +1,35 @@
 package org.nem.core.model;
 
-public class VestedBalance implements Comparable<VestedBalance> {
+public class WeightedBalance implements Comparable<WeightedBalance> {
 	private final BlockHeight blockHeight;
 	private double unvestedBalance;
 	private double vestedBalance;
 
-	public VestedBalance(final BlockHeight blockHeight, final Amount unvestedBalance) {
+	public WeightedBalance(final BlockHeight blockHeight, final Amount unvestedBalance) {
 		this.blockHeight = blockHeight;
 		this.unvestedBalance = unvestedBalance.getNumMicroNem();
 		this.vestedBalance = 0d;
 	}
 
-	private VestedBalance(final BlockHeight blockHeight, final double  unvestedBalance, final double vestedBalance) {
+	private WeightedBalance(final BlockHeight blockHeight, final double unvestedBalance, final double vestedBalance) {
 		this.blockHeight = blockHeight;
 		this.unvestedBalance = unvestedBalance;
 		this.vestedBalance = vestedBalance;
 	}
 
-	public VestedBalance next() {
+	public WeightedBalance next() {
 		final double newUv = this.unvestedBalance*126d/128d;
 		final double move = this.unvestedBalance - newUv;
-		return new VestedBalance(
+		return new WeightedBalance(
 				new BlockHeight(this.blockHeight.getRaw() + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
 				newUv,
 				this.vestedBalance + move);
 	}
 
-	public VestedBalance previous() {
+	public WeightedBalance previous() {
 		final double newUv = this.unvestedBalance*128d/126d;
 		final double move = newUv - this.unvestedBalance;
-		return new VestedBalance(
+		return new WeightedBalance(
 				new BlockHeight(this.blockHeight.getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
 				newUv,
 				this.vestedBalance - move);
@@ -73,7 +73,7 @@ public class VestedBalance implements Comparable<VestedBalance> {
 	}
 
 	@Override
-	public int compareTo(final VestedBalance o) {
+	public int compareTo(final WeightedBalance o) {
 		return this.blockHeight.compareTo(o.blockHeight);
 	}
 }
