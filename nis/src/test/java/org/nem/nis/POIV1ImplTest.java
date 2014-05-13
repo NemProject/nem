@@ -318,10 +318,37 @@ public class POIV1ImplTest {
 		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
 		System.out.println(", ratio is " + format.format(ratio));
+		System.out.println("Importances: " + importances);
 		System.out.println("");
 		
 		// Assert
 		Assert.assertTrue(ratio > 500.0);
+	}
+	
+	@Test
+	public void poiIsFairerThanPOS() { 
+		LOGGER.info("Check that POI distributes importance differently than POS");
+		//TODO: I don't know why the outlinks vectors are the same for the two groups of accounts below.
+		// Arrange:
+		// Accounts with smaller vested balance should be able to have more importance than accounts with high balance and low activity
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.addAll(createUserAccounts(1, 10, 10000, 1, 500, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(createUserAccounts(1, 10, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
+
+		// Act: calculate importances
+		POI poi = new POIV1Impl();
+		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
+		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
+		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
+		System.out.println(", ratio is " + format.format(ratio));
+		System.out.println("Importances: " + importances);
+		System.out.println("");
+		
+		// Assert
+		Assert.assertTrue(ratio > 1.0);
 	}
 	
 	@Test
@@ -379,10 +406,10 @@ public class POIV1ImplTest {
 		Assert.assertTrue(stop-start < 1000);//TODO: this takes slightly over 2s on my 3 year old macbook air
 	}
 	
-	@Test
 	/**
 	 * Test to see if the calculation time grows approximately linearly with the input.
 	 */
+	@Test
 	public void poiCalculationHasLinearPerformance() {
 		LOGGER.info("Testing linear performance of the poi calculation");
 		
