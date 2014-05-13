@@ -12,6 +12,7 @@ public class PoiScorer {
 	public enum ScoringAlg {
 		BLOODYROOKIEOLD,
 		BLOODYROOKIENEW,
+		BLOODYROOKIENEWV2,
 		UTOPIAN,
 		PYTHON,
 		MAKOTO
@@ -84,8 +85,11 @@ public class PoiScorer {
 				return calculateMakotoFutureScore(importanceVector, outLinkVector, coinDaysVector);
 
 			case BLOODYROOKIENEW:
-			default:
 				return calculateBloodyRookieNewScore(importanceVector, outLinkVector, coinDaysVector);
+
+			case BLOODYROOKIENEWV2:
+			default:
+				return calculateBloodyRookieNewV2Score(importanceVector, outLinkVector, coinDaysVector);
 		}
 	}
 
@@ -126,6 +130,27 @@ public class PoiScorer {
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
 		return coinDaysVector.add(weightedOutlinks).add(weightedImportances);
+	}
+	
+	private ColumnVector calculateBloodyRookieNewV2Score(
+			final ColumnVector importanceVector,
+			final ColumnVector outLinkVector,
+			final ColumnVector coinDaysVector) {
+
+		// alg is: l1norm(stakes+ c1*outlinkstrengths) + c2 * l1norm(PR)
+
+		coinDaysVector.normalize();
+		outLinkVector.normalize();
+
+		double c1 = 2.;
+		double c2 = 0.01;
+
+		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).add(coinDaysVector);
+		ColumnVector weightedImportances = importanceVector.multiply(c2);
+		
+		weightedOutlinks.normalize();
+
+		return weightedOutlinks.add(weightedImportances);
 	}
 
 	private ColumnVector calculateUtopianFutureScore(
