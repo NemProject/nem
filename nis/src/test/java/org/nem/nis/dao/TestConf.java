@@ -44,7 +44,7 @@ public class TestConf {
 
 		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
 		localSessionFactoryBuilder.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-		localSessionFactoryBuilder.setProperty("hibernate.show_sql", "false");
+		localSessionFactoryBuilder.setProperty("hibernate.show_sql", "true");
 		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", "false");
 		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", "20");
 

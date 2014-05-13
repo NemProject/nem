@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.CoreMatchers;
+import org.hibernate.LazyInitializationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,12 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Collection;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BlockDaoTest {
+	@Autowired
+	AccountDao accountDao;
 
 	@Autowired
 	BlockDao blockDao;
@@ -66,6 +70,69 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
 		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
+	}
+
+	@Test
+	public void canReadSavedBlockUsingHash() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 345);
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(dbBlock);
+		final Block entity = blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
+		Assert.assertThat(entity.getHeight(), equalTo(emptyBlock.getHeight().getRaw()));
+		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
+		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
+	}
+
+	@Test(expected = LazyInitializationException.class)
+	public void getBlocksForAccountDoesNotRetrieveTransfers() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(dbBlock);
+		final Collection<Block> entities = blockDao.getBlocksForAccount(signer, 25);
+
+		// Assert:
+		Assert.assertThat(entities.size(), equalTo(1));
+		final Block entity = entities.iterator().next();
+
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+	}
+
+	@Test
+	public void deleteBlockDoesNotRemoveAccounts() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 567);
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(dbBlock);
+		blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
+		org.nem.nis.dbmodel.Account entity = accountDao.getAccount(dbBlock.getForger().getId());
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
+		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
