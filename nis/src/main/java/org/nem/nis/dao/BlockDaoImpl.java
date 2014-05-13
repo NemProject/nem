@@ -56,26 +56,23 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Long count() {
 		return (Long)getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
+	//region find*
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Block findById(long id) {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("id", id));
-
-//		Query query = getCurrentSession()
-//				.createQuery("from Block a where a.id = :id")
-//				.setParameter("id", id);
 		return executeSingleQuery(criteria);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Block findByHeight(final BlockHeight height) {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
@@ -83,25 +80,37 @@ public class BlockDaoImpl implements BlockDao {
 		return executeSingleQuery(criteria);
 	}
 
+	/**
+	 * First try to find block using "shortId",
+	 * than find proper block in software.
+	 */
+	@Override
+	@Transactional
+	public Block findByHash(final Hash blockHash) {
+		final byte[] blockHashBytes = blockHash.getRaw();
+		long blockId = ByteUtils.bytesToLong(blockHashBytes);
+
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.add(Restrictions.eq("shortId", blockId));
+		final  List<Block> blockList = listAndCast(criteria);
+
+		for (final Object blockObject : blockList) {
+			final Block block = (Block)blockObject;
+			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
+				return block;
+			}
+		}
+		return null;
+	}
+	//endregion
+
     @Override
 	@Transactional(readOnly = true)
     public HashChain getHashesFrom(final BlockHeight height, int limit) {
 		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit);
         return HashChain.fromRawHashes(blockList);
     }
-
-	@Override
-	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, int limit) {
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("forger", FetchMode.JOIN)
-				.setFetchMode("blockTransfers", FetchMode.SELECT)
-				.setMaxResults(limit)
-				// nested criteria
-				.createCriteria("forger", "f")
-					.add(Restrictions.eq("f.printableKey", account.getAddress().getEncoded()));
-		return listAndCast(criteria);
-	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -115,6 +124,19 @@ public class BlockDaoImpl implements BlockDao {
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
 		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
 		return rawTimestamps.stream().map(TimeInstant::new).collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection<Block> getBlocksForAccount(final Account account, int limit) {
+		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+				.setFetchMode("forger", FetchMode.JOIN)
+				.setFetchMode("blockTransfers", FetchMode.SELECT)
+				.setMaxResults(limit)
+				// nested criteria
+				.createCriteria("forger", "f")
+				.add(Restrictions.eq("f.printableKey", account.getAddress().getEncoded()));
+		return listAndCast(criteria);
 	}
 
 	@Override
@@ -162,33 +184,6 @@ public class BlockDaoImpl implements BlockDao {
 		return listAndCast(criteria);
 	}
 
-	/**
-	 * First try to find block using "shortId",
-	 * than find proper block in software.
-	 */
-	@Override
-	@Transactional
-	public Block findByHash(final Hash blockHash) {
-		final byte[] blockHashBytes = blockHash.getRaw();
-		long blockId = ByteUtils.bytesToLong(blockHashBytes);
-
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.add(Restrictions.eq("shortId", blockId));
-		final  List<Block> blockList = listAndCast(criteria);
-
-//		Query query = getCurrentSession()
-//				.createQuery("from Block a where a.shortId = :id")
-//				.setParameter("id", blockId);
-//		final List<?> blockList = query.list();
-		for (final Object blockObject : blockList) {
-			final Block block = (Block)blockObject;
-			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
-				return block;
-			}
-		}
-		return null;
-	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> List<T> listAndCast(final Query q) {
