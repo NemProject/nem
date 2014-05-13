@@ -1,75 +1,114 @@
 package org.nem.core.model;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 public class WeightedBalance implements Comparable<WeightedBalance> {
 	private final BlockHeight blockHeight;
-	private double unvestedBalance;
-	private double vestedBalance;
+	private BigInteger unvestedBalance;
+	private BigInteger vestedBalance;
+	private Amount balance;
 
 	public WeightedBalance(final BlockHeight blockHeight, final Amount unvestedBalance) {
-		this.blockHeight = blockHeight;
-		this.unvestedBalance = unvestedBalance.getNumMicroNem();
-		this.vestedBalance = 0d;
+		this(blockHeight, unvestedBalance, BigInteger.valueOf(unvestedBalance.getNumMicroNem()), BigInteger.ZERO);
 	}
 
-	private WeightedBalance(final BlockHeight blockHeight, final double unvestedBalance, final double vestedBalance) {
+	private WeightedBalance(final BlockHeight blockHeight, Amount balance, final BigInteger unvestedBalance, final BigInteger vestedBalance) {
 		this.blockHeight = blockHeight;
 		this.unvestedBalance = unvestedBalance;
 		this.vestedBalance = vestedBalance;
+		this.balance = balance;
+
+		reduce();
+	}
+
+	private void reduce() {
+		final BigInteger gcd = this.vestedBalance.gcd(this.unvestedBalance);
+		if (gcd.equals(BigInteger.ZERO)) {
+			return;
+		}
+		this.vestedBalance = this.vestedBalance.divide(gcd);
+		this.unvestedBalance = this.unvestedBalance.divide(gcd);
 	}
 
 	public WeightedBalance next() {
-		final double newUv = this.unvestedBalance*126d/128d;
-		final double move = this.unvestedBalance - newUv;
+		final BigInteger base = BigInteger.valueOf(100);
+		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(98));
+		final BigInteger move = this.unvestedBalance.multiply(base).subtract(newUv);
+
 		return new WeightedBalance(
 				new BlockHeight(this.blockHeight.getRaw() + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
-				newUv,
-				this.vestedBalance + move);
+				this.balance,
+				this.unvestedBalance.multiply(base).subtract(move),
+				this.vestedBalance.multiply(base).add(move)
+		);
 	}
 
 	public WeightedBalance previous() {
-		final double newUv = this.unvestedBalance*128d/126d;
-		final double move = newUv - this.unvestedBalance;
+		final BigInteger base = BigInteger.valueOf(98);
+		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(100));
+		final BigInteger move = newUv.subtract(this.unvestedBalance.multiply(base));
+
 		return new WeightedBalance(
 				new BlockHeight(this.blockHeight.getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
-				newUv,
-				this.vestedBalance - move);
+				this.balance,
+				this.unvestedBalance.multiply(base).add(move),
+				this.vestedBalance.multiply(base).subtract(move));
 	}
 
 	public void send(final Amount amount) {
-		// I guess we shouldn't care about possible div by zero here,
-		// as this func shouldn't be called if Account's balance is 0
-		double vested = amount.getNumMicroNem()*this.vestedBalance / (this.vestedBalance + this.unvestedBalance);;
-		this.vestedBalance = this.vestedBalance - vested;
-		this.unvestedBalance = this.unvestedBalance - (amount.getNumMicroNem() - vested);
+		final BigInteger a = BigInteger.valueOf(amount.getNumMicroNem());
+		final BigInteger t = a.multiply(this.vestedBalance);
+		final BigInteger c = this.unvestedBalance.add(this.vestedBalance);
+		this.vestedBalance = this.vestedBalance.multiply(c).subtract(t);
+		this.unvestedBalance = this.unvestedBalance.multiply(c).subtract(a.multiply(c).subtract(t));
+
+		reduce();
+		this.balance = this.balance.subtract(amount);
 	}
 
 	public void undoSend(final Amount amount) {
-		double vested = amount.getNumMicroNem()*this.vestedBalance / (this.vestedBalance + this.unvestedBalance);;
-		this.vestedBalance = this.vestedBalance + vested;
-		this.unvestedBalance = this.unvestedBalance + (amount.getNumMicroNem() - vested);
+		final BigInteger a = BigInteger.valueOf(amount.getNumMicroNem());
+		final BigInteger t = a.multiply(vestedBalance);
+		final BigInteger c = this.unvestedBalance.add(this.vestedBalance);
+		this.vestedBalance = this.vestedBalance.multiply(c).add(t);
+		this.unvestedBalance = this.unvestedBalance.multiply(c).add(a.multiply(c).subtract(t));
+		reduce();
+
+		this.balance = this.balance.add(amount);
 	}
 
 	public void receive(final Amount amount) {
-		this.unvestedBalance = this.unvestedBalance + amount.getNumMicroNem();
+		this.unvestedBalance = this.unvestedBalance.add(BigInteger.valueOf(amount.getNumMicroNem()));
+		this.balance = this.balance.add(amount);
 	}
 
 	public void undoReceive(final Amount amount) {
-		if (amount.getNumMicroNem() > this.unvestedBalance)
-			throw new IllegalArgumentException("amount must be non-negative");
+		final BigInteger bigAmount = BigInteger.valueOf(amount.getNumMicroNem());
+//		if (bigAmount.compareTo(this.unvestedBalance.multiply()) > 0)
+//			throw new IllegalArgumentException("amount must be non-negative");
 
-		this.unvestedBalance = this.unvestedBalance - amount.getNumMicroNem();
+		this.unvestedBalance = this.unvestedBalance.subtract(bigAmount);
+		this.balance = this.balance.subtract(amount);
 	}
 
 	public BlockHeight getBlockHeight() {
 		return blockHeight;
 	}
 
-	public Amount getUnvestedBalance() {
-		return Amount.fromMicroNem(Math.round(unvestedBalance));
+	public Amount getVestedBalance() {
+		return Amount.fromMicroNem(
+				this.vestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem()))
+					.divide(this.vestedBalance.add(this.unvestedBalance)).longValue()
+		);
 	}
 
-	public Amount getVestedBalance() {
-		return Amount.fromMicroNem(Math.round(vestedBalance));
+	public Amount getUnvestedBalance() {
+		return Amount.fromMicroNem(
+				this.unvestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem()))
+						.divide(this.vestedBalance.add(this.unvestedBalance)).longValue()
+		);
 	}
 
 	@Override

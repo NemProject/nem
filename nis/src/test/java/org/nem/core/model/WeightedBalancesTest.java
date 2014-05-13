@@ -54,6 +54,7 @@ public class WeightedBalancesTest {
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 2881, referenceBalance.getUnvestedBalance());
+		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.next().getUnvestedBalance());
 		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(456933369)); // referenceBalance.next().getUnvestedBalance()
 	}
 	//endregion
