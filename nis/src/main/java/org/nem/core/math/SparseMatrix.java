@@ -16,18 +16,35 @@ public class SparseMatrix {
 	 * The rows of the matrix
 	 */
 	final private HashMap<Long, Double> entries;
+	private double[] values=null;
+	private long[] indices=null;
+	private boolean converted = false;
 
 	/**
 	 * Creates a new matrix of the specified size which has a given capacity for each row.
 	 *
 	 * @param numRows The desired number of rows to represent.
-	 * @param numCols The desired number of columns to represen.
+	 * @param numCols The desired number of columns to represent.
 	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
 	 */
 	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		entries = new HashMap<Long, Double>(initialCapacity);
+	}
+	
+	/**
+	 * Converts the hash map into 2 arrays for faster operations.
+	 */
+	public void convert() {
+		values = new double[entries.size()];
+		indices = new long[entries.size()];
+		int i=0;
+		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+			values[i] = entry.getValue();
+			indices[i++] = entry.getKey();
+		}
+		converted = true;
 	}
 	
 	/**
@@ -46,6 +63,15 @@ public class SparseMatrix {
 	 */
 	public int getColumnCount() {
 		return this.numCols;
+	}
+
+	/**
+	 * Gets the number of non-zero entries.
+	 *
+	 * @return The number of non-zero entries.
+	 */
+	public int getEntryCount() {
+		return this.entries.size();
 	}
 
 	/**
@@ -73,7 +99,7 @@ public class SparseMatrix {
 	 *
 	 * @param row The row.
 	 * @param col The column.
-	 * @param val The value.
+	 * @param value The value.
 	 */
 	public void setAt(final long row, final long col, final double value) {
 		if (row < 0 || row >= numRows) {
@@ -91,7 +117,7 @@ public class SparseMatrix {
 	}
 
 	/**
-	 * Increments a value at the specified row and column by the given val.
+	 * Increments a value at the specified row and column by the given value.
 	 * 
 	 * @param row The row.
 	 * @param col The column.
@@ -152,10 +178,16 @@ public class SparseMatrix {
 		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
-		
 		final ColumnVector result = new ColumnVector(this.numRows);
-		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-			result.incrementAt((int)(entry.getKey() >> 32), entry.getValue() * vector.getAt((int)(entry.getKey() & 0xffffffff)));
+		if (converted) {
+			int arraySize = indices.length;
+			for (int i=0; i<arraySize; i++) {
+				result.incrementAt((int)(indices[i] >> 32), values[i] * vector.getAt((int)(indices[i] & 0xffffffff)));
+			}
+		} else {
+			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
+				result.incrementAt((int)(entry.getKey() >> 32), entry.getValue() * vector.getAt((int)(entry.getKey() & 0xffffffff)));
+			}
 		}
 		return result;
 	}	

@@ -242,26 +242,42 @@ public class SparseMatrixTest {
 		final SparseMatrix sparseMatrix = new SparseMatrix(size, size, 2*size);
 		ColumnVector vector = new ColumnVector(size);
 		SecureRandom sr = new SecureRandom();
-		byte[] rows = new byte[2*numEntries];
-		byte[] cols = new byte[2*numEntries];
+		byte[] rows = new byte[3*numEntries];
+		byte[] cols = new byte[3*numEntries];
 		sr.nextBytes(rows);
 		sr.nextBytes(cols);
 		for (int i=0; i<numEntries; i++) {
 			vector.setAt(i % size, cols[i]);
-			long row = Math.abs((rows[2*i] << 8 + rows[2*i+1]) % size);
-			long col = Math.abs((cols[2*i] << 8 + cols[2*i+1]) % size);
+			long row = Math.abs(((rows[3*i] << 16) + (rows[3*i+1] << 8) + rows[3*i+2]) % size);
+			long col = Math.abs(((cols[3*i] << 16) + (cols[3*i+1] << 8) + cols[3*i+2]) % size);
 			sparseMatrix.setAt(row, col, 3.0);
 		}
 		System.out.println("done.");
+		System.out.println(sparseMatrix.getEntryCount() + " entries.");
 
 		// Act:
 		long start = System.currentTimeMillis();
-		ColumnVector result = sparseMatrix.multiply(vector);
+		ColumnVector result1 = sparseMatrix.multiply(vector);
 		long stop = System.currentTimeMillis();
 		
 		// Assert:
 		System.out.println("Multiply needed " + (stop - start) + "ms.");
 		Assert.assertTrue((stop - start) < 1000);
+
+		// Act:
+		start = System.currentTimeMillis();
+		sparseMatrix.convert();
+		stop = System.currentTimeMillis();
+		System.out.println("Convert needed " + (stop - start) + "ms.");
+		start = System.currentTimeMillis();
+		ColumnVector result2 = sparseMatrix.multiply(vector);
+		stop = System.currentTimeMillis();
+		
+		// Assert:
+		System.out.println("Multiply needed " + (stop - start) + "ms.");
+		Assert.assertTrue((stop - start) < 1000);
+		result1.setAt(100, 1);
+		result2.setAt(100, 1);
 	}
 
 	//endregion
