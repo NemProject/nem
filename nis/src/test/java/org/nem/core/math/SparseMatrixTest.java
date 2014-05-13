@@ -239,7 +239,7 @@ public class SparseMatrixTest {
 		int size = 1000000;
 		int numEntries = 2000000;
 		System.out.print("Setting up multiplication test: " + size + " x " + size + " matrix with " + numEntries + " entries...");
-		final SparseMatrix sparseMatrix = new SparseMatrix(size, size, 2*size);
+		final SparseMatrix sparseMatrix = new SparseMatrix(size, size, 2*numEntries);
 		ColumnVector vector = new ColumnVector(size);
 		SecureRandom sr = new SecureRandom();
 		byte[] rows = new byte[3*numEntries];
@@ -262,7 +262,7 @@ public class SparseMatrixTest {
 		
 		// Assert:
 		System.out.println("Multiply needed " + (stop - start) + "ms.");
-		Assert.assertTrue((stop - start) < 1000);
+		Assert.assertTrue((stop - start) < 2000);
 
 		// Act:
 		start = System.currentTimeMillis();

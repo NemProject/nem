@@ -78,7 +78,8 @@
 			<artifactId>maven-resources-plugin</artifactId>
 			<version>2.4.3</version>
 		</dependency>
-	</dependencies>
+		<dependency><groupId>com.googlecode.matrix-toolkits-java</groupId><artifactId>mtj</artifactId><version>1.0.1</version></dependency>
+		<dependency><groupId>com.github.fommil.netlib</groupId><artifactId>all</artifactId><version>1.1.2</version><type>pom</type></dependency></dependencies>
 
 	<build>
 		<resources>
