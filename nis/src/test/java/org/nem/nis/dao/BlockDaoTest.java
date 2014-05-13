@@ -4,13 +4,11 @@ import org.hibernate.LazyInitializationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nem.core.model.Account;
-import org.nem.core.model.BlockHeight;
-import org.nem.core.model.Hash;
-import org.nem.core.model.HashUtils;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
@@ -21,8 +19,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,8 +31,12 @@ public class BlockDaoTest {
 	AccountDao accountDao;
 
 	@Autowired
+	TransferDao transferDao;
+
+	@Autowired
 	BlockDao blockDao;
 
+	//region save
 	@Test
 	public void savingBlockSavesAccounts() {
 		// Arrange:
@@ -49,6 +53,30 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 	}
 
+	@Test
+	public void savingBlockSavesTransactions() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
+		final TransferTransaction transferTransaction = prepareTransferTransaction(recipient, signer, 10);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 133);
+		emptyBlock.addTransaction(transferTransaction);
+		emptyBlock.sign();
+		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(entity);
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransfers().size(), not(equalTo(0)));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
+	}
+	//endregion
+
+	// region retrieve
 	@Test
 	public void canReadSavedBlockUsingHeight() {
 		// Arrange:
@@ -115,7 +143,9 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
 	}
+	//endregion
 
+	//region delete/modify
 	@Test
 	public void deleteBlockDoesNotRemoveAccounts() {
 		// Arrange:
@@ -127,7 +157,7 @@ public class BlockDaoTest {
 		// Act:
 		blockDao.save(dbBlock);
 		blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		org.nem.nis.dbmodel.Account entity = accountDao.getAccount(dbBlock.getForger().getId());
+		final org.nem.nis.dbmodel.Account entity = accountDao.getAccount(dbBlock.getForger().getId());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
@@ -135,6 +165,38 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
 	}
 
+	@Test
+	public void deleteBlockRemovesTransactions() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 678);
+		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 10));
+		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 20));
+		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 30));
+		emptyBlock.sign();
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(dbBlock);
+		blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
+		final org.nem.nis.dbmodel.Account entity = accountDao.getAccount(dbBlock.getForger().getId());
+		final Transfer transfer1 = transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
+		final Transfer transfer2 = transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
+		final Transfer transfer3 = transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
+		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(transfer1, nullValue());
+		Assert.assertThat(transfer2, nullValue());
+		Assert.assertThat(transfer3, nullValue());
+	}
+	//endregion
+
+	//region helpers
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
@@ -151,4 +213,18 @@ public class BlockDaoTest {
 		emptyBlock.sign();
 		return emptyBlock;
 	}
+
+	private TransferTransaction prepareTransferTransaction(Account sender, Account recipient, long amount) {
+		// Arrange:
+		final TransferTransaction transferTransaction = new TransferTransaction(
+				new TimeInstant(0),
+				sender,
+				recipient,
+				Amount.fromNem(amount),
+				null
+		);
+		transferTransaction.sign();
+		return transferTransaction;
+	}
+	//endregion
 }

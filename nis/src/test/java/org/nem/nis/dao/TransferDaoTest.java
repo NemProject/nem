@@ -1,6 +1,5 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
