@@ -140,30 +140,30 @@ public class SparseMatrixV3 {
 	 * Normalizes each column of the matrix.
 	 */
 	public void normalizeColumns() {
-		ColumnVector vector = new ColumnVector(this.numRows);
+		double[] vector = new double[this.numRows];
 		if (this.converted) {
 			int arraySize = this.indices.length;
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
-				vector.incrementAt((int)(index & 0xffffffff),  Math.abs(this.values[i]));
+				vector[(int)(index & 0xffffffff)] +=  Math.abs(this.values[i]);
 			}			
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
 				double value = this.values[i];
 				if (value != 0.0) {
-					this.values[i] /= vector.getAt((int)(index & 0xffffffff));
+					this.values[i] /= vector[(int)(index & 0xffffffff)];
 				}
 			}
 		} else {
 			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
 			    it.advance();
-				vector.incrementAt((int)(it.key() & 0xffffffff), Math.abs(it.value()));
+				vector[(int)(it.key() & 0xffffffff)] += Math.abs(it.value());
 			}
 			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
 			    it.advance();
 			    double value = it.value();
 				if (value != 0.0) {
-					this.entries.put(it.key(), value/vector.getAt((int)(it.key() & 0xffffffff)));
+					this.entries.put(it.key(), value/vector[(int)(it.key() & 0xffffffff)]);
 				}
 			}
 		}

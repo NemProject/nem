@@ -251,11 +251,13 @@ public class SparseMatrixV3Test {
 		stop = System.currentTimeMillis();
 		System.out.println("Convert needed " + (stop - start) + "ms.");
 		start = System.currentTimeMillis();
-		sparseMatrixV3.normalizeColumns();
+		for (int i=0; i<10; i++) {
+			sparseMatrixV3.normalizeColumns();
+		}
 		stop = System.currentTimeMillis();
 		
 		// Assert:
-		System.out.println("Arrays: normalizeColumns needed " + (stop - start) + "ms.");
+		System.out.println("Arrays: normalizeColumns needed " + (stop - start)/10 + "ms.");
 		Assert.assertTrue((stop - start) < 1000);
 		System.out.println("");
 	}
@@ -302,11 +304,13 @@ public class SparseMatrixV3Test {
 		stop = System.currentTimeMillis();
 		System.out.println("Convert needed " + (stop - start) + "ms.");
 		start = System.currentTimeMillis();
-		double[] result2 = sparseMatrixV3.multiply(vector);
+		for (int i=0; i<10; i++) {
+			double[] result2 = sparseMatrixV3.multiply(vector);
+		}
 		stop = System.currentTimeMillis();
 		
 		// Assert:
-		System.out.println("Array: multiply needed " + (stop - start) + "ms.");
+		System.out.println("Array: multiply needed " + (stop - start)/10 + "ms.");
 		Assert.assertTrue((stop - start) < 1000);
 		System.out.println("");
 	}
@@ -346,10 +350,12 @@ public class SparseMatrixV3Test {
 
 		// perform multiplication
 		long start = System.currentTimeMillis();
-		A.mult(x, y);
+		for (int i=0; i<10; i++) {
+			A.mult(x, y);
+		}
 		long stop = System.currentTimeMillis();
 		
-		System.out.println("mtj CompRowMatrix with " + (numRows*numEntriesPerRow) + " entries, multiply needed " + (stop - start) + "ms.");
+		System.out.println("mtj CompRowMatrix with " + (numRows*numEntriesPerRow) + " entries, multiply needed " + (stop - start)/10 + "ms.");
 		System.out.println("");
 	}
 	//endregion
