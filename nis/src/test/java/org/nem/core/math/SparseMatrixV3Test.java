@@ -3,90 +3,89 @@ package org.nem.core.math;
 import java.security.SecureRandom;
 import java.util.logging.Logger;
 
-import no.uib.cipr.matrix.*;
-import no.uib.cipr.matrix.sparse.*;
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.nis.POIV1ImplTest;
 
-public class SparseMatrixTest {
+public class SparseMatrixV3Test {
 	private static final Logger LOGGER = Logger.getLogger(SparseMatrixTest.class.getName());
 
 	//region constructor / getAt / setAt / incrementAt
 
 	@Test
-	public void uninitializedSparseMatrixReturnsZeros() {
+	public void uninitializedsparseMatrixV3ReturnsZeros() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(2, 3, 100);
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(2, 3, 100);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCount(), IsEqual.equalTo(2));
-		Assert.assertThat(sparseMatrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 2), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 2), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getRowCount(), IsEqual.equalTo(2));
+		Assert.assertThat(sparseMatrixV3.getColumnCount(), IsEqual.equalTo(3));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 0), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 2), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 0), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
-	public void sparseMatrixValuesCanBeSet() {
+	public void sparseMatrixV3ValuesCanBeSet() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 100);
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(3, 2, 100);
 
 		// Act:
-		sparseMatrix.setAt(0, 0, 7);
-		sparseMatrix.setAt(0, 1, 3);
-		sparseMatrix.setAt(1, 0, 5);
-		sparseMatrix.setAt(1, 1, 11);
-		sparseMatrix.setAt(2, 0, 1);
-		sparseMatrix.setAt(2, 1, 9);
+		sparseMatrixV3.setAt(0, 0, 7);
+		sparseMatrixV3.setAt(0, 1, 3);
+		sparseMatrixV3.setAt(1, 0, 5);
+		sparseMatrixV3.setAt(1, 1, 11);
+		sparseMatrixV3.setAt(2, 0, 1);
+		sparseMatrixV3.setAt(2, 1, 9);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(7.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(5.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(11.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(1.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(9.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 0), IsEqual.equalTo(7.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 1), IsEqual.equalTo(3.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 0), IsEqual.equalTo(5.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 1), IsEqual.equalTo(11.0));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 0), IsEqual.equalTo(1.0));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 1), IsEqual.equalTo(9.0));
 	}
 
 	@Test
-	public void sparseMatrixValuesCanBeIncremented() {
+	public void sparseMatrixV3ValuesCanBeIncremented() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 100);
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(3, 2, 100);
 
 		// Act:
 		// Increment values
-		sparseMatrix.setAt(0, 0, 7);
-		sparseMatrix.setAt(0, 1, 3);
-		sparseMatrix.setAt(1, 0, 5);
-		sparseMatrix.setAt(1, 1, 12);
-		sparseMatrix.setAt(2, 0, 1);
-		sparseMatrix.setAt(2, 1, 9);
+		sparseMatrixV3.setAt(0, 0, 7);
+		sparseMatrixV3.setAt(0, 1, 3);
+		sparseMatrixV3.setAt(1, 0, 5);
+		sparseMatrixV3.setAt(1, 1, 12);
+		sparseMatrixV3.setAt(2, 0, 1);
+		sparseMatrixV3.setAt(2, 1, 9);
 		
 		// Double increment
-		sparseMatrix.incrementAt(0, 0, 10);
-		sparseMatrix.incrementAt(0, 1, 20);
-		sparseMatrix.incrementAt(1, 0, 30);
-		sparseMatrix.incrementAt(1, 1, 40);
-		sparseMatrix.incrementAt(2, 0, 50);
-		sparseMatrix.incrementAt(2, 1, 60);
+		sparseMatrixV3.incrementAt(0, 0, 10);
+		sparseMatrixV3.incrementAt(0, 1, 20);
+		sparseMatrixV3.incrementAt(1, 0, 30);
+		sparseMatrixV3.incrementAt(1, 1, 40);
+		sparseMatrixV3.incrementAt(2, 0, 50);
+		sparseMatrixV3.incrementAt(2, 1, 60);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(17.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(23.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(35.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(52.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(51.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(69.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 0), IsEqual.equalTo(17.0));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 1), IsEqual.equalTo(23.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 0), IsEqual.equalTo(35.0));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 1), IsEqual.equalTo(52.0));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 0), IsEqual.equalTo(51.0));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 1), IsEqual.equalTo(69.0));
 	}
 
 	@Test
-	public void sparseMatrixGetCannotBeIndexedOutOfBounds() {
+	public void sparseMatrixV3GetCannotBeIndexedOutOfBounds() {
 		// Assert:
 		assertGetOutOfBounds(2, 3, -1, 0);
 		assertGetOutOfBounds(2, 3, 0, -1);
@@ -95,7 +94,7 @@ public class SparseMatrixTest {
 	}
 
 	@Test
-	public void sparseMatrixSetCannotBeIndexedOutOfBounds() {
+	public void sparseMatrixV3SetCannotBeIndexedOutOfBounds() {
 		// Assert:
 		assertSetOutOfBounds(2, 3, -1, 0);
 		assertSetOutOfBounds(2, 3, 0, -1);
@@ -106,10 +105,10 @@ public class SparseMatrixTest {
 	private static void assertGetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
 		try {
 			// Arrange:
-			final SparseMatrix sparseMatrix = new SparseMatrix(numRows, numCols, 100);
+			final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(numRows, numCols, 100);
 
 			// Act:
-			sparseMatrix.getAt(row, col);
+			sparseMatrixV3.getAt(row, col);
 
 			// Assert:
 			Assert.fail("expected exception was not thrown");
@@ -120,10 +119,10 @@ public class SparseMatrixTest {
 	private static void assertSetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
 		try {
 			// Arrange:
-			final SparseMatrix sparseMatrix = new SparseMatrix(numRows, numCols, 100);
+			final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(numRows, numCols, 100);
 
 			// Act:
-			sparseMatrix.setAt(row, col, 0);
+			sparseMatrixV3.setAt(row, col, 0);
 
 			// Assert:
 			Assert.fail("expected exception was not thrown");
@@ -135,22 +134,22 @@ public class SparseMatrixTest {
 	//region normalizeColumns
 
 	@Test
-	public void allSparseMatrixColumnsCanBeNormalized() {
+	public void allsparseMatrixV3ColumnsCanBeNormalized() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
+		final SparseMatrixV3 sparseMatrixV3 = createThreeByTwoSparseMatrixV3(new double[] {
 				2, 3, 5, 11, 1, 8
 		});
 
 		// Act:
-		sparseMatrix.normalizeColumns();
+		sparseMatrixV3.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(0.2));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(0.3));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(0.5));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(0.55));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(0.05));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(0.4));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 0), IsEqual.equalTo(0.2));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 0), IsEqual.equalTo(0.3));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 0), IsEqual.equalTo(0.5));
+		Assert.assertThat(sparseMatrixV3.getAt(0, 1), IsEqual.equalTo(0.55));
+		Assert.assertThat(sparseMatrixV3.getAt(1, 1), IsEqual.equalTo(0.05));
+		Assert.assertThat(sparseMatrixV3.getAt(2, 1), IsEqual.equalTo(0.4));
 	}
 
 	//endregion
@@ -160,12 +159,12 @@ public class SparseMatrixTest {
 	@Test
 	public void rowSumVectorCanBeCreated() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
+		final SparseMatrixV3 sparseMatrixV3 = createThreeByTwoSparseMatrixV3(new double[] {
 				2, -3, -5, 11, -1, 8
 		});
 
 		// Act:
-		ColumnVector rowVector = sparseMatrix.getRowSumVector();
+		ColumnVector rowVector = sparseMatrixV3.getRowSumVector();
 		
 		// Assert:
 		Assert.assertThat(rowVector.getAt(0), IsEqual.equalTo(13.0));
@@ -178,21 +177,21 @@ public class SparseMatrixTest {
 	//region multiply
 
 	@Test(expected = IllegalArgumentException.class)
-	public void sparseMatrixCannotBeMultipliesWithVectorOfDifferentSize() {
+	public void sparseMatrixV3CannotBeMultipliesWithVectorOfDifferentSize() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
+		final SparseMatrixV3 sparseMatrixV3 = createThreeByTwoSparseMatrixV3(new double[] {
 				2, -3, -5, 11, -1, 8
 		});
 		ColumnVector vector = new ColumnVector(4);
 
 		// Act:
-		sparseMatrix.multiply(vector);
+		sparseMatrixV3.multiply(vector);
 	}
 
 	@Test
-	public void sparseMatrixCanBeMultipliesWithVectorOfSameSize() {
+	public void sparseMatrixV3CanBeMultipliesWithVectorOfSameSize() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
+		final SparseMatrixV3 sparseMatrixV3 = createThreeByTwoSparseMatrixV3(new double[] {
 				2, -3, -5, 11, -1, 8
 		});
 		ColumnVector vector = new ColumnVector(2);
@@ -200,7 +199,7 @@ public class SparseMatrixTest {
 		vector.setAt(1,3);
 
 		// Act:
-//		ColumnVector result = sparseMatrix.multiply(vector);
+//		ColumnVector result = sparseMatrixV3.multiply(vector);
 //		
 //		// Assert:
 //		Assert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
@@ -211,14 +210,15 @@ public class SparseMatrixTest {
 	//endregion
 
 	@Test
-	public void sparseMatrixnormalizeColumnsIsFastEnough() {
-		LOGGER.info("sparseMatrixnormalizeColumnsIsFastEnough");
+	public void sparseMatrixV3normalizeColumnsIsFastEnough() {
+		LOGGER.info("sparseMatrixV3normalizeColumnsIsFastEnough");
+
 		// Arrange:
 		int size = 1000000;
 		int numEntries = 5000000;
 		System.out.print("Setting up normalizeColumns test: " + size + " x " + size + " matrix with " + numEntries + " entries...");
 		long start = System.currentTimeMillis();
-		final SparseMatrix sparseMatrix = new SparseMatrix(size, size, 2*size);
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(size, size, 2*size);
 		SecureRandom sr = new SecureRandom();
 		byte[] rows = new byte[2*numEntries];
 		byte[] cols = new byte[2*numEntries];
@@ -227,7 +227,7 @@ public class SparseMatrixTest {
 		for (int i=0; i<numEntries; i++) {
 			long row = Math.abs((rows[2*i] << 8 + rows[2*i+1]) % size);
 			long col = Math.abs((cols[2*i] << 8 + cols[2*i+1]) % size);
-			sparseMatrix.setAt(row, col, 3.0);
+			sparseMatrixV3.setAt(row, col, 3.0);
 		}
 		long stop = System.currentTimeMillis();
 		System.out.println("done.");
@@ -235,25 +235,23 @@ public class SparseMatrixTest {
 
 		// Act:
 		start = System.currentTimeMillis();
-		sparseMatrix.normalizeColumns();
+		sparseMatrixV3.normalizeColumns();
 		stop = System.currentTimeMillis();
 		
 		// Assert:
-		System.out.println("HashMap: normalizeColumns needed " + (stop - start) + "ms.");
+		System.out.println("Trove TLongDoubleHashMap: normalizeColumns needed " + (stop - start) + "ms.");
 		Assert.assertTrue((stop - start) < 2000);
-
-		// Act:
 		for (int i=0; i<numEntries; i++) {
 			long row = Math.abs((rows[2*i] << 8 + rows[2*i+1]) % size);
 			long col = Math.abs((cols[2*i] << 8 + cols[2*i+1]) % size);
-			sparseMatrix.setAt(row, col, 3.0);
+			sparseMatrixV3.setAt(row, col, 3.0);
 		}
 		start = System.currentTimeMillis();
-		sparseMatrix.convert();
+		sparseMatrixV3.convert();
 		stop = System.currentTimeMillis();
 		System.out.println("Convert needed " + (stop - start) + "ms.");
 		start = System.currentTimeMillis();
-		sparseMatrix.normalizeColumns();
+		sparseMatrixV3.normalizeColumns();
 		stop = System.currentTimeMillis();
 		
 		// Assert:
@@ -263,15 +261,15 @@ public class SparseMatrixTest {
 	}
 
 	@Test
-	public void sparseMatrixMultiplyIsFastEnough() {
-		LOGGER.info("sparseMatrixMultiplyIsFastEnough");
+	public void sparseMatrixV3MultiplyIsFastEnough() {
+		LOGGER.info("sparseMatrixV3MultiplyIsFastEnough");
 
 		// Arrange:
 		int size = 1000000;
 		int numEntries = 5000000;
 		System.out.print("Setting up multiplication test: " + size + " x " + size + " matrix with " + numEntries + " entries...");
 		long start = System.currentTimeMillis();
-		final SparseMatrix sparseMatrix = new SparseMatrix(size, size, 2*numEntries);
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(size, size, 2*numEntries);
 		ColumnVector vector = new ColumnVector(size);
 		SecureRandom sr = new SecureRandom();
 		byte[] rows = new byte[3*numEntries];
@@ -282,29 +280,29 @@ public class SparseMatrixTest {
 			vector.setAt(i % size, cols[i]);
 			long row = Math.abs(((rows[3*i] << 16) + (rows[3*i+1] << 8) + rows[3*i+2]) % size);
 			long col = Math.abs(((cols[3*i] << 16) + (cols[3*i+1] << 8) + cols[3*i+2]) % size);
-			sparseMatrix.setAt(row, col, 3.0);
+			sparseMatrixV3.setAt(row, col, 3.0);
 		}
 		long stop = System.currentTimeMillis();
 		System.out.println("done.");
-		System.out.println(sparseMatrix.getEntryCount() + " entries.");
+		System.out.println(sparseMatrixV3.getEntryCount() + " entries.");
 		System.out.println("Setup needed " + (stop - start) + "ms.");
 
 		// Act:
 		start = System.currentTimeMillis();
-		double[] result1 = sparseMatrix.multiply(vector);
+		double[] result1 = sparseMatrixV3.multiply(vector);
 		stop = System.currentTimeMillis();
 		
 		// Assert:
-		System.out.println("HashMap: multiply needed " + (stop - start) + "ms.");
+		System.out.println("Trove TLongDoubleHashMap: multiply needed " + (stop - start) + "ms.");
 		Assert.assertTrue((stop - start) < 2000);
 
 		// Act:
 		start = System.currentTimeMillis();
-		sparseMatrix.convert();
+		sparseMatrixV3.convert();
 		stop = System.currentTimeMillis();
 		System.out.println("Convert needed " + (stop - start) + "ms.");
 		start = System.currentTimeMillis();
-		double[] result2 = sparseMatrix.multiply(vector);
+		double[] result2 = sparseMatrixV3.multiply(vector);
 		stop = System.currentTimeMillis();
 		
 		// Assert:
@@ -356,18 +354,18 @@ public class SparseMatrixTest {
 	}
 	//endregion
 
-	private static SparseMatrix createThreeByTwoSparseMatrix(final double[] values) {
+	private static SparseMatrixV3 createThreeByTwoSparseMatrixV3(final double[] values) {
 		if (6 != values.length)
 			throw new IllegalArgumentException("values must have 6 elements");
 
 		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 100);
-		sparseMatrix.setAt(0, 0, values[0]);
-		sparseMatrix.setAt(1, 0, values[1]);
-		sparseMatrix.setAt(2, 0, values[2]);
-		sparseMatrix.setAt(0, 1, values[3]);
-		sparseMatrix.setAt(1, 1, values[4]);
-		sparseMatrix.setAt(2, 1, values[5]);
-		return sparseMatrix;
+		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(3, 2, 100);
+		sparseMatrixV3.setAt(0, 0, values[0]);
+		sparseMatrixV3.setAt(1, 0, values[1]);
+		sparseMatrixV3.setAt(2, 0, values[2]);
+		sparseMatrixV3.setAt(0, 1, values[3]);
+		sparseMatrixV3.setAt(1, 1, values[4]);
+		sparseMatrixV3.setAt(2, 1, values[5]);
+		return sparseMatrixV3;
 	}
 }

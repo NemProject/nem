@@ -1,13 +1,12 @@
 package org.nem.core.math;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * Represents a linear algebra matrix which is sparsely populated.
- */
-public class SparseMatrix {
+public class SparseMatrixV2 {
 
 	final int numRows;
 	final int numCols;
@@ -15,36 +14,24 @@ public class SparseMatrix {
 	/**
 	 * The rows of the matrix
 	 */
-	final private HashMap<Long, Double> entries;
-	private double[] values=null;
-	private long[] indices=null;
-	private boolean converted = false;
+	private ArrayList<Double> values=null;
+	private ArrayList<Long> indices=null;
+	private double[] rawValues=null;
+	private long[] rawIndices=null;
+	private boolean converted=false;
 
 	/**
-	 * Creates a new matrix of the specified size which has a given capacity for each row.
+	 * Creates a new matrix of the specified size which has a given capacity.
 	 *
 	 * @param numRows The desired number of rows to represent.
 	 * @param numCols The desired number of columns to represent.
-	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
+	 * @param initialCapacity The initial of the array. Choose carefully to avoid reallocation!
 	 */
-	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
+	public SparseMatrixV2(final int numRows, final int numCols, final int initialCapacity) {
 		this.numRows = numRows;
 		this.numCols = numCols;
-		this.entries = new HashMap<Long, Double>(initialCapacity);
-	}
-	
-	/**
-	 * Converts the hash map into 2 arrays for faster operations.
-	 */
-	public void convert() {
-		this.values = new double[this.entries.size()];
-		this.indices = new long[this.entries.size()];
-		int i=0;
-		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-			this.values[i] = entry.getValue();
-			this.indices[i] = entry.getKey();
-		}
-		this.converted = true;
+		values = new ArrayList<Double>(initialCapacity);
+		indices = new ArrayList<Long>(initialCapacity);
 	}
 	
 	/**
@@ -71,7 +58,7 @@ public class SparseMatrix {
 	 * @return The number of non-zero entries.
 	 */
 	public int getEntryCount() {
-		return this.entries.size();
+		return this.values.size();
 	}
 
 	/**
@@ -90,8 +77,11 @@ public class SparseMatrix {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
 		long index = (row << 32) + col;
-		Double value = this.entries.get(index);
-		return value == null? 0 : value;
+		int idx = Collections.binarySearch(this.indices, index);
+		if (idx < 0) {
+			return 0.0;
+		}
+		return this.values.get(idx);
 	}
 
 	/**
@@ -109,10 +99,19 @@ public class SparseMatrix {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
 		long index = (row << 32) + col;
+		int idx = Collections.binarySearch(this.indices, index);
 		if (value == 0.0) {
-			this.entries.remove(index);
+			if (idx >= 0) {
+				this.values.remove(index);
+				this.indices.remove(index);
+			}
 		} else {
-			this.entries.put(index, value);
+			if (idx < 0) {
+				this.values.add(-idx-1, value);
+				this.indices.add(-idx-1, index);
+			} else {
+				this.values.set(idx, this.values.get(idx) + value);				
+			}
 		}
 	}
 
@@ -124,18 +123,27 @@ public class SparseMatrix {
 	 * @param val The value to increment by.
 	 */
 	public void incrementAt(final long row, final long col, final double val) {
-		if (row < 0 || row >= this.numRows) {
+		if (row < 0 || row >= numRows) {
 			throw new IllegalArgumentException("Row index out of bounds");
 		}
-		if (col < 0 || col >= this.numCols) {
+		if (col < 0 || col >= numCols) {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
 		long index = (row << 32) + col;
 		double value = getAt(row, col) + val;
+		int idx = Collections.binarySearch(this.indices, index);
 		if (value == 0.0) {
-			this.entries.remove(index);
+			if (idx >= 0) {
+				this.values.remove(index);
+				this.indices.remove(index);
+			}
 		} else {
-			this.entries.put(index, value);
+			if (idx < 0) {
+				this.values.add(-idx-1, value);
+				this.indices.add(-idx-1, index);
+			} else {
+				this.values.set(idx, value);				
+			}
 		}
 	}
 
@@ -143,28 +151,17 @@ public class SparseMatrix {
 	 * Normalizes each column of the matrix.
 	 */
 	public void normalizeColumns() {
-		ColumnVector vector = new ColumnVector(this.numRows);
-		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				vector.incrementAt((int)(index & 0xffffffff),  Math.abs(values[i]));
-			}			
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				double value = this.values[i];
-				if (value != 0.0) {
-					this.values[i] /= vector.getAt((int)(index & 0xffffffff));
-				}
-			}
-		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				vector.incrementAt((int)(entry.getKey() & 0xffffffff), Math.abs(entry.getValue()));
-			}
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				if (entry.getValue() != 0.0) {
-					this.entries.put(entry.getKey(), entry.getValue()/vector.getAt((int)(entry.getKey() & 0xffffffff)));
-				}
+		double[] vector = new double[this.numRows];
+		int size = this.indices.size();
+		for (int i=0; i<size; i++) {
+			long index = this.indices.get(i);
+			vector[(int)(index & 0xffffffff)] += Math.abs(this.values.get(i));
+		}
+		for (int i=0; i<size; i++) {
+			long index = this.indices.get(i);
+			double val = vector[(int)(index & 0xffffffff)];
+			if (val != 0.0) {
+				this.values.set(i, this.values.get(i)/val);
 			}
 		}
 	}
@@ -174,19 +171,12 @@ public class SparseMatrix {
 	 *
 	 * @return The row sum vector.
 	 */
-	public ColumnVector getRowSumVector() {
-		ColumnVector result = new ColumnVector(this.numRows);
-		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				double value = this.values[i];
-				result.incrementAt((int)(index >> 32), value);
-			}
-		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				result.incrementAt((int)(entry.getKey() >> 32), entry.getValue());
-			}
+	public double[] getRowSumVector() {
+		double[] result = new double[this.numRows];
+		int size = this.indices.size();
+		for (int i=0; i<size; i++) {
+			long index = this.indices.get(i);
+			result[(int)(index >> 32)] += this.values.get(i);
 		}
 		return result;
 	}
@@ -205,14 +195,16 @@ public class SparseMatrix {
 		double[] result = new double[this.numRows];
 		double[] rawVector = vector.getVector(); 
 		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				result[(int)(index >> 32)] += this.values[i] * rawVector[(int)(index & 0xffffffff)];
-			}
+//			int arraySize = indices.length;
+//			for (int i=0; i<arraySize; i++) {
+//				long index = indices[i];
+//				result[(int)(index >> 32)] += this.values[i] * rawVector[(int)(index & 0xffffffff)];
+//			}
 		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				result[(int)(entry.getKey() >> 32)] += entry.getValue() * rawVector[(int)(entry.getKey() & 0xffffffff)];
+			int size = this.indices.size();
+			for (int i=0; i<size; i++) {
+				long index = this.indices.get(i);
+				result[(int)(index >> 32)] += this.values.get(i) * rawVector[(int)(index & 0xffffffff)];
 			}
 		}
 		return result;

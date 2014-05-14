@@ -1,13 +1,9 @@
 package org.nem.core.math;
 
-import java.util.HashMap;
-import java.util.Map;
+import gnu.trove.iterator.TLongDoubleIterator;
+import gnu.trove.map.hash.TLongDoubleHashMap;
 
-
-/**
- * Represents a linear algebra matrix which is sparsely populated.
- */
-public class SparseMatrix {
+public class SparseMatrixV3 {
 
 	final int numRows;
 	final int numCols;
@@ -15,7 +11,7 @@ public class SparseMatrix {
 	/**
 	 * The rows of the matrix
 	 */
-	final private HashMap<Long, Double> entries;
+	final private TLongDoubleHashMap entries;
 	private double[] values=null;
 	private long[] indices=null;
 	private boolean converted = false;
@@ -27,10 +23,10 @@ public class SparseMatrix {
 	 * @param numCols The desired number of columns to represent.
 	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
 	 */
-	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
+	public SparseMatrixV3(final int numRows, final int numCols, final int initialCapacity) {
 		this.numRows = numRows;
 		this.numCols = numCols;
-		this.entries = new HashMap<Long, Double>(initialCapacity);
+		this.entries = new TLongDoubleHashMap(initialCapacity);
 	}
 	
 	/**
@@ -40,9 +36,10 @@ public class SparseMatrix {
 		this.values = new double[this.entries.size()];
 		this.indices = new long[this.entries.size()];
 		int i=0;
-		for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-			this.values[i] = entry.getValue();
-			this.indices[i] = entry.getKey();
+		for ( TLongDoubleIterator it = entries.iterator(); it.hasNext(); ) {
+		    it.advance();
+		    this.values[i] = it.value();
+		    this.indices[i] = it.key();
 		}
 		this.converted = true;
 	}
@@ -90,8 +87,8 @@ public class SparseMatrix {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
 		long index = (row << 32) + col;
-		Double value = this.entries.get(index);
-		return value == null? 0 : value;
+		double value = this.entries.get(index);
+		return value;
 	}
 
 	/**
@@ -148,7 +145,7 @@ public class SparseMatrix {
 			int arraySize = this.indices.length;
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
-				vector.incrementAt((int)(index & 0xffffffff),  Math.abs(values[i]));
+				vector.incrementAt((int)(index & 0xffffffff),  Math.abs(this.values[i]));
 			}			
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
@@ -158,12 +155,15 @@ public class SparseMatrix {
 				}
 			}
 		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				vector.incrementAt((int)(entry.getKey() & 0xffffffff), Math.abs(entry.getValue()));
+			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
+			    it.advance();
+				vector.incrementAt((int)(it.key() & 0xffffffff), Math.abs(it.value()));
 			}
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				if (entry.getValue() != 0.0) {
-					this.entries.put(entry.getKey(), entry.getValue()/vector.getAt((int)(entry.getKey() & 0xffffffff)));
+			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
+			    it.advance();
+			    double value = it.value();
+				if (value != 0.0) {
+					this.entries.put(it.key(), value/vector.getAt((int)(it.key() & 0xffffffff)));
 				}
 			}
 		}
@@ -184,8 +184,9 @@ public class SparseMatrix {
 				result.incrementAt((int)(index >> 32), value);
 			}
 		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				result.incrementAt((int)(entry.getKey() >> 32), entry.getValue());
+			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
+			    it.advance();
+				result.incrementAt((int)(it.key() >> 32), it.value());
 			}
 		}
 		return result;
@@ -211,8 +212,10 @@ public class SparseMatrix {
 				result[(int)(index >> 32)] += this.values[i] * rawVector[(int)(index & 0xffffffff)];
 			}
 		} else {
-			for (Map.Entry<Long, Double> entry : this.entries.entrySet()) {
-				result[(int)(entry.getKey() >> 32)] += entry.getValue() * rawVector[(int)(entry.getKey() & 0xffffffff)];
+			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
+			    it.advance();
+			    long index = it.key();
+				result[(int)(index >> 32)] += it.value() * rawVector[(int)(index & 0xffffffff)];
 			}
 		}
 		return result;
