@@ -27,6 +27,11 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySend(height, account1, amount);
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceive(height, account2, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
 		}
 	}
 
@@ -49,6 +54,11 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceiveUndo(height, account1, amount);
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySendUndo(height, account2, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
 		}
 	}
 
@@ -67,8 +77,14 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		aggregateObserver.notifyCredit(account, amount);
 
 		// Assert:
-		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers)
+		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceive(height, account, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
 	}
 
 	@Test
@@ -86,8 +102,14 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		aggregateObserver.notifyCredit(account, amount);
 
 		// Assert:
-		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers)
+		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySendUndo(height, account, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
 	}
 
 	@Test
@@ -105,8 +127,14 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		aggregateObserver.notifyDebit(account, amount);
 
 		// Assert:
-		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers)
+		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySend(height, account, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
 	}
 
 	@Test
@@ -124,8 +152,14 @@ public class AggregateBlockTransferObserverToTransferObserverAdapterTest {
 		aggregateObserver.notifyDebit(account, amount);
 
 		// Assert:
-		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers)
+		for (final BlockTransferObserver blockTransferObserver : blockTransferObservers) {
 			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceiveUndo(height, account, amount);
+
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(blockTransferObserver, Mockito.times(1)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
 	}
 
 	private static List<BlockTransferObserver> createBlockTransferObservers() {

@@ -6,7 +6,7 @@ import org.nem.core.test.Utils;
 
 import java.util.*;
 
-public class TransferObserverAggregateTest {
+public class AggregateTransferObserverTest {
 
 	@Test
 	public void notifyTransferDelegatesToSubObservers() {
@@ -22,8 +22,13 @@ public class TransferObserverAggregateTest {
 		aggregateObserver.notifyTransfer(account1, account2, amount);
 
 		// Assert:
-		for (final TransferObserver transferObserver : transferObservers)
+		for (final TransferObserver transferObserver : transferObservers) {
 			Mockito.verify(transferObserver, Mockito.times(1)).notifyTransfer(account1, account2, amount);
+
+			Mockito.verify(transferObserver, Mockito.times(1)).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyCredit(Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyDebit(Mockito.any(), Mockito.any());
+		}
 	}
 
 	@Test
@@ -39,8 +44,13 @@ public class TransferObserverAggregateTest {
 		aggregateObserver.notifyCredit(account, amount);
 
 		// Assert:
-		for (final TransferObserver transferObserver : transferObservers)
+		for (final TransferObserver transferObserver : transferObservers) {
 			Mockito.verify(transferObserver, Mockito.times(1)).notifyCredit(account, amount);
+
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(1)).notifyCredit(Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyDebit(Mockito.any(), Mockito.any());
+		}
 	}
 
 	@Test
@@ -56,8 +66,13 @@ public class TransferObserverAggregateTest {
 		aggregateObserver.notifyDebit(account, amount);
 
 		// Assert:
-		for (final TransferObserver transferObserver : transferObservers)
+		for (final TransferObserver transferObserver : transferObservers) {
 			Mockito.verify(transferObserver, Mockito.times(1)).notifyDebit(account, amount);
+
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(0)).notifyCredit(Mockito.any(), Mockito.any());
+			Mockito.verify(transferObserver, Mockito.times(1)).notifyDebit(Mockito.any(), Mockito.any());
+		}
 	}
 
 	private static List<TransferObserver> createTransferObservers() {
