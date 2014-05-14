@@ -2,14 +2,11 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.messages.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TransferTransactionTest {
 
@@ -410,7 +407,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.execute(true);
+		transaction.execute();
 
 		// Assert:
 		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(891L)));
@@ -426,7 +423,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.execute(true);
+		transaction.execute();
 
 		// Assert:
 		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(99L)));
@@ -442,7 +439,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.execute(true);
+		transaction.execute();
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
@@ -459,7 +456,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.execute(true);
+		transaction.execute();
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
@@ -477,7 +474,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.execute(false);
+		transaction.execute(Mockito.mock(TransferObserver.class));
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
@@ -498,7 +495,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.undo(true);
+		transaction.undo();
 
 		// Assert:
 		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(1109L)));
@@ -515,7 +512,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.undo(true);
+		transaction.undo();
 
 		// Assert:
 		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(1L)));
@@ -533,7 +530,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.undo(true);
+		transaction.undo();
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
@@ -560,7 +557,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.undo(true);
+		transaction.undo();
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(3));
@@ -587,7 +584,7 @@ public class TransferTransactionTest {
 		transaction.setFee(new Amount(10));
 
 		// Act:
-		transaction.undo(false);
+		transaction.undo(Mockito.mock(TransferObserver.class));
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));

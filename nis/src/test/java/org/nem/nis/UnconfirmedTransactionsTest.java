@@ -45,7 +45,6 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -61,7 +60,6 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(false));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -78,7 +76,6 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -93,7 +90,6 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(true));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -108,7 +104,6 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(isAdded, IsEqual.equalTo(false));
-		Assert.assertThat(transactions.isSubscribed(transaction), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -137,7 +132,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
 		Assert.assertThat(((TransferTransaction)transactionList.get(0)).getAmount(), IsEqual.equalTo(Amount.fromNem(9)));
 		Assert.assertThat(((TransferTransaction)transactionList.get(1)).getAmount(), IsEqual.equalTo(Amount.fromNem(7)));
-		Assert.assertThat(transactions.isSubscribed(toRemove), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -277,9 +271,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(
 				getCustomFieldValues(unconfirmedTransactions.getTransactionsBefore(new TimeInstant(101))),
 				IsEquivalent.equivalentTo(new Integer[] { 0, 2, 3, 5, 6, 8, 9 }));
-		Assert.assertThat(
-				blockTransactions.stream().anyMatch(unconfirmedTransactions::isSubscribed),
-				IsEqual.equalTo(false));
 	}
 
 	//endregion
