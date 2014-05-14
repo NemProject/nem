@@ -3,14 +3,14 @@ package org.nem.core.math;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-public class MatrixTest {
+public class DenseMatrixTest {
 
 	//region constructor / getAt / setAt
 
 	@Test
 	public void matrixIsInitializedToZero() {
 		// Arrange:
-		final Matrix matrix = new Matrix(2, 3);
+		final Matrix matrix = new DenseMatrix(2, 3);
 
 		// Assert:
 		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
@@ -26,7 +26,7 @@ public class MatrixTest {
 	@Test
 	public void matrixValuesCanBeSet() {
 		// Arrange:
-		final Matrix matrix = new Matrix(3, 2);
+		final Matrix matrix = new DenseMatrix(3, 2);
 
 		// Act:
 		matrix.setAt(0, 0, 7);
@@ -94,7 +94,7 @@ public class MatrixTest {
 	private static void assertGetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
 		try {
 			// Arrange:
-			final Matrix matrix = new Matrix(numRows, numCols);
+			final Matrix matrix = new DenseMatrix(numRows, numCols);
 
 			// Act:
 			matrix.getAt(row, col);
@@ -108,7 +108,7 @@ public class MatrixTest {
 	private static void assertSetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
 		try {
 			// Arrange:
-			final Matrix matrix = new Matrix(numRows, numCols);
+			final Matrix matrix = new DenseMatrix(numRows, numCols);
 
 			// Act:
 			matrix.setAt(row, col, 0);
@@ -126,7 +126,7 @@ public class MatrixTest {
 	@Test
 	public void matrixCanBeTransposed() {
 		// Arrange:
-		final Matrix matrix = createThreeByTwoMatrix(new double[] {
+		final DenseMatrix matrix = createThreeByTwoMatrix(new double[] {
 				7, 5, 1, 3, 11, 9
 		});
 
@@ -200,8 +200,8 @@ public class MatrixTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void matrixCannotBeMultipliedElementWiseWithDifferentSizeMatrix() {
 		// Arrange:
-		final Matrix matrix1 = new Matrix(3, 2);
-		final Matrix matrix2 = new Matrix(2, 3);
+		final Matrix matrix1 = new DenseMatrix(3, 2);
+		final Matrix matrix2 = new DenseMatrix(2, 3);
 
 		// Act:
 		matrix1.multiplyElementWise(matrix2);
@@ -237,14 +237,14 @@ public class MatrixTest {
 	@Test
 	public void isSameSizeReturnsTrueWhenMatriciesHaveSameSize() {
 		// Arrange:
-		final Matrix matrix = new Matrix(3, 2);
+		final DenseMatrix matrix = new DenseMatrix(3, 2);
 
 		// Assert:
-		Assert.assertThat(matrix.isSameSize(new Matrix(3, 2)), IsEqual.equalTo(true));
-		Assert.assertThat(matrix.isSameSize(new Matrix(2, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new Matrix(4, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new Matrix(3, 1)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new Matrix(3, 3)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 2)), IsEqual.equalTo(true));
+		Assert.assertThat(matrix.isSameSize(new DenseMatrix(2, 2)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(new DenseMatrix(4, 2)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 1)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 3)), IsEqual.equalTo(false));
 
 	}
 
@@ -271,12 +271,12 @@ public class MatrixTest {
 
 	//endregion
 
-	private static Matrix createThreeByTwoMatrix(final double[] values) {
+	private static DenseMatrix createThreeByTwoMatrix(final double[] values) {
 		if (6 != values.length)
 			throw new IllegalArgumentException("values must have 6 elements");
 
 		// Arrange:
-		final Matrix matrix = new Matrix(3, 2);
+		final DenseMatrix matrix = new DenseMatrix(3, 2);
 		matrix.setAt(0, 0, values[0]);
 		matrix.setAt(1, 0, values[1]);
 		matrix.setAt(2, 0, values[2]);

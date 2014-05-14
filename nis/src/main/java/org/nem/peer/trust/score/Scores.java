@@ -78,7 +78,7 @@ public abstract class Scores<T extends Score> {
 	 */
 	public Matrix getScoreMatrix(final Node[] nodes) {
 		final int numNodes = nodes.length;
-		final Matrix trustMatrix = new Matrix(numNodes, numNodes);
+		final Matrix trustMatrix = new DenseMatrix(numNodes, numNodes);
 		for (int i = 0; i < numNodes; ++i) {
 			for (int j = 0; j < numNodes; ++j) {
 				final Score score = this.getScore(nodes[i], nodes[j]);

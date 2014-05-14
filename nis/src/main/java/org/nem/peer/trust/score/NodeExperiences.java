@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.nem.core.math.DenseMatrix;
 import org.nem.core.math.Matrix;
 import org.nem.core.utils.AbstractTwoLevelMap;
 import org.nem.peer.node.Node;
@@ -46,7 +47,7 @@ public class NodeExperiences {
 	 * @return The shared experiences matrix.
 	 */
 	public Matrix getSharedExperienceMatrix(final Node node, final Node[] nodes) {
-		final Matrix matrix = new Matrix(nodes.length, nodes.length);
+		final Matrix matrix = new DenseMatrix(nodes.length, nodes.length);
 		for (int i = 0; i < nodes.length; ++i) {
 			// skip the node (since the node will not have interacted with itself)
 			if (node.equals(nodes[i]))

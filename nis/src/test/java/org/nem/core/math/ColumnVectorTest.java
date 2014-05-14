@@ -350,7 +350,7 @@ public class ColumnVectorTest {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(3, 2);
 
-		final Matrix matrix = new Matrix(3, 2);
+		final Matrix matrix = new DenseMatrix(3, 2);
 		matrix.setAt(0, 0, 2);
 		matrix.setAt(1, 0, 3);
 		matrix.setAt(2, 0, 5);
@@ -371,7 +371,7 @@ public class ColumnVectorTest {
 	public void vectorCannotBeMultipliedByMatrixWithFewerColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new Matrix(2, 1);
+		final Matrix m = new DenseMatrix(2, 1);
 
 		// Act:
 		v.multiply(m);
@@ -381,7 +381,7 @@ public class ColumnVectorTest {
 	public void vectorCannotBeMultipliedByMatrixWithMoreColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new Matrix(2, 3);
+		final Matrix m = new DenseMatrix(2, 3);
 
 		// Act:
 		v.multiply(m);
