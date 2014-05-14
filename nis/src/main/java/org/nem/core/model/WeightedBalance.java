@@ -23,6 +23,10 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		reduce();
 	}
 
+	public WeightedBalance copy() {
+		return new WeightedBalance(this.blockHeight, this.balance, this.unvestedBalance, this.vestedBalance);
+	}
+
 	private void reduce() {
 		final BigInteger gcd = this.vestedBalance.gcd(this.unvestedBalance);
 		if (gcd.equals(BigInteger.ZERO)) {

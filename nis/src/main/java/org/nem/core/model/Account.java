@@ -217,25 +217,21 @@ public class Account implements SerializableEntity {
 	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
 		return this.weightedBalances.historicalBalances.getBalance(lastBlockHeight, height);
 	}
-	
-	/**
-	 * Adds a given amount to the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void addHistoricalBalance(final BlockHeight height, final Amount amount) {
-		this.weightedBalances.historicalBalances.add(height, amount);
+
+	public void weightedSend(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.addSend(blockHeight, amount);
 	}
-	
-	/**
-	 * Subtracts a given amount from the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
-		this.weightedBalances.historicalBalances.subtract(height, amount);
+
+	public void weightedSendUndo(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.undoSend(blockHeight, amount);
+	}
+
+	public void weightedReceive(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.addReceive(blockHeight, amount);
+	}
+
+	public void weightedReceiveUndo(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.undoReceive(blockHeight, amount);
 	}
 
 	/**

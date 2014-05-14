@@ -310,7 +310,6 @@ public class UnconfirmedTransactionsTest {
 		final Account sender =Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(nems);
 		sender.incrementBalance(amount);
-		sender.addHistoricalBalance(BlockHeight.ONE, amount);
 		return sender;
 	}
 }

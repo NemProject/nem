@@ -3,6 +3,7 @@ package org.nem.core.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Container for vested balances.
@@ -18,16 +19,20 @@ public class WeightedBalances {
 	private final List<WeightedBalance> balances;
 	public final HistoricalBalances historicalBalances;
 
-	private WeightedBalances(final HistoricalBalances historicalBalances) {
-		this.balances = new ArrayList<>();
+	private WeightedBalances(final List<WeightedBalance> balances, final HistoricalBalances historicalBalances) {
+		this.balances = balances;
 		this.historicalBalances = historicalBalances;
 	}
+
 	public WeightedBalances() {
-		this(new HistoricalBalances());
+		this(new ArrayList<>(), new HistoricalBalances());
 	}
 
 	public WeightedBalances copy() {
-		return new WeightedBalances(this.historicalBalances.copy());
+		return new WeightedBalances(
+				balances.stream()
+						.map(weightedBalance -> weightedBalance.copy()).collect(Collectors.toList()),
+				this.historicalBalances.copy());
 	}
 
 	/**
@@ -38,6 +43,8 @@ public class WeightedBalances {
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
 		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
+
+		this.historicalBalances.add(height, amount);
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
@@ -69,6 +76,8 @@ public class WeightedBalances {
 	public void undoReceive(final BlockHeight height, final Amount amount) {
 		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
+		this.historicalBalances.subtract(height, amount);
+
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
 			index = undoIterateBalances(index);
@@ -86,6 +95,8 @@ public class WeightedBalances {
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
 		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
+
+		this.historicalBalances.subtract(height, amount);
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
@@ -111,6 +122,8 @@ public class WeightedBalances {
 	 */
 	public void undoSend(final BlockHeight height, final Amount amount) {
 		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
+
+		this.historicalBalances.add(height, amount);
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {

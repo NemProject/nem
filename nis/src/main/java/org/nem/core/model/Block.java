@@ -51,6 +51,8 @@ public class Block extends VerifiableEntity {
 		this.height = height;
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+
+		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	/**
@@ -81,6 +83,7 @@ public class Block extends VerifiableEntity {
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	//region Getters
