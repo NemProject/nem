@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class PoiScorer {
 
-	public enum ScoringAlg { BLOODYROOKIE, UTOPIAN, MAKOTO }
+	public enum ScoringAlg { BLOODYROOKIE, BLOODYROOKIENEWV2, UTOPIAN, MAKOTO }
 	
 	
 	/**
@@ -47,9 +47,9 @@ public class PoiScorer {
 			final ColumnVector coinDaysVector,
 			final ScoringAlg scoringAlg) {
 		
-		System.out.println("outLinkVector" + outLinkVector);
-		System.out.println("importanceVector" + importanceVector);
-		System.out.println("coinDaysVector" + coinDaysVector);
+//		System.out.println("outLinkVector" + outLinkVector);
+//		System.out.println("importanceVector" + importanceVector);
+//		System.out.println("coinDaysVector" + coinDaysVector);
 //		final double maxImportance = importanceVector.max();
 //		final double maxOutLink = outLinkVector.max();
 //		final double maxCoinDays = coinDaysVector.max();
@@ -74,6 +74,17 @@ public class PoiScorer {
 			// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
 			//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
 			
+		} else if (scoringAlg == ScoringAlg.BLOODYROOKIENEWV2) {
+			// norm(stake + c1*outlink) + c2*norm(PR)
+			
+			double c1=1.5;
+			double c2=0.01;
+			ColumnVector vector = outLinkVector.multiply(c1).add(coinDaysVector);
+			vector.normalize();
+
+			ColumnVector vector2 = importanceVector.multiply(c2);
+
+			finalScoreVector = vector.add(vector2);
 		} else if (scoringAlg == ScoringAlg.UTOPIAN) {
 			// norm(outlink 2 + PR)*stake + sqrt(stake)
 			

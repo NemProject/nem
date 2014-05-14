@@ -291,7 +291,7 @@ public class SparseMatrixV3Test {
 
 		// Act:
 		start = System.currentTimeMillis();
-		double[] result1 = sparseMatrixV3.multiply(vector);
+		ColumnVector result1 = sparseMatrixV3.multiply(vector);
 		stop = System.currentTimeMillis();
 		
 		// Assert:
@@ -305,7 +305,7 @@ public class SparseMatrixV3Test {
 		System.out.println("Convert needed " + (stop - start) + "ms.");
 		start = System.currentTimeMillis();
 		for (int i=0; i<10; i++) {
-			double[] result2 = sparseMatrixV3.multiply(vector);
+			ColumnVector result2 = sparseMatrixV3.multiply(vector);
 		}
 		stop = System.currentTimeMillis();
 		

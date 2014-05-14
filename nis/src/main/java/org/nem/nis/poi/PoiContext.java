@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.math.Matrix;
+import org.nem.core.math.SparseMatrixV3;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
 import org.nem.core.model.Address;
@@ -22,7 +23,7 @@ public class PoiContext {
 	private final ColumnVector coinDaysVector;
 	private final ColumnVector importanceVector;
 	private final ColumnVector outLinkScoreVector;
-	private final Matrix outLinkMatrix;
+	private final SparseMatrixV3 outLinkMatrix;
 
 	private final ColumnVector teleportationVector;
 	private final ColumnVector inverseTeleportationVector;
@@ -121,7 +122,7 @@ public class PoiContext {
 	 *
 	 * @return The out-link matrix.
 	 */
-	public Matrix getOutLinkMatrix() {
+	public SparseMatrixV3 getOutLinkMatrix() {
 		return this.outLinkMatrix;
 	}
 
@@ -132,9 +133,9 @@ public class PoiContext {
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
 		private final ColumnVector coinDaysVector;
-		private final ColumnVector importanceVector;
+		private ColumnVector importanceVector;
 		private final ColumnVector outLinkScoreVector;
-		private final Matrix outLinkMatrix;
+		private SparseMatrixV3 outLinkMatrix;
 
 		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
@@ -148,14 +149,15 @@ public class PoiContext {
 			this.coinDaysVector = new ColumnVector(numAccounts);
 			this.importanceVector = new ColumnVector(numAccounts);
 			this.outLinkScoreVector = new ColumnVector(numAccounts);
-			this.outLinkMatrix = new Matrix(numAccounts, numAccounts);
 		}
 
 		public void process(final Iterable<Account> accounts, final BlockHeight height) {
 			// (1) go through all accounts and initialize all vectors
 			int i = 0;
+			int numOutlinks = 0;
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
+				numOutlinks += account.getOutlinks() == null? 0 : account.getOutlinks().size();
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
 				// TODO: I would recommend playing around with this after we get POI working initially
@@ -180,15 +182,14 @@ public class PoiContext {
 				++i;
 			}
 			
+			this.outLinkMatrix = new SparseMatrixV3(i, i, numOutlinks * 2);
 			createOutLinkMatrix();
 			createImportanceVector();
 		}
 		
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outLinkMatrix to the components
-			for (int i=0; i<importanceVector.size(); i++) {
-				importanceVector.setAt(i, outLinkMatrix.rowSum(i));
-			}
+			importanceVector = new ColumnVector(outLinkMatrix.getRowSumVector().getVector());
 			
 			// (2) normalize the importance vector
 			this.importanceVector.normalize();			

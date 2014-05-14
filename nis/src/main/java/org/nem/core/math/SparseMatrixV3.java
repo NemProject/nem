@@ -175,21 +175,21 @@ public class SparseMatrixV3 {
 	 * @return The row sum vector.
 	 */
 	public ColumnVector getRowSumVector() {
-		ColumnVector result = new ColumnVector(this.numRows);
+		double[] result = new double[this.numRows];
 		if (this.converted) {
 			int arraySize = this.indices.length;
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
 				double value = this.values[i];
-				result.incrementAt((int)(index >> 32), value);
+				result[(int)(index >> 32)] += value;
 			}
 		} else {
 			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
 			    it.advance();
-				result.incrementAt((int)(it.key() >> 32), it.value());
+				result[(int)(it.key() >> 32)] += it.value();
 			}
 		}
-		return result;
+		return new ColumnVector(result);
 	}
 
 	/**
@@ -199,7 +199,7 @@ public class SparseMatrixV3 {
 	 *
 	 * @return The resulting vector.
 	 */
-	public double[] multiply(final ColumnVector vector) {
+	public ColumnVector multiply(final ColumnVector vector) {
 		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
@@ -218,6 +218,6 @@ public class SparseMatrixV3 {
 				result[(int)(index >> 32)] += it.value() * rawVector[(int)(index & 0xffffffff)];
 			}
 		}
-		return result;
+		return new ColumnVector(result);
 	}	
 }

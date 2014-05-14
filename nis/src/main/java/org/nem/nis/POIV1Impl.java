@@ -26,7 +26,7 @@ public class POIV1Impl implements POI {
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIE);
+		return calculateImportancesImpl(blockHeight, accounts, DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL/accounts.size(), PoiScorer.ScoringAlg.BLOODYROOKIENEWV2);
 	}
 	
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
@@ -81,9 +81,12 @@ public class POIV1Impl implements POI {
 					.add(this.context.getInverseTeleportationVector());
 
 			// M(out-link) * V(importance) .* V(teleportation)
-			final ColumnVector importances = prevIterImportances
-					.multiply(this.context.getOutLinkMatrix())
+			final ColumnVector importances = this.context.getOutLinkMatrix()
+					.multiply(prevIterImportances)
 					.multiplyElementWise(this.context.getTeleportationVector());
+//			final ColumnVector importances = prevIterImportances
+//					.multiply(this.context.getOutLinkMatrix())
+//					.multiplyElementWise(this.context.getTeleportationVector());
 
 			return importances.add(poiAdjustmentVector);
 		}

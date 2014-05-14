@@ -215,7 +215,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
@@ -311,8 +311,8 @@ public class POIV1ImplTest {
 	
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.UTOPIAN);
-			System.out.println("importances: " + importances);
+			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			//System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(0)));
