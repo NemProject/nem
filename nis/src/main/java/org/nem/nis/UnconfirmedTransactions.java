@@ -3,7 +3,6 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
@@ -64,22 +63,10 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		transaction.subscribe(this.transferObserver);
-		transaction.execute(false);
-		transaction.unsubscribe(this.transferObserver);
+		transaction.execute(this.transferObserver);
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
-	}
-
-	/**
-	 * Gets a value indicated whether or not this object is subscribed to the specified transaction.
-	 *
-	 * @param transaction The transaction.
-	 * @return true if the this object is subscribed to this transaction.
-	 */
-	boolean isSubscribed(final Transaction transaction) {
-		return transaction.isSubscribed(this.transferObserver);
 	}
 
 	boolean remove(final Transaction transaction) {
@@ -88,9 +75,7 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		transaction.subscribe(this.transferObserver);
-		transaction.undo(false);
-		transaction.unsubscribe(this.transferObserver);
+		transaction.undo(this.transferObserver);
 
 		this.transactions.remove(transactionHash);
 		return true;
