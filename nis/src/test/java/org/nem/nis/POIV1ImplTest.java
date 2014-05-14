@@ -389,7 +389,7 @@ public class POIV1ImplTest {
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
 		// TODO: why 1s?
 		System.out.println("Setting up accounts.");
-		int numAccounts = 50000;
+		int numAccounts = 5000;
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 

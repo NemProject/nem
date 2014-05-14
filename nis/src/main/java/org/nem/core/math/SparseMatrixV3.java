@@ -39,7 +39,7 @@ public class SparseMatrixV3 {
 		for ( TLongDoubleIterator it = entries.iterator(); it.hasNext(); ) {
 		    it.advance();
 		    this.values[i] = it.value();
-		    this.indices[i] = it.key();
+		    this.indices[i++] = it.key();
 		}
 		this.converted = true;
 	}
