@@ -27,6 +27,18 @@ public class DenseMatrix implements Matrix {
 			this.columns[i] = new ColumnVector(this.rows);
 	}
 
+	/**
+	 * Creates a new matrix of the specified size and initial values.
+	 *
+	 * @param rows The desired number of rows.
+	 * @param cols The desired number of columns.
+	 * @param values The initial values.
+	 */
+	public DenseMatrix(final int rows, final int cols, final double[] values) {
+		this(rows, cols);
+		this.setAll(values);
+	}
+
 	@Override
 	public int getRowCount() {
 		return this.rows;
@@ -50,6 +62,35 @@ public class DenseMatrix implements Matrix {
 	@Override
 	public void incrementAt(final int row, final int col, final double val) {
 		this.columns[col].setAt(row, this.columns[col].getAt(row) + val);
+	}
+
+	/**
+	 * Sets all the matrix's elements to the specified value.
+	 *
+	 * @param val The value.
+	 */
+	public void setAll(double val) {
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < cols; ++j) {
+				this.setAt(i, j, val);
+			}
+		}
+	}
+
+	/**
+	 * Sets all the matrix's elements to the specified values.
+	 *
+	 * @param values The values.
+	 */
+	public void setAll(double[] values) {
+		if (values.length != this.rows * this.cols)
+			throw new IllegalArgumentException("incompatible number of values");
+
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < cols; ++j) {
+				this.setAt(i, j, values[i * cols + j]);
+			}
+		}
 	}
 
 	/**
@@ -165,5 +206,29 @@ public class DenseMatrix implements Matrix {
 		}
 
 		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return this.rows ^ this.cols;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Matrix))
+			return false;
+
+		final Matrix rhs = (Matrix)obj;
+		if (!this.isSameSize(rhs))
+			return false;
+
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < cols; ++j) {
+				if (this.getAt(i, j) != rhs.getAt(i, j))
+					return false;
+			}
+		}
+
+		return true;
 	}
 }
