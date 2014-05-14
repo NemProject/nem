@@ -42,7 +42,10 @@ public class POIV1Impl implements POI {
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(context, scorer, maxIters, tol);
+		long start = System.currentTimeMillis();
 		iterator.run();
+		long stop = System.currentTimeMillis();
+		System.out.println("POI iterator needed " + (stop-start) + "ms.");
 
 		if (!iterator.hasConverged()) {
 			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);

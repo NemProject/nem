@@ -451,18 +451,15 @@ public class POIV1ImplTest {
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
 		List<MockAccount> accounts = new ArrayList<MockAccount>();
 		
-		// MUCH faster if the address is supplied to createMockAccountWithBalance!
-		Address address = Utils.generateRandomAddress();
-		
 		for (int i=0; i<numAccounts; i++) {
 			if (outLinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
 				if (i == 0) {
-					accounts.add(createMockAccountWithBalance(totalVestedBalance - totalOutLinkStrength - numAccounts + 1, address));
+					accounts.add(createMockAccountWithBalance(totalVestedBalance - totalOutLinkStrength - numAccounts + 1));
 				} else {
-					accounts.add(createMockAccountWithBalance(1, address));					
+					accounts.add(createMockAccountWithBalance(1));					
 				}
 			} else {
-				accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutLinkStrength)/numAccounts, address));
+				accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutLinkStrength)/numAccounts));
 			}
 		}
 		
@@ -511,8 +508,8 @@ public class POIV1ImplTest {
 		return account;
 	}
 
-	private static MockAccount createMockAccountWithBalance(long numNEM, Address address) {
-		final MockAccount account = new MockAccount(address);
+	private static MockAccount createMockAccountWithBalance(long numNEM) {
+		final MockAccount account = new MockAccount(Utils.generateRandomAddress());
 		account.incrementBalance(Amount.fromNem(numNEM));
 		return account;
 	}
