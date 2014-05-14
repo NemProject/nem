@@ -21,6 +21,11 @@ public class MockAccount extends Account {
 		this.heightToCoinDaysMap = new HashMap<>();
 	}
 
+	public MockAccount(Address address){
+		super(address);
+		this.heightToCoinDaysMap = new HashMap<>();
+	}
+
 	/**
 	 * Sets coin days at the specified block height.
 	 *

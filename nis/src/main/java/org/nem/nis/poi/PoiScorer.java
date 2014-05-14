@@ -139,10 +139,7 @@ public class PoiScorer {
 
 		// alg is: l1norm(stakes+ c1*outlinkstrengths) + c2 * l1norm(PR)
 
-		coinDaysVector.normalize();
-		outLinkVector.normalize();
-
-		double c1 = 2.;
+		double c1 = 2;
 		double c2 = 0.01;
 
 		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).add(coinDaysVector);
