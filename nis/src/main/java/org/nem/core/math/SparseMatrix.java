@@ -162,34 +162,14 @@ public class SparseMatrix {
 	/**
 	 * Normalizes each column of the matrix.
 	 */
-//	public void normalizeColumns() {
-//		double[] vector = new double[this.numRows];
-//		for (int i=0; i<numRows; i++) {
-//			double[] rowValues = this.values[i];
-//			int[] rowCols = this.cols[i];
-//			int size = this.maxIndices[i];
-//			for (int j=0; j<size; j++) {
-//				vector[rowCols[j]] += Math.abs(rowValues[j]);
-//			}
-//		}
-//		for (int i=0; i<numRows; i++) {
-//			double[] rowValues = this.values[i];
-//			int[] rowCols = this.cols[i];
-//			int size = this.maxIndices[i];
-//			for (int j=0; j<size; j++) {
-//				double norm =  vector[rowCols[j]];
-//				if (norm > 0) {
-//					rowValues[j] /= norm;
-//				}
-//			}
-//		}		
-//	}
 	public void normalizeColumns() {
 		double[] vector = new double[this.numRows];
 		for (int i=0; i<numRows; i++) {
+			double[] rowValues = this.values[i];
+			int[] rowCols = this.cols[i];
 			int size = this.maxIndices[i];
 			for (int j=0; j<size; j++) {
-				vector[this.cols[i][j]] += Math.abs(this.values[i][j]);
+				vector[rowCols[j]] += Math.abs(rowValues[j]);
 			}
 		}
 		for (int i=0; i<numRows; i++) {
