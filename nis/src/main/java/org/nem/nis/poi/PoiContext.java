@@ -1,8 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.core.math.Matrix;
-import org.nem.core.math.SparseMatrixV3;
+import org.nem.core.math.SparseMatrix;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
 import org.nem.core.model.Address;
@@ -23,7 +22,7 @@ public class PoiContext {
 	private final ColumnVector coinDaysVector;
 	private final ColumnVector importanceVector;
 	private final ColumnVector outLinkScoreVector;
-	private final SparseMatrixV3 outLinkMatrix;
+	private final SparseMatrix outLinkMatrix;
 
 	private final ColumnVector teleportationVector;
 	private final ColumnVector inverseTeleportationVector;
@@ -122,7 +121,7 @@ public class PoiContext {
 	 *
 	 * @return The out-link matrix.
 	 */
-	public SparseMatrixV3 getOutLinkMatrix() {
+	public SparseMatrix getOutLinkMatrix() {
 		return this.outLinkMatrix;
 	}
 
@@ -135,7 +134,7 @@ public class PoiContext {
 		private final ColumnVector coinDaysVector;
 		private ColumnVector importanceVector;
 		private final ColumnVector outLinkScoreVector;
-		private SparseMatrixV3 outLinkMatrix;
+		private SparseMatrix outLinkMatrix;
 
 		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
@@ -182,7 +181,7 @@ public class PoiContext {
 				++i;
 			}
 			
-			this.outLinkMatrix = new SparseMatrixV3(i, i, numOutLinks * 2);
+			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks * 2);
 			createOutLinkMatrix();
 			createImportanceVector();
 		}

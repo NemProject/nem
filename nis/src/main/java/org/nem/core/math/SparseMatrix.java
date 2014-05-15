@@ -3,7 +3,7 @@ package org.nem.core.math;
 import gnu.trove.iterator.TLongDoubleIterator;
 import gnu.trove.map.hash.TLongDoubleHashMap;
 
-public class SparseMatrixV3 {
+public class SparseMatrix {
 
 	final int numRows;
 	final int numCols;
@@ -23,7 +23,7 @@ public class SparseMatrixV3 {
 	 * @param numCols The desired number of columns to represent.
 	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
 	 */
-	public SparseMatrixV3(final int numRows, final int numCols, final int initialCapacity) {
+	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.entries = new TLongDoubleHashMap(initialCapacity);
