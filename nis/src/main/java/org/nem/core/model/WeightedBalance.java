@@ -1,8 +1,6 @@
 package org.nem.core.model;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 
 public class WeightedBalance implements Comparable<WeightedBalance> {
 	private final BlockHeight blockHeight;
@@ -32,8 +30,10 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		if (gcd.equals(BigInteger.ZERO)) {
 			return;
 		}
-		this.vestedBalance = this.vestedBalance.divide(gcd);
-		this.unvestedBalance = this.unvestedBalance.divide(gcd);
+
+		// last multiply, in order to always keep vested/unvested balance > balance
+		this.vestedBalance = this.vestedBalance.divide(gcd).multiply(BigInteger.valueOf(this.balance.getNumMicroNem()));
+		this.unvestedBalance = this.unvestedBalance.divide(gcd).multiply(BigInteger.valueOf(this.balance.getNumMicroNem()));
 	}
 
 	public WeightedBalance next() {
@@ -89,11 +89,10 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public void undoReceive(final Amount amount) {
-		final BigInteger bigAmount = BigInteger.valueOf(amount.getNumMicroNem());
-//		if (bigAmount.compareTo(this.unvestedBalance.multiply()) > 0)
-//			throw new IllegalArgumentException("amount must be non-negative");
+		if (amount.compareTo(getUnvestedBalance()) > 0)
+			throw new IllegalArgumentException("amount must be non-negative");
 
-		this.unvestedBalance = this.unvestedBalance.subtract(bigAmount);
+		this.unvestedBalance = this.unvestedBalance.subtract(BigInteger.valueOf(amount.getNumMicroNem()));
 		this.balance = this.balance.subtract(amount);
 	}
 
@@ -109,10 +108,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public Amount getUnvestedBalance() {
-		return Amount.fromMicroNem(
-				this.unvestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem()))
-						.divide(this.vestedBalance.add(this.unvestedBalance)).longValue()
-		);
+		return this.balance.subtract(getVestedBalance());
 	}
 
 	@Override

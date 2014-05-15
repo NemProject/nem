@@ -55,7 +55,7 @@ public class WeightedBalancesTest {
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 2881, referenceBalance.getUnvestedBalance());
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.next().getUnvestedBalance());
-		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(456933369)); // referenceBalance.next().getUnvestedBalance()
+		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(440498211));
 	}
 	//endregion
 
@@ -80,7 +80,8 @@ public class WeightedBalancesTest {
 
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
-		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(456933369)));
+		// use previous test as a reference to obtain proper value here
+		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(440498211)));
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.getUnvestedBalance());
 	}
 	//endregion

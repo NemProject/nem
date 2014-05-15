@@ -127,6 +127,7 @@ public class WeightedBalances {
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
+			// TODO: in case if balance is 0, use historical balances to "correct" it
 			index = undoIterateBalances(index);
 			balances.get(index).undoSend(amount);
 

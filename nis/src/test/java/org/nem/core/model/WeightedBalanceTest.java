@@ -89,18 +89,19 @@ public class WeightedBalanceTest {
 	}
 
 	@Test
-	@Ignore // this test doesn't make much sense now, also it doesn't actually matter now
 	public void nemsAreNotLostDuringIterationOfTinyAmounts() {
 		// Arrange:
-		final WeightedBalance initialBalance = new WeightedBalance(BlockHeight.ONE, Amount.fromMicroNem(75));
+		WeightedBalance balance = new WeightedBalance(BlockHeight.ONE, Amount.fromMicroNem(75));
 
-		// Act
-		final WeightedBalance weightedBalance = initialBalance.next();
+		for (int i = 1; i < 75; ++i) {
+			// Act
+			balance = balance.next();
 
-		// Assert:
-		Assert.assertThat(weightedBalance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
-		Assert.assertThat(weightedBalance.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(1)));
-		Assert.assertThat(weightedBalance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(74)));
+			// Assert:
+			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY *i+ 1)));
+			final Amount sum = balance.getVestedBalance().add(balance.getUnvestedBalance());
+			Assert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
+		}
 	}
 
 	@Test
