@@ -20,7 +20,7 @@ public class SparseMatrixV2 {
 	 *
 	 * @param numRows The desired number of rows to represent.
 	 * @param numCols The desired number of columns to represent.
-	 * @param initialCapacity The initial of a row. Choose carefully to avoid reallocation!
+	 * @param initialCapacity The initial capacity of a row. Choose carefully to avoid reallocation!
 	 */
 	public SparseMatrixV2(final int numRows, final int numCols, final int initialCapacityPerRow) {
 		this.numRows = numRows;
@@ -31,9 +31,6 @@ public class SparseMatrixV2 {
 		for (int i=0; i<numRows; i++) {
 			this.values[i] = new double[initialCapacityPerRow];
 			this.cols[i] = new int[initialCapacityPerRow];
-			for (int j=0; j<initialCapacityPerRow; j++) {
-				this.cols[i][j] = -1;
-			}
 			this.maxIndices[i] = 0;
 		}
 	}
@@ -54,6 +51,24 @@ public class SparseMatrixV2 {
 	 */
 	public int getColumnCount() {
 		return this.numCols;
+	}
+
+	/**
+	 * Gets the number of non zero columns of a row.
+	 *
+	 * @return The number of non zero columns.
+	 */
+	public int getNonZeroColumnCount(int row) {
+		return this.maxIndices[row];
+	}
+
+	/**
+	 * Gets the capacity of a row.
+	 *
+	 * @return The capacity of the row.
+	 */
+	public int getRowCapacity(int row) {
+		return this.cols[row].length;
 	}
 
 	/**
@@ -246,9 +261,6 @@ public class SparseMatrixV2 {
 		double[] newValues = new double[size*2];
 		System.arraycopy(this.cols[row], 0, newCols, 0, size);
 		System.arraycopy(this.values[row], 0, newValues, 0, size);
-		for (int i=size; i<newCols.length; i++) {
-			newCols[i] = -1;
-		}
 		this.cols[row] = newCols;
 		this.values[row] = newValues;
 	}
