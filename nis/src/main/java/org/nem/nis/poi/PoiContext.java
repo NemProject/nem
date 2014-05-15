@@ -210,7 +210,6 @@ public class PoiContext {
 					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
 				}
 			}
-			outLinkMatrix.convert();
 			outLinkMatrix.normalizeColumns();
 		}
 	}
