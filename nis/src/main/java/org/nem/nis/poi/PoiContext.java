@@ -212,7 +212,7 @@ public class PoiContext {
 			}
 
 			// TODO: we should test the impact of convert
-			outLinkMatrix.convert();
+//			outLinkMatrix.convert();
 			outLinkMatrix.normalizeColumns();
 		}
 	}

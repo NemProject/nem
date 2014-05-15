@@ -1,7 +1,5 @@
 package org.nem.core.math;
 
-import gnu.trove.iterator.TLongDoubleIterator;
-import gnu.trove.map.hash.TLongDoubleHashMap;
 
 public class SparseMatrix {
 
@@ -11,37 +9,28 @@ public class SparseMatrix {
 	/**
 	 * The rows of the matrix
 	 */
-	final private TLongDoubleHashMap entries;
-	private double[] values=null;
-	private long[] indices=null;
-	private boolean converted = false;
+	private double[][] values=null;
+	private int[][] cols=null;
+	private int[] maxIndices=null;
 
 	/**
 	 * Creates a new matrix of the specified size which has a given capacity for each row.
 	 *
 	 * @param numRows The desired number of rows to represent.
 	 * @param numCols The desired number of columns to represent.
-	 * @param initialCapacity The initial of the hash map. Choose carefully to avoid rehashing!
+	 * @param initialCapacity The initial capacity of a row. Choose carefully to avoid reallocation!
 	 */
-	public SparseMatrix(final int numRows, final int numCols, final int initialCapacity) {
+	public SparseMatrix(final int numRows, final int numCols, final int initialCapacityPerRow) {
 		this.numRows = numRows;
 		this.numCols = numCols;
-		this.entries = new TLongDoubleHashMap(initialCapacity);
-	}
-	
-	/**
-	 * Converts the hash map into 2 arrays for faster operations.
-	 */
-	public void convert() {
-		this.values = new double[this.entries.size()];
-		this.indices = new long[this.entries.size()];
-		int i=0;
-		for ( TLongDoubleIterator it = entries.iterator(); it.hasNext(); ) {
-		    it.advance();
-		    this.values[i] = it.value();
-		    this.indices[i++] = it.key();
+		this.values = new double[numRows][];
+		this.cols = new int[numRows][];
+		this.maxIndices = new int[numRows];
+		for (int i=0; i<numRows; i++) {
+			this.values[i] = new double[initialCapacityPerRow];
+			this.cols[i] = new int[initialCapacityPerRow];
+			this.maxIndices[i] = 0;
 		}
-		this.converted = true;
 	}
 	
 	/**
@@ -63,12 +52,21 @@ public class SparseMatrix {
 	}
 
 	/**
-	 * Gets the number of non-zero entries.
+	 * Gets the number of non zero columns of a row.
 	 *
-	 * @return The number of non-zero entries.
+	 * @return The number of non zero columns.
 	 */
-	public int getEntryCount() {
-		return this.entries.size();
+	public int getNonZeroColumnCount(int row) {
+		return this.maxIndices[row];
+	}
+
+	/**
+	 * Gets the capacity of a row.
+	 *
+	 * @return The capacity of the row.
+	 */
+	public int getRowCapacity(int row) {
+		return this.cols[row].length;
 	}
 
 	/**
@@ -79,16 +77,19 @@ public class SparseMatrix {
 	 *
 	 * @return The value.
 	 */
-	public double getAt(final long row, final long col) {
+	public double getAt(final int row, final int col) {
 		if (row < 0 || row >= this.numRows) {
 			throw new IllegalArgumentException("Row index out of bounds");
 		}
 		if (col < 0 || col >= this.numCols) {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
-		long index = (row << 32) + col;
-		double value = this.entries.get(index);
-		return value;
+		for (int i=0; i<this.maxIndices[row]; i++) {
+			if (this.cols[row][i] == col) {
+				return this.values[row][i];
+			}
+		}
+		return 0.0;
 	}
 
 	/**
@@ -98,18 +99,36 @@ public class SparseMatrix {
 	 * @param col The column.
 	 * @param value The value.
 	 */
-	public void setAt(final long row, final long col, final double value) {
+	public void setAt(final int row, final int col, final double value) {
 		if (row < 0 || row >= this.numRows) {
 			throw new IllegalArgumentException("Row index out of bounds");
 		}
 		if (col < 0 || col >= this.numCols) {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
-		long index = (row << 32) + col;
 		if (value == 0.0) {
-			this.entries.remove(index);
+			for (int i=0; i<this.maxIndices[row]; i++) {
+				if (this.cols[row][i] == col) {
+					remove(row, col);
+					return;
+				}
+			}
 		} else {
-			this.entries.put(index, value);
+			int size = this.cols[row].length;
+			for (int i=0; i<this.maxIndices[row]; i++) {
+				if (this.cols[row][i] == col) {
+					this.values[row][i] = value;
+					return;
+				}
+			}
+			
+			// New column
+			if (this.maxIndices[row] == size) {
+				reallocate(row);
+			}
+			this.cols[row][this.maxIndices[row]] = col;
+			this.values[row][this.maxIndices[row]] = value;
+			this.maxIndices[row] += 1;			
 		}
 	}
 
@@ -120,19 +139,23 @@ public class SparseMatrix {
 	 * @param col The column.
 	 * @param val The value to increment by.
 	 */
-	public void incrementAt(final long row, final long col, final double val) {
+	public void incrementAt(final int row, final int col, final double val) {
 		if (row < 0 || row >= this.numRows) {
 			throw new IllegalArgumentException("Row index out of bounds");
 		}
 		if (col < 0 || col >= this.numCols) {
 			throw new IllegalArgumentException("Column index out of bounds");
 		}
-		long index = (row << 32) + col;
 		double value = getAt(row, col) + val;
 		if (value == 0.0) {
-			this.entries.remove(index);
+			for (int i=0; i<this.maxIndices[row]; i++) {
+				if (this.cols[row][i] == col) {
+					remove(row, col);
+					return;
+				}
+			}
 		} else {
-			this.entries.put(index, value);
+			setAt(row, col, value);
 		}
 	}
 
@@ -141,32 +164,25 @@ public class SparseMatrix {
 	 */
 	public void normalizeColumns() {
 		double[] vector = new double[this.numRows];
-		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				vector[(int)(index & 0xffffffff)] +=  Math.abs(this.values[i]);
-			}			
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				double value = this.values[i];
-				if (value != 0.0) {
-					this.values[i] /= vector[(int)(index & 0xffffffff)];
-				}
-			}
-		} else {
-			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
-			    it.advance();
-				vector[(int)(it.key() & 0xffffffff)] += Math.abs(it.value());
-			}
-			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
-			    it.advance();
-			    double value = it.value();
-				if (value != 0.0) {
-					this.entries.put(it.key(), value/vector[(int)(it.key() & 0xffffffff)]);
-				}
+		for (int i=0; i<numRows; i++) {
+			double[] rowValues = this.values[i];
+			int[] rowCols = this.cols[i];
+			int size = this.maxIndices[i];
+			for (int j=0; j<size; j++) {
+				vector[rowCols[j]] += Math.abs(rowValues[j]);
 			}
 		}
+		for (int i=0; i<numRows; i++) {
+			double[] rowValues = this.values[i];
+			int[] rowCols = this.cols[i];
+			int size = this.maxIndices[i];
+			for (int j=0; j<size; j++) {
+				double norm =  vector[rowCols[j]];
+				if (norm > 0) {
+					rowValues[j] /= norm;
+				}
+			}
+		}		
 	}
 
 	/**
@@ -176,19 +192,14 @@ public class SparseMatrix {
 	 */
 	public ColumnVector getRowSumVector() {
 		double[] result = new double[this.numRows];
-		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				double value = this.values[i];
-				result[(int)(index >> 32)] += value;
-			}
-		} else {
-			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
-			    it.advance();
-				result[(int)(it.key() >> 32)] += it.value();
+		for (int i=0; i<numRows; i++) {
+			double[] rowValues = this.values[i];
+			int size = this.maxIndices[i];
+			for (int j=0; j<size; j++) {
+				result[i] += rowValues[j];
 			}
 		}
+		
 		return new ColumnVector(result);
 	}
 
@@ -204,19 +215,51 @@ public class SparseMatrix {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
 		double[] result = new double[this.numRows];
-		if (this.converted) {
-			int arraySize = this.indices.length;
-			for (int i=0; i<arraySize; i++) {
-				long index = this.indices[i];
-				result[(int)(index >> 32)] += this.values[i] * vector.getAt((int)(index & 0xffffffff));
-			}
-		} else {
-			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
-			    it.advance();
-			    long index = it.key();
-				result[(int)(index >> 32)] += it.value() * vector.getAt((int)(index & 0xffffffff));
-			}
+		double[] rawVector = new double[this.numRows];
+		for (int i=0; i<this.numCols; i++) {
+			rawVector[i] = vector.getAt(i);
 		}
+		for (int i=0; i<numRows; i++) {
+			double[] rowValues = this.values[i];
+			int[] rowCols = this.cols[i];
+			int size = this.maxIndices[i];
+			double dot=0.0;
+			for (int j=0; j<size; j++) {
+				dot += rowValues[j] * rawVector[rowCols[j]];
+			}
+			result[i] = dot;
+		}
+		
 		return new ColumnVector(result);
 	}	
+
+	/**
+	 * Remove an entries at a specific position
+	 * 
+	 * @param row
+	 * @param col
+	 */
+	private void remove(int row, int col) {
+		// Shrink arrays
+		System.arraycopy(this.cols[row], col+1, this.cols[row], col, this.cols[row].length-1-col);
+		System.arraycopy(this.values[row], col+1, this.values[row], col, this.values[row].length-1-col);
+		this.maxIndices[row] -= 1;
+		
+	}
+	
+	/**
+	 * Reallocate the value and column arrays of a row
+	 * 
+	 * @param row
+	 */
+	private void reallocate(int row) {
+		// Hopefully doesn't happen too often
+		int size = this.cols[row].length;
+		int[] newCols = new int[size*2];
+		double[] newValues = new double[size*2];
+		System.arraycopy(this.cols[row], 0, newCols, 0, size);
+		System.arraycopy(this.values[row], 0, newValues, 0, size);
+		this.cols[row] = newCols;
+		this.values[row] = newValues;
+	}
 }
