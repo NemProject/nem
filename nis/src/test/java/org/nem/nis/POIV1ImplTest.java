@@ -372,7 +372,7 @@ public class POIV1ImplTest {
 			
 			// Assert
 			// Temporary changed the assert so it doesn't fail although the sybil attack succeeds
-//			Assert.assertTrue(0.00009 < ratio && ratio < 1.1);
+			Assert.assertTrue(0.00009 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}

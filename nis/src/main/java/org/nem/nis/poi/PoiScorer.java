@@ -102,15 +102,6 @@ public class PoiScorer {
 		vector.normalize();
 		return importanceVector
 				.multiplyElementWise(vector);
-		// TODO: in the latest Python prototype, I added outLinkVector instead of multiplying,
-		// because I was concerned that otherwise people could boost their importance too easily.
-		// Weighting by CoinDays should make this safe enough, though, and multiplying will make the
-		// importance more fair to people with less NEM.
-		// TODO: write unit tests to study the effect of adding outLinkVector vs. multiplying here.
-		//.multiplyElementWise(coinDaysVector);
-
-		// BR: Why scale? this should have no influence on foraging, normalizing seems more natural
-		//finalScoreVector.scale(scale); // TODO: This won't work if we add outLinkVector, so keep that in mind.
 	}
 
 	private ColumnVector calculateBloodyRookieNewScore(
@@ -118,7 +109,7 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
 
-		//		final score = l1norm(stakes) + c1 * l1norm(outlinkstrengths) + c2 * l1norm(PR)
+		// final score = l1norm(stakes) + c1 * l1norm(outlinkstrengths) + c2 * l1norm(PR)
 
 		coinDaysVector.normalize();
 		outLinkVector.normalize();
