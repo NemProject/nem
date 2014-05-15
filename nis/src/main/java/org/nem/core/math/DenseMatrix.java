@@ -171,7 +171,7 @@ public class DenseMatrix implements Matrix {
 		final DenseMatrix result = new DenseMatrix(this.rows, this.cols);
 		for (int i = 0; i < this.cols; ++i) {
 			for (int j = 0; j < this.rows; ++j)
-				result.columns[i].setAt(j, result.columns[i].getAt(j) * matrix.getAt(i, j));
+				result.columns[i].setAt(j, this.columns[i].getAt(j) * matrix.getAt(j, i));
 		}
 
 		return result;

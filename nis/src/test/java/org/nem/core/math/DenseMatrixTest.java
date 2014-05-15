@@ -116,27 +116,24 @@ public class DenseMatrixTest {
 	@Test
 	public void matrixValuesCanBeIncremented() {
 		// Arrange:
-		final Matrix matrix = new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2 });
+		final Matrix matrix = new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 11 });
 
 		// Act:
 		// Increment values
-		matrix.incrementAt(0, 0, 1);
-		matrix.incrementAt(1, 0, 2);
-		matrix.incrementAt(2, 0, 4);
-		matrix.incrementAt(0, 1, 4);
+		matrix.incrementAt(0, 0, 4);
+		matrix.incrementAt(0, 1, 2);
+		matrix.incrementAt(0, 2, 3);
+		matrix.incrementAt(1, 0, 4);
 		matrix.incrementAt(1, 1, 5);
-		matrix.incrementAt(2, 1, 6);
+		matrix.incrementAt(1, 2, 6);
 
 		// Double increment
-		matrix.incrementAt(2, 1, 7);
+		matrix.incrementAt(0, 2, 7);
 
 		// Assert:
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(8.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(9.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(15.0));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(6.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(22.0));
+		Assert.assertThat(
+				matrix,
+				IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 5, 6, 15, 11, 7, 17 })));
 	}
 
 	//endregion
@@ -241,13 +238,13 @@ public class DenseMatrixTest {
 	@Test
 	public void matrixWithZeroSumColumnsCanBeNormalized() {
 		// Arrange:
-		final Matrix matrix = new DenseMatrix(2, 3, new double[] { 2, 0, 0, -2, 0, 0 });
+		final Matrix matrix = new DenseMatrix(2, 3, new double[] { 2, 0, 0, 0, -2, 0 });
 
 		// Act:
 		matrix.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 2, 0, 0, -2, 0, 0 })));
+		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 1, 0, 0, 0, -1, 0 })));
 	}
 
 	@Test
@@ -483,18 +480,6 @@ public class DenseMatrixTest {
 				"2.123 11.123" + System.lineSeparator() +
 						"3.235 1.000" + System.lineSeparator() +
 						"5012.013 8.000";
-
-		// Assert:
-		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
-	}
-
-	@Test
-	public void sparseMatrixStringRepresentationIsCorrect() {
-		// Arrange:
-		final Matrix matrix = new DenseMatrix(3, 2);
-
-		// Assert:
-		final String expectedResult = "[3 x 2]";
 
 		// Assert:
 		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));

@@ -154,10 +154,10 @@ public class PoiContext {
 		public void process(final Iterable<Account> accounts, final BlockHeight height) {
 			// (1) go through all accounts and initialize all vectors
 			int i = 0;
-			int numOutlinks = 0;
+			int numOutLinks = 0;
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
-				numOutlinks += account.getOutlinks() == null? 0 : account.getOutlinks().size();
+				numOutLinks += null == account.getOutlinks() ? 0 : account.getOutlinks().size();
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
 				// TODO: I would recommend playing around with this after we get POI working initially
@@ -182,14 +182,14 @@ public class PoiContext {
 				++i;
 			}
 			
-			this.outLinkMatrix = new SparseMatrixV3(i, i, numOutlinks * 2);
+			this.outLinkMatrix = new SparseMatrixV3(i, i, numOutLinks * 2);
 			createOutLinkMatrix();
 			createImportanceVector();
 		}
 		
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outLinkMatrix to the components
-			importanceVector = new ColumnVector(outLinkMatrix.getRowSumVector().getVector());
+			this.importanceVector = this.outLinkMatrix.getRowSumVector();
 			
 			// (2) normalize the importance vector
 			this.importanceVector.normalize();			

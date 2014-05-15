@@ -51,15 +51,6 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
-	 * Gets the value vector.
-	 *
-	 * @return The value vector.
-	 */
-	public double[] getVector() {
-		return this.vector;
-	}
-
-	/**
 	 * Gets the value at the specified index.
 	 *
 	 * @param index The index.
@@ -342,7 +333,7 @@ public class ColumnVector implements Cloneable {
 
 		return distance;
 	}
-	
+
 	@Override
 	public ColumnVector clone() throws CloneNotSupportedException {
 		super.clone();

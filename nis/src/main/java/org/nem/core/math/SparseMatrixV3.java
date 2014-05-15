@@ -204,18 +204,17 @@ public class SparseMatrixV3 {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
 		double[] result = new double[this.numRows];
-		double[] rawVector = vector.getVector(); 
 		if (this.converted) {
 			int arraySize = this.indices.length;
 			for (int i=0; i<arraySize; i++) {
 				long index = this.indices[i];
-				result[(int)(index >> 32)] += this.values[i] * rawVector[(int)(index & 0xffffffff)];
+				result[(int)(index >> 32)] += this.values[i] * vector.getAt((int)(index & 0xffffffff));
 			}
 		} else {
 			for ( TLongDoubleIterator it = this.entries.iterator(); it.hasNext(); ) {
 			    it.advance();
 			    long index = it.key();
-				result[(int)(index >> 32)] += it.value() * rawVector[(int)(index & 0xffffffff)];
+				result[(int)(index >> 32)] += it.value() * vector.getAt((int)(index & 0xffffffff));
 			}
 		}
 		return new ColumnVector(result);

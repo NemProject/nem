@@ -11,12 +11,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class SparseMatrixV3Test {
-	private static final Logger LOGGER = Logger.getLogger(SparseMatrixTest.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SparseMatrixV3Test.class.getName());
 
 	//region constructor / getAt / setAt / incrementAt
 
 	@Test
-	public void uninitializedsparseMatrixV3ReturnsZeros() {
+	public void uninitializedSparseMatrixV3ReturnsZeros() {
 		// Arrange:
 		final SparseMatrixV3 sparseMatrixV3 = new SparseMatrixV3(2, 3, 100);
 
