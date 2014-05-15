@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
+import org.nem.core.math.DenseMatrix;
 import org.nem.core.math.Matrix;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
@@ -126,7 +127,7 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) account link weights are normalized
-		final Matrix expectedAccountLinks = new Matrix(4, 4);
+		final Matrix expectedAccountLinks = new DenseMatrix(4, 4);
 		expectedAccountLinks.setAt(1, 0, 0.6);
 		expectedAccountLinks.setAt(2, 0, 0.4);
 		expectedAccountLinks.setAt(0, 1, 1.0);

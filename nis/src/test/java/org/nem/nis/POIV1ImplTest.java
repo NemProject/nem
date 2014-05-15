@@ -41,7 +41,7 @@ public class POIV1ImplTest {
 	static private final int OUTLINK_STRATEGY_LOOP = 2;
 	static private final int OUTLINK_STRATEGY_LOOP_SELF = 3;
 	static private final int OUTLINK_STRATEGY_ALL_TO_ONE = 4;
-	
+
 	@Test
 	public void threeSimpleAccounts() {
 		// Arrange:
@@ -61,12 +61,12 @@ public class POIV1ImplTest {
 		ColumnVector importances = poi
 				.getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
-		
+
 		// Assert
 		//a > b > c
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(1)  && importances.getAt(1) > importances.getAt(2));
 	}
-	
+
 	/**
 	 * Four nodes (A, B, C, D) are owned by one person with 400 NEM who distributed the NEM 
 	between the nodes and cycled the NEM around. The other three nodes are independent and have 400 NEM each.
@@ -176,7 +176,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.05); //TODO:0.9 ratio is probably OK.
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
@@ -207,10 +207,8 @@ public class POIV1ImplTest {
 			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
 			System.out.println(", ratio is " + format.format(ratio));
 			
-			System.out.println(importances);
-			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.05); //TODO: having any PR at all will make it so that more accounts will have more importance than fewer accounts (because of teleportation, PR will always be non-zero)
+			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
 		}
 		System.out.println("");
 	}
@@ -318,15 +316,14 @@ public class POIV1ImplTest {
 		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
 		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("Importances: " + importances);
 		System.out.println("");
 		
 		// Assert
-		Assert.assertTrue(ratio > 500.0);
+		Assert.assertTrue(ratio > 100.0);
 	}
-	
+
 	@Test
-	public void poiIsFairerThanPOS() { 
+	public void poiIsFairerThanPOS() {
 		LOGGER.info("Check that POI distributes importance differently than POS");
 		//TODO: I don't know why the outlinks vectors are the same for the two groups of accounts below.
 		// Arrange:
@@ -344,9 +341,9 @@ public class POIV1ImplTest {
 		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
 		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
 		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("Importances: " + importances);
+//		System.out.println("Importances: " + importances);
 		System.out.println("");
-		
+
 		// Assert
 		Assert.assertTrue(ratio > 1.0);
 	}
@@ -366,7 +363,7 @@ public class POIV1ImplTest {
 			// Act: calculate importances
 			POI poi = new POIV1Impl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
-			System.out.println("importances: " + importances);
+//			System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(0)));
@@ -379,11 +376,11 @@ public class POIV1ImplTest {
 		}
 		System.out.println("");
 	}
-	
+
 	@Test
 	public void poiCalculationIsPerformantEnough() {
 		LOGGER.info("Testing performance of the poi calculation");
-		
+
 		// Arrange:
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
 		// TODO: why 1s?
@@ -401,20 +398,20 @@ public class POIV1ImplTest {
 		System.out.println("Finished poi calculation.");
 
 		System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop-start) + "ms.");
-		
+
 		// Assert
 		Assert.assertTrue(stop-start < 1000);//TODO: this takes slightly over 2s on my 3 year old macbook air
 	}
-	
+
 	/**
 	 * Test to see if the calculation time grows approximately linearly with the input.
 	 */
 	@Test
 	public void poiCalculationHasLinearPerformance() {
 		LOGGER.info("Testing linear performance of the poi calculation");
-		
+
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
-		
+
 		final BlockHeight height = new BlockHeight(1);
 		long prevTimeDiff = -1;
 		for (int numAccounts = 5; numAccounts < 10000; numAccounts*=10) {
@@ -431,18 +428,18 @@ public class POIV1ImplTest {
 			System.out.println("Finished poi calculation.");
 
 			System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop-start) + "ms.");
-			
+
 			// Assert
 			long currTimeDiff = stop-start;
-			
+
 			if (prevTimeDiff > 0) {
 				double ratio = prevTimeDiff * 10. / currTimeDiff;
 				System.out.println("Prev time: " + prevTimeDiff
-								 + "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
-				
+						+ "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
+
 				Assert.assertTrue(ratio > .9);
 			}
-			
+
 			prevTimeDiff = currTimeDiff;
 		}
 	}
@@ -508,7 +505,7 @@ public class POIV1ImplTest {
 	}
 
 	private static MockAccount createMockAccountWithBalance(long numNEM) {
-		final MockAccount account = new MockAccount();
+		final MockAccount account = new MockAccount(Utils.generateRandomAddress());
 		account.incrementBalance(Amount.fromNem(numNEM));
 		return account;
 	}

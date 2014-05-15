@@ -55,6 +55,23 @@ public class ColumnVectorTest {
 	}
 
 	@Test
+	public void vectorValuesCanBeIncremented() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(3);
+
+		// Act:
+		vector.setAt(0, 7);
+		vector.setAt(1, 3);
+		vector.setAt(2, 5);
+		vector.incrementAt(0, 6);
+		vector.incrementAt(1, 4);
+		vector.incrementAt(2, 1);
+
+		// Assert:
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(13, 7, 6)));
+	}
+
+	@Test
 	public void vectorCannotBeIndexedOutOfBounds() {
 		// Assert:
 		assertOutOfBounds(3, -1);
@@ -333,7 +350,7 @@ public class ColumnVectorTest {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(3, 2);
 
-		final Matrix matrix = new Matrix(3, 2);
+		final Matrix matrix = new DenseMatrix(3, 2);
 		matrix.setAt(0, 0, 2);
 		matrix.setAt(1, 0, 3);
 		matrix.setAt(2, 0, 5);
@@ -354,7 +371,7 @@ public class ColumnVectorTest {
 	public void vectorCannotBeMultipliedByMatrixWithFewerColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new Matrix(2, 1);
+		final Matrix m = new DenseMatrix(2, 1);
 
 		// Act:
 		v.multiply(m);
@@ -364,7 +381,7 @@ public class ColumnVectorTest {
 	public void vectorCannotBeMultipliedByMatrixWithMoreColumns() {
 		// Arrange:
 		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new Matrix(2, 3);
+		final Matrix m = new DenseMatrix(2, 3);
 
 		// Act:
 		v.multiply(m);

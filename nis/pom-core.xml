@@ -77,10 +77,10 @@
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-resources-plugin</artifactId>
 			<version>2.4.3</version>
-		</dependency>
-	</dependencies>
+        </dependency>
+    </dependencies>
 
-	<build>
+    <build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

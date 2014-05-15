@@ -22,6 +22,16 @@ public class MockAccount extends Account {
 	}
 
 	/**
+	 * Creates a new mock account with the specified address.
+	 *
+	 * @param address The address.
+	 */
+	public MockAccount(final Address address){
+		super(address);
+		this.heightToCoinDaysMap = new HashMap<>();
+	}
+
+	/**
 	 * Sets coin days at the specified block height.
 	 *
 	 * @param coinDays The coin days.

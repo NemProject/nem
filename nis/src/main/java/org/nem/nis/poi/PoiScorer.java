@@ -52,9 +52,9 @@ public class PoiScorer {
 			final ColumnVector coinDaysVector,
 			final ScoringAlg scoringAlg) {
 
-		System.out.println("outLinkVector" + outLinkVector);
-		System.out.println("importanceVector" + importanceVector);
-		System.out.println("coinDaysVector" + coinDaysVector);
+//		System.out.println("outLinkVector" + outLinkVector);
+//		System.out.println("importanceVector" + importanceVector);
+//		System.out.println("coinDaysVector" + coinDaysVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,
@@ -131,7 +131,7 @@ public class PoiScorer {
 
 		return coinDaysVector.add(weightedOutlinks).add(weightedImportances);
 	}
-	
+
 	private ColumnVector calculateBloodyRookieNewV2Score(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
@@ -147,7 +147,7 @@ public class PoiScorer {
 
 		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).add(coinDaysVector);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
-		
+
 		weightedOutlinks.normalize();
 
 		return weightedOutlinks.add(weightedImportances);

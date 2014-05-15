@@ -72,6 +72,16 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
+	 * Increments at the specified index by a value.
+	 *
+	 * @param index The index.
+	 * @param val   The value.
+	 */
+	public void incrementAt(final int index, double val) {
+		this.vector[index] += val;
+	}
+
+	/**
 	 * Sets all the vector's elements to the specified value.
 	 *
 	 * @param val The value.
@@ -322,7 +332,7 @@ public class ColumnVector implements Cloneable {
 
 		return distance;
 	}
-	
+
 	@Override
 	public ColumnVector clone() throws CloneNotSupportedException {
 		super.clone();

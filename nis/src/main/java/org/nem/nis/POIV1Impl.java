@@ -9,26 +9,26 @@ import java.util.List;
 
 /**
  * This is a first draft implementation of the POI importance calculation.
- * 
+ *
  * Because a lot of the infrastructure is not yet in place, I am making the
  * following assumptions in this code:
- * 
+ *
  * 1) This class's calculateImportancesImpl is called with a list of all the accounts.
  * 2) POI is calculated by the forager after processing new transactions. 
  *    This algorithm is not currently iterative, so importances are calculated from scratch every time. 
  *    I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
- * 
+ *
  */
 public class POIV1Impl implements POI {
 
 	public static final int DEFAULT_MAX_ITERS = 200;
-	
+
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
 		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
 	}
-	
+
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
 		return calculateImportancesImpl(blockHeight, accounts, scoringAlg);
 	}
@@ -45,7 +45,11 @@ public class POIV1Impl implements POI {
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accounts.size());
+
+		long start = System.currentTimeMillis();
 		iterator.run();
+		long stop = System.currentTimeMillis();
+		System.out.println("POI iterator needed " + (stop-start) + "ms.");
 
 		if (!iterator.hasConverged()) {
 			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);
@@ -85,9 +89,12 @@ public class POIV1Impl implements POI {
 					.add(this.context.getInverseTeleportationVector());
 
 			// M(out-link) * V(importance) .* V(teleportation)
-			final ColumnVector importances = prevIterImportances
-					.multiply(this.context.getOutLinkMatrix())
+			final ColumnVector importances = this.context.getOutLinkMatrix()
+					.multiply(prevIterImportances)
 					.multiplyElementWise(this.context.getTeleportationVector());
+//			final ColumnVector importances = prevIterImportances
+//					.multiply(this.context.getOutLinkMatrix())
+//					.multiplyElementWise(this.context.getTeleportationVector());
 
 			return importances.add(poiAdjustmentVector);
 		}

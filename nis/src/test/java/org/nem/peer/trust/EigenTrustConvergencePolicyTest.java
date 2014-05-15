@@ -71,7 +71,7 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(0, 1.0 / 3);
 		vector.setAt(1, 2.0 / 3);
 
-		final Matrix matrix = new Matrix(2, 2);
+		final Matrix matrix = new DenseMatrix(2, 2);
 		matrix.setAt(0, 0, 2);
 		matrix.setAt(0, 1, -12);
 		matrix.setAt(1, 0, 1);
@@ -86,7 +86,7 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(0, 1.0 / 3);
 		vector.setAt(1, 2.0 / 3);
 
-		final Matrix matrix = new Matrix(2, 2);
+		final Matrix matrix = new DenseMatrix(2, 2);
 		matrix.setAt(0, 0, 1);
 		matrix.setAt(0, 1, 1);
 		matrix.setAt(1, 0, 1);
