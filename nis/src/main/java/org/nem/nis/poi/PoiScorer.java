@@ -83,7 +83,7 @@ public class PoiScorer {
 				return calculatePythonScore(importanceVector, outLinkVector, coinDaysVector);
 
 			case MAKOTO:
-				return calculateMakotoFutureScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculateMakotoScore(importanceVector, outLinkVector, coinDaysVector);
 
 			case BLOODYROOKIENEW:
 				return calculateBloodyRookieNewScore(importanceVector, outLinkVector, coinDaysVector);
@@ -177,21 +177,27 @@ public class PoiScorer {
 				.multiplyElementWise(coinDaysVector);
 	}
 
-	private ColumnVector calculateMakotoFutureScore(
+	private ColumnVector calculateMakotoScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
-		//		final score = l1norm(stakes) + c1 * l1norm(outlinkstrengths) + c2 * l1norm(PR)
+		
+		// alg is: l1norm(stakes * c1*outlinkstrengths) + c2 * l1norm(PR)
 
 		coinDaysVector.normalize();
 		outLinkVector.normalize();
 
-		double c1 = 0.5;
-		double c2 = 0.05;
+		System.out.println("normalized coinDaysVector: " + coinDaysVector);
+		System.out.println("normalized outLinkVector: " + outLinkVector);
 
-		ColumnVector weightedOutlinks = outLinkVector.multiply(c1);
+		double c1 = 2.;
+		double c2 = 0.01;
+
+		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(coinDaysVector);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
-		return coinDaysVector.add(weightedOutlinks).add(weightedImportances);
+		weightedOutlinks.normalize();
+
+		return weightedOutlinks.add(weightedImportances);
 	}
 }
