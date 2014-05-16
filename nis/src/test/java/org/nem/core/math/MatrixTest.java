@@ -56,7 +56,7 @@ public abstract class MatrixTest {
 
 			// Act:
 			matrix.getAt(row, col);
-		}, ArrayIndexOutOfBoundsException.class);
+		}, IndexOutOfBoundsException.class);
 	}
 
 	private void assertSetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
@@ -66,7 +66,7 @@ public abstract class MatrixTest {
 
 			// Act:
 			matrix.setAt(row, col, 0.0);
-		}, ArrayIndexOutOfBoundsException.class);
+		}, IndexOutOfBoundsException.class);
 	}
 
 	@Test

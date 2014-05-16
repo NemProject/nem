@@ -51,19 +51,6 @@ public class DenseMatrix extends Matrix {
 	}
 
 	/**
-	 * Sets all the matrix's elements to the specified value.
-	 *
-	 * @param val The value.
-	 */
-	public void setAll(double val) {
-		for (int i = 0; i < rows; ++i) {
-			for (int j = 0; j < cols; ++j) {
-				this.setAt(i, j, val);
-			}
-		}
-	}
-
-	/**
 	 * Sets all the matrix's elements to the specified values.
 	 *
 	 * @param values The values.
@@ -150,6 +137,12 @@ public class DenseMatrix extends Matrix {
 	}
 
 	@Override
+	public void scale(final double scale) {
+		for (int i = 0; i < this.cols; ++i)
+			this.columns[i].scale(scale);
+	}
+
+	@Override
 	public Matrix multiplyElementWise(final Matrix matrix) {
 		if (!this.isSameSize(matrix))
 			throw new IllegalArgumentException("matrix sizes must be equal");
@@ -158,6 +151,20 @@ public class DenseMatrix extends Matrix {
 		for (int i = 0; i < this.cols; ++i) {
 			for (int j = 0; j < this.rows; ++j)
 				result.columns[i].setAt(j, this.columns[i].getAt(j) * matrix.getAt(j, i));
+		}
+
+		return result;
+	}
+
+	@Override
+	public Matrix add(final Matrix matrix) {
+		if (!this.isSameSize(matrix))
+			throw new IllegalArgumentException("matrix sizes must be equal");
+
+		final DenseMatrix result = new DenseMatrix(this.rows, this.cols);
+		for (int i = 0; i < this.cols; ++i) {
+			for (int j = 0; j < this.rows; ++j)
+				result.columns[i].setAt(j, this.columns[i].getAt(j) + matrix.getAt(j, i));
 		}
 
 		return result;

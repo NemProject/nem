@@ -53,18 +53,6 @@ public class DenseMatrixTest extends MatrixTest {
 	//region setAll
 
 	@Test
-	public void setAllSetsAllMatrixElementValuesToDefaultValue() {
-		// Arrange:
-		final DenseMatrix matrix = new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 3 });
-
-		// Act:
-		matrix.setAll(3.2);
-
-		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 3.2, 3.2, 3.2, 3.2, 3.2, 3.2 })));
-	}
-
-	@Test
 	public void setAllSetsAllMatrixElementValuesToSpecificValues() {
 		// Arrange:
 		final DenseMatrix matrix = new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 3 });
@@ -106,7 +94,6 @@ public class DenseMatrixTest extends MatrixTest {
 	public void sparseMatrixCanBeTransposed() {
 		// Arrange:
 		final DenseMatrix matrix = new DenseMatrix(3, 2);
-		matrix.setAll(3);
 		matrix.setAt(1, 0, 7);
 		matrix.setAt(2, 1, 5);
 
@@ -116,7 +103,7 @@ public class DenseMatrixTest extends MatrixTest {
 		// Assert:
 		Assert.assertThat(
 				transposedMatrix,
-				IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 3, 7, 3, 3, 3, 5 })));
+				IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 0, 7, 0, 0, 0, 5 })));
 	}
 
 	//endregion
@@ -192,12 +179,11 @@ public class DenseMatrixTest extends MatrixTest {
 	public void matrixAbsSumCanBeCalculatedForSparseMatrix() {
 		// Arrange:
 		final DenseMatrix matrix = new DenseMatrix(3, 2);
-		matrix.setAll(3);
 		matrix.setAt(1, 0, 7);
 		matrix.setAt(2, 1, -5);
 
 		// Assert:
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(24.0));
+		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(12.0));
 	}
 
 	@Test
@@ -213,58 +199,56 @@ public class DenseMatrixTest extends MatrixTest {
 	public void matrixSumCanBeCalculatedForSparseMatrix() {
 		// Arrange:
 		final DenseMatrix matrix = new DenseMatrix(3, 2);
-		matrix.setAll(3);
 		matrix.setAt(1, 0, 7);
 		matrix.setAt(2, 1, -5);
 
 		// Assert:
-		Assert.assertThat(matrix.sum(), IsEqual.equalTo(14.0));
+		Assert.assertThat(matrix.sum(), IsEqual.equalTo(2.0));
 	}
 
 	//endregion
 
 	//region add
 
-	// TODO:
-//	@Test
-//	public void matrixCannotBeAddedWithDifferentSizeMatrix() {
-//		// Arrange:
-//		final Matrix matrix1 = new DenseMatrix(3, 2);
-//		final Matrix matrix2 = new DenseMatrix(2, 3);
-//
-//		// Assert:
-//		ExceptionAssert.assertThrows(v -> matrix1.add(matrix2), IllegalArgumentException.class);
-//		ExceptionAssert.assertThrows(v -> matrix2.add(matrix1), IllegalArgumentException.class);
-//	}
-//
-//	@Test
-//	public void denseMatrixCanBeAddedWithSameSizeMatrix() {
-//		// Arrange:
-//		final Matrix matrix1 = new DenseMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
-//		final Matrix matrix2 = new DenseMatrix(3, 2, new double[] { 7, 3, 1, 5, 11, 9 });
-//
-//		// Act:
-//		final Matrix result = matrix1.add(matrix2);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 9, 6, 6, 16, 12, 17 })));
-//	}
-//
-//	@Test
-//	public void sparseMatrixCanBeAddedWithSameSizeMatrix() {
-//		// Arrange:
-//		final DenseMatrix matrix1 = new DenseMatrix(3, 2, new double[] { 1, 0, 2, 3, 0, 5 });
-//
-//		final DenseMatrix matrix2 = new DenseMatrix(3, 2);
-//		matrix2.setAll(2);
-//		matrix2.setAt(1, 1, 5);
-//
-//		// Act:
-//		final Matrix result = matrix1.add(matrix2);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 3, 2, 4, 8, 2, 7 })));
-//	}
+	@Test
+	public void matrixCannotBeAddedWithDifferentSizeMatrix() {
+		// Arrange:
+		final Matrix matrix1 = new DenseMatrix(3, 2);
+		final Matrix matrix2 = new DenseMatrix(2, 3);
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> matrix1.add(matrix2), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> matrix2.add(matrix1), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void denseMatrixCanBeAddedWithSameSizeMatrix() {
+		// Arrange:
+		final Matrix matrix1 = new DenseMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final Matrix matrix2 = new DenseMatrix(3, 2, new double[] { 7, 3, 1, 5, 11, 9 });
+
+		// Act:
+		final Matrix result = matrix1.add(matrix2);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 9, 6, 6, 16, 12, 17 })));
+	}
+
+	@Test
+	public void sparseMatrixCanBeAddedWithSameSizeMatrix() {
+		// Arrange:
+		final DenseMatrix matrix1 = new DenseMatrix(3, 2, new double[] { 1, 0, 2, 3, 0, 5 });
+
+		final DenseMatrix matrix2 = new DenseMatrix(3, 2);
+		matrix2.setAt(2, 0, 7);
+		matrix2.setAt(1, 1, 5);
+
+		// Act:
+		final Matrix result = matrix1.add(matrix2);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 1, 0, 2, 8, 7, 5 })));
+	}
 
 	//endregion
 
@@ -298,51 +282,47 @@ public class DenseMatrixTest extends MatrixTest {
 	public void sparseMatrixCanBeMultipliedElementWiseWithSameSizeMatrix() {
 		// Arrange:
 		final DenseMatrix matrix1 = new DenseMatrix(3, 2);
-		matrix1.setAll(1);
 		matrix1.setAll(new double[] { 1, 1, 2, 3, 1, 5 });
 
 		final DenseMatrix matrix2 = new DenseMatrix(3, 2);
-		matrix2.setAll(2);
 		matrix2.setAt(1, 1, 5);
 
 		// Act:
 		final Matrix result = matrix1.multiplyElementWise(matrix2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 2, 2, 4, 15, 2, 10 })));
+		Assert.assertThat(result, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 0, 0, 0, 15, 0, 0 })));
 	}
 
 	//endregion
 
 	//region scale
 
-	// TODO:
-//	@Test
-//	public void denseMatrixCanBeScaled() {
-//		// Arrange:
-//		final Matrix matrix = new DenseMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
-//
-//		// Act:
-//		matrix.scale(10);
-//
-//		// Assert:
-//		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 0.2, 0.3, 0.5, 1.1, 0.1, 0.8 })));
-//	}
+	@Test
+	public void denseMatrixCanBeScaled() {
+		// Arrange:
+		final Matrix matrix = new DenseMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
-	// TODO:
-//	@Test
-//	public void sparseMatrixCanBeScaled() {
-//		// Arrange:
-//		final DenseMatrix matrix = new DenseMatrix(3, 2);
-//		matrix.setAll(1);
-//		matrix.setAt(1, 1, 5);
-//
-//		// Act:
-//		matrix.scale(5);
-//
-//		// Assert:
-//		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 0.2, 0.2, 0.2, 1.0, 0.2, 0.2 })));
-//	}
+		// Act:
+		matrix.scale(10);
+
+		// Assert:
+		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 0.2, 0.3, 0.5, 1.1, 0.1, 0.8 })));
+	}
+
+	@Test
+	public void sparseMatrixCanBeScaled() {
+		// Arrange:
+		final DenseMatrix matrix = new DenseMatrix(3, 2);
+		matrix.setAt(2, 0, 3);
+		matrix.setAt(1, 1, 5);
+
+		// Act:
+		matrix.scale(5);
+
+		// Assert:
+		Assert.assertThat(matrix, IsEqual.equalTo(new DenseMatrix(3, 2, new double[] { 0.0, 0.0, 0.0, 1.0, 0.6, 0.0 })));
+	}
 
 	//endregion
 
@@ -417,37 +397,6 @@ public class DenseMatrixTest extends MatrixTest {
 	}
 
 	@Test
-	public void equalsReturnsFalseForSparseMatricesWithDifferentDefaultValues() {
-		// Arrange:
-		final DenseMatrix matrix = new DenseMatrix(2, 3);
-		final DenseMatrix matrix2 = new DenseMatrix(2, 3);
-
-		// Act:
-		matrix.setAll(7);
-		matrix2.setAll(8);
-
-		// Assert:
-		Assert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
-	}
-
-	@Test
-	public void equalsReturnsTrueForEquivalentDenseMatricesWithDifferentDefaultValues() {
-		// Arrange:
-		final DenseMatrix matrix = new DenseMatrix(1, 2);
-		final DenseMatrix matrix2 = new DenseMatrix(1, 2);
-
-		// Act:
-		matrix.setAll(7);
-		matrix.setAll(new double[] { 4, 9 });
-
-		matrix2.setAll(8);
-		matrix2.setAll(new double[] { 4, 9 });
-
-		// Assert:
-		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
-	}
-
-	@Test
 	public void equalsReturnsTrueForEquivalentSparseMatrices() {
 		// Arrange:
 		final Matrix matrix = new DenseMatrix(100, 1000);
@@ -472,20 +421,6 @@ public class DenseMatrixTest extends MatrixTest {
 
 		// Assert:
 		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
-	}
-
-	@Test
-	public void equalsReturnsTrueForEquivalentDenseAndSparseMatrices() {
-		// Arrange:
-		final DenseMatrix sparseMatrix = new DenseMatrix(2, 3);
-		sparseMatrix.setAll(7.0);
-		sparseMatrix.setAt(1, 0, 8);
-
-		final Matrix denseMatrix = new DenseMatrix(2, 3, new double[]{ 7, 7, 7, 8, 7, 7 });
-
-		// Assert:
-		Assert.assertThat(sparseMatrix, IsEqual.equalTo(denseMatrix));
-		Assert.assertThat(denseMatrix, IsEqual.equalTo(sparseMatrix));
 	}
 
 	@Test

@@ -99,6 +99,13 @@ public abstract class Matrix {
 	public abstract void normalizeColumns();
 
 	/**
+	 * Scales this matrix by dividing all of its elements by the specified factor.
+	 *
+	 * @param scale The scale factor.
+	 */
+	public abstract void scale(final double scale);
+
+	/**
 	 * Creates a new Matrix by multiplying this matrix element-wise with
 	 * another matrix.
 	 *
@@ -107,6 +114,16 @@ public abstract class Matrix {
 	 * @return The new matrix.
 	 */
 	public abstract Matrix multiplyElementWise(final Matrix matrix);
+
+	/**
+	 * Creates a new Matrix by adding this matrix element-wise with
+	 * another matrix.
+	 *
+	 * @param matrix The other matrix.
+	 *
+	 * @return The new matrix.
+	 */
+	public abstract Matrix add(final Matrix matrix);
 
 	/**
 	 * Gets the sum of the absolute value of all the matrix's elements.
@@ -135,9 +152,9 @@ public abstract class Matrix {
 
 	private void checkBounds(final int row, final int col) {
 		if (row < 0 || row >= this.numRows)
-			throw new IllegalArgumentException("Row index out of bounds");
+			throw new IndexOutOfBoundsException("Row index out of bounds");
 
 		if (col < 0 || col >= this.numCols)
-			throw new IllegalArgumentException("Column index out of bounds");
+			throw new IndexOutOfBoundsException("Column index out of bounds");
 	}
 }
