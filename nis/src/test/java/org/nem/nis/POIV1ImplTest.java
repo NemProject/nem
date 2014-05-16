@@ -319,8 +319,7 @@ public class POIV1ImplTest {
 		System.out.println("");
 		
 		// Assert
-		Assert.assertTrue(ratio > 5.0);
-//		Assert.assertTrue(ratio > 100.0);
+		Assert.assertTrue(ratio > 100.0);
 	}
 
 	@Test

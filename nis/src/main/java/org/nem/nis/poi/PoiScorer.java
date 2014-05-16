@@ -129,7 +129,7 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
 
-		// alg is: l1norm(stakes+ c1*outlinkstrengths) + c2 * l1norm(PR)
+		// alg is: l1norm(stakes+ c1*outLinkVector) + c2 * l1norm(PR)
 
 		coinDaysVector.normalize();
 		outLinkVector.normalize();
@@ -182,7 +182,7 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
 		
-		// alg is: l1norm(stakes * c1*outlinkstrengths) + c2 * l1norm(PR)
+		// alg is: l1norm(stakes * c1*outLinkVector) + c2 * l1norm(PR)
 
 		coinDaysVector.normalize();
 		outLinkVector.normalize();
