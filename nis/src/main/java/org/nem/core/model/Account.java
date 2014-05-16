@@ -23,7 +23,7 @@ public class Account implements SerializableEntity {
 	private CoinDays coindays;
 
 	private BlockAmount foragedBlocks;
-	private HistoricalBalances historicalBalances;
+	private WeightedBalances weightedBalances;
 
 	/**
 	 * Creates an account around a key pair.
@@ -55,7 +55,7 @@ public class Account implements SerializableEntity {
 		this.address = address;
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
-		this.historicalBalances = new HistoricalBalances();
+		this.weightedBalances = new WeightedBalances();
 
 		this.coindays = new CoinDays();
 	}
@@ -215,27 +215,23 @@ public class Account implements SerializableEntity {
 	 * @return The historical balance.
 	 */
 	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
-		return historicalBalances.getBalance(lastBlockHeight, height);
+		return this.weightedBalances.historicalBalances.getBalance(lastBlockHeight, height);
 	}
-	
-	/**
-	 * Adds a given amount to the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void addHistoricalBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.add(height, amount);
+
+	public void weightedSend(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.addSend(blockHeight, amount);
 	}
-	
-	/**
-	 * Subtracts a given amount from the historical balances at a given height.
-	 *
-	 * @param height The block height.
-	 * @param amount The amount to add
-	 */
-	public void subtractHistoricalBalance(final BlockHeight height, final Amount amount) {
-		historicalBalances.subtract(height, amount);
+
+	public void weightedSendUndo(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.undoSend(blockHeight, amount);
+	}
+
+	public void weightedReceive(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.addReceive(blockHeight, amount);
+	}
+
+	public void weightedReceiveUndo(final BlockHeight blockHeight, final Amount amount) {
+		this.weightedBalances.undoReceive(blockHeight, amount);
 	}
 
 	/**
@@ -415,7 +411,7 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
-		copy.historicalBalances = this.historicalBalances.copy();
+		copy.weightedBalances = this.weightedBalances.copy();
 		return copy;
 	}
 }

@@ -167,6 +167,11 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
+	public boolean isValid(final TransactionValidator transactionValidator) {
+		return true;
+	}
+
+	@Override
 	protected Amount getMinimumFee() {
 		return new Amount(this.minimumFee);
 	}

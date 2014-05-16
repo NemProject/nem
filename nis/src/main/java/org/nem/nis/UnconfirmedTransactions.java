@@ -3,7 +3,6 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
@@ -19,6 +18,8 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
+	private final TransactionValidator UNCONFIRMED_TRANSACTION_VALIDATOR =
+			(final Account sender, final Account recipient, final Amount amount) -> unconfirmedBalances.get(sender).compareTo(amount) >= 0;
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -56,25 +57,16 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		// isValid checks the sender balance
-		if (!transaction.isValid()) {
+		// not sure if adding to cache here is a good idea...
+		addToCache(transaction.getSigner());
+		if (!transaction.isValid(UNCONFIRMED_TRANSACTION_VALIDATOR)) {
 			return false;
 		}
 
-		transaction.subscribe(this.transferObserver);
-		transaction.execute(false);
+		transaction.execute(this.transferObserver);
+
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
-	}
-
-	/**
-	 * Gets a value indicated whether or not this object is subscribed to the specified transaction.
-	 *
-	 * @param transaction The transaction.
-	 * @return true if the this object is subscribed to this transaction.
-	 */
-	boolean isSubscribed(final Transaction transaction) {
-		return transaction.isSubscribed(this.transferObserver);
 	}
 
 	boolean remove(final Transaction transaction) {
@@ -83,8 +75,8 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		transaction.undo(false);
-		transaction.unsubscribe(this.transferObserver);
+		transaction.undo(this.transferObserver);
+
 		this.transactions.remove(transactionHash);
 		return true;
 	}
@@ -102,8 +94,7 @@ public class UnconfirmedTransactions {
 	void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			final Transaction removedTransaction = this.transactions.remove(transactionHash);
-			removedTransaction.unsubscribe(this.transferObserver);
+			this.transactions.remove(transactionHash);
 		}
 	}
 

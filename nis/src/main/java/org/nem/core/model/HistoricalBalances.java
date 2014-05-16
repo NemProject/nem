@@ -13,17 +13,7 @@ public class HistoricalBalances {
 	public final long MAX_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + BlockChainConstants.REWRITE_LIMIT;
 	
 	private final ArrayList<HistoricalBalance> balances = new ArrayList<>();
-	
-//	/**
-//	 * The block chain
-//	 */
-//	private BlockChainLastBlockLayer blockChainLastBlockLayer;
-//
-//	@Autowired(required = true)
-//	HistoricalBalances(final BlockChainLastBlockLayer blockChainLastBlockLayer) {
-//		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-//	}
-		
+
 	/**
 	 * Gets the size of the list
 	 * 
@@ -39,7 +29,7 @@ public class HistoricalBalances {
 	 * @return the copy
 	 */
 	public HistoricalBalances copy() {
-		HistoricalBalances historicalBalances = new HistoricalBalances();
+		final HistoricalBalances historicalBalances = new HistoricalBalances();
 
 		if (size() > 0) {
 			BlockHeight height = balances.get(balances.size() - 1).getHeight();
@@ -113,7 +103,7 @@ public class HistoricalBalances {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
-			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index-2).getBalance();
+			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index - 2).getBalance();
 			balances.add(-index-1, new HistoricalBalance(height, numMicroNem.add(amount)));
 			startIndex = -index;
 		} else {
@@ -140,7 +130,7 @@ public class HistoricalBalances {
 		int startIndex = -1;
 		int index = Collections.binarySearch(balances, new HistoricalBalance(height, null));
 		if (index < 0) {
-			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index-2).getBalance();
+			Amount numMicroNem = index == -1? Amount.ZERO : balances.get(-index - 2).getBalance();
 			balances.add(-index-1, new HistoricalBalance(height, numMicroNem.subtract(amount)));
 			startIndex = -index;
 		} else {
