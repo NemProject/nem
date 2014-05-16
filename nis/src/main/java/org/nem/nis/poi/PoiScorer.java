@@ -133,6 +133,9 @@ public class PoiScorer {
 
 		coinDaysVector.normalize();
 		outLinkVector.normalize();
+		
+		System.out.println("normalized coinDaysVector: " + coinDaysVector);
+		System.out.println("normalized outLinkVector: " + outLinkVector);
 
 		double c1 = 2.;
 		double c2 = 0.01;
