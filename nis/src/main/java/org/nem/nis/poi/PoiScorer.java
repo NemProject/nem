@@ -52,9 +52,10 @@ public class PoiScorer {
 			final ColumnVector coinDaysVector,
 			final ScoringAlg scoringAlg) {
 
-//		System.out.println("outLinkVector" + outLinkVector);
-//		System.out.println("importanceVector" + importanceVector);
-//		System.out.println("coinDaysVector" + coinDaysVector);
+		//TODO: For testing use, take out when final scoring alg is decided
+		System.out.println("outLinkVector" + outLinkVector);
+		System.out.println("importanceVector" + importanceVector);
+		System.out.println("coinDaysVector" + coinDaysVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,
