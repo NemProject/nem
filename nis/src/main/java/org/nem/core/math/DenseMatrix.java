@@ -5,9 +5,9 @@ import org.nem.core.utils.FormatUtils;
 import java.text.DecimalFormat;
 
 /**
- * Represents a linear algebra matrix.
+ * Represents a dense matrix.
  */
-public class DenseMatrix implements Matrix {
+public class DenseMatrix extends Matrix {
 
 	final int rows;
 	final int cols;
@@ -20,6 +20,7 @@ public class DenseMatrix implements Matrix {
 	 * @param cols The desired number of columns.
 	 */
 	public DenseMatrix(final int rows, final int cols) {
+		super(rows, cols);
 		this.rows = rows;
 		this.cols = cols;
 		this.columns = new ColumnVector[this.cols];
@@ -40,28 +41,13 @@ public class DenseMatrix implements Matrix {
 	}
 
 	@Override
-	public int getRowCount() {
-		return this.rows;
-	}
-
-	@Override
-	public int getColumnCount() {
-		return this.cols;
-	}
-
-	@Override
-	public double getAt(final int row, final int col) {
+	public double getAtUnchecked(final int row, final int col) {
 		return this.columns[col].getAt(row);
 	}
 
 	@Override
-	public void setAt(final int row, final int col, final double val) {
+	public void setAtUnchecked(final int row, final int col, final double val) {
 		this.columns[col].setAt(row, val);
-	}
-
-	@Override
-	public void incrementAt(final int row, final int col, final double val) {
-		this.columns[col].setAt(row, this.columns[col].getAt(row) + val);
 	}
 
 	/**

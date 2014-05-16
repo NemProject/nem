@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-public class DenseMatrixTest {
+public class DenseMatrixTest extends MatrixTest {
 
 	//region constructor
 
@@ -46,94 +46,6 @@ public class DenseMatrixTest {
 		ExceptionAssert.assertThrows(
 				v -> new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2 }),
 				IllegalArgumentException.class);
-	}
-
-	//endregion
-
-	//region getAt / setAt / incrementAt
-
-	@Test
-	public void matrixValuesCanBeSet() {
-		// Arrange:
-		final Matrix matrix = new DenseMatrix(3, 2);
-
-		// Act:
-		matrix.setAt(0, 0, 7);
-		matrix.setAt(0, 1, 3);
-		matrix.setAt(1, 0, 5);
-		matrix.setAt(1, 1, 11);
-		matrix.setAt(2, 0, 0);
-		matrix.setAt(2, 1, 9);
-
-		// Assert:
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(7.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(3.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(5.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(11.0));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(9.0));
-	}
-
-	@Test
-	public void matrixGetCannotBeIndexedOutOfBounds() {
-		// Assert:
-		assertGetOutOfBounds(2, 3, -1, 0);
-		assertGetOutOfBounds(2, 3, 0, -1);
-		assertGetOutOfBounds(2, 3, 2, 0);
-		assertGetOutOfBounds(2, 3, 0, 3);
-	}
-
-	@Test
-	public void matrixSetCannotBeIndexedOutOfBounds() {
-		// Assert:
-		assertSetOutOfBounds(2, 3, -1, 0);
-		assertSetOutOfBounds(2, 3, 0, -1);
-		assertSetOutOfBounds(2, 3, 2, 0);
-		assertSetOutOfBounds(2, 3, 0, 3);
-	}
-
-	private static void assertGetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
-		// Assert:
-		ExceptionAssert.assertThrows(v -> {
-			// Arrange:
-			final Matrix matrix = new DenseMatrix(numRows, numCols);
-
-			// Act:
-			matrix.getAt(row, col);
-		}, ArrayIndexOutOfBoundsException.class);
-	}
-
-	private static void assertSetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
-		ExceptionAssert.assertThrows(v -> {
-			// Arrange:
-			final Matrix matrix = new DenseMatrix(numRows, numCols);
-
-			// Act:
-			matrix.setAt(row, col, 0.0);
-		}, ArrayIndexOutOfBoundsException.class);
-	}
-
-	@Test
-	public void matrixValuesCanBeIncremented() {
-		// Arrange:
-		final Matrix matrix = new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 11 });
-
-		// Act:
-		// Increment values
-		matrix.incrementAt(0, 0, 4);
-		matrix.incrementAt(0, 1, 2);
-		matrix.incrementAt(0, 2, 3);
-		matrix.incrementAt(1, 0, 4);
-		matrix.incrementAt(1, 1, 5);
-		matrix.incrementAt(1, 2, 6);
-
-		// Double increment
-		matrix.incrementAt(0, 2, 7);
-
-		// Assert:
-		Assert.assertThat(
-				matrix,
-				IsEqual.equalTo(new DenseMatrix(2, 3, new double[] { 5, 6, 15, 11, 7, 17 })));
 	}
 
 	//endregion
@@ -434,39 +346,6 @@ public class DenseMatrixTest {
 
 	//endregion
 
-	//region isSameSize / isSparse
-
-	@Test
-	public void isSameSizeReturnsTrueWhenMatriciesHaveSameSize() {
-		// Arrange:
-		final DenseMatrix matrix = new DenseMatrix(3, 2);
-
-		// Assert:
-		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 2)), IsEqual.equalTo(true));
-		Assert.assertThat(matrix.isSameSize(new DenseMatrix(2, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new DenseMatrix(4, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 1)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(new DenseMatrix(3, 3)), IsEqual.equalTo(false));
-	}
-
-	// TODO: review
-//	@Test
-//	public void isSameSizeReturnsTrueWhenMatrixIsSparse() {
-//		// Arrange:
-//		final Matrix sparseMatrix = new DenseMatrix(2, 3);
-//		sparseMatrix.setAll(7.0);
-//		sparseMatrix.setAt(1, 0, 8);
-//
-//		final Matrix denseMatrix = new DenseMatrix(2, 3, new double[]{ 7, 7, 7, 8, 7, 7 });
-//
-//		// Assert:
-//		Assert.assertThat(sparseMatrix.isSparse(), IsEqual.equalTo(true));
-//		Assert.assertThat(denseMatrix.isSparse(), IsEqual.equalTo(false));
-//	}
-
-	//endregion
-
-
 	//region rowSum / columnSum
 
 	@Test
@@ -622,4 +501,14 @@ public class DenseMatrixTest {
 	}
 
 	//endregion
+
+	@Override
+	protected Matrix createMatrix(int rows, int cols) {
+		return new DenseMatrix(rows, cols);
+	}
+
+	@Override
+	protected Matrix createMatrix(int rows, int cols, double[] values) {
+		return new DenseMatrix(rows, cols, values);
+	}
 }
