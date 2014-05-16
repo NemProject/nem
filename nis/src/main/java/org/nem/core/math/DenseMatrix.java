@@ -3,6 +3,8 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.Function;
 
 /**
  * Represents a dense matrix.
@@ -88,50 +90,30 @@ public class DenseMatrix extends Matrix {
 			this.columns[i].normalize();
 	}
 
-	/**
-	 * Gets the sum of the absolute value of all the matrix's elements.
-	 *
-	 * @return The sum of the absolute value of all the matrix's elements.
-	 */
+	@Override
 	public double absSum() {
-		double sum = 0.0;
-		for (int i = 0; i < this.cols; ++i)
-			sum += this.columns[i].absSum();
-
-		return sum;
+		return this.aggregate(ColumnVector::absSum);
 	}
 
-	/**
-	 * Gets the sum of all the matrix's elements.
-	 *
-	 * @return The sum of all the matrix's elements.
-	 */
+	@Override
 	public double sum() {
+		return this.aggregate(ColumnVector::sum);
+	}
+
+	private double aggregate(final Function<ColumnVector, Double> op) {
 		double sum = 0.0;
 		for (int i = 0; i < this.cols; ++i)
-			sum += this.columns[i].sum();
+			sum += op.apply(this.columns[i]);
 
 		return sum;
 	}
 
-	/**
-	 * Gets the sum of all the matrix's elements in a row.
-	 *
-	 * @return The sum of all the matrix's elements of a row.
-	 */
+	@Override
 	public double rowSum(final int row) {
-		double sum = 0.0;
-		for (int i = 0; i < this.cols; ++i)
-			sum += this.columns[i].getAt(row);
-
-		return sum;
+		return aggregate(v -> v.getAt(row));
 	}
 
-	/**
-	 * Gets the sum of all the matrix's elements in a column.
-	 *
-	 * @return The sum of all the matrix's elements of a column.
-	 */
+	@Override
 	public double columnSum(final int column) {
 		return this.columns[column].sum();
 	}
@@ -144,41 +126,25 @@ public class DenseMatrix extends Matrix {
 
 	@Override
 	public Matrix multiplyElementWise(final Matrix matrix) {
-		if (!this.isSameSize(matrix))
-			throw new IllegalArgumentException("matrix sizes must be equal");
-
-		final DenseMatrix result = new DenseMatrix(this.rows, this.cols);
-		for (int i = 0; i < this.cols; ++i) {
-			for (int j = 0; j < this.rows; ++j)
-				result.columns[i].setAt(j, this.columns[i].getAt(j) * matrix.getAt(j, i));
-		}
-
-		return result;
+		return join(matrix, (l, r) -> l * r);
 	}
 
 	@Override
 	public Matrix add(final Matrix matrix) {
+		return join(matrix, (l, r) -> l + r);
+	}
+
+	private Matrix join(final Matrix matrix, final DoubleBinaryOperator op) {
 		if (!this.isSameSize(matrix))
 			throw new IllegalArgumentException("matrix sizes must be equal");
 
-		final DenseMatrix result = new DenseMatrix(this.rows, this.cols);
-		for (int i = 0; i < this.cols; ++i) {
-			for (int j = 0; j < this.rows; ++j)
-				result.columns[i].setAt(j, this.columns[i].getAt(j) + matrix.getAt(j, i));
+		final DenseMatrix result = new DenseMatrix(this.getRowCount(), this.getColumnCount());
+		for (int i = 0; i < this.getColumnCount(); ++i) {
+			for (int j = 0; j < this.getRowCount(); ++j)
+				result.columns[i].setAt(j, op.applyAsDouble(this.columns[i].getAt(j), matrix.getAt(j, i)));
 		}
 
 		return result;
-	}
-
-	/**
-	 * Determines if two this matrix and another matrix have the same dimensions.
-	 *
-	 * @param matrix The other matrix.
-	 *
-	 * @return true this matrix and the other matrix have the same dimensions.
-	 */
-	public boolean isSameSize(final Matrix matrix) {
-		return this.rows == matrix.getRowCount() && this.cols == matrix.getColumnCount();
 	}
 
 	@Override

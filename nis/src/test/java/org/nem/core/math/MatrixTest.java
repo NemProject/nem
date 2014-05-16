@@ -111,6 +111,31 @@ public abstract class MatrixTest {
 
 	//endregion
 
+	//region rowSum / columnSum
+
+	@Test
+	public void matrixRowSumsCanBeCalculated() {
+		// Arrange:
+		final DenseMatrix matrix = new DenseMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 6 });
+
+		// Assert:
+		Assert.assertThat(matrix.rowSum(0), IsEqual.equalTo(13.0));
+		Assert.assertThat(matrix.rowSum(1), IsEqual.equalTo(4.0));
+		Assert.assertThat(matrix.rowSum(2), IsEqual.equalTo(11.0));
+	}
+
+	@Test
+	public void matrixColumnSumsCanBeCalculated() {
+		// Arrange:
+		final DenseMatrix matrix = new DenseMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 6 });
+
+		// Assert:
+		Assert.assertThat(matrix.columnSum(0), IsEqual.equalTo(10.0));
+		Assert.assertThat(matrix.columnSum(1), IsEqual.equalTo(18.0));
+	}
+
+	//endregion
+
 	/**
 	 * Creates a new matrix of the specified size.
 	 *

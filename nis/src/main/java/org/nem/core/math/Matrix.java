@@ -38,6 +38,20 @@ public abstract class Matrix {
 	}
 
 	/**
+	 * Gets the sum of all the matrix's elements in a row.
+	 *
+	 * @return The sum of all the matrix's elements of a row.
+	 */
+	public abstract double rowSum(final int row);
+
+	/**
+	 * Gets the sum of all the matrix's elements in a column.
+	 *
+	 * @return The sum of all the matrix's elements of a column.
+	 */
+	public abstract double columnSum(final int column);
+
+	/**
 	 * Gets the value at the specified row and column.
 	 *
 	 * @param row The row.
@@ -146,7 +160,7 @@ public abstract class Matrix {
 	 *
 	 * @return true this matrix and the other matrix have the same dimensions.
 	 */
-	public boolean isSameSize(final Matrix matrix) {
+	public final boolean isSameSize(final Matrix matrix) {
 		return this.numRows == matrix.getRowCount() && this.numCols == matrix.getColumnCount();
 	}
 
