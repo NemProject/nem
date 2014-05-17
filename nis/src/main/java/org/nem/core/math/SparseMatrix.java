@@ -87,12 +87,13 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
-		for (int i = 0; i < this.numRows; i++) {
+		for (int i = 0; i < this.numRows; ++i) {
 			final double[] rowValues = this.values[i];
 			final int[] rowCols = this.cols[i];
 			final int size = this.maxIndices[i];
-			for (int j = 0; j < size; j++) {
-				func.visit(i, rowCols[j], rowValues[j]);
+			for (int j = 0; j < size; ++j) {
+				final int jCopy = j;
+				func.visit(i, rowCols[j], rowValues[j], v -> rowValues[jCopy] = v);
 			}
 		}
 	}
@@ -115,30 +116,6 @@ public class SparseMatrix extends Matrix {
 	 */
 	public int getRowCapacity(int row) {
 		return this.cols[row].length;
-	}
-
-	@Override
-	public void normalizeColumns() {
-		double[] vector = new double[this.numRows];
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			for (int j=0; j<size; j++) {
-				vector[rowCols[j]] += Math.abs(rowValues[j]);
-			}
-		}
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			for (int j=0; j<size; j++) {
-				double norm =  vector[rowCols[j]];
-				if (norm > 0) {
-					rowValues[j] /= norm;
-				}
-			}
-		}
 	}
 
 	/**

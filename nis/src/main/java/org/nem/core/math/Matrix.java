@@ -126,11 +126,14 @@ public abstract class Matrix {
 	/**
 	 * Normalizes each column of the matrix.
 	 */
-	public void normalizeColumns() {
+	public final void normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
-		this.forEach((r, c, v) -> {
+		this.forEach((r, c, v, u) -> {
 			final double sum = columnSums[c];
-			this.setAtUnchecked(r, c, v / (0 == sum ? 1 : sum));
+			if (0 == sum)
+				return;
+
+			u.accept(v / sum);
 		});
 	}
 
@@ -140,7 +143,7 @@ public abstract class Matrix {
 	 * @param scale The scale factor.
 	 */
 	public final void scale(final double scale) {
-		this.forEach((r, c, v) -> this.setAtUnchecked(r, c, v / scale));
+		this.forEach((r, c, v, u) -> u.accept(v / scale));
 	}
 
 	//endregion
@@ -264,6 +267,36 @@ public abstract class Matrix {
 
 	//endregion
 
+	//region readonly-foreach
+
+	/**
+	 * Calls the specified function for every non-zero element.
+	 *
+	 * @param func The function.
+	 */
+	protected void forEach(final ReadOnlyElementVisitorFunction func) {
+		this.forEach((r, c, v, u) -> func.visit(r, c, v));
+	}
+
+	/**
+	 * Functional interface that visits every non-zero element in this matrix.
+	 * Depending on the implementation, zero elements may or may not be visited.
+	 */
+	@FunctionalInterface
+	protected static interface ReadOnlyElementVisitorFunction {
+
+		/**
+		 * Visits the specified element.
+		 *
+		 * @param row The row.
+		 * @param col The column.
+		 * @param value The value.
+		 */
+		public void visit(final int row, final int col, final double value);
+	}
+
+	//endregion
+
 	//region abstract functions
 
 	/**
@@ -304,7 +337,7 @@ public abstract class Matrix {
 	 * Depending on the implementation, zero elements may or may not be visited.
 	 */
 	@FunctionalInterface
-	public interface ElementVisitorFunction {
+	protected static interface ElementVisitorFunction {
 
 		/**
 		 * Visits the specified element.
@@ -312,8 +345,9 @@ public abstract class Matrix {
 		 * @param row The row.
 		 * @param col The column.
 		 * @param value The value.
+		 * @param setter a function that can be used to update the value.
 		 */
-		public void visit(int row, int col, double value);
+		public void visit(final int row, final int col, final double value, final DoubleConsumer setter);
 	}
 
 	//endregion

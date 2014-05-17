@@ -45,7 +45,9 @@ public final class DenseMatrix extends Matrix {
 	protected final void forEach(final ElementVisitorFunction func) {
 		for (int i = 0; i < this.getRowCount(); ++i) {
 			for (int j = 0; j < this.getColumnCount(); ++j) {
-				func.visit(i, j, this.getAtUnchecked(i, j));
+				final int iCopy = i;
+				final int jCopy = j;
+				func.visit(i, j, this.getAtUnchecked(i, j), v -> this.setAtUnchecked(iCopy, jCopy, v));
 			}
 		}
 	}
