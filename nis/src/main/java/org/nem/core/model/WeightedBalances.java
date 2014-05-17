@@ -42,9 +42,12 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
-		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
-
 		this.historicalBalances.add(height, amount);
+		addReceiveInternal(height, amount);
+	}
+
+	private void addReceiveInternal(final BlockHeight height, final Amount amount) {
+		final WeightedBalance weightedBalance = createVestedBalance(height, amount);
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
@@ -127,9 +130,24 @@ public class WeightedBalances {
 
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index >= 0) {
-			// TODO: in case if balance is 0, use historical balances to "correct" it
 			index = undoIterateBalances(index);
-			balances.get(index).undoSend(amount);
+			final WeightedBalance wb = balances.get(index);
+
+			// in case if balance is 0, use historical balances to "correct" it
+			// TODO: probably would be better to have public "getBalance()"?
+			if (wb.getUnvestedBalance().compareTo(Amount.ZERO) == 0 && wb.getVestedBalance().compareTo(Amount.ZERO) == 0) {
+				final BlockHeight topHeight = new BlockHeight(wb.getBlockHeight().getRaw());
+				balances.remove(index);
+
+				Amount temp = historicalBalances.getBalance(topHeight, topHeight);
+				if (index > 0) {
+					temp = temp.subtract(historicalBalances.getBalance(topHeight, new BlockHeight(topHeight.getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)));
+				}
+				addReceiveInternal(topHeight, temp);
+
+			} else {
+				wb.undoSend(amount);
+			}
 
 		} else {
 			throw new IllegalArgumentException("trying to undo non-existent send or too far in past");

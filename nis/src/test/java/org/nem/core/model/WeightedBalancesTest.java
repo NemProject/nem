@@ -156,6 +156,21 @@ public class WeightedBalancesTest {
 	}
 
 	@Test
+	public void canUndoSendPartiallyMaturedWholeBalance() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+
+		// Act:
+		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
+		weightedBalances.addSend(new BlockHeight(1441), Amount.fromNem(123));
+		weightedBalances.undoSend(new BlockHeight(1441), Amount.fromNem(123));
+
+		// Assert:
+		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
+		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem(120540000));
+	}
+
+	@Test
 	public void canUndoAfterTimeSendBalance() {
 		// Arrange:
 		final WeightedBalances weightedBalances = new WeightedBalances();
