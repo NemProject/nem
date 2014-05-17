@@ -119,36 +119,6 @@ public class SparseMatrix extends Matrix {
 	}
 
 	/**
-	 * Multiplies this sparse matrix by a vector.
-	 *
-	 * @param vector The vector.
-	 *
-	 * @return The resulting vector.
-	 */
-	public ColumnVector multiply(final ColumnVector vector) {
-		if (this.numCols != vector.size()) {
-			throw new IllegalArgumentException("vector size and matrix column count must be equal");
-		}
-		double[] result = new double[this.numRows];
-		double[] rawVector = new double[this.numRows];
-		for (int i=0; i<this.numCols; i++) {
-			rawVector[i] = vector.getAt(i);
-		}
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			double dot=0.0;
-			for (int j=0; j<size; j++) {
-				dot += rowValues[j] * rawVector[rowCols[j]];
-			}
-			result[i] = dot;
-		}
-		
-		return new ColumnVector(result);
-	}	
-
-	/**
 	 * Remove an entries at a specific position
 	 * 
 	 * @param row The row.

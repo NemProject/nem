@@ -216,6 +216,29 @@ public abstract class Matrix {
 
 	//endregion
 
+	//region vector operations
+
+	/**
+	 * Multiplies this matrix by a vector.
+	 *
+	 * @param vector The vector.
+	 * @return The resulting vector.
+	 */
+	public ColumnVector multiply(final ColumnVector vector) {
+		if (this.numCols != vector.size())
+			throw new IllegalArgumentException("vector size and matrix column count must be equal");
+
+		double[] rawResult = new double[this.numRows];
+		double[] rawVector = new double[this.numCols];
+		for (int i = 0; i < this.numCols; ++i)
+			rawVector[i] = vector.getAt(i);
+
+		this.forEach((r, c, v) -> rawResult[r] += v * rawVector[c]);
+		return new ColumnVector(rawResult);
+	}
+
+	//endregion
+
 	/**
 	 * Transposes this matrix.
 	 *

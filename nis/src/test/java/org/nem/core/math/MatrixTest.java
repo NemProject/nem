@@ -442,6 +442,35 @@ public abstract class MatrixTest {
 
 	//endregion
 
+	//region multiply
+
+	@Test
+	public void matrixCannotBeMultipliedByVectorOfDifferentSize() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 11, -1, 8 });
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> matrix.multiply(new ColumnVector(1)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> matrix.multiply(new ColumnVector(3)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void matrixCanBeMultipliedByVectorOfSameSize() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, -3, -1, -5, 8 });
+		final ColumnVector vector = new ColumnVector(2, 3);
+
+		// Act:
+		final ColumnVector result = matrix.multiply(vector);
+
+		// Assert:
+		Assert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
+		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-9.0));
+		Assert.assertThat(result.getAt(2), IsEqual.equalTo(14.0));
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test

@@ -66,41 +66,6 @@ public class SparseMatrixTest extends MatrixTest {
 
 	//endregion
 
-	//region multiply
-
-	@Test(expected = IllegalArgumentException.class)
-	public void sparseMatrixCannotBeMultipliesWithVectorOfDifferentSize() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
-				2, -3, -5, 11, -1, 8
-		});
-		ColumnVector vector = new ColumnVector(4);
-
-		// Act:
-		sparseMatrix.multiply(vector);
-	}
-
-	@Test
-	public void sparseMatrixCanBeMultipliesWithVectorOfSameSize() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
-				2, -3, -5, 11, -1, 8
-		});
-		ColumnVector vector = new ColumnVector(2);
-		vector.setAt(0,2);
-		vector.setAt(1,3);
-
-		// Act:
-		ColumnVector result = sparseMatrix.multiply(vector);
-		
-		// Assert:
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-9.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(14.0));
-	}
-
-	//endregion
-
 	@Test
 	public void SparseMatrixVsCompRowMatrixNormalizeColumnsTest() {
 		LOGGER.info("SparseMatrixVsCompRowMatrixNormalizeColumnsTest");
