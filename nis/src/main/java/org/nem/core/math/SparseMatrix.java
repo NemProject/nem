@@ -1,24 +1,27 @@
 package org.nem.core.math;
 
 
+/**
+ * Represents a sparse matrix.
+ */
 public class SparseMatrix {
 
-	final int numRows;
-	final int numCols;
+	private final int numRows;
+	private final int numCols;
 
 	/**
 	 * The rows of the matrix
 	 */
-	private double[][] values=null;
-	private int[][] cols=null;
-	private int[] maxIndices=null;
+	private double[][] values = null;
+	private int[][] cols = null;
+	private int[] maxIndices = null;
 
 	/**
 	 * Creates a new matrix of the specified size which has a given capacity for each row.
 	 *
 	 * @param numRows The desired number of rows to represent.
 	 * @param numCols The desired number of columns to represent.
-	 * @param initialCapacity The initial capacity of a row. Choose carefully to avoid reallocation!
+	 * @param initialCapacityPerRow The initial capacity of a row. Choose carefully to avoid reallocation!
 	 */
 	public SparseMatrix(final int numRows, final int numCols, final int initialCapacityPerRow) {
 		this.numRows = numRows;
@@ -32,21 +35,11 @@ public class SparseMatrix {
 			this.maxIndices[i] = 0;
 		}
 	}
-	
-	/**
-	 * Gets the number of rows.
-	 *
-	 * @return The number of rows.
-	 */
+
 	public int getRowCount() {
 		return this.numRows;
 	}
 
-	/**
-	 * Gets the number of columns.
-	 *
-	 * @return The number of columns.
-	 */
 	public int getColumnCount() {
 		return this.numCols;
 	}

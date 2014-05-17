@@ -24,18 +24,6 @@ public final class DenseMatrix extends Matrix {
 			this.columns[i] = new ColumnVector(rows);
 	}
 
-	/**
-	 * Creates a new matrix of the specified size and initial values.
-	 *
-	 * @param rows The desired number of rows.
-	 * @param cols The desired number of columns.
-	 * @param values The initial values.
-	 */
-	public DenseMatrix(final int rows, final int cols, final double[] values) {
-		this(rows, cols);
-		this.setAll(values);
-	}
-
 	//region Matrix abstract functions
 
 	@Override
@@ -63,24 +51,6 @@ public final class DenseMatrix extends Matrix {
 	}
 
 	//endregion
-
-	/**
-	 * Sets all the matrix's elements to the specified values.
-	 *
-	 * @param values The values.
-	 */
-	public void setAll(double[] values) {
-		final int rows = this.getRowCount();
-		final int cols = this.getColumnCount();
-		if (values.length != rows * cols)
-			throw new IllegalArgumentException("incompatible number of values");
-
-		for (int i = 0; i < rows; ++i) {
-			for (int j = 0; j < cols; ++j) {
-				this.setAt(i, j, values[i * cols + j]);
-			}
-		}
-	}
 
 	@Override
 	public String toString() {

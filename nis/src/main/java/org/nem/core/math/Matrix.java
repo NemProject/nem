@@ -24,7 +24,16 @@ public abstract class Matrix {
 		this.numCols = numCols;
 	}
 
-	//region get{Row|Column}Count / {get|set|increment}At
+	//region get{Element|Row|Column}Count / {get|set|increment}At
+
+	/**
+	 * Gets the number of elements.
+	 *
+	 * @return The number of elements.
+	 */
+	public final int getElementCount() {
+		return this.numRows * this.numCols;
+	}
 
 	/**
 	 * Gets the number of rows.

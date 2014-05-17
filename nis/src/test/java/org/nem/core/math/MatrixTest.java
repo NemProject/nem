@@ -6,7 +6,7 @@ import org.nem.core.test.ExceptionAssert;
 
 public abstract class MatrixTest {
 
-	//region abstract methods
+	//region createMatrix
 
 	/**
 	 * Creates a new matrix of the specified size.
@@ -23,7 +23,20 @@ public abstract class MatrixTest {
 	 * @param cols The desired number of columns.
 	 * @param values The initial values.
 	 */
-	protected abstract Matrix createMatrix(final int rows, final int cols, final double[] values);
+	protected Matrix createMatrix(final int rows, final int cols, final double[] values) {
+		final Matrix matrix = new DenseMatrix(rows, cols);
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < cols; ++j) {
+				final double value = values[i * cols + j];
+				if (0 == value)
+					continue;
+
+				matrix.setAt(i, j, value);
+			}
+		}
+
+		return matrix;
+	}
 
 	//endregion
 
