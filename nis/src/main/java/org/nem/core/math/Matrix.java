@@ -126,7 +126,7 @@ public abstract class Matrix {
 	/**
 	 * Normalizes each column of the matrix.
 	 */
-	public final void normalizeColumns() {
+	public void normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		this.forEach((r, c, v, u) -> {
 			final double sum = columnSums[c];
