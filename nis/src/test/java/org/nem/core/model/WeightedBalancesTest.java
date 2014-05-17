@@ -167,7 +167,7 @@ public class WeightedBalancesTest {
 
 		// Assert:
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
-		assertUnvested(weightedBalances, 1441, Amount.fromNem(123)); // The amount must be corrected after fixing the bug
+		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem(120540000));
 	}
 
 	@Test

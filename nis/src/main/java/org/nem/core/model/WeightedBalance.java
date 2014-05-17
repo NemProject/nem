@@ -101,9 +101,12 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public Amount getVestedBalance() {
+		final BigInteger sum = this.vestedBalance.add(this.unvestedBalance);
+		if (sum.compareTo(BigInteger.ZERO) == 0) {
+			return Amount.ZERO;
+		}
 		return Amount.fromMicroNem(
-				this.vestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem()))
-					.divide(this.vestedBalance.add(this.unvestedBalance)).longValue()
+				this.vestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem())).divide(sum).longValue()
 		);
 	}
 
