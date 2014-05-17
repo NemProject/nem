@@ -42,6 +42,15 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
+	 * Gets the underlying, raw array.
+	 *
+	 * @return The underlying, raw array.
+	 */
+	public double[] getRaw() {
+		return this.vector;
+	}
+
+	/**
 	 * Gets the size of the vector.
 	 *
 	 * @return The size of the vector.

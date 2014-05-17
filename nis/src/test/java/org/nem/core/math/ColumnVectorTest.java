@@ -4,6 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
+import java.util.Arrays;
+
 public class ColumnVectorTest {
 
 	//region constructor / getAt / setAt
@@ -86,6 +88,35 @@ public class ColumnVectorTest {
 			// Act:
 			vector.getAt(index);
 		}, ArrayIndexOutOfBoundsException.class);
+	}
+
+	//endregion
+
+	//region getRaw
+
+	@Test
+	public void rawVectorIsAccessible() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
+
+		// Act:
+		boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 3.2, 5.4 });
+
+		// Assert:
+		Assert.assertThat(areEqual, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void rawVectorIsMutable() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
+
+		// Act:
+		vector.setAt(1, 7.1);
+		boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 7.1, 5.4 });
+
+		// Assert:
+		Assert.assertThat(areEqual, IsEqual.equalTo(true));
 	}
 
 	//endregion
