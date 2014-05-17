@@ -171,6 +171,26 @@ public class WeightedBalancesTest {
 	}
 
 	@Test
+	public void canUndoSendWholeBalanceCumulative() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+
+		// Act:
+		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(10_000));
+		weightedBalances.addReceive(new BlockHeight(1440), Amount.fromNem(2_000));
+		weightedBalances.addReceive(new BlockHeight(1441), Amount.fromNem(300));
+		weightedBalances.addReceive(new BlockHeight(2880), Amount.fromNem(40));
+		weightedBalances.addReceive(new BlockHeight(2881), Amount.fromNem(5));
+		weightedBalances.addSend(new BlockHeight(2882), Amount.fromNem(12_345));
+		weightedBalances.undoSend(new BlockHeight(2882), Amount.fromNem(12_345));
+
+		// Assert:
+		assertSum(weightedBalances, 2880, Amount.fromNem(12_340));
+		assertSum(weightedBalances, 2881, Amount.fromNem(12_345));
+		assertSum(weightedBalances, 2882, Amount.fromNem(12_345));
+	}
+
+	@Test
 	public void canUndoAfterTimeSendBalance() {
 		// Arrange:
 		final WeightedBalances weightedBalances = new WeightedBalances();
@@ -204,5 +224,11 @@ public class WeightedBalancesTest {
 
 	private void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
+	}
+
+	private void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
+		final BlockHeight blockHeight = new BlockHeight(height);
+		final Amount actualSum = weightedBalances.getUnvested(blockHeight).add(weightedBalances.getVested(blockHeight));
+		Assert.assertThat(actualSum, IsEqual.equalTo(amount));
 	}
 }

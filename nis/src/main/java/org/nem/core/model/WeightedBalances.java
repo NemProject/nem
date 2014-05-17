@@ -136,7 +136,7 @@ public class WeightedBalances {
 			// in case if balance is 0, use historical balances to "correct" it
 			// TODO: probably would be better to have public "getBalance()"?
 			if (wb.getUnvestedBalance().compareTo(Amount.ZERO) == 0 && wb.getVestedBalance().compareTo(Amount.ZERO) == 0) {
-				final BlockHeight topHeight = new BlockHeight(wb.getBlockHeight().getRaw());
+				final BlockHeight topHeight = wb.getBlockHeight();
 				balances.remove(index);
 
 				Amount temp = historicalBalances.getBalance(topHeight, topHeight);
@@ -152,6 +152,16 @@ public class WeightedBalances {
 		} else {
 			throw new IllegalArgumentException("trying to undo non-existent send or too far in past");
 		}
+	}
+
+	public Amount getVested(final BlockHeight height) {
+		final WeightedBalance weightedBalance = createVestedBalance(height, Amount.ZERO);
+		int index = Collections.binarySearch(balances, weightedBalance);
+		if (index < 0) {
+			index = -index-1;
+			index = iterateBalances(height, index);
+		}
+		return balances.get(index).getVestedBalance();
 	}
 
 	public Amount getUnvested(final BlockHeight height) {
@@ -171,7 +181,7 @@ public class WeightedBalances {
 	private int iterateBalances(final BlockHeight height, int newIndex) {
 		newIndex -= 1;
 
-		while (balances.get(newIndex).getBlockHeight().compareTo(height) <= 0) {
+		while (balances.get(newIndex).getBlockHeight().compareTo(height) < 0) {
 			balances.add(balances.get(newIndex).next());
 			newIndex++;
 		}
