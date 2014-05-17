@@ -11,7 +11,7 @@ import java.util.List;
 public class PoiAccountInfo {
 
 	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1);
-	public static final double DECAY_BASE = 0.9d;
+	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR/(double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
 	private final Account account;
