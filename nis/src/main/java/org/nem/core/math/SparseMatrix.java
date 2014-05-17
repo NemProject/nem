@@ -4,10 +4,11 @@ package org.nem.core.math;
 /**
  * Represents a sparse matrix.
  */
-public class SparseMatrix {
+public class SparseMatrix extends Matrix {
 
 	private final int numRows;
 	private final int numCols;
+	private final int initialCapacityPerRow;
 
 	/**
 	 * The rows of the matrix
@@ -24,8 +25,10 @@ public class SparseMatrix {
 	 * @param initialCapacityPerRow The initial capacity of a row. Choose carefully to avoid reallocation!
 	 */
 	public SparseMatrix(final int numRows, final int numCols, final int initialCapacityPerRow) {
+		super(numRows, numCols);
 		this.numRows = numRows;
 		this.numCols = numCols;
+		this.initialCapacityPerRow = initialCapacityPerRow;
 		this.values = new double[numRows][];
 		this.cols = new int[numRows][];
 		this.maxIndices = new int[numRows];
@@ -36,13 +39,66 @@ public class SparseMatrix {
 		}
 	}
 
-	public int getRowCount() {
-		return this.numRows;
+	//region Matrix abstract functions
+
+	@Override
+	protected final Matrix create(final int numRows, final int numCols) {
+		return new SparseMatrix(numRows, numCols, this.initialCapacityPerRow);
 	}
 
-	public int getColumnCount() {
-		return this.numCols;
+	@Override
+	protected final double getAtUnchecked(final int row, final int col) {
+		for (int i=0; i<this.maxIndices[row]; i++) {
+			if (this.cols[row][i] == col) {
+				return this.values[row][i];
+			}
+		}
+
+		return 0.0;
 	}
+
+	@Override
+	protected final void setAtUnchecked(final int row, final int col, final double val) {
+		if (val == 0.0) {
+			for (int i=0; i<this.maxIndices[row]; i++) {
+				if (this.cols[row][i] == col) {
+					remove(row, col);
+					return;
+				}
+			}
+		} else {
+			int size = this.cols[row].length;
+			for (int i=0; i<this.maxIndices[row]; i++) {
+				if (this.cols[row][i] == col) {
+					this.values[row][i] = val;
+					return;
+				}
+			}
+
+			// New column
+			if (this.maxIndices[row] == size) {
+				reallocate(row);
+			}
+
+			this.cols[row][this.maxIndices[row]] = col;
+			this.values[row][this.maxIndices[row]] = val;
+			this.maxIndices[row] += 1;
+		}
+	}
+
+	@Override
+	protected final void forEach(final ElementVisitorFunction func) {
+		for (int i = 0; i < this.numRows; i++) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			for (int j = 0; j < size; j++) {
+				func.visit(i, rowCols[j], rowValues[j]);
+			}
+		}
+	}
+
+	//endregion
 
 	/**
 	 * Gets the number of non zero columns of a row.
@@ -62,99 +118,7 @@ public class SparseMatrix {
 		return this.cols[row].length;
 	}
 
-	/**
-	 * Gets the value at the specified row and column.
-	 *
-	 * @param row The row.
-	 * @param col The column.
-	 *
-	 * @return The value.
-	 */
-	public double getAt(final int row, final int col) {
-		if (row < 0 || row >= this.numRows) {
-			throw new IllegalArgumentException("Row index out of bounds");
-		}
-		if (col < 0 || col >= this.numCols) {
-			throw new IllegalArgumentException("Column index out of bounds");
-		}
-		for (int i=0; i<this.maxIndices[row]; i++) {
-			if (this.cols[row][i] == col) {
-				return this.values[row][i];
-			}
-		}
-		return 0.0;
-	}
-
-	/**
-	 * Sets a value at the specified row and column.
-	 *
-	 * @param row The row.
-	 * @param col The column.
-	 * @param value The value.
-	 */
-	public void setAt(final int row, final int col, final double value) {
-		if (row < 0 || row >= this.numRows) {
-			throw new IllegalArgumentException("Row index out of bounds");
-		}
-		if (col < 0 || col >= this.numCols) {
-			throw new IllegalArgumentException("Column index out of bounds");
-		}
-		if (value == 0.0) {
-			for (int i=0; i<this.maxIndices[row]; i++) {
-				if (this.cols[row][i] == col) {
-					remove(row, col);
-					return;
-				}
-			}
-		} else {
-			int size = this.cols[row].length;
-			for (int i=0; i<this.maxIndices[row]; i++) {
-				if (this.cols[row][i] == col) {
-					this.values[row][i] = value;
-					return;
-				}
-			}
-			
-			// New column
-			if (this.maxIndices[row] == size) {
-				reallocate(row);
-			}
-			this.cols[row][this.maxIndices[row]] = col;
-			this.values[row][this.maxIndices[row]] = value;
-			this.maxIndices[row] += 1;			
-		}
-	}
-
-	/**
-	 * Increments a value at the specified row and column by the given value.
-	 * 
-	 * @param row The row.
-	 * @param col The column.
-	 * @param val The value to increment by.
-	 */
-	public void incrementAt(final int row, final int col, final double val) {
-		if (row < 0 || row >= this.numRows) {
-			throw new IllegalArgumentException("Row index out of bounds");
-		}
-		if (col < 0 || col >= this.numCols) {
-			throw new IllegalArgumentException("Column index out of bounds");
-		}
-		double value = getAt(row, col) + val;
-		if (value == 0.0) {
-			for (int i=0; i<this.maxIndices[row]; i++) {
-				if (this.cols[row][i] == col) {
-					remove(row, col);
-					return;
-				}
-			}
-		} else {
-			setAt(row, col, value);
-		}
-	}
-
-	/**
-	 * Normalizes each column of the matrix.
-	 */
+	@Override
 	public void normalizeColumns() {
 		double[] vector = new double[this.numRows];
 		for (int i=0; i<numRows; i++) {
@@ -175,25 +139,7 @@ public class SparseMatrix {
 					rowValues[j] /= norm;
 				}
 			}
-		}		
-	}
-
-	/**
-	 * Sum of all the matrix's elements in each row thus forming a vector
-	 *
-	 * @return The row sum vector.
-	 */
-	public ColumnVector getRowSumVector() {
-		double[] result = new double[this.numRows];
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int size = this.maxIndices[i];
-			for (int j=0; j<size; j++) {
-				result[i] += rowValues[j];
-			}
 		}
-		
-		return new ColumnVector(result);
 	}
 
 	/**
@@ -229,21 +175,20 @@ public class SparseMatrix {
 	/**
 	 * Remove an entries at a specific position
 	 * 
-	 * @param row
-	 * @param col
+	 * @param row The row.
+	 * @param col The column.
 	 */
 	private void remove(int row, int col) {
 		// Shrink arrays
 		System.arraycopy(this.cols[row], col+1, this.cols[row], col, this.cols[row].length-1-col);
 		System.arraycopy(this.values[row], col+1, this.values[row], col, this.values[row].length-1-col);
 		this.maxIndices[row] -= 1;
-		
 	}
 	
 	/**
 	 * Reallocate the value and column arrays of a row
 	 * 
-	 * @param row
+	 * @param row The row.
 	 */
 	private void reallocate(int row) {
 		// Hopefully doesn't happen too often

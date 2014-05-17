@@ -60,7 +60,7 @@ public abstract class Matrix {
 	 * @param col The column.
 	 * @return The value.
 	 */
-	public double getAt(final int row, final int col) {
+	public final double getAt(final int row, final int col) {
 		this.checkBounds(row, col);
 		return this.getAtUnchecked(row, col);
 	}
@@ -72,7 +72,7 @@ public abstract class Matrix {
 	 * @param col The column.
 	 * @param val The value.
 	 */
-	public void setAt(final int row, final int col, final double val) {
+	public final void setAt(final int row, final int col, final double val) {
 		this.checkBounds(row, col);
 		this.setAtUnchecked(row, col, val);
 	}
@@ -84,7 +84,7 @@ public abstract class Matrix {
 	 * @param col The column.
 	 * @param val The value to increment by.
 	 */
-	public void incrementAt(final int row, final int col, final double val) {
+	public final void incrementAt(final int row, final int col, final double val) {
 		final double originalVal = this.getAt(row, col);
 		this.setAtUnchecked(row, col, originalVal + val);
 	}
@@ -126,7 +126,7 @@ public abstract class Matrix {
 	/**
 	 * Normalizes each column of the matrix.
 	 */
-	public final void normalizeColumns() {
+	public void normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		this.forEach((r, c, v) -> {
 			final double sum = columnSums[c];

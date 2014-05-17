@@ -2,30 +2,8 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
 
 public class DenseMatrixTest extends MatrixTest {
-
-	//region constructor
-
-	@Test
-	public void matrixIsInitializedToZero() {
-		// Arrange:
-		final Matrix matrix = new DenseMatrix(2, 3);
-
-		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
-	}
-
-	//endregion
 
 	//region toString
 

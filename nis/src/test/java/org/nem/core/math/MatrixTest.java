@@ -40,6 +40,27 @@ public abstract class MatrixTest {
 
 	//endregion
 
+	//region constructor
+
+	@Test
+	public void matrixIsInitializedToZero() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(2, 3);
+
+		// Assert:
+		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
+		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		Assert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
+		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(0.0));
+		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
+		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
+	}
+
+	//endregion
+
 	//region getAt / setAt / incrementAt
 
 	@Test

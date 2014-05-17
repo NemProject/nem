@@ -10,133 +10,15 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SparseMatrixTest {
+public class SparseMatrixTest extends MatrixTest {
 	private static final Logger LOGGER = Logger.getLogger(SparseMatrixTest.class.getName());
 
-	//region constructor / getAt / setAt / incrementAt
-
-	@Test
-	public void uninitializedSparseMatrixReturnsZeros() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(2, 3, 100);
-
-		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCount(), IsEqual.equalTo(2));
-		Assert.assertThat(sparseMatrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 2), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 2), IsEqual.equalTo(0.0));
-	}
-
-	@Test
-	public void sparseMatrixValuesCanBeSet() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 100);
-
-		// Act:
-		sparseMatrix.setAt(0, 0, 7);
-		sparseMatrix.setAt(0, 1, 3);
-		sparseMatrix.setAt(1, 0, 5);
-		sparseMatrix.setAt(1, 1, 11);
-		sparseMatrix.setAt(2, 0, 1);
-		sparseMatrix.setAt(2, 1, 9);
-
-		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(7.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(5.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(11.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(1.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(9.0));
-	}
-
-	@Test
-	public void sparseMatrixValuesCanBeIncremented() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 100);
-
-		// Act:
-		// Increment values
-		sparseMatrix.setAt(0, 0, 7);
-		sparseMatrix.setAt(0, 1, 3);
-		sparseMatrix.setAt(1, 0, 5);
-		sparseMatrix.setAt(1, 1, 12);
-		sparseMatrix.setAt(2, 0, 1);
-		sparseMatrix.setAt(2, 1, 9);
-		
-		// Double increment
-		sparseMatrix.incrementAt(0, 0, 10);
-		sparseMatrix.incrementAt(0, 1, 20);
-		sparseMatrix.incrementAt(1, 0, 30);
-		sparseMatrix.incrementAt(1, 1, 40);
-		sparseMatrix.incrementAt(2, 0, 50);
-		sparseMatrix.incrementAt(2, 1, 60);
-
-		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(17.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(23.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(35.0));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(52.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(51.0));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(69.0));
-	}
-
-	@Test
-	public void sparseMatrixGetCannotBeIndexedOutOfBounds() {
-		// Assert:
-		assertGetOutOfBounds(2, 3, -1, 0);
-		assertGetOutOfBounds(2, 3, 0, -1);
-		assertGetOutOfBounds(2, 3, 2, 0);
-		assertGetOutOfBounds(2, 3, 0, 3);
-	}
-
-	@Test
-	public void sparseMatrixSetCannotBeIndexedOutOfBounds() {
-		// Assert:
-		assertSetOutOfBounds(2, 3, -1, 0);
-		assertSetOutOfBounds(2, 3, 0, -1);
-		assertSetOutOfBounds(2, 3, 2, 0);
-		assertSetOutOfBounds(2, 3, 0, 3);
-	}
-
-	private static void assertGetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
-		try {
-			// Arrange:
-			final SparseMatrix sparseMatrix = new SparseMatrix(numRows, numCols, 100);
-
-			// Act:
-			sparseMatrix.getAt(row, col);
-
-			// Assert:
-			Assert.fail("expected exception was not thrown");
-		} catch (IllegalArgumentException ex) {
-		}
-	}
-
-	private static void assertSetOutOfBounds(final int numRows, int numCols, final int row, final int col) {
-		try {
-			// Arrange:
-			final SparseMatrix sparseMatrix = new SparseMatrix(numRows, numCols, 100);
-
-			// Act:
-			sparseMatrix.setAt(row, col, 0);
-
-			// Assert:
-			Assert.fail("expected exception was not thrown");
-		} catch (IllegalArgumentException ex) {
-		}
-	}
-	//endregion
-	
 	//region removal / reallocation
 
 	@Test
 	public void entryCanBeRemoved() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
+		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[]{
 				2, 3, 5, 11, 1, 8
 		});
 
@@ -166,48 +48,6 @@ public class SparseMatrixTest {
 		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
 		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(5.0));
 		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
-	}
-
-	//endregion
-	
-	//region normalizeColumns
-	@Test
-	public void allSparseMatrixColumnsCanBeNormalized() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
-				2, 3, 5, 11, 1, 8
-		});
-
-		// Act:
-		sparseMatrix.normalizeColumns();
-
-		// Assert:
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(0.2));
-		Assert.assertThat(sparseMatrix.getAt(1, 0), IsEqual.equalTo(0.3));
-		Assert.assertThat(sparseMatrix.getAt(2, 0), IsEqual.equalTo(0.5));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(0.55));
-		Assert.assertThat(sparseMatrix.getAt(1, 1), IsEqual.equalTo(0.05));
-		Assert.assertThat(sparseMatrix.getAt(2, 1), IsEqual.equalTo(0.4));
-	}
-
-	//endregion
-
-	//region getRowSumVector
-
-	@Test
-	public void rowSumVectorCanBeCreated() {
-		// Arrange:
-		final SparseMatrix sparseMatrix = createThreeByTwoSparseMatrix(new double[] {
-				2, -3, -5, 11, -1, 8
-		});
-
-		// Act:
-		ColumnVector rowVector = sparseMatrix.getRowSumVector();
-		
-		// Assert:
-		Assert.assertThat(rowVector.getAt(0), IsEqual.equalTo(13.0));
-		Assert.assertThat(rowVector.getAt(1), IsEqual.equalTo(-4.0));
-		Assert.assertThat(rowVector.getAt(2), IsEqual.equalTo(3.0));
 	}
 
 	//endregion
@@ -400,5 +240,10 @@ public class SparseMatrixTest {
 		sparseMatrix.setAt(1, 1, values[4]);
 		sparseMatrix.setAt(2, 1, values[5]);
 		return sparseMatrix;
+	}
+
+	@Override
+	protected Matrix createMatrix(int rows, int cols) {
+		return new SparseMatrix(rows, cols, 100);
 	}
 }
