@@ -62,24 +62,11 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public void send(final Amount amount) {
-		final BigInteger a = BigInteger.valueOf(amount.getNumMicroNem());
-		final BigInteger t = a.multiply(this.vestedBalance);
-		final BigInteger c = this.unvestedBalance.add(this.vestedBalance);
-		this.vestedBalance = this.vestedBalance.multiply(c).subtract(t);
-		this.unvestedBalance = this.unvestedBalance.multiply(c).subtract(a.multiply(c).subtract(t));
-
-		reduce();
+		// no need to do anything, send keeps the ratio
 		this.balance = this.balance.subtract(amount);
 	}
 
 	public void undoSend(final Amount amount) {
-		final BigInteger a = BigInteger.valueOf(amount.getNumMicroNem());
-		final BigInteger t = a.multiply(vestedBalance);
-		final BigInteger c = this.unvestedBalance.add(this.vestedBalance);
-		this.vestedBalance = this.vestedBalance.multiply(c).add(t);
-		this.unvestedBalance = this.unvestedBalance.multiply(c).add(a.multiply(c).subtract(t));
-		reduce();
-
 		this.balance = this.balance.add(amount);
 	}
 
