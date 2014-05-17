@@ -274,31 +274,6 @@ public class ColumnVector implements Cloneable {
 	}
 
 	/**
-	 * Creates a new ColumnVector by multiplying this vector by a matrix.
-	 *
-	 * @param matrix The matrix.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector multiply(final Matrix matrix) {
-		final int columnCount = matrix.getColumnCount();
-		if (this.size != columnCount)
-			throw new IllegalArgumentException("vector size and matrix column count must be equal");
-
-		final int rowCount = matrix.getRowCount();
-		final ColumnVector result = new ColumnVector(rowCount);
-		for (int i = 0; i < rowCount; ++i) {
-			double sumProduct = 0.0;
-			for (int j = 0; j < columnCount; ++j)
-				sumProduct += matrix.getAt(i, j) * this.vector[j];
-
-			result.vector[i] = sumProduct;
-		}
-
-		return result;
-	}
-
-	/**
 	 * Calculates the Manhattan distance (L1-norm) between the specified vector and this vector.
 	 *
 	 * @param vector The specified vector.
@@ -331,14 +306,6 @@ public class ColumnVector implements Cloneable {
 		}
 
 		return distance;
-	}
-
-	@Override
-	public ColumnVector clone() throws CloneNotSupportedException {
-		super.clone();
-		double [] clonedVector = new double[this.vector.length];
-		System.arraycopy(this.vector, 0, clonedVector, 0, this.vector.length);
-		return new ColumnVector(clonedVector);
 	}
 
 	@Override

@@ -58,11 +58,11 @@ public class EigenTrustConvergencePolicy {
 		int numIterations = 0;
 		double scale = 1.0;
 		ColumnVector sumVector = new ColumnVector(numDimensions);
-		ColumnVector lastTermVector = this.preTrustVector.multiply(this.trustMatrix);
+		ColumnVector lastTermVector = this.trustMatrix.multiply(this.preTrustVector);
 		do {
 			sumVector = sumVector.add(lastTermVector);
 
-			lastTermVector = lastTermVector.multiply(this.trustMatrix);
+			lastTermVector = this.trustMatrix.multiply(lastTermVector);
 			scale += 1.0;
 			lastTermVector.scale(scale);
 

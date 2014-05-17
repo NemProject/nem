@@ -345,48 +345,6 @@ public class ColumnVectorTest {
 		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(16, -32, 8)));
 	}
 
-	@Test
-	public void vectorCanBeMultipliedByMatrix() {
-		// Arrange:
-		final ColumnVector v = new ColumnVector(3, 2);
-
-		final Matrix matrix = new DenseMatrix(3, 2);
-		matrix.setAt(0, 0, 2);
-		matrix.setAt(1, 0, 3);
-		matrix.setAt(2, 0, 5);
-		matrix.setAt(0, 1, 11);
-		matrix.setAt(1, 1, 1);
-		matrix.setAt(2, 1, 8);
-
-		// Act:
-		final ColumnVector result = v.multiply(matrix);
-
-		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(v)));
-		Assert.assertThat(result.size(), IsEqual.equalTo(3));
-		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(28, 11, 31)));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void vectorCannotBeMultipliedByMatrixWithFewerColumns() {
-		// Arrange:
-		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new DenseMatrix(2, 1);
-
-		// Act:
-		v.multiply(m);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void vectorCannotBeMultipliedByMatrixWithMoreColumns() {
-		// Arrange:
-		final ColumnVector v = new ColumnVector(2);
-		final Matrix m = new DenseMatrix(2, 3);
-
-		// Act:
-		v.multiply(m);
-	}
-
 	//endregion
 
 	//region multiplyElementWise
@@ -458,24 +416,6 @@ public class ColumnVectorTest {
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(vector)));
 		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(25.0, 6.0, 11.0)));
-	}
-
-	//endregion
-
-	//region clone
-
-	@Test
-	public void cloneCreatesCopyOfVector() throws CloneNotSupportedException {
-		// Arrange:
-		final ColumnVector a = new ColumnVector(2, -4, 1);
-
-		// Act:
-		final ColumnVector result = a.clone();
-		a.setAt(0, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
-		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(2, -4, 1)));
 	}
 
 	//endregion
