@@ -13,8 +13,10 @@ import java.util.*;
 
 public class PoiContextTest {
 
+	private static final double TELEPORTATION_PROB = .85;
+	
 	@Test
-	public void coinDaysVectorIsInitializedCorrectly() {
+	public void vestedBalanceVectorIsInitializedCorrectly() {
 		// Act:
 		final PoiContext context = createTestPoiContext();
 
@@ -22,8 +24,8 @@ public class PoiContextTest {
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
 		// (2) coin days are not normalized
 		Assert.assertThat(
-				context.getCoinDaysVector(),
-				IsEqual.equalTo(new ColumnVector(3, 2, 0, 1, 0, 4)));
+				context.getVestedBalanceVector(),
+				IsEqual.equalTo(new ColumnVector(3000001, 2999999, 5, 1000000, 999999, 4000000)));
 	}
 
 	@Test
@@ -36,7 +38,7 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
 				context.getOutLinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(1, 0, 6, 0, 5, 10)));
+				IsEqual.equalTo(new ColumnVector(1e06, 0, 6e06, 0, 5e06, 10e06)));
 	}
 
 	@Test
@@ -45,12 +47,19 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext();
 
 		// Assert:
+		// Outlink matrix should look like:
+		// (1 0 0 0 0 0)
+		// (0 0 0 0 0 0)
+		// (0 0 1 0 0 0)
+		// (0 0 0 0 0 0)
+		// (0 0 0 0 1 0)
+		// (0 0 0 0 0 1)
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
-		// (2) importance is initially set to balance
-		// (3) importance are normalized
+		// (2) importance vector is initially set to row sum vector of the outlink matrix
+		// (3) importance vector is normalized
 		Assert.assertThat(
 				context.getImportanceVector(),
-				IsEqual.equalTo(new ColumnVector(0, 0.4, 0.1, 0.2, 0.3, 0)));
+				IsEqual.equalTo(new ColumnVector(0.25, 0.0, 0.25, 0.0, 0.25, 0.25)));
 	}
 
 	@Test
@@ -62,7 +71,7 @@ public class PoiContextTest {
 		// (1) accounts without out-links are dangling
 		Assert.assertThat(
 				context.getTeleportationVector(),
-				IsEqual.equalTo(new ColumnVector(0.7000, 0.9500, 0.7625, 0.8250, 0.8875, 0.7000)));
+				IsEqual.equalTo(new ColumnVector(TELEPORTATION_PROB, TELEPORTATION_PROB, TELEPORTATION_PROB, TELEPORTATION_PROB, TELEPORTATION_PROB, TELEPORTATION_PROB)));
 	}
 
 	@Test
@@ -74,7 +83,7 @@ public class PoiContextTest {
 		// (1) accounts without out-links are dangling
 		Assert.assertThat(
 				context.getInverseTeleportationVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(0.3000, 0.0500, 0.2375, 0.1750, 0.1125, 0.3000)));
+				IsEqual.equalTo(new ColumnVector(0.0250, 0.0250, 0.0250, 0.0250, 0.0250, 0.0250)));
 	}
 
 	@Test
@@ -116,11 +125,11 @@ public class PoiContextTest {
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
 
 		// set up account links
-		addAccountLink(accounts.get(0), accounts.get(1), 6);
-		addAccountLink(accounts.get(0), accounts.get(2), 4);
-		addAccountLink(accounts.get(1), accounts.get(0), 2);
-		addAccountLink(accounts.get(3), accounts.get(0), 3);
-		addAccountLink(accounts.get(3), accounts.get(2), 5);
+		addAccountLink(height, accounts.get(0), accounts.get(1), 6);
+		addAccountLink(height, accounts.get(0), accounts.get(2), 4);
+		addAccountLink(height, accounts.get(1), accounts.get(0), 2);
+		addAccountLink(height, accounts.get(3), accounts.get(0), 3);
+		addAccountLink(height, accounts.get(3), accounts.get(2), 5);
 
 		// Act:
 		final PoiContext context = new PoiContext(accounts, accounts.size(), height);
@@ -134,16 +143,18 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(0, 3, 0.375);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
-		// TODO: cheating by comparing the string matrix representations, but should really round the matrix
-		Assert.assertThat(
-				context.getOutLinkMatrix().toString(),
-				IsEqual.equalTo(expectedAccountLinks.toString()));
+		for (int i=0; i<4; i++) {
+			for (int j=0; j<4; j++) {
+				Assert.assertTrue(expectedAccountLinks.getAt(i, j) == context.getOutLinkMatrix().getAt(i, j));
+			}
+		}
 	}
 
 	private static void addAccountLink(
+			final BlockHeight height,
 			final Account sender,
 			final Account recipient,
-			final int weight) {
+			final int amount) {
 
 		List<AccountLink> accountLinks = sender.getOutlinks();
 		if (null == accountLinks) {
@@ -151,9 +162,7 @@ public class PoiContextTest {
 			sender.setOutlinks(accountLinks);
 		}
 
-		final AccountLink link = new AccountLink();
-		link.setOtherAccount(recipient);
-		link.setStrength(weight);
+		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient);
 		sender.getOutlinks().add(link);
 	}
 
@@ -164,14 +173,12 @@ public class PoiContextTest {
 		for (final TestAccountInfo info : accountInfos) {
 			final MockAccount account = new MockAccount();
 			account.incrementBalance(Amount.fromMicroNem(info.balance));
-			account.setCoinDaysAt(Amount.fromMicroNem(info.coinDays), height);
+			account.setVestedBalanceAt(Amount.fromMicroNem(info.vestedBalance), height);
 
 			final List<AccountLink> outLinks = new ArrayList<>();
-			for (final int strength : info.outLinkStrengths) {
+			for (final int amount : info.amounts) {
 				// TODO: addOutLinks probably makes more sense
-				final AccountLink link = new AccountLink();
-				link.setStrength(strength);
-				link.setOtherAccount(account);
+				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
 				outLinks.add(link);
 			}
 
@@ -199,14 +206,14 @@ public class PoiContextTest {
 
 	private static class TestAccountInfo {
 
-		public final int coinDays;
+		public final int vestedBalance;
 		public final int balance;
-		public final int[] outLinkStrengths;
+		public final int[] amounts;
 
-		public TestAccountInfo(int coinDays, int balance, int[] outLinkStrengths) {
-			this.coinDays = coinDays;
+		public TestAccountInfo(int vestedBalance, int balance, int[] amounts) {
+			this.vestedBalance = vestedBalance;
 			this.balance = balance;
-			this.outLinkStrengths = null == outLinkStrengths ? new int[] { } : outLinkStrengths;
+			this.amounts = null == amounts ? new int[] { } : amounts;
 		}
 	}
 }
