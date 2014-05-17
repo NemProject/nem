@@ -3,16 +3,12 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.Function;
 
 /**
  * Represents a dense matrix.
  */
-public class DenseMatrix extends Matrix {
+public final class DenseMatrix extends Matrix {
 
-	final int rows;
-	final int cols;
 	final ColumnVector[] columns;
 
 	/**
@@ -23,11 +19,9 @@ public class DenseMatrix extends Matrix {
 	 */
 	public DenseMatrix(final int rows, final int cols) {
 		super(rows, cols);
-		this.rows = rows;
-		this.cols = cols;
-		this.columns = new ColumnVector[this.cols];
-		for (int i = 0; i < this.cols; ++i)
-			this.columns[i] = new ColumnVector(this.rows);
+		this.columns = new ColumnVector[cols];
+		for (int i = 0; i < cols; ++i)
+			this.columns[i] = new ColumnVector(rows);
 	}
 
 	/**
@@ -42,15 +36,33 @@ public class DenseMatrix extends Matrix {
 		this.setAll(values);
 	}
 
+	//region Matrix abstract functions
+
 	@Override
-	public double getAtUnchecked(final int row, final int col) {
+	protected final Matrix create(final int numRows, final int numCols) {
+		return new DenseMatrix(numRows, numCols);
+	}
+
+	@Override
+	protected final double getAtUnchecked(final int row, final int col) {
 		return this.columns[col].getAt(row);
 	}
 
 	@Override
-	public void setAtUnchecked(final int row, final int col, final double val) {
+	protected final void setAtUnchecked(final int row, final int col, final double val) {
 		this.columns[col].setAt(row, val);
 	}
+
+	@Override
+	protected final void forEach(final ElementVisitorFunction func) {
+		for (int i = 0; i < this.getRowCount(); ++i) {
+			for (int j = 0; j < this.getColumnCount(); ++j) {
+				func.visit(i, j, this.getAtUnchecked(i, j));
+			}
+		}
+	}
+
+	//endregion
 
 	/**
 	 * Sets all the matrix's elements to the specified values.
@@ -58,7 +70,9 @@ public class DenseMatrix extends Matrix {
 	 * @param values The values.
 	 */
 	public void setAll(double[] values) {
-		if (values.length != this.rows * this.cols)
+		final int rows = this.getRowCount();
+		final int cols = this.getColumnCount();
+		if (values.length != rows * cols)
 			throw new IllegalArgumentException("incompatible number of values");
 
 		for (int i = 0; i < rows; ++i) {
@@ -68,95 +82,18 @@ public class DenseMatrix extends Matrix {
 		}
 	}
 
-	/**
-	 * Transposes this matrix.
-	 *
-	 * @return A transposed matrix.
-	 */
-	public Matrix transpose() {
-		final DenseMatrix transposedMatrix = new DenseMatrix(this.cols, this.rows);
-		for (int i = 0; i < this.rows; ++i) {
-			for (int j = 0; j < this.cols; ++j) {
-				transposedMatrix.columns[i].setAt(j, this.columns[j].getAt(i));
-			}
-		}
-
-		return transposedMatrix;
-	}
-
-	@Override
-	public void normalizeColumns() {
-		for (int i = 0; i < this.cols; ++i)
-			this.columns[i].normalize();
-	}
-
-	@Override
-	public double absSum() {
-		return this.aggregate(ColumnVector::absSum);
-	}
-
-	@Override
-	public double sum() {
-		return this.aggregate(ColumnVector::sum);
-	}
-
-	private double aggregate(final Function<ColumnVector, Double> op) {
-		double sum = 0.0;
-		for (int i = 0; i < this.cols; ++i)
-			sum += op.apply(this.columns[i]);
-
-		return sum;
-	}
-
-	@Override
-	public double rowSum(final int row) {
-		return aggregate(v -> v.getAt(row));
-	}
-
-	@Override
-	public double columnSum(final int column) {
-		return this.columns[column].sum();
-	}
-
-	@Override
-	public void scale(final double scale) {
-		for (int i = 0; i < this.cols; ++i)
-			this.columns[i].scale(scale);
-	}
-
-	@Override
-	public Matrix multiplyElementWise(final Matrix matrix) {
-		return join(matrix, (l, r) -> l * r);
-	}
-
-	@Override
-	public Matrix add(final Matrix matrix) {
-		return join(matrix, (l, r) -> l + r);
-	}
-
-	private Matrix join(final Matrix matrix, final DoubleBinaryOperator op) {
-		if (!this.isSameSize(matrix))
-			throw new IllegalArgumentException("matrix sizes must be equal");
-
-		final DenseMatrix result = new DenseMatrix(this.getRowCount(), this.getColumnCount());
-		for (int i = 0; i < this.getColumnCount(); ++i) {
-			for (int j = 0; j < this.getRowCount(); ++j)
-				result.columns[i].setAt(j, op.applyAsDouble(this.columns[i].getAt(j), matrix.getAt(j, i)));
-		}
-
-		return result;
-	}
-
 	@Override
 	public String toString() {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final StringBuilder builder = new StringBuilder();
 
-		for (int i = 0; i < this.rows; ++i) {
+		final int rows = this.getRowCount();
+		final int cols = this.getColumnCount();
+		for (int i = 0; i < rows; ++i) {
 			if (0 != i)
 				builder.append(System.lineSeparator());
 
-			for (int j = 0; j < this.cols; ++j) {
+			for (int j = 0; j < cols; ++j) {
 				if (0 != j)
 					builder.append(" ");
 
@@ -169,7 +106,7 @@ public class DenseMatrix extends Matrix {
 
 	@Override
 	public int hashCode() {
-		return this.rows ^ this.cols;
+		return this.getRowCount() ^ this.getColumnCount();
 	}
 
 	@Override
@@ -181,6 +118,8 @@ public class DenseMatrix extends Matrix {
 		if (!this.isSameSize(rhs))
 			return false;
 
+		final int rows = this.getRowCount();
+		final int cols = this.getColumnCount();
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
 				if (this.getAt(i, j) != rhs.getAt(i, j))
