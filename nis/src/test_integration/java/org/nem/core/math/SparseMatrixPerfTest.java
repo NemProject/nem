@@ -201,6 +201,11 @@ public class SparseMatrixPerfTest {
 					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
 				},
+				(rows, entriesPerRow, bytes) -> {
+					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
+					final Matrix matrix = new TunedMtjSparseMatrix(rows, rows, mtjMatrix);
+					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "TunedMtjSparseMatrix");
+				},
 				(rows, entriesPerRow, bytes) -> new MtjMatrixTestAdapter(rows, entriesPerRow, bytes, "DirectMtjMatrix")
 		};
 	}
