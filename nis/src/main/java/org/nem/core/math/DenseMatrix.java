@@ -9,7 +9,8 @@ import java.text.DecimalFormat;
  */
 public final class DenseMatrix extends Matrix {
 
-	final ColumnVector[] columns;
+	final int numCols;
+	final double[] values;
 
 	/**
 	 * Creates a new matrix of the specified size.
@@ -19,9 +20,8 @@ public final class DenseMatrix extends Matrix {
 	 */
 	public DenseMatrix(final int rows, final int cols) {
 		super(rows, cols);
-		this.columns = new ColumnVector[cols];
-		for (int i = 0; i < cols; ++i)
-			this.columns[i] = new ColumnVector(rows);
+		this.numCols = cols;
+		this.values = new double[this.getElementCount()];
 	}
 
 	//region Matrix abstract functions
@@ -33,12 +33,12 @@ public final class DenseMatrix extends Matrix {
 
 	@Override
 	protected final double getAtUnchecked(final int row, final int col) {
-		return this.columns[col].getAt(row);
+		return this.values[row * this.numCols + col];
 	}
 
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
-		this.columns[col].setAt(row, val);
+		this.values[row * this.numCols + col] = val;
 	}
 
 	@Override
