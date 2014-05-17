@@ -1,11 +1,15 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.MissingResourceException;
 
 /**
@@ -82,6 +86,11 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	public HashChain getHashesFrom(final BlockHeight height, int limit) {
 		// TODO: throw exception?
 		return this.blockDao.getHashesFrom(height, limit);
+	}
+
+	@Override
+	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(Account account, int limit) {
+		return this.blockDao.getBlocksForAccount(account, limit);
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

@@ -144,6 +144,11 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
+	public Collection<Block> getBlocksForAccount(Account account, int limit) {
+		return null;
+	}
+
+	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)

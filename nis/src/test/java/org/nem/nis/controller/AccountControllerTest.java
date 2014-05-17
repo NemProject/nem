@@ -6,6 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.nis.Foraging;
 import org.nem.nis.service.AccountIoAdapter;
+import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.service.RequiredTransferDao;
 import org.nem.nis.test.MockTransferDaoImpl;
 
@@ -21,7 +22,8 @@ public class AccountControllerTest {
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		final MockForaging foraging = new MockForaging();
 		final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+		final RequiredBlockDao mockRequiredBlockDao = mock(RequiredBlockDao.class);
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, mockRequiredBlockDao, new MockAccountLookup());
 		final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
 		// Act:
@@ -38,7 +40,8 @@ public class AccountControllerTest {
 		// Arrange:
 		final MockForaging foraging = new MockForaging();
 		final RequiredTransferDao mockRequiredTransferDao = mock(RequiredTransferDao.class);
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, new MockAccountLookup());
+		final RequiredBlockDao mockRequiredBlockDao = mock(RequiredBlockDao.class);
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(mockRequiredTransferDao, mockRequiredBlockDao, new MockAccountLookup());
 		final AccountController controller = new AccountController(foraging, accountIoAdapter);
 
 		// Act:

@@ -4,6 +4,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.HashChain;
 import org.nem.nis.dbmodel.Block;
 
+import java.util.Collection;
+
 /**
  * Read-only DAO for accessing db Block objects.
  */
@@ -52,4 +54,6 @@ public interface ReadOnlyBlockDao {
 	 * @return HashChain.
 	 */
 	public HashChain getHashesFrom(final BlockHeight height, int limit);
+
+	public Collection<Block> getBlocksForAccount(final Account account, int limit);
 }
