@@ -167,20 +167,20 @@
 			<version>2.3.1</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>4.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpasyncclient</artifactId>
+			<version>4.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
-        <plugins>
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -283,29 +283,27 @@
 
 			</plugin>
 
-            <!--
-            this adds test_integration, so that during test-compile phase
-            they will be compiled, unfortunatelly, we can't specify target dir :/
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test_integration/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+			<!-- this adds test_integration, so that during test-compile phase they 
+				will be compiled, unfortunatelly, we can't specify target dir :/ -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/test_integration/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -316,11 +314,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.16</version>
-                <configuration>
-                    <testSourceDirectory>src/integrationtest/java</testSourceDirectory>
-                    <failIfNoTests>true</failIfNoTests>
-                </configuration>
-                <executions>
+				<configuration>
+					<testSourceDirectory>src/integrationtest/java</testSourceDirectory>
+					<failIfNoTests>true</failIfNoTests>
+				</configuration>
+				<executions>
 					<execution>
 						<id>default-integration-test</id>
 						<goals>
@@ -328,6 +326,52 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-beta-6</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>keytool-api-1.7</artifactId>
+						<version>1.4</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jnlp</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludeTransitive>false</excludeTransitive>
+					<jnlp>
+						<inputTemplate>nem-server.vm</inputTemplate>
+						<outputFile>nem-server.jnlp</outputFile>
+						<mainClass>org.nem.deploy.CommonStarter</mainClass>
+						<allPermissions />
+					</jnlp>
+					<libPath>serverjars</libPath>
+					<resourcesDirectory>${project.basedir}/src/main/site</resourcesDirectory>
+					<workDirectory>${project.basedir}/site</workDirectory>
+					<dependencies>
+						<excludes />
+					</dependencies>
+					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+					<sign>
+						<keystore>identity.jks</keystore>
+						<alias>nem-cert</alias>
+						<storepass>nem-start-201404</storepass>
+						<keypass>nem-start-201404</keypass>
+						<verify>true</verify>
+					</sign>
+					<gzip>true</gzip>
+					<outputJarVersions>true</outputJarVersions>
+					<verbose>true</verbose>
+				</configuration>
+
 			</plugin>
 
 			<plugin>
