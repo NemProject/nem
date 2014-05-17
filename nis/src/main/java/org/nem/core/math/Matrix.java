@@ -242,6 +242,28 @@ public abstract class Matrix {
 			throw new IndexOutOfBoundsException("Column index out of bounds");
 	}
 
+	//region hashCode / equals
+
+	@Override
+	public int hashCode() {
+		return this.getRowCount() ^ this.getColumnCount();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Matrix))
+			return false;
+
+		final Matrix rhs = (Matrix)obj;
+		if (!this.isSameSize(rhs))
+			return false;
+
+		final Matrix inequalityMatrix = this.join(rhs, true, (l, r) -> l == r ? 0 : 1);
+		return 0 == inequalityMatrix.sum();
+	}
+
+	//endregion
+
 	//region abstract functions
 
 	/**

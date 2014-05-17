@@ -7,11 +7,25 @@ import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 public class SparseMatrixTest extends MatrixTest {
 	private static final Logger LOGGER = Logger.getLogger(SparseMatrixTest.class.getName());
+
+	//region toString
+
+	@Test
+	public void sparseMatrixStringRepresentationIsCorrect() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] {
+				2.1234, 11.1234, 3.2345, 1, 5012.0126, 8
+		});
+
+		// Assert:
+		Assert.assertThat(matrix.toString(), IsEqual.equalTo("[3 x 2]"));
+	}
+
+	//endregion
 
 	//region removal / reallocation
 
@@ -96,7 +110,7 @@ public class SparseMatrixTest extends MatrixTest {
 			SecureRandom sr = new SecureRandom();
 			byte[] cols = new byte[3*numEntriesPerRow*numRows];
 			sr.nextBytes(cols);
-			
+
 			// Sparse matrix
 			SparseMatrix sparseMatrix = setupSparseMatrix(numRows, numEntriesPerRow, cols);
 			long start = System.currentTimeMillis();
@@ -105,7 +119,7 @@ public class SparseMatrixTest extends MatrixTest {
 			}
 			long stop = System.currentTimeMillis();
 			System.out.println("SparseMatrix with " + (numRows*numEntriesPerRow) + " entries, normalizeColumns needed " + (stop - start)/numTries + "ms.");
-			
+
 			// Comp row matrix
 			CompRowMatrix A = setupCompRowMatrix(numRows, numEntriesPerRow, cols);
 			start = System.currentTimeMillis();
@@ -115,7 +129,7 @@ public class SparseMatrixTest extends MatrixTest {
 			stop = System.currentTimeMillis();
 			System.out.println("CompRowMatrix with " + (numRows*numEntriesPerRow) + " entries, normalizeColumns needed " + (stop - start)/10 + "ms.");
 			System.out.println("");
-			
+
 			// Assert
 		}
 	}
@@ -129,7 +143,7 @@ public class SparseMatrixTest extends MatrixTest {
 			SecureRandom sr = new SecureRandom();
 			byte[] cols = new byte[3*numEntriesPerRow*numRows];
 			sr.nextBytes(cols);
-			
+
 			// Sparse matrix
 			SparseMatrix sparseMatrix = setupSparseMatrix(numRows, numEntriesPerRow, cols);
 			ColumnVector vector = setupColumnVector(numRows, numEntriesPerRow, cols);
@@ -140,7 +154,7 @@ public class SparseMatrixTest extends MatrixTest {
 			}
 			long stop = System.currentTimeMillis();
 			System.out.println("SparseMatrix with " + (numRows*numEntriesPerRow) + " entries, multiply needed " + (stop - start)/numTries + "ms.");
-			
+
 			// Comp row matrix
 			CompRowMatrix A = setupCompRowMatrix(numRows, numEntriesPerRow, cols);
 			DenseVector x = setupDenseVector(numRows, numEntriesPerRow, cols);
@@ -152,7 +166,7 @@ public class SparseMatrixTest extends MatrixTest {
 			stop = System.currentTimeMillis();
 			System.out.println("CompRowMatrix with " + (numRows*numEntriesPerRow) + " entries, multiply needed " + (stop - start)/10 + "ms.");
 			System.out.println("");
-			
+
 			// Assert
 			for (int i=0; i<numRows; i++) {
 				Assert.assertTrue(result.getAt(i) == y.get(i));

@@ -57,46 +57,16 @@ public final class DenseMatrix extends Matrix {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final StringBuilder builder = new StringBuilder();
 
-		final int rows = this.getRowCount();
-		final int cols = this.getColumnCount();
-		for (int i = 0; i < rows; ++i) {
-			if (0 != i)
+		this.forEach((r, c, v) -> {
+			if (0 != r && 0 == c)
 				builder.append(System.lineSeparator());
 
-			for (int j = 0; j < cols; ++j) {
-				if (0 != j)
-					builder.append(" ");
+			if (0 != c)
+				builder.append(" ");
 
-				builder.append(format.format(this.getAt(i, j)));
-			}
-		}
+			builder.append(format.format(v));
+		});
 
 		return builder.toString();
-	}
-
-	@Override
-	public int hashCode() {
-		return this.getRowCount() ^ this.getColumnCount();
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (!(obj instanceof Matrix))
-			return false;
-
-		final Matrix rhs = (Matrix)obj;
-		if (!this.isSameSize(rhs))
-			return false;
-
-		final int rows = this.getRowCount();
-		final int cols = this.getColumnCount();
-		for (int i = 0; i < rows; ++i) {
-			for (int j = 0; j < cols; ++j) {
-				if (this.getAt(i, j) != rhs.getAt(i, j))
-					return false;
-			}
-		}
-
-		return true;
 	}
 }

@@ -1,6 +1,5 @@
 package org.nem.core.math;
 
-
 /**
  * Represents a sparse matrix.
  */
@@ -199,5 +198,10 @@ public class SparseMatrix extends Matrix {
 		System.arraycopy(this.values[row], 0, newValues, 0, size);
 		this.cols[row] = newCols;
 		this.values[row] = newValues;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("[%d x %d]", this.numRows, this.numCols);
 	}
 }

@@ -19,74 +19,7 @@ public class DenseMatrixTest extends MatrixTest {
 				"2.123 11.123" + System.lineSeparator() +
 						"3.235 1.000" + System.lineSeparator() +
 						"5012.013 8.000";
-
-		// Assert:
 		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
-	}
-
-	//endregion
-
-	//region equals / hashCode
-
-	@Test
-	public void equalsReturnsFalseForNonMatrixObjects() {
-		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-
-		// Assert:
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new double[] { 0, 0, 7, 0, 0, 5 }, IsNot.not(IsEqual.equalTo((Object)matrix)));
-	}
-
-	@Test
-	public void equalsReturnsFalseForMatrixObjectsWithDifferentDimensions() {
-		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{ 0, 0, 7, 0, 0, 5 });
-
-		// Assert:
-		Assert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new DenseMatrix(3, 3), IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new DenseMatrix(2, 4), IsNot.not(IsEqual.equalTo(matrix)));
-	}
-
-	@Test
-	public void equalsReturnsTrueForEquivalentSparseMatrices() {
-		// Arrange:
-		final Matrix matrix = new DenseMatrix(100, 1000);
-		final Matrix matrix2 = new DenseMatrix(100, 1000);
-
-		// Act:
-		matrix.setAt(50, 50, 4);
-		matrix.setAt(99, 200, 9);
-
-		matrix2.setAt(50, 50, 4);
-		matrix2.setAt(99, 200, 9);
-
-		// Assert:
-		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
-	}
-
-	@Test
-	public void equalsReturnsTrueForEquivalentDenseMatrices() {
-		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
-
-		// Assert:
-		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
-	}
-
-	@Test
-	public void hashCodesAreEqualForObjectsWithEquivalentDimensions() {
-		// Arrange:
-		final Matrix matrix1 = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-
-		// Assert:
-		Assert.assertThat(this.createMatrix(2, 3).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
-		Assert.assertThat(this.createMatrix(3, 2).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
-		Assert.assertThat(this.createMatrix(2, 2).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
-		Assert.assertThat(this.createMatrix(2, 4).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
 	}
 
 	//endregion

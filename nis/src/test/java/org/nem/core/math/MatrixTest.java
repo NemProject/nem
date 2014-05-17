@@ -1,6 +1,6 @@
 package org.nem.core.math;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
@@ -24,7 +24,7 @@ public abstract class MatrixTest {
 	 * @param values The initial values.
 	 */
 	protected Matrix createMatrix(final int rows, final int cols, final double[] values) {
-		final Matrix matrix = new DenseMatrix(rows, cols);
+		final Matrix matrix = this.createMatrix(rows, cols);
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
 				final double value = values[i * cols + j];
@@ -438,6 +438,71 @@ public abstract class MatrixTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 0, 15, 0, 0 })));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	@Test
+	public void equalsReturnsFalseForNonMatrixObjects() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+
+		// Assert:
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(matrix)));
+		Assert.assertThat(new double[] { 0, 0, 7, 0, 0, 5 }, IsNot.not(IsEqual.equalTo((Object)matrix)));
+	}
+
+	@Test
+	public void equalsReturnsFalseForMatrixObjectsWithDifferentDimensions() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{ 0, 0, 7, 0, 0, 5 });
+
+		// Assert:
+		Assert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
+		Assert.assertThat(new DenseMatrix(3, 3), IsNot.not(IsEqual.equalTo(matrix)));
+		Assert.assertThat(new DenseMatrix(2, 4), IsNot.not(IsEqual.equalTo(matrix)));
+	}
+
+	@Test
+	public void equalsReturnsTrueForEquivalentSparseMatrices() {
+		// Arrange:
+		final Matrix matrix = new DenseMatrix(100, 1000);
+		final Matrix matrix2 = new DenseMatrix(100, 1000);
+
+		// Act:
+		matrix.setAt(50, 50, 4);
+		matrix.setAt(99, 200, 9);
+
+		matrix2.setAt(50, 50, 4);
+		matrix2.setAt(99, 200, 9);
+
+		// Assert:
+		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
+	}
+
+	@Test
+	public void equalsReturnsTrueForEquivalentDenseMatrices() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix2 = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
+
+		// Assert:
+		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
+	}
+
+	@Test
+	public void hashCodesAreEqualForObjectsWithEquivalentDimensions() {
+		// Arrange:
+		final Matrix matrix1 = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+
+		// Assert:
+		Assert.assertThat(this.createMatrix(2, 3).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
+		Assert.assertThat(this.createMatrix(3, 2).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
+		Assert.assertThat(this.createMatrix(2, 2).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
+		Assert.assertThat(this.createMatrix(2, 4).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
 	}
 
 	//endregion
