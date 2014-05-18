@@ -15,13 +15,9 @@ import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
-import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.Closeable;
 import java.util.*;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -29,16 +25,10 @@ public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	private final AccountDao accountDao;
-
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-
 	private final BlockDao blockDao;
-
 	private final AccountAnalyzer accountAnalyzer;
-
 	private final Foraging foraging;
-
-	private BlockScorer scorer;
 
 	@Autowired(required = true)
 	public BlockChain(
@@ -52,8 +42,6 @@ public class BlockChain implements BlockSynchronizer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.foraging = foraging;
-
-		// this.scorer = null;
 	}
 
 	public Block forageBlock() {
@@ -65,11 +53,12 @@ public class BlockChain implements BlockSynchronizer {
 		if (block != null && this.processBlock(block)) {
 			return block;
 		}
+
 		return null;
 	}
 
 	private void penalize(Node node) {
-
+		// TODO: need to do something here!
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(Set<Hash> transactionHashes, final long wantedHeight, final AccountAnalyzer accountAnalyzer) {
@@ -141,9 +130,12 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return score for iterated blocks.
 	 */
-	private long undoTxesAndGetScore(AccountAnalyzer contemporaryAccountAnalyzer, long commonBlockHeight) {
+	private long undoTxesAndGetScore(
+			final BlockScorer blockScorer,
+			final AccountAnalyzer contemporaryAccountAnalyzer,
+			long commonBlockHeight) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-				this.scorer,
+				blockScorer,
 				PartialWeightedScoreVisitor.BlockOrder.Reverse);
 
 		// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
@@ -158,13 +150,16 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 
-	private void calculatePeerChainDifficulties(Block parentBlock, final List<Block> peerChain) {
+	private void calculatePeerChainDifficulties(
+			final BlockScorer blockScorer,
+			final Block parentBlock,
+			final List<Block> peerChain) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 
 		for (Block block : peerChain) {
-			final BlockDifficulty difficulty = this.scorer.calculateDifficulty(difficulties, timestamps);
+			final BlockDifficulty difficulty = blockScorer.calculateDifficulty(difficulties, timestamps);
 			block.setDifficulty(difficulty);
 
 			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
@@ -185,15 +180,21 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return score or -1 if chain is invalid
 	 */
-	private boolean validatePeerChain(final Block parentBlock, final List<Block> peerChain) {
-		final BlockChainValidator validator = new BlockChainValidator(this.scorer, BlockChainConstants.BLOCKS_LIMIT);
-		calculatePeerChainDifficulties(parentBlock, peerChain);
+	private boolean validatePeerChain(
+			final BlockScorer blockScorer,
+			final Block parentBlock,
+			final List<Block> peerChain) {
+		final BlockChainValidator validator = new BlockChainValidator(blockScorer, BlockChainConstants.BLOCKS_LIMIT);
+		calculatePeerChainDifficulties(blockScorer, parentBlock, peerChain);
 		return validator.isValid(parentBlock, peerChain);
 	}
 
-	private long getPeerChainScore(final Block parentBlock, final List<Block> peerChain) {
+	private long getPeerChainScore(
+			final BlockScorer blockScorer,
+			final Block parentBlock,
+			final List<Block> peerChain) {
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-				this.scorer,
+				blockScorer,
 				PartialWeightedScoreVisitor.BlockOrder.Forward);
 		BlockIterator.all(parentBlock, peerChain, scoreVisitor);
 		return scoreVisitor.getScore();
@@ -232,6 +233,7 @@ public class BlockChain implements BlockSynchronizer {
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
 		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
+		final BlockScorer blockScorer = new BlockScorer(contemporaryAccountAnalyzer);
 		final SyncConnector connector = connectorPool.getSyncConnector(contemporaryAccountAnalyzer);
 		final ComparisonResult result = compareChains(connector, node);
 
@@ -244,7 +246,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
-			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
+			ourScore = undoTxesAndGetScore(blockScorer, contemporaryAccountAnalyzer, commonBlockHeight.getRaw());
 		}
 		//endregion
 
@@ -252,7 +254,7 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		updateOurChain(ourDbBlock, contemporaryAccountAnalyzer, peerChain, ourScore, !result.areChainsConsistent());
+		updateOurChain(blockScorer, ourDbBlock, contemporaryAccountAnalyzer, peerChain, ourScore, !result.areChainsConsistent());
 	}
 
 	/**
@@ -296,6 +298,7 @@ public class BlockChain implements BlockSynchronizer {
 //		}
 
 		final AccountAnalyzer contemporaryAccountAnalyzer = this.accountAnalyzer.copy();
+		final BlockScorer blockScorer = new BlockScorer(contemporaryAccountAnalyzer);
 		// EVIL hack, see issue#70
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
 		receivedBlock = BlockMapper.toModel(dbBlock, contemporaryAccountAnalyzer);
@@ -306,17 +309,18 @@ public class BlockChain implements BlockSynchronizer {
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
 			// warning: this changes number of foraged blocks
-			ourScore = undoTxesAndGetScore(contemporaryAccountAnalyzer, parent.getHeight());
+			ourScore = undoTxesAndGetScore(blockScorer, contemporaryAccountAnalyzer, parent.getHeight());
 			hasOwnChain = true;
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
-		return updateOurChain(parent, contemporaryAccountAnalyzer, peerChain, ourScore, hasOwnChain);
+		return updateOurChain(blockScorer, parent, contemporaryAccountAnalyzer, peerChain, ourScore, hasOwnChain);
 	}
 
 	private boolean updateOurChain(
+			final BlockScorer blockScorer,
 			final org.nem.nis.dbmodel.Block parent,
 			final AccountAnalyzer contemporaryAccountAnalyzer,
 			final List<Block> peerChain,
@@ -325,20 +329,17 @@ public class BlockChain implements BlockSynchronizer {
 
 		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
-		this.scorer = new BlockScorer(contemporaryAccountAnalyzer);
-		if (!validatePeerChain(parentBlock, peerChain)) {
-			this.scorer = null;
+		if (!validatePeerChain(blockScorer, parentBlock, peerChain)) {
 			// penalty?
 			return false;
 		}
 
 		// warning: this changes number of foraged blocks
-		long peerScore = getPeerChainScore(parentBlock, peerChain);
+		long peerScore = getPeerChainScore(blockScorer, parentBlock, peerChain);
 		if (peerScore < 0) {
 			// penalty?
 			return false;
 		}
-		this.scorer = null;
 
 		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
 		if (peerScore < ourScore) {
