@@ -71,13 +71,14 @@ public class HistoricalOutlinks {
 	}
 
 	/**
-	 * Returns number of HistoricalOutlink in this container.
-	 * TODO: this probably should be protected
+	 * Returns number of ALL AccountLink in this container.
 	 *
-	 * @return number of HistoricalOutlink.
+	 * @return number of AccountLink
 	 */
-	public int size() {
-		return outlinks.size();
+	public int outlinkSize() {
+		return outlinks.stream()
+				.map(a -> a.size())
+				.reduce(0, Integer::sum);
 	}
 
 	public HistoricalOutlink getLastHistoricalOutlink() {

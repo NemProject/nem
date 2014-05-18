@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.test.Utils;
@@ -16,7 +15,7 @@ public class HistoricalOutlinksTest {
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.size(), equalTo(0));
+		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
 	}
 
 	//region add
@@ -31,7 +30,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.size(), equalTo(1));
+		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
 		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
 	}
 
@@ -46,7 +45,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.size(), equalTo(2));
+		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
 		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1235)));
 	}
 	//endregion
@@ -63,7 +62,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.remove(new BlockHeight(1234), account, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.size(), equalTo(0));
+		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.remove(new BlockHeight(1235), account, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.size(), equalTo(1));
+		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(1));
 		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
 	}
 
