@@ -352,6 +352,40 @@ public abstract class MatrixTest {
 
 	//endregion
 
+	//region roundTo
+
+	@Test
+	public void denseMatrixCanBeRounded() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2.1234, 11.1234, 3.2345, 1, 5012.0126, 8 });
+
+		// Act:
+		final Matrix roundedMatrix = matrix.roundTo(2);
+
+		// Assert:
+		Assert.assertThat(
+				roundedMatrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2.12, 11.12, 3.23, 1, 5012.01, 8 })));
+	}
+
+	@Test
+	public void sparseMatrixCanBeRounded() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2);
+		matrix.setAt(2, 0, 5012.0126);
+		matrix.setAt(1, 1, 11.1234);
+
+		// Act:
+		final Matrix roundedMatrix = matrix.roundTo(1);
+
+		// Assert:
+		Assert.assertThat(
+				roundedMatrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 0, 11.1, 5012.0, 0 })));
+	}
+
+	//endregion
+
 	//region addElementWise
 
 	@Test
@@ -445,6 +479,36 @@ public abstract class MatrixTest {
 	//region multiply
 
 	@Test
+	public void denseMatrixCanBeMultipliedByScalar() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+
+		// Act:
+		final Matrix result = matrix.multiply(0.1);
+
+		// Assert:
+		Assert.assertThat(
+				result.roundTo(5),
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.3, 0.5, 1.1, 0.1, 0.8 })));
+	}
+
+	@Test
+	public void sparseMatrixCanBeMultipliedByScalar() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2);
+		matrix.setAt(2, 0, 3);
+		matrix.setAt(1, 1, 5);
+
+		// Act::
+		final Matrix result = matrix.multiply(0.2);
+
+		// Assert:
+		Assert.assertThat(
+				result.roundTo(5),
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.0, 0.0, 0.0, 1.0, 0.6, 0.0 })));
+	}
+
+	@Test
 	public void matrixCannotBeMultipliedByVectorOfDifferentSize() {
 		// Arrange:
 		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 11, -1, 8 });
@@ -467,6 +531,53 @@ public abstract class MatrixTest {
 		Assert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
 		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-9.0));
 		Assert.assertThat(result.getAt(2), IsEqual.equalTo(14.0));
+	}
+
+	@Test
+	public void sparseMatrixCanBeMultipliedByVectorOfSameSize() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, -1, -5, 0 });
+		final ColumnVector vector = new ColumnVector(2, 3);
+
+		// Act:
+		final ColumnVector result = matrix.multiply(vector);
+
+		// Assert:
+		Assert.assertThat(result.getAt(0), IsEqual.equalTo(4.0));
+		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-3.0));
+		Assert.assertThat(result.getAt(2), IsEqual.equalTo(-10.0));
+	}
+
+	//endregion
+
+	//region abs / sqrt
+
+	@Test
+	public void absoluteValueOfMatrixCanBeTaken() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 0, -1, 8 });
+
+		// Act:
+		final Matrix result = matrix.abs();
+
+		// Assert:
+		Assert.assertThat(
+				result,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 3, 5, 0, 1, 8 })));
+	}
+
+	@Test
+	public void squareRootOfMatrixCanBeTaken() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 625, 4, 0, 36, 49, 121 });
+
+		// Act:
+		final Matrix result = matrix.sqrt();
+
+		// Assert:
+		Assert.assertThat(
+				result,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 25, 2, 0, 6, 7, 11 })));
 	}
 
 	//endregion

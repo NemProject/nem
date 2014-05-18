@@ -5,15 +5,16 @@ import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.function.DoubleFunction;
+import java.util.function.*;
 
 /**
  * Represents a linear algebra vector.
  */
-public class ColumnVector implements Cloneable {
+public class ColumnVector {
 
 	private final int size;
 	private final double[] vector;
+	private final DenseMatrix matrix;
 
 	/**
 	 * Creates a new vector of the specified size.
@@ -26,6 +27,7 @@ public class ColumnVector implements Cloneable {
 
 		this.size = size;
 		this.vector = new double[this.size];
+		this.matrix = new DenseMatrix(this.size, 1, this.vector);
 	}
 
 	/**
@@ -39,16 +41,19 @@ public class ColumnVector implements Cloneable {
 
 		this.size = vector.length;
 		this.vector = vector;
+		this.matrix = new DenseMatrix(this.size, 1, this.vector);
 	}
 
-	/**
-	 * Gets the underlying, raw array.
-	 *
-	 * @return The underlying, raw array.
-	 */
-	public double[] getRaw() {
-		return this.vector;
+	private ColumnVector(final Matrix matrix) {
+		// since this is only being called internally, matrix should be a DenseMatrix
+		this.matrix = (DenseMatrix)matrix;
+		this.vector = this.matrix.getRaw();
+		this.size = this.vector.length;
 	}
+
+	//region matrix delegation
+
+	//region size / {get|set|increment}At
 
 	/**
 	 * Gets the size of the vector.
@@ -56,7 +61,7 @@ public class ColumnVector implements Cloneable {
 	 * @return The size of the vector.
 	 */
 	public int size() {
-		return this.size;
+		return this.matrix.getRowCount();
 	}
 
 	/**
@@ -67,7 +72,7 @@ public class ColumnVector implements Cloneable {
 	 * @return The value.
 	 */
 	public double getAt(final int index) {
-		return this.vector[index];
+		return this.matrix.getAt(index, 0);
 	}
 
 	/**
@@ -77,7 +82,7 @@ public class ColumnVector implements Cloneable {
 	 * @param val   The value.
 	 */
 	public void setAt(final int index, double val) {
-		this.vector[index] = val;
+		this.matrix.setAt(index, 0, val);
 	}
 
 	/**
@@ -87,7 +92,142 @@ public class ColumnVector implements Cloneable {
 	 * @param val   The value.
 	 */
 	public void incrementAt(final int index, double val) {
-		this.vector[index] += val;
+		this.matrix.incrementAt(index, 0, val);
+	}
+
+	//endregion
+
+	//region mutation functions
+
+	/**
+	 * Normalizes this vector's elements so that the absolute value of all
+	 * elements sums to 1.0.
+	 *
+	 * This method has the side effect of modifying the implicit context
+	 * object, so be careful.
+	 */
+	public void normalize() {
+		this.matrix.normalizeColumns();
+	}
+
+	/**
+	 * Scales this vector by dividing all of its elements by the specified factor.
+	 *
+	 * @param scale The scale factor.
+	 */
+	public void scale(final double scale) {
+		this.matrix.scale(scale);
+	}
+
+	//endregion
+
+	//region element-wise operations
+
+	/**
+	 * Creates a new ColumnVector by multiplying this vector element-wise with
+	 * another vector.
+	 *
+	 * @param vector The vector.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector multiplyElementWise(final ColumnVector vector) {
+		return this.transform(() -> this.matrix.multiplyElementWise(vector.matrix));
+	}
+
+	/**
+	 * Creates a new ColumnVector by adding the specified vector to this vector.
+	 *
+	 * @param vector The specified vector.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector add(final ColumnVector vector) {
+		return this.transform(() -> this.matrix.addElementWise(vector.matrix));
+	}
+
+	//endregion
+
+	//region aggregation functions
+
+	/**
+	 * Gets the sum of the absolute value of all the vector's elements.
+	 *
+	 * @return The sum of the absolute value of all the vector's elements.
+	 */
+	public double absSum() {
+		return this.matrix.absSum();
+	}
+
+	/**
+	 * Gets the sum of all the vector's elements.
+	 *
+	 * @return The sum of all the vectors elements.
+	 */
+	public double sum() {
+		return this.matrix.sum();
+	}
+
+	//endregion
+
+	//region transforms
+
+	/**
+	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
+	 *
+	 * @param numPlaces The number of decimal places.
+	 * @return The new vector.
+	 */
+	public ColumnVector roundTo(final int numPlaces) {
+		return this.transform(() -> this.matrix.roundTo(numPlaces));
+	}
+
+	/**
+	 * Creates a new ColumnVector by multiplying this vector by a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new vector.
+	 */
+	public ColumnVector multiply(final double scalar) {
+		return this.transform(() -> this.matrix.multiply(scalar));
+	}
+
+	/**
+	 * Creates a new ColumnVector by taking the square root of each element in this vector.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector sqrt() {
+		return this.transform(this.matrix::sqrt);
+	}
+
+	/**
+	 * Creates a new ColumnVector by taking the absolute value of each element in this vector.
+	 *
+	 * @return The new vector.
+	 */
+	public ColumnVector abs() {
+		return this.transform(this.matrix::abs);
+	}
+
+	private ColumnVector transform(final Supplier<Matrix> supplier) {
+		final Matrix matrix = supplier.get();
+		return new ColumnVector(matrix);
+	}
+
+	//endregion
+
+	//endregion
+
+	//region getRaw / setAll
+
+	/**
+	 * Gets the underlying, raw array.
+	 *
+	 * @return The underlying, raw array.
+	 */
+	public double[] getRaw() {
+		return this.vector;
 	}
 
 	/**
@@ -100,31 +240,9 @@ public class ColumnVector implements Cloneable {
 			this.vector[i] = val;
 	}
 
-	/**
-	 * Gets the sum of all the vector's elements.
-	 *
-	 * @return The sum of all the vectors elements.
-	 */
-	public double sum() {
-		double sum = 0.0;
-		for (double value : this.vector)
-			sum += value;
+	//endregion
 
-		return sum;
-	}
-
-	/**
-	 * Gets the sum of the absolute value of all the vector's elements.
-	 *
-	 * @return The sum of the absolute value of all the vector's elements.
-	 */
-	public double absSum() {
-		double sum = 0.0;
-		for (double value : this.vector)
-			sum += Math.abs(value);
-
-		return sum;
-	}
+	//region align
 
 	/**
 	 * Scales this vector so that v[0] is equal to 1.
@@ -141,30 +259,9 @@ public class ColumnVector implements Cloneable {
 		return true;
 	}
 
-	/**
-	 * Normalizes this vector's elements so that the absolute value of all
-	 * elements sums to 1.0.
-	 * 
-	 * This method has the side effect of modifying the implicit context 
-	 * object, so be careful.
-	 */
-	public void normalize() {
-		double sum = this.absSum();
-		if (0.0 == sum)
-			return;
+	//endregion
 
-		this.scale(sum);
-	}
-
-	/**
-	 * Scales this vector by dividing all of its elements by the specified factor.
-	 *
-	 * @param scale The scale factor.
-	 */
-	public void scale(final double scale) {
-		for (int i = 0; i < this.size; ++i)
-			this.vector[i] /= scale;
-	}
+	//region getMagnitude / max / median
 
 	/**
 	 * Gets the magnitude of this vector.
@@ -183,9 +280,8 @@ public class ColumnVector implements Cloneable {
 	 */
 	public double max() {
 		double maxVal = this.vector[0];
-		for (double val : this.vector) {
+		for (double val : this.vector)
 			maxVal = Math.max(maxVal, val);
-		}
 		
 		return maxVal;
 	}
@@ -200,87 +296,9 @@ public class ColumnVector implements Cloneable {
 		return median.evaluate(this.vector);
 	}
 
-	/**
-	 * Creates a new ColumnVector by adding the specified vector to this vector.
-	 *
-	 * @param vector The specified vector.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector add(final ColumnVector vector) {
-		if (this.size != vector.size)
-			throw new IllegalArgumentException("cannot add vectors with different sizes");
+	//endregion
 
-		final ColumnVector result = new ColumnVector(this.size);
-		for (int i = 0; i < this.size; ++i)
-			result.vector[i] = this.vector[i] + vector.vector[i];
-
-		return result;
-	}
-	
-	/**
-	 * Creates a new ColumnVector by taking the square root of each element in this vector.
-	 * We take the absolute value of each element and then take its square root.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector sqrt() {
-		final ColumnVector result = new ColumnVector(this.size);
-		for (int i = 0; i < this.size; ++i)
-			result.vector[i] = Math.sqrt(Math.abs(this.vector[i]));
-
-		return result;
-	}
-
-	/**
-	 * Creates a new ColumnVector by multiplying this vector element-wise with
-	 * another vector.
-	 *
-	 * @param vector The vector.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector multiplyElementWise(final ColumnVector vector) {
-		if (this.size != vector.size)
-			throw new IllegalArgumentException("vector sizes must be equal");
-
-		final ColumnVector result = new ColumnVector(this.size);
-		for (int i = 0; i < this.size; ++i)
-			result.vector[i] = this.vector[i] * vector.vector[i];
-
-		return result;
-	}
-
-	/**
-	 * Creates a new ColumnVector by multiplying this vector by a scalar.
-	 *
-	 * @param scalar The scalar.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector multiply(final double scalar) {
-		final ColumnVector result = new ColumnVector(this.size);
-		for (int i = 0; i < this.size; ++i)
-			result.vector[i] = this.vector[i] * scalar;
-
-		return result;
-	}
-
-	/**
-	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
-	 *
-	 * @param numPlaces The number of places to round.
-	 *
-	 * @return The new vector.
-	 */
-	public ColumnVector roundTo(final int numPlaces) {
-		double multipler = Math.pow(10, numPlaces);
-		final ColumnVector result = new ColumnVector(this.size);
-		for (int i = 0; i < this.size; ++i)
-			result.vector[i] = Math.round(this.vector[i] * multipler) / multipler;
-
-		return result;
-	}
+	//region distance
 
 	/**
 	 * Calculates the Manhattan distance (L1-norm) between the specified vector and this vector.
@@ -317,6 +335,10 @@ public class ColumnVector implements Cloneable {
 		return distance;
 	}
 
+	//endregion
+
+	//region toString
+
 	@Override
 	public String toString() {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -332,6 +354,10 @@ public class ColumnVector implements Cloneable {
 		return builder.toString();
 	}
 
+	//endregion
+
+	//region hashCode / equals
+
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(this.vector);
@@ -345,4 +371,6 @@ public class ColumnVector implements Cloneable {
 		final ColumnVector rhs = (ColumnVector)obj;
 		return Arrays.equals(this.vector, rhs.vector);
 	}
+
+	//endregion
 }

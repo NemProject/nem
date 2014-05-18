@@ -237,6 +237,8 @@ public abstract class Matrix {
 
 	//endregion
 
+	//region transforms
+
 	/**
 	 * Transposes this matrix.
 	 *
@@ -244,9 +246,56 @@ public abstract class Matrix {
 	 */
 	public final Matrix transpose() {
 		final Matrix transposedMatrix = this.create(this.getColumnCount(), this.getRowCount());
-		forEach((r, c, v) -> transposedMatrix.setAtUnchecked(c, r, v));
+		this.forEach((r, c, v) -> transposedMatrix.setAtUnchecked(c, r, v));
 		return transposedMatrix;
 	}
+
+	/**
+	 * Creates a new matrix by rounding all elements in this matrix to the specified number of decimal places.
+	 *
+	 * @param numPlaces The number of decimal places.
+	 * @return The new matrix.
+	 */
+	public Matrix roundTo(final int numPlaces) {
+		final double multipler = Math.pow(10, numPlaces);
+		return this.transform(v -> Math.round(v * multipler) / multipler);
+	}
+
+	/**
+	 * Creates a new matrix by multiplying this matrix by a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new matrix.
+	 */
+	public Matrix multiply(final double scalar) {
+		return this.transform(v -> v * scalar);
+	}
+
+	/**
+	 * Creates a new matrix by taking the absolute value of this matrix.
+	 *
+	 * @return The new matrix.
+	 */
+	public Matrix abs() {
+		return this.transform(Math::abs);
+	}
+
+	/**
+	 * Creates a new matrix by taking the square root of this matrix.
+	 *
+	 * @return The new matrix.
+	 */
+	public Matrix sqrt() {
+		return this.transform(Math::sqrt);
+	}
+
+	private Matrix transform(final DoubleUnaryOperator op) {
+		final Matrix matrix = this.create(this.getRowCount(), this.getColumnCount());
+		this.forEach((r, c, v) -> matrix.setAtUnchecked(r, c, op.applyAsDouble(v)));
+		return matrix;
+	}
+
+	//endregion
 
 	/**
 	 * Determines if two this matrix and another matrix have the same dimensions.

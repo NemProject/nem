@@ -153,14 +153,14 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector coinDaysVector) {
 
-		// norm(outlink 2 + PR)*stake + sqrt(stake)
+		// norm(outlink 2 + PR)*stake + sqrt(abs(stake))
 
 		outLinkVector.normalize();
 		ColumnVector vector = outLinkVector.multiply(2.0).add(
 				importanceVector);
 		vector.normalize();
 
-		ColumnVector sqrtcoindays = coinDaysVector.sqrt();
+		ColumnVector sqrtcoindays = coinDaysVector.abs().sqrt();
 
 		return vector.multiplyElementWise(
 				coinDaysVector).add(sqrtcoindays);

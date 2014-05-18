@@ -24,6 +24,32 @@ public final class DenseMatrix extends Matrix {
 		this.values = new double[this.getElementCount()];
 	}
 
+	/**
+	 * Creates a new matrix of the specified size and values.
+	 *
+	 * @param rows The desired number of rows.
+	 * @param cols The desired number of columns.
+	 * @param values The specified values.
+	 */
+	public DenseMatrix(final int rows, final int cols, final double[] values) {
+		super(rows, cols);
+
+		if (values.length != this.getElementCount())
+			throw new IllegalArgumentException("incompatible number of values");
+
+		this.numCols = cols;
+		this.values = values;
+	}
+
+	/**
+	 * Gets the underlying, raw array.
+	 *
+	 * @return The underlying, raw array.
+	 */
+	public double[] getRaw() {
+		return this.values;
+	}
+
 	//region Matrix abstract functions
 
 	@Override

@@ -87,7 +87,7 @@ public class ColumnVectorTest {
 
 			// Act:
 			vector.getAt(index);
-		}, ArrayIndexOutOfBoundsException.class);
+		}, IndexOutOfBoundsException.class);
 	}
 
 	//endregion
@@ -417,7 +417,7 @@ public class ColumnVectorTest {
 
 	//endregion
 
-	//region roundTo
+	//region roundTo / abs / sqrt
 
 	@Test
 	public void vectorCanBeRounded() {
@@ -432,9 +432,18 @@ public class ColumnVectorTest {
 		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(0.00, -0.12, 0.58)));
 	}
 
-	//endregion
+	@Test
+	public void vectorAbsoluteValueCanBeTaken() {
+		// Arrange:
+		final ColumnVector vector = new ColumnVector(12.4, -2.1, 7);
 
-	//region roundTo
+		// Act:
+		final ColumnVector result = vector.abs();
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(vector)));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(12.4, 2.1, 7)));
+	}
 
 	@Test
 	public void vectorCanBeSquareRooted() {
