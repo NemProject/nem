@@ -29,7 +29,7 @@ public class BlockScorer {
 	/**
 	 * Number of blocks which the calculation of difficulty should include 
 	 */
-    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
+    public static final int NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
 
     /**
      * Helper constant calculating the logarithm of BigInteger
