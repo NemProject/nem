@@ -33,8 +33,8 @@ import org.nem.nis.test.MockAccount;
  * - small transaction spam attack<br/>
  * -
  */
-public class POIV1ImplTest {
-	private static final Logger LOGGER = Logger.getLogger(POIV1ImplTest.class.getName());
+public class PoiAlphaImplTest {
+	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImplTest.class.getName());
 
 	static private final int OUTLINK_STRATEGY_NONE = 0;
 	static private final int OUTLINK_STRATEGY_RANDOM = 1;
@@ -57,7 +57,7 @@ public class POIV1ImplTest {
 		List<Account> accts = Arrays.asList(a, b, c);
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
@@ -114,7 +114,7 @@ public class POIV1ImplTest {
 		List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
@@ -143,7 +143,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -170,7 +170,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, i, 800, 1, 400, OUTLINK_STRATEGY_LOOP));
 	
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
@@ -198,7 +198,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, i, i*50, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
@@ -230,7 +230,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, i, i*8000, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
@@ -261,7 +261,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, 1, 800, i, 400, OUTLINK_STRATEGY_LOOP_SELF));
 	
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/importances.getAt(1);
@@ -286,7 +286,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 50, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -311,7 +311,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -336,7 +336,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, 10, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -361,7 +361,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, 2, 10000, 2, 9900, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -389,7 +389,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, i, 800, 1, 400, OUTLINK_STRATEGY_ALL_TO_ONE));
 	
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
 //			System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
@@ -417,7 +417,7 @@ public class POIV1ImplTest {
 		accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		POI poi = new POIV1Impl();
+		Poi poi = new PoiAlphaImpl();
 		System.out.println("Starting poi calculation.");
 		long start = System.currentTimeMillis();
 		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
@@ -447,7 +447,7 @@ public class POIV1ImplTest {
 			accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 			// Act: calculate importances
-			POI poi = new POIV1Impl();
+			Poi poi = new PoiAlphaImpl();
 			System.out.println("Starting poi calculation.");
 			long start = System.currentTimeMillis();
 			ColumnVector importances = poi.getAccountImportances(height, accounts);
