@@ -5,6 +5,8 @@ package org.nem.core.math;
  */
 public class SparseMatrix extends Matrix {
 
+	private double REALLOC_MULTIPLIER = 1.6;
+
 	private final int numRows;
 	private final int numCols;
 	private final int initialCapacityPerRow;
@@ -150,9 +152,10 @@ public class SparseMatrix extends Matrix {
 	 */
 	private void reallocate(int row) {
 		// Hopefully doesn't happen too often
-		int size = this.cols[row].length;
-		int[] newCols = new int[size*2];
-		double[] newValues = new double[size*2];
+		final int size = this.cols[row].length;
+		final int newSize = (int)Math.ceil(REALLOC_MULTIPLIER * size);
+		final int[] newCols = new int[newSize];
+		final double[] newValues = new double[newSize];
 		System.arraycopy(this.cols[row], 0, newCols, 0, size);
 		System.arraycopy(this.values[row], 0, newValues, 0, size);
 		this.cols[row] = newCols;
