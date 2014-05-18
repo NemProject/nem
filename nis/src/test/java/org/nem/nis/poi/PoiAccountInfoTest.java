@@ -48,10 +48,10 @@ public class PoiAccountInfoTest {
 	@Test
 	public void hasOutLinksIsOnlyTrueWhenAccountHasAtLeastOneOutLink() {
 		// Assert:
-		Assert.assertThat(createAccountInfoWithNullOutLinks().hasOutLinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutLinks().hasOutLinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutLinks(1).hasOutLinks(), IsEqual.equalTo(true));
-		Assert.assertThat(createAccountInfoWithOutLinks(2, 4).hasOutLinks(), IsEqual.equalTo(true));
+		Assert.assertThat(createAccountInfoWithNullOutLinks().hasOutLinks(BlockHeight.ONE), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithOutLinks().hasOutLinks(BlockHeight.ONE), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithOutLinks(1).hasOutLinks(BlockHeight.ONE), IsEqual.equalTo(true));
+		Assert.assertThat(createAccountInfoWithOutLinks(2, 4).hasOutLinks(BlockHeight.ONE), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class PoiAccountInfoTest {
 		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
 
 		// Assert:
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(0.0));
+		Assert.assertThat(info.getOutLinkScore(BlockHeight.ONE), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -90,8 +90,8 @@ public class PoiAccountInfoTest {
 		final PoiAccountInfo info2 = new PoiAccountInfo(info.getIndex(), info.getAccount(), new BlockHeight(2881));
 
 		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(15.0e06));
-		Assert.assertThat(info2.getOutLinkScore(), IsEqual.equalTo(15.0e06 * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE));
+		Assert.assertThat(info.getOutLinkScore(BlockHeight.ONE), IsEqual.equalTo(15.0e06));
+		Assert.assertThat(info2.getOutLinkScore(BlockHeight.ONE), IsEqual.equalTo(15.0e06 * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE));
 	}
 
 	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
@@ -102,7 +102,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
 		for (final AccountLink accountLink : outLinks) {
-			account.addOutlink(accountLink);
+			account.addHistoricalOutlink(height, accountLink);
 		}
 		return new PoiAccountInfo(11, account, height);
 	}
@@ -113,7 +113,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		for (int amount : amounts) {
 			final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-			account.addOutlink(link);
+			account.addHistoricalOutlink(height, link);
 		}
 
 		return new PoiAccountInfo(11, account, height);

@@ -52,7 +52,7 @@ public class POIV1ImplTest {
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// A sends all 100 NEM to B,
-		a.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), b));
+		a.addHistoricalOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(100), b));
 
 		List<Account> accts = Arrays.asList(a, b, c);
 
@@ -94,23 +94,23 @@ public class POIV1ImplTest {
 
 		//TODO: we really need the infrastructure for adding coinday-weighted links and updating balances.
 		// A sends all 400 NEM to B,
-		a.addOutlink(new AccountLink(blockHeight, Amount.fromNem(400), b));
-		
+		addOutlink(a, b, blockHeight, 400);
+
 		//who sends 300 NEM to C,
-		b.addOutlink(new AccountLink(blockHeight, Amount.fromNem(300), c));
-		
+		addOutlink(b, c, blockHeight, 300);
+
 		//who sends 200 NEM to D,
-		c.addOutlink(new AccountLink(blockHeight, Amount.fromNem(200), d));
-				
+		addOutlink(c, d, blockHeight, 200);
+
 		// who sends 100 to A.
-		d.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), a));
-		
+		addOutlink(d, a, blockHeight, 100);
+
 		// e sends 100 NEM to g
-		e.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), g));
-		
+		addOutlink(e, g, blockHeight, 100);
+
 		// g sends 100 NEM to f
-		g.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), f));
-		
+		addOutlink(g, f, blockHeight, 100);
+
 		List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
@@ -126,6 +126,10 @@ public class POIV1ImplTest {
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(1));// a>b
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(2));// a>c
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(3));// a>d
+	}
+
+	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
+		a.addHistoricalOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(amount), b));
 	}
 
 	@Test
@@ -503,7 +507,7 @@ public class POIV1ImplTest {
 						break;
 				}
 				long outlinkStrength = (account.getBalance().getNumNem() * totalOutLinkStrength)/((totalVestedBalance - totalOutLinkStrength) * numOutLinksPerAccount);
-				account.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(outlinkStrength), otherAccount));
+				addOutlink(account, otherAccount, BlockHeight.ONE, outlinkStrength);
 			}
 		}
 		

@@ -17,8 +17,7 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	
-	private final List<AccountLink> outlinks;
-	private HistoricalOutlinks historicalOutlinks;
+	private final HistoricalOutlinks historicalOutlinks;
 	
 	private BlockAmount foragedBlocks;
 	private WeightedBalances weightedBalances;
@@ -54,7 +53,7 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		this.weightedBalances = new WeightedBalances();
-		this.outlinks = new LinkedList<>();
+		this.historicalOutlinks = new HistoricalOutlinks();
 	}
 
 	/**
@@ -239,12 +238,6 @@ public class Account implements SerializableEntity {
 		this.weightedBalances.undoReceive(blockHeight, amount);
 	}
 
-	/**
-	 * @param acctLink - an outlink to add
-	 */
-	public void addOutlink(final AccountLink acctLink) {
-		this.outlinks.add(acctLink);
-	}
 	
 	/**
 	 * @param accountLink - an outlink to add
@@ -263,19 +256,12 @@ public class Account implements SerializableEntity {
 	/**
 	 * @return the outlinks
 	 */
-	public Iterator<AccountLink> getOutlinksIterator() {
-		return outlinks.iterator();
+	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
+		return historicalOutlinks.outlinksIterator(blockHeight);
 	}
 
-	public int getOutlinksSize() {
-		return outlinks.size();
-	}
-
-	/**
-	 * @return the outlinks
-	 */
-	public List<AccountLink> getOutlinks(final BlockHeight blockHeight) {
-		return null; //TODO:
+	public int getOutlinksSize(final BlockHeight blockHeight) {
+		return historicalOutlinks.outlinksSize(blockHeight);
 	}
 	
 	@Override

@@ -25,17 +25,17 @@ public class PoiAccountInfo {
 	 * @param account The account.
 	 * @param height The height at which the strength is evaluated
 	 */
-	public PoiAccountInfo(final int index, final Account account, BlockHeight height) {
+	public PoiAccountInfo(final int index, final Account account, final BlockHeight height) {
 		this.index = index;
 		this.account = account;
 
-		if (!this.hasOutLinks()) {
+		if (!this.hasOutLinks(height)) {
 			this.outLinkWeightsVector = null;
 			return;
 		}
 
-		final Iterator<AccountLink> outLinks = this.account.getOutlinksIterator();
-		this.outLinkWeightsVector = new ColumnVector(this.account.getOutlinksSize());
+		final Iterator<AccountLink> outLinks = this.account.getOutlinksIterator(height);
+		this.outLinkWeightsVector = new ColumnVector(this.account.getOutlinksSize(height));
 
 		// weight = outlink amount * DECAY_BASE^(age in days)
 		int i = 0;
@@ -78,8 +78,8 @@ public class PoiAccountInfo {
 	 *
 	 * @return true if the account has any out-links.
 	 */
-	public boolean hasOutLinks() {
-		return this.account.getOutlinksSize() != 0;
+	public boolean hasOutLinks(final BlockHeight blockHeight) {
+		return this.account.getOutlinksSize(blockHeight) != 0;
 	}
 
 	/**
@@ -96,8 +96,8 @@ public class PoiAccountInfo {
 	 *
 	 * @return The out-link score.
 	 */
-	public double getOutLinkScore() {
-		if (!this.hasOutLinks())
+	public double getOutLinkScore(final BlockHeight blockHeight) {
+		if (!this.hasOutLinks(blockHeight))
 			return 0;
 
 		final double weightsMedian = this.outLinkWeightsVector.median();

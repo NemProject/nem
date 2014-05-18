@@ -155,7 +155,8 @@ public class PoiContext {
 			int numOutLinks = 0;
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
-				numOutLinks += account.getOutlinksSize();
+				numOutLinks += account.getOutlinksSize(height);
+
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
 				// TODO: I would recommend playing around with this after we get POI working initially
@@ -166,9 +167,9 @@ public class PoiContext {
 
 				this.accountInfos.add(accountInfo);
 				this.vestedBalanceVector.setAt(i, account.getVestedBalance(height).getNumMicroNem());
-				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
+				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore(height));
 
-				if (!accountInfo.hasOutLinks()) {
+				if (!accountInfo.hasOutLinks(height)) {
 					this.dangleIndexes.add(i);
 					this.dangleVector.setAt(i, 0);
 				}
@@ -177,7 +178,7 @@ public class PoiContext {
 			}
 
 			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks<i ? 1 : numOutLinks/i);
-			createOutLinkMatrix();
+			createOutLinkMatrix(height);
 
 			// Initially set importance to the row sum vector of the outlink matrix
 			// TODO: Is there a better way to estimate the eigenvector
@@ -192,14 +193,14 @@ public class PoiContext {
 			this.importanceVector.normalize();			
 		}
 
-		private void createOutLinkMatrix() {
+		private void createOutLinkMatrix(BlockHeight height) {
 			for (final PoiAccountInfo accountInfo : accountInfos) {
 
-				if (!accountInfo.hasOutLinks())
+				if (!accountInfo.hasOutLinks(height))
 					continue;
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
-				final Iterator<AccountLink> accountLinkIterator = accountInfo.getAccount().getOutlinksIterator();
+				final Iterator<AccountLink> accountLinkIterator = accountInfo.getAccount().getOutlinksIterator(height);
 				for (int j = 0; j < outLinkWeights.size(); ++j) {
 					final AccountLink outLink = accountLinkIterator.next();
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
