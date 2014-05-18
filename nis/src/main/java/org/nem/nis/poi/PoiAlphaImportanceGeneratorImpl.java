@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
@@ -19,15 +19,12 @@ import java.util.Collection;
  *    I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
  *
  */
-public class PoiAlphaImpl implements Poi {
+public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 	public static final int DEFAULT_MAX_ITERS = 200;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
-	public ColumnVector getAccountImportances(final BlockHeight blockHeight, Collection<Account> accounts) {
-		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEWV2);
-	}
-
+	@Override
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, Collection<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
 		return calculateImportancesImpl(blockHeight, accounts, scoringAlg);
 	}

@@ -9,6 +9,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.poi.*;
 
 /**
  * Account cache that implements AccountLookup and provides the lookup of accounts
@@ -20,7 +21,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 
 	private final ConcurrentHashMap<Address, Account> addressToAccountMap;
 
-	private final Poi poi;
+	private final PoiImportanceGenerator importanceGenerator;
 
 	private BlockHeight lastPoiRecalc;
 
@@ -29,7 +30,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	 */
 	public AccountAnalyzer() {
 		this.addressToAccountMap = new ConcurrentHashMap<>();
-		this.poi = new PoiAlphaImpl();
+		this.importanceGenerator = new PoiAlphaImportanceGeneratorImpl();
 	}
 
 	/**
@@ -142,7 +143,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	public void recalculateImportances(final BlockHeight blockHeight) {
 		if (lastPoiRecalc == null || lastPoiRecalc.compareTo(blockHeight) != 0) {
 			final Collection<Account> accounts = this.addressToAccountMap.values();
-			final ColumnVector poiVector = poi.getAccountImportances(blockHeight, accounts);
+			final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
 
 			// TODO: I'm missing something like for (pair : zip(accounts, poiVector))
 			int i = 0;

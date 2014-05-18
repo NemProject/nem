@@ -1,22 +1,15 @@
-package org.nem.nis;
+package org.nem.nis.poi;
 
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.Account;
-import org.nem.core.model.AccountLink;
-import org.nem.core.model.Amount;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.poi.PoiScorer;
 import org.nem.nis.test.MockAccount;
 
 /**
@@ -33,8 +26,8 @@ import org.nem.nis.test.MockAccount;
  * - small transaction spam attack<br/>
  * -
  */
-public class PoiAlphaImplTest {
-	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImplTest.class.getName());
+public class PoiAlphaImportanceGeneratorImplTest {
+	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
 
 	static private final int OUTLINK_STRATEGY_NONE = 0;
 	static private final int OUTLINK_STRATEGY_RANDOM = 1;
@@ -57,8 +50,7 @@ public class PoiAlphaImplTest {
 		List<Account> accts = Arrays.asList(a, b, c);
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
+		ColumnVector importances = getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
 		// Assert
@@ -114,8 +106,7 @@ public class PoiAlphaImplTest {
 		List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
+		ColumnVector importances = getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
 		// Assert:
@@ -138,13 +129,12 @@ public class PoiAlphaImplTest {
 		
 		// Arrange:
 		// TODO: Loops should be detected.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP_SELF));
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
@@ -163,15 +153,14 @@ public class PoiAlphaImplTest {
 
 		// Arrange 1 vs many:
 		// Splitting of one account into many small accounts should have no influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		for (int i=2; i<10; i++) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
 			accounts.addAll(createUserAccounts(1, i, 800, 1, 400, OUTLINK_STRATEGY_LOOP));
 	
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
 			System.out.print("1 vs. " + i + ": User 1 importance is " + format.format(importances.getAt(0)));
@@ -190,7 +179,7 @@ public class PoiAlphaImplTest {
 
 		// Arrange 1 vs 8, with lazy accounts:
 		// The presence of many small lazy accounts should have no influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		for (int i=0; i<400; i=i+40) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -198,8 +187,7 @@ public class PoiAlphaImplTest {
 			accounts.addAll(createUserAccounts(1, i, i*50, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j=1; j<9; j++) {
@@ -222,7 +210,7 @@ public class PoiAlphaImplTest {
 
 		// Arrange 1 vs 8, with 0 or 1 big lazy account:
 		// The presence of a big lazy account should have no influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		for (int i=0; i<2; i++) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -230,8 +218,7 @@ public class PoiAlphaImplTest {
 			accounts.addAll(createUserAccounts(1, i, i*8000, 0, 0, OUTLINK_STRATEGY_NONE));
 	
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j=1; j<9; j++) {
@@ -254,15 +241,14 @@ public class PoiAlphaImplTest {
 
 		// Arrange 1 vs 1, the latter distributes the strength to many outlinks:
 		// Splitting one transaction into many small transactions should have no influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		for (int i=1; i<10; i++) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
 			accounts.addAll(createUserAccounts(1, 1, 800, i, 400, OUTLINK_STRATEGY_LOOP_SELF));
 	
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+			ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/importances.getAt(1);
 			System.out.print("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(0)));
@@ -281,13 +267,12 @@ public class PoiAlphaImplTest {
 		
 		// Arrange:
 		// The strength of an outlink should have influence on the importance distribution (but how much?).
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 50, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
@@ -306,13 +291,12 @@ public class PoiAlphaImplTest {
 		
 		// Arrange:
 		// The vested balance of an account should have influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
@@ -331,13 +315,12 @@ public class PoiAlphaImplTest {
 		//TODO: I don't know why the outlinks vectors are the same for the two groups of accounts below.
 		// Arrange:
 		// Accounts with smaller vested balance should be able to have more importance than accounts with high balance and low activity
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, 10, 10000, 1, 500, OUTLINK_STRATEGY_RANDOM));
 		accounts.addAll(createUserAccounts(1, 10, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
@@ -356,13 +339,12 @@ public class PoiAlphaImplTest {
 		LOGGER.info("Check that an account can't just send most of their balance to another account to boost their score");
 		// Arrange:
 		// Accounts should not just be able to transfer all their balance to another account to boost their score
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, 2, 10000, 2, 100, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(createUserAccounts(1, 2, 10000, 2, 9900, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
@@ -382,15 +364,14 @@ public class PoiAlphaImplTest {
 
 		// Arrange 1 vs many, the latter concentrate the strength to one account:
 		// Colluding accounts that try to push one account with many links should have no influence on the importance distribution.
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		for (int i=4; i<40; i++) {
 			accounts.clear();
 			accounts.addAll(createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
 			accounts.addAll(createUserAccounts(1, i, 800, 1, 400, OUTLINK_STRATEGY_ALL_TO_ONE));
 	
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
-			ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEW);
+			ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 //			System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double ratio = importances.getAt(0)/(importances.sum() - importances.getAt(0));
@@ -413,14 +394,13 @@ public class PoiAlphaImplTest {
 		// TODO: why 1s?
 		System.out.println("Setting up accounts.");
 		int numAccounts = 5000;
-		List<Account> accounts = new ArrayList<Account>();
+		List<Account> accounts = new ArrayList<>();
 		accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		Poi poi = new PoiAlphaImpl();
 		System.out.println("Starting poi calculation.");
 		long start = System.currentTimeMillis();
-		ColumnVector importances = poi.getAccountImportances(new BlockHeight(1), accounts);
+		getAccountImportances(new BlockHeight(1), accounts);
 		long stop = System.currentTimeMillis();
 		System.out.println("Finished poi calculation.");
 
@@ -443,14 +423,13 @@ public class PoiAlphaImplTest {
 		long prevTimeDiff = -1;
 		for (int numAccounts = 5; numAccounts < 10000; numAccounts*=10) {
 			// Arrange:
-			List<Account> accounts = new ArrayList<Account>();
+			List<Account> accounts = new ArrayList<>();
 			accounts.addAll(createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 			// Act: calculate importances
-			Poi poi = new PoiAlphaImpl();
 			System.out.println("Starting poi calculation.");
 			long start = System.currentTimeMillis();
-			ColumnVector importances = poi.getAccountImportances(height, accounts);
+			getAccountImportances(height, accounts);
 			long stop = System.currentTimeMillis();
 			System.out.println("Finished poi calculation.");
 
@@ -472,7 +451,7 @@ public class PoiAlphaImplTest {
 	}
 	
 	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
-		List<MockAccount> accounts = new ArrayList<MockAccount>();
+		List<MockAccount> accounts = new ArrayList<>();
 		
 		for (int i=0; i<numAccounts; i++) {
 			if (outLinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
@@ -514,17 +493,6 @@ public class PoiAlphaImplTest {
 		return accounts;
 	}
 
-	private List<Account> getAccountsWithSameBalance(int numAccounts, long numNEM) {
-		List<Account> accounts = new ArrayList<Account>();
-
-		for (int ndx = 0; ndx < numAccounts; ndx++) {
-			Account acct = createAccountWithBalance(numNEM);
-			accounts.add(acct);
-		}
-
-		return accounts;
-	}
-
 	private static Account createAccountWithBalance(long numNEM) {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(Amount.fromNem(numNEM));
@@ -535,5 +503,12 @@ public class PoiAlphaImplTest {
 		final MockAccount account = new MockAccount(Utils.generateRandomAddress());
 		account.incrementBalance(Amount.fromNem(numNEM));
 		return account;
+	}
+
+	private static ColumnVector getAccountImportances(
+			final BlockHeight blockHeight,
+			final Collection<Account> accounts) {
+		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
+		return poi.getAccountImportances(blockHeight, accounts);
 	}
 }
