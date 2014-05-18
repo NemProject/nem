@@ -155,7 +155,7 @@ public class PoiContext {
 			int numOutLinks = 0;
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
-				numOutLinks += null == account.getOutlinks() ? 0 : account.getOutlinks().size();
+				numOutLinks += account.getOutlinksSize();
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
 				// TODO: I would recommend playing around with this after we get POI working initially
@@ -199,8 +199,9 @@ public class PoiContext {
 					continue;
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
+				final Iterator<AccountLink> accountLinkIterator = accountInfo.getAccount().getOutlinksIterator();
 				for (int j = 0; j < outLinkWeights.size(); ++j) {
-					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
+					final AccountLink outLink = accountLinkIterator.next();
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
 					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
 				}

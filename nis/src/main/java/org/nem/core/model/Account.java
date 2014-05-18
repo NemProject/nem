@@ -17,7 +17,7 @@ public class Account implements SerializableEntity {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	
-	private List<AccountLink> outlinks;
+	private final List<AccountLink> outlinks;
 	private HistoricalOutlinks historicalOutlinks;
 	
 	private BlockAmount foragedBlocks;
@@ -54,6 +54,7 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		this.weightedBalances = new WeightedBalances();
+		this.outlinks = new LinkedList<>();
 	}
 
 	/**
@@ -241,10 +242,7 @@ public class Account implements SerializableEntity {
 	/**
 	 * @param acctLink - an outlink to add
 	 */
-	public void addOutlink(AccountLink acctLink) {
-		if (this.outlinks == null) {
-			this.outlinks = new LinkedList<AccountLink>();
-		}
+	public void addOutlink(final AccountLink acctLink) {
 		this.outlinks.add(acctLink);
 	}
 	
@@ -265,18 +263,14 @@ public class Account implements SerializableEntity {
 	/**
 	 * @return the outlinks
 	 */
-	public List<AccountLink> getOutlinks() {
-		return outlinks;
+	public Iterator<AccountLink> getOutlinksIterator() {
+		return outlinks.iterator();
 	}
 
-	/**
-	 * @param outlinks the outlinks to set
-	 * TODO: should probably have addOutlink
-	 */
-	public void setOutlinks(List<AccountLink> outlinks) {
-		this.outlinks = outlinks;
+	public int getOutlinksSize() {
+		return outlinks.size();
 	}
-	
+
 	/**
 	 * @return the outlinks
 	 */

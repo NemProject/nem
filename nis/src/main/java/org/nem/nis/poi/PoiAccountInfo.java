@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,14 +34,17 @@ public class PoiAccountInfo {
 			return;
 		}
 
-		final List<AccountLink> outLinks = this.account.getOutlinks();
-		this.outLinkWeightsVector = new ColumnVector(outLinks.size());
+		final Iterator<AccountLink> outLinks = this.account.getOutlinksIterator();
+		this.outLinkWeightsVector = new ColumnVector(this.account.getOutlinksSize());
 
 		// weight = outlink amount * DECAY_BASE^(age in days)
-		for (int i = 0; i < outLinks.size(); ++i) {
-			long age = (height.getRaw() - outLinks.get(i).getHeight().getRaw())/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			double weight = age < 0? 0.0 : outLinks.get(i).getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+		int i = 0;
+		while (outLinks.hasNext()) {
+			final AccountLink outLink = outLinks.next();
+			long age = (height.getRaw() - outLink.getHeight().getRaw())/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			double weight = age < 0? 0.0 : outLink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
 			this.outLinkWeightsVector.setAt(i, weight);
+			++i;
 		}
 	}
 
@@ -75,8 +79,7 @@ public class PoiAccountInfo {
 	 * @return true if the account has any out-links.
 	 */
 	public boolean hasOutLinks() {
-		final List<?> outLinks = this.account.getOutlinks();
-		return null != outLinks && !outLinks.isEmpty();
+		return this.account.getOutlinksSize() != 0;
 	}
 
 	/**

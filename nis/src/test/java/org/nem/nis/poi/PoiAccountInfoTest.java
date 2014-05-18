@@ -4,7 +4,9 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
@@ -53,12 +55,12 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void outLinkWeightsAreNullWhenAccountHasNoOutLinks() {
+	public void outLinkSizeIsZerolWhenAccountHasNoOutLinks() {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
 
 		// Assert:
-		Assert.assertThat(info.getOutLinkWeights(), IsNull.nullValue());
+		Assert.assertNull(info.getOutLinkWeights());
 	}
 
 	@Test
@@ -93,27 +95,27 @@ public class PoiAccountInfoTest {
 	}
 
 	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
-		return createAccountInfoWithOutLinks((List<AccountLink>)null);
+		return createAccountInfoWithOutLinks(new LinkedList<>());
 	}
 
 	private static PoiAccountInfo createAccountInfoWithOutLinks(final List<AccountLink> outLinks) {
 		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
-		account.setOutlinks(outLinks);
+		for (final AccountLink accountLink : outLinks) {
+			account.addOutlink(accountLink);
+		}
 		return new PoiAccountInfo(11, account, height);
 	}
 
 	private static PoiAccountInfo createAccountInfoWithOutLinks(final int... amounts) {
 		final Account account = Utils.generateRandomAccount();
 
-		final List<AccountLink> outLinks = new ArrayList<>();
 		final BlockHeight height = BlockHeight.ONE;
 		for (int amount : amounts) {
 			final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-			outLinks.add(link);
+			account.addOutlink(link);
 		}
 
-		account.setOutlinks(outLinks);
 		return new PoiAccountInfo(11, account, height);
 	}
 }

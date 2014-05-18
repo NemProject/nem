@@ -156,14 +156,8 @@ public class PoiContextTest {
 			final Account recipient,
 			final int amount) {
 
-		List<AccountLink> accountLinks = sender.getOutlinks();
-		if (null == accountLinks) {
-			accountLinks = new ArrayList<>();
-			sender.setOutlinks(accountLinks);
-		}
-
 		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient);
-		sender.getOutlinks().add(link);
+		sender.addOutlink(link);
 	}
 
 	private static List<Account> createTestPoiAccounts(
@@ -175,14 +169,12 @@ public class PoiContextTest {
 			account.incrementBalance(Amount.fromMicroNem(info.balance));
 			account.setVestedBalanceAt(Amount.fromMicroNem(info.vestedBalance), height);
 
-			final List<AccountLink> outLinks = new ArrayList<>();
 			for (final int amount : info.amounts) {
 				// TODO: addOutLinks probably makes more sense
 				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-				outLinks.add(link);
+				account.addOutlink(link);
 			}
 
-			account.setOutlinks(outLinks);
 			accounts.add(account);
 		}
 
