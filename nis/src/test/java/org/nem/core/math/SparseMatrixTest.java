@@ -3,7 +3,7 @@ package org.nem.core.math;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
-public class SparseMatrixTest extends MatrixTest {
+public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 	//region toString
 
@@ -25,7 +25,7 @@ public class SparseMatrixTest extends MatrixTest {
 	@Test
 	public void entryCanBeRemoved() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = (SparseMatrix)this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
 		// Assert:
 		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
@@ -58,7 +58,7 @@ public class SparseMatrixTest extends MatrixTest {
 	//endregion
 
 	@Override
-	protected Matrix createMatrix(int rows, int cols) {
+	protected SparseMatrix createMatrix(int rows, int cols) {
 		return new SparseMatrix(rows, cols, 100);
 	}
 }

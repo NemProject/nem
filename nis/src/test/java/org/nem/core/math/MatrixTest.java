@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-public abstract class MatrixTest {
+public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//region createMatrix
 
@@ -14,7 +14,7 @@ public abstract class MatrixTest {
 	 * @param rows The desired number of rows.
 	 * @param cols The desired number of columns.
 	 */
-	protected abstract Matrix createMatrix(final int rows, final int cols);
+	protected abstract TMatrix createMatrix(final int rows, final int cols);
 
 	/**
 	 * Creates a new matrix of the specified size and initial values.
@@ -23,8 +23,8 @@ public abstract class MatrixTest {
 	 * @param cols The desired number of columns.
 	 * @param values The initial values.
 	 */
-	protected Matrix createMatrix(final int rows, final int cols, final double[] values) {
-		final Matrix matrix = this.createMatrix(rows, cols);
+	protected TMatrix createMatrix(final int rows, final int cols, final double[] values) {
+		final TMatrix matrix = this.createMatrix(rows, cols);
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
 				final double value = values[i * cols + j];

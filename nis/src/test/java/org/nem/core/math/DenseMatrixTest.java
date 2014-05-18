@@ -6,7 +6,7 @@ import org.nem.core.test.ExceptionAssert;
 
 import java.util.Arrays;
 
-public class DenseMatrixTest extends MatrixTest {
+public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 
 	//region constructor
 
@@ -44,7 +44,7 @@ public class DenseMatrixTest extends MatrixTest {
 	@Test
 	public void rawVectorIsAccessible() {
 		// Arrange:
-		final DenseMatrix matrix = (DenseMatrix)this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final DenseMatrix matrix = this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
 
 		// Act:
 		boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
@@ -56,7 +56,7 @@ public class DenseMatrixTest extends MatrixTest {
 	@Test
 	public void rawVectorIsMutable() {
 		// Arrange:
-		final DenseMatrix matrix = (DenseMatrix)this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final DenseMatrix matrix = this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
 
 		// Act:
 		matrix.setAt(0, 1, 12.1);
@@ -88,7 +88,7 @@ public class DenseMatrixTest extends MatrixTest {
 	//endregion
 
 	@Override
-	protected Matrix createMatrix(int rows, int cols) {
+	protected DenseMatrix createMatrix(int rows, int cols) {
 		return new DenseMatrix(rows, cols);
 	}
 }
