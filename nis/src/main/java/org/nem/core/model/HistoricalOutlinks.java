@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import sun.management.resources.agent_pt_BR;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -44,7 +45,34 @@ public class HistoricalOutlinks {
 	}
 
 	/**
+	 * Returns number of AccountLink up to (inclusive) given height
+	 *
+	 * @param blockHeight the height.
+	 * @return number of AccountLink
+	 */
+	public int outlinksSize(final BlockHeight blockHeight) {
+		return outlinks.stream()
+				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
+				.map(a -> a.size())
+				.reduce(0, Integer::sum);
+	}
+
+	/**
+	 * Returns iterator over AccountLink up to (inclusive) given height
+	 *
+	 * @param blockHeight the height.
+	 * @return iterator
+	 */
+	public Iterator<AccountLink> outlinksIterator(final BlockHeight blockHeight) {
+		return this.outlinks.stream()
+				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
+				.flatMap(x -> x.getOutlinks().stream())
+				.iterator();
+	}
+
+	/**
 	 * Returns number of HistoricalOutlink in this container.
+	 * TODO: this probably should be protected
 	 *
 	 * @return number of HistoricalOutlink.
 	 */

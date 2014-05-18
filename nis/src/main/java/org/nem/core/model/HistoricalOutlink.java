@@ -24,6 +24,14 @@ public class HistoricalOutlink {
 		return height;
 	}
 
+	public LinkedList<AccountLink> getOutlinks() {
+		return outlinks;
+	}
+
+	public int size() {
+		return this.outlinks.size();
+	}
+
 	public void add(final AccountLink accountLink) {
 		this.outlinks.addLast(accountLink);
 	}
@@ -33,9 +41,5 @@ public class HistoricalOutlink {
 			throw new IllegalArgumentException("add/remove must be 'paired'.");
 		}
 		this.outlinks.removeLast();
-	}
-
-	public int size() {
-		return this.outlinks.size();
 	}
 }
