@@ -7,40 +7,55 @@ package org.nem.core.model;
  * 
  */
 public class AccountLink {
-	double strength;// XXX: should be coinday weighted
 
-	Account otherAccount; // TODO: this probably needs to be a hash/public key?
+	/**
+	 * The height at which the link was created.
+	 */
+	private BlockHeight height; 
 
 	/**
 	 * 
 	 */
-	public AccountLink() {
-		super();
-	}
+	private Amount amount;
+	
+	/**
+	 * The account this link leads to.
+	 */
+	private Account otherAccount;
 
 	/**
 	 * @param strength
 	 * @param otherAccount
 	 */
-	public AccountLink(double strength, Account otherAccount) {
+	public AccountLink(BlockHeight height, Amount amount, Account otherAccount) {
 		super();
-		this.strength = strength;
+		this.height = height;
+		this.amount = amount;
 		this.otherAccount = otherAccount;
 	}
 
 	/**
-	 * @return the strength
+	 * Returns the height at which the links was created.
+	 * 
+	 * @return the height
 	 */
-	public double getStrength() {
-		return strength;
+	public BlockHeight getHeight() {
+		return height;
+	}
+
+	/**
+	 * @return the amount
+	 */
+	public Amount getAmount() {
+		return amount;
 	}
 
 	/**
 	 * @param strength
 	 *            the strength to set
 	 */
-	public void setStrength(double strength) {
-		this.strength = strength;
+	public void setStrength(Amount amount) {
+		this.amount = amount;
 	}
 
 	/**

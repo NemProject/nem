@@ -14,8 +14,9 @@ public class PoiAccountInfoTest {
 	@Test
 	public void accountInfoExposesConstructorParameters() {
 		// Arrange:
+		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
-		final PoiAccountInfo info = new PoiAccountInfo(17, account);
+		final PoiAccountInfo info = new PoiAccountInfo(17, account, height);
 
 		// Assert:
 		Assert.assertThat(info.getIndex(), IsEqual.equalTo(17));
@@ -23,7 +24,7 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void foragingRequiresPositiveBalanceAndPositiveCoinDays() {
+	public void foragingRequiresPositiveBalanceAndPositiveVestedBalance() {
 		// Assert:
 		Assert.assertThat(canForage(0, 0), IsEqual.equalTo(false));
 		Assert.assertThat(canForage(0, 1), IsEqual.equalTo(false));
@@ -36,10 +37,10 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = new BlockHeight(33);
 		final MockAccount account = new MockAccount();
 		account.incrementBalance(Amount.fromNem(balance));
-		account.setCoinDaysAt(Amount.fromNem(coinDays), height);
+		account.setVestedBalanceAt(Amount.fromNem(coinDays), height);
 
 		// Act:
-		return new PoiAccountInfo(11, account).canForage(height);
+		return new PoiAccountInfo(11, account, height).canForage(height);
 	}
 
 	@Test
@@ -77,16 +78,18 @@ public class PoiAccountInfoTest {
 		// Assert:
 		Assert.assertThat(
 				info.getOutLinkWeights(),
-				IsEqual.equalTo(new ColumnVector(2.0, 3.0, 1.0, 5.0, 9.0)));
+				IsEqual.equalTo(new ColumnVector(2.0e06, 3.0e06, 1.0e06, 5.0e06, 9.0e06)));
 	}
 
 	@Test
 	public void outLinkScoreIsComputedCorrectlyWhenAccountHasOutLinks() {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
+		final PoiAccountInfo info2 = new PoiAccountInfo(info.getIndex(), info.getAccount(), new BlockHeight(2881));
 
-		// Assert: (normalized median * num out-links)
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(15.0));
+		// Assert: (median * num out-links)
+		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(15.0e06));
+		Assert.assertThat(info2.getOutLinkScore(), IsEqual.equalTo(15.0e06 * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE));
 	}
 
 	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
@@ -94,22 +97,23 @@ public class PoiAccountInfoTest {
 	}
 
 	private static PoiAccountInfo createAccountInfoWithOutLinks(final List<AccountLink> outLinks) {
+		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
 		account.setOutlinks(outLinks);
-		return new PoiAccountInfo(11, account);
+		return new PoiAccountInfo(11, account, height);
 	}
 
-	private static PoiAccountInfo createAccountInfoWithOutLinks(final int... strengths) {
+	private static PoiAccountInfo createAccountInfoWithOutLinks(final int... amounts) {
 		final Account account = Utils.generateRandomAccount();
 
 		final List<AccountLink> outLinks = new ArrayList<>();
-		for (int strength : strengths) {
-			final AccountLink link = new AccountLink();
-			link.setStrength(strength);
+		final BlockHeight height = BlockHeight.ONE;
+		for (int amount : amounts) {
+			final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
 			outLinks.add(link);
 		}
 
 		account.setOutlinks(outLinks);
-		return new PoiAccountInfo(11, account);
+		return new PoiAccountInfo(11, account, height);
 	}
 }

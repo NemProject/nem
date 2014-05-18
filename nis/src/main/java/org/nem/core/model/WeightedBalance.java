@@ -3,6 +3,9 @@ package org.nem.core.model;
 import java.math.BigInteger;
 
 public class WeightedBalance implements Comparable<WeightedBalance> {
+	public static final long DECAY_NUMERATOR = 9;
+	public static final long DECAY_DENOMINATOR = 10;
+	
 	private final BlockHeight blockHeight;
 	private BigInteger unvestedBalance;
 	private BigInteger vestedBalance;
@@ -37,8 +40,8 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public WeightedBalance next() {
-		final BigInteger base = BigInteger.valueOf(100);
-		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(98));
+		final BigInteger base = BigInteger.valueOf(DECAY_DENOMINATOR);
+		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(DECAY_NUMERATOR));
 		final BigInteger move = this.unvestedBalance.multiply(base).subtract(newUv);
 
 		return new WeightedBalance(
@@ -50,8 +53,8 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	public WeightedBalance previous() {
-		final BigInteger base = BigInteger.valueOf(98);
-		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(100));
+		final BigInteger base = BigInteger.valueOf(DECAY_NUMERATOR);
+		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(DECAY_DENOMINATOR));
 		final BigInteger move = newUv.subtract(this.unvestedBalance.multiply(base));
 
 		return new WeightedBalance(

@@ -11,6 +11,7 @@ import java.util.List;
 public class PoiAccountInfo {
 
 	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1);
+	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR/(double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
 	private final Account account;
@@ -21,8 +22,9 @@ public class PoiAccountInfo {
 	 *
 	 * @param index The temporal account index.
 	 * @param account The account.
+	 * @param height The height at which the strength is evaluated
 	 */
-	public PoiAccountInfo(final int index, final Account account) {
+	public PoiAccountInfo(final int index, final Account account, BlockHeight height) {
 		this.index = index;
 		this.account = account;
 
@@ -34,9 +36,11 @@ public class PoiAccountInfo {
 		final List<AccountLink> outLinks = this.account.getOutlinks();
 		this.outLinkWeightsVector = new ColumnVector(outLinks.size());
 
+		// weight = outlink amount * DECAY_BASE^(age in days)
 		for (int i = 0; i < outLinks.size(); ++i) {
-			double strength = outLinks.get(i).getStrength();
-			this.outLinkWeightsVector.setAt(i, strength);
+			long age = (height.getRaw() - outLinks.get(i).getHeight().getRaw())/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			double weight = age < 0? 0.0 : outLinks.get(i).getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+			this.outLinkWeightsVector.setAt(i, weight);
 		}
 	}
 
@@ -61,7 +65,7 @@ public class PoiAccountInfo {
 	 * @return true if the account is eligible.
 	 */
 	public boolean canForage(final BlockHeight height) {
-		return this.account.getCoinDayWeightedBalance(height).compareTo(MIN_FORAGING_BALANCE) >= 0
+		return this.account.getVestedBalance(height).compareTo(MIN_FORAGING_BALANCE) >= 0
 				&& this.account.getBalance().compareTo(MIN_FORAGING_BALANCE) >= 0;
 	}
 

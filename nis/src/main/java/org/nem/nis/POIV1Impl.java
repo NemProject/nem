@@ -22,11 +22,10 @@ import java.util.List;
 public class POIV1Impl implements POI {
 
 	public static final int DEFAULT_MAX_ITERS = 200;
-
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
-		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.MAKOTO);
+		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEWV2);
 	}
 
 	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
@@ -60,7 +59,7 @@ public class POIV1Impl implements POI {
 		return scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutLinkScoreVector(),
-				context.getCoinDaysVector(),
+				context.getVestedBalanceVector(),
 				scoringAlg);
 	}
 
@@ -92,9 +91,6 @@ public class POIV1Impl implements POI {
 			final ColumnVector importances = this.context.getOutLinkMatrix()
 					.multiply(prevIterImportances)
 					.multiplyElementWise(this.context.getTeleportationVector());
-//			final ColumnVector importances = prevIterImportances
-//					.multiply(this.context.getOutLinkMatrix())
-//					.multiplyElementWise(this.context.getTeleportationVector());
 
 			return importances.add(poiAdjustmentVector);
 		}

@@ -43,24 +43,24 @@ public class PoiScorer {
 	 *
 	 * @param importanceVector The importances sub-scores.
 	 * @param outLinkVector    The out-link sub-scores.
-	 * @param coinDaysVector   The coin-day sub-scores.
+	 * @param vestedBalanceVector   The coin-day sub-scores.
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
 	public ColumnVector calculateFinalScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector,
+			final ColumnVector vestedBalanceVector,
 			final ScoringAlg scoringAlg) {
 
 		//TODO: For testing use, take out when final scoring alg is decided
-		System.out.println("outLinkVector" + outLinkVector);
-		System.out.println("importanceVector" + importanceVector);
-		System.out.println("coinDaysVector" + coinDaysVector);
+//		System.out.println("outLinkVector" + outLinkVector);
+//		System.out.println("importanceVector" + importanceVector);
+//		System.out.println("vestedBalanceVector" + vestedBalanceVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,
 				outLinkVector,
-				coinDaysVector,
+				vestedBalanceVector,
 				scoringAlg);
 
 		finalScoreVector.normalize();
@@ -70,36 +70,36 @@ public class PoiScorer {
 	private ColumnVector calculateNonNormalizedScoreVector(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector,
+			final ColumnVector vestedBalanceVector,
 			final ScoringAlg scoringAlg) {
 		switch (scoringAlg) {
 			case BLOODYROOKIEOLD:
-				return calculateBloodyRookieOldScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculateBloodyRookieOldScore(importanceVector, outLinkVector, vestedBalanceVector);
 
 			case UTOPIAN:
-				return calculateUtopianFutureScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculateUtopianFutureScore(importanceVector, outLinkVector, vestedBalanceVector);
 
 			case PYTHON:
-				return calculatePythonScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculatePythonScore(importanceVector, outLinkVector, vestedBalanceVector);
 
 			case MAKOTO:
-				return calculateMakotoScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculateMakotoScore(importanceVector, outLinkVector, vestedBalanceVector);
 
 			case BLOODYROOKIENEW:
-				return calculateBloodyRookieNewScore(importanceVector, outLinkVector, coinDaysVector);
+				return calculateBloodyRookieNewScore(importanceVector, outLinkVector, vestedBalanceVector);
 
 			case BLOODYROOKIENEWV2:
 			default:
-				return calculateBloodyRookieNewV2Score(importanceVector, outLinkVector, coinDaysVector);
+				return calculateBloodyRookieNewV2Score(importanceVector, outLinkVector, vestedBalanceVector);
 		}
 	}
 
 	private ColumnVector calculateBloodyRookieOldScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 
-		final ColumnVector vector = outLinkVector.multiply(2.0).add(coinDaysVector);
+		final ColumnVector vector = outLinkVector.multiply(2.0).add(vestedBalanceVector);
 		vector.normalize();
 		return importanceVector
 				.multiplyElementWise(vector);
@@ -108,11 +108,11 @@ public class PoiScorer {
 	private ColumnVector calculateBloodyRookieNewScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 
 		// final score = l1norm(stakes) + c1 * l1norm(outlinkstrengths) + c2 * l1norm(PR)
 
-		coinDaysVector.normalize();
+		vestedBalanceVector.normalize();
 		outLinkVector.normalize();
 
 		double c1 = 0.5;
@@ -121,26 +121,20 @@ public class PoiScorer {
 		ColumnVector weightedOutlinks = outLinkVector.multiply(c1);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
-		return coinDaysVector.add(weightedOutlinks).add(weightedImportances);
+		return vestedBalanceVector.add(weightedOutlinks).add(weightedImportances);
 	}
 
 	private ColumnVector calculateBloodyRookieNewV2Score(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 
 		// alg is: l1norm(stakes+ c1*outLinkVector) + c2 * l1norm(PR)
 
-		coinDaysVector.normalize();
-		outLinkVector.normalize();
-		
-		System.out.println("normalized coinDaysVector: " + coinDaysVector);
-		System.out.println("normalized outLinkVector: " + outLinkVector);
-
-		double c1 = 2.;
+		double c1 = 1.5;
 		double c2 = 0.01;
 
-		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).add(coinDaysVector);
+		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).add(vestedBalanceVector);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
 		weightedOutlinks.normalize();
@@ -151,7 +145,7 @@ public class PoiScorer {
 	private ColumnVector calculateUtopianFutureScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 
 		// norm(outlink 2 + PR)*stake + sqrt(stake)
 
@@ -160,40 +154,40 @@ public class PoiScorer {
 				importanceVector);
 		vector.normalize();
 
-		ColumnVector sqrtcoindays = coinDaysVector.sqrt();
+		ColumnVector sqrtcoindays = vestedBalanceVector.sqrt();
 
 		return vector.multiplyElementWise(
-				coinDaysVector).add(sqrtcoindays);
+				vestedBalanceVector).add(sqrtcoindays);
 	}
 
 	private ColumnVector calculatePythonScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 		// from the original python prototype
 		outLinkVector.normalize();
-		coinDaysVector.normalize();
+		vestedBalanceVector.normalize();
 		return importanceVector.add(outLinkVector)
-				.multiplyElementWise(coinDaysVector);
+				.multiplyElementWise(vestedBalanceVector);
 	}
 
 	private ColumnVector calculateMakotoScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outLinkVector,
-			final ColumnVector coinDaysVector) {
+			final ColumnVector vestedBalanceVector) {
 		
 		// alg is: l1norm(stakes * c1*outLinkVector) + c2 * l1norm(PR)
 
-		coinDaysVector.normalize();
+		vestedBalanceVector.normalize();
 		outLinkVector.normalize();
 
-		System.out.println("normalized coinDaysVector: " + coinDaysVector);
+		System.out.println("normalized vestedBalanceVector: " + vestedBalanceVector);
 		System.out.println("normalized outLinkVector: " + outLinkVector);
 
 		double c1 = 2.;
 		double c2 = 0.01;
 
-		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(coinDaysVector);
+		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(vestedBalanceVector);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
 		weightedOutlinks.normalize();

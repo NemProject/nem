@@ -52,14 +52,13 @@ public class POIV1ImplTest {
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// A sends all 100 NEM to B,
-		a.addOutlink(new AccountLink(100, b));
+		a.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), b));
 
 		List<Account> accts = Arrays.asList(a, b, c);
 
 		// Act: calculate importances
 		POI poi = new POIV1Impl();
-		ColumnVector importances = poi
-				.getAccountImportances(blockHeight, accts);
+		ColumnVector importances = poi.getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
 		// Assert
@@ -95,22 +94,22 @@ public class POIV1ImplTest {
 
 		//TODO: we really need the infrastructure for adding coinday-weighted links and updating balances.
 		// A sends all 400 NEM to B,
-		a.addOutlink(new AccountLink(400, b));
+		a.addOutlink(new AccountLink(blockHeight, Amount.fromNem(400), b));
 		
 		//who sends 300 NEM to C,
-		b.addOutlink(new AccountLink(300, c));
+		b.addOutlink(new AccountLink(blockHeight, Amount.fromNem(300), c));
 		
 		//who sends 200 NEM to D,
-		c.addOutlink(new AccountLink(200, d));
+		c.addOutlink(new AccountLink(blockHeight, Amount.fromNem(200), d));
 				
 		// who sends 100 to A.
-		d.addOutlink(new AccountLink(100, a));
+		d.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), a));
 		
 		// e sends 100 NEM to g
-		e.addOutlink(new AccountLink(100, g));
+		e.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), g));
 		
 		// g sends 100 NEM to f
-		g.addOutlink(new AccountLink(100, f));
+		g.addOutlink(new AccountLink(blockHeight, Amount.fromNem(100), f));
 		
 		List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
 
@@ -208,7 +207,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
@@ -240,7 +239,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
@@ -396,8 +395,7 @@ public class POIV1ImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			// Temporary changed the assert so it doesn't fail although the sybil attack succeeds
-			Assert.assertTrue(0.00009 < ratio && ratio < 1.1);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
@@ -488,7 +486,7 @@ public class POIV1ImplTest {
 		MockAccount otherAccount = null;
 		for (int i=0; i<numAccounts; i++) {
 			MockAccount account = accounts.get(i);
-			account.setCoinDaysAt(account.getBalance(), new BlockHeight(blockHeight));
+			account.setVestedBalanceAt(account.getBalance(), new BlockHeight(blockHeight));
 			for (int j=0; j< numOutLinksPerAccount; j++) {
 				switch (outLinkStrategy) {
 					case OUTLINK_STRATEGY_RANDOM:
@@ -505,7 +503,7 @@ public class POIV1ImplTest {
 						break;
 				}
 				long outlinkStrength = (account.getBalance().getNumNem() * totalOutLinkStrength)/((totalVestedBalance - totalOutLinkStrength) * numOutLinksPerAccount);
-				account.addOutlink(new AccountLink(Amount.fromNem(outlinkStrength).getNumNem(), otherAccount));
+				account.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(outlinkStrength), otherAccount));
 			}
 		}
 		

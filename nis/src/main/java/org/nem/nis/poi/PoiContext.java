@@ -14,12 +14,11 @@ import java.util.*;
  */
 public class PoiContext {
 
-	private static final double MIN_TELEPORTATION_PROB = .85;
-	private static final double MAX_TELEPORTATION_PROB = .95;
+	private static final double TELEPORTATION_PROB = .85;
 
 	private final List<Integer> dangleIndexes;
 	private final ColumnVector dangleVector;
-	private final ColumnVector coinDaysVector;
+	private final ColumnVector vestedBalanceVector;
 	private final ColumnVector importanceVector;
 	private final ColumnVector outLinkScoreVector;
 	private final SparseMatrix outLinkMatrix;
@@ -40,7 +39,7 @@ public class PoiContext {
 		ap.process(accounts, height);
 		this.dangleIndexes = ap.dangleIndexes;
 		this.dangleVector = ap.dangleVector;
-		this.coinDaysVector = ap.coinDaysVector;
+		this.vestedBalanceVector = ap.vestedBalanceVector;
 		this.outLinkScoreVector = ap.outLinkScoreVector;
 		this.importanceVector = ap.importanceVector;
 		this.outLinkMatrix = ap.outLinkMatrix;
@@ -54,12 +53,12 @@ public class PoiContext {
 	//region Getters
 
 	/**
-	 * Gets the coin days vector.
+	 * Gets the vested balance vector.
 	 *
-	 * @return The coin days vector.
+	 * @return The vested balance vector.
 	 */
-	public ColumnVector getCoinDaysVector() {
-		return this.coinDaysVector;
+	public ColumnVector getVestedBalanceVector() {
+		return this.vestedBalanceVector;
 	}
 
 	/**
@@ -131,7 +130,7 @@ public class PoiContext {
 
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
-		private final ColumnVector coinDaysVector;
+		private final ColumnVector vestedBalanceVector;
 		private ColumnVector importanceVector;
 		private final ColumnVector outLinkScoreVector;
 		private SparseMatrix outLinkMatrix;
@@ -145,7 +144,7 @@ public class PoiContext {
 			this.dangleVector = new ColumnVector(numAccounts);
 			this.dangleVector.setAll(1);
 
-			this.coinDaysVector = new ColumnVector(numAccounts);
+			this.vestedBalanceVector = new ColumnVector(numAccounts);
 			this.importanceVector = new ColumnVector(numAccounts);
 			this.outLinkScoreVector = new ColumnVector(numAccounts);
 		}
@@ -155,7 +154,7 @@ public class PoiContext {
 			int i = 0;
 			int numOutLinks = 0;
 			for (final Account account : accounts) {
-				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account);
+				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
 				numOutLinks += null == account.getOutlinks() ? 0 : account.getOutlinks().size();
 				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
 				// TODO: (this should shrink the matrix size)
@@ -166,13 +165,9 @@ public class PoiContext {
 				this.addressToIndexMap.put(account.getAddress(), i);
 
 				this.accountInfos.add(accountInfo);
-				this.coinDaysVector.setAt(i, account.getCoinDayWeightedBalance(height).getNumNem());
+				this.vestedBalanceVector.setAt(i, account.getVestedBalance(height).getNumMicroNem());
 				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
 
-				// initially set importance to account balance
-				//TODO: wouldn't the coinday-weighted balance be better here?
-				// BR: The initial importance vector should be calculated from the outLinkMatrix,
-				//     the power iteration has nothing to do with balance/coinday balance/vested balance
 				if (!accountInfo.hasOutLinks()) {
 					this.dangleIndexes.add(i);
 					this.dangleVector.setAt(i, 0);
@@ -181,8 +176,11 @@ public class PoiContext {
 				++i;
 			}
 
-			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks * 2);
+			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks<i ? 1 : numOutLinks/i);
 			createOutLinkMatrix();
+
+			// Initially set importance to the row sum vector of the outlink matrix
+			// TODO: Is there a better way to estimate the eigenvector
 			createImportanceVector();
 		}
 		
@@ -202,17 +200,12 @@ public class PoiContext {
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
 				for (int j = 0; j < outLinkWeights.size(); ++j) {
-					// TODO: using a hash-map for this will be slow
-					// TODO: true, a hashMap would be slow, but I was concerned about using Matrix 
-					// here because this should be a very sparse matrix. We can optimize later, though.
 					final AccountLink outLink = accountInfo.getAccount().getOutlinks().get(j);
 					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
 					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
 				}
 			}
 
-			// TODO: we should test the impact of convert
-//			outLinkMatrix.convert();
 			outLinkMatrix.normalizeColumns();
 		}
 	}
@@ -253,7 +246,7 @@ public class PoiContext {
 //			this.inverseTeleportationVector.multiply(numAccountNorm);
 
 			ColumnVector vector = new ColumnVector(importanceVector.size());
-			vector.setAll(MIN_TELEPORTATION_PROB);
+			vector.setAll(TELEPORTATION_PROB);
 			this.teleportationVector = vector;
 			final ColumnVector onesVector = new ColumnVector(importanceVector.size());
 			onesVector.setAll(1.0);

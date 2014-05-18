@@ -155,6 +155,9 @@ public class WeightedBalances {
 	}
 
 	public Amount getVested(final BlockHeight height) {
+		if (balances.size() == 0) {
+			return Amount.ZERO;
+		}
 		final WeightedBalance weightedBalance = createVestedBalance(height, Amount.ZERO);
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index < 0) {
@@ -165,6 +168,9 @@ public class WeightedBalances {
 	}
 
 	public Amount getUnvested(final BlockHeight height) {
+		if (balances.size() == 0) {
+			return Amount.ZERO;
+		}
 		final WeightedBalance weightedBalance = createVestedBalance(height, Amount.ZERO);
 		int index = Collections.binarySearch(balances, weightedBalance);
 		if (index < 0) {

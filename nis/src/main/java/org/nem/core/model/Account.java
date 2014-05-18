@@ -20,8 +20,6 @@ public class Account implements SerializableEntity {
 	private List<AccountLink> outlinks;
 	private HistoricalOutlinks historicalOutlinks;
 	
-	private CoinDays coindays;
-
 	private BlockAmount foragedBlocks;
 	private WeightedBalances weightedBalances;
 
@@ -56,8 +54,6 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.foragedBlocks = BlockAmount.ZERO;
 		this.weightedBalances = new WeightedBalances();
-
-		this.coindays = new CoinDays();
 	}
 
 	/**
@@ -218,6 +214,14 @@ public class Account implements SerializableEntity {
 		return this.weightedBalances.historicalBalances.getBalance(lastBlockHeight, height);
 	}
 
+	public Amount getVestedBalance(final BlockHeight height) {
+		return this.weightedBalances.getVested(height);
+	}
+
+	public Amount getUnvestedBalance(final BlockHeight height) {
+		return this.weightedBalances.getUnvested(height);
+	}
+
 	public void weightedSend(final BlockHeight blockHeight, final Amount amount) {
 		this.weightedBalances.addSend(blockHeight, amount);
 	}
@@ -278,27 +282,6 @@ public class Account implements SerializableEntity {
 	 */
 	public List<AccountLink> getOutlinks(final BlockHeight blockHeight) {
 		return null; //TODO:
-	}
-	
-	/**
-	 * This method applies the <code>coindays</code> to the balance at the given blockHeight and returns the result.
-	 * 
-	 * @return coinday-weighted balance for the given blockheight
-	 */
-	public Amount getCoinDayWeightedBalance(final BlockHeight blockHeight) {
-		
-		CoinDayAmount coinDayBalance = coindays.getCoinDayWeightedBalance(blockHeight);
-		
-		//Assume any remaining balance has the full weight
-		coinDayBalance.addWeightedAmount(this.getBalance().subtract(coinDayBalance.getUnweightedAmount()));
-		
-		if (coinDayBalance.getWeightedAmount().compareTo(this.getBalance()) > 0) {
-//			coinDayBalance = this.getBalance(); // TODO: XXX:or should we throw an exception?
-			throw new IllegalStateException("Calculate coinday balance is greater than the balance.");
-		}
-		
-//		return coinDayBalance.getWeightedAmount();
-		return getBalance();
 	}
 	
 	@Override
