@@ -6,7 +6,6 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
@@ -102,7 +101,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
 		for (final AccountLink accountLink : outLinks) {
-			account.addHistoricalOutlink(height, accountLink);
+			account.addOutlink(height, accountLink);
 		}
 		return new PoiAccountInfo(11, account, height);
 	}
@@ -113,7 +112,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		for (int amount : amounts) {
 			final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-			account.addHistoricalOutlink(height, link);
+			account.addOutlink(height, link);
 		}
 
 		return new PoiAccountInfo(11, account, height);

@@ -52,7 +52,7 @@ public class POIV1ImplTest {
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// A sends all 100 NEM to B,
-		a.addHistoricalOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(100), b));
+		a.addOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(100), b));
 
 		List<Account> accts = Arrays.asList(a, b, c);
 
@@ -129,7 +129,7 @@ public class POIV1ImplTest {
 	}
 
 	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
-		a.addHistoricalOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(amount), b));
+		a.addOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(amount), b));
 	}
 
 	@Test

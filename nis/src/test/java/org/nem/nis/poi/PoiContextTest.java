@@ -157,7 +157,7 @@ public class PoiContextTest {
 			final int amount) {
 
 		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient);
-		sender.addHistoricalOutlink(height, link);
+		sender.addOutlink(height, link);
 	}
 
 	private static List<Account> createTestPoiAccounts(
@@ -172,7 +172,7 @@ public class PoiContextTest {
 			for (final int amount : info.amounts) {
 				// TODO: addOutLinks probably makes more sense
 				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-				account.addHistoricalOutlink(height, link);
+				account.addOutlink(height, link);
 			}
 
 			accounts.add(account);
