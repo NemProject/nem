@@ -1,25 +1,41 @@
 package org.nem.core.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-/**
- *TODO: still trying to decide if this class is needed
- */
-public class HistoricalOutlink implements Comparable<HistoricalOutlink> {
+public class HistoricalOutlink {
 	private final BlockHeight height;
-	private ArrayList<AccountLink> outlinks; //Outlinks at blockheight
+	private LinkedList<AccountLink> outlinks;
 	/**
 	 * @param height
 	 * @param outlinks
 	 */
-	public HistoricalOutlink(BlockHeight height, ArrayList<AccountLink> outlinks) {
+	public HistoricalOutlink(BlockHeight height) {
 		super();
 		this.height = height;
-		this.outlinks = outlinks;
+		this.outlinks = new LinkedList<>();
 	}
-	@Override
-	public int compareTo(HistoricalOutlink o) {
-		// TODO Auto-generated method stub
-		return 0;
+
+	/**
+	 * Returns height of current outlink.
+	 *
+	 * @return The height.
+	 */
+	public BlockHeight getHeight() {
+		return height;
+	}
+
+	public void add(final AccountLink accountLink) {
+		this.outlinks.addLast(accountLink);
+	}
+
+	public void remove(final AccountLink accountLink) {
+		if (this.outlinks.getLast().compareTo(accountLink) != 0) {
+			throw new IllegalArgumentException("add/remove must be 'paired'.");
+		}
+		this.outlinks.removeLast();
+	}
+
+	public int size() {
+		return this.outlinks.size();
 	}
 }

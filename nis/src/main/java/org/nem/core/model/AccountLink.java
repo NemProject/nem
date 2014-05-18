@@ -6,7 +6,7 @@ package org.nem.core.model;
  * an AccountLinks class to handle this?
  * 
  */
-public class AccountLink {
+public class AccountLink implements Comparable<AccountLink> {
 
 	/**
 	 * The height at which the link was created.
@@ -71,5 +71,21 @@ public class AccountLink {
 	 */
 	public void setOtherAccount(Account otherAccount) {
 		this.otherAccount = otherAccount;
+	}
+
+	@Override
+	public int compareTo(final AccountLink rhs) {
+		int[] comparisonResults = new int[] {
+				this.getHeight().compareTo(rhs.getHeight()),
+				this.getAmount().compareTo(rhs.getAmount()),
+				this.getOtherAccount().getAddress().getEncoded().compareTo(rhs.getOtherAccount().getAddress().getEncoded()),
+		};
+
+		for (int result : comparisonResults) {
+			if (result != 0)
+				return result;
+		}
+
+		return 0;
 	}
 }
