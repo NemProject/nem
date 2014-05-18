@@ -1,76 +1,52 @@
 package org.nem.core.model;
 
 /**
- * Class to link accounts for the POI calculation. TODO: this class needs to be
- * hooked up to the object model and updated based on transactions. Maybe create
- * an AccountLinks class to handle this?
- * 
+ * A link between a source account and another account.
  */
 public class AccountLink implements Comparable<AccountLink> {
 
-	/**
-	 * The height at which the link was created.
-	 */
-	private BlockHeight height; 
+	private final BlockHeight height;
+	private final Amount amount;
+	private final Account otherAccount;
 
 	/**
-	 * 
+	 * Creates an account link.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount.
+	 * @param otherAccount The linked account.
 	 */
-	private Amount amount;
-	
-	/**
-	 * The account this link leads to.
-	 */
-	private Account otherAccount;
-
-	/**
-	 * @param strength
-	 * @param otherAccount
-	 */
-	public AccountLink(BlockHeight height, Amount amount, Account otherAccount) {
-		super();
+	public AccountLink(final BlockHeight height, final Amount amount, final Account otherAccount) {
 		this.height = height;
 		this.amount = amount;
 		this.otherAccount = otherAccount;
 	}
 
 	/**
-	 * Returns the height at which the links was created.
+	 * Gets the block height of this link.
 	 * 
-	 * @return the height
+	 * @return The block height.
 	 */
 	public BlockHeight getHeight() {
-		return height;
+		return this.height;
 	}
 
 	/**
-	 * @return the amount
+	 * Gets the amount.
+	 *
+	 * @return The amount.
 	 */
 	public Amount getAmount() {
-		return amount;
+		return this.amount;
 	}
 
 	/**
-	 * @param strength
-	 *            the strength to set
-	 */
-	public void setStrength(Amount amount) {
-		this.amount = amount;
-	}
-
-	/**
-	 * @return the otherAccount
+	 * Gets the other account.
+	 *
+	 * @return The other account.
 	 */
 	public Account getOtherAccount() {
-		return otherAccount;
-	}
-
-	/**
-	 * @param otherAccount
-	 *            the otherAccount to set
-	 */
-	public void setOtherAccount(Account otherAccount) {
-		this.otherAccount = otherAccount;
+		return this.otherAccount;
 	}
 
 	@Override
@@ -82,10 +58,27 @@ public class AccountLink implements Comparable<AccountLink> {
 		};
 
 		for (int result : comparisonResults) {
-			if (result != 0)
+			if (0 != result)
 				return result;
 		}
 
 		return 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getHeight().hashCode() ^
+				this.getAmount().hashCode() ^
+				this.getOtherAccount().getAddress().getEncoded().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		return obj instanceof AccountLink && 0 == this.compareTo((AccountLink) obj);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s -> %s @ %s", this.getAmount(), this.getOtherAccount().getAddress(), this.getHeight());
 	}
 }
