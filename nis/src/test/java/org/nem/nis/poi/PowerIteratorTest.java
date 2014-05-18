@@ -89,7 +89,7 @@ public class PowerIteratorTest {
 
 		@Override
 		protected ColumnVector stepImpl(final ColumnVector vector) {
-			final ColumnVector updatedVector = vector.multiply(this.matrix);
+			final ColumnVector updatedVector = this.matrix.multiply(vector);
 			// TODO: this makes sure the vectors are always pointing in the same direction
 			// TODO: but i'm not sure why it's needed
 			// TODO: if removed, the unit tests fail

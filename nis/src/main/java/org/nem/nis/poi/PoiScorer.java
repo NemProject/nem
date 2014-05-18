@@ -147,7 +147,7 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector vestedBalanceVector) {
 
-		// norm(outlink 2 + PR)*stake + sqrt(stake)
+		// norm(outlink 2 + PR)*stake + sqrt(abs(stake))
 
 		outLinkVector.normalize();
 		ColumnVector vector = outLinkVector.multiply(2.0).add(
