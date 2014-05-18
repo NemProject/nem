@@ -261,17 +261,7 @@ public class ColumnVector {
 
 	//endregion
 
-	//region getMagnitude / max / median
-
-	/**
-	 * Gets the magnitude of this vector.
-	 *
-	 * @return The magnitude of this vector.
-	 */
-	public double getMagnitude() {
-		final ColumnVector nullVector = new ColumnVector(this.size);
-		return this.l2Distance(nullVector);
-	}
+	//region max / median
 	
 	/**
 	 * Gets the maximum value for an individual element in this vector.
@@ -298,7 +288,17 @@ public class ColumnVector {
 
 	//endregion
 
-	//region distance
+	//region magnitude / distance
+
+	/**
+	 * Gets the magnitude of this vector.
+	 *
+	 * @return The magnitude of this vector.
+	 */
+	public double getMagnitude() {
+		final ColumnVector nullVector = new ColumnVector(this.size);
+		return this.l2Distance(nullVector);
+	}
 
 	/**
 	 * Calculates the Manhattan distance (L1-norm) between the specified vector and this vector.
