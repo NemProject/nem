@@ -35,10 +35,13 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
+		Assert.assertThat(
+				sparseMatrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
 	}
 
 	@Test
-	public void lastEntryCanBeRemoved() {
+	public void lastEntryInRowCanBeRemoved() {
 		// Arrange:
 		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
@@ -51,6 +54,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(0));
+		Assert.assertThat(
+				sparseMatrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 5, 11, 1, 8 })));
 	}
 
 	@Test
