@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.MockBlockScorerAnalyzer;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -50,7 +51,7 @@ public class BlockScorerITCase {
 			foragerAccounts[i]	= createAccountWithBalance(numNEM/numForagers);
 		}
 		int averageTime = 0, maxTime = 0, minTime = Integer.MAX_VALUE, index=0;
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		Block block;
 		Block[] blocks = new Block[numRounds];
 		int[] secondsBetweenBlocks = new int[numRounds];
@@ -226,7 +227,7 @@ public class BlockScorerITCase {
 		final Account foragerA = createAccountWithBalance(1_000_000_000);
 		final Account foragerB = createAccountWithBalance(100_000_000);
 
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		final List<Block> blocks = new LinkedList<>();
 		byte[] rndBytes = new byte[32];
 
@@ -259,7 +260,7 @@ public class BlockScorerITCase {
 
 	public int normalForagerVersusSelfishForager(int numRounds, int maxTime, long normalForgerBalance, long selfishForgerBalance) {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -318,7 +319,7 @@ public class BlockScorerITCase {
 	public int normalForgersOldVersusSelfishNew(GenerateStrategy strategy, int numRounds, int maxTime, long foragedBlocksPerNormalForager, int count, long normalForgerBalance, int selfishCount, long selfishForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -385,7 +386,7 @@ public class BlockScorerITCase {
 	public int normalXForagerVersusSelfishForager(GenerateStrategy strategy, int numRounds, int maxTime, int count, long normalForgerBalance,  long selfishForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -446,7 +447,7 @@ public class BlockScorerITCase {
 	public int normalXRandomForagerVersusSelfishForager(GenerateStrategy strategy, int numRounds, int maxTime, int percentage, int count, long normalForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -509,7 +510,7 @@ public class BlockScorerITCase {
 	public long oneForagersVersusManyForagers(int maxTime, int count, long manyForagersBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(new MockBlockScorerAnalyzer());
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];

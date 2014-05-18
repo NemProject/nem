@@ -20,4 +20,6 @@ public class BlockChainConstants {
 	 * Number of blocks send and compared during synchronization
 	 */
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
+
+	public static final int POI_GROUPING = 31;
 }

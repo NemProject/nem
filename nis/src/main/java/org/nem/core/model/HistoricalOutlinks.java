@@ -1,7 +1,5 @@
 package org.nem.core.model;
 
-import sun.management.resources.agent_pt_BR;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 

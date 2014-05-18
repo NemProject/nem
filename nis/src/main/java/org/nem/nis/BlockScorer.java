@@ -36,7 +36,13 @@ public class BlockScorer {
      */
     private static final double TWO_TO_THE_POWER_OF_256 = Math.pow(2.0, 256.0);
 
-    /**
+	public final AccountAnalyzer accountAnalyzer;
+
+	public BlockScorer(final AccountAnalyzer accountAnalyzer) {
+		this.accountAnalyzer = accountAnalyzer;
+	}
+
+	/**
 	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.
@@ -61,7 +67,13 @@ public class BlockScorer {
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = block.getSigner().getBalance(prevBlock.getHeight(), new BlockHeight(Math.max(1, block.getHeight().getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY))).getNumNem();
+		//
+		final long backInTime = block.getHeight().getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
+		this.accountAnalyzer.recalculateImportances(blockHeight);
+		// TODO: how this should be scaled?
+		long forgerBalance = (long)( block.getSigner().getImportance(blockHeight) * 4_000_000_000L * 1_000_000);
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)

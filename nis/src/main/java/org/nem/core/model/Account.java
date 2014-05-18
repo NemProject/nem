@@ -22,6 +22,9 @@ public class Account implements SerializableEntity {
 	private BlockAmount foragedBlocks;
 	private WeightedBalances weightedBalances;
 
+	private BlockHeight importanceHeight;
+	private double importance;
+
 	/**
 	 * Creates an account around a key pair.
 	 *
@@ -263,7 +266,25 @@ public class Account implements SerializableEntity {
 	public int getOutlinksSize(final BlockHeight blockHeight) {
 		return historicalOutlinks.outlinksSize(blockHeight);
 	}
-	
+
+
+	public void setImportance(final BlockHeight blockHeight, double importance) {
+		if (importanceHeight == null || importanceHeight.compareTo(blockHeight) == 0) {
+			this.importanceHeight = blockHeight;
+			this.importance = importance;
+
+		} else if (importanceHeight.compareTo(blockHeight) != 0) {
+			throw new IllegalArgumentException("importance already set at given height");
+		}
+	}
+
+	public double getImportance(final BlockHeight blockHeight) {
+		if (importanceHeight == null || importanceHeight.compareTo(blockHeight) != 0) {
+			throw new IllegalArgumentException("importance not set at wanted height");
+		}
+		return importance;
+	}
+
 	@Override
 	public int hashCode() {
 		return this.address.hashCode();
@@ -375,6 +396,8 @@ public class Account implements SerializableEntity {
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
 		copy.weightedBalances = this.weightedBalances.copy();
+		copy.importance = this.importance;
+		copy.importanceHeight = this.importanceHeight;
 		return copy;
 	}
 }

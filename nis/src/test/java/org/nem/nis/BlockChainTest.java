@@ -19,6 +19,7 @@ import org.nem.core.model.TransferTransaction;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
+import org.nem.nis.test.MockBlockScorerAnalyzer;
 import org.nem.nis.test.MockForaging;
 
 import java.lang.reflect.Field;
@@ -125,7 +126,7 @@ public class BlockChainTest {
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, accountAnalyzer);
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);

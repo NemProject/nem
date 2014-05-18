@@ -5,7 +5,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.BlockHeight;
 import org.nem.nis.poi.*;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * This is a first draft implementation of the POI importance calculation.
@@ -24,18 +24,18 @@ public class PoiAlphaImpl implements Poi {
 	public static final int DEFAULT_MAX_ITERS = 200;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
-	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts) {
+	public ColumnVector getAccountImportances(final BlockHeight blockHeight, Collection<Account> accounts) {
 		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEWV2);
 	}
 
-	public ColumnVector getAccountImportances(final BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
+	public ColumnVector getAccountImportances(final BlockHeight blockHeight, Collection<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
 		return calculateImportancesImpl(blockHeight, accounts, scoringAlg);
 	}
 
 	// This is the draft implementation for calculating proof-of-importance
 	private ColumnVector calculateImportancesImpl(
 			final BlockHeight blockHeight,
-			final List<Account> accounts,
+			final Collection<Account> accounts,
 			final PoiScorer.ScoringAlg scoringAlg) {
 
 		// (1) set up the matrices and vectors

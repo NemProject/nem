@@ -30,15 +30,15 @@ public class BlockChain implements BlockSynchronizer {
 
 	private final AccountDao accountDao;
 
-	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
-	private BlockDao blockDao;
+	private final BlockDao blockDao;
 
-	private AccountAnalyzer accountAnalyzer;
+	private final AccountAnalyzer accountAnalyzer;
 
-	private Foraging foraging;
+	private final Foraging foraging;
 
-	private final BlockScorer scorer = new BlockScorer();
+	private BlockScorer scorer;
 
 	@Autowired(required = true)
 	public BlockChain(
@@ -52,10 +52,13 @@ public class BlockChain implements BlockSynchronizer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.foraging = foraging;
+
+		// this.scorer = null;
 	}
 
 	public Block forageBlock() {
-		Block block = this.foraging.forageBlock();
+		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer);
+		final Block block = this.foraging.forageBlock(scorer);
 
 		// make a full-blown analysis
 		// TODO: we can call it thanks to the "hack" inside processBlock
@@ -322,7 +325,9 @@ public class BlockChain implements BlockSynchronizer {
 
 		// do not trust peer, take first block from our db and convert it
 		final Block parentBlock = BlockMapper.toModel(parent, contemporaryAccountAnalyzer);
+		this.scorer = new BlockScorer(contemporaryAccountAnalyzer);
 		if (!validatePeerChain(parentBlock, peerChain)) {
+			this.scorer = null;
 			// penalty?
 			return false;
 		}
@@ -333,6 +338,7 @@ public class BlockChain implements BlockSynchronizer {
 			// penalty?
 			return false;
 		}
+		this.scorer = null;
 
 		LOGGER.info("our score: " + Long.toString(ourScore) + " peer's score: " + Long.toString(peerScore));
 		if (peerScore < ourScore) {

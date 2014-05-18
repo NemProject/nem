@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.nem.core.math.ColumnVector;
@@ -12,6 +13,6 @@ import org.nem.nis.poi.PoiScorer;
  * implementations, so I moved this out to make that easier.
  */
 public interface Poi {
-	public ColumnVector getAccountImportances(BlockHeight blockHeight, List<Account> accounts);
-	public ColumnVector getAccountImportances(BlockHeight blockHeight, List<Account> accounts, PoiScorer.ScoringAlg scoringAlg);
+	public ColumnVector getAccountImportances(BlockHeight blockHeight, Collection<Account> accounts);
+	public ColumnVector getAccountImportances(BlockHeight blockHeight, Collection<Account> accounts, PoiScorer.ScoringAlg scoringAlg);
 }

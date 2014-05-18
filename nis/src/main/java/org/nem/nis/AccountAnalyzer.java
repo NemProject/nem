@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.*;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 
@@ -19,11 +20,16 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 
 	private final ConcurrentHashMap<Address, Account> addressToAccountMap;
 
+	private final Poi poi;
+
+	private BlockHeight lastPoiRecalc;
+
 	/**
 	 * Creates a new, empty account cache.
 	 */
 	public AccountAnalyzer() {
 		this.addressToAccountMap = new ConcurrentHashMap<>();
+		this.poi = new PoiAlphaImpl();
 	}
 
 	/**
@@ -131,6 +137,22 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	@Override
 	public Iterator<Account> iterator() {
 		return this.addressToAccountMap.values().iterator();
+	}
+
+	public void recalculateImportances(final BlockHeight blockHeight) {
+		if (lastPoiRecalc == null || lastPoiRecalc.compareTo(blockHeight) != 0) {
+			final Collection<Account> accounts = this.addressToAccountMap.values();
+			final ColumnVector poiVector = poi.getAccountImportances(blockHeight, accounts);
+
+			// TODO: I'm missing something like for (pair : zip(accounts, poiVector))
+			int i = 0;
+			for (Account account : accounts) {
+				account.setImportance(blockHeight, poiVector.getAt(i));
+				i++;
+			}
+
+			lastPoiRecalc = blockHeight;
+		}
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {
