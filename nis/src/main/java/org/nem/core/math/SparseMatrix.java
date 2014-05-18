@@ -140,9 +140,13 @@ public class SparseMatrix extends Matrix {
 	 */
 	private void remove(int row, int col) {
 		// Shrink arrays
-		System.arraycopy(this.cols[row], col+1, this.cols[row], col, this.cols[row].length-1-col);
-		System.arraycopy(this.values[row], col+1, this.values[row], col, this.values[row].length-1-col);
-		this.maxIndices[row] -= 1;
+		final int lastIndex = this.maxIndices[row] - 1;
+		if (lastIndex > 0) {
+			this.cols[row][col] = this.cols[row][lastIndex];
+			this.values[row][col] = this.values[row][lastIndex];
+		}
+
+		--this.maxIndices[row];
 	}
 	
 	/**

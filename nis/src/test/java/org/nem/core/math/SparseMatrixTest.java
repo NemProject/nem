@@ -38,6 +38,22 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	}
 
 	@Test
+	public void lastEntryCanBeRemoved() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
+
+		// Act:
+		sparseMatrix.setAt(0, 1, 0.0);
+		sparseMatrix.setAt(0, 0, 0.0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void rowCanBeReallocated() {
 		// Arrange:
 		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 1);
