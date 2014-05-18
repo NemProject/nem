@@ -98,6 +98,18 @@ public class SparseMatrix extends Matrix {
 		}
 	}
 
+	@Override
+	protected final void forEach(final ReadOnlyElementVisitorFunction func) {
+		for (int i = 0; i < this.numRows; ++i) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			for (int j = 0; j < size; ++j) {
+				func.visit(i, rowCols[j], rowValues[j]);
+			}
+		}
+	}
+
 	//endregion
 
 	/**

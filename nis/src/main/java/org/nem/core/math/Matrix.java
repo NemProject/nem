@@ -229,9 +229,7 @@ public abstract class Matrix {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 
 		double[] rawResult = new double[this.numRows];
-		double[] rawVector = new double[this.numCols];
-		for (int i = 0; i < this.numCols; ++i)
-			rawVector[i] = vector.getAt(i);
+		double[] rawVector = vector.getRaw();
 
 		this.forEach((r, c, v) -> rawResult[r] += v * rawVector[c]);
 		return new ColumnVector(rawResult);

@@ -67,11 +67,7 @@ public class TunedMtjSparseMatrix extends Matrix {
 		if (numCols != vector.size())
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 
-		double[] rawVector = new double[numCols];
-		for (int i = 0; i < numCols; ++i)
-			rawVector[i] = vector.getAt(i);
-
-		final DenseVector multiplier = new DenseVector(rawVector);
+		final DenseVector multiplier = new DenseVector(vector.getRaw());
 		final DenseVector result = new DenseVector(this.matrix.numRows());
 
 		this.matrix.mult(multiplier, result);

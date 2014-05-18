@@ -98,6 +98,18 @@ public class TunedSparseMatrix extends Matrix {
 		}
 	}
 
+	@Override
+	protected final void forEach(final ReadOnlyElementVisitorFunction func) {
+		for (int i = 0; i < this.numRows; i++) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			for (int j = 0; j < size; j++) {
+				func.visit(i, rowCols[j], rowValues[j]);
+			}
+		}
+	}
+
 	//endregion
 
 	/**
@@ -154,10 +166,7 @@ public class TunedSparseMatrix extends Matrix {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
 		double[] result = new double[this.numRows];
-		double[] rawVector = new double[this.numRows];
-		for (int i=0; i<this.numCols; i++) {
-			rawVector[i] = vector.getAt(i);
-		}
+		double[] rawVector = vector.getRaw();
 		for (int i=0; i<numRows; i++) {
 			double[] rowValues = this.values[i];
 			int[] rowCols = this.cols[i];

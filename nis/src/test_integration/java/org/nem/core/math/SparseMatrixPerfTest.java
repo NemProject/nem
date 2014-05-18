@@ -18,7 +18,7 @@ public class SparseMatrixPerfTest {
 	@Test
 	public void timeNormalizeColumnsFewRepetitions() {
 		LOGGER.info("timeNormalizeColumnsFewRepetitions");
-		timeNormalizeColumns(1000000, 5, 4);
+		timeNormalizeColumns(1000000, 50, 4);
 	}
 
 	private static void timeNormalizeColumns(final int numRows, final int numTries, final int maxEntriesPerRow) {
@@ -32,7 +32,7 @@ public class SparseMatrixPerfTest {
 	@Test
 	public void timeMatrixVectorMultiplyFewRepetitions() {
 		LOGGER.info("timeMatrixVectorMultiplyFewRepetitions");
-		timeMatrixVectorMultiply(1000000, 5, 4);
+		timeMatrixVectorMultiply(1000000, 50, 4);
 	}
 
 	public static void timeMatrixVectorMultiply(final int numRows, final int numTries, final int maxEntriesPerRow) {
