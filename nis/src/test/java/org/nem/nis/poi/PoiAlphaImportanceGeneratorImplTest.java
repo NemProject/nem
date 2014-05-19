@@ -315,17 +315,28 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		//TODO: I don't know why the outlinks vectors are the same for the two groups of accounts below.
 		// Arrange:
 		// Accounts with smaller vested balance should be able to have more importance than accounts with high balance and low activity
+		final int numAccounts = 10;
+		
 		List<Account> accounts = new ArrayList<>();
-		accounts.addAll(createUserAccounts(1, 10, 10000, 1, 500, OUTLINK_STRATEGY_RANDOM));
-		accounts.addAll(createUserAccounts(1, 10, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(createUserAccounts(1, numAccounts, 10000, 1, 500, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(createUserAccounts(1, numAccounts, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
 
 		// Act: calculate importances
 		ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		double ratio = (importances.getAt(0) + importances.getAt(1))/(importances.getAt(2) + importances.getAt(3));
-		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(importances.getAt(0) + importances.getAt(1)));
-		System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2) + importances.getAt(3)));
+		
+		double highBalanceSum = 0;
+		double lowBalanceSum = 0;
+		
+		for (int ndx = 0; ndx < numAccounts; ndx++) {
+			highBalanceSum += importances.getAt(ndx);
+			lowBalanceSum += importances.getAt(ndx + numAccounts);
+		}
+		
+		double ratio = highBalanceSum/lowBalanceSum;
+		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(highBalanceSum));
+		System.out.print(", User 2 cumulative importance is " + format.format(lowBalanceSum));
 		System.out.println(", ratio is " + format.format(ratio));
 //		System.out.println("Importances: " + importances);
 		System.out.println("");

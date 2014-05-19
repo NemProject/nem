@@ -21,7 +21,7 @@ public interface PoiImportanceGenerator {
 	public default ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<Account> accounts) {
-		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.BLOODYROOKIENEWV2);
+		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.MAKOTO);
 	}
 
 	/**

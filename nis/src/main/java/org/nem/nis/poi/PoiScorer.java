@@ -187,6 +187,9 @@ public class PoiScorer {
 		double c1 = 2.;
 		double c2 = 0.01;
 
+//		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(vestedBalanceVector);
+//		ColumnVector weightedImportances = importanceVector.multiply(c2);
+		
 		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(vestedBalanceVector);
 		ColumnVector weightedImportances = importanceVector.multiply(c2);
 
