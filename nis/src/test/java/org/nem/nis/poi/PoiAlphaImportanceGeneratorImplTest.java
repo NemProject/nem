@@ -168,7 +168,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
 		}
 		System.out.println("");
 	}
@@ -209,7 +209,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		LOGGER.info("1 account vs. 8 accounts with 0 or 1 big lazy account");
 
 		// Arrange 1 vs 8, with 0 or 1 big lazy account:
-		// The presence of a big lazy account should have no influence on the importance distribution.
+		// The presence of a big lazy account should have no influence on the relative importance distribution.
 		List<Account> accounts = new ArrayList<>();
 		for (int i=0; i<2; i++) {
 			accounts.clear();
@@ -239,7 +239,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	public void outlinkStrengthSplittingDoesNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account with 1 outlink vs. 1 account many outlinks (same cumulative strength)");
 
-		// Arrange 1 vs 1, the latter distributes the strength to many outlinks:
+		// Arrange: 1 vs 1, the latter distributes the strength to many outlinks:
 		// Splitting one transaction into many small transactions should have no influence on the importance distribution.
 		List<Account> accounts = new ArrayList<>();
 		for (int i=1; i<10; i++) {
@@ -306,7 +306,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		System.out.println("");
 		
 		// Assert
-		Assert.assertTrue(ratio > 100.0);
+		Assert.assertTrue(ratio > 10.0);
 	}
 
 	@Test
@@ -331,14 +331,14 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		
 		for (int ndx = 0; ndx < numAccounts; ndx++) {
 			highBalanceSum += importances.getAt(ndx);
-			lowBalanceSum += importances.getAt(ndx + numAccounts);
+			lowBalanceSum  += importances.getAt(ndx + numAccounts);
 		}
 		
 		double ratio = highBalanceSum/lowBalanceSum;
 		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(highBalanceSum));
 		System.out.print(", User 2 cumulative importance is " + format.format(lowBalanceSum));
 		System.out.println(", ratio is " + format.format(ratio));
-//		System.out.println("Importances: " + importances);
+		System.out.println("Importances: " + importances);
 		System.out.println("");
 
 		// Assert
@@ -366,7 +366,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		System.out.println("");
 
 		// Assert
-		Assert.assertTrue(ratio >= 1.0);
+		Assert.assertTrue(ratio > .95);
 	}
 	
 	@Test

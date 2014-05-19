@@ -53,9 +53,9 @@ public class PoiScorer {
 			final ScoringAlg scoringAlg) {
 
 		//TODO: For testing use, take out when final scoring alg is decided
-//		System.out.println("outLinkVector" + outLinkVector);
-//		System.out.println("importanceVector" + importanceVector);
-//		System.out.println("vestedBalanceVector" + vestedBalanceVector);
+		System.out.println("outLinkVector" + outLinkVector);
+		System.out.println("importanceVector" + importanceVector);
+		System.out.println("vestedBalanceVector" + vestedBalanceVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,
@@ -176,22 +176,12 @@ public class PoiScorer {
 			final ColumnVector outLinkVector,
 			final ColumnVector vestedBalanceVector) {
 		
-		// alg is: l1norm(stakes * c1*outLinkVector) + c2 * l1norm(PR)
+		// alg is: l1norm(stakes + outlinkWeight*outLinkVector) + importanceWeight * l1norm(PR)
+		double outlinkWeight = 1.05;
+		double importanceWeight = 0.05;
 
-		vestedBalanceVector.normalize();
-		outLinkVector.normalize();
-
-		System.out.println("normalized vestedBalanceVector: " + vestedBalanceVector);
-		System.out.println("normalized outLinkVector: " + outLinkVector);
-
-		double c1 = 2.;
-		double c2 = 0.01;
-
-//		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(vestedBalanceVector);
-//		ColumnVector weightedImportances = importanceVector.multiply(c2);
-		
-		ColumnVector weightedOutlinks = outLinkVector.multiply(c1).multiplyElementWise(vestedBalanceVector);
-		ColumnVector weightedImportances = importanceVector.multiply(c2);
+		ColumnVector weightedOutlinks = outLinkVector.multiply(outlinkWeight).add(vestedBalanceVector);
+		ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
 
 		weightedOutlinks.normalize();
 
