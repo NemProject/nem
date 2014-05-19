@@ -57,7 +57,7 @@ public class AccountImportance {
 	 * @param importance The importance.
 	 */
 	public void setImportance(final BlockHeight blockHeight, double importance) {
-		if (null == importanceHeight || 0 == this.importanceHeight.compareTo(blockHeight)) {
+		if (null == importanceHeight || 0 != this.importanceHeight.compareTo(blockHeight)) {
 			this.importanceHeight = blockHeight;
 			this.importance = importance;
 

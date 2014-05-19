@@ -390,7 +390,6 @@ public class AccountAnalyzerTest {
 	}
 
 	// TODO: this test is failing because the AccountAnalyzer is storing accounts in a map, so the order is not guaranteed
-	// TODO: also, importances can't be updated in the Account class either :/
 	@Test
 	public void recalculateImportancesRecalculatesImportancesForNewBlockHeight() {
 		// Arrange:
