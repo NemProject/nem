@@ -2,6 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.model.BlockHeight;
 import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.ObjectDeserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
 
@@ -9,6 +10,8 @@ import org.nem.core.serialization.Serializer;
  * Class for holding additional information about transaction required by ncc.
  */
 public class TransactionMetaData implements SerializableEntity {
+	public static final ObjectDeserializer<TransactionMetaData> DESERIALIZER = TransactionMetaData::new;
+
 	private BlockHeight height;
 
 	public TransactionMetaData(final BlockHeight blockHeight) {
