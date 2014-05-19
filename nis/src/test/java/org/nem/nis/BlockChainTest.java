@@ -88,7 +88,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000_000_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000_000_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
@@ -96,7 +96,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -109,7 +109,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();

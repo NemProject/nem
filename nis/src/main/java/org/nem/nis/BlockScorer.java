@@ -73,7 +73,8 @@ public class BlockScorer {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
 		this.accountAnalyzer.recalculateImportances(blockHeight);
 		// TODO: how this should be scaled?
-		long forgerBalance = (long)( block.getSigner().getImportance(blockHeight) * 4_000_000_000L * 1_000_000);
+		final long multiplier = 4_000_000_000L * 1_000_000;
+		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)

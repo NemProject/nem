@@ -170,10 +170,10 @@ public class BlockScorerTest {
 	private Account createAccountWithBalance(MockBlockScorerAnalyzer mockBlockScorerAnalyzer, long balance) {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(Amount.fromNem(balance));
-		account.weightedReceive(BlockHeight.ONE, Amount.fromNem(balance));
+		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 		final Account blockSigner = mockBlockScorerAnalyzer.addAccountToCache(account.getAddress());
 		blockSigner.incrementBalance(Amount.fromNem(balance));
-		blockSigner.weightedReceive(BlockHeight.ONE, Amount.fromNem(balance));
+		blockSigner.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 		return account;
 	}
 }

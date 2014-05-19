@@ -16,14 +16,10 @@ public class Account implements SerializableEntity {
 	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
-	
-	private final HistoricalOutlinks historicalOutlinks;
-	
-	private BlockAmount foragedBlocks;
-	private WeightedBalances weightedBalances;
+	private BlockAmount foragedBlocks = BlockAmount.ZERO;
 
-	private BlockHeight importanceHeight;
-	private double importance;
+	private final WeightedBalances weightedBalances = new WeightedBalances();
+	private final AccountImportance importance = new AccountImportance();
 
 	/**
 	 * Creates an account around a key pair.
@@ -54,9 +50,6 @@ public class Account implements SerializableEntity {
 		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
-		this.foragedBlocks = BlockAmount.ZERO;
-		this.weightedBalances = new WeightedBalances();
-		this.historicalOutlinks = new HistoricalOutlinks();
 	}
 
 	/**
@@ -209,80 +202,21 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the historical balance at a given height.
+	 * Gets the weighted balances associated with this account.
 	 *
-	 * @return The historical balance.
+	 * @return The weighted balances
 	 */
-	public Amount getBalance(final BlockHeight lastBlockHeight, final BlockHeight height) {
-		return this.weightedBalances.historicalBalances.getBalance(lastBlockHeight, height);
+	public WeightedBalances getWeightedBalances() {
+		return this.weightedBalances;
 	}
 
-	public Amount getVestedBalance(final BlockHeight height) {
-		return this.weightedBalances.getVested(height);
-	}
-
-	public Amount getUnvestedBalance(final BlockHeight height) {
-		return this.weightedBalances.getUnvested(height);
-	}
-
-	public void weightedSend(final BlockHeight blockHeight, final Amount amount) {
-		this.weightedBalances.addSend(blockHeight, amount);
-	}
-
-	public void weightedSendUndo(final BlockHeight blockHeight, final Amount amount) {
-		this.weightedBalances.undoSend(blockHeight, amount);
-	}
-
-	public void weightedReceive(final BlockHeight blockHeight, final Amount amount) {
-		this.weightedBalances.addReceive(blockHeight, amount);
-	}
-
-	public void weightedReceiveUndo(final BlockHeight blockHeight, final Amount amount) {
-		this.weightedBalances.undoReceive(blockHeight, amount);
-	}
-
-	
 	/**
-	 * @param accountLink - an outlink to add
+	 * Gets the importance information associated with this account.
+	 *
+	 * @return The importance information associated with this account.
 	 */
-	public void addOutlink(final BlockHeight height, final AccountLink accountLink) {
-		historicalOutlinks.add(height, accountLink.getOtherAccount(), accountLink.getAmount());
-	}
-	
-	/**
-	 * @param accountLink - an outlink to remove
-	 */
-	public void removeOutlink(final BlockHeight height, AccountLink accountLink) {
-		historicalOutlinks.remove(height, accountLink.getOtherAccount(), accountLink.getAmount());
-	}
-	
-	/**
-	 * @return the outlinks
-	 */
-	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
-		return historicalOutlinks.outlinksIterator(blockHeight);
-	}
-
-	public int getOutlinksSize(final BlockHeight blockHeight) {
-		return historicalOutlinks.outlinksSize(blockHeight);
-	}
-
-
-	public void setImportance(final BlockHeight blockHeight, double importance) {
-		if (importanceHeight == null || importanceHeight.compareTo(blockHeight) == 0) {
-			this.importanceHeight = blockHeight;
-			this.importance = importance;
-
-		} else if (importanceHeight.compareTo(blockHeight) != 0) {
-			throw new IllegalArgumentException("importance already set at given height");
-		}
-	}
-
-	public double getImportance(final BlockHeight blockHeight) {
-		if (importanceHeight == null || importanceHeight.compareTo(blockHeight) != 0) {
-			throw new IllegalArgumentException("importance not set at wanted height");
-		}
-		return importance;
+	public AccountImportance getImportanceInfo() {
+		return this.importance;
 	}
 
 	@Override
@@ -395,9 +329,9 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
-		copy.weightedBalances = this.weightedBalances.copy();
-		copy.importance = this.importance;
-		copy.importanceHeight = this.importanceHeight;
+		// TODO: fix copying
+//		copy.weightedBalances = this.weightedBalances.copy();
+//		copy.importance = this.importance;
 		return copy;
 	}
 }

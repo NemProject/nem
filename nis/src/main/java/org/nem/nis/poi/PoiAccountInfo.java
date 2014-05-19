@@ -34,8 +34,9 @@ public class PoiAccountInfo {
 			return;
 		}
 
-		final Iterator<AccountLink> outLinks = this.account.getOutlinksIterator(height);
-		this.outLinkWeightsVector = new ColumnVector(this.account.getOutlinksSize(height));
+		final AccountImportance importanceInfo = this.account.getImportanceInfo();
+		final Iterator<AccountLink> outLinks = importanceInfo.getOutLinksIterator(height);
+		this.outLinkWeightsVector = new ColumnVector(importanceInfo.getOutLinksSize(height));
 
 		// weight = outlink amount * DECAY_BASE^(age in days)
 		int i = 0;
@@ -69,7 +70,7 @@ public class PoiAccountInfo {
 	 * @return true if the account is eligible.
 	 */
 	public boolean canForage(final BlockHeight height) {
-		return this.account.getVestedBalance(height).compareTo(MIN_FORAGING_BALANCE) >= 0
+		return this.account.getWeightedBalances().getVested(height).compareTo(MIN_FORAGING_BALANCE) >= 0
 				&& this.account.getBalance().compareTo(MIN_FORAGING_BALANCE) >= 0;
 	}
 
@@ -79,7 +80,7 @@ public class PoiAccountInfo {
 	 * @return true if the account has any out-links.
 	 */
 	public boolean hasOutLinks(final BlockHeight blockHeight) {
-		return this.account.getOutlinksSize(blockHeight) != 0;
+		return 0 != this.account.getImportanceInfo().getOutLinksSize(blockHeight);
 	}
 
 	/**

@@ -155,7 +155,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 
 		int i = 0;
 		for (final Account account : accounts)
-			account.setImportance(blockHeight, poiVector.getAt(i++));
+			account.getImportanceInfo().setImportance(blockHeight, poiVector.getAt(i++));
 
 		this.lastPoiRecalc = blockHeight;
 	}

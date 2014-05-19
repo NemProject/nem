@@ -30,6 +30,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+
+		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -45,6 +48,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+
+		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -62,6 +68,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+
+		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	//endregion
@@ -379,6 +388,9 @@ public class AccountTest {
 		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
 		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
 		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+
+		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
@@ -426,7 +438,7 @@ public class AccountTest {
 	//region inline serialization
 
 	@Test
-	public void canWriteAccount() {
+	public void canWriteAccountWithDefaultEncoding() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Address address = Address.fromEncoded("MockAcc");
@@ -493,7 +505,7 @@ public class AccountTest {
 	}
 
 	@Test
-	public void canRoundtripAccount() {
+	public void canRoundtripAccountWithDefaultEncoding() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Address address = Address.fromEncoded("MockAcc");
@@ -583,6 +595,18 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
+		// Assert:
+		Assert.fail();
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountImportance() {
+		// Assert:
+		Assert.fail();
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {

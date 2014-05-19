@@ -370,7 +370,7 @@ public class AccountAnalyzerTest {
 		// Assert: all accounts have the expected importance values
 		for (int i = 0; i < finalImportanceVector.size(); ++i) {
 			Assert.assertThat(
-					accounts.get(i).getImportance(new BlockHeight(7)),
+					accounts.get(i).getImportanceInfo().getImportance(new BlockHeight(7)),
 					IsEqual.equalTo(finalImportanceVector.getAt(i)));
 		}
 	}
@@ -419,7 +419,7 @@ public class AccountAnalyzerTest {
 		// Assert: all accounts have the expected (most recent) importance values
 		for (int i = 0; i < finalImportanceVector.size(); ++i) {
 			Assert.assertThat(
-					accounts.get(i).getImportance(new BlockHeight(8)),
+					accounts.get(i).getImportanceInfo().getImportance(new BlockHeight(8)),
 					IsEqual.equalTo(finalImportanceVector.getAt(i)));
 		}
 	}
