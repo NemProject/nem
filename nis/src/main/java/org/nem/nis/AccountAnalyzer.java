@@ -20,17 +20,18 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	private static final Logger LOGGER = Logger.getLogger(AccountAnalyzer.class.getName());
 
 	private final ConcurrentHashMap<Address, Account> addressToAccountMap;
-
 	private final PoiImportanceGenerator importanceGenerator;
 
 	private BlockHeight lastPoiRecalc;
 
 	/**
 	 * Creates a new, empty account cache.
+	 *
+	 * @param importanceGenerator The importance generator to use.
 	 */
-	public AccountAnalyzer() {
+	public AccountAnalyzer(final PoiImportanceGenerator importanceGenerator) {
 		this.addressToAccountMap = new ConcurrentHashMap<>();
-		this.importanceGenerator = new PoiAlphaImportanceGeneratorImpl();
+		this.importanceGenerator = importanceGenerator;
 	}
 
 	/**
@@ -127,7 +128,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	 * @return A copy of this analyzer.
 	 */
 	public AccountAnalyzer copy() {
-		final AccountAnalyzer copy = new AccountAnalyzer();
+		final AccountAnalyzer copy = new AccountAnalyzer(this.importanceGenerator);
 		for (final Map.Entry<Address, Account> entry : this.addressToAccountMap.entrySet()) {
 			copy.addressToAccountMap.put(entry.getKey(), entry.getValue().copy());
 		}
@@ -140,25 +141,28 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		return this.addressToAccountMap.values().iterator();
 	}
 
+	/**
+	 * Recalculates the importance of all accounts at the specified block height.
+	 *
+	 * @param blockHeight The block height.
+	 */
 	public void recalculateImportances(final BlockHeight blockHeight) {
-		if (lastPoiRecalc == null || lastPoiRecalc.compareTo(blockHeight) != 0) {
-			final Collection<Account> accounts = this.addressToAccountMap.values();
-			final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
+		if (null != this.lastPoiRecalc && 0 == this.lastPoiRecalc.compareTo(blockHeight))
+			return;
 
-			// TODO: I'm missing something like for (pair : zip(accounts, poiVector))
-			int i = 0;
-			for (Account account : accounts) {
-				account.setImportance(blockHeight, poiVector.getAt(i));
-				i++;
-			}
+		final Collection<Account> accounts = this.addressToAccountMap.values();
+		final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
 
-			lastPoiRecalc = blockHeight;
-		}
+		int i = 0;
+		for (final Account account : accounts)
+			account.setImportance(blockHeight, poiVector.getAt(i++));
+
+		this.lastPoiRecalc = blockHeight;
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {
 
-		final AccountAnalyzer accountAnalyzer;
+		private final AccountAnalyzer accountAnalyzer;
 
 		public AutoCacheAccountLookup(final AccountAnalyzer accountAnalyzer) {
 			this.accountAnalyzer = accountAnalyzer;

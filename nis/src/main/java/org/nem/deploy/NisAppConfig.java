@@ -9,6 +9,7 @@ import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -96,7 +97,7 @@ public class NisAppConfig {
 
 	@Bean
 	public AccountAnalyzer accountAnalyzer() {
-		return new AccountAnalyzer();
+		return new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
 	}
 
 	@Bean

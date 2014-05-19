@@ -6,9 +6,11 @@ import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
@@ -231,7 +233,7 @@ public class ForagingTest {
 	public void canSignBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 		final MockForaging foraging = new MockForaging(accountAnalyzer, lastBlockLayer);
 		final Account account = Utils.generateRandomAccount();
 		accountAnalyzer.addAccountToCache(account.getAddress());
