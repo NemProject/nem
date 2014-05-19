@@ -345,7 +345,6 @@ public class AccountAnalyzerTest {
 
 	//region recalculateImportances
 
-	// TODO: this test is failing because the AccountAnalyzer is storing accounts in a map, so the order is not guaranteed
 	@Test
 	public void recalculateImportancesDelegatesToImportanceGenerator() {
 		// Arrange:
@@ -367,12 +366,15 @@ public class AccountAnalyzerTest {
 		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
 
+		final Set<Double> finalList = primitiveArrayToSet(finalImportanceVector.getRaw());
 		// Assert: all accounts have the expected importance values
-		for (int i = 0; i < finalImportanceVector.size(); ++i) {
-			Assert.assertThat(
-					accounts.get(i).getImportanceInfo().getImportance(new BlockHeight(7)),
-					IsEqual.equalTo(finalImportanceVector.getAt(i)));
-		}
+		Assert.assertThat(
+				accounts.stream()
+						.map(Account::getImportanceInfo)
+						.map(a -> a.getImportance(new BlockHeight(7))).collect(Collectors.toSet())
+				,
+				IsEqual.equalTo(finalList)
+		);
 	}
 
 	@Test
@@ -389,7 +391,6 @@ public class AccountAnalyzerTest {
 		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 	}
 
-	// TODO: this test is failing because the AccountAnalyzer is storing accounts in a map, so the order is not guaranteed
 	@Test
 	public void recalculateImportancesRecalculatesImportancesForNewBlockHeight() {
 		// Arrange:
@@ -415,12 +416,22 @@ public class AccountAnalyzerTest {
 		Mockito.verify(importanceGenerator, Mockito.times(2)).getAccountImportances(Mockito.any(), Mockito.any());
 		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
 
-		// Assert: all accounts have the expected (most recent) importance values
-		for (int i = 0; i < finalImportanceVector.size(); ++i) {
-			Assert.assertThat(
-					accounts.get(i).getImportanceInfo().getImportance(new BlockHeight(8)),
-					IsEqual.equalTo(finalImportanceVector.getAt(i)));
+		final Set<Double> finalList = primitiveArrayToSet(finalImportanceVector.getRaw());
+		Assert.assertThat(
+			accounts.stream()
+				.map(Account::getImportanceInfo)
+				.map(a -> a.getImportance(new BlockHeight(8))).collect(Collectors.toSet())
+			,
+			IsEqual.equalTo(finalList)
+		);
+	}
+
+	private Set<Double> primitiveArrayToSet(double[] primitiveArray) {
+		final Set<Double> finalList = new HashSet<>();
+		for (double d : primitiveArray) {
+			finalList.add(d);
 		}
+		return finalList;
 	}
 
 	@SuppressWarnings("unchecked")
