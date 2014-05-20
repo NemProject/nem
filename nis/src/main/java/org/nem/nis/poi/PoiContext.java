@@ -157,11 +157,10 @@ public class PoiContext {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
 				numOutLinks += account.getOutlinksSize(height);
 
-				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
-				// TODO: (this should shrink the matrix size)
-				// TODO: I would recommend playing around with this after we get POI working initially
-				//	 if (!accountInfo.canForage())
-				//	 continue;
+				// TODO: to simplify the calculation, should we exclude accounts that can't forage? (this should shrink the matrix size)
+//				if (!accountInfo.canForage(height)) {
+//					 continue;
+//				}
 
 				this.addressToIndexMap.put(account.getAddress(), i);
 
