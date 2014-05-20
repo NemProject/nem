@@ -65,12 +65,13 @@ public class TransferDaoImpl implements TransferDao {
 		return null;
 	}
 
+	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
 	@Transactional
-	public Collection<Transfer> getTransactionsForAccount(final Account address, final int limit) {
+	public Collection<Object[]> getTransactionsForAccount(final Account address, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		Query query = getCurrentSession()
-				.createQuery("from Transfer t where t.recipient.printableKey = :pubkey or t.sender.printableKey = :pubkey")
+				.createQuery("select t, t.block.id from Transfer t where t.recipient.printableKey = :pubkey or t.sender.printableKey = :pubkey")
 				.setParameter("pubkey", address.getAddress().getEncoded());
 		return listAndCast(query);
 	}

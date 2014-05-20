@@ -1,8 +1,8 @@
 package org.nem.nis.controller;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.service.AccountIo;
@@ -43,7 +43,7 @@ public class AccountController {
 
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Transaction> accountUnlock(@RequestParam(value = "address") final String nemAddress) {
+	public SerializableList<TransactionMetaDataPair> accountUnlock(@RequestParam(value = "address") final String nemAddress) {
 		return this.accountIo.getAccountTransfers(getAddress(nemAddress));
 	}
 

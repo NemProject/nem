@@ -34,5 +34,5 @@ public interface ReadOnlyTransferDao {
 	 * @param limit The limit.
 	 * @return (sorted?) Collection of Transfers
 	 */
-	public Collection<Transfer> getTransactionsForAccount(final Account account, final int limit);
+	public Collection<Object[]> getTransactionsForAccount(final Account account, final int limit);
 }
