@@ -56,7 +56,7 @@ public class NisMain {
 
 		final Account genesisAccount = accountAnalyzer.addAccountToCache(GenesisBlock.ACCOUNT.getAddress());
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
-		genesisAccount.weightedReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
+		genesisAccount.getWeightedBalances().addReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
 
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());

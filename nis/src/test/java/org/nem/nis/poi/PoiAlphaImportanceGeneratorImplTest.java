@@ -45,7 +45,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// A sends all 100 NEM to B,
-		a.addOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(100), b));
+		addOutlink(a, b, blockHeight, 100);
 
 		List<Account> accts = Arrays.asList(a, b, c);
 
@@ -120,7 +120,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	}
 
 	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
-		a.addOutlink(blockHeight, new AccountLink(blockHeight, Amount.fromNem(amount), b));
+		a.getImportanceInfo().addOutLink(new AccountLink(blockHeight, Amount.fromNem(amount), b));
 	}
 
 	@Test

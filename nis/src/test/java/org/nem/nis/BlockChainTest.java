@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
@@ -16,10 +17,10 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.model.TransferTransaction;
+import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
-import org.nem.nis.test.MockBlockScorerAnalyzer;
 import org.nem.nis.test.MockForaging;
 
 import java.lang.reflect.Field;
@@ -87,7 +88,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000_000_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000_000_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
@@ -95,7 +96,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -108,7 +109,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.weightedReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
@@ -121,7 +122,7 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
 		final Account signer = accounts.get(0);
 

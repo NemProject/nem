@@ -1,19 +1,23 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.BlockHeight;
+import org.mockito.Mockito;
+import org.nem.core.model.*;
 import org.nem.nis.AccountAnalyzer;
-
-import java.util.Iterator;
+import org.nem.nis.poi.PoiImportanceGenerator;
 
 public class MockBlockScorerAnalyzer extends AccountAnalyzer {
 
+	public MockBlockScorerAnalyzer() {
+		super(Mockito.mock(PoiImportanceGenerator.class));
+	}
+
 	@Override
 	public void recalculateImportances(final BlockHeight blockHeight) {
-		final Iterator<Account> accountIterator = iterator();
-		while (accountIterator.hasNext()) {
-			final Account account = accountIterator.next();
-			account.setImportance(blockHeight, account.getBalance(blockHeight, blockHeight).getNumMicroNem()/1000.0);
+		for (final Account account : this) {
+			final HistoricalBalances historicalBalances = account.getWeightedBalances().historicalBalances;
+			final Amount balance = historicalBalances.getHistoricalBalance(blockHeight, blockHeight).getBalance();
+			final double importance = balance.getNumMicroNem() / 1000.0;
+			account.getImportanceInfo().setImportance(blockHeight, importance);
 		}
 	}
 }

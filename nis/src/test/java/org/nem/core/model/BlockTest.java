@@ -388,7 +388,7 @@ public class BlockTest {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
 		account1.incrementBalance(Amount.fromNem(25));
-		account1.weightedReceive(BlockHeight.ONE, Amount.fromNem(25));
+		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
@@ -515,11 +515,11 @@ public class BlockTest {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
 		account1.incrementBalance(Amount.fromNem(25));
-		account1.weightedReceive(BlockHeight.ONE, Amount.fromNem(25));
+		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
 		final Account account2 = Utils.generateRandomAccount();
 		// this might look strange, but we won't be able to undo if weighted balances doesn't have
 		// knowledge, that somewhere in the past we received something
-		account2.weightedReceive(BlockHeight.ONE, Amount.fromNem(12));
+		account2.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(12));
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
 		transaction.setTransferAction(to -> {
@@ -531,7 +531,7 @@ public class BlockTest {
 		final BlockHeight height = new BlockHeight(11);
 		final Block block = createBlockWithHeight(height);
 		block.getSigner().incrementBalance(Amount.fromNem(7));
-		block.getSigner().weightedReceive(BlockHeight.ONE, Amount.fromNem(7));
+		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(7));
 		block.addTransaction(transaction);
 
 		registerObservers.accept(block);
@@ -582,7 +582,7 @@ public class BlockTest {
 			this.block.addTransaction(this.transaction1);
 			this.block.addTransaction(this.transaction2);
 
-			this.account.weightedReceive(BlockHeight.ONE, new Amount(100));
+			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
 		}
 
 		private MockTransaction createTransaction(final int customField, final long fee) {

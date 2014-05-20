@@ -101,7 +101,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
 		for (final AccountLink accountLink : outLinks) {
-			account.addOutlink(height, accountLink);
+			account.getImportanceInfo().addOutLink(accountLink);
 		}
 		return new PoiAccountInfo(11, account, height);
 	}
@@ -112,7 +112,7 @@ public class PoiAccountInfoTest {
 		final BlockHeight height = BlockHeight.ONE;
 		for (int amount : amounts) {
 			final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
-			account.addOutlink(height, link);
+			account.getImportanceInfo().addOutLink(link);
 		}
 
 		return new PoiAccountInfo(11, account, height);

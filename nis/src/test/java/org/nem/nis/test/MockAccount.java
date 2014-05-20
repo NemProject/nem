@@ -7,7 +7,6 @@ import java.util.*;
 
 /**
  * Mock Account implementation that allows the setting of coin days.
- * TODO: we need a better way to set vested balance
  */
 public class MockAccount extends Account {
 
@@ -42,7 +41,15 @@ public class MockAccount extends Account {
 	}
 
 	@Override
-	public Amount getVestedBalance(final BlockHeight blockHeight) {
-		return this.heightToVestedBalanceMap.getOrDefault(blockHeight, null);
+	public WeightedBalances getWeightedBalances() {
+		return new MockWeightedBalances();
+	}
+
+	private class MockWeightedBalances extends WeightedBalances  {
+
+		@Override
+		public Amount getVested(final BlockHeight blockHeight) {
+			return heightToVestedBalanceMap.getOrDefault(blockHeight, null);
+		}
 	}
 }
