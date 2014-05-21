@@ -6,6 +6,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A mock Transaction implementation.
@@ -15,13 +16,18 @@ public class MockTransaction extends Transaction {
 	public static final int TYPE = 124;
 	public static final int VERSION = 758;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
+	public static final TimeInstant DEADLINE = TIMESTAMP.addHours(2);
 
 	private int customField;
 	private long minimumFee;
 
-	private List<Integer> simulateExecuteList = new ArrayList<>();
 	private List<Integer> executeList = new ArrayList<>();
 	private List<Integer> undoList = new ArrayList<>();
+	private Consumer<TransferObserver> transferAction = to -> { };
+
+	public int numExecuteCommitCalls;
+	public int numUndoCommitCalls;
+	public int numTransferCalls;
 
 	/**
 	 * Creates a mock transaction.
@@ -48,6 +54,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final Account sender, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, sender);
 		this.customField = customField;
+		this.setDeadline(DEADLINE);
 	}
 
 	/**
@@ -60,6 +67,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final int customField, final TimeInstant timeStamp) {
 		super(TYPE, VERSION, timeStamp, Utils.generateRandomAccount());
 		this.customField = customField;
+		this.setDeadline(timeStamp.addHours(2));
 	}
 
 	/**
@@ -74,6 +82,7 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final long fee) {
 		super(type, version, timeStamp, Utils.generateRandomAccount());
 		this.setFee(new Amount(fee));
+		this.setDeadline(timeStamp.addHours(2));
 	}
 
 	/**
@@ -85,6 +94,27 @@ public class MockTransaction extends Transaction {
 		super(deserializer.readInt("type"), DeserializationOptions.VERIFIABLE, deserializer);
 		this.customField = deserializer.readInt("customField");
 	}
+
+	/**
+	 * Gets the number executeCommit was called.
+	 *
+	 * @return The number of times executeCommit was called.
+	 */
+	public int getNumExecuteCommitCalls() { return this.numExecuteCommitCalls; }
+
+	/**
+	 * Gets the number undoCommit was called.
+	 *
+	 * @return The number of times undoCommit was called.
+	 */
+	public int getNumUndoCommitCalls() { return this.numUndoCommitCalls; }
+
+	/**
+	 * Gets the number of times transfer was called.
+	 *
+	 * @return The number of times transfer was called.
+	 */
+	public int getNumTransferCalls() { return this.numTransferCalls; }
 
 	/**
 	 * Gets the custom field value.
@@ -122,9 +152,23 @@ public class MockTransaction extends Transaction {
 		this.undoList = list;
 	}
 
+	/**
+	 * Sets an action that should be executed when transfer is called.
+	 *
+	 * @param transferAction The action.
+	 */
+	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
+		this.transferAction = transferAction;
+	}
+
 	@Override
 	public boolean isValid() {
 		return super.isValid();
+	}
+
+	@Override
+	public boolean isValid(final TransactionValidator transactionValidator) {
+		return true;
 	}
 
 	@Override
@@ -139,19 +183,20 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public void execute() {
+	protected void executeCommit() {
+		++this.numExecuteCommitCalls;
 		this.executeList.add(this.customField);
 	}
 
 	@Override
-	public void undo() {
+	protected void undoCommit() {
+		++this.numUndoCommitCalls;
 		this.undoList.add(this.customField);
 	}
 
 	@Override
-	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
-		this.simulateExecuteList.add(this.customField);
-		return true;
+	protected void transfer(final TransferObserver observer) {
+		this.transferAction.accept(observer);
+		++this.numTransferCalls;
 	}
-
 }

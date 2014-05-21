@@ -3,11 +3,11 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.model.HashChain;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChain;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.service.RequiredBlockDaoAdapter;
 import org.nem.nis.test.*;
@@ -52,6 +52,6 @@ public class ChainControllerTest {
 		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(new BlockHeight(44)));
-		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(BlockChain.BLOCKS_LIMIT));
+		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
 	}
 }

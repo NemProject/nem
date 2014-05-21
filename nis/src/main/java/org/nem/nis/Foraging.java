@@ -49,7 +49,7 @@ public class Foraging  {
 		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions(this.accountLookup);
+		this.unconfirmedTransactions = new UnconfirmedTransactions();
 	}
 
 	public void addUnlockedAccount(Account account) {
@@ -103,6 +103,7 @@ public class Foraging  {
 	 */
 	public boolean processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		//TODO: 30 seconds should probably be a constant instead of a magic number, below
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
 			return false;
@@ -115,14 +116,16 @@ public class Foraging  {
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
-		return this.unconfirmedTransactions.getTransactionsBefore(blockTime);
+		return this.unconfirmedTransactions.removeConflictingTransactions(
+				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
+		);
 	}
 
 	/**
 	 * returns foraged block or null
 	 * @return
 	 */
-	public Block forageBlock() {
+	public Block forageBlock(final BlockScorer blockScorer) {
 		if (blockChainLastBlockLayer.getLastDbBlock() == null) {
 			return null;
 		}
@@ -134,13 +137,13 @@ public class Foraging  {
 		// because of access to unconfirmedTransactions, and lastBlock*
 
 		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		unconfirmedTransactions.dropExpiredTransactions(blockTime);
 		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
-		final BlockScorer scorer = new BlockScorer();
 		try {
 			synchronized (blockChainLastBlockLayer) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainLastBlockLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
-				final BlockDifficulty difficulty = this.calculateDifficulty(scorer, lastBlock);
+				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
 
@@ -149,15 +152,15 @@ public class Foraging  {
 
 					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
-					final BigInteger hit = scorer.calculateHit(newBlock);
+					final BigInteger hit = blockScorer.calculateHit(newBlock);
 					System.out.println("   hit: 0x" + hit.toString(16));
-					final BigInteger target = scorer.calculateTarget(lastBlock, newBlock);
+					final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
 
-						final long score = scorer.calculateBlockScore(lastBlock, newBlock);
+						final long score = blockScorer.calculateBlockScore(lastBlock, newBlock);
 						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;

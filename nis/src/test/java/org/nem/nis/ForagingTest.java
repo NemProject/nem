@@ -6,11 +6,11 @@ import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.test.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
@@ -79,8 +79,7 @@ public class ForagingTest {
 	@Test
 	public void processTransactionsDoesNotSaveDoubleSpendTransaction() throws InterruptedException {
 		// Arrange (category boost trust attack, stop foraging attack):
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 		final Account signer = createAccountWithBalance(1000);
 		final Foraging foraging = createMockForaging();
 		Transaction tx = new TransferTransaction(now, signer, RECIPIENT1, Amount.fromNem(800), null);
@@ -106,13 +105,11 @@ public class ForagingTest {
 	@Test
 	public void canProcessTransaction() {
 		// Arrange:
-		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = createMockForaging();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, Amount.fromNem(123), null);
+		Transaction transaction = dummyTransaction(recipient, 123);
 		transaction.sign();
 		boolean result = foraging.processTransaction(transaction);
 
@@ -127,11 +124,10 @@ public class ForagingTest {
 		final Account signer = createAccountWithBalance(150);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = createMockForaging();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction = new TransferTransaction(systemTimeProvider.getCurrentTime(), signer, recipient, Amount.fromNem(123), null);
-		transaction.sign();
+		TransferTransaction transaction = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
 
 		boolean result1 = foraging.processTransaction(transaction);
 		boolean result2 = foraging.processTransaction(transaction);
@@ -148,14 +144,11 @@ public class ForagingTest {
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = createMockForaging();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
-		transaction1.sign();
-		TransferTransaction transaction2 = new TransferTransaction(now.addSeconds(20), signer, recipient, Amount.fromNem(123), null);
-		transaction2.sign();
+		TransferTransaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now);
+		TransferTransaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(20));
 
 		boolean result1 = foraging.processTransaction(transaction1);
 		boolean result2 = foraging.processTransaction(transaction2);
@@ -176,16 +169,11 @@ public class ForagingTest {
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = createMockForaging();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
-		transaction1.setFee(Amount.fromNem(5));
-		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
-		transaction2.setFee(Amount.fromNem(10));
-		transaction2.sign();
+		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(10), now.addSeconds(2));
 
 		final Hash transactionHash1 = HashUtils.calculateHash(transaction1);
 		final Hash transactionHash2 = HashUtils.calculateHash(transaction2);
@@ -213,16 +201,11 @@ public class ForagingTest {
 		final Account signer = createAccountWithBalance(400);
 		final Account recipient = Utils.generateRandomAccount();
 		final Foraging foraging = createMockForaging();
-		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
-		final TimeInstant now = systemTimeProvider.getCurrentTime();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = new TransferTransaction(now.addSeconds(2), signer, recipient, Amount.fromNem(123), null);
-		transaction1.setFee(new Amount(5));
-		transaction1.sign();
-		Transaction transaction2 = new TransferTransaction(now.addSeconds(-2), signer, recipient, Amount.fromNem(123), null);
-		transaction2.setFee(new Amount(5));
-		transaction2.sign();
+		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
 
 		boolean result1 = foraging.processTransaction(transaction1);
 		boolean result2 = foraging.processTransaction(transaction2);
@@ -238,11 +221,19 @@ public class ForagingTest {
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
 
+	private TransferTransaction createSignedTransactionWithTime(Account signer, Account recipient, Amount fee, TimeInstant now) {
+		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
+		transaction1.setDeadline(now.addHours(1));
+		transaction1.setFee(fee);
+		transaction1.sign();
+		return transaction1;
+	}
+
 	@Test
 	public void canSignBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 		final MockForaging foraging = new MockForaging(accountAnalyzer, lastBlockLayer);
 		final Account account = Utils.generateRandomAccount();
 		accountAnalyzer.addAccountToCache(account.getAddress());
@@ -274,12 +265,14 @@ public class ForagingTest {
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		return new TransferTransaction(
+		Transaction transaction = new TransferTransaction(
 				(new SystemTimeProvider()).getCurrentTime(),
 				createAccountWithBalance(amount*3),
 				recipient,
 				new Amount(amount),
 				null);
+		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
+		return transaction;
 	}
 
 	private static Account createAccountWithBalance(long balance) {

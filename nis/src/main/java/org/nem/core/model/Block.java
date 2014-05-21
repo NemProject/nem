@@ -22,6 +22,7 @@ public class Block extends VerifiableEntity {
 	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
+	private final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
 
 	// these are helper fields and shouldn't be serialized
 	private BlockDifficulty difficulty;
@@ -50,6 +51,8 @@ public class Block extends VerifiableEntity {
 		this.height = height;
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+
+		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	/**
@@ -80,6 +83,7 @@ public class Block extends VerifiableEntity {
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
+		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	//region Getters
@@ -187,22 +191,38 @@ public class Block extends VerifiableEntity {
 	 * Executes all transactions in the block.
 	 */
 	public void execute() {
+		final TransferObserver observer = new AggregateBlockTransferObserverToTransferObserverAdapter(
+				this.blockTransferObservers,
+				this.height,
+				true);
+
 		for (final Transaction transaction : this.transactions) {
 			transaction.execute();
+			transaction.execute(observer);
 		}
 
-		this.getSigner().incrementForagedBlocks();
-		this.getSigner().incrementBalance(this.getTotalFee());
+		final Account signer = this.getSigner();
+		signer.incrementForagedBlocks();
+		signer.incrementBalance(this.getTotalFee());
+		observer.notifyCredit(this.getSigner(), this.getTotalFee());
 	}
 
 	/**
 	 * Undoes all transactions in the block.
 	 */
 	public void undo() {
-		this.getSigner().decrementForagedBlocks();
-		this.getSigner().decrementBalance(this.getTotalFee());
+		final TransferObserver observer = new AggregateBlockTransferObserverToTransferObserverAdapter(
+				this.blockTransferObservers,
+				this.height,
+				false);
+
+		final Account signer = this.getSigner();
+		observer.notifyDebit(this.getSigner(), this.getTotalFee());
+		signer.decrementForagedBlocks();
+		signer.decrementBalance(this.getTotalFee());
 
 		for (final Transaction transaction : this.getReverseTransactions()) {
+			transaction.undo(observer);
 			transaction.undo();
 		}
 	}
@@ -223,5 +243,23 @@ public class Block extends VerifiableEntity {
 	@Override
 	public String toString() {
 		return String.format("height: %d, #tx: %d", this.height.getRaw(), this.transactions.size());
+	}
+
+	/**
+	 * Subscribes the observer to transfers initiated by this block.
+	 *
+	 * @param observer The observer.
+	 */
+	public void subscribe(final BlockTransferObserver observer) {
+		this.blockTransferObservers.add(observer);
+	}
+
+	/**
+	 * Unsubscribes the observer from transfers initiated by this block.
+	 *
+	 * @param observer The observer.
+	 */
+	public void unsubscribe(final BlockTransferObserver observer) {
+		this.blockTransferObservers.remove(observer);
 	}
 }

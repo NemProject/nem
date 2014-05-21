@@ -2,8 +2,8 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.messages.*;
-import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -300,6 +300,28 @@ public class TransferTransactionTest {
 	}
 
 	@Test
+	public void isValidFailsWithFailingValidator() {
+		// Arrange:
+		final Transaction transaction = createTransaction(2, 1, 1);
+		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> false;
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isValidSucceedsWithSuceedingValidator() {
+		// Arrange:
+		final Transaction transaction = createTransaction(2, 2, 1);
+		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> true;
+
+		// Assert:
+		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void transactionsWithNonNegativeAmountAreValid() {
 		// Assert:
 		Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));
@@ -323,7 +345,8 @@ public class TransferTransactionTest {
 		Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(false));
 	}
 
-	private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+
+	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(new Amount(senderBalance));
@@ -331,6 +354,13 @@ public class TransferTransactionTest {
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
 		transaction.setFee(new Amount(fee));
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
+
+		return transaction;
+	}
+
+	private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+		// Arrange:
+		TransferTransaction transaction = createTransaction(senderBalance, amount, fee);
 
 		// Act:
 		return transaction.isValid();
@@ -433,6 +463,23 @@ public class TransferTransactionTest {
 		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
 	}
 
+	@Test
+	public void executeNonCommitDoesNotAppendNonEmptyMessageToRecipientAccount() {
+		// Arrange:
+		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.execute(Mockito.mock(TransferObserver.class));
+
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
+	}
+
 	//endregion
 
 	//region undo
@@ -517,6 +564,30 @@ public class TransferTransactionTest {
 		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(messageInput1));
 		Assert.assertThat(recipient.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(messageInput2));
 		Assert.assertThat(recipient.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(messageInput2));
+	}
+
+	@Test
+	public void undoNonCommitDoesNotRemoveNonEmptyMessageFromAccount() {
+		// Arrange:
+		final byte[] messageInput1 = Utils.generateRandomBytes();
+		final byte[] messageInput2 = Utils.generateRandomBytes();
+		final Message message = new PlainMessage(messageInput1);
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(new Amount(1000));
+		final Account recipient = Utils.generateRandomAccount();
+		recipient.incrementBalance(new Amount(100));
+		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		recipient.addMessage(new PlainMessage(messageInput1));
+		recipient.addMessage(new PlainMessage(messageInput2));
+		transaction.setFee(new Amount(10));
+
+		// Act:
+		transaction.undo(Mockito.mock(TransferObserver.class));
+
+		// Assert:
+		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));
 	}
 
 	//endregion

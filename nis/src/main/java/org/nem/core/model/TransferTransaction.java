@@ -11,6 +11,9 @@ import org.nem.core.time.TimeInstant;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 1000;
 
+	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER =
+			(final Account sender, final Account recipient, final Amount amount) -> sender.getBalance().compareTo(amount) >= 0;
+
 	private Amount amount;
 	private Message message;
 	private Account recipient;
@@ -78,9 +81,15 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isValid()
+	{
+		return this.isValid(DEFAULT_TRANSFER_VERIFIER);
+	}
+
+	@Override
+	public boolean isValid(final TransactionValidator transactionValidator) {
 		return super.isValid()
-				&& this.getSigner().getBalance().compareTo(this.amount.add(this.getFee())) >= 0
+				&& transactionValidator.validateTransfer(this.getSigner(), this.getRecipient(), this.amount.add(this.getFee()))
 				&& this.getMessageLength() <= MAX_MESSAGE_SIZE;
 	}
 
@@ -104,30 +113,20 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public void execute() {
-		this.getSigner().decrementBalance(this.amount.add(this.getFee()));
-		this.recipient.incrementBalance(this.amount);
-
+	protected void executeCommit() {
 		if (0 != this.getMessageLength())
 			this.recipient.addMessage(this.message);
 	}
 
 	@Override
-	public void undo() {
-		this.getSigner().incrementBalance(this.amount.add(this.getFee()));
-		this.recipient.decrementBalance(this.amount);
-
+	protected void undoCommit() {
 		if (0 != this.getMessageLength())
 			this.recipient.removeMessage(this.message);
-
 	}
 
 	@Override
-	public boolean simulateExecute(NemTransferSimulate nemTransferSimulate) {
-		if (! nemTransferSimulate.sub(this.getSigner(), this.amount.add(this.getFee()))) {
-			return false;
-		}
-		nemTransferSimulate.add(this.recipient, this.amount);
-		return true;
+	protected void transfer(final TransferObserver observer) {
+		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		observer.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

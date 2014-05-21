@@ -2,11 +2,13 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class BlockTest {
 
@@ -299,7 +301,7 @@ public class BlockTest {
 
 	//endregion
 
- 	//region execute / undo
+ 	//region execute
 
 	@Test
 	public void executeIncrementsForagedBlocks() {
@@ -337,12 +339,100 @@ public class BlockTest {
 		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
 	}
 
+	@Test
+	public void executeDelegatesToSubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertExecuteNotificationForObservers(Arrays.asList(observer), b -> b.subscribe(observer));
+	}
+
+	@Test
+	public void executeDelegatesToAllSubscribedObservers() {
+		// Arrange:
+		final List<BlockTransferObserver> observers = Arrays.asList(
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class));
+
+		// Assert:
+		assertExecuteNotificationForObservers(observers, b -> observers.stream().forEach(b::subscribe));
+	}
+
+	@Test
+	public void executeDoesNotDelegateToUnsubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer1 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer2 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer3 = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertExecuteNotificationForObservers(Arrays.asList(observer1, observer3), b -> {
+			b.subscribe(observer1);
+			b.subscribe(observer2);
+			b.subscribe(observer3);
+			b.unsubscribe(observer2);
+		});
+
+		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	}
+
+	private static void assertExecuteNotificationForObservers(
+			final List<BlockTransferObserver> observers,
+			final Consumer<Block> registerObservers) {
+
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setFee(Amount.fromNem(7));
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithHeight(height);
+		block.addTransaction(transaction);
+		registerObservers.accept(block);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
+
+		for (final BlockTransferObserver observer : observers) {
+			// transaction transfer action
+			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account2, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(11));
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account1, Amount.fromNem(9));
+
+			// signer fee
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, block.getSigner(), Amount.fromNem(7));
+
+			// total call counts
+			Mockito.verify(observer, Mockito.times(2)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(3)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
+	}
+
 	//endregion
 
 	//region undo
 
 	@Test
-	public void executeDecrementsForagedBlocks() {
+	public void undoDecrementsForagedBlocks() {
 		// Arrange: initial foraged blocks = 3
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
@@ -354,7 +444,7 @@ public class BlockTest {
 	}
 
 	@Test
-	public void executeDecrementsForagerBalanceByTotalFee() {
+	public void undoDecrementsForagerBalanceByTotalFee() {
 		// Arrange: initial balance = 100, total fee = 28
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
@@ -377,6 +467,99 @@ public class BlockTest {
 		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
 	}
 
+	@Test
+	public void undoDelegatesToSubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertUndoNotificationForObservers(Arrays.asList(observer), b -> b.subscribe(observer));
+	}
+
+	@Test
+	public void undoDelegatesToAllSubscribedObservers() {
+		// Arrange:
+		final List<BlockTransferObserver> observers = Arrays.asList(
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class));
+
+		// Assert:
+		assertUndoNotificationForObservers(observers, b -> observers.stream().forEach(b::subscribe));
+	}
+
+	@Test
+	public void undoDoesNotDelegateToUnsubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer1 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer2 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer3 = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertUndoNotificationForObservers(Arrays.asList(observer1, observer3), b -> {
+			b.subscribe(observer1);
+			b.subscribe(observer2);
+			b.subscribe(observer3);
+			b.unsubscribe(observer2);
+		});
+
+		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	}
+
+	private static void assertUndoNotificationForObservers(
+			final List<BlockTransferObserver> observers,
+			final Consumer<Block> registerObservers) {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(25));
+		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
+		final Account account2 = Utils.generateRandomAccount();
+		// this might look strange, but we won't be able to undo if weighted balances doesn't have
+		// knowledge, that somewhere in the past we received something
+		account2.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(12));
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setFee(Amount.fromNem(7));
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account2, account1, Amount.fromNem(12));
+			to.notifyDebit(account1, Amount.fromNem(9));
+			to.notifyCredit(account1, Amount.fromNem(11));
+		});
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithHeight(height);
+		block.getSigner().incrementBalance(Amount.fromNem(7));
+		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(7));
+		block.addTransaction(transaction);
+
+		registerObservers.accept(block);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
+
+		for (final BlockTransferObserver observer : observers) {
+			// transaction transfer action
+			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifySendUndo(height, account2, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(11));
+			Mockito.verify(observer, Mockito.times(1)).notifySendUndo(height, account1, Amount.fromNem(9));
+
+			// signer fee
+			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, block.getSigner(), Amount.fromNem(7));
+
+			// total call counts
+			Mockito.verify(observer, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(2)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			Mockito.verify(observer, Mockito.times(3)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		}
+	}
+
 	private final class UndoExecuteTestContext {
 
 		private final Account account;
@@ -388,16 +571,18 @@ public class BlockTest {
 
 		public UndoExecuteTestContext() {
 			this.account = Utils.generateRandomAccount();
-			account.incrementBalance(new Amount(100));
+			this.account.incrementBalance(new Amount(100));
 			for (int i = 0; i < 3; ++i)
-				account.incrementForagedBlocks();
+				this.account.incrementForagedBlocks();
 
 			this.transaction1 = createTransaction(1, 17);
 			this.transaction2 = createTransaction(2, 11);
 
-			this.block = createBlock(account);
-			block.addTransaction(this.transaction1);
-			block.addTransaction(this.transaction2);
+			this.block = createBlock(this.account);
+			this.block.addTransaction(this.transaction1);
+			this.block.addTransaction(this.transaction2);
+
+			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
 		}
 
 		private MockTransaction createTransaction(final int customField, final long fee) {
@@ -407,6 +592,8 @@ public class BlockTest {
 			return transaction;
 		}
 	}
+
+	//endregion
 
 	//endregion
 
@@ -441,6 +628,19 @@ public class BlockTest {
 	private static Block createBlock(final Account forger) {
 		// Arrange:
 		return new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, new TimeInstant(7), new BlockHeight(3));
+	}
+
+	private static Block createBlockWithHeight(final BlockHeight height) {
+		// Arrange:
+		final Account forger = Utils.generateRandomAccount();
+		final Block block = new Block(
+				forger,
+				DUMMY_PREVIOUS_HASH,
+				DUMMY_GENERATION_HASH,
+				new TimeInstant(7),
+				height);
+		forger.incrementForagedBlocks();
+		return block;
 	}
 
 	private static Block createBlock() {

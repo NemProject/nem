@@ -5,9 +5,15 @@ import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.MockBlockScorer;
+import org.nem.nis.test.MockBlockScorerAnalyzer;
 
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.logging.Logger;
 
@@ -33,8 +39,9 @@ public class BlockScorerTest {
 	public void hitIsCalculatedCorrectly() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair(new PublicKey(PUBKEY_BYTES));
-		final Account blockSigner = new Account(keyPair);
-		final BlockScorer scorer = new BlockScorer();
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = accountAnalyzer.addAccountToCache(new Account(keyPair).getAddress());
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		final Block previousBlock = new Block(blockSigner, Hash.ZERO, new Hash(HASH_BYTES), TimeInstant.ZERO, new BlockHeight(11));
 
 		// Act:
@@ -45,13 +52,14 @@ public class BlockScorerTest {
 	}
 
 	@Test
-	public void targetIsZeroWhenBalanceIsZero() {
+	public void targetIsZeroWhenBalanceIsZero() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(0);
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 0);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 
-		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(blockSigner, 101, 11);
+		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(accountAnalyzer, blockSigner, 101, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -61,13 +69,14 @@ public class BlockScorerTest {
 	}
 
 	@Test
-	public void targetIsZeroWhenElapsedTimeIsZero() {
+	public void targetIsZeroWhenElapsedTimeIsZero() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(72);
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 
-		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(blockSigner, 1, 11);
+		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(accountAnalyzer, blockSigner, 1, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -77,13 +86,14 @@ public class BlockScorerTest {
 	}
 
 	@Test
-	public void targetIsZeroWhenElapsedTimeIsNegative() {
+	public void targetIsZeroWhenElapsedTimeIsNegative() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(72);
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 
-		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 101, 11);
-		final Block block = createBlock(blockSigner, 1, 11);
+		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 101, 11);
+		final Block block = createBlock(accountAnalyzer, blockSigner, 1, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -92,14 +102,16 @@ public class BlockScorerTest {
 		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
-	@Test
-	public void targetIsCalculatedCorrectlyWhenBalanceIsNonZero() {
-		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(72);
 
-		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(blockSigner, 101, 11);
+	@Test
+	public void targetIsCalculatedCorrectlyWhenBalanceIsNonZero() throws NoSuchFieldException, IllegalAccessException {
+		// Arrange:
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+
+		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(accountAnalyzer, blockSigner, 101, 11);
 
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
@@ -113,14 +125,15 @@ public class BlockScorerTest {
 	}
 
 	@Test
-	public void targetIncreasesAsTimeElapses() {
+	public void targetIncreasesAsTimeElapses() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer();
-		final Account blockSigner = createAccountWithBalance(72);
+		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
+		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 
-		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
-		final Block block1 = createBlock(blockSigner, 101, 11);
-		final Block block2 = createBlock(blockSigner, 201, 11);
+		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
+		final Block block1 = createBlock(accountAnalyzer, blockSigner, 101, 11);
+		final Block block2 = createBlock(accountAnalyzer, blockSigner, 201, 11);
 
 		// Act:
 		final BigInteger target1 = scorer.calculateTarget(previousBlock, block1);
@@ -130,14 +143,37 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
+	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
+		final SerializableEntity entity = block;
+		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
-	private static Block createBlock(final Account account, int timeStamp, long height) {
-		return new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
+		Block b = new Block(deserializer.readInt("type"), options, deserializer);
+
+		Field field = b.getClass().getDeclaredField("generationHash");
+		field.setAccessible(true);
+		field.set(b, block.getGenerationHash());
+
+		field = b.getClass().getDeclaredField("prevBlockHash");
+		field.setAccessible(true);
+		field.set(b, block.getPreviousBlockHash());
+
+		return b;
 	}
 
-	private static Account createAccountWithBalance(long balance) {
+	private static Block createBlock(final AccountLookup accountLookup, final Account account, int timeStamp, long height) throws NoSuchFieldException, IllegalAccessException {
+		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
+		block.sign();
+		return roundTripBlock(accountLookup, block);
+	}
+
+	private Account createAccountWithBalance(MockBlockScorerAnalyzer mockBlockScorerAnalyzer, long balance) {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(Amount.fromNem(balance));
+		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
+		final Account blockSigner = mockBlockScorerAnalyzer.addAccountToCache(account.getAddress());
+		blockSigner.incrementBalance(Amount.fromNem(balance));
+		blockSigner.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 		return account;
 	}
 }

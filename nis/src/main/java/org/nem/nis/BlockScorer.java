@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ public class BlockScorer {
 	/**
 	 * The target time between two blocks in seconds.
 	 */
-	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChain.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * BigInteger constant 2^64
@@ -30,14 +29,20 @@ public class BlockScorer {
 	/**
 	 * Number of blocks which the calculation of difficulty should include 
 	 */
-    public static final long NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
+    public static final int NUM_BLOCKS_FOR_AVERAGE_CALCULATION = 60;
 
     /**
      * Helper constant calculating the logarithm of BigInteger
      */
     private static final double TWO_TO_THE_POWER_OF_256 = Math.pow(2.0, 256.0);
 
-    /**
+	public final AccountAnalyzer accountAnalyzer;
+
+	public BlockScorer(final AccountAnalyzer accountAnalyzer) {
+		this.accountAnalyzer = accountAnalyzer;
+	}
+
+	/**
 	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.
@@ -62,7 +67,14 @@ public class BlockScorer {
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = block.getSigner().getBalance().getNumNem();
+		//
+		final long backInTime = block.getHeight().getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
+		this.accountAnalyzer.recalculateImportances(blockHeight);
+		// TODO: how this should be scaled?
+		final long multiplier = 4_000_000_000L * 1_000_000;
+		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
 						 .multiply(TWO_TO_THE_POWER_OF_64)

@@ -285,6 +285,7 @@ public class Utils {
 
 	/**
 	 * Creates a JsonDeserializer around a JSONObject.
+	 *
 	 * @param object The json object.
 	 * @return The deserializer.
 	 */
@@ -292,5 +293,20 @@ public class Utils {
 		return new JsonDeserializer(
 				object,
 				new DeserializationContext(new MockAccountLookup()));
+	}
+
+	/**
+	 * Creates a new account link.
+	 *
+	 * @param blockHeight The block height.
+	 * @param amount The amount.
+	 * @param address The address.
+	 * @return The account link.
+	 */
+	public static AccountLink createLink(final int blockHeight, final long amount, final String address) {
+		return new AccountLink(
+				new BlockHeight(blockHeight),
+				Amount.fromNem(amount),
+				new Account(Address.fromEncoded(address)));
 	}
 }

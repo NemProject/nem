@@ -3,11 +3,13 @@ package org.nem.deploy;
 import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
+import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -26,6 +28,9 @@ import java.util.Properties;
 })
 @EnableTransactionManagement
 public class NisAppConfig {
+
+	@Autowired
+	private AccountDao accountDao;
 
 	@Autowired
 	private BlockDao blockDao;
@@ -82,7 +87,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChain blockChain() {
-		return new BlockChain();
+		return new BlockChain(this.accountAnalyzer(), this.accountDao, this.blockChainLastBlockLayer, this.blockDao, this.foraging());
 	}
 
 	@Bean
@@ -92,7 +97,7 @@ public class NisAppConfig {
 
 	@Bean
 	public AccountAnalyzer accountAnalyzer() {
-		return new AccountAnalyzer();
+		return new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
 	}
 
 	@Bean
@@ -107,7 +112,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost();
+		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
 	}
 
 	@Bean

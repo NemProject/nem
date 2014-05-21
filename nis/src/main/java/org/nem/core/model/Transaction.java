@@ -103,12 +103,61 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	/**
 	 * Executes the transaction.
 	 */
-	public abstract void execute();
+	public final void execute() {
+		this.execute(new CommitTransferObserver());
+		this.executeCommit();
+	}
+
+	/**
+	 * Executes the transaction using the specified observer.
+	 *
+	 * @param observer The observer to use.
+	 */
+	public final void execute(final TransferObserver observer) {
+		this.transfer(observer);
+	}
+
+	/**
+	 * Performs any other actions required to commit the transaction.
+	 */
+	protected abstract void executeCommit();
+
 
 	/**
 	 * Undoes the transaction.
 	 */
-	public abstract void undo();
+	public final void undo() {
+		this.undo(new CommitTransferObserver());
+		this.undoCommit();
+	}
+
+	/**
+	 * Undoes the transaction using the specified observer.
+	 *
+	 * @param observer The observer to use.
+	 */
+	public final void undo(final TransferObserver observer) {
+		this.transfer(new ReverseTransferObserver(observer));
+	}
+
+	/**
+	 * Performs any other actions required to undo the transaction.
+	 */
+	protected abstract void undoCommit();
+
+	/**
+	 * Executes all transfers using the specified observer.
+	 *
+	 * @param observer The transfer observer.
+	 */
+	protected abstract void transfer(final TransferObserver observer);
+
+	/**
+	 * Determine if transaction is valid using given transaction validator
+	 * @param transactionValidator transaction validator to use for validation
+	 * @return true if transaction is valid
+	 */
+	public abstract boolean isValid(final TransactionValidator transactionValidator);
 
 	/**
 	 * Determines if this transaction is valid.
@@ -127,5 +176,46 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Amount getMinimumFee();
 
-	public abstract boolean simulateExecute(NemTransferSimulate nemTransferSimulate);
+	private static class ReverseTransferObserver implements TransferObserver {
+
+		private final TransferObserver observer;
+
+		public ReverseTransferObserver(final TransferObserver observer) {
+			this.observer = observer;
+		}
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.observer.notifyTransfer(recipient, sender, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			this.observer.notifyDebit(account, amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			this.observer.notifyCredit(account, amount);
+		}
+	}
+
+	private static class CommitTransferObserver implements TransferObserver {
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.notifyDebit(sender, amount);
+			this.notifyCredit(recipient, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			account.incrementBalance(amount);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			account.decrementBalance(amount);
+		}
+	}
 }

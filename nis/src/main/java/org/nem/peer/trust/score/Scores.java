@@ -59,7 +59,7 @@ public abstract class Scores<T extends Score> {
 	 * @param scoreVector The score values.
 	 */
 	public void setScoreVector(final Node node, final Node[] nodes, final ColumnVector scoreVector) {
-		if (nodes.length != scoreVector.getSize())
+		if (nodes.length != scoreVector.size())
 			throw new IllegalArgumentException("nodes and scoreVector must be same size");
 
 		for (int i = 0; i < nodes.length; ++i) {
@@ -78,7 +78,7 @@ public abstract class Scores<T extends Score> {
 	 */
 	public Matrix getScoreMatrix(final Node[] nodes) {
 		final int numNodes = nodes.length;
-		final Matrix trustMatrix = new Matrix(numNodes, numNodes);
+		final Matrix trustMatrix = new DenseMatrix(numNodes, numNodes);
 		for (int i = 0; i < numNodes; ++i) {
 			for (int j = 0; j < numNodes; ++j) {
 				final Score score = this.getScore(nodes[i], nodes[j]);

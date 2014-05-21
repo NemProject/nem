@@ -16,8 +16,10 @@ public class Account implements SerializableEntity {
 	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
+	private BlockAmount foragedBlocks = BlockAmount.ZERO;
 
-	private BlockAmount foragedBlocks;
+	private final WeightedBalances weightedBalances = new WeightedBalances();
+	private final AccountImportance importance = new AccountImportance();
 
 	/**
 	 * Creates an account around a key pair.
@@ -48,7 +50,6 @@ public class Account implements SerializableEntity {
 		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
-		this.foragedBlocks = BlockAmount.ZERO;
 	}
 
 	/**
@@ -185,7 +186,7 @@ public class Account implements SerializableEntity {
 	public void addMessage(final Message message) {
 		this.messages.add(message);
 	}
-
+	
 	/**
 	 * Removes the last occurrence of the specified message from this account.
 	 *
@@ -198,6 +199,24 @@ public class Account implements SerializableEntity {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Gets the weighted balances associated with this account.
+	 *
+	 * @return The weighted balances
+	 */
+	public WeightedBalances getWeightedBalances() {
+		return this.weightedBalances;
+	}
+
+	/**
+	 * Gets the importance information associated with this account.
+	 *
+	 * @return The importance information associated with this account.
+	 */
+	public AccountImportance getImportanceInfo() {
+		return this.importance;
 	}
 
 	@Override
@@ -310,6 +329,9 @@ public class Account implements SerializableEntity {
 		copy.label = this.getLabel();
 		copy.foragedBlocks = this.getForagedBlocks();
 		copy.messages.addAll(this.getMessages());
+		// TODO: fix copying
+//		copy.weightedBalances = this.weightedBalances.copy();
+//		copy.importance = this.importance;
 		return copy;
 	}
 }

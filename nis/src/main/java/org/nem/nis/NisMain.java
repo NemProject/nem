@@ -56,6 +56,7 @@ public class NisMain {
 
 		final Account genesisAccount = accountAnalyzer.addAccountToCache(GenesisBlock.ACCOUNT.getAddress());
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
+		genesisAccount.getWeightedBalances().addReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
 
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
@@ -87,9 +88,9 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
-		this.blockChain.boot();
-
 		this.networkHost.boot();
+
+		this.networkHost.bootForaging();
 	}
 
 	private static void logGenesisInformation() {

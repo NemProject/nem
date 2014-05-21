@@ -94,4 +94,46 @@ public class ArrayUtils {
 
 		return new BigInteger(bigEndianBytes);
 	}
+	
+	/**
+	 * Utility method to find the maximum value in an array.
+	 * 
+	 * @param vector - non-empty array of doubles
+	 * @return double in <code>vector</code> that has the largest value.
+	 */
+	public static double max(double[] vector) {
+		if (vector == null || vector.length < 1) {
+			throw new IllegalArgumentException("input vector is empty");
+		}
+		double max = Double.MIN_VALUE;
+		
+		for (double val : vector) {
+			if (max < val) {
+				max = val;
+			}
+		}
+		
+		return max;
+	}
+	
+	/**
+	 * Utility method to find the maximum value in an array.
+	 * 
+	 * @param vector - non-empty array of longs
+	 * @return double in <code>vector</code> that has the largest value.
+	 */
+	public static long max(long[] vector) {
+		if (vector == null || vector.length < 1) {
+			throw new IllegalArgumentException("input vector is empty");
+		}
+		long max = Long.MIN_VALUE;
+		
+		for (long val : vector) {
+			if (max < val) {
+				max = val;
+			}
+		}
+		
+		return max;
+	}
 }

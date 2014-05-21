@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.Block;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockScorer;
 
 import java.math.BigInteger;
@@ -13,6 +14,10 @@ public class MockBlockScorer extends BlockScorer {
 
 	private Set<Block> zeroTargetBlocks = new HashSet<>();
 	private Map<BlockScoreKey, Long> blockScores = new HashMap<>();
+
+	public MockBlockScorer() {
+		super(new MockBlockScorerAnalyzer());
+	}
 
 	/**
 	 * Configures the scorer to return a ZERO target for the specified block.

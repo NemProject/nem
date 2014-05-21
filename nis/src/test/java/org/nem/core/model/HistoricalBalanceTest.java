@@ -11,13 +11,10 @@ public class HistoricalBalanceTest {
 	public void historicalBalanceCanBeConstructedWithInitialValues() {
 		// Arrange:
 		final HistoricalBalance balance1 = new HistoricalBalance(new BlockHeight(10L), new Amount(1000L));
-		final HistoricalBalance balance2 = new HistoricalBalance(20L, 2000L);
 
 		// Assert:
 		Assert.assertThat(balance1.getHeight().getRaw(), IsEqual.equalTo(10L));
 		Assert.assertThat(balance1.getBalance().getNumMicroNem(), IsEqual.equalTo(1000L));
-		Assert.assertThat(balance2.getHeight().getRaw(), IsEqual.equalTo(20L));
-		Assert.assertThat(balance2.getBalance().getNumMicroNem(), IsEqual.equalTo(2000L));
 	}
 	//endregion
 
@@ -25,7 +22,7 @@ public class HistoricalBalanceTest {
 	@Test
 	public void amountCanBeAddedToHistoricalBalance() {
 		// Arrange:
-		final HistoricalBalance balance = new HistoricalBalance(20L, 2000L);
+		final HistoricalBalance balance = createTestHistoricalBalance(20L, 2000L);
 		final Amount amount = new Amount(111);
 
 		// Act:
@@ -38,7 +35,7 @@ public class HistoricalBalanceTest {
 	@Test
 	public void amountCanBeSubtractedFromHistoricalBalanceWithLargerAmount() {
 		// Arrange:
-		final HistoricalBalance balance = new HistoricalBalance(20L, 2000L);
+		final HistoricalBalance balance = createTestHistoricalBalance(20L, 2000L);
 		final Amount amount = new Amount(200);
 
 		// Act:
@@ -52,7 +49,7 @@ public class HistoricalBalanceTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void amountCannotBeSubtractedFromHistoricalBalanceWithSmallerAmount() {
 		// Arrange:
-		final HistoricalBalance balance = new HistoricalBalance(20L, 200L);
+		final HistoricalBalance balance = createTestHistoricalBalance(20L, 200L);
 		final Amount amount = new Amount(2000);
 
 		// Act:
@@ -63,8 +60,8 @@ public class HistoricalBalanceTest {
 	@Test
 	public void compareToCanCompareEqualInstances() {
 		// Arrange:
-		final HistoricalBalance balance1 = new HistoricalBalance(20L, 0L);
-		final HistoricalBalance balance2 = new HistoricalBalance(20L, 0L);
+		final HistoricalBalance balance1 = createTestHistoricalBalance(20L, 0L);
+		final HistoricalBalance balance2 = createTestHistoricalBalance(20L, 0L);
 
 		// Assert:
 		Assert.assertThat(balance1.compareTo(balance2), IsEqual.equalTo(0));
@@ -74,12 +71,16 @@ public class HistoricalBalanceTest {
 	@Test
 	public void compareToCanCompareUnequalInstances() {
 		// Arrange:
-		final HistoricalBalance balance1 = new HistoricalBalance(20L, 0L);
-		final HistoricalBalance balance2 = new HistoricalBalance(21L, 0L);
+		final HistoricalBalance balance1 = createTestHistoricalBalance(20L, 0L);
+		final HistoricalBalance balance2 = createTestHistoricalBalance(21L, 0L);
 
 		// Assert:
 		Assert.assertThat(balance1.compareTo(balance2), IsEqual.equalTo(-1));
 		Assert.assertThat(balance2.compareTo(balance1), IsEqual.equalTo(1));
 	}
 	//endregion
+
+	private HistoricalBalance createTestHistoricalBalance(long height, long amount) {
+		return new HistoricalBalance(new BlockHeight(height), new Amount(amount));
+	}
 }

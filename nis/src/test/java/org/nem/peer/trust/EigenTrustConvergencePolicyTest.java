@@ -28,7 +28,7 @@ public class EigenTrustConvergencePolicyTest {
 
 		// Assert:
 		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
+		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.1);
 		Assert.assertEquals(4.00, result.getAt(0) / result.getAt(1), 0.1);
 	}
@@ -44,7 +44,7 @@ public class EigenTrustConvergencePolicyTest {
 
 		// Assert:
 		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
+		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(1.907, result.getAt(0) / result.getAt(1), 0.001);
 	}
@@ -60,7 +60,7 @@ public class EigenTrustConvergencePolicyTest {
 
 		// Assert:
 		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getSize(), IsEqual.equalTo(2));
+		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(1.00, result.getAt(0) / result.getAt(1), 0.001);
 	}
@@ -71,7 +71,7 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(0, 1.0 / 3);
 		vector.setAt(1, 2.0 / 3);
 
-		final Matrix matrix = new Matrix(2, 2);
+		final Matrix matrix = new DenseMatrix(2, 2);
 		matrix.setAt(0, 0, 2);
 		matrix.setAt(0, 1, -12);
 		matrix.setAt(1, 0, 1);
@@ -86,7 +86,7 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(0, 1.0 / 3);
 		vector.setAt(1, 2.0 / 3);
 
-		final Matrix matrix = new Matrix(2, 2);
+		final Matrix matrix = new DenseMatrix(2, 2);
 		matrix.setAt(0, 0, 1);
 		matrix.setAt(0, 1, 1);
 		matrix.setAt(1, 0, 1);

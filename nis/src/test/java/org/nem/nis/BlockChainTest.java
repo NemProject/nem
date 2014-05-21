@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
@@ -11,17 +12,16 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccount;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.model.TransferTransaction;
+import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
 import org.nem.nis.test.MockForaging;
-import org.nem.nis.test.MockTransferDaoImpl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
 	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;
-	private static org.nem.core.model.Account SENDER = new MockAccount(Address.fromEncoded(GenesisBlock.ACCOUNT.getAddress().getEncoded()));
+	private static org.nem.core.model.Account SENDER = new Account(GenesisBlock.ACCOUNT.getKeyPair());
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static org.nem.nis.dbmodel.Account DB_SENDER = new org.nem.nis.dbmodel.Account(SENDER.getAddress().getEncoded(), SENDER.getKeyPair().getPublicKey());
@@ -88,6 +88,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000_000_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000_000_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
@@ -95,6 +96,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -107,6 +109,7 @@ public class BlockChainTest {
 		a.incrementBalance(Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
+		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
@@ -119,12 +122,12 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, accountAnalyzer);
-		final BlockScorer scorer = new BlockScorer();
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
@@ -133,19 +136,14 @@ public class BlockChainTest {
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
 				retriveAccount(1, parentBlock.getSigner())
 		);
-		AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
+		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
 		org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
 
-		final BlockChain blockChain = new BlockChain();
-
-		blockChain.setAccountDao(accountDao);
-		MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
-		blockChain.setBlockDao(mockBlockDao);
-		blockChain.setAccountAnalyzer(accountAnalyzer);
-		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		blockChain.setForaging(new MockForaging(accountAnalyzer, lastBlockLayer));
+		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
+		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
-		blockChain.setBlockChainLastBlockLayer(blockChainLastBlockLayer);
+		final Foraging foraging = new MockForaging(accountAnalyzer, blockChainLastBlockLayer);
+		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, foraging);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));

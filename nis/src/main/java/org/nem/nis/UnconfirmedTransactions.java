@@ -3,7 +3,6 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
@@ -18,12 +17,9 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
-
-	private final AccountLookup accountLookup;
-
-	UnconfirmedTransactions(AccountLookup accountLookup) {
-		this.accountLookup = accountLookup;
-	}
+	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
+	private final TransactionValidator UNCONFIRMED_TRANSACTION_VALIDATOR =
+			(final Account sender, final Account recipient, final Amount amount) -> unconfirmedBalances.get(sender).compareTo(amount) >= 0;
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -61,32 +57,28 @@ public class UnconfirmedTransactions {
 			return false;
 		}
 
-		if (! transaction.simulateExecute(
-				new NemTransferSimulate() {
-					@Override
-					public boolean sub(Account sender, Amount amount) {
-						addToCache(sender);
-						if (unconfirmedBalances.get(sender).compareTo(amount) < 0) {
-							return false;
-						}
-						Amount newBalance = unconfirmedBalances.get(sender).subtract(amount);
-						unconfirmedBalances.replace(sender, newBalance);
-						return true;
-					}
-
-					@Override
-					public void add(Account recipient, Amount amount) {
-						addToCache(recipient);
-						Amount newBalance = unconfirmedBalances.get(recipient).add(amount);
-						unconfirmedBalances.replace(recipient, newBalance);
-					}
-				}
-		)) {
+		// not sure if adding to cache here is a good idea...
+		addToCache(transaction.getSigner());
+		if (!transaction.isValid(UNCONFIRMED_TRANSACTION_VALIDATOR)) {
 			return false;
 		}
 
+		transaction.execute(this.transferObserver);
+
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	boolean remove(final Transaction transaction) {
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
+		if (! this.transactions.containsKey(transactionHash)) {
+			return false;
+		}
+
+		transaction.undo(this.transferObserver);
+
+		this.transactions.remove(transactionHash);
+		return true;
 	}
 
 	private void addToCache(Account account) {
@@ -106,17 +98,8 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	/**
-	 * Gets all transactions before the specified time.
-	 *
-	 * @param time The specified time.
-	 * @return All transactions before the specified time.
-	 */
-	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions =  this.transactions.values().stream()
-				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-				.collect(Collectors.toList());
 
+	private List<Transaction> sortTransactions(List<Transaction> transactions) {
 		Collections.sort(transactions, (lhs, rhs) -> {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
 			// maybe we should change Transaction.compare? also it
@@ -129,5 +112,82 @@ public class UnconfirmedTransactions {
 		});
 
 		return transactions;
+	}
+
+	/**
+	 * Gets all transactions before the specified time.
+	 *
+	 * @param time The specified time.
+	 * @return All transactions before the specified time.
+	 */
+	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.collect(Collectors.toList());
+
+		return sortTransactions(transactions);
+	}
+
+	/**
+	 * Gets all transactions.
+	 * @return All transaction from this unconfirmed transactions.
+	 */
+	public List<Transaction> getAll() {
+		final List<Transaction> transactions =  this.transactions.values().stream()
+				.collect(Collectors.toList());
+
+		return sortTransactions(transactions);
+	}
+
+
+	/**
+	 * There might be conflicting transactions on the list of unconfirmed transactions.
+	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.
+	 * Currently conflicting transactions are NOT removed from main list of unconfirmed transactions.
+	 *
+	 * @param unconfirmedTransactions sorted list of unconfirmed transactions.
+	 * @return filtered out list of unconfirmed transactions.
+	 */
+	public List<Transaction> removeConflictingTransactions(List<Transaction> unconfirmedTransactions) {
+		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions();
+
+		// TODO: should we remove those that .add() failed?
+		unconfirmedTransactions.stream()
+				.forEach(filteredTxes::add);
+
+		return filteredTxes.getAll();
+	}
+
+	/**
+	 * drops transactions for which we are after the deadline already
+	 *
+	 * @param time
+	 */
+	public void dropExpiredTransactions(TimeInstant time) {
+		this.transactions.values().stream()
+				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
+				.forEach(this::remove);
+	}
+
+	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.notifyDebit(sender, amount);
+			this.notifyCredit(recipient, amount);
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			addToCache(account);
+			final Amount newBalance = unconfirmedBalances.get(account).add(amount);
+			unconfirmedBalances.replace(account, newBalance);
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			addToCache(account);
+			final Amount newBalance = unconfirmedBalances.get(account).subtract(amount);
+			unconfirmedBalances.replace(account, newBalance);
+		}
 	}
 }
