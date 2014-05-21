@@ -29,11 +29,14 @@ import org.nem.nis.test.MockAccount;
 public class PoiAlphaImportanceGeneratorImplTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
 
-	static private final int OUTLINK_STRATEGY_NONE = 0;
-	static private final int OUTLINK_STRATEGY_RANDOM = 1;
-	static private final int OUTLINK_STRATEGY_LOOP = 2;
-	static private final int OUTLINK_STRATEGY_LOOP_SELF = 3;
-	static private final int OUTLINK_STRATEGY_ALL_TO_ONE = 4;
+	private static final int OUTLINK_STRATEGY_NONE = 0;
+	private static final int OUTLINK_STRATEGY_RANDOM = 1;
+	private static final int OUTLINK_STRATEGY_LOOP = 2;
+	private static final int OUTLINK_STRATEGY_LOOP_SELF = 3;
+	private static final int OUTLINK_STRATEGY_ALL_TO_ONE = 4;
+
+	private static final double HIGH_TOLERANCE = 0.1;
+	private static final double LOW_TOLERANCE = 0.05;
 
 	@Test
 	public void threeSimpleAccounts() {
@@ -144,7 +147,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		System.out.println("");
 		
 		// Assert
-		Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+		assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
 	}
 	
 	@Test
@@ -168,7 +171,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
+			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
 		System.out.println("");
 	}
@@ -199,7 +202,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
+			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
 		System.out.println("");
 	}
@@ -230,7 +233,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
+			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
 		System.out.println("");
 	}
@@ -256,7 +259,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.95 < ratio && ratio < 1.05);
+			assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
 		}
 		System.out.println("");
 	}
@@ -391,7 +394,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			System.out.println(", ratio is " + format.format(ratio));
 			
 			// Assert
-			Assert.assertTrue(0.9 < ratio && ratio < 1.1);
+			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
 		System.out.println("");
 	}
@@ -502,6 +505,10 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		}
 		
 		return accounts;
+	}
+
+	private static void assertRatioIsWithinTolerance(double ratio, double tolerance) {
+		Assert.assertTrue(1.0 - tolerance < ratio && ratio < 1.0 + tolerance);
 	}
 
 	private static Account createAccountWithBalance(long numNEM) {
