@@ -104,34 +104,38 @@ public class PoiAccountInfoTest {
 		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
 		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
 		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+
+		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutLinks(
 				4322,
-				new int[] { 2, 3, 1, 5, 9, 11, 7 },
-				new int[] { 1442, 4323, 4322, 2882, 2, 1443, 7000 });
+				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
+				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
 
 		// Assert:
 		final ColumnVector expectedWeights = new ColumnVector(
-				2.0e06 * twoDayDecay,
-				0,
-				1.0e06,
+				2.0e06 * threeDayDecay,
+				6.0e06 * twoDayDecay,
+				3.0e06 * twoDayDecay,
+				1.0e06 * oneDayDecay,
 				5.0e06 * oneDayDecay,
-				9.0e06 * threeDayDecay,
-				11.0e06 * oneDayDecay,
-				0);
+				8.0e06,
+				9.0e06);
 		Assert.assertThat(info.getOutLinkWeights(), IsEqual.equalTo(expectedWeights));
 	}
 
 	@Test
 	public void outLinkScoreIsComputedCorrectlyWhenAccountHasOutLinksWithVariableHeights() {
 		// Arrange:
-		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
+
+		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutLinks(
 				4322,
-				new int[] { 2, 3, 1, 5, 9, 11, 7 },
-				new int[] { 1442, 4323, 4322, 2882, 2, 1443, 7000 });
+				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
+				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
 
 		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(2.0e06 * twoDayDecay * 7));
+		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(5.0e06 * oneDayDecay * 7));
 	}
 
 	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
