@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.core</groupId>
 	<artifactId>nem-core</artifactId>
-	<version>0.0.5-ALPHA</version>
+	<version>0.0.6-ALPHA</version>
 	<name>NEM Core</name>
 
 	<properties>
@@ -108,16 +108,9 @@
 					<includes>
 						<include>org/nem/core/**/*.java</include>
 					</includes>
-					<excludes>
-						<exclude>org/nem/core/model/HistoricalBalances.java</exclude>
-
-					</excludes>
 					<testIncludes>
 						<include>org/nem/core/**/*.java</include>
 					</testIncludes>
-					<testExcludes>
-						<exclude>org/nem/core/model/HistoricalBalancesTest.java</exclude>
-					</testExcludes>
 				</configuration>
 			</plugin>
 
