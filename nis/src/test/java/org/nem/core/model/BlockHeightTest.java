@@ -101,7 +101,7 @@ public class BlockHeightTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat((Long)jsonObject.get("height"), IsEqual.equalTo(142L));
+		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(142L));
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public class BlockHeightTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((Long)object.get("Height"), IsEqual.equalTo(0x8712411223456L));
+		Assert.assertThat(object.get("Height"), IsEqual.equalTo(0x8712411223456L));
 	}
 
 	@Test

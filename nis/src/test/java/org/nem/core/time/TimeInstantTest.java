@@ -206,7 +206,7 @@ public class TimeInstantTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((Integer)object.get("TimeInstant"), IsEqual.equalTo(77124));
+		Assert.assertThat(object.get("TimeInstant"), IsEqual.equalTo(77124));
 	}
 
 	@Test

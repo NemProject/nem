@@ -59,10 +59,10 @@ public class ErrorResponseTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat((Integer)jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo(0)));
-		Assert.assertThat((String)jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
-		Assert.assertThat((String)jsonObject.get("message"), IsEqual.equalTo("badness"));
-		Assert.assertThat((Integer)jsonObject.get("status"), IsEqual.equalTo(500));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo((Integer)0)));
+		Assert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
+		Assert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
+		Assert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));
 	}
 
 	@Test

@@ -138,7 +138,7 @@ public class AmountTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((Long)object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
+		Assert.assertThat(object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
 	}
 
 	@Test

@@ -99,7 +99,7 @@ public class BlockAmountTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((Long)object.get("xyzAmount"), IsEqual.equalTo(0x8712411223456L));
+		Assert.assertThat(object.get("xyzAmount"), IsEqual.equalTo(0x8712411223456L));
 	}
 
 	@Test

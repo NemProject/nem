@@ -187,7 +187,7 @@ public class AddressTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat((String)object.get("Address"), IsEqual.equalTo(address.getEncoded()));
+		Assert.assertThat(object.get("Address"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test

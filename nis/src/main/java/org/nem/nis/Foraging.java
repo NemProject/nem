@@ -180,8 +180,8 @@ public class Foraging  {
 
 	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
-		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, (int)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 		return scorer.calculateDifficulty(difficulties, timestamps);
 	}
 
