@@ -51,7 +51,7 @@ public class HistoricalOutlinks {
 	public int outlinksSize(final BlockHeight blockHeight) {
 		return outlinks.stream()
 				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
-				.map(a -> a.size())
+				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
 	}
 
@@ -75,7 +75,7 @@ public class HistoricalOutlinks {
 	 */
 	public int outlinkSize() {
 		return outlinks.stream()
-				.map(a -> a.size())
+				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
 	}
 
