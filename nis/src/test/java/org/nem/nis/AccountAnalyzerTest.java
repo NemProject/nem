@@ -366,15 +366,9 @@ public class AccountAnalyzerTest {
 		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
 
-		final Set<Double> finalList = primitiveArrayToSet(finalImportanceVector.getRaw());
-		// Assert: all accounts have the expected importance values
 		Assert.assertThat(
-				accounts.stream()
-						.map(Account::getImportanceInfo)
-						.map(a -> a.getImportance(new BlockHeight(7))).collect(Collectors.toSet())
-				,
-				IsEqual.equalTo(finalList)
-		);
+				importancesAsList(accounts, 7),
+				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
 	}
 
 	@Test
@@ -416,22 +410,23 @@ public class AccountAnalyzerTest {
 		Mockito.verify(importanceGenerator, Mockito.times(2)).getAccountImportances(Mockito.any(), Mockito.any());
 		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
 
-		final Set<Double> finalList = primitiveArrayToSet(finalImportanceVector.getRaw());
 		Assert.assertThat(
-			accounts.stream()
-				.map(Account::getImportanceInfo)
-				.map(a -> a.getImportance(new BlockHeight(8))).collect(Collectors.toSet())
-			,
-			IsEqual.equalTo(finalList)
-		);
+				importancesAsList(accounts, 8),
+				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
 	}
 
-	private Set<Double> primitiveArrayToSet(double[] primitiveArray) {
-		final Set<Double> finalList = new HashSet<>();
-		for (double d : primitiveArray) {
-			finalList.add(d);
-		}
-		return finalList;
+	private List<Double> importancesAsList(final List<Account> accounts, final long blockHeight) {
+		return accounts.stream()
+				.map(Account::getImportanceInfo)
+				.map(a -> a.getImportance(new BlockHeight(blockHeight))).collect(Collectors.toList());
+	}
+
+	private List<Double> columnVectorAsList(final ColumnVector vector) {
+		final List<Double> list = new ArrayList<>();
+		for (int i = 0; i < vector.size(); ++i)
+			list.add(vector.getAt(i));
+
+		return list;
 	}
 
 	@SuppressWarnings("unchecked")
