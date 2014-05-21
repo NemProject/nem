@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.Account;
+import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 
@@ -29,7 +30,7 @@ public class MockTransferDaoImpl implements TransferDao {
 	}
 
 	@Override
-	public Collection<Transfer> getTransactionsForAccount(Account account, int limit) {
+	public Collection<Object[]> getTransactionsForAccount(Account account, int limit) {
 		return null;
 	}
 }

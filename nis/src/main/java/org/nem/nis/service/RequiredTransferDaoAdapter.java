@@ -50,8 +50,8 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 	 * @throws ?
 	 */
 	@Override
-	public Collection<Transfer> getTransactionsForAccount(Account account, int limit) {
-		final Collection<Transfer> transfers = this.transferDao.getTransactionsForAccount(account, limit);
+	public Collection<Object[]> getTransactionsForAccount(Account account, int limit) {
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, limit);
 		// TODO: throw execption
 		return transfers;
 	}

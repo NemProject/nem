@@ -3,6 +3,8 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.model.ncc.TransactionMetaData;
+import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.BlockMapper;
@@ -33,18 +35,21 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<Transaction> getAccountTransfers(Address address) {
+	public SerializableList<TransactionMetaDataPair> getAccountTransfers(Address address) {
 
 		// TODO: probably it'll be better to a) ask accountDao about account
 		// TODO: b) pass obtained db-account to getTransactionsForAccount
 
 		final Account account = this.accountLookup.findByAddress(address);
 
-		Collection<Transfer> transfers = transferDao.getTransactionsForAccount(account, 25);
+		Collection<Object[]> transfers = transferDao.getTransactionsForAccount(account, 25);
 
-		final SerializableList<Transaction> transactionList = new SerializableList<>(0);
+		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
-				.map(tr -> TransferMapper.toModel(tr, this.accountLookup))
+				.map(tr -> new TransactionMetaDataPair(
+						TransferMapper.toModel((Transfer)tr[0], this.accountLookup),
+						new TransactionMetaData(new BlockHeight((long)tr[1]))
+				))
 				.forEach(transactionList::add);
 		return transactionList;
 	}
