@@ -1,6 +1,5 @@
 package org.nem.nis.service;
 
-import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 
 /**

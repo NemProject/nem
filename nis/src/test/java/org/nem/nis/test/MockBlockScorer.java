@@ -1,7 +1,6 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.Block;
-import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockScorer;
 
 import java.math.BigInteger;

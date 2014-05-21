@@ -5,7 +5,6 @@ import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.model.TransferTransaction;
 
 import java.util.ArrayList;
 import java.util.List;

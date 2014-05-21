@@ -1,6 +1,5 @@
 package org.nem.nis.service;
 
-import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.BlockHeight;
 import org.nem.nis.BlockChain;

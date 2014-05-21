@@ -1,7 +1,6 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 

@@ -1,7 +1,6 @@
 package org.nem.nis.visitors;
 
 import org.nem.core.model.Block;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.BlockScorer;
 
 /**

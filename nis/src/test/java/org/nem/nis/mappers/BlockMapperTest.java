@@ -9,7 +9,6 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.model.TransferTransaction;
 import org.nem.nis.test.MockAccountDao;
 
 public class BlockMapperTest {

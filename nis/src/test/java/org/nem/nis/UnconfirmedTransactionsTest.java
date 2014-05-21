@@ -3,8 +3,6 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.test.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
@@ -270,7 +268,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(
 				getCustomFieldValues(unconfirmedTransactions.getTransactionsBefore(new TimeInstant(101))),
-				IsEquivalent.equivalentTo(new Integer[] { 0, 2, 3, 5, 6, 8, 9 }));
+				IsEquivalent.equivalentTo(new Integer[]{ 0, 2, 3, 5, 6, 8, 9 }));
 	}
 
 	//endregion

@@ -3,16 +3,10 @@ package org.nem.nis.test;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.BlockChain;
 import org.nem.nis.Foraging;
-import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.PeerNetwork;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MockForaging extends Foraging {
 	private int removeFromUnconfirmedTransactionsCalls = 0;

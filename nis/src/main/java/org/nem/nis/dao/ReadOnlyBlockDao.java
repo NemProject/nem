@@ -1,7 +1,6 @@
 package org.nem.nis.dao;
 
 import org.nem.core.model.*;
-import org.nem.core.model.HashChain;
 import org.nem.nis.dbmodel.Block;
 
 import java.util.Collection;

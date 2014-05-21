@@ -1,8 +1,6 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;

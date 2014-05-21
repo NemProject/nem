@@ -9,10 +9,7 @@ import org.nem.core.test.MockAccountLookup;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.controller.utils.ErrorResponse;
 
-import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A helper class that connects to an NIS instance running on the local machine.

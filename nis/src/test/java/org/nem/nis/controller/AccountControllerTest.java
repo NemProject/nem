@@ -8,7 +8,6 @@ import org.nem.nis.Foraging;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.service.RequiredTransferDao;
-import org.nem.nis.test.MockTransferDaoImpl;
 
 import java.util.*;
 

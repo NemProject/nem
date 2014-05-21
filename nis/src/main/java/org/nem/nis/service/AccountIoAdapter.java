@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.MissingResourceException;
 
 @Service
 public class AccountIoAdapter implements AccountIo {

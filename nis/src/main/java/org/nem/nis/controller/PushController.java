@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
-import org.nem.core.model.TransactionFactory;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
 import org.nem.nis.Foraging;

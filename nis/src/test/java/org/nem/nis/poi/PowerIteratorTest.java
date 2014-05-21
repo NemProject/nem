@@ -3,7 +3,6 @@ package org.nem.nis.poi;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.core.math.Matrix;
 
 
 public class PowerIteratorTest {

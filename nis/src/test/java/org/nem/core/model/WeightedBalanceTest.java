@@ -1,9 +1,7 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 
 public class WeightedBalanceTest {
 	@Test

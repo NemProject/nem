@@ -10,7 +10,6 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.MockBlockScorer;
 import org.nem.nis.test.MockBlockScorerAnalyzer;
 
 import java.lang.reflect.Field;

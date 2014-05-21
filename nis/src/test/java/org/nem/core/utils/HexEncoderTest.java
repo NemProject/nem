@@ -2,7 +2,6 @@ package org.nem.core.utils;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.SerializationException;
 
 public class HexEncoderTest {
 
