@@ -156,19 +156,19 @@ public class PoiContext {
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
 				numOutLinks += account.getImportanceInfo().getOutLinksSize(height);
-
-				// TODO: to simplify the calculation, should we exclude accounts that can't forage? (this should shrink the matrix size)
-//				if (!accountInfo.canForage(height)) {
-//					 continue;
-//				}
+				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
+				// TODO: (this should shrink the matrix size)
+				// TODO: I would recommend playing around with this after we get POI working initially
+				//	 if (!accountInfo.canForage())
+				//	 continue;
 
 				this.addressToIndexMap.put(account.getAddress(), i);
 
 				this.accountInfos.add(accountInfo);
 				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(height).getNumMicroNem());
-				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore(height));
+				this.outLinkScoreVector.setAt(i, accountInfo.getOutLinkScore());
 
-				if (!accountInfo.hasOutLinks(height)) {
+				if (!accountInfo.hasOutLinks()) {
 					this.dangleIndexes.add(i);
 					this.dangleVector.setAt(i, 0);
 				}
@@ -176,12 +176,12 @@ public class PoiContext {
 				++i;
 			}
 
-			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks<i ? 1 : numOutLinks/i);
-			createOutLinkMatrix(height);
+			this.outLinkMatrix = new SparseMatrix(i, i, numOutLinks < i ? 1 : numOutLinks / i);
+			this.createOutLinkMatrix(height);
 
 			// Initially set importance to the row sum vector of the outlink matrix
 			// TODO: Is there a better way to estimate the eigenvector
-			createImportanceVector();
+			this.createImportanceVector();
 		}
 		
 		private void createImportanceVector() {
@@ -193,23 +193,23 @@ public class PoiContext {
 		}
 
 		private void createOutLinkMatrix(BlockHeight height) {
-			for (final PoiAccountInfo accountInfo : accountInfos) {
+			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 
-				if (!accountInfo.hasOutLinks(height))
+				if (!accountInfo.hasOutLinks())
 					continue;
 
 				final ColumnVector outLinkWeights = accountInfo.getOutLinkWeights();
 				final Iterator<AccountLink> accountLinkIterator = accountInfo.getAccount()
 						.getImportanceInfo()
 						.getOutLinksIterator(height);
-				for (int j = 0; j < outLinkWeights.size(); ++j) {
+				for (int i = 0; i < outLinkWeights.size(); ++i) {
 					final AccountLink outLink = accountLinkIterator.next();
-					int rowIndex = addressToIndexMap.get(outLink.getOtherAccount().getAddress());
-					outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(j));
+					int rowIndex = this.addressToIndexMap.get(outLink.getOtherAccount().getAddress());
+					this.outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(i));
 				}
 			}
 
-			outLinkMatrix.normalizeColumns();
+			this.outLinkMatrix.normalizeColumns();
 		}
 	}
 
