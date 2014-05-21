@@ -28,11 +28,13 @@ public interface ReadOnlyTransferDao {
 	public Transfer findByHash(byte[] txHash);
 
 	/**
-	 * Retrieves latest limit Transfers from db for given account
+	 * Retrieves latest limit Transfers from db for given account.
 	 *
 	 * @param account The account.
 	 * @param limit The limit.
-	 * @return (sorted?) Collection of Transfers
+	 * @return Collection of Transfer information.
+	 * Each Object array will contain two elements:
+	 * { [0] - Transfer (Transfer), [1] Block Height (long) }
 	 */
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final int limit);
 }

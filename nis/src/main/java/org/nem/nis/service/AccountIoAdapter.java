@@ -42,7 +42,7 @@ public class AccountIoAdapter implements AccountIo {
 
 		final Account account = this.accountLookup.findByAddress(address);
 
-		Collection<Object[]> transfers = transferDao.getTransactionsForAccount(account, 25);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
@@ -67,9 +67,5 @@ public class AccountIoAdapter implements AccountIo {
 				.map(bl -> BlockMapper.toModel(bl, this.accountLookup))
 				.forEach(blockList::add);
 		return blockList;
-	}
-
-	private static MissingResourceException createMissingResourceException(final String key) {
-		return new MissingResourceException("account not found", AccountIoAdapter.class.getName(), key);
 	}
 }

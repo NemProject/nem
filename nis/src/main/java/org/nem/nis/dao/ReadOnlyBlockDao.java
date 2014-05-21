@@ -51,9 +51,16 @@ public interface ReadOnlyBlockDao {
 	 *
 	 * @param height height of a first block.
 	 * @param limit maximal number of elements to return.
-	 * @return HashChain.
+	 * @return The hash chain.
 	 */
 	public HashChain getHashesFrom(final BlockHeight height, int limit);
 
+	/**
+	 * Retrieves all Blocks from the database that were forged by the specified account.
+	 *
+	 * @param account The account.
+	 * @param limit The maximum number of blocks to return.
+	 * @return The blocks.
+	 */
 	public Collection<Block> getBlocksForAccount(final Account account, int limit);
 }

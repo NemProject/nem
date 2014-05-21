@@ -85,7 +85,7 @@ public class BlockDaoImpl implements BlockDao {
 	 * than find proper block in software.
 	 */
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Block findByHash(final Hash blockHash) {
 		final byte[] blockHashBytes = blockHash.getRaw();
 		long blockId = ByteUtils.bytesToLong(blockHashBytes);
@@ -164,11 +164,6 @@ public class BlockDaoImpl implements BlockDao {
 					.setParameterList("ids", txToDelete);
 			dropTxes.executeUpdate();
 		}
-	}
-
-	private <T> T executeSingleQuery(final Query query) {
-		final List<T> blockList = listAndCast(query);
-		return blockList.size() > 0 ? blockList.get(0) : null;
 	}
 
 	private <T> T executeSingleQuery(final Criteria criteria) {

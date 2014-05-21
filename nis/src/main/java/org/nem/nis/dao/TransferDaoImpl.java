@@ -1,21 +1,16 @@
 package org.nem.nis.dao;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-import javax.transaction.Transactional;
-
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.nem.core.model.Account;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.utils.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
@@ -38,7 +33,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Long count() {
 		return (Long)getCurrentSession().createQuery("select count (*) from Transfer").uniqueResult();
 	}
@@ -48,7 +43,7 @@ public class TransferDaoImpl implements TransferDao {
 	 * than find proper block in software.
 	 */
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Transfer findByHash(byte[] txHash) {
 		long txId = ByteUtils.bytesToLong(txHash);
 		List<?> userList;
@@ -67,7 +62,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Collection<Object[]> getTransactionsForAccount(final Account address, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		Query query = getCurrentSession()

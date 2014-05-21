@@ -2,14 +2,13 @@ package org.nem.nis.dao;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.nem.nis.dbmodel.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class AccountDaoImpl implements AccountDao {
@@ -26,29 +25,21 @@ public class AccountDaoImpl implements AccountDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Account getAccount(Long id) {
 		Query query = getCurrentSession()
 				.createQuery("from Account a where a.id = :id")
 				.setParameter("id", id);
-		List<?> userList = query.list();
-		if (userList.size() > 0)
-			return (Account)userList.get(0);
-		else
-			return null;
+		return firstFromQuery(query);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Account getAccountByPrintableAddress(String printableAddress) {
 		Query query = getCurrentSession()
 				.createQuery("from Account a where a.printableKey = :key")
 				.setParameter("key", printableAddress);
-		List<?> userList = query.list();
-		if (userList.size() > 0)
-			return (Account)userList.get(0);
-		else
-			return null;
+		return firstFromQuery(query);
 	}
 
 	@Override
@@ -58,7 +49,7 @@ public class AccountDaoImpl implements AccountDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Long count() {
 //		return (Long) getCurrentSession()
 //				.createCriteria("Account")
@@ -85,4 +76,8 @@ public class AccountDaoImpl implements AccountDao {
 		}
 	}
 
+	private static Account firstFromQuery(final Query query) {
+		final List<?> userList = query.list();
+		return userList.size() > 0 ? (Account)userList.get(0) : null;
+	}
 }
