@@ -93,9 +93,14 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
 			// note that if an account does not have a public key, it can only have a balance
 			// so we only need to copy the balance to the new account
-			final Amount originalBalance = account.getBalance();
-			account = new Account(address);
-			account.incrementBalance(originalBalance);
+
+			// this is totally wrong now:
+//			final Amount originalBalance = account.getBalance();
+//			account = new Account(address);
+//			account.incrementBalance(originalBalance);
+//			this.addressToAccountMap.put(address, account);
+
+			account = account.shallowCopyWithAddress(address);
 			this.addressToAccountMap.put(address, account);
 		}
 

@@ -318,6 +318,17 @@ public class Account implements SerializableEntity {
 
 	//endregion
 
+	public Account shallowCopyWithAddress(final Address address) {
+		final Account copy = new Account(address);
+		copy.balance = this.getBalance();
+		copy.label = this.getLabel();
+		copy.foragedBlocks = this.getForagedBlocks();
+		copy.messages.addAll(this.getMessages());
+		//copy.weightedBalances = this.weightedBalances;
+		//copy.importance = this.importance;
+		return copy;
+	}
+
 	/**
 	 * Creates an unlinked copy of this account.
 	 *
