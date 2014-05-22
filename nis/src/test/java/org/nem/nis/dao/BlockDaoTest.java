@@ -133,7 +133,7 @@ public class BlockDaoTest {
 
 		// Act:
 		blockDao.save(dbBlock);
-		final Collection<Block> entities = blockDao.getBlocksForAccount(signer, 25);
+		final Collection<Block> entities = blockDao.getBlocksForAccount(signer, Integer.MAX_VALUE, 25);
 
 		// Assert:
 		Assert.assertThat(entities.size(), equalTo(1));
@@ -142,6 +142,24 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+	}
+
+	@Test
+	public void getBlocksForAccountRespectsTimestamp() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		blockDao.save(dbBlock);
+		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime(), 25);
+		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime()-1, 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(1));
+		Assert.assertThat(entities2.size(), equalTo(0));
 	}
 	//endregion
 

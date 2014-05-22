@@ -33,15 +33,28 @@ public class AccountIoAdapter implements AccountIo {
 		return this.accountLookup.findByAddress(address);
 	}
 
+	private Integer intOrMaxInt(String timestamp) {
+		Integer intTimestamp;
+		if (timestamp == null) {
+			return Integer.MAX_VALUE;
+		}
+		try {
+			intTimestamp = Integer.valueOf(timestamp, 10);
+		} catch (NumberFormatException e) {
+			intTimestamp = Integer.MAX_VALUE;
+		}
+		return intTimestamp;
+	}
+
 	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfers(Address address) {
+	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp) {
 
 		// TODO: probably it'll be better to a) ask accountDao about account
 		// TODO: b) pass obtained db-account to getTransactionsForAccount
 
 		final Account account = this.accountLookup.findByAddress(address);
-
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, 25);
+		final Integer intTimestamp = intOrMaxInt(timestamp);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimestamp, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
@@ -54,9 +67,10 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<Block> getAccountBlocks(Address address) {
+	public SerializableList<Block> getAccountBlocks(final Address address, final String timestamp) {
 		final Account account = this.accountLookup.findByAddress(address);
-		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, 25);
+		final Integer intTimestamp = intOrMaxInt(timestamp);
+		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
 
 		final SerializableList<Block> blockList = new SerializableList<>(0);
 		blocks.stream()

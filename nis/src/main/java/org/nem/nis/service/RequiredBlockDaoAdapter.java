@@ -61,8 +61,8 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	}
 
 	@Override
-	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(Account account, int limit) {
-		return this.blockDao.getBlocksForAccount(account, limit);
+	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
+		return this.blockDao.getBlocksForAccount(account, timestamp, limit);
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

@@ -128,10 +128,11 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
+				.add(Restrictions.le("timestamp", timestamp))
 				.setMaxResults(limit)
 				// nested criteria
 				.createCriteria("forger", "f")

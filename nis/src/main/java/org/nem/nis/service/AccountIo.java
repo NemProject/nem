@@ -20,15 +20,17 @@ public interface AccountIo {
 	 * Gets all transaction information associated with an account.
 	 *
 	 * @param address The account address.
+	 * @param timestamp The maximum timestamp of a transaction.
 	 * @return The transaction information.
 	 */
-	SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address);
+	SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp);
 
 	/**
 	 * Gets all blocks forged by an account.
 	 *
 	 * @param address The account address.
+	 * @param timestamp The maximum timestamp of a block.
 	 * @return The blocks.
 	 */
-	SerializableList<Block> getAccountBlocks(final Address address);
+	SerializableList<Block> getAccountBlocks(final Address address, final String timestamp);
 }

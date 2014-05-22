@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Collection;
+
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
@@ -66,10 +68,29 @@ public class TransferDaoTest {
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
 	}
 
+	@Test
+	public void getTransactionsForAccountRespectsTimestamp() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(sender, recipient);
+		final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10);
+		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+
+		// Act
+		transferDao.save(dbTransfer);
+		final Collection<Object[]> entities1 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime(), 25);
+		final Collection<Object[]> entities2 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime()-1, 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(1));
+		Assert.assertThat(entities2.size(), equalTo(0));
+	}
+
 	private TransferTransaction prepareTransferTransaction(Account sender, Account recipient, long amount) {
 		// Arrange:
 		final TransferTransaction transferTransaction = new TransferTransaction(
-				new TimeInstant(0),
+				new TimeInstant(123),
 				sender,
 				recipient,
 				Amount.fromNem(amount),
