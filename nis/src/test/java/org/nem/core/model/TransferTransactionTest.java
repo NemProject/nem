@@ -103,17 +103,22 @@ public class TransferTransactionTest {
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
 		// Assert:
-		Assert.assertThat(calculateFee(12000, 0), IsEqual.equalTo(12L));
-		Assert.assertThat(calculateFee(12001, 0), IsEqual.equalTo(13L));
-		Assert.assertThat(calculateFee(13000, 0), IsEqual.equalTo(13L));
+		Assert.assertThat(calculateFee(1, 0), IsEqual.equalTo(1L));
+		Assert.assertThat(calculateFee(144, 0), IsEqual.equalTo(1L));
+		Assert.assertThat(calculateFee(145, 0), IsEqual.equalTo(2L));
+		Assert.assertThat(calculateFee(1024, 0), IsEqual.equalTo(2L));
+		Assert.assertThat(calculateFee(32768, 0), IsEqual.equalTo(4L));
+		Assert.assertThat(calculateFee(1048576, 0), IsEqual.equalTo(45L));
 	}
 
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithMessage() {
 		// Assert:
-		Assert.assertThat(calculateFee(12000, 1), IsEqual.equalTo(13L));
-		Assert.assertThat(calculateFee(12000, 199), IsEqual.equalTo(13L));
-		Assert.assertThat(calculateFee(13000, 200), IsEqual.equalTo(14L));
+		Assert.assertThat(calculateFee(1024, 1), IsEqual.equalTo(3L));
+		Assert.assertThat(calculateFee(1024, 255), IsEqual.equalTo(6L));
+		Assert.assertThat(calculateFee(1024, 256), IsEqual.equalTo(7L));
+		Assert.assertThat(calculateFee(1024, 257), IsEqual.equalTo(7L));
+		Assert.assertThat(calculateFee(1024, 512), IsEqual.equalTo(12L));
 	}
 
 	@Test
@@ -131,8 +136,8 @@ public class TransferTransactionTest {
 	@Test
 	public void messageFeeIsBasedOnEncodedSize() {
 		// Assert:
-		Assert.assertThat(calculateMessageFee(1000, 2000), IsEqual.equalTo(5L));
-		Assert.assertThat(calculateMessageFee(2000, 3000), IsEqual.equalTo(10L));
+		Assert.assertThat(calculateMessageFee(256, 512), IsEqual.equalTo(6L));
+		Assert.assertThat(calculateMessageFee(512, 256), IsEqual.equalTo(11L));
 	}
 
 	private long calculateFee(final long amount, final int messageSize) {
@@ -370,13 +375,15 @@ public class TransferTransactionTest {
 	public void smallMessagesAreValid() {
 		// Assert:
 		Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(true));
-		Assert.assertThat(isMessageSizeValid(999), IsEqual.equalTo(true));
-		Assert.assertThat(isMessageSizeValid(1000), IsEqual.equalTo(true));
+		Assert.assertThat(isMessageSizeValid(1), IsEqual.equalTo(true));
+		Assert.assertThat(isMessageSizeValid(511), IsEqual.equalTo(true));
+		Assert.assertThat(isMessageSizeValid(512), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
+		Assert.assertThat(isMessageSizeValid(513), IsEqual.equalTo(false));
 		Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(false));
 	}
 
