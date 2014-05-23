@@ -18,8 +18,8 @@ public class Account implements SerializableEntity {
 	private Amount balance = Amount.ZERO;
 	private BlockAmount foragedBlocks = BlockAmount.ZERO;
 
-	private final WeightedBalances weightedBalances = new WeightedBalances();
-	private final AccountImportance importance = new AccountImportance();
+	private final WeightedBalances weightedBalances;
+	private final AccountImportance importance;
 
 	/**
 	 * Creates an account around a key pair.
@@ -50,7 +50,62 @@ public class Account implements SerializableEntity {
 		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
+		this.weightedBalances = new WeightedBalances();
+		this.importance = new AccountImportance();
 	}
+
+	/**
+	 * Special ctor for .copy()
+	 * @param rhs
+	 */
+	private Account(final Account rhs) {
+		this.keyPair = rhs.getKeyPair();
+		this.address = rhs.getAddress();
+
+		this.balance = rhs.getBalance();
+		this.label = rhs.getLabel();
+		this.foragedBlocks = rhs.getForagedBlocks();
+
+		this.messages = new ArrayList<>();
+		this.messages.addAll(rhs.getMessages());
+		this.weightedBalances = rhs.weightedBalances.copy();
+		//this.importance = rhs.importance.copy();
+		this.importance = rhs.importance;
+	}
+
+	/**
+	 * Special ctor for shallow copy ctor, that modifies address
+	 * (TODO: Maybe it would be better to simply make address non-final?)
+	 *
+	 * @param rhs
+	 * @param address
+	 */
+	private Account(final Account rhs, final Address address) {
+		this.keyPair = null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
+		this.address = address;
+
+		this.balance = rhs.getBalance();
+		this.label = rhs.getLabel();
+		this.foragedBlocks = rhs.getForagedBlocks();
+
+		this.messages = rhs.getMessages();
+		this.weightedBalances = rhs.weightedBalances;
+		this.importance = rhs.importance;
+	}
+
+	/**
+	 * Creates an unlinked copy of this account.
+	 *
+	 * @return An unlinked copy of this account.
+	 */
+	public Account copy() {
+		return new Account(this);
+	}
+
+	public Account shallowCopyWithAddress(final Address address) {
+		return new Account(this, address);
+	}
+
 
 	/**
 	 * Deserializes an account.
@@ -317,32 +372,4 @@ public class Account implements SerializableEntity {
 	}
 
 	//endregion
-
-	public Account shallowCopyWithAddress(final Address address) {
-		final Account copy = new Account(address);
-		copy.balance = this.getBalance();
-		copy.label = this.getLabel();
-		copy.foragedBlocks = this.getForagedBlocks();
-		copy.messages.addAll(this.getMessages());
-		//copy.weightedBalances = this.weightedBalances;
-		//copy.importance = this.importance;
-		return copy;
-	}
-
-	/**
-	 * Creates an unlinked copy of this account.
-	 *
-	 * @return An unlinked copy of this account.
-	 */
-	public Account copy() {
-		final Account copy = new Account(this.getKeyPair(), this.getAddress());
-		copy.balance = this.getBalance();
-		copy.label = this.getLabel();
-		copy.foragedBlocks = this.getForagedBlocks();
-		copy.messages.addAll(this.getMessages());
-		// TODO: fix copying
-//		copy.weightedBalances = this.weightedBalances.copy();
-//		copy.importance = this.importance;
-		return copy;
-	}
 }
