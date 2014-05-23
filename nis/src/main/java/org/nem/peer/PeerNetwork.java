@@ -119,7 +119,7 @@ public class PeerNetwork {
 				this.config.getTrustParameters());
 
 		this.selector = new BasicNodeSelector(
-				new ActiveNodeTrustProvider(config.getTrustProvider(), this.nodes),
+				new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.nodes),
 				context);
 	}
 
