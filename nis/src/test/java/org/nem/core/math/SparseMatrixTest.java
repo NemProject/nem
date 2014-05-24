@@ -41,6 +41,34 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	}
 
 	@Test
+	public void entryCanBeRemovedWhenValuesAreAddedOutOfOrder() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = this.createMatrix(3, 2);
+		final int numRows = 3;
+		final int numCols = 2;
+		final double[] values = new double[] { 2, 3, 5, 11, 1, 8 };
+		for (int r = 0; r < numRows; ++r) {
+			for (int c = 0; c < numCols; ++c) {
+				final int r2 = numRows - r - 1;
+				final int c2 = numCols - c - 1;
+				sparseMatrix.setAt(r2, c2, values[r2 * numCols + c2]);
+			}
+		}
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
+
+		// Act:
+		sparseMatrix.setAt(0, 1, 0.0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
+		Assert.assertThat(
+				sparseMatrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
+	}
+
+	@Test
 	public void lastEntryInRowCanBeRemoved() {
 		// Arrange:
 		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
