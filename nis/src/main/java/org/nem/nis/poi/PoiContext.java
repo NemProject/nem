@@ -181,6 +181,7 @@ public class PoiContext {
 
 			// Initially set importance to the row sum vector of the outlink matrix
 			// TODO: Is there a better way to estimate the eigenvector
+			// TODO: maybe save from previous block
 			this.createImportanceVector();
 		}
 		
@@ -206,9 +207,37 @@ public class PoiContext {
 					final AccountLink outlink = accountLinkIterator.next();
 					int rowIndex = this.addressToIndexMap.get(outlink.getOtherAccountAddress());
 					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outlinkWeights.getAt(i));
+					//decrement other end of transaction
+					this.outlinkMatrix.decrementAt(accountInfo.getIndex(), rowIndex, outlinkWeights.getAt(i));
+//					double otherNodeVal = this.outlinkMatrix.getAt(accountInfo.getIndex(), rowIndex);
+//					if (otherNodeVal < 0) {
+//						this.outlinkMatrix.setAt(accountInfo.getIndex(), rowIndex, 0.0);
+//					} else if (otherNodeVal == 0) { //remove both sides
+//						this.outlinkMatrix.setAt(rowIndex, accountInfo.getIndex(), 0.0);
+//						this.outlinkMatrix.setAt(accountInfo.getIndex(), rowIndex, 0.0);
+//					}
 				}
+				
+//				final Iterator<AccountLink> accountLinkIterator2 = accountInfo.getAccount()
+//						.getImportanceInfo().getOutlinksIterator(height);
+//				for (int i = 0; i < outlinkWeights.size(); ++i) {
+//					final AccountLink outlink = accountLinkIterator2.next();
+//					int rowIndex = this.addressToIndexMap.get(outlink.getOtherAccountAddress());
+//
+//					System.out.println("row ndx: " + rowIndex + "\tacct ndx:" + accountInfo.getIndex());
+//					
+//					double otherNodeVal = this.outlinkMatrix.getAt(accountInfo.getIndex(), rowIndex);
+//					if (otherNodeVal < 0) {
+//						this.outlinkMatrix.setAt(accountInfo.getIndex(), rowIndex, 0.0);
+//					} else if (otherNodeVal == 0) { 
+//						//remove both sides
+//						this.outlinkMatrix.setAt(rowIndex, accountInfo.getIndex(), 0.0);
+//						this.outlinkMatrix.setAt(accountInfo.getIndex(), rowIndex, 0.0);
+//					}
+//				}
 			}
 
+			this.outlinkMatrix.removeNegatives();
 			this.outlinkMatrix.normalizeColumns();
 		}
 	}
