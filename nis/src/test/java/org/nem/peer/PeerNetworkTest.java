@@ -480,22 +480,69 @@ public class PeerNetworkTest {
 
 	@Test
 	public void synchronizeSyncsWithActiveNode() {
+		// Act:
+		final SynchronizeResult result = synchronizeActiveNode(true);
+
+		// Assert:
+		Assert.assertThat(
+				result.node.getEndpoint().getBaseUrl().getHost(),
+				IsEqual.equalTo("10.0.0.2"));
+	}
+
+	@Test
+	public void synchronizePartnerExperienceOnSuccess() {
+		// Act:
+		final SynchronizeResult result = synchronizeActiveNode(true);
+
+		// Assert:
+		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(1L));
+		Assert.assertThat(result.experience.failedCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(1L));
+	}
+
+	@Test
+	public void synchronizePartnerExperienceOnFailure() {
+		// Act:
+		final SynchronizeResult result = synchronizeActiveNode(false);
+
+		// Assert:
+		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.failedCalls().get(), IsEqual.equalTo(1L));
+		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(1L));
+	}
+
+	private static class SynchronizeResult {
+		private Node node;
+		private NodeExperience experience;
+	}
+
+	private static SynchronizeResult synchronizeActiveNode(boolean synchronizeNodeResult) {
 		// Arrange:
+		final NodeExperiences nodeExperiences = new NodeExperiences();
+
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
+		synchronizer.setSynchronizeNodeResult(synchronizeNodeResult);
+
 		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector, synchronizer);
 		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
 		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
+
+		final PeerNetwork network =  new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						connector,
+						Mockito.mock(SyncConnectorPool.class),
+						synchronizer),
+				nodeExperiences);
 
 		network.refresh().join();
 
 		// Act:
 		network.synchronize();
-
-		// Assert:
-		Assert.assertThat(
-				synchronizer.getLastNode().getEndpoint().getBaseUrl().getHost(),
-				IsEqual.equalTo("10.0.0.2"));
+		final SynchronizeResult result = new SynchronizeResult();
+		result.node = synchronizer.getLastNode();
+		result.experience = nodeExperiences.getNodeExperience(network.getLocalNode(), result.node);
+		return result;
 	}
 
 	//endregion
@@ -629,7 +676,9 @@ public class PeerNetworkTest {
 		return createTestNetwork(new MockConnector(), synchronizer);
 	}
 
-	private static PeerNetwork createTestNetwork(final MockConnector connector, final MockBlockSynchronizer synchronizer) {
+	private static PeerNetwork createTestNetwork(
+			final MockConnector connector,
+			final MockBlockSynchronizer synchronizer) {
 		return new PeerNetwork(
 				ConfigFactory.createDefaultTestConfig(),
 				new PeerNetworkServices(

@@ -76,11 +76,12 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param node The other node.
 	 */
 	@Override
-	public void synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public boolean synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			this.synchronizeNodeInternal(connectorPool, node);
+			return true;
 		} catch (InactivePeerException | FatalPeerException ex) {
-			penalize(node);
+			return false;
 		}
 	}
 
@@ -93,7 +94,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
 		if (0 != (ComparisonResult.Code.REMOTE_IS_EVIL & result.getCode())) {
-			this.penalize(node);
+			throw new FatalPeerException("remote node is evil");
 		}
 
 		return result;

@@ -12,7 +12,8 @@ public interface BlockSynchronizer {
 	 * Synchronizes the running node's block chain with node's block chains.
 	 *
 	 * @param connector The connector pool.
-	 * @param node      The other node.
+	 * @param node The other node.
+	 * @return true if the sync succeeded; false if there was a fatal error.
 	 */
-	public void synchronizeNode(final SyncConnectorPool connector, final Node node);
+	public boolean synchronizeNode(final SyncConnectorPool connector, final Node node);
 }

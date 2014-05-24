@@ -158,7 +158,12 @@ public class PeerNetwork {
 
 		final Node partnerNode = partnerNodePair.getNode();
 		LOGGER.info("synchronizing with: " + partnerNode);
-		this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
+		boolean isSyncSuccess = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
+		this.updateExperience(partnerNodePair.getExperience(), isSyncSuccess);
+	}
+
+	private void updateExperience(final NodeExperience experience, boolean isSyncSuccess) {
+		(isSyncSuccess ? experience.successfulCalls() : experience.failedCalls()).increment();
 	}
 
 	private static class NodeRefresher {
