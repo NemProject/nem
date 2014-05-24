@@ -376,10 +376,7 @@ public class BlockTest {
 			b.unsubscribe(observer2);
 		});
 
-		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		verifyCallCounts(observer2, 0, 0, 0, 0);
 	}
 
 	private static void assertExecuteNotificationForObservers(
@@ -421,10 +418,7 @@ public class BlockTest {
 			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, block.getSigner(), Amount.fromNem(7));
 
 			// total call counts
-			Mockito.verify(observer, Mockito.times(2)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(3)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			verifyCallCounts(observer, 2, 3, 0, 0);
 		}
 	}
 
@@ -504,10 +498,7 @@ public class BlockTest {
 			b.unsubscribe(observer2);
 		});
 
-		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		verifyCallCounts(observer2, 0, 0, 0, 0);
 	}
 
 	private static void assertUndoNotificationForObservers(
@@ -517,10 +508,15 @@ public class BlockTest {
 		final Account account1 = Utils.generateRandomAccount();
 		account1.incrementBalance(Amount.fromNem(25));
 		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
+
 		final Account account2 = Utils.generateRandomAccount();
 		// this might look strange, but we won't be able to undo if weighted balances doesn't have
 		// knowledge, that somewhere in the past we received something
 		account2.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(12));
+		// we won't be able to undo if an original outlink doesn't exist
+		account2.getImportanceInfo().addOutlink(
+				new AccountLink(new BlockHeight(11), Amount.fromNem(12), account1.getAddress()));
+
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
 		transaction.setTransferAction(to -> {
@@ -554,15 +550,23 @@ public class BlockTest {
 			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, block.getSigner(), Amount.fromNem(7));
 
 			// total call counts
-			Mockito.verify(observer, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(2)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(3)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			verifyCallCounts(observer, 0, 0, 2, 3);
 		}
 	}
 
-	private final class UndoExecuteTestContext {
+	private static void verifyCallCounts(
+			final BlockTransferObserver observer,
+			final int notifySendCounts,
+			final int notifyReceiveCounts,
+			final int notifySendUndoCounts,
+			final int notifyReceiveUndoCounts) {
+		Mockito.verify(observer, Mockito.times(notifySendCounts)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifyReceiveCounts)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifySendUndoCounts)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifyReceiveUndoCounts)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	}
 
+	private final class UndoExecuteTestContext {
 		private final Account account;
 		private final Block block;
 		private final MockTransaction transaction1;
