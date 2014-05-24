@@ -208,7 +208,7 @@ public class PoiContext {
 					int rowIndex = this.addressToIndexMap.get(outlink.getOtherAccountAddress());
 					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outlinkWeights.getAt(i));
 					//decrement other end of transaction
-//					this.outlinkMatrix.decrementAt(accountInfo.getIndex(), rowIndex, outlinkWeights.getAt(i));
+					this.outlinkMatrix.decrementAt(accountInfo.getIndex(), rowIndex, outlinkWeights.getAt(i));
 				}
 			}
 
