@@ -302,7 +302,7 @@ public class BlockTest {
 
 	//endregion
 
- 	//region execute
+ 	//region execute / undo basic updates
 
 	@Test
 	public void executeIncrementsForagedBlocks() {
@@ -341,6 +341,78 @@ public class BlockTest {
 	}
 
 	@Test
+	public void undoDecrementsForagedBlocks() {
+		// Arrange: initial foraged blocks = 3
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	@Test
+	public void undoDecrementsForagerBalanceByTotalFee() {
+		// Arrange: initial balance = 100, total fee = 28
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
+	}
+
+	@Test
+	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
+		// Arrange:
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
+	}
+
+	private final class UndoExecuteTestContext {
+		private final Account account;
+		private final Block block;
+		private final MockTransaction transaction1;
+		private final MockTransaction transaction2;
+		private final List<Integer> executeList = new ArrayList<>();
+		private final List<Integer> undoList = new ArrayList<>();
+
+		public UndoExecuteTestContext() {
+			this.account = Utils.generateRandomAccount();
+			this.account.incrementBalance(new Amount(100));
+			for (int i = 0; i < 3; ++i)
+				this.account.incrementForagedBlocks();
+
+			this.transaction1 = createTransaction(1, 17);
+			this.transaction2 = createTransaction(2, 11);
+
+			this.block = createBlock(this.account);
+			this.block.addTransaction(this.transaction1);
+			this.block.addTransaction(this.transaction2);
+
+			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
+		}
+
+		private MockTransaction createTransaction(final int customField, final long fee) {
+			final MockTransaction transaction = createTransactionWithFee(customField, fee);
+			transaction.setExecuteList(this.executeList);
+			transaction.setUndoList(this.undoList);
+			return transaction;
+		}
+	}
+
+	//endregion
+
+	//region execute / undo notifications
+
+	@Test
 	public void executeDelegatesToSubscribedObserver() {
 		// Arrange:
 		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
@@ -370,6 +442,45 @@ public class BlockTest {
 
 		// Assert:
 		assertExecuteNotificationForObservers(Arrays.asList(observer1, observer3), b -> {
+			b.subscribe(observer1);
+			b.subscribe(observer2);
+			b.subscribe(observer3);
+			b.unsubscribe(observer2);
+		});
+
+		verifyCallCounts(observer2, 0, 0, 0, 0);
+	}
+
+	@Test
+	public void undoDelegatesToSubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertUndoNotificationForObservers(Arrays.asList(observer), b -> b.subscribe(observer));
+	}
+
+	@Test
+	public void undoDelegatesToAllSubscribedObservers() {
+		// Arrange:
+		final List<BlockTransferObserver> observers = Arrays.asList(
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class),
+				Mockito.mock(BlockTransferObserver.class));
+
+		// Assert:
+		assertUndoNotificationForObservers(observers, b -> observers.stream().forEach(b::subscribe));
+	}
+
+	@Test
+	public void undoDoesNotDelegateToUnsubscribedObserver() {
+		// Arrange:
+		final BlockTransferObserver observer1 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer2 = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransferObserver observer3 = Mockito.mock(BlockTransferObserver.class);
+
+		// Assert:
+		assertUndoNotificationForObservers(Arrays.asList(observer1, observer3), b -> {
 			b.subscribe(observer1);
 			b.subscribe(observer2);
 			b.subscribe(observer3);
@@ -420,85 +531,6 @@ public class BlockTest {
 			// total call counts
 			verifyCallCounts(observer, 2, 3, 0, 0);
 		}
-	}
-
-	//endregion
-
-	//region undo
-
-	@Test
-	public void undoDecrementsForagedBlocks() {
-		// Arrange: initial foraged blocks = 3
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	@Test
-	public void undoDecrementsForagerBalanceByTotalFee() {
-		// Arrange: initial balance = 100, total fee = 28
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
-	}
-
-	@Test
-	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
-		// Arrange:
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
-	}
-
-	@Test
-	public void undoDelegatesToSubscribedObserver() {
-		// Arrange:
-		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
-
-		// Assert:
-		assertUndoNotificationForObservers(Arrays.asList(observer), b -> b.subscribe(observer));
-	}
-
-	@Test
-	public void undoDelegatesToAllSubscribedObservers() {
-		// Arrange:
-		final List<BlockTransferObserver> observers = Arrays.asList(
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class));
-
-		// Assert:
-		assertUndoNotificationForObservers(observers, b -> observers.stream().forEach(b::subscribe));
-	}
-
-	@Test
-	public void undoDoesNotDelegateToUnsubscribedObserver() {
-		// Arrange:
-		final BlockTransferObserver observer1 = Mockito.mock(BlockTransferObserver.class);
-		final BlockTransferObserver observer2 = Mockito.mock(BlockTransferObserver.class);
-		final BlockTransferObserver observer3 = Mockito.mock(BlockTransferObserver.class);
-
-		// Assert:
-		assertUndoNotificationForObservers(Arrays.asList(observer1, observer3), b -> {
-			b.subscribe(observer1);
-			b.subscribe(observer2);
-			b.subscribe(observer3);
-			b.unsubscribe(observer2);
-		});
-
-		verifyCallCounts(observer2, 0, 0, 0, 0);
 	}
 
 	private static void assertUndoNotificationForObservers(
@@ -564,38 +596,6 @@ public class BlockTest {
 		Mockito.verify(observer, Mockito.times(notifyReceiveCounts)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.times(notifySendUndoCounts)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.times(notifyReceiveUndoCounts)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
-	}
-
-	private final class UndoExecuteTestContext {
-		private final Account account;
-		private final Block block;
-		private final MockTransaction transaction1;
-		private final MockTransaction transaction2;
-		private final List<Integer> executeList = new ArrayList<>();
-		private final List<Integer> undoList = new ArrayList<>();
-
-		public UndoExecuteTestContext() {
-			this.account = Utils.generateRandomAccount();
-			this.account.incrementBalance(new Amount(100));
-			for (int i = 0; i < 3; ++i)
-				this.account.incrementForagedBlocks();
-
-			this.transaction1 = createTransaction(1, 17);
-			this.transaction2 = createTransaction(2, 11);
-
-			this.block = createBlock(this.account);
-			this.block.addTransaction(this.transaction1);
-			this.block.addTransaction(this.transaction2);
-
-			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-		}
-
-		private MockTransaction createTransaction(final int customField, final long fee) {
-			final MockTransaction transaction = createTransactionWithFee(customField, fee);
-			transaction.setExecuteList(this.executeList);
-			transaction.setUndoList(this.undoList);
-			return transaction;
-		}
 	}
 
 	//endregion
