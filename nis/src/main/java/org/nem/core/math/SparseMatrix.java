@@ -5,10 +5,9 @@ package org.nem.core.math;
  */
 public class SparseMatrix extends Matrix {
 
-	private double REALLOC_MULTIPLIER = 1.6;
+	private static final double REALLOC_MULTIPLIER = 1.6;
 
 	private final int numRows;
-	private final int numCols;
 	private final int initialCapacityPerRow;
 
 	/**
@@ -28,7 +27,6 @@ public class SparseMatrix extends Matrix {
 	public SparseMatrix(final int numRows, final int numCols, final int initialCapacityPerRow) {
 		super(numRows, numCols);
 		this.numRows = numRows;
-		this.numCols = numCols;
 		this.initialCapacityPerRow = initialCapacityPerRow;
 		this.values = new double[numRows][];
 		this.cols = new int[numRows][];
@@ -63,7 +61,7 @@ public class SparseMatrix extends Matrix {
 		if (val == 0.0) {
 			for (int i=0; i<this.maxIndices[row]; i++) {
 				if (this.cols[row][i] == col) {
-					remove(row, col);
+					remove(row, i);
 					return;
 				}
 			}
@@ -136,14 +134,14 @@ public class SparseMatrix extends Matrix {
 	 * Remove an entries at a specific position
 	 * 
 	 * @param row The row.
-	 * @param col The column.
+	 * @param colIndex The column index.
 	 */
-	private void remove(int row, int col) {
+	private void remove(int row, int colIndex) {
 		// Shrink arrays
 		final int lastIndex = this.maxIndices[row] - 1;
 		if (lastIndex > 0) {
-			this.cols[row][col] = this.cols[row][lastIndex];
-			this.values[row][col] = this.values[row][lastIndex];
+			this.cols[row][colIndex] = this.cols[row][lastIndex];
+			this.values[row][colIndex] = this.values[row][lastIndex];
 		}
 
 		--this.maxIndices[row];
@@ -168,6 +166,6 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	public String toString() {
-		return String.format("[%d x %d]", this.numRows, this.numCols);
+		return String.format("[%d x %d]", this.getRowCount(), this.getColumnCount());
 	}
 }
