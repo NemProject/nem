@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+/**
+ * An observer that updates weighted balance information.
+ */
 public class WeightedBalancesObserver implements BlockTransferObserver {
 
 	// keep in mind this is called TWICE for every transaction:
