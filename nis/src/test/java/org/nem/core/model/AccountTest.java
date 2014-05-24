@@ -597,16 +597,67 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
 	}
 
+	// two poor test, but better than nothing I guess :]
+	@Test
+	public void copyCreatesCopyOfWeightedBalances() {
+		// Assert:
+		final Account account = Utils.generateRandomAccount();
+		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1234));
+
+		// Act:
+		final Account copyAccount = account.copy();
+
+		// Assert:
+		Assert.assertThat(copyAccount.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(1234)));
+	}
+
 	@Test
 	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
 		// Assert:
-		Assert.fail();
+		final Account account = Utils.generateRandomAccount();
+		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1234));
+
+		// Act:
+		final Account copyAccount = account.copy();
+		copyAccount.getWeightedBalances().undoReceive(BlockHeight.ONE, Amount.fromNem(1234));
+
+		// Assert:
+		Assert.assertThat(account.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(1234)));
+		Assert.assertThat(copyAccount.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(0)));
+		Assert.assertThat(copyAccount.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(0)));
+	}
+
+	// doubles chosen in a way to allow comparison using equalTo()
+	@Test
+	public void copyCreatesCopyOfAccountImportance() {
+		// Assert:
+		final Account account = Utils.generateRandomAccount();
+		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
+		// TODO:
+		// account.getImportanceInfo().addOutLink(new AccountLink());
+
+		// Act:
+		final Account copyAccount = account.copy();
+
+		// Assert:
+		Assert.assertThat(copyAccount.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
 	}
 
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
 		// Assert:
-		Assert.fail();
+		final Account account = Utils.generateRandomAccount();
+		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
+		// TODO:
+		// account.getImportanceInfo().addOutLink(new AccountLink());
+
+		// Act:
+		final Account copyAccount = account.copy();
+		copyAccount.getImportanceInfo().setImportance(BlockHeight.ONE, 0.0234375);
+
+		// Assert:
+		Assert.assertThat(account.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
+		Assert.assertThat(copyAccount.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.0234375));
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
