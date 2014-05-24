@@ -11,23 +11,33 @@ import java.util.stream.Collectors;
  * Methods of this class, assume, that they are called in paired order
  */
 public class WeightedBalances {
+
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
 	 */
 	public final long MAX_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + BlockChainConstants.REWRITE_LIMIT;
 
 	private final List<WeightedBalance> balances;
+	// TODO: this should not be a public field
 	public final HistoricalBalances historicalBalances;
+
+	/**
+	 * Creates a new weighted balances instance.
+	 */
+	public WeightedBalances() {
+		this(new ArrayList<>(), new HistoricalBalances());
+	}
 
 	private WeightedBalances(final List<WeightedBalance> balances, final HistoricalBalances historicalBalances) {
 		this.balances = balances;
 		this.historicalBalances = historicalBalances;
 	}
 
-	public WeightedBalances() {
-		this(new ArrayList<>(), new HistoricalBalances());
-	}
-
+	/**
+	 * Creates a deep copy of this weighted balances instance.
+	 *
+	 * @return A copy of this weighted balances instance.
+	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
 				balances.stream()
@@ -154,6 +164,12 @@ public class WeightedBalances {
 		}
 	}
 
+	/**
+	 * Gets the vested amount at the specified height.
+	 *
+	 * @param height The height.
+	 * @return The vested amount.
+	 */
 	public Amount getVested(final BlockHeight height) {
 		if (balances.size() == 0) {
 			return Amount.ZERO;
@@ -167,6 +183,12 @@ public class WeightedBalances {
 		return balances.get(index).getVestedBalance();
 	}
 
+	/**
+	 * Gets the unvested amount at the specified height.
+	 *
+	 * @param height The height.
+	 * @return The unvested amount.
+	 */
 	public Amount getUnvested(final BlockHeight height) {
 		if (balances.size() == 0) {
 			return Amount.ZERO;
@@ -180,8 +202,9 @@ public class WeightedBalances {
 		return balances.get(index).getUnvestedBalance();
 	}
 
-	private long calculateBucket(BlockHeight blockHeight) {
-		return  ((blockHeight.getRaw() + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1) / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static long calculateBucket(final BlockHeight blockHeight) {
+		final int blocksPerDay = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		return ((blockHeight.getRaw() + blocksPerDay - 1) / blocksPerDay) * blocksPerDay;
 	}
 
 	private int iterateBalances(final BlockHeight height, int newIndex) {

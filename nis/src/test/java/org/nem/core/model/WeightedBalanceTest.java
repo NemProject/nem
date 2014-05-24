@@ -215,6 +215,23 @@ public class WeightedBalanceTest {
 		Assert.assertThat(weightedBalance2.compareTo(weightedBalance1), IsEqual.equalTo(1));
 	}
 
+	@Test
+	public void multipleReceiveTest() {
+		// Arrange:
+		WeightedBalance balance = new WeightedBalance(new BlockHeight(1440), Amount.fromNem(123));
+
+		// Act / Assert:
+		balance = balance.next();
+		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(110_700_000)));
+
+		balance = balance.next();
+		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(99_630_000)));
+
+		// TODO: why is receive increasing vested balance?
+		balance.receive(Amount.fromNem(345));
+		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(444_630_000)));
+	}
+
 	private static WeightedBalance advanceDays(WeightedBalance weightedBalance, int numDays) {
 		for (int i = 0; i < numDays; ++i)
 			weightedBalance = weightedBalance.next();
