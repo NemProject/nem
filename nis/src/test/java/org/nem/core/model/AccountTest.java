@@ -597,67 +597,58 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
 	}
 
-	// two poor test, but better than nothing I guess :]
 	@Test
-	public void copyCreatesCopyOfWeightedBalances() {
-		// Assert:
+	public void copyCreatesUnlinkedCopyOfMessages() {
+		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1234));
+		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
+		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 
 		// Act:
 		final Account copyAccount = account.copy();
 
 		// Assert:
-		Assert.assertThat(copyAccount.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(1234)));
+		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
+		Assert.assertThat(copyAccount.getMessages().size(), IsEqual.equalTo(2));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 0), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
 	}
 
 	@Test
 	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
-		// Assert:
+		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1234));
+		final WeightedBalances balances = account.getWeightedBalances();
+		balances.addReceive(new BlockHeight(17), Amount.fromNem(1234));
 
 		// Act:
 		final Account copyAccount = account.copy();
-		copyAccount.getWeightedBalances().undoReceive(BlockHeight.ONE, Amount.fromNem(1234));
+		final WeightedBalances copyBalances = copyAccount.getWeightedBalances();
 
 		// Assert:
-		Assert.assertThat(account.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(copyAccount.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(0)));
-		Assert.assertThat(copyAccount.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(0)));
-	}
-
-	// doubles chosen in a way to allow comparison using equalTo()
-	@Test
-	public void copyCreatesCopyOfAccountImportance() {
-		// Assert:
-		final Account account = Utils.generateRandomAccount();
-		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
-		// TODO:
-		// account.getImportanceInfo().addOutlink(new AccountLink());
-
-		// Act:
-		final Account copyAccount = account.copy();
-
-		// Assert:
-		Assert.assertThat(copyAccount.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
+		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
+		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
 	}
 
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
-		// Assert:
+		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
-		// TODO:
-		// account.getImportanceInfo().addOutlink(new AccountLink());
+		final AccountImportance importance = account.getImportanceInfo();
+		importance.setImportance(BlockHeight.ONE, 0.03125);
+		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
 
 		// Act:
 		final Account copyAccount = account.copy();
-		copyAccount.getImportanceInfo().setImportance(BlockHeight.ONE, 0.0234375);
+		final AccountImportance copyImportance = copyAccount.getImportanceInfo();
 
 		// Assert:
-		Assert.assertThat(account.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyAccount.getImportanceInfo().getImportance(BlockHeight.ONE), IsEqual.equalTo(0.0234375));
+		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
+		Assert.assertThat(copyImportance.getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
+		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
+		Assert.assertThat(
+				copyImportance.getOutlinksIterator(BlockHeight.ONE).next(),
+				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE).next()));
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
@@ -682,11 +673,10 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 
-		// note that only getMessages is mutable, so it's important to verify that it is not the same
+		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
-		Assert.assertThat(copyAccount.getMessages().size(), IsEqual.equalTo(2));
-		Assert.assertThat(getEncodedMessageAt(copyAccount, 0), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
-		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
+		Assert.assertThat(copyAccount.getWeightedBalances(), IsNot.not(IsSame.sameInstance(account.getWeightedBalances())));
+		Assert.assertThat(copyAccount.getImportanceInfo(), IsNot.not(IsSame.sameInstance(account.getImportanceInfo())));
 		return copyAccount;
 	}
 

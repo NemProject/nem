@@ -69,8 +69,7 @@ public class Account implements SerializableEntity {
 		this.messages = new ArrayList<>();
 		this.messages.addAll(rhs.getMessages());
 		this.weightedBalances = rhs.weightedBalances.copy();
-		//this.importance = rhs.importance.copy();
-		this.importance = rhs.importance;
+		this.importance = rhs.importance.copy();
 	}
 
 	/**
@@ -102,10 +101,10 @@ public class Account implements SerializableEntity {
 		return new Account(this);
 	}
 
+	// TODO: do we still need this?
 	public Account shallowCopyWithAddress(final Address address) {
 		return new Account(this, address);
 	}
-
 
 	/**
 	 * Deserializes an account.
