@@ -13,32 +13,33 @@ public class HistoricalOutlinks {
 	 * Add an outlink at a given block height.
 	 *
 	 * @param height the height where the outlink is inserted
-	 * @param otherAccount linked account
+	 * @param otherAccountAddress linked account address
 	 * @param amount link strength
 	 */
-	public void add(final BlockHeight height, final Account otherAccount, final Amount amount) {
-		if (outlinks.size() == 0 || outlinks.getLast().getHeight().compareTo(height) < 0) {
-			outlinks.addLast(new HistoricalOutlink(height));
+	public void add(final BlockHeight height, final Address otherAccountAddress, final Amount amount) {
+		if (this.outlinks.size() == 0 || this.outlinks.getLast().getHeight().compareTo(height) < 0) {
+			this.outlinks.addLast(new HistoricalOutlink(height));
 		}
 
-		outlinks.getLast().add(new AccountLink(height, amount, otherAccount));
+		this.outlinks.getLast().add(new AccountLink(height, amount, otherAccountAddress));
 	}
 
 	/**
 	 * Remove an outlink at a given block height.
 	 *
 	 * @param height the height where the outlink is to be removed
-	 * @param otherAccount linked account
+	 * @param otherAccountAddress linked account address
 	 * @param amount link strength
 	 */
-	public void remove(final BlockHeight height, final Account otherAccount, final Amount amount) {
-		if (outlinks.size() == 0 || outlinks.getLast().getHeight().compareTo(height) != 0) {
+	public void remove(final BlockHeight height, final Address otherAccountAddress, final Amount amount) {
+		if (this.outlinks.size() == 0 || this.outlinks.getLast().getHeight().compareTo(height) != 0) {
 			throw new IllegalArgumentException("unexpected height, add/remove must be 'paired'.");
 		}
-		final AccountLink accountLink = new AccountLink(height, amount, otherAccount);
-		outlinks.getLast().remove(accountLink);
-		if (outlinks.getLast().size() == 0) {
-			outlinks.removeLast();
+
+		final AccountLink accountLink = new AccountLink(height, amount, otherAccountAddress);
+		this.outlinks.getLast().remove(accountLink);
+		if (this.outlinks.getLast().size() == 0) {
+			this.outlinks.removeLast();
 		}
 	}
 
@@ -49,7 +50,7 @@ public class HistoricalOutlinks {
 	 * @return number of AccountLink
 	 */
 	public int outlinksSize(final BlockHeight blockHeight) {
-		return outlinks.stream()
+		return this.outlinks.stream()
 				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
 				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
@@ -74,7 +75,7 @@ public class HistoricalOutlinks {
 	 * @return number of AccountLink
 	 */
 	public int outlinkSize() {
-		return outlinks.stream()
+		return this.outlinks.stream()
 				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
 	}

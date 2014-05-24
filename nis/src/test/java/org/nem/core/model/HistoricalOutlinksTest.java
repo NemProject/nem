@@ -22,12 +22,12 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void canAddOutlinkToHistoricalOutlink() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
 
 		// Assert:
 		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
@@ -37,12 +37,12 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void canAddOutlinksToHistoricalOutlink() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
 
 		// Assert:
 		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
@@ -54,12 +54,12 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void canRemoveOutlinkFromHistoricalOutlink() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.remove(new BlockHeight(1234), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 
 		// Assert:
 		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
@@ -68,13 +68,13 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void canRemoveOutlinkFromFewHistoricalOutlink() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(789));
-		historicalOutlinks.remove(new BlockHeight(1235), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
+		historicalOutlinks.remove(new BlockHeight(1235), address, Amount.fromNem(789));
 
 		// Assert:
 		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(1));
@@ -85,25 +85,25 @@ public class HistoricalOutlinksTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void removingAmountNotInOrderThrowsException() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(123));
-		historicalOutlinks.remove(new BlockHeight(1234), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void removingHeightNotInOrderThrowsException() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(789));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(789));
-		historicalOutlinks.remove(new BlockHeight(1234), account, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
+		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 	}
 	//endregion
 
@@ -111,15 +111,15 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void historicalOutlinksSizeReturnsProperValue() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(123));
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(234));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(345));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(456));
-		historicalOutlinks.add(new BlockHeight(1236), account, Amount.fromNem(567));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(456));
+		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(567));
 
 		// Assert:
 		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1235)), equalTo(4));
@@ -128,15 +128,15 @@ public class HistoricalOutlinksTest {
 	@Test
 	public void historicalOutlinksIteratorReturnsProperValues() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(123));
-		historicalOutlinks.add(new BlockHeight(1234), account, Amount.fromNem(234));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(345));
-		historicalOutlinks.add(new BlockHeight(1235), account, Amount.fromNem(456));
-		historicalOutlinks.add(new BlockHeight(1236), account, Amount.fromNem(567));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(456));
+		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(567));
 
 		// Assert:
 		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1235));

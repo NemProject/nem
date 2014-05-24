@@ -22,12 +22,11 @@ public class HistoricalOutlinkTest {
 	@Test
 	public void canAddOutlinkToHistoricalOutlink() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
 
 		// Act:
-		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(789), account));
+		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAddress()));
 
 		// Assert:
 		Assert.assertThat(historicalOutlink.getHeight(), IsEqual.equalTo(blockHeight));
@@ -37,14 +36,12 @@ public class HistoricalOutlinkTest {
 	@Test
 	public void canAddOutlinksToHistoricalOutlink() {
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		final Account account2 = Utils.generateRandomAccount();
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
 
 		// Act:
-		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(789), account1));
-		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(456), account2));
+		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAddress()));
+		historicalOutlink.add(new AccountLink(blockHeight, Amount.fromNem(456), Utils.generateRandomAddress()));
 
 		// Assert:
 		Assert.assertThat(historicalOutlink.getHeight(), IsEqual.equalTo(blockHeight));
@@ -58,8 +55,8 @@ public class HistoricalOutlinkTest {
 		// Arrange:
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
-		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAccount());
-		final AccountLink accountLink2 = new AccountLink(blockHeight, Amount.fromNem(456), Utils.generateRandomAccount());
+		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAddress());
+		final AccountLink accountLink2 = new AccountLink(blockHeight, Amount.fromNem(456), Utils.generateRandomAddress());
 
 		// Act:
 		historicalOutlink.add(accountLink1);
@@ -77,8 +74,8 @@ public class HistoricalOutlinkTest {
 		// Arrange:
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
-		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAccount());
-		final AccountLink accountLink2 = new AccountLink(blockHeight, Amount.fromNem(456), Utils.generateRandomAccount());
+		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAddress());
+		final AccountLink accountLink2 = new AccountLink(blockHeight, Amount.fromNem(456), Utils.generateRandomAddress());
 
 		// Act:
 		historicalOutlink.add(accountLink1);
@@ -96,7 +93,7 @@ public class HistoricalOutlinkTest {
 		// Arrange:
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
-		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAccount());
+		final AccountLink accountLink1 = new AccountLink(blockHeight, Amount.fromNem(789), Utils.generateRandomAddress());
 
 		// Act:
 		historicalOutlink.remove(accountLink1);

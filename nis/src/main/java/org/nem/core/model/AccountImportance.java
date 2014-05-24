@@ -18,7 +18,10 @@ public class AccountImportance {
 	 * @param accountLink The account link to add.
 	 */
 	public void addOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.add(accountLink.getHeight(), accountLink.getOtherAccount(), accountLink.getAmount());
+		this.historicalOutLinks.add(
+				accountLink.getHeight(),
+				accountLink.getOtherAccountAddress(),
+				accountLink.getAmount());
 	}
 
 	/**
@@ -27,7 +30,10 @@ public class AccountImportance {
 	 * @param accountLink The account link to remove.
 	 */
 	public void removeOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.remove(accountLink.getHeight(), accountLink.getOtherAccount(), accountLink.getAmount());
+		this.historicalOutLinks.remove(
+				accountLink.getHeight(),
+				accountLink.getOtherAccountAddress(),
+				accountLink.getAmount());
 	}
 
 	/**

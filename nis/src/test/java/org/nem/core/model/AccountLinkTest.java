@@ -11,13 +11,13 @@ public class AccountLinkTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(7);
 		final Amount amount = Amount.fromNem(12);
-		final Account account = Utils.generateRandomAccount();
-		final AccountLink link = new AccountLink(height, amount, account);
+		final Address address = Utils.generateRandomAddress();
+		final AccountLink link = new AccountLink(height, amount, address);
 
 		// Assert:
 		Assert.assertThat(link.getHeight(), IsSame.sameInstance(height));
 		Assert.assertThat(link.getAmount(), IsSame.sameInstance(amount));
-		Assert.assertThat(link.getOtherAccount(), IsSame.sameInstance(account));
+		Assert.assertThat(link.getOtherAccountAddress(), IsSame.sameInstance(address));
 	}
 
 	@Test
