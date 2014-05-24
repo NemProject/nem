@@ -7,7 +7,7 @@ import java.util.Iterator;
  */
 public class AccountImportance {
 
-	private final HistoricalOutlinks historicalOutLinks;
+	private final HistoricalOutlinks historicalOutlinks;
 
 	private BlockHeight importanceHeight;
 	private double importance;
@@ -19,8 +19,8 @@ public class AccountImportance {
 		this(new HistoricalOutlinks());
 	}
 
-	private AccountImportance(final HistoricalOutlinks historicalOutLinks) {
-		this.historicalOutLinks = historicalOutLinks;
+	private AccountImportance(final HistoricalOutlinks historicalOutlinks) {
+		this.historicalOutlinks = historicalOutlinks;
 	}
 
 	/**
@@ -28,8 +28,8 @@ public class AccountImportance {
 	 *
 	 * @param accountLink The account link to add.
 	 */
-	public void addOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.add(
+	public void addOutlink(final AccountLink accountLink) {
+		this.historicalOutlinks.add(
 				accountLink.getHeight(),
 				accountLink.getOtherAccountAddress(),
 				accountLink.getAmount());
@@ -40,8 +40,8 @@ public class AccountImportance {
 	 *
 	 * @param accountLink The account link to remove.
 	 */
-	public void removeOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.remove(
+	public void removeOutlink(final AccountLink accountLink) {
+		this.historicalOutlinks.remove(
 				accountLink.getHeight(),
 				accountLink.getOtherAccountAddress(),
 				accountLink.getAmount());
@@ -53,8 +53,8 @@ public class AccountImportance {
 	 * @param blockHeight The block height.
 	 * @return The matching links.
 	 */
-	public Iterator<AccountLink> getOutLinksIterator(final BlockHeight blockHeight) {
-		return this.historicalOutLinks.outlinksIterator(blockHeight);
+	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
+		return this.historicalOutlinks.outlinksIterator(blockHeight);
 	}
 
 	/**
@@ -63,8 +63,8 @@ public class AccountImportance {
 	 * @param blockHeight The block height.
 	 * @return The number of matching links.
 	 */
-	public int getOutLinksSize(final BlockHeight blockHeight) {
-		return this.historicalOutLinks.outlinksSize(blockHeight);
+	public int getOutlinksSize(final BlockHeight blockHeight) {
+		return this.historicalOutlinks.outlinksSize(blockHeight);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class AccountImportance {
 	 * @return A copy of this importance.
 	 */
 	public AccountImportance copy() {
-		final AccountImportance copy = new AccountImportance(this.historicalOutLinks.copy());
+		final AccountImportance copy = new AccountImportance(this.historicalOutlinks.copy());
 		copy.importance = this.importance;
 		copy.importanceHeight = this.importanceHeight;
 		return copy;

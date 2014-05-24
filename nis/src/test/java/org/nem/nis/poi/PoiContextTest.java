@@ -27,7 +27,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void outLinkScoreVectorIsInitializedCorrectly() {
+	public void outlinkScoreVectorIsInitializedCorrectly() {
 		// Act:
 		final PoiContext context = createTestPoiContext();
 
@@ -35,7 +35,7 @@ public class PoiContextTest {
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
-				context.getOutLinkScoreVector().roundTo(5),
+				context.getOutlinkScoreVector().roundTo(5),
 				IsEqual.equalTo(new ColumnVector(1e06, 0, 6e06, 0, 5e06, 10e06)));
 	}
 
@@ -104,7 +104,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void outLinkMatrixIsInitializedCorrectly() {
+	public void outlinkMatrixIsInitializedCorrectly() {
 		// Act:
 		// (0, 1, 6), (0, 2, 4)
 		// (1, 0, 2)
@@ -121,7 +121,7 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
 		Assert.assertThat(
-				context.getOutLinkMatrix().roundTo(5),
+				context.getOutlinkMatrix().roundTo(5),
 				IsEqual.equalTo(expectedAccountLinks));
 	}
 
@@ -132,7 +132,7 @@ public class PoiContextTest {
 			final int amount) {
 
 		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient.getAddress());
-		sender.getImportanceInfo().addOutLink(link);
+		sender.getImportanceInfo().addOutlink(link);
 	}
 
 	private static List<Account> createTestPoiAccounts(
@@ -146,7 +146,7 @@ public class PoiContextTest {
 
 			for (final int amount : info.amounts) {
 				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account.getAddress());
-				account.getImportanceInfo().addOutLink(link);
+				account.getImportanceInfo().addOutlink(link);
 			}
 
 			accounts.add(account);

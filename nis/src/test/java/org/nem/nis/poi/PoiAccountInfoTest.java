@@ -52,61 +52,61 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void hasOutLinksIsOnlyTrueWhenAccountHasAtLeastOneOutLink() {
+	public void hasOutlinksIsOnlyTrueWhenAccountHasAtLeastOneOutlink() {
 		// Assert:
-		Assert.assertThat(createAccountInfoWithNullOutLinks().hasOutLinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutLinks().hasOutLinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutLinks(1).hasOutLinks(), IsEqual.equalTo(true));
-		Assert.assertThat(createAccountInfoWithOutLinks(2, 4).hasOutLinks(), IsEqual.equalTo(true));
+		Assert.assertThat(createAccountInfoWithNullOutlinks().hasOutlinks(), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithOutlinks().hasOutlinks(), IsEqual.equalTo(false));
+		Assert.assertThat(createAccountInfoWithOutlinks(1).hasOutlinks(), IsEqual.equalTo(true));
+		Assert.assertThat(createAccountInfoWithOutlinks(2, 4).hasOutlinks(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void outLinkWeightsAreNullWhenAccountHasNoOutLinks() {
+	public void outlinkWeightsAreNullWhenAccountHasNoOutlinks() {
 		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
+		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
 
 		// Assert:
-		Assert.assertThat(info.getOutLinkWeights(), IsNull.nullValue());
+		Assert.assertThat(info.getOutlinkWeights(), IsNull.nullValue());
 	}
 
 	@Test
-	public void outLinkScoreIsZeroWhenAccountHasNoOutLinks() {
+	public void outlinkScoreIsZeroWhenAccountHasNoOutlinks() {
 		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithNullOutLinks();
+		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
 
 		// Assert:
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(0.0));
+		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
-	public void outLinkWeightsAreOrderedWhenAccountHasOutLinks() {
+	public void outlinkWeightsAreOrderedWhenAccountHasOutlinks() {
 		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
 
 		// Assert:
 		Assert.assertThat(
-				info.getOutLinkWeights(),
+				info.getOutlinkWeights(),
 				IsEqual.equalTo(new ColumnVector(2.0e06, 3.0e06, 1.0e06, 5.0e06, 9.0e06)));
 	}
 
 	@Test
-	public void outLinkScoreIsComputedCorrectlyWhenAccountHasOutLinks() {
+	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinks() {
 		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithOutLinks(2, 3, 1, 5, 9);
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
 
 		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(15.0e06));
+		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(15.0e06));
 	}
 
 	@Test
-	public void outLinkWeightsAreOrderedWhenAccountHasOutLinksWithVariableHeights() {
+	public void outlinkWeightsAreOrderedWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
 		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
 		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
 		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
 
 		// block heights must be in order so that account links have increasing block heights
-		final PoiAccountInfo info = createAccountInfoWithOutLinks(
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(
 				4322,
 				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
 				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
@@ -120,44 +120,44 @@ public class PoiAccountInfoTest {
 				5.0e06 * oneDayDecay,
 				8.0e06,
 				9.0e06);
-		Assert.assertThat(info.getOutLinkWeights(), IsEqual.equalTo(expectedWeights));
+		Assert.assertThat(info.getOutlinkWeights(), IsEqual.equalTo(expectedWeights));
 	}
 
 	@Test
-	public void outLinkScoreIsComputedCorrectlyWhenAccountHasOutLinksWithVariableHeights() {
+	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
 		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
 
 		// block heights must be in order so that account links have increasing block heights
-		final PoiAccountInfo info = createAccountInfoWithOutLinks(
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(
 				4322,
 				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
 				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
 
 		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutLinkScore(), IsEqual.equalTo(5.0e06 * oneDayDecay * 7));
+		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(5.0e06 * oneDayDecay * 7));
 	}
 
-	private static PoiAccountInfo createAccountInfoWithNullOutLinks() {
-		return createAccountInfoWithOutLinks((List<AccountLink>)null);
+	private static PoiAccountInfo createAccountInfoWithNullOutlinks() {
+		return createAccountInfoWithOutlinks((List<AccountLink>)null);
 	}
 
-	private static PoiAccountInfo createAccountInfoWithOutLinks(final List<AccountLink> outLinks) {
+	private static PoiAccountInfo createAccountInfoWithOutlinks(final List<AccountLink> outlinks) {
 		final BlockHeight height = BlockHeight.ONE;
 		final Account account = Utils.generateRandomAccount();
-		addAllOutLinks(account, outLinks);
+		addAllOutlinks(account, outlinks);
 		return new PoiAccountInfo(11, account, height);
 	}
 
-	private static PoiAccountInfo createAccountInfoWithOutLinks(final int... amounts) {
+	private static PoiAccountInfo createAccountInfoWithOutlinks(final int... amounts) {
 		final int[] heights = new int[amounts.length];
 		for (int i = 0; i < amounts.length; ++i)
 			heights[i] = 1;
 
-		return createAccountInfoWithOutLinks(1, amounts, heights);
+		return createAccountInfoWithOutlinks(1, amounts, heights);
 	}
 
-	private static PoiAccountInfo createAccountInfoWithOutLinks(
+	private static PoiAccountInfo createAccountInfoWithOutlinks(
 			final int referenceHeight,
 			final int[] amounts,
 			final int[] heights) {
@@ -166,24 +166,24 @@ public class PoiAccountInfoTest {
 
 		final Account account = Utils.generateRandomAccount();
 
-		final List<AccountLink> outLinks = new ArrayList<>();
+		final List<AccountLink> outlinks = new ArrayList<>();
 		for (int i = 0; i < amounts.length; ++i) {
 			final AccountLink link = new AccountLink(
 					new BlockHeight(heights[i]),
 					Amount.fromNem(amounts[i]),
 					account.getAddress());
-			outLinks.add(link);
+			outlinks.add(link);
 		}
 
-		addAllOutLinks(account, outLinks);
+		addAllOutlinks(account, outlinks);
 		return new PoiAccountInfo(11, account, new BlockHeight(referenceHeight));
 	}
 
-	private static void addAllOutLinks(final Account account, final List<AccountLink> outLinks) {
-		if (null == outLinks)
+	private static void addAllOutlinks(final Account account, final List<AccountLink> outlinks) {
+		if (null == outlinks)
 			return;
 
-		for (final AccountLink link : outLinks)
-			account.getImportanceInfo().addOutLink(link);
+		for (final AccountLink link : outlinks)
+			account.getImportanceInfo().addOutlink(link);
 	}
 }

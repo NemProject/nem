@@ -151,7 +151,7 @@ public class HistoricalOutlinksTest {
 	//region copy
 
 	@Test
-	public void copyCopiesOutLinks() {
+	public void copyCopiesOutlinks() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
@@ -171,7 +171,7 @@ public class HistoricalOutlinksTest {
 	}
 
 	@Test
-	public void copyCreatesDeepCopyOfOutLinks() {
+	public void copyCreatesDeepCopyOfOutlinks() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();

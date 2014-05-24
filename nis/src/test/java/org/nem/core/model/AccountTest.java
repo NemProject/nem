@@ -634,7 +634,7 @@ public class AccountTest {
 		final Account account = Utils.generateRandomAccount();
 		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
 		// TODO:
-		// account.getImportanceInfo().addOutLink(new AccountLink());
+		// account.getImportanceInfo().addOutlink(new AccountLink());
 
 		// Act:
 		final Account copyAccount = account.copy();
@@ -649,7 +649,7 @@ public class AccountTest {
 		final Account account = Utils.generateRandomAccount();
 		account.getImportanceInfo().setImportance(BlockHeight.ONE, 0.03125);
 		// TODO:
-		// account.getImportanceInfo().addOutLink(new AccountLink());
+		// account.getImportanceInfo().addOutlink(new AccountLink());
 
 		// Act:
 		final Account copyAccount = account.copy();

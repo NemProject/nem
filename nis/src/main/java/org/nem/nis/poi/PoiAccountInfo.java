@@ -16,7 +16,7 @@ public class PoiAccountInfo {
 	private final int index;
 	private final Account account;
 	private final BlockHeight height;
-	private final ColumnVector outLinkWeightsVector;
+	private final ColumnVector outlinkWeightsVector;
 
 	/**
 	 * Creates a new POI account info.
@@ -30,23 +30,23 @@ public class PoiAccountInfo {
 		this.account = account;
 		this.height = height;
 
-		if (!this.hasOutLinks()) {
-			this.outLinkWeightsVector = null;
+		if (!this.hasOutlinks()) {
+			this.outlinkWeightsVector = null;
 			return;
 		}
 
 		final AccountImportance importanceInfo = this.account.getImportanceInfo();
-		final Iterator<AccountLink> outLinks = importanceInfo.getOutLinksIterator(height);
-		this.outLinkWeightsVector = new ColumnVector(importanceInfo.getOutLinksSize(height));
+		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
+		this.outlinkWeightsVector = new ColumnVector(importanceInfo.getOutlinksSize(height));
 
 		// weight = out-link amount * DECAY_BASE^(age in days)
 		int i = 0;
-		while (outLinks.hasNext()) {
-			final AccountLink outLink = outLinks.next();
-			final long heightDifference = height.subtract(outLink.getHeight());
+		while (outlinks.hasNext()) {
+			final AccountLink outlink = outlinks.next();
+			final long heightDifference = height.subtract(outlink.getHeight());
 			long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			double weight = heightDifference < 0 ? 0.0 : outLink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
-			this.outLinkWeightsVector.setAt(i, weight);
+			double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+			this.outlinkWeightsVector.setAt(i, weight);
 			++i;
 		}
 	}
@@ -80,8 +80,8 @@ public class PoiAccountInfo {
 	 *
 	 * @return true if the account has any out-links.
 	 */
-	public boolean hasOutLinks() {
-		return 0 != this.account.getImportanceInfo().getOutLinksSize(this.height);
+	public boolean hasOutlinks() {
+		return 0 != this.account.getImportanceInfo().getOutlinksSize(this.height);
 	}
 
 	/**
@@ -89,8 +89,8 @@ public class PoiAccountInfo {
 	 *
 	 * @return The out-links weight vector.
 	 */
-	public ColumnVector getOutLinkWeights() {
-		return this.outLinkWeightsVector;
+	public ColumnVector getOutlinkWeights() {
+		return this.outlinkWeightsVector;
 	}
 
 	/**
@@ -98,11 +98,11 @@ public class PoiAccountInfo {
 	 *
 	 * @return The out-link score.
 	 */
-	public double getOutLinkScore() {
-		if (!this.hasOutLinks())
+	public double getOutlinkScore() {
+		if (!this.hasOutlinks())
 			return 0;
 
-		final double weightsMedian = this.outLinkWeightsVector.median();
-		return weightsMedian * this.outLinkWeightsVector.size();
+		final double weightsMedian = this.outlinkWeightsVector.median();
+		return weightsMedian * this.outlinkWeightsVector.size();
 	}
 }

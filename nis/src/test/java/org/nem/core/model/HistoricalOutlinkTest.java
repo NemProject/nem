@@ -106,7 +106,7 @@ public class HistoricalOutlinkTest {
 	//region copy
 
 	@Test
-	public void copyCopiesHeightAndOutLinks() {
+	public void copyCopiesHeightAndOutlinks() {
 		// Arrange:
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);
@@ -124,7 +124,7 @@ public class HistoricalOutlinkTest {
 	}
 
 	@Test
-	public void copyCreatesDeepCopyOfOutLinksList() {
+	public void copyCreatesDeepCopyOfOutlinksList() {
 		// Arrange:
 		final BlockHeight blockHeight = new BlockHeight(1234);
 		final HistoricalOutlink historicalOutlink = new HistoricalOutlink(blockHeight);

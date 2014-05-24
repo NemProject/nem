@@ -123,7 +123,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	}
 
 	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
-		a.getImportanceInfo().addOutLink(new AccountLink(blockHeight, Amount.fromNem(amount), b.getAddress()));
+		a.getImportanceInfo().addOutlink(new AccountLink(blockHeight, Amount.fromNem(amount), b.getAddress()));
 	}
 
 	@Test
@@ -464,18 +464,18 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		}
 	}
 	
-	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutLinksPerAccount, long totalOutLinkStrength, int outLinkStrategy) {
+	private List<MockAccount> createUserAccounts(long blockHeight, int numAccounts, long totalVestedBalance, int numOutlinksPerAccount, long totalOutlinkStrength, int outlinkStrategy) {
 		List<MockAccount> accounts = new ArrayList<>();
 		
 		for (int i=0; i<numAccounts; i++) {
-			if (outLinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
+			if (outlinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
 				if (i == 0) {
-					accounts.add(createMockAccountWithBalance(totalVestedBalance - totalOutLinkStrength - numAccounts + 1));
+					accounts.add(createMockAccountWithBalance(totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
 				} else {
 					accounts.add(createMockAccountWithBalance(1));					
 				}
 			} else {
-				accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutLinkStrength)/numAccounts));
+				accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutlinkStrength)/numAccounts));
 			}
 		}
 		
@@ -484,8 +484,8 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		for (int i=0; i<numAccounts; i++) {
 			MockAccount account = accounts.get(i);
 			account.setVestedBalanceAt(account.getBalance(), new BlockHeight(blockHeight));
-			for (int j=0; j< numOutLinksPerAccount; j++) {
-				switch (outLinkStrategy) {
+			for (int j=0; j< numOutlinksPerAccount; j++) {
+				switch (outlinkStrategy) {
 					case OUTLINK_STRATEGY_RANDOM:
 						otherAccount = accounts.get(sr.nextInt(numAccounts));
 						break;
@@ -499,7 +499,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 						otherAccount = accounts.get(0);
 						break;
 				}
-				long outlinkStrength = (account.getBalance().getNumNem() * totalOutLinkStrength)/((totalVestedBalance - totalOutLinkStrength) * numOutLinksPerAccount);
+				long outlinkStrength = (account.getBalance().getNumNem() * totalOutlinkStrength)/((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
 				addOutlink(account, otherAccount, BlockHeight.ONE, outlinkStrength);
 			}
 		}

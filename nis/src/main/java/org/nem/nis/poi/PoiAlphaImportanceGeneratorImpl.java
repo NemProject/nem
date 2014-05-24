@@ -55,7 +55,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		// (3) merge all sub-scores
 		return scorer.calculateFinalScore(
 				iterator.getResult(),
-				context.getOutLinkScoreVector(),
+				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector(),
 				scoringAlg);
 	}
@@ -85,7 +85,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 					.add(this.context.getInverseTeleportationVector());
 
 			// M(out-link) * V(importance) .* V(teleportation)
-			final ColumnVector importances = this.context.getOutLinkMatrix()
+			final ColumnVector importances = this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
 					.multiplyElementWise(this.context.getTeleportationVector());
 
