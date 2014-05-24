@@ -4,9 +4,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- *
+ * A collection of historical out-links.
  */
 public class HistoricalOutlinks {
+
 	private final LinkedList<HistoricalOutlink> outlinks = new LinkedList<>();
 	
 	/**
@@ -80,7 +81,21 @@ public class HistoricalOutlinks {
 				.reduce(0, Integer::sum);
 	}
 
+	/**
+	 * Gets the last historical out-link.
+	 *
+	 * @return The last historical out-link.
+	 */
 	public HistoricalOutlink getLastHistoricalOutlink() {
 		return this.outlinks.getLast();
+	}
+
+	/**
+	 * Creates a new copy of these out-links.
+	 */
+	public HistoricalOutlinks copy() {
+		final HistoricalOutlinks copy = new HistoricalOutlinks();
+		this.outlinks.stream().map(HistoricalOutlink::copy).forEach(copy.outlinks::add);
+		return copy;
 	}
 }

@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.nem.core.test.Utils;
 
 import java.util.Iterator;
@@ -146,5 +146,47 @@ public class HistoricalOutlinksTest {
 		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(456)));
 		Assert.assertFalse(it.hasNext());
 	}
+	//endregion
+
+	//region copy
+
+	@Test
+	public void copyCopiesOutLinks() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
+
+		// Act:
+		final HistoricalOutlinks copy = historicalOutlinks.copy();
+
+		// Assert:
+		final Iterator<AccountLink> it = copy.outlinksIterator(new BlockHeight(1235));
+		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(123)));
+		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(234)));
+		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(345)));
+		Assert.assertFalse(it.hasNext());
+	}
+
+	@Test
+	public void copyCreatesDeepCopyOfOutLinks() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
+
+		// Act:
+		final HistoricalOutlinks copy = historicalOutlinks.copy();
+		copy.add(new BlockHeight(1235), address, Amount.fromNem(111));
+
+		// Assert:
+		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().size(), IsEqual.equalTo(1));
+		Assert.assertThat(copy.getLastHistoricalOutlink().size(), IsEqual.equalTo(2));
+	}
+
 	//endregion
 }
