@@ -154,8 +154,7 @@ public abstract class Matrix {
 	 */
 	public void removeNegatives() {
 		this.forEach((r, c, v, u) -> {
-			System.out.println(v);
-			if (0 > v)
+			if (0 >= v)
 				this.setAt(r, c, 0.0);
 		});
 	}
