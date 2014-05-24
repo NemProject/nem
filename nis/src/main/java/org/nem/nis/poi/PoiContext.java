@@ -168,10 +168,8 @@ public class PoiContext {
 				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(height).getNumMicroNem());
 				this.outlinkScoreVector.setAt(i, accountInfo.getOutlinkScore());
 
-				if (!accountInfo.hasOutlinks()) {
+				if (!accountInfo.hasOutlinks())
 					this.dangleIndexes.add(i);
-					this.dangleVector.setAt(i, 0);
-				}
 
 				++i;
 			}
