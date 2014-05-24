@@ -139,6 +139,63 @@ public class AccountImportanceTest {
 
 	//endregion
 
+	//region copy
+
+	@Test
+	public void copyCopiesLatestImportanceInformation() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+		ai.setImportance(new BlockHeight(5), 17);
+
+			// Act:
+		final AccountImportance copy = ai.copy();
+		final double importance = copy.getImportance(new BlockHeight(5));
+
+		// Assert:
+		Assert.assertThat(importance, IsEqual.equalTo(17.0));
+	}
+
+	@Test
+	public void copyCopiesHistoricalOutLinkInformation() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+		ai.addOutLink(Utils.createLink(7, 27, "BBB"));
+		ai.addOutLink(Utils.createLink(8, 35, "CCC"));
+		ai.addOutLink(Utils.createLink(9, 18, "AAA"));
+
+		// Act:
+		final AccountImportance copy = ai.copy();
+
+		// Assert:
+		final List<AccountLink> expectedLinks = Arrays.asList(
+				Utils.createLink(7, 27, "BBB"),
+				Utils.createLink(8, 35, "CCC"),
+				Utils.createLink(9, 18, "AAA"));
+
+		final List<AccountLink> links = toList(copy.getOutLinksIterator(new BlockHeight(9)));
+		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		Assert.assertThat(copy.getOutLinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void copyCreatesDeepCopyOfHistoricalOutLinkInformation() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+		ai.addOutLink(Utils.createLink(7, 27, "BBB"));
+		ai.addOutLink(Utils.createLink(8, 35, "CCC"));
+		ai.addOutLink(Utils.createLink(9, 18, "AAA"));
+
+		// Act:
+		final AccountImportance copy = ai.copy();
+		copy.addOutLink(Utils.createLink(11, 14, "DDD"));
+
+		// Assert:
+		Assert.assertThat(ai.getOutLinksSize(new BlockHeight(15)), IsEqual.equalTo(3));
+		Assert.assertThat(copy.getOutLinksSize(new BlockHeight(15)), IsEqual.equalTo(4));
+	}
+
+	//endregion
+
 	private List<AccountLink> toList(final Iterator<AccountLink> linkIterator) {
 		final List<AccountLink> links = new ArrayList<>();
 		while (linkIterator.hasNext())

@@ -7,19 +7,19 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	private final BlockHeight height;
 	private final Amount amount;
-	private final Account otherAccount;
+	private final Address otherAccountAddress;
 
 	/**
 	 * Creates an account link.
 	 *
 	 * @param height The block height.
 	 * @param amount The amount.
-	 * @param otherAccount The linked account.
+	 * @param otherAccountAddress The address of the linked account.
 	 */
-	public AccountLink(final BlockHeight height, final Amount amount, final Account otherAccount) {
+	public AccountLink(final BlockHeight height, final Amount amount, final Address otherAccountAddress) {
 		this.height = height;
 		this.amount = amount;
-		this.otherAccount = otherAccount;
+		this.otherAccountAddress = otherAccountAddress;
 	}
 
 	/**
@@ -41,12 +41,12 @@ public class AccountLink implements Comparable<AccountLink> {
 	}
 
 	/**
-	 * Gets the other account.
+	 * Gets the address of the linked account.
 	 *
-	 * @return The other account.
+	 * @return The address of the linked account.
 	 */
-	public Account getOtherAccount() {
-		return this.otherAccount;
+	public Address getOtherAccountAddress() {
+		return this.otherAccountAddress;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class AccountLink implements Comparable<AccountLink> {
 		int[] comparisonResults = new int[] {
 				this.getHeight().compareTo(rhs.getHeight()),
 				this.getAmount().compareTo(rhs.getAmount()),
-				this.getOtherAccount().getAddress().getEncoded().compareTo(rhs.getOtherAccount().getAddress().getEncoded()),
+				this.otherAccountAddress.getEncoded().compareTo(rhs.otherAccountAddress.getEncoded()),
 		};
 
 		for (int result : comparisonResults) {
@@ -69,7 +69,7 @@ public class AccountLink implements Comparable<AccountLink> {
 	public int hashCode() {
 		return this.getHeight().hashCode() ^
 				this.getAmount().hashCode() ^
-				this.getOtherAccount().getAddress().getEncoded().hashCode();
+				this.otherAccountAddress.getEncoded().hashCode();
 	}
 
 	@Override
@@ -79,6 +79,6 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	@Override
 	public String toString() {
-		return String.format("%s -> %s @ %s", this.getAmount(), this.getOtherAccount().getAddress(), this.getHeight());
+		return String.format("%s -> %s @ %s", this.getAmount(), this.otherAccountAddress, this.getHeight());
 	}
 }

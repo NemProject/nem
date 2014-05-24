@@ -2,6 +2,7 @@ package org.nem.core.async;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 
@@ -59,6 +60,23 @@ public class DelayStrategyTest {
 
 		// Assert:
 		assertStrategy(strategy, new int[] { 10, 30, 50, 70 });
+	}
+
+	@Test
+	public void linearStrategyCanBeCreatedWithApproximateDuration() {
+		// Assert:
+		assertStrategy(LinearDelayStrategy.withDuration(10, 70, 80), new int[] { 10, 70 }); // sum == 80
+		assertStrategy(LinearDelayStrategy.withDuration(10, 70, 160), new int[] { 10, 30, 50, 70 }); // sum == 160
+		assertStrategy(LinearDelayStrategy.withDuration(10, 70, 200), new int[] { 10, 25, 40, 55, 70 }); // sum == 200
+		assertStrategy(LinearDelayStrategy.withDuration(10, 70, 300), new int[] { 10, 20, 30, 40, 50, 60, 70 }); // sum == 280
+	}
+
+	@Test
+	public void linearStrategyRequiresDurationAtLeastSumOfMinDelayAndMaxDelay() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> LinearDelayStrategy.withDuration(10, 70, 0), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> LinearDelayStrategy.withDuration(10, 70, 1), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> LinearDelayStrategy.withDuration(10, 70, 79), IllegalArgumentException.class);
 	}
 
 	//endregion

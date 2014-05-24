@@ -168,7 +168,10 @@ public class PoiAccountInfoTest {
 
 		final List<AccountLink> outLinks = new ArrayList<>();
 		for (int i = 0; i < amounts.length; ++i) {
-			final AccountLink link = new AccountLink(new BlockHeight(heights[i]), Amount.fromNem(amounts[i]), account);
+			final AccountLink link = new AccountLink(
+					new BlockHeight(heights[i]),
+					Amount.fromNem(amounts[i]),
+					account.getAddress());
 			outLinks.add(link);
 		}
 

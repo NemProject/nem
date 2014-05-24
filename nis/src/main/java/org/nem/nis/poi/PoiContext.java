@@ -204,7 +204,7 @@ public class PoiContext {
 						.getOutLinksIterator(height);
 				for (int i = 0; i < outLinkWeights.size(); ++i) {
 					final AccountLink outLink = accountLinkIterator.next();
-					int rowIndex = this.addressToIndexMap.get(outLink.getOtherAccount().getAddress());
+					int rowIndex = this.addressToIndexMap.get(outLink.getOtherAccountAddress());
 					this.outLinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outLinkWeights.getAt(i));
 				}
 			}

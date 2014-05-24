@@ -10,7 +10,7 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 	private final float delayStep;
 
 	/**
-	 * Creates a new infinite uniform delay strategy.
+	 * Creates a new linear delay strategy.
 	 *
 	 * @param minDelay The minimum delay.
 	 * @param maxDelay The maximum delay.
@@ -25,5 +25,21 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 	@Override
 	protected int nextInternal(final int iteration) {
 		return this.minDelay + (int)(delayStep * (iteration - 1));
+	}
+
+	/**
+	 * Creates a new linear delay strategy with an approximate back-off duration.
+	 *
+	 * @param minDelay The minimum delay.
+	 * @param maxDelay The maximum delay.
+	 * @param duration The desired (approximate duration).
+	 * @return A new strategy.
+	 */
+	public static LinearDelayStrategy withDuration(final int minDelay, final int maxDelay, final int duration) {
+		if (duration < minDelay + maxDelay)
+			throw new IllegalArgumentException("duration must be at least minDelay + maxDelay");
+
+		final int iterations = 2 * duration / (minDelay + maxDelay);
+		return new LinearDelayStrategy(minDelay, maxDelay, iterations);
 	}
 }

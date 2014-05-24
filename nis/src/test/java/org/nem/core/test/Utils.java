@@ -307,6 +307,6 @@ public class Utils {
 		return new AccountLink(
 				new BlockHeight(blockHeight),
 				Amount.fromNem(amount),
-				new Account(Address.fromEncoded(address)));
+				Address.fromEncoded(address));
 	}
 }

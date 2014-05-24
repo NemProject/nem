@@ -16,12 +16,21 @@ import java.util.concurrent.CompletableFuture;
  */
 public class NisPeerNetworkHost implements AutoCloseable {
 
+	private static final int ONE_SECOND = 1000;
+	private static final int ONE_MINUTE = 60 * ONE_SECOND;
+	private static final int ONE_HOUR = 60 * ONE_MINUTE;
+
 	private static final int REFRESH_INITIAL_DELAY = 200;
-	private static final int REFRESH_INTERVAL = 1 * 60 * 1000;
-	private static final int SYNC_INTERVAL = 1000;
-	private static final int BROADCAST_INTERVAL = 5 * 60 * 1000;
-	private static final int FORAGING_INITIAL_DELAY = 5 * 1000;
-	private static final int FORAGING_INTERVAL = 3 * 1000;
+	private static final int REFRESH_INITIAL_INTERVAL = 1 * ONE_SECOND;
+	private static final int REFRESH_PLATEAU_INTERVAL = 5 * ONE_MINUTE;
+	private static final int REFRESH_BACK_OFF_TIME = 12 * ONE_HOUR;
+
+	private static final int SYNC_INTERVAL = ONE_SECOND;
+
+	private static final int BROADCAST_INTERVAL = 5 * ONE_MINUTE;
+
+	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
+	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
@@ -110,11 +119,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		}
 
 		private static AbstractDelayStrategy getRefreshDelayStrategy() {
-			// initially refresh at 1/6 of the desired rate, gradually increase to the desired rate
-			// over 60 iterations, and then plateau at that rate forever
+			// initially refresh at REFRESH_INITIAL_INTERVAL (1s), gradually increasing to
+			// REFRESH_PLATEAU_INTERVAL (5m) over REFRESH_BACK_OFF_TIME (12 hours),
+			// and then plateau at that rate forever
 			final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
-					new LinearDelayStrategy(REFRESH_INTERVAL / 6, REFRESH_INTERVAL, 60),
-					new UniformDelayStrategy(REFRESH_INTERVAL));
+					LinearDelayStrategy.withDuration(
+							REFRESH_INITIAL_INTERVAL,
+							REFRESH_PLATEAU_INTERVAL,
+							REFRESH_BACK_OFF_TIME),
+					new UniformDelayStrategy(REFRESH_PLATEAU_INTERVAL));
 			return new AggregateDelayStrategy(subStrategies);
 		}
 

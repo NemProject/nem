@@ -7,10 +7,21 @@ import java.util.Iterator;
  */
 public class AccountImportance {
 
-	private final HistoricalOutlinks historicalOutLinks = new HistoricalOutlinks();
+	private final HistoricalOutlinks historicalOutLinks;
 
 	private BlockHeight importanceHeight;
 	private double importance;
+
+	/**
+	 * Creates a new importance instance.
+	 */
+	public AccountImportance() {
+		this(new HistoricalOutlinks());
+	}
+
+	private AccountImportance(final HistoricalOutlinks historicalOutLinks) {
+		this.historicalOutLinks = historicalOutLinks;
+	}
 
 	/**
 	 * Adds an out-link.
@@ -18,7 +29,10 @@ public class AccountImportance {
 	 * @param accountLink The account link to add.
 	 */
 	public void addOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.add(accountLink.getHeight(), accountLink.getOtherAccount(), accountLink.getAmount());
+		this.historicalOutLinks.add(
+				accountLink.getHeight(),
+				accountLink.getOtherAccountAddress(),
+				accountLink.getAmount());
 	}
 
 	/**
@@ -27,7 +41,10 @@ public class AccountImportance {
 	 * @param accountLink The account link to remove.
 	 */
 	public void removeOutLink(final AccountLink accountLink) {
-		this.historicalOutLinks.remove(accountLink.getHeight(), accountLink.getOtherAccount(), accountLink.getAmount());
+		this.historicalOutLinks.remove(
+				accountLink.getHeight(),
+				accountLink.getOtherAccountAddress(),
+				accountLink.getAmount());
 	}
 
 	/**
@@ -76,6 +93,18 @@ public class AccountImportance {
 		if (this.importanceHeight == null || 0 != this.importanceHeight.compareTo(blockHeight))
 			throw new IllegalArgumentException("importance not set at wanted height");
 
-		return importance;
+		return this.importance;
+	}
+
+	/**
+	 * Creates a copy of this importance.
+	 *
+	 * @return A copy of this importance.
+	 */
+	public AccountImportance copy() {
+		final AccountImportance copy = new AccountImportance(this.historicalOutLinks.copy());
+		copy.importance = this.importance;
+		copy.importanceHeight = this.importanceHeight;
+		return copy;
 	}
 }

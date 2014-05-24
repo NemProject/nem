@@ -123,7 +123,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	}
 
 	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
-		a.getImportanceInfo().addOutLink(new AccountLink(blockHeight, Amount.fromNem(amount), b));
+		a.getImportanceInfo().addOutLink(new AccountLink(blockHeight, Amount.fromNem(amount), b.getAddress()));
 	}
 
 	@Test

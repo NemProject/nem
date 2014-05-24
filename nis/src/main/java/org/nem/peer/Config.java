@@ -123,7 +123,8 @@ public class Config {
 	}
 
 	private static TrustProvider getDefaultTrustProvider() {
-		return new LowComTrustProvider(new EigenTrust(), 30);
+		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
+		return new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT);
 	}
 
 	/**

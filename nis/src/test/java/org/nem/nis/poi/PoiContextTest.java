@@ -131,7 +131,7 @@ public class PoiContextTest {
 			final Account recipient,
 			final int amount) {
 
-		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient);
+		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient.getAddress());
 		sender.getImportanceInfo().addOutLink(link);
 	}
 
@@ -145,7 +145,7 @@ public class PoiContextTest {
 			account.setVestedBalanceAt(Amount.fromMicroNem(info.vestedBalance), height);
 
 			for (final int amount : info.amounts) {
-				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account);
+				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account.getAddress());
 				account.getImportanceInfo().addOutLink(link);
 			}
 

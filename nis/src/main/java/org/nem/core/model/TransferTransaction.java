@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
-	private static final int MAX_MESSAGE_SIZE = 1000;
+	private static final int MAX_MESSAGE_SIZE = 512;
 
 	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER =
 			(final Account sender, final Account recipient, final Amount amount) -> sender.getBalance().compareTo(amount) >= 0;
@@ -98,10 +98,18 @@ public class TransferTransaction extends Transaction {
 		if (GenesisBlock.ACCOUNT.equals(this.getSigner()))
 			return Amount.ZERO;
 
-		// TODO: add scaling to Amount
-		long amountFee = (long)Math.ceil(this.amount.getNumMicroNem() * 0.001);
-		long messageFee = (long)Math.ceil(this.getMessageLength() * 0.005);
-		return new Amount(Math.max(1, amountFee + messageFee));
+		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
+	}
+
+	private long getMinimumTransferFee() {
+		double microNemAmount = this.amount.getNumNem();
+		return Math.max(1, (long)Math.ceil(microNemAmount / 25000 + Math.log(microNemAmount) / 5));
+	}
+
+	private long getMinimumMessageFee() {
+		return 0 == this.getMessageLength()
+				? 0
+				: Math.max(1, 5 * this.getMessageLength() / 256);
 	}
 
 	@Override
