@@ -98,11 +98,11 @@ public class TransferTransaction extends Transaction {
 		if (GenesisBlock.ACCOUNT.equals(this.getSigner()))
 			return Amount.ZERO;
 
-		return new Amount(this.getMinimumTransferFee() + this.getMinimumMessageFee());
+		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
 
 	private long getMinimumTransferFee() {
-		double microNemAmount = this.amount.getNumMicroNem();
+		double microNemAmount = this.amount.getNumNem();
 		return Math.max(1, (long)Math.ceil(microNemAmount / 25000 + Math.log(microNemAmount) / 5));
 	}
 

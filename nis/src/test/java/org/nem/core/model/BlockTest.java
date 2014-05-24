@@ -119,7 +119,8 @@ public class BlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(2L)));
+		// (t1 has a fee of 1 and t2 has a fee of 2)
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(3L)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
@@ -127,10 +128,10 @@ public class BlockTest {
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
 		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
-		Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(new Amount(17L)));
+		Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(Amount.fromNem(17)));
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(new Amount(290L)));
+		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(290)));
 	}
 
 	@Test
@@ -241,7 +242,7 @@ public class BlockTest {
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
-				new Amount(amount),
+				Amount.fromNem(amount),
 				null);
 		transaction.sign();
 		return transaction;
@@ -592,8 +593,6 @@ public class BlockTest {
 			return transaction;
 		}
 	}
-
-	//endregion
 
 	//endregion
 

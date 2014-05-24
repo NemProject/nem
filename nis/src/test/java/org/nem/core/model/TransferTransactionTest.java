@@ -35,7 +35,7 @@ public class TransferTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
+		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
 	}
 
@@ -51,7 +51,7 @@ public class TransferTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
+		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
@@ -69,7 +69,7 @@ public class TransferTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
+		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
 	}
 
@@ -86,7 +86,7 @@ public class TransferTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(new Amount(123L)));
+		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
@@ -97,65 +97,65 @@ public class TransferTransactionTest {
 	@Test
 	public void feeIsCalculatedCorrectlyForEmptyTransaction() {
 		// Assert:
-		Assert.assertThat(calculateFee(0, 0), IsEqual.equalTo(1L));
+		Assert.assertThat(calculateFee(0, 0), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
 		// Assert:
-		Assert.assertThat(calculateFee(1, 0), IsEqual.equalTo(1L));
-		Assert.assertThat(calculateFee(144, 0), IsEqual.equalTo(1L));
-		Assert.assertThat(calculateFee(145, 0), IsEqual.equalTo(2L));
-		Assert.assertThat(calculateFee(1024, 0), IsEqual.equalTo(2L));
-		Assert.assertThat(calculateFee(32768, 0), IsEqual.equalTo(4L));
-		Assert.assertThat(calculateFee(1048576, 0), IsEqual.equalTo(45L));
+		Assert.assertThat(calculateFee(1, 0), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(calculateFee(144, 0), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(calculateFee(145, 0), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(calculateFee(1024, 0), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(calculateFee(32768, 0), IsEqual.equalTo(Amount.fromNem(4)));
+		Assert.assertThat(calculateFee(1048576, 0), IsEqual.equalTo(Amount.fromNem(45)));
 	}
 
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithMessage() {
 		// Assert:
-		Assert.assertThat(calculateFee(1024, 1), IsEqual.equalTo(3L));
-		Assert.assertThat(calculateFee(1024, 255), IsEqual.equalTo(6L));
-		Assert.assertThat(calculateFee(1024, 256), IsEqual.equalTo(7L));
-		Assert.assertThat(calculateFee(1024, 257), IsEqual.equalTo(7L));
-		Assert.assertThat(calculateFee(1024, 512), IsEqual.equalTo(12L));
+		Assert.assertThat(calculateFee(1024, 1), IsEqual.equalTo(Amount.fromNem(3)));
+		Assert.assertThat(calculateFee(1024, 255), IsEqual.equalTo(Amount.fromNem(6)));
+		Assert.assertThat(calculateFee(1024, 256), IsEqual.equalTo(Amount.fromNem(7)));
+		Assert.assertThat(calculateFee(1024, 257), IsEqual.equalTo(Amount.fromNem(7)));
+		Assert.assertThat(calculateFee(1024, 512), IsEqual.equalTo(Amount.fromNem(12)));
 	}
 
 	@Test
 	public void feeIsWaivedForGenesisAccount() {
 		// Assert:
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 0, 0), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 0), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12001, 0), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 0), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 1), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 199), IsEqual.equalTo(0L));
-		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 200), IsEqual.equalTo(0L));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 0, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12001, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 1), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 12000, 199), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(GenesisBlock.ACCOUNT, 13000, 200), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
 	public void messageFeeIsBasedOnEncodedSize() {
 		// Assert:
-		Assert.assertThat(calculateMessageFee(256, 512), IsEqual.equalTo(6L));
-		Assert.assertThat(calculateMessageFee(512, 256), IsEqual.equalTo(11L));
+		Assert.assertThat(calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(6)));
+		Assert.assertThat(calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(11)));
 	}
 
-	private long calculateFee(final long amount, final int messageSize) {
+	private Amount calculateFee(final long amount, final int messageSize) {
 		// Act:
 		return calculateFee(Utils.generateRandomAccount(), amount, messageSize);
 	}
 
-	private long calculateFee(final Account signer, final long amount, final int messageSize) {
+	private Amount calculateFee(final Account signer, final long amount, final int messageSize) {
 		// Arrange:
 		final Account recipient = Utils.generateRandomAccount();
 		final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, message);
 
 		// Act:
-		return transaction.getFee().getNumMicroNem();
+		return transaction.getFee();
 	}
 
-	private long calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
+	private Amount calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -165,7 +165,7 @@ public class TransferTransactionTest {
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, 0, message);
 
 		// Act:
-		return transaction.getFee().getNumMicroNem();
+		return transaction.getFee();
 	}
 
 	//endregion
@@ -178,7 +178,7 @@ public class TransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, Amount.fromNem(1), null);
 		transaction.setDeadline(new TimeInstant(60));
 		transaction.setFee(transaction.getMinimumFee());
 
@@ -297,7 +297,7 @@ public class TransferTransactionTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, new Amount(1), null);
+		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, Amount.fromNem(1), null);
 		transaction.setDeadline(TimeInstant.ZERO);
 
 		// Assert:
@@ -308,7 +308,8 @@ public class TransferTransactionTest {
 	public void isValidFailsWithFailingValidator() {
 		// Arrange:
 		final Transaction transaction = createTransaction(2, 1, 1);
-		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> false;
+		final TransactionValidator failingTransactionValidator =
+				(sender, recipient, amount) -> false;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
@@ -316,10 +317,11 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void isValidSucceedsWithSuceedingValidator() {
+	public void isValidSucceedsWithSucceedingValidator() {
 		// Arrange:
 		final Transaction transaction = createTransaction(2, 2, 1);
-		final TransactionValidator failingTransactionValidator = (final Account sender, final Account recipient, final Amount amount) -> true;
+		final TransactionValidator failingTransactionValidator =
+				(sender, recipient, amount) -> true;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
@@ -354,10 +356,10 @@ public class TransferTransactionTest {
 	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(senderBalance));
+		signer.incrementBalance(Amount.fromNem(senderBalance));
 		final Account recipient = Utils.generateRandomAccount();
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
-		transaction.setFee(new Amount(fee));
+		transaction.setFee(Amount.fromNem(fee));
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		return transaction;
@@ -390,7 +392,7 @@ public class TransferTransactionTest {
 	private boolean isMessageSizeValid(final int messageSize) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
@@ -408,42 +410,42 @@ public class TransferTransactionTest {
 	public void executeTransfersAmountAndFeeFromSigner() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.execute();
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(891L)));
+		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(891L)));
 	}
 
 	@Test
 	public void executeTransfersAmountToRecipient() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.execute();
 
 		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(99L)));
+		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(99L)));
 	}
 
 	@Test
 	public void executeDoesNotAppendEmptyMessageToRecipientAccount() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.execute();
@@ -457,10 +459,10 @@ public class TransferTransactionTest {
 		// Arrange:
 		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.execute();
@@ -475,10 +477,10 @@ public class TransferTransactionTest {
 		// Arrange:
 		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.execute(Mockito.mock(TransferObserver.class));
@@ -495,46 +497,46 @@ public class TransferTransactionTest {
 	public void undoTransfersAmountAndFeeToSigner() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(new Amount(100));
+		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.undo();
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(new Amount(1109L)));
+		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(1109L)));
 	}
 
 	@Test
 	public void undoTransfersAmountFromRecipient() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(new Amount(100));
+		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.undo();
 
 		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(new Amount(1L)));
+		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(1L)));
 	}
 
 	@Test
 	public void undoDoesNotRemoveEmptyMessageFomAccount() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(new Amount(100));
+		recipient.incrementBalance(Amount.fromNem(100));
 		recipient.addMessage(new PlainMessage(new byte[] { 0x25, 0x52, 0x7F }));
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.undo();
@@ -553,15 +555,15 @@ public class TransferTransactionTest {
 		final byte[] messageInput2 = Utils.generateRandomBytes();
 		final Message message = new PlainMessage(messageInput1);
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(new Amount(100));
+		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
 		recipient.addMessage(new PlainMessage(messageInput1));
 		recipient.addMessage(new PlainMessage(messageInput2));
 		recipient.addMessage(new PlainMessage(messageInput1));
 		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.undo();
@@ -580,15 +582,15 @@ public class TransferTransactionTest {
 		final byte[] messageInput2 = Utils.generateRandomBytes();
 		final Message message = new PlainMessage(messageInput1);
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(new Amount(1000));
+		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(new Amount(100));
+		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 99, message);
 		recipient.addMessage(new PlainMessage(messageInput1));
 		recipient.addMessage(new PlainMessage(messageInput2));
 		recipient.addMessage(new PlainMessage(messageInput1));
 		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(new Amount(10));
+		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
 		transaction.undo(Mockito.mock(TransferObserver.class));
@@ -645,7 +647,7 @@ public class TransferTransactionTest {
 	//endregion
 
 	private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(amount), message);
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
 	}
 
 	private TransferTransaction createRoundTrippedTransaction(
