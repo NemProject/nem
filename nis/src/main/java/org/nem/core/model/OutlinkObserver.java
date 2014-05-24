@@ -21,11 +21,14 @@ public class OutlinkObserver implements TransferObserver {
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-		final AccountLink link = new AccountLink(this.height, amount, recipient.getAddress());
-		if (this.isExecute)
+		if (this.isExecute) {
+			final AccountLink link = new AccountLink(this.height, amount, recipient.getAddress());
 			sender.getImportanceInfo().addOutlink(link);
-		else
-			sender.getImportanceInfo().removeOutlink(link);
+		}
+		else {
+			final AccountLink link = new AccountLink(this.height, amount, sender.getAddress());
+			recipient.getImportanceInfo().removeOutlink(link);
+		}
 	}
 
 	@Override

@@ -25,13 +25,13 @@ public class OutlinkObserverTest {
 	}
 
 	@Test
-	public void notifyTransferUndoRemovesSenderOutlink() {
+	public void notifyTransferUndoRemovesRecipientOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), false);
 
 		// Act:
-		observer.notifyTransfer(context.account1, context.account2, new Amount(752));
+		observer.notifyTransfer(context.account2, context.account1, new Amount(752));
 
 		// Assert:
 		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(752), context.account2.getAddress());

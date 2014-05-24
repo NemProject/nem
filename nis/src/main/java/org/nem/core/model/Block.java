@@ -191,10 +191,7 @@ public class Block extends VerifiableEntity {
 	 * Executes all transactions in the block.
 	 */
 	public void execute() {
-		final TransferObserver observer = new AggregateBlockTransferObserverToTransferObserverAdapter(
-				this.blockTransferObservers,
-				this.height,
-				true);
+		final TransferObserver observer = this.createTransferObserver(true);
 
 		for (final Transaction transaction : this.transactions) {
 			transaction.execute();
@@ -211,10 +208,7 @@ public class Block extends VerifiableEntity {
 	 * Undoes all transactions in the block.
 	 */
 	public void undo() {
-		final TransferObserver observer = new AggregateBlockTransferObserverToTransferObserverAdapter(
-				this.blockTransferObservers,
-				this.height,
-				false);
+		final TransferObserver observer = this.createTransferObserver(false);
 
 		final Account signer = this.getSigner();
 		observer.notifyDebit(this.getSigner(), this.getTotalFee());
@@ -229,6 +223,15 @@ public class Block extends VerifiableEntity {
 
 	private Iterable<Transaction> getReverseTransactions() {
 		return () -> new ReverseListIterator<>(transactions);
+	}
+
+	private TransferObserver createTransferObserver(final boolean isExecute) {
+		final TransferObserver aggregateObserver = new AggregateBlockTransferObserverToTransferObserverAdapter(
+				this.blockTransferObservers,
+				this.height,
+				isExecute);
+		final TransferObserver outlinkObserver = new OutlinkObserver(this.height, isExecute);
+		return new AggregateTransferObserver(Arrays.asList(aggregateObserver, outlinkObserver));
 	}
 
 	@Override

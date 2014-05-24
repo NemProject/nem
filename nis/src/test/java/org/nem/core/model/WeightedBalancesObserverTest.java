@@ -77,7 +77,7 @@ public class WeightedBalancesObserverTest {
 		public TestContext() {
 			this.account = Mockito.mock(Account.class);
 			this.balances = Mockito.mock(WeightedBalances.class);
-			Mockito.when(account.getWeightedBalances()).thenReturn(balances);
+			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
 
 			this.observer = new WeightedBalancesObserver();
 		}

@@ -493,12 +493,10 @@ public class BlockTest {
 	private static void assertExecuteNotificationForObservers(
 			final List<BlockTransferObserver> observers,
 			final Consumer<Block> registerObservers) {
-
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
-		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
-		final Account account2 = Utils.generateRandomAccount();
+		final Account account1 = new MockAccountContext().account;
+		final Account account2 = new MockAccountContext().account;
+
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
 		transaction.setTransferAction(to -> {
@@ -508,8 +506,7 @@ public class BlockTest {
 		});
 
 		final BlockHeight height = new BlockHeight(11);
-		final Block block = createBlockWithHeight(height);
-		block.addTransaction(transaction);
+		final Block block = createBlockWithTransaction(height, Amount.fromNem(7), transaction);
 		registerObservers.accept(block);
 
 		// Act:
@@ -517,7 +514,6 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
-
 		for (final BlockTransferObserver observer : observers) {
 			// transaction transfer action
 			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
@@ -537,17 +533,8 @@ public class BlockTest {
 			final List<BlockTransferObserver> observers,
 			final Consumer<Block> registerObservers) {
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
-		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
-
-		final Account account2 = Utils.generateRandomAccount();
-		// this might look strange, but we won't be able to undo if weighted balances doesn't have
-		// knowledge, that somewhere in the past we received something
-		account2.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(12));
-		// we won't be able to undo if an original outlink doesn't exist
-		account2.getImportanceInfo().addOutlink(
-				new AccountLink(new BlockHeight(11), Amount.fromNem(12), account1.getAddress()));
+		final Account account1 = new MockAccountContext().account;
+		final Account account2 = new MockAccountContext().account;
 
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
@@ -558,11 +545,7 @@ public class BlockTest {
 		});
 
 		final BlockHeight height = new BlockHeight(11);
-		final Block block = createBlockWithHeight(height);
-		block.getSigner().incrementBalance(Amount.fromNem(7));
-		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(7));
-		block.addTransaction(transaction);
-
+		final Block block = createBlockWithTransaction(height, Amount.fromNem(7), transaction);
 		registerObservers.accept(block);
 
 		// Act:
@@ -570,7 +553,6 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
-
 		for (final BlockTransferObserver observer : observers) {
 			// transaction transfer action
 			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(12));
@@ -596,6 +578,116 @@ public class BlockTest {
 		Mockito.verify(observer, Mockito.times(notifyReceiveCounts)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.times(notifySendUndoCounts)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.times(notifyReceiveUndoCounts)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	}
+
+	private static Block createBlockWithTransaction(final BlockHeight height, final Amount amount, final Transaction transaction) {
+		final Block block = createBlockWithHeight(height);
+		block.getSigner().incrementBalance(amount);
+		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, amount);
+		block.addTransaction(transaction);
+		return block;
+	}
+
+	private static Block createBlockWithDefaultTransaction(
+			final BlockHeight height,
+			final Account account1,
+			final Account account2) {
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setFee(Amount.fromNem(7));
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyDebit(account1, Amount.fromNem(9));
+			to.notifyCredit(account1, Amount.fromNem(11));
+		});
+
+		return createBlockWithTransaction(height, Amount.fromNem(7), transaction);
+	}
+
+	//endregion
+
+	//region execute / undo notification updates
+
+	@Test
+	public void executeUpdatesOutlinks() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Mockito.verify(accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
+		Mockito.verify(accountContext2.importance, Mockito.times(0)).addOutlink(Mockito.any());
+	}
+
+	@Test
+	public void undoUpdatesOutlinks() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Mockito.verify(accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
+		Mockito.verify(accountContext2.importance, Mockito.times(0)).removeOutlink(Mockito.any());
+	}
+
+	@Test
+	public void executeUpdatesWeightedBalances() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Mockito.verify(accountContext1.balances, Mockito.times(2)).addSend(Mockito.any(), Mockito.any());
+		Mockito.verify(accountContext2.balances, Mockito.times(1)).addReceive(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void undoUpdatesWeightedBalances() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Mockito.verify(accountContext1.balances, Mockito.times(2)).undoSend(Mockito.any(), Mockito.any());
+		Mockito.verify(accountContext2.balances, Mockito.times(1)).undoReceive(Mockito.any(), Mockito.any());
+	}
+
+	private static class MockAccountContext {
+		private final Account account;
+		private final AccountImportance importance;
+		private final WeightedBalances balances;
+
+		public MockAccountContext() {
+			this.account = Mockito.mock(Account.class);
+			this.importance = Mockito.mock(AccountImportance.class);
+			this.balances = Mockito.mock(WeightedBalances.class);
+
+			Mockito.when(this.account.getImportanceInfo()).thenReturn(this.importance);
+			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
+		}
 	}
 
 	//endregion
