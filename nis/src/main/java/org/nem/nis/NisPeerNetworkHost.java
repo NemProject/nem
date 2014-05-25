@@ -6,7 +6,6 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeApiId;
-import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

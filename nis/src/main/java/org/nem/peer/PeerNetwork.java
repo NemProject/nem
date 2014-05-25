@@ -137,6 +137,11 @@ public class PeerNetwork {
 				LOGGER.log(Level.INFO, "verifyLocalNode with trusted nodes", e);
 			}
 		}
+		
+		if(yourNode == null) {
+			LOGGER.log(Level.INFO, String.format("local node configuration unchanged: <%s>", localNode));
+			return;
+		}
 
 		// Check if IPs are different
 		NodeEndpoint requestEndpoint = yourNode.getRequestEndpoint();
