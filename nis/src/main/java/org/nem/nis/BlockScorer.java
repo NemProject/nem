@@ -72,8 +72,8 @@ public class BlockScorer {
 		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
 		this.accountAnalyzer.recalculateImportances(blockHeight);
-		// TODO: how this should be scaled?
-		final long multiplier = 4_000_000_000L * 1_000_000;
+		// TODO: maybe it'd be better to use Genesis.AMOUNT.getNumNem()
+		final long multiplier = 4_000_000_000L;
 		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 		return BigInteger.valueOf(timeStampDifference)
 						 .multiply(BigInteger.valueOf(forgerBalance))
