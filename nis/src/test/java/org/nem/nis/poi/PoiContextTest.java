@@ -97,10 +97,10 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext();
 
 		// Assert:
-		// (1) accounts without out-links are dangling
+		// (1) dangle vector is the 1-vector
 		Assert.assertThat(
 				context.getDangleVector(),
-				IsEqual.equalTo(new ColumnVector(1, 0, 1, 0, 1, 1)));
+				IsEqual.equalTo(new ColumnVector(1, 1, 1, 1, 1, 1)));
 	}
 
 	@Test

@@ -302,7 +302,7 @@ public class BlockTest {
 
 	//endregion
 
- 	//region execute
+ 	//region execute / undo basic updates
 
 	@Test
 	public void executeIncrementsForagedBlocks() {
@@ -341,6 +341,78 @@ public class BlockTest {
 	}
 
 	@Test
+	public void undoDecrementsForagedBlocks() {
+		// Arrange: initial foraged blocks = 3
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+	}
+
+	@Test
+	public void undoDecrementsForagerBalanceByTotalFee() {
+		// Arrange: initial balance = 100, total fee = 28
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
+	}
+
+	@Test
+	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
+		// Arrange:
+		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+
+		// Act:
+		context.block.undo();
+
+		// Assert:
+		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
+	}
+
+	private final class UndoExecuteTestContext {
+		private final Account account;
+		private final Block block;
+		private final MockTransaction transaction1;
+		private final MockTransaction transaction2;
+		private final List<Integer> executeList = new ArrayList<>();
+		private final List<Integer> undoList = new ArrayList<>();
+
+		public UndoExecuteTestContext() {
+			this.account = Utils.generateRandomAccount();
+			this.account.incrementBalance(new Amount(100));
+			for (int i = 0; i < 3; ++i)
+				this.account.incrementForagedBlocks();
+
+			this.transaction1 = createTransaction(1, 17);
+			this.transaction2 = createTransaction(2, 11);
+
+			this.block = createBlock(this.account);
+			this.block.addTransaction(this.transaction1);
+			this.block.addTransaction(this.transaction2);
+
+			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
+		}
+
+		private MockTransaction createTransaction(final int customField, final long fee) {
+			final MockTransaction transaction = createTransactionWithFee(customField, fee);
+			transaction.setExecuteList(this.executeList);
+			transaction.setUndoList(this.undoList);
+			return transaction;
+		}
+	}
+
+	//endregion
+
+	//region execute / undo notifications
+
+	@Test
 	public void executeDelegatesToSubscribedObserver() {
 		// Arrange:
 		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
@@ -376,96 +448,7 @@ public class BlockTest {
 			b.unsubscribe(observer2);
 		});
 
-		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
-	}
-
-	private static void assertExecuteNotificationForObservers(
-			final List<BlockTransferObserver> observers,
-			final Consumer<Block> registerObservers) {
-
-		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
-		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
-		final Account account2 = Utils.generateRandomAccount();
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setFee(Amount.fromNem(7));
-		transaction.setTransferAction(to -> {
-			to.notifyTransfer(account1, account2, Amount.fromNem(12));
-			to.notifyCredit(account1, Amount.fromNem(9));
-			to.notifyDebit(account1, Amount.fromNem(11));
-		});
-
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = createBlockWithHeight(height);
-		block.addTransaction(transaction);
-		registerObservers.accept(block);
-
-		// Act:
-		block.execute();
-
-		// Assert:
-		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
-
-		for (final BlockTransferObserver observer : observers) {
-			// transaction transfer action
-			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account2, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(11));
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account1, Amount.fromNem(9));
-
-			// signer fee
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, block.getSigner(), Amount.fromNem(7));
-
-			// total call counts
-			Mockito.verify(observer, Mockito.times(2)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(3)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		}
-	}
-
-	//endregion
-
-	//region undo
-
-	@Test
-	public void undoDecrementsForagedBlocks() {
-		// Arrange: initial foraged blocks = 3
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	@Test
-	public void undoDecrementsForagerBalanceByTotalFee() {
-		// Arrange: initial balance = 100, total fee = 28
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
-	}
-
-	@Test
-	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
-		// Arrange:
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.block.undo();
-
-		// Assert:
-		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
+		verifyCallCounts(observer2, 0, 0, 0, 0);
 	}
 
 	@Test
@@ -504,23 +487,55 @@ public class BlockTest {
 			b.unsubscribe(observer2);
 		});
 
-		Mockito.verify(observer2, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer2, Mockito.times(0)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		verifyCallCounts(observer2, 0, 0, 0, 0);
+	}
+
+	private static void assertExecuteNotificationForObservers(
+			final List<BlockTransferObserver> observers,
+			final Consumer<Block> registerObservers) {
+		// Arrange:
+		final Account account1 = new MockAccountContext().account;
+		final Account account2 = new MockAccountContext().account;
+
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setFee(Amount.fromNem(7));
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithTransaction(height, Amount.fromNem(7), transaction);
+		registerObservers.accept(block);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
+		for (final BlockTransferObserver observer : observers) {
+			// transaction transfer action
+			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account2, Amount.fromNem(12));
+			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(11));
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account1, Amount.fromNem(9));
+
+			// signer fee
+			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, block.getSigner(), Amount.fromNem(7));
+
+			// total call counts
+			verifyCallCounts(observer, 2, 3, 0, 0);
+		}
 	}
 
 	private static void assertUndoNotificationForObservers(
 			final List<BlockTransferObserver> observers,
 			final Consumer<Block> registerObservers) {
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
-		account1.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(25));
-		final Account account2 = Utils.generateRandomAccount();
-		// this might look strange, but we won't be able to undo if weighted balances doesn't have
-		// knowledge, that somewhere in the past we received something
-		account2.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(12));
+		final Account account1 = new MockAccountContext().account;
+		final Account account2 = new MockAccountContext().account;
+
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setFee(Amount.fromNem(7));
 		transaction.setTransferAction(to -> {
@@ -530,11 +545,7 @@ public class BlockTest {
 		});
 
 		final BlockHeight height = new BlockHeight(11);
-		final Block block = createBlockWithHeight(height);
-		block.getSigner().incrementBalance(Amount.fromNem(7));
-		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(7));
-		block.addTransaction(transaction);
-
+		final Block block = createBlockWithTransaction(height, Amount.fromNem(7), transaction);
 		registerObservers.accept(block);
 
 		// Act:
@@ -542,7 +553,6 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
-
 		for (final BlockTransferObserver observer : observers) {
 			// transaction transfer action
 			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(12));
@@ -554,43 +564,129 @@ public class BlockTest {
 			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, block.getSigner(), Amount.fromNem(7));
 
 			// total call counts
-			Mockito.verify(observer, Mockito.times(0)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(0)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(2)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-			Mockito.verify(observer, Mockito.times(3)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+			verifyCallCounts(observer, 0, 0, 2, 3);
 		}
 	}
 
-	private final class UndoExecuteTestContext {
+	private static void verifyCallCounts(
+			final BlockTransferObserver observer,
+			final int notifySendCounts,
+			final int notifyReceiveCounts,
+			final int notifySendUndoCounts,
+			final int notifyReceiveUndoCounts) {
+		Mockito.verify(observer, Mockito.times(notifySendCounts)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifyReceiveCounts)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifySendUndoCounts)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(notifyReceiveUndoCounts)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	}
 
+	private static Block createBlockWithTransaction(final BlockHeight height, final Amount amount, final Transaction transaction) {
+		final Block block = createBlockWithHeight(height);
+		block.getSigner().incrementBalance(amount);
+		block.getSigner().getWeightedBalances().addReceive(BlockHeight.ONE, amount);
+		block.addTransaction(transaction);
+		return block;
+	}
+
+	private static Block createBlockWithDefaultTransaction(
+			final BlockHeight height,
+			final Account account1,
+			final Account account2) {
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setFee(Amount.fromNem(7));
+		transaction.setTransferAction(to -> {
+			to.notifyTransfer(account1, account2, Amount.fromNem(12));
+			to.notifyDebit(account1, Amount.fromNem(9));
+			to.notifyCredit(account1, Amount.fromNem(11));
+		});
+
+		return createBlockWithTransaction(height, Amount.fromNem(7), transaction);
+	}
+
+	//endregion
+
+	//region execute / undo notification updates
+
+	@Test
+	public void executeUpdatesOutlinks() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Mockito.verify(accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
+		Mockito.verify(accountContext2.importance, Mockito.times(0)).addOutlink(Mockito.any());
+	}
+
+	@Test
+	public void undoUpdatesOutlinks() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Mockito.verify(accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
+		Mockito.verify(accountContext2.importance, Mockito.times(0)).removeOutlink(Mockito.any());
+	}
+
+	@Test
+	public void executeUpdatesWeightedBalances() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Mockito.verify(accountContext1.balances, Mockito.times(2)).addSend(Mockito.any(), Mockito.any());
+		Mockito.verify(accountContext2.balances, Mockito.times(1)).addReceive(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void undoUpdatesWeightedBalances() {
+		// Arrange:
+		final MockAccountContext accountContext1 = new MockAccountContext();
+		final MockAccountContext accountContext2 = new MockAccountContext();
+
+		final BlockHeight height = new BlockHeight(11);
+		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+
+		// Act:
+		block.undo();
+
+		// Assert:
+		Mockito.verify(accountContext1.balances, Mockito.times(2)).undoSend(Mockito.any(), Mockito.any());
+		Mockito.verify(accountContext2.balances, Mockito.times(1)).undoReceive(Mockito.any(), Mockito.any());
+	}
+
+	private static class MockAccountContext {
 		private final Account account;
-		private final Block block;
-		private final MockTransaction transaction1;
-		private final MockTransaction transaction2;
-		private final List<Integer> executeList = new ArrayList<>();
-		private final List<Integer> undoList = new ArrayList<>();
+		private final AccountImportance importance;
+		private final WeightedBalances balances;
 
-		public UndoExecuteTestContext() {
-			this.account = Utils.generateRandomAccount();
-			this.account.incrementBalance(new Amount(100));
-			for (int i = 0; i < 3; ++i)
-				this.account.incrementForagedBlocks();
+		public MockAccountContext() {
+			this.account = Mockito.mock(Account.class);
+			this.importance = Mockito.mock(AccountImportance.class);
+			this.balances = Mockito.mock(WeightedBalances.class);
 
-			this.transaction1 = createTransaction(1, 17);
-			this.transaction2 = createTransaction(2, 11);
-
-			this.block = createBlock(this.account);
-			this.block.addTransaction(this.transaction1);
-			this.block.addTransaction(this.transaction2);
-
-			this.account.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-		}
-
-		private MockTransaction createTransaction(final int customField, final long fee) {
-			final MockTransaction transaction = createTransactionWithFee(customField, fee);
-			transaction.setExecuteList(this.executeList);
-			transaction.setUndoList(this.undoList);
-			return transaction;
+			Mockito.when(this.account.getImportanceInfo()).thenReturn(this.importance);
+			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
 		}
 	}
 

@@ -24,7 +24,6 @@ public class TransactionMetaDataPairTest {
 		Assert.assertThat(entity.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
-	// TODO: review next
 	@Test
 	public void canRoundTripTransactionMetaDataPair() {
 		// Arrange:

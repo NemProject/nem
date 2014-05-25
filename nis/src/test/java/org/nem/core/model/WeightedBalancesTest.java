@@ -5,7 +5,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class WeightedBalancesTest {
+
 	//region addReceive
+
 	@Test
 	public void canAddToEmptyBalances() {
 		// Arrange:
@@ -55,11 +57,13 @@ public class WeightedBalancesTest {
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 2881, referenceBalance.getUnvestedBalance());
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.next().getUnvestedBalance());
-		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(440498211));
+		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(343_355_445));
 	}
+
 	//endregion
 
 	//region receiveUndo
+
 	@Test
 	public void undoRestoresProperBalance() {
 		// Arrange:
@@ -81,12 +85,14 @@ public class WeightedBalancesTest {
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		// use previous test as a reference to obtain proper value here
-		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(440498211)));
+		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(343_355_445)));
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.getUnvestedBalance());
 	}
+
 	//endregion
 
 	//region addSend
+
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSendFromEmptyBalances() {
 		// Arrange:
@@ -120,8 +126,8 @@ public class WeightedBalancesTest {
 		weightedBalances.addSend(BlockHeight.ONE, Amount.fromNem(123));
 
 		// Assert:
-		assertUnvested(weightedBalances, 1, Amount.fromNem(0));
-		assertUnvested(weightedBalances, 1440, Amount.fromNem(0));
+		assertUnvested(weightedBalances, 1, Amount.ZERO);
+		assertUnvested(weightedBalances, 1440, Amount.ZERO);
 	}
 
 	@Test
@@ -138,7 +144,6 @@ public class WeightedBalancesTest {
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 	}
-
 
 	@Test
 	public void canUndoSendWholeBalance() {
@@ -167,7 +172,7 @@ public class WeightedBalancesTest {
 
 		// Assert:
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
-		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem(120540000));
+		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem(110700000));
 	}
 
 	@Test
@@ -198,7 +203,8 @@ public class WeightedBalancesTest {
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
 		weightedBalances.addSend(BlockHeight.ONE, Amount.fromNem(23));
-		weightedBalances.getUnvested(new BlockHeight(1441));
+		assertUnvested(weightedBalances, 1, Amount.fromNem(100));
+
 		weightedBalances.undoSend(BlockHeight.ONE, Amount.fromNem(23));
 
 		// Assert:
@@ -206,20 +212,6 @@ public class WeightedBalancesTest {
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 	}
 
-	@Test
-	public void canUndoSendBalanceAfterTime() {
-		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
-
-		// Act:
-		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
-		weightedBalances.addSend(new BlockHeight(1441), Amount.fromNem(23));
-		weightedBalances.undoSend(new BlockHeight(1441), Amount.fromNem(23));
-
-		// Assert:
-		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
-		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
-	}
 	//endregion
 
 	private void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {

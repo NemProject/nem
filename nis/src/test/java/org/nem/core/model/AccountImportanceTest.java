@@ -109,7 +109,7 @@ public class AccountImportanceTest {
 	}
 
 	@Test
-	public void canUpdateImportanceWhenAtHeight() {
+	public void importanceSetAtHeightCannotBeUpdated() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
 		ai.setImportance(new BlockHeight(5), 17);
@@ -118,13 +118,12 @@ public class AccountImportanceTest {
 		ai.setImportance(new BlockHeight(5), 11);
 		final double importance = ai.getImportance(new BlockHeight(5));
 
-		// Assert:
-		Assert.assertThat(importance, IsEqual.equalTo(11.0));
+		// Assert: the importance was not updated and has its initial value
+		Assert.assertThat(importance, IsEqual.equalTo(17.0));
 	}
 
-	// TODO: this fails because setImportance has a bug
 	@Test
-	public void cannotSetImportanceAtNewHeight() {
+	public void canSetImportanceAtNewHeight() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
 		ai.setImportance(new BlockHeight(5), 17);
