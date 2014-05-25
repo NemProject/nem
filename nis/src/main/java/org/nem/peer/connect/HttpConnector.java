@@ -74,7 +74,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
 		final Deserializer deserializer = this.post(url, height);
-		return deserializer.readObjectArray("blocks", BlockFactory.VERIFIABLE);
+		return deserializer.readObjectArray("data", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
