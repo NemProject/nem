@@ -74,10 +74,10 @@ public class NodeController {
 	 * address from the request
 	 *
 	 */
-	@RequestMapping(value = "/node/cysm", method = RequestMethod.POST)
+	@RequestMapping(value = "/node/cysm", method = RequestMethod.GET)
 	@P2PApi
-	public Node canYouSeeMe(HttpServletRequest request) {
-		Node result = null;
+	public YourNode canYouSeeMe(HttpServletRequest request) {
+		YourNode result = null;
 		final String userIpAddress = request.getRemoteAddr();
 		final NodeEndpoint endPoint = new NodeEndpoint("http", userIpAddress, 7890);
 
@@ -85,10 +85,10 @@ public class NodeController {
 			HttpConnectorPool pool = new HttpConnectorPool();
 			PeerConnector peerConnector = pool.getPeerConnector(null);
 			CompletableFuture<Node> future = peerConnector.getInfo(endPoint);
-			result = future.get();
+			result = new YourNode(endPoint, future.get());
 		} catch (Throwable e) {
 			// Something went
-			result = new Node(endPoint, "n/a", e.getMessage());
+			result = new YourNode(endPoint, e.getMessage());
 		}
 
 		return result;
