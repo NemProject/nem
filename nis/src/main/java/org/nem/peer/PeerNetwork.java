@@ -126,6 +126,8 @@ public class PeerNetwork {
 	 * adjusted to reflect the externally seen endpoint.
 	 */
 	public void verifyLocalNodeConfig() {
+		LOGGER.log(Level.INFO, "verifyLocalNode with trusted nodes.");
+
 		Node localNode = config.getLocalNode();
 		YourNode yourNode = null;
 		for (Node node : config.getPreTrustedNodes().getNodes()) {
