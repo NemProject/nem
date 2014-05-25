@@ -34,14 +34,14 @@ public class PeerNetwork {
 	/**
 	 * Creates a new network with the specified configuration.
 	 *
-	 * @param config
-	 *            The network configuration.
-	 * @param services
-	 *            The services to use.
-	 * @param nodeExperiences
-	 *            The node experiences to use.
+	 * @param config          The network configuration.
+	 * @param services        The services to use.
+	 * @param nodeExperiences The node experiences to use.
 	 */
-	public PeerNetwork(final Config config, final PeerNetworkServices services, final NodeExperiences nodeExperiences) {
+	public PeerNetwork(
+			final Config config,
+			final PeerNetworkServices services,
+			final NodeExperiences nodeExperiences) {
 
 		this.config = config;
 		this.nodes = new NodeCollection();
@@ -57,10 +57,8 @@ public class PeerNetwork {
 	/**
 	 * Creates a new network with the specified configuration.
 	 *
-	 * @param config
-	 *            The network configuration.
-	 * @param services
-	 *            The services to use.
+	 * @param config   The network configuration.
+	 * @param services The services to use.
 	 */
 	public PeerNetwork(final Config config, final PeerNetworkServices services) {
 		this(config, services, new NodeExperiences());
@@ -91,14 +89,15 @@ public class PeerNetwork {
 	 */
 	public NodeExperiencesPair getLocalNodeAndExperiences() {
 		final Node localNode = this.getLocalNode();
-		return new NodeExperiencesPair(localNode, this.nodeExperiences.getNodeExperiences(localNode));
+		return new NodeExperiencesPair(
+				localNode,
+				this.nodeExperiences.getNodeExperiences(localNode));
 	}
 
 	/**
 	 * Sets the experiences for the specified remote node.
 	 *
-	 * @param pair
-	 *            A node and experiences pair for a remote node.
+	 * @param pair A node and experiences pair for a remote node.
 	 */
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		if (this.getLocalNode().equals(pair.getNode()))
@@ -114,12 +113,19 @@ public class PeerNetwork {
 	private void updateTrust() {
 		// create a new trust context each iteration in order to allow
 		// nodes to change in-between iterations.
-		final TrustContext context = new TrustContext(this.getNodeArray(), this.getLocalNode(), this.nodeExperiences,
-				this.config.getPreTrustedNodes(), this.config.getTrustParameters());
+		final TrustContext context = new TrustContext(
+				this.getNodeArray(),
+				this.getLocalNode(),
+				this.nodeExperiences,
+				this.config.getPreTrustedNodes(),
+				this.config.getTrustParameters());
 
-		this.selector = new BasicNodeSelector(new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.nodes), context);
+		this.selector = new BasicNodeSelector(
+				new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.nodes),
+				context);
 	}
 
+	// TODO: make this async
 	/**
 	 * Verifies the configured local node URL with the URL seen from trusted
 	 * peers If there is a difference, the endpoint of the local node is
@@ -162,7 +168,10 @@ public class PeerNetwork {
 	 * Refreshes the network.
 	 */
 	public CompletableFuture<Void> refresh() {
-		final NodeRefresher refresher = new NodeRefresher(this.getLocalNode(), this.getNodes(), this.peerConnector);
+		final NodeRefresher refresher = new NodeRefresher(
+				this.getLocalNode(),
+				this.getNodes(),
+				this.peerConnector);
 
 		return refresher.refresh().whenComplete((v, e) -> this.updateTrust());
 	}
@@ -170,14 +179,13 @@ public class PeerNetwork {
 	/**
 	 * Broadcasts an entity to all active nodes.
 	 *
-	 * @param broadcastId
-	 *            The type of entity.
-	 * @param entity
-	 *            The entity.
+	 * @param broadcastId The type of entity.
+	 * @param entity      The entity.
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
-				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity)).collect(Collectors.toList());
+				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
+				.collect(Collectors.toList());
 
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 	}
@@ -206,7 +214,10 @@ public class PeerNetwork {
 		final Map<Node, NodeStatus> nodesToUpdate;
 		final ConcurrentHashSet<Node> connectedNodes;
 
-		public NodeRefresher(final Node localNode, final NodeCollection nodes, final PeerConnector connector) {
+		public NodeRefresher(
+				final Node localNode,
+				final NodeCollection nodes,
+				final PeerConnector connector) {
 			this.localNode = localNode;
 			this.nodes = nodes;
 			this.connector = connector;
@@ -215,13 +226,15 @@ public class PeerNetwork {
 		}
 
 		public CompletableFuture<Void> refresh() {
-			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream().map(this::refreshNodeAsync)
+			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream()
+					.map(this::refreshNodeAsync)
 					.collect(Collectors.toList());
 
-			return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).whenComplete((o, e) -> {
-				for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
-					this.nodes.update(entry.getKey(), entry.getValue());
-			});
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+                    .whenComplete((o, e) -> {
+						for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+							this.nodes.update(entry.getKey(), entry.getValue());
+					});
 		}
 
 		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
@@ -233,28 +246,31 @@ public class PeerNetwork {
 				return CompletableFuture.completedFuture(null);
 			}
 
-			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint()).thenApply(n -> {
-				// if the node returned inconsistent information, drop it for
-				// this round
-					if (!areCompatible(node, n))
-						throw new FatalPeerException("node response is not compatible with node identity");
+			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
+					.thenApply(n -> {
+						// if the node returned inconsistent information, drop it for this round
+						if (!areCompatible(node, n))
+							throw new FatalPeerException("node response is not compatible with node identity");
 
-					return NodeStatus.ACTIVE;
-				});
+						return NodeStatus.ACTIVE;
+					});
 
 			if (isDirectContact) {
 				future = future
 						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
-						.thenCompose(
-								nodes -> {
-									final List<CompletableFuture> futures = nodes.getActiveNodes().stream()
-											.map(n -> this.getNodeInfo(n, false)).collect(Collectors.toList());
+						.thenCompose(nodes -> {
+							final List<CompletableFuture> futures = nodes.getActiveNodes().stream()
+									.map(n -> this.getNodeInfo(n, false))
+									.collect(Collectors.toList());
 
-									return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
-								}).thenApply(v -> NodeStatus.ACTIVE);
+							return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+						})
+						.thenApply(v -> NodeStatus.ACTIVE);
 			}
 
-			return future.exceptionally(this::getNodeStatusFromException).thenAccept(ns -> this.update(node, ns));
+			return future
+					.exceptionally(this::getNodeStatusFromException)
+					.thenAccept(ns -> this.update(node, ns));
 		}
 
 		private NodeStatus getNodeStatusFromException(Throwable ex) {
