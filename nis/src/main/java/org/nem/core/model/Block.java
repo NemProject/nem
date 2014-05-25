@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class Block extends VerifiableEntity {
 
-	private final static int BLOCK_TYPE = 1;
+	protected final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
 	private final BlockHeight height;
@@ -155,6 +155,11 @@ public class Block extends VerifiableEntity {
 				this.getSigner().getKeyPair().getPublicKey());
 
 		this.prevBlockHash = HashUtils.calculateHash(prevBlock);
+	}
+
+	protected void setPrevious(final Hash generationHash, final Hash prevBlockHash) {
+		this.generationHash = generationHash;
+		this.prevBlockHash = prevBlockHash;
 	}
 
 	/**
