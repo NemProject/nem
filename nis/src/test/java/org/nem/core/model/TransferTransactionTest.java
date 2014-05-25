@@ -537,7 +537,7 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void secureMessageCannotBeDecodedWithoutRecipientPrivateKey() {
+	public void secureMessageCannotBeDecodedWithoutSenderAndRecipientPrivateKey() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -545,7 +545,7 @@ public class TransferTransactionTest {
 		final TransferTransaction originalTransaction = createTransferTransaction(sender, recipient, 1L, message);
 
 		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(sender);
+		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(sender));
 		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(recipient));
 
 		// Act:

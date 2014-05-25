@@ -10,6 +10,8 @@ import org.nem.core.test.Utils;
 
 public class SecureMessageTest {
 
+	//region construction
+
 	@Test
 	public void canCreateMessageAroundDecodedPayload() {
 		// Act:
@@ -42,6 +44,37 @@ public class SecureMessageTest {
 		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
 		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void secureMessageCannotBeCreatedAroundDecodedPayloadWithoutSenderPrivateKey() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+
+		// Act:
+		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
+		SecureMessage.fromDecodedPayload(senderPublicKeyOnly, recipient, input);
+	}
+
+	@Test
+	public void secureMessageCanBeCreatedAroundEncodedPayloadWithoutSenderPrivateKey() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+
+		// Act:
+		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
+		final Message message = SecureMessage.fromEncodedPayload(senderPublicKeyOnly, recipient, input);
+
+		// Assert:
+		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+	}
+
+	//endregion
+
+	//region serialization
 
 	@Test
 	public void messageCanBeRoundTripped() {
@@ -80,50 +113,63 @@ public class SecureMessageTest {
 		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void secureMessageCannotBeCreatedAroundDecodedPayloadWithoutSenderPrivateKey() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+	//endregion
 
-		// Act:
-		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
-		SecureMessage.fromDecodedPayload(senderPublicKeyOnly, recipient, input);
-	}
+	//region private key requirement
 
 	@Test
-	public void secureMessageCanBeCreatedAroundEncodedPayloadWithoutSenderPrivateKey() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-
+	public void secureMessageCanBeDecodedWithOnlyRecipientPrivateKey() {
 		// Act:
-		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
-		final Message message = SecureMessage.fromEncodedPayload(senderPublicKeyOnly, recipient, input);
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final SecureMessage message = createRoundTrippedMessage(input, false, true);
 
 		// Assert:
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
-	public void secureMessageCannotBeDecodedWithoutRecipientPrivateKey() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
-		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
-
+	public void secureMessageCanBeDecodedWithOnlySenderPrivateKey() {
 		// Act:
-		final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
-		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientPublicKeyOnly);
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final SecureMessage message = createRoundTrippedMessage(input, true, false);
+
+		// Assert:
+		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+	}
+
+	@Test
+	public void secureMessageCannotBeDecodedWithNeitherSenderNorRecipientPrivateKey() {
+		// Act:
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final SecureMessage message = createRoundTrippedMessage(input, false, false);
 
 		// Assert:
 		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
 		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
 		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
+
+	private static SecureMessage createRoundTrippedMessage(
+			final byte[] input,
+			final boolean useSenderPrivateKey,
+			final boolean useRecipientPrivateKey) {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
+
+		// Act:
+		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
+		final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
+		return createRoundTrippedMessage(
+				originalMessage,
+				useSenderPrivateKey ? sender : senderPublicKeyOnly,
+				useRecipientPrivateKey ? recipient : recipientPublicKeyOnly);
+	}
+
+	//endregion
 
 	//region equals / hashCode
 

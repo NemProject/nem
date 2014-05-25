@@ -393,7 +393,7 @@ public class AccountTest {
 	}
 
 	@Test
-	public void secureMessagesCannotBeRoundTrippedWithoutPrivateKey() {
+	public void secureMessagesRequireAtLeastOnePrivateKeyToBeRoundTripped() {
 		// Arrange: create 3 secure messages from three different senders
 		final List<Account> senders = Arrays.asList(
 				Utils.generateRandomAccount(),
@@ -408,8 +408,8 @@ public class AccountTest {
 		// add the recipient (public key only) and senders ([0, 2] - public key only, [1] - private key)
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(recipient));
-		accountLookup.setMockAccount(senders.get(1));
 		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
+		accountLookup.setMockAccount(senders.get(1));
 
 		// Act:
 		final Account roundTrippedRecipient = new Account(Utils.roundtripSerializableEntity(recipient, accountLookup));
@@ -418,7 +418,7 @@ public class AccountTest {
 		final List<Message> messages = roundTrippedRecipient.getMessages();
 		Assert.assertThat(messages.size(), IsEqual.equalTo(3));
 		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(null));
-		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 2, 4, 8 }));
 		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(null));
 	}
 

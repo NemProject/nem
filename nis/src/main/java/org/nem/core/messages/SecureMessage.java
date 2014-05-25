@@ -111,7 +111,7 @@ public class SecureMessage extends Message {
 		}
 
 		public boolean canDecode() {
-			return this.getRecipientKeyPair().hasPrivateKey();
+			return this.getRecipientKeyPair().hasPrivateKey() || this.getSenderKeyPair().hasPrivateKey();
 		}
 
 		public byte[] getEncoded() {
@@ -122,7 +122,10 @@ public class SecureMessage extends Message {
 			if (!this.canDecode())
 				return null;
 
-			final Cipher cipher = new Cipher(this.getSenderKeyPair(), this.getRecipientKeyPair());
+			final Cipher cipher =
+					this.getRecipientKeyPair().hasPrivateKey()
+							? new Cipher(this.getSenderKeyPair(), this.getRecipientKeyPair())
+							: new Cipher(this.getRecipientKeyPair(), this.getSenderKeyPair());
 			return cipher.decrypt(this.payload);
 		}
 
