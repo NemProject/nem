@@ -52,14 +52,12 @@ public class SecureMessage extends Message {
 	/**
 	 * Deserializes a secure message.
 	 *
-	 * @param sender       The message sender.
-	 * @param recipient    The message recipient.
 	 * @param deserializer The deserializer.
 	 */
-	public SecureMessage(final Account sender, final Account recipient, final Deserializer deserializer) {
+	public SecureMessage(final Deserializer deserializer) {
 		super(MessageTypes.SECURE);
-		this.sender = sender;
-		this.recipient = recipient;
+		this.sender = null;
+		this.recipient = null;
 		this.payload = deserializer.readBytes("payload");
 	}
 
@@ -102,6 +100,16 @@ public class SecureMessage extends Message {
 		return Arrays.equals(this.payload, rhs.payload)
 				&& this.sender.getAddress().equals(rhs.sender.getAddress())
 				&& this.recipient.getAddress().equals(rhs.recipient.getAddress());
+	}
+
+	private static class SecureMessagePayload implements SerializableEntity {
+
+
+
+		@Override
+		public void serialize(Serializer serializer) {
+
+		}
 	}
 }
 

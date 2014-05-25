@@ -17,7 +17,7 @@ public class MessageFactoryTest {
 		final JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
 		// Act:
-		MessageFactory.deserialize(null, null, deserializer);
+		MessageFactory.DESERIALIZER.deserialize(deserializer);
 	}
 
 	@Test
@@ -27,7 +27,7 @@ public class MessageFactoryTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
 
 		// Act:
-		final Message message = MessageFactory.deserialize(null, null, deserializer);
+		final Message message = MessageFactory.DESERIALIZER.deserialize(deserializer);
 
 		// Assert:
 		Assert.assertThat(message, IsInstanceOf.instanceOf(PlainMessage.class));
@@ -44,7 +44,7 @@ public class MessageFactoryTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
 
 		// Act:
-		final Message message = MessageFactory.deserialize(sender, recipient, deserializer);
+		final Message message = MessageFactory.DESERIALIZER.deserialize(deserializer);
 
 		// Assert:
 		Assert.assertThat(message, IsInstanceOf.instanceOf(SecureMessage.class));

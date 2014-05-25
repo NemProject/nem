@@ -407,7 +407,7 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 
-		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.createDeserializer(null, null));
+		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
 		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
 		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
 		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));

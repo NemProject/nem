@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 
 public class SecureMessageTest {
@@ -181,9 +182,14 @@ public class SecureMessageTest {
 			final SecureMessage originalMessage,
 			final Account sender,
 			final Account recipient) {
+		// Arrange:
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(sender);
+		accountLookup.setMockAccount(recipient);
+
 		// Act:
-		Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, accountLookup);
 		deserializer.readInt("type");
-		return new SecureMessage(sender, recipient, deserializer);
+		return new SecureMessage(deserializer);
 	}
 }
