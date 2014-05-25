@@ -126,6 +126,8 @@ public class PeerNetwork {
 	 * adjusted to reflect the externally seen endpoint.
 	 */
 	public void verifyLocalNodeConfig() {
+		LOGGER.log(Level.INFO, "verifyLocalNode with trusted nodes.");
+
 		Node localNode = config.getLocalNode();
 		YourNode yourNode = null;
 		for (Node node : config.getPreTrustedNodes().getNodes()) {
@@ -134,11 +136,11 @@ public class PeerNetwork {
 				break;
 			} catch (InterruptedException | ExecutionException e) {
 				// We do nothing just logging
-				LOGGER.log(Level.INFO, "verifyLocalNode with trusted nodes", e);
+				LOGGER.log(Level.INFO, String.format("verifyLocalNode with trusted nodes: <%s>", e.getMessage()));
 			}
 		}
-		
-		if(yourNode == null) {
+
+		if (yourNode == null) {
 			LOGGER.log(Level.INFO, String.format("local node configuration unchanged: <%s>", localNode));
 			return;
 		}
@@ -147,13 +149,13 @@ public class PeerNetwork {
 		NodeEndpoint requestEndpoint = yourNode.getRequestEndpoint();
 		URL requestEndpointURL = yourNode.getRequestEndpoint().getBaseUrl();
 		URL configuredEndpointURL = localNode.getEndpoint().getBaseUrl();
-		LOGGER.info(String.format("verifyLocalNode config configured: <%s> / seen as <%s>.", configuredEndpointURL.toExternalForm(),
+		LOGGER.info(String.format("verifyLocalNode config configured: <%s> seen as <%s>.", configuredEndpointURL.toExternalForm(),
 				requestEndpointURL.toExternalForm()));
 		if (!configuredEndpointURL.equals(requestEndpointURL)) {
 			// Adjust the URL of the local node
 			localNode.setEndpoint(requestEndpoint);
+			LOGGER.info(String.format("local node config changed to: <%s>.", requestEndpointURL.toExternalForm()));
 		}
-
 	}
 
 	/**

@@ -368,6 +368,7 @@
 						</manifest>
 						<manifestEntries>
 							<Implementation-Build>${project.version}</Implementation-Build>
+							<Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
 						</manifestEntries>
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>

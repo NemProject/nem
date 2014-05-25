@@ -20,7 +20,7 @@ public class NodeControllerTest {
 		final NodeController controller = new NodeController(host);
 
 		// Act:
-		final Node node = controller.getInfo();
+		final Node node = controller.getInfo().getNode();
 
 		// Assert:
 		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));

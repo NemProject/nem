@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.nem.core.model.NisInfo;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.peer.*;
@@ -36,8 +38,8 @@ public class NodeController {
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public Node getInfo() {
-		return this.host.getNetwork().getLocalNode();
+	public NisNodeInfo getInfo() {
+		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), new NisInfo(CommonStarter.META_DATA));
 	}
 
 	/**

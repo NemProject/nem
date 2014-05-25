@@ -43,8 +43,9 @@ public class Node implements SerializableEntity {
 		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
 
 		String tmpStr = deserializer.readString("platform");
-		if(StringUtils.isNullOrEmpty(this.platform)) {
-			this.platform = String.format("%s (%s) on %s", System.getenv("java.vendor"), System.getenv("java.version"), System.getenv("os.name"));
+		if(StringUtils.isNullOrEmpty(tmpStr)) {
+			//TODO: Should be done only if it is the local node...anyway, it should not happen to have no plattform information.
+			this.platform = String.format("%s (%s) on %s", System.getProperty("java.vendor"), System.getProperty("java.version"), System.getProperty("os.name"));
 		} else {
 			this.platform = tmpStr;
 		}
