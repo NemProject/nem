@@ -23,8 +23,9 @@ public class MetaDataReader {
 		String version = null;
 		String appName = null;
 		X509Certificate nemCertificate = null;
+		long startTime = System.currentTimeMillis();
 
-		ApplicationMetaData result = new ApplicationMetaData("NEM", "DEVELOPER BUILD", null);
+		ApplicationMetaData result = new ApplicationMetaData("NEM", "DEVELOPER BUILD", null, startTime);
 
 		CodeSource cs = clazz.getProtectionDomain().getCodeSource();
 		URL jarURL = cs.getLocation();
@@ -50,7 +51,7 @@ public class MetaDataReader {
 						LOGGER.info(String.format("Certificate found: <%s>", nemCertificate.getIssuerX500Principal().getName()));
 					}
 
-					result = new ApplicationMetaData(appName, version, nemCertificate);
+					result = new ApplicationMetaData(appName, version, nemCertificate, startTime);
 				} catch (IOException e) {
 					// Just log
 					LOGGER.info(String.format("could not read jar file <%s>", e.getMessage()));
