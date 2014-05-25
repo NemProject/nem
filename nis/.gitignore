@@ -7,3 +7,4 @@ superlog.txt
 *.db
 my.*.sh
 .DS_Store
+/site

@@ -50,6 +50,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		final PeerNetwork network = new PeerNetwork(
 				Config.fromFile("peers-config.json"),
 				createNetworkServices());
+		
+		network.verifyLocalNodeConfig();
+		
 		this.host = new PeerNetworkHost(network);
 
 		this.foragingTimer = new AsyncTimer(
@@ -77,7 +80,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.foragingTimer.close();
 		this.host.close();
 	}
-
+	
 	private PeerNetworkServices createNetworkServices() {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool();
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
@@ -98,7 +101,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		 */
 		public PeerNetworkHost(final PeerNetwork network) {
 			this.network = network;
-
+			
 			this.refreshTimer = new AsyncTimer(
 					this.network::refresh,
 					REFRESH_INITIAL_DELAY,

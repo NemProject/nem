@@ -205,6 +205,12 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
+	public CompletableFuture<YourNode> getYourNode(NodeEndpoint endpoint) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		this.numAnnounceCalls.incrementAndGet();
 
