@@ -49,6 +49,12 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
+	public CompletableFuture<YourNode> getYourNode(NodeEndpoint endpoint) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CAN_YOU_SEE_ME);
+		return this.getAsync(url).getFuture().thenApply(YourNode::new);
+	}
+
+	@Override
 	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
 		return this.postVoidAsync(url, entity).getFuture();

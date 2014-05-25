@@ -48,4 +48,9 @@ public enum NodeApiId {
 	 * get hashes of blocks after given height
 	 */
 	REST_CHAIN_HASHES_FROM,
+	
+	/**
+	 * get the node information from requester
+	 */
+	REST_CAN_YOU_SEE_ME,
 }

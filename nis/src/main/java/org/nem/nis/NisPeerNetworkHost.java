@@ -6,6 +6,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeApiId;
+import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -50,6 +51,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		final PeerNetwork network = new PeerNetwork(
 				Config.fromFile("peers-config.json"),
 				createNetworkServices());
+		
+		network.verifyLocalNodeConfig();
+		
 		this.host = new PeerNetworkHost(network);
 
 		this.foragingTimer = new AsyncTimer(
@@ -77,7 +81,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.foragingTimer.close();
 		this.host.close();
 	}
-
+	
 	private PeerNetworkServices createNetworkServices() {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool();
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
@@ -98,7 +102,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		 */
 		public PeerNetworkHost(final PeerNetwork network) {
 			this.network = network;
-
+			
 			this.refreshTimer = new AsyncTimer(
 					this.network::refresh,
 					REFRESH_INITIAL_DELAY,

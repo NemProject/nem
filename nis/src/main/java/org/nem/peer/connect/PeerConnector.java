@@ -27,6 +27,17 @@ public interface PeerConnector {
 	 * @return A collection of all known peers.
 	 */
 	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint);
+	
+	/**
+	 * Requests information about own node information.
+	 * Can be used to determine own IP address and refresh local node information.
+	 * This enables a kind of automagical configuration
+	 *
+	 * @param endpoint The endpoint.
+	 *
+	 * @return A collection of all known peers.
+	 */
+	public CompletableFuture<YourNode> getYourNode(final NodeEndpoint endpoint);
 
 	/**
 	 * Announces a new entity to the target node.

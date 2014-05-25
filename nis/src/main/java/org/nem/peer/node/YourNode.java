@@ -27,6 +27,18 @@ public class YourNode implements SerializableEntity {
 		this.error = deserializer.readString("error");
 	}
 
+	public Node getNodeInfo() {
+		return nodeInfo;
+	}
+
+	public NodeEndpoint getRequestEndpoint() {
+		return requestEndpoint;
+	}
+
+	public String getError() {
+		return error;
+	}
+
 	@Override
 	public void serialize(Serializer serializer) {
 		//
