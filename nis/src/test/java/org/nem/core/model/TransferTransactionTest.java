@@ -532,26 +532,27 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 		// Assert:
+		Assert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(true));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
 	}
 
 	@Test
-	public void inconsistentSecureMessageCannotBeDecoded() {
+	public void secureMessageCannotBeDecodedWithoutSenderAndRecipientPrivateKey() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final Account messageSender = Utils.generateRandomAccount();
-		final Message message = SecureMessage.fromDecodedPayload(messageSender, recipient, new byte[] { 1, 2, 3 });
+		final Message message = SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 1, 2, 3 });
 		final TransferTransaction originalTransaction = createTransferTransaction(sender, recipient, 1L, message);
 
 		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(sender);
-		accountLookup.setMockAccount(recipient);
+		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(sender));
+		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(recipient));
 
 		// Act:
 		final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 		// Assert:
+		Assert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(false));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
 	}
 

@@ -11,15 +11,11 @@ import java.util.Arrays;
  */
 public class SecureMessage extends Message {
 
-	private final Account sender;
-	private final Account recipient;
-	private final byte[] payload;
+	private final SecureMessagePayload payload;
 
 	private SecureMessage(final Account sender, final Account recipient, final byte[] payload) {
 		super(MessageTypes.SECURE);
-		this.sender = sender;
-		this.recipient = recipient;
-		this.payload = payload;
+		this.payload = new AccountBasedSecureMessagePayload(sender, recipient, payload);
 	}
 
 	/**
@@ -30,7 +26,6 @@ public class SecureMessage extends Message {
 	 * @param payload   The unencrypted payload.
 	 */
 	public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
-
 		if (!sender.getKeyPair().hasPrivateKey())
 			throw new IllegalArgumentException("sender private key is required for creating secure message");
 
@@ -52,45 +47,39 @@ public class SecureMessage extends Message {
 	/**
 	 * Deserializes a secure message.
 	 *
-	 * @param sender       The message sender.
-	 * @param recipient    The message recipient.
 	 * @param deserializer The deserializer.
 	 */
-	public SecureMessage(final Account sender, final Account recipient, final Deserializer deserializer) {
+	public SecureMessage(final Deserializer deserializer) {
 		super(MessageTypes.SECURE);
-		this.sender = sender;
-		this.recipient = recipient;
-		this.payload = deserializer.readBytes("payload");
+		byte[] payload = deserializer.readBytes("payload");
+		final Deserializer payloadDeserializer = new BinaryDeserializer(payload, deserializer.getContext());
+		this.payload = new DeserializedSecureMessagePayload(payloadDeserializer);
 	}
 
 	@Override
 	public boolean canDecode() {
-		return this.recipient.getKeyPair().hasPrivateKey();
+		return this.payload.canDecode();
 	}
 
 	@Override
 	public byte[] getEncodedPayload() {
-		return this.payload;
+		return this.payload.getEncoded();
 	}
 
 	@Override
 	public byte[] getDecodedPayload() {
-		if (!this.recipient.getKeyPair().hasPrivateKey())
-			return null;
-
-		final Cipher cipher = new Cipher(this.sender.getKeyPair(), this.recipient.getKeyPair());
-		return cipher.decrypt(this.payload);
+		return this.payload.getDecoded();
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
 		super.serialize(serializer);
-		serializer.writeBytes("payload", this.payload);
+		serializer.writeBytes("payload", BinarySerializer.serializeToBytes(this.payload));
 	}
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(this.payload);
+		return this.payload.hashCode();
 	}
 
 	@Override
@@ -99,9 +88,123 @@ public class SecureMessage extends Message {
 			return false;
 
 		final SecureMessage rhs = (SecureMessage)obj;
-		return Arrays.equals(this.payload, rhs.payload)
-				&& this.sender.getAddress().equals(rhs.sender.getAddress())
-				&& this.recipient.getAddress().equals(rhs.recipient.getAddress());
+		return this.payload.equals(rhs.payload);
 	}
+
+	//region SecureMessagePayload
+
+	private static abstract class SecureMessagePayload implements SerializableEntity {
+		private final Address senderAddress;
+		private final Address recipientAddress;
+		private final byte[] payload;
+
+		protected SecureMessagePayload(final Address senderAddress, final Address recipientAddress, final byte[] payload) {
+			this.senderAddress = senderAddress;
+			this.recipientAddress = recipientAddress;
+			this.payload = payload;
+		}
+
+		protected SecureMessagePayload(final Deserializer deserializer) {
+			this.senderAddress = Address.readFrom(deserializer, "sender");
+			this.recipientAddress = Address.readFrom(deserializer, "recipient");
+			this.payload = deserializer.readBytes("payload");
+		}
+
+		public boolean canDecode() {
+			return this.getRecipientKeyPair().hasPrivateKey() || this.getSenderKeyPair().hasPrivateKey();
+		}
+
+		public byte[] getEncoded() {
+			return this.payload;
+		}
+
+		public byte[] getDecoded() {
+			if (!this.canDecode())
+				return null;
+
+			final Cipher cipher =
+					this.getRecipientKeyPair().hasPrivateKey()
+							? new Cipher(this.getSenderKeyPair(), this.getRecipientKeyPair())
+							: new Cipher(this.getRecipientKeyPair(), this.getSenderKeyPair());
+			return cipher.decrypt(this.payload);
+		}
+
+		@Override
+		public void serialize(final Serializer serializer) {
+			Address.writeTo(serializer, "sender", this.senderAddress);
+			Address.writeTo(serializer, "recipient", this.recipientAddress);
+			serializer.writeBytes("payload", this.payload);
+		}
+
+		protected Address getSenderAddress() {
+			return this.senderAddress;
+		}
+
+		protected Address getRecipientAddress() {
+			return this.recipientAddress;
+		}
+
+		protected abstract KeyPair getSenderKeyPair();
+
+		protected abstract KeyPair getRecipientKeyPair();
+
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(this.payload);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (!(obj instanceof SecureMessagePayload))
+				return false;
+
+			final SecureMessagePayload rhs = (SecureMessagePayload)obj;
+			return Arrays.equals(this.payload, rhs.payload)
+					&& this.senderAddress.equals(rhs.senderAddress)
+					&& this.recipientAddress.equals(rhs.recipientAddress);
+		}
+	}
+
+	private static class DeserializedSecureMessagePayload extends SecureMessagePayload {
+		private final DeserializationContext deserializationContext;
+
+		public DeserializedSecureMessagePayload(final Deserializer deserializer) {
+			super(deserializer);
+			this.deserializationContext = deserializer.getContext();
+		}
+
+		@Override
+		protected KeyPair getSenderKeyPair() {
+			return this.deserializationContext.findAccountByAddress(this.getSenderAddress()).getKeyPair();
+		}
+
+		@Override
+		protected KeyPair getRecipientKeyPair() {
+			return this.deserializationContext.findAccountByAddress(this.getRecipientAddress()).getKeyPair();
+		}
+	}
+
+	private static class AccountBasedSecureMessagePayload extends SecureMessagePayload {
+		private final Account sender;
+		private final Account recipient;
+
+		public AccountBasedSecureMessagePayload(final Account sender, final Account recipient, final byte[] payload) {
+			super(sender.getAddress(), recipient.getAddress(), payload);
+			this.sender = sender;
+			this.recipient = recipient;
+		}
+
+		@Override
+		protected KeyPair getSenderKeyPair() {
+			return this.sender.getKeyPair();
+		}
+
+		@Override
+		protected KeyPair getRecipientKeyPair() {
+			return this.recipient.getKeyPair();
+		}
+	}
+
+	//endregion
 }
 

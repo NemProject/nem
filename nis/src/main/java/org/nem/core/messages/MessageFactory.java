@@ -9,28 +9,11 @@ import org.nem.core.serialization.*;
 public class MessageFactory {
 
 	/**
-	 * Creates an object deserializer that is able to deserialize messages
-	 * sent from sender to recipient.
-	 *
-	 * @param sender    The message sender.
-	 * @param recipient The message recipient.
-	 *
-	 * @return An object deserializer.
+	 * An object deserializer that wraps this factory.
 	 */
-	public static ObjectDeserializer<Message> createDeserializer(final Account sender, final Account recipient) {
-		return deserializer -> deserialize(sender, recipient, deserializer);
-	}
+	public static final ObjectDeserializer<Message> DESERIALIZER = MessageFactory::deserialize;
 
-	/**
-	 * Deserializes a message.
-	 *
-	 * @param sender       The message sender.
-	 * @param recipient    The message recipient.
-	 * @param deserializer The deserializer.
-	 *
-	 * @return The deserialized message.
-	 */
-	public static Message deserialize(final Account sender, final Account recipient, final Deserializer deserializer) {
+	private static Message deserialize(final Deserializer deserializer) {
 		int type = deserializer.readInt("type");
 
 		switch (type) {
@@ -38,7 +21,7 @@ public class MessageFactory {
 				return new PlainMessage(deserializer);
 
 			case MessageTypes.SECURE:
-				return new SecureMessage(sender, recipient, deserializer);
+				return new SecureMessage(deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown message type: " + type);

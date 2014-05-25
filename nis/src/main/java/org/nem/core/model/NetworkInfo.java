@@ -5,7 +5,7 @@ package org.nem.core.model;
  */
 public class NetworkInfo {
 
-	private static NetworkInfo mainNetworkInfo = createMainNetworkInfo();
+//	private static NetworkInfo mainNetworkInfo = createMainNetworkInfo();
 	private static NetworkInfo testNetworkInfo = createTestNetworkInfo();
 
 	private byte version;
@@ -54,9 +54,9 @@ public class NetworkInfo {
 	 *
 	 * @return Information about the MAIN network.
 	 */
-	public static NetworkInfo getMainNetworkInfo() {
-		return mainNetworkInfo;
-	}
+//	public static NetworkInfo getMainNetworkInfo() {
+//		return mainNetworkInfo;
+//	}
 
 	/**
 	 * Gets information about the TEST network.
@@ -76,24 +76,24 @@ public class NetworkInfo {
 		return getTestNetworkInfo();
 	}
 
-	private static NetworkInfo createMainNetworkInfo() {
-		final NetworkInfo info = new NetworkInfo();
-		info.version = 0x68;
-		info.addressStartChar = 'N';
-		info.genesisAccountId = "NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
-		info.genesisRecipientAccountIds = new String[] {
-				"NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
-				"NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
-				"NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
-				"NAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL5KYTTX7",
-				"NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
-				"NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
-				"NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
-				"NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
-		};
-
-		return info;
-	}
+//	private static NetworkInfo createMainNetworkInfo() {
+//		final NetworkInfo info = new NetworkInfo();
+//		info.version = 0x68;
+//		info.addressStartChar = 'N';
+//		info.genesisAccountId = "NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
+//		info.genesisRecipientAccountIds = new String[] {
+//				"NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
+//				"NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
+//				"NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
+//				"NAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL5KYTTX7",
+//				"NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
+//				"NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
+//				"NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
+//				"NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
+//		};
+//
+//		return info;
+//	}
 
 	private static NetworkInfo createTestNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();
@@ -101,14 +101,15 @@ public class NetworkInfo {
 		info.addressStartChar = 'T';
 		info.genesisAccountId = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
 		info.genesisRecipientAccountIds = new String[] {
-				"TBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6VYUBA363",
-				"TCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUKYZCGN6",
-				"TBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EESOPNFUP",
-				"TAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL7FQPZDR",
-				"TBT7M43C4X25VDNSL34IRQO5IRKO6WXSMTNVYQWZ",
-				"TAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPHA36MIM",
-				"TCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDYQZMAX",
-				"TBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4AYXF56OJ"
+				"TbloodZW6W4DUVL4NGAQXHZXFQJLNHPDXHULLHZW",
+				"TAthiesMY6QO6XKPCBZFEVVVFVL2UT3ESDHAVGL7",
+				"TDmakotEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT",
+				"TDpatemA4HXS7D44AQNT6VH3AHKDSNVC3MYROLEZ",
+				"TBgimreUQQ5ZQX6C3IGLBSVPMROHCMPEIHY4GV2L",
+				"TDIUWEjaguaWGXI56V5MO7GJAQGHJXE2IZXEK6S5",
+				"TCZloitrAOV4F5J2H2ACC4KXHHTKLQHN3G7HV4B4",
+				"TDHDSTFY757SELOAE3FU7U7krystoP6FFB7XXSYH",
+				"TD53NLTDK7EMSutopiAK4RSYQ523VBS3C62UMJC5"
 		};
 
 		return info;

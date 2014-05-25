@@ -58,7 +58,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param options      Deserialization options.
 	 * @param deserializer The deserializer to use.
 	 */
-	public VerifiableEntity(final int type, DeserializationOptions options, Deserializer deserializer) {
+	public VerifiableEntity(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		this.type = type;
 		this.version = deserializer.readInt("version");
 		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");

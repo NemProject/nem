@@ -117,7 +117,7 @@ public class Account implements SerializableEntity {
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
-		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.createDeserializer(this, this)));
+		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
