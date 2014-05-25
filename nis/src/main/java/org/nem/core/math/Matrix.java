@@ -88,19 +88,7 @@ public abstract class Matrix {
 		final double originalVal = this.getAt(row, col);
 		this.setAtUnchecked(row, col, originalVal + val);
 	}
-	
-	/**
-	 * Decrements a value at the specified row and column by the given val.
-	 *
-	 * @param row The row.
-	 * @param col The column.
-	 * @param val The value to decrement by.
-	 */
-	public final void decrementAt(final int row, final int col, final double val) {
-		final double originalVal = this.getAt(row, col);
-		this.setAt(row, col, originalVal - val);
-	}
-	
+
 	//endregion
 
 	//region get{Row|Column}SumVector
@@ -148,14 +136,14 @@ public abstract class Matrix {
 			u.accept(v / sum);
 		});
 	}
-	
+
 	/**
-	 * Removes negatives
+	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
-		this.forEach((r, c, v) -> {
-			if (0 >= v)
-				this.setAt(r, c, 0.0);
+		this.forEach((r, c, v, u) -> {
+			if (v < 0)
+				u.accept(0.0);
 		});
 	}
 
@@ -165,7 +153,6 @@ public abstract class Matrix {
 	 * @param scale The scale factor.
 	 */
 	public final void scale(final double scale) {
-		// (r,c,v,u) -> (row, column, value, updateFunction)
 		this.forEach((r, c, v, u) -> u.accept(v / scale));
 	}
 

@@ -186,6 +186,7 @@ public class PoiContext {
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outlinkMatrix to the components
 			this.importanceVector = this.outlinkMatrix.getRowSumVector();
+
 			// (2) normalize the importance vector
 			this.importanceVector.normalize();			
 		}
@@ -203,9 +204,11 @@ public class PoiContext {
 				for (int i = 0; i < outlinkWeights.size(); ++i) {
 					final AccountLink outlink = accountLinkIterator.next();
 					int rowIndex = this.addressToIndexMap.get(outlink.getOtherAccountAddress());
-					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), outlinkWeights.getAt(i));
-					//decrement other end of transaction
-					this.outlinkMatrix.decrementAt(accountInfo.getIndex(), rowIndex, outlinkWeights.getAt(i));
+
+					// calculate net inflows and outflows
+					double weight = outlinkWeights.getAt(i);
+					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), weight);
+					this.outlinkMatrix.incrementAt(accountInfo.getIndex(), rowIndex, -weight);
 				}
 			}
 
