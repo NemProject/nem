@@ -7,15 +7,15 @@ public class NetworkInfoTest {
 
 	@Test
 	public void mainNetworkInfoIsCorrect() {
-//		// Arrange:
-//		final NetworkInfo info = NetworkInfo.getMainNetworkInfo();
-//
-//		// Assert:
-//		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
-//		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
-//		Assert.assertThat(info.getGenesisAccountId().charAt(0), IsEqual.equalTo('N'));
-//		for (final String accountId : info.getGenesisRecipientAccountIds())
-//			Assert.assertThat(accountId.charAt(0), IsEqual.equalTo('N'));
+		// Arrange:
+		final NetworkInfo info = NetworkInfo.getMainNetworkInfo();
+
+		// Assert:
+		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
+		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
+		Assert.assertThat(info.getGenesisAccountId().charAt(0), IsEqual.equalTo('N'));
+		for (final String accountId : info.getGenesisRecipientAccountIds())
+			Assert.assertThat(accountId.charAt(0), IsEqual.equalTo('N'));
 	}
 
 	@Test
