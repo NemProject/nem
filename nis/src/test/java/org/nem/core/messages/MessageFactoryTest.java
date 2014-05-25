@@ -40,8 +40,13 @@ public class MessageFactoryTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
+
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(sender);
+		accountLookup.setMockAccount(recipient);
+
 		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 1, 2, 4 });
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, accountLookup);
 
 		// Act:
 		final Message message = MessageFactory.DESERIALIZER.deserialize(deserializer);
