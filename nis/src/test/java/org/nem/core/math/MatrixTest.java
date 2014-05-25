@@ -61,7 +61,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
-	//region getAt / setAt / incrementAt
+	//region getAt / setAt / incrementAt / decrementAt
 
 	@Test
 	public void matrixValuesCanBeSet() {
@@ -145,6 +145,29 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		Assert.assertThat(
 				matrix,
 				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 5, 6, 15, 11, 7, 17 })));
+	}
+	
+	@Test
+	public void matrixValuesCanBeDecremented() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 11 });
+
+		// Act:
+		// Decrement values
+		matrix.decrementAt(0, 0, 4);
+		matrix.decrementAt(0, 1, 2);
+		matrix.decrementAt(0, 2, 3);
+		matrix.decrementAt(1, 0, 4);
+		matrix.decrementAt(1, 1, 5);
+		matrix.decrementAt(1, 2, 6);
+
+		// Double decrement
+		matrix.decrementAt(0, 2, 7);
+
+		// Assert:
+		Assert.assertThat(
+				matrix,
+				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { -3, 2, 0, 3, -3, 5 })));
 	}
 
 	//endregion
