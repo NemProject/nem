@@ -51,8 +51,8 @@ public class PoiContextTest {
 		// (1) importance vector is initially set to row sum vector of the out-link matrix
 		// (2) importance vector is normalized
 		Assert.assertThat(
-				context.getImportanceVector(),
-				IsEqual.equalTo(new ColumnVector(1.375 / 3, 0.6 / 3, 1.025 / 3, 0)));
+				context.getImportanceVector().roundTo(3),
+				IsEqual.equalTo(new ColumnVector(0.188, 0.25, 0.563, 0)));
 	}
 
 	@Test

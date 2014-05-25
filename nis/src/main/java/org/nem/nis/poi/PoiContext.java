@@ -186,7 +186,6 @@ public class PoiContext {
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outlinkMatrix to the components
 			this.importanceVector = this.outlinkMatrix.getRowSumVector();
-			
 			// (2) normalize the importance vector
 			this.importanceVector.normalize();			
 		}

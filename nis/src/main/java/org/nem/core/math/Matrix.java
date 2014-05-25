@@ -153,7 +153,7 @@ public abstract class Matrix {
 	 * Removes negatives
 	 */
 	public void removeNegatives() {
-		this.forEach((r, c, v, u) -> {
+		this.forEach((r, c, v) -> {
 			if (0 >= v)
 				this.setAt(r, c, 0.0);
 		});
