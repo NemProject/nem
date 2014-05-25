@@ -163,11 +163,12 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 		// Double decrement
 		matrix.decrementAt(0, 2, 7);
+		matrix.decrementAt(1, 0, 3); //to become zero
 
 		// Assert:
 		Assert.assertThat(
 				matrix,
-				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { -3, 2, 0, 3, -3, 5 })));
+				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { -3, 2, -5, 0, -3, 5 })));
 	}
 
 	//endregion
