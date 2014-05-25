@@ -81,12 +81,8 @@ public class PushController {
 		if (!block.verify())
 			throw new IllegalArgumentException("block must be verifiable");
 
-		// PeerNetworkHost peerNetworkHost = PeerNetworkHost.getDefaultHost();
-
-		// validate block, add to chain
+		// validate block and broadcast (async)
 		this.blockChain.processBlock(block);
-
-		// TODO: propagate block
-		//peerNetworkHost.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+		this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
 	}
 }
