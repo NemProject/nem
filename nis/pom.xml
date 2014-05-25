@@ -61,12 +61,12 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- hibernate -->
 		<dependency>
@@ -190,22 +190,22 @@
 			<artifactId>httpasyncclient</artifactId>
 			<version>4.0</version>
 		</dependency>
-        <dependency>
-        	<groupId>com.googlecode.matrix-toolkits-java</groupId>
-        	<artifactId>mtj</artifactId>
-        	<version>1.0.1</version>
-        </dependency>
-        <dependency>
-        	<groupId>com.github.fommil.netlib</groupId>
-        	<artifactId>all</artifactId>
-        	<version>1.1.2</version>
-        	<type>pom</type>
-        </dependency>
-        <dependency>
-        	<groupId>net.sf.trove4j</groupId>
-        	<artifactId>trove4j</artifactId>
-        	<version>3.0.3</version>
-        </dependency>
+		<dependency>
+			<groupId>com.googlecode.matrix-toolkits-java</groupId>
+			<artifactId>mtj</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.fommil.netlib</groupId>
+			<artifactId>all</artifactId>
+			<version>1.1.2</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>3.0.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -356,6 +356,24 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${project.version}</Implementation-Build>
+						</manifestEntries>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>

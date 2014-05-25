@@ -23,7 +23,8 @@ public class MetaDataReader {
 		String version = null;
 		String appName = null;
 		X509Certificate nemCertificate = null;
-		ApplicationMetaData result = null;
+
+		ApplicationMetaData result = new ApplicationMetaData("NEM", "DEVELOPER BUILD", null);
 
 		CodeSource cs = clazz.getProtectionDomain().getCodeSource();
 		URL jarURL = cs.getLocation();
@@ -61,5 +62,4 @@ public class MetaDataReader {
 		}
 		return result;
 	}
-
 }
