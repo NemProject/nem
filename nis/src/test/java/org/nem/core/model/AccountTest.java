@@ -10,6 +10,7 @@ import org.nem.core.test.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 public class AccountTest {
@@ -360,6 +361,65 @@ public class AccountTest {
 
 		// Assert:
 		assertAccountRoundTrip(address, null);
+	}
+
+	@Test
+	public void secureMessagesCanBeRoundTrippedWithPrivateKey() {
+		// Arrange: create 3 secure messages from three different senders
+		final List<Account> senders = Arrays.asList(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
+		final Account recipient = Utils.generateRandomAccount();
+
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(0), recipient, new byte[] { 1, 1, 1 }));
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(1), recipient, new byte[] { 2, 4, 8 }));
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(2), recipient, new byte[] { 3, 9, 27 }));
+
+		// add the recipient (private key) and senders (public key only)
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(recipient);
+		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
+
+		// Act:
+		final Account roundTrippedRecipient = new Account(Utils.roundtripSerializableEntity(recipient, accountLookup));
+
+		// Assert:
+		final List<Message> messages = roundTrippedRecipient.getMessages();
+		Assert.assertThat(messages.size(), IsEqual.equalTo(3));
+		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 1, 1 }));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 2, 4, 8 }));
+		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(new byte[] { 3, 9, 27 }));
+	}
+
+	@Test
+	public void secureMessagesCannotBeRoundTrippedWithoutPrivateKey() {
+		// Arrange: create 3 secure messages from three different senders
+		final List<Account> senders = Arrays.asList(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
+		final Account recipient = Utils.generateRandomAccount();
+
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(0), recipient, new byte[] { 1, 1, 1 }));
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(1), recipient, new byte[] { 2, 4, 8 }));
+		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(2), recipient, new byte[] { 3, 9, 27 }));
+
+		// add the recipient (public key only) and senders ([0, 2] - public key only, [1] - private key)
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(recipient));
+		accountLookup.setMockAccount(senders.get(1));
+		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
+
+		// Act:
+		final Account roundTrippedRecipient = new Account(Utils.roundtripSerializableEntity(recipient, accountLookup));
+
+		// Assert:
+		final List<Message> messages = roundTrippedRecipient.getMessages();
+		Assert.assertThat(messages.size(), IsEqual.equalTo(3));
+		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(null));
+		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(null));
 	}
 
 	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
