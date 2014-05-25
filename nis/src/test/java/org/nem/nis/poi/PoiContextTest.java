@@ -114,9 +114,9 @@ public class PoiContextTest {
 		// Assert:
 		// (1) account link weights are normalized
 		final Matrix expectedAccountLinks = new DenseMatrix(4, 4);
-		expectedAccountLinks.setAt(1, 0, 0.6);
-		expectedAccountLinks.setAt(2, 0, 0.4);
-		expectedAccountLinks.setAt(0, 1, 1.0);
+		expectedAccountLinks.setAt(1, 0, 0.5);
+		expectedAccountLinks.setAt(2, 0, 0.5);
+		expectedAccountLinks.setAt(0, 1, 0.0);
 		expectedAccountLinks.setAt(0, 3, 0.375);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
