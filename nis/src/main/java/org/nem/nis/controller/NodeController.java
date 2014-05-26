@@ -69,7 +69,7 @@ public class NodeController {
 	@P2PApi
 	public NodeEndpoint canYouSeeMe(final HttpServletRequest request) {
 		return new NodeEndpoint(
-				request.getProtocol(),
+				request.getScheme(),
 				request.getRemoteAddr(),
 				request.getRemotePort());
 	}

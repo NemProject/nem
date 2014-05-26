@@ -367,6 +367,7 @@
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 						<manifestEntries>
+							<Permissions>all-permissions</Permissions>
 							<Implementation-Build>${project.version}</Implementation-Build>
 							<Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
 						</manifestEntries>
