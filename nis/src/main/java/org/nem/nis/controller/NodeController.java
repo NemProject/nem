@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.nem.core.model.NisInfo;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
@@ -35,7 +34,7 @@ public class NodeController {
 	@PublicApi
 	public NisNodeInfo getInfo() {
 		// TODO: test the NisInfoPart
-		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), new NisInfo(CommonStarter.META_DATA));
+		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
 
 	/**
