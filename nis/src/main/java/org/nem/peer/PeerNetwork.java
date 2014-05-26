@@ -8,9 +8,9 @@ import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,6 +23,7 @@ public class PeerNetwork {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private final Config config;
+	private final Node localNode;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
@@ -42,8 +43,16 @@ public class PeerNetwork {
 			final Config config,
 			final PeerNetworkServices services,
 			final NodeExperiences nodeExperiences) {
+		this(config, config.getLocalNode(), services, nodeExperiences);
+	}
 
+	private PeerNetwork(
+			final Config config,
+			final Node localNode,
+			final PeerNetworkServices services,
+			final NodeExperiences nodeExperiences) {
 		this.config = config;
+		this.localNode = localNode;
 		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
 		this.syncConnectorPool = services.getSyncConnectorPool();
@@ -65,12 +74,58 @@ public class PeerNetwork {
 	}
 
 	/**
+	 * Creates a new network with the specified configuration and uses a independent trusted node
+	 * to verify this node's identity.
+	 *
+	 * @param config          The network configuration.
+	 * @param services        The services to use.
+	 */
+	public static CompletableFuture<PeerNetwork> createWithVerificationOfLocalNode(
+			final Config config,
+			final PeerNetworkServices services) {
+
+		LOGGER.log(Level.INFO, "creating a new network with verification of the local node");
+
+		final Node configLocalNode = config.getLocalNode();
+		final CompletableFuture<PeerNetwork> networkFuture = new CompletableFuture<>();
+		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
+		config.getPreTrustedNodes().getNodes().stream()
+				.map(node ->
+						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint())
+								.exceptionally(e -> null)
+								.thenAccept(endpoint -> {
+									if (null == endpoint && 0 != numOutstandingRequests.decrementAndGet())
+										return;
+
+									networkFuture.complete(new PeerNetwork(
+											config,
+											getLocalNode(configLocalNode, endpoint),
+											services,
+											new NodeExperiences()));
+								}))
+				.collect(Collectors.toList());
+
+		return networkFuture;
+	}
+
+	private static Node getLocalNode(final Node configLocalNode, final NodeEndpoint reportedEndpoint) {
+		LOGGER.info(String.format(
+				"local node configured as <%s> seen as <%s>",
+				configLocalNode.getEndpoint(),
+				reportedEndpoint));
+
+		return null == reportedEndpoint
+				? configLocalNode
+				: new Node(reportedEndpoint, configLocalNode.getPlatform(), configLocalNode.getApplication());
+	}
+
+	/**
 	 * Gets the local node.
 	 *
 	 * @return The local node.
 	 */
 	public Node getLocalNode() {
-		return this.config.getLocalNode();
+		return this.localNode;
 	}
 
 	/**
@@ -123,45 +178,6 @@ public class PeerNetwork {
 		this.selector = new BasicNodeSelector(
 				new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.nodes),
 				context);
-	}
-
-	// TODO: make this async
-	/**
-	 * Verifies the configured local node URL with the URL seen from trusted
-	 * peers If there is a difference, the endpoint of the local node is
-	 * adjusted to reflect the externally seen endpoint.
-	 */
-	public void verifyLocalNodeConfig() {
-		LOGGER.log(Level.INFO, "verifyLocalNode with trusted nodes.");
-
-		Node localNode = config.getLocalNode();
-		YourNode yourNode = null;
-		for (Node node : config.getPreTrustedNodes().getNodes()) {
-			try {
-				yourNode = peerConnector.getYourNode(node.getEndpoint()).get();
-				break;
-			} catch (InterruptedException | ExecutionException e) {
-				// We do nothing just logging
-				LOGGER.log(Level.INFO, String.format("verifyLocalNode with trusted nodes: <%s>", e.getMessage()));
-			}
-		}
-
-		if (yourNode == null) {
-			LOGGER.log(Level.INFO, String.format("local node configuration unchanged: <%s>", localNode));
-			return;
-		}
-
-		// Check if IPs are different
-		NodeEndpoint requestEndpoint = yourNode.getRequestEndpoint();
-		URL requestEndpointURL = yourNode.getRequestEndpoint().getBaseUrl();
-		URL configuredEndpointURL = localNode.getEndpoint().getBaseUrl();
-		LOGGER.info(String.format("verifyLocalNode config configured: <%s> seen as <%s>.", configuredEndpointURL.toExternalForm(),
-				requestEndpointURL.toExternalForm()));
-		if (!configuredEndpointURL.equals(requestEndpointURL)) {
-			// Adjust the URL of the local node
-			localNode.setEndpoint(requestEndpoint);
-			LOGGER.info(String.format("local node config changed to: <%s>.", requestEndpointURL.toExternalForm()));
-		}
 	}
 
 	/**

@@ -124,4 +124,9 @@ public class NodeEndpoint implements SerializableEntity {
 		NodeEndpoint rhs = (NodeEndpoint)obj;
 		return this.url.equals(rhs.url);
 	}
+
+	@Override
+	public String toString() {
+		return this.url.toString();
+	}
 }

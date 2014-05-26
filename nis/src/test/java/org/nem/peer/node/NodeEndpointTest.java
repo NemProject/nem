@@ -6,6 +6,7 @@ import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 import java.net.URL;
+import java.util.*;
 
 public class NodeEndpointTest {
 
@@ -37,15 +38,24 @@ public class NodeEndpointTest {
 	}
 
 	private static void assertApiUrlsAreCorrect(final URL url, final NodeEndpoint endpoint) throws Exception {
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_NODE_INFO), IsEqual.equalTo(new URL(url, "node/info")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_NODE_PING), IsEqual.equalTo(new URL(url, "node/ping")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST), IsEqual.equalTo(new URL(url, "node/peer-list")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_PUSH_TRANSACTION), IsEqual.equalTo(new URL(url, "push/transaction")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_PUSH_BLOCK), IsEqual.equalTo(new URL(url, "push/block")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK), IsEqual.equalTo(new URL(url, "chain/last-block")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER), IsEqual.equalTo(new URL(url, "chain/blocks-after")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM), IsEqual.equalTo(new URL(url, "chain/hashes-from")));
-		Assert.assertThat(endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT), IsEqual.equalTo(new URL(url, "block/at")));
+		final Map<NodeApiId, String > apiIdToPathMap = new HashMap<>();
+		apiIdToPathMap.put(NodeApiId.REST_NODE_INFO, "node/info");
+		apiIdToPathMap.put(NodeApiId.REST_NODE_PING, "node/ping");
+		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST, "node/peer-list");
+		apiIdToPathMap.put(NodeApiId.REST_PUSH_TRANSACTION, "push/transaction");
+		apiIdToPathMap.put(NodeApiId.REST_PUSH_BLOCK, "push/block");
+		apiIdToPathMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, "chain/last-block");
+		apiIdToPathMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, "chain/blocks-after");
+		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, "chain/hashes-from");
+		apiIdToPathMap.put(NodeApiId.REST_CHAIN_BLOCK_AT, "block/at");
+		apiIdToPathMap.put(NodeApiId.REST_CAN_YOU_SEE_ME, "node/cysm");
+
+		for (final NodeApiId apiId : NodeApiId.values()) {
+			if (!apiIdToPathMap.containsKey(apiId))
+				Assert.fail(String.format("path for '%s' is not being tested", apiId));
+
+			Assert.assertThat(endpoint.getApiUrl(apiId), IsEqual.equalTo(new URL(url, apiIdToPathMap.get(apiId))));
+		}
 	}
 
 	//region invalid parameters
@@ -128,6 +138,19 @@ public class NodeEndpointTest {
 
 		// Assert:
 		Assert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));
+	}
+
+	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsBaseUrlStringRepresentation() {
+		// Arrange:
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "127.0.0.1", 12);
+
+		// Assert:
+		Assert.assertThat(endpoint.toString(), IsEqual.equalTo(endpoint.getBaseUrl().toString()));
 	}
 
 	//endregion

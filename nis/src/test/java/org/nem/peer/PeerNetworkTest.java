@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
+import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.node.*;
 import org.nem.peer.test.Utils;
@@ -663,7 +664,98 @@ public class PeerNetworkTest {
 
 	//endregion
 
-	//region factories
+	//region createWithVerificationOfLocalNode
+
+	@Test
+	public void createWithVerificationOfLocalNodeCallsGetYourNodeForAllActiveNodes() throws Exception {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+
+		// Act:
+		createPeerNetworkWithVerificationOfLocalNode(connector);
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetLocalNodeInfoCalls(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfNoCallSucceeds () throws Exception {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		connector.setGetLocalNodeInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
+		connector.setGetLocalNodeInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
+		connector.setGetLocalNodeInfoError("10.0.0.3", MockConnector.TriggerAction.INACTIVE);
+
+		// Act:
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+
+		// Assert:
+		final Node localNode = network.getLocalNode();
+		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
+		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfAllCallsReturnNull () throws Exception {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+
+		// Act:
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+
+		// Assert:
+		final Node localNode = network.getLocalNode();
+		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
+		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeUsesReportedEndpointIfAtLeastOneCallSucceeds() throws Exception {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		connector.setGetLocalNodeInfoError("10.0.0.1", MockConnector.TriggerAction.FATAL);
+		connector.setGetLocalNodeInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
+		connector.setGetLocalNodeInfoEndpoint(new NodeEndpoint("http", "10.0.0.25", 8990)) ;
+
+		// Act:
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+
+		// Assert:
+		final Node localNode = network.getLocalNode();
+		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.25", 8990)));
+		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeIsAsync() throws Exception {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+
+		// Act:
+		final CompletableFuture<PeerNetwork> networkCompletable = createPeerNetworkWithVerificationOfLocalNode(connector);
+
+		// Assert:
+		Assert.assertThat(networkCompletable.isDone(), IsEqual.equalTo(false));
+	}
+
+	public static CompletableFuture<PeerNetwork> createPeerNetworkWithVerificationOfLocalNode(final PeerConnector connector) {
+		return PeerNetwork.createWithVerificationOfLocalNode(
+				ConfigFactory.createDefaultTestConfig(),
+				new PeerNetworkServices(
+						connector,
+						Mockito.mock(SyncConnectorPool.class),
+						new MockBlockSynchronizer()));
+	}
+
+	//endregion
+
+	//region test factories
 
 	private static PeerNetworkServices createMockPeerNetworkServices() {
 		return new PeerNetworkServices(
