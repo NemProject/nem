@@ -12,6 +12,8 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.metadata.MetaDataReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -23,13 +25,12 @@ import org.springframework.web.servlet.DispatcherServlet;
  * file to the Jetty runner does not work.
  * <p/>
  * I had to switch to the Servlet API 3.x with programmatic configuration.
- *
- * @author Thies1965
  */
 
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
+	public final static ApplicationMetaData META_DATA = MetaDataReader.extractMetaData(CommonStarter.class);;
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");
@@ -47,7 +48,7 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpAfterStart(false);
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
-
+		
 		LOGGER.info("Calling start().");
 		server.start();
 		server.join();

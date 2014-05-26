@@ -2,39 +2,106 @@ package org.nem.core.metadata;
 
 import java.security.cert.X509Certificate;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
+/**
+ * Meta data information about the application.
+ */
 public class ApplicationMetaData implements SerializableEntity {
-	final private String appName;
-	final private String version;
-	final private String nemCertificateSigner;
+	private final String appName;
+	private final String version;
+	private final String certificateSigner;
+	private final TimeProvider timeProvider;
+	private final TimeInstant startTime;
+	private final TimeInstant currentTime;
 
-	public ApplicationMetaData(String appName, String version, X509Certificate nemCertificate) {
-		//
+	/**
+	 * Creates a new application meta data instance.
+	 *
+	 * @param appName The application name.
+	 * @param version The application version.
+	 * @param certificate The application certificate.
+	 * @param timeProvider The time provider.
+	 */
+	public ApplicationMetaData(
+			final String appName,
+			final String version,
+			final X509Certificate certificate,
+			final TimeProvider timeProvider) {
 		this.appName = appName;
 		this.version = version;
-		if(nemCertificate != null) {
-			this.nemCertificateSigner = nemCertificate.getIssuerX500Principal().getName();
-		} else {
-			this.nemCertificateSigner = null;
-		}
+		this.certificateSigner = null == certificate ? null : certificate.getIssuerX500Principal().getName();
+		this.timeProvider = timeProvider;
+		this.startTime = this.timeProvider.getCurrentTime();
+		this.currentTime = TimeInstant.ZERO;
 	}
 
+	/**
+	 * Deserializes an application meta data instance.
+	 *
+	 * @param deserializer The deserializer
+	 */
 	public ApplicationMetaData(Deserializer deserializer) {
-		//
 		this.appName = deserializer.readString("application");
 		this.version = deserializer.readString("version");
-		this.nemCertificateSigner = deserializer.readString("nemSigner");
+		this.certificateSigner = deserializer.readString("signer");
+		this.startTime = TimeInstant.readFrom(deserializer, "startTime");
+		this.currentTime = TimeInstant.readFrom(deserializer, "currentTime");
+		this.timeProvider = null;
+	}
+
+	/**
+	 * Gets the application name.
+	 *
+	 * @return The application name.
+	 */
+	public String getAppName() {
+		return this.appName;
+	}
+
+	/**
+	 * Gets the application version.
+	 *
+	 * @return The application version.
+	 */
+	public String getVersion() {
+		return this.version;
+	}
+
+	/**
+	 * Gets the signer of the application certificate.
+	 *
+	 * @return the signer of the application certificate.
+	 */
+	public String getCertificateSigner() {
+		return this.certificateSigner;
+	}
+
+	/**
+	 * Gets the start time of the application.
+	 *
+	 * @return The start time of the application.
+	 */
+	public TimeInstant getStartTime() {
+		return this.startTime;
+	}
+
+	/**
+	 * Gets the current time of the application.
+	 *
+	 * @return The current time of the application.
+	 */
+	public TimeInstant getCurrentTime() {
+		return null == this.timeProvider ? this.currentTime : this.timeProvider.getCurrentTime();
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
-		// 
-		serializer.writeString("application", appName);
-		serializer.writeString("version", version);
-		serializer.writeString("nemSigner", nemCertificateSigner);
+	public void serialize(final Serializer serializer) {
+		serializer.writeString("application", this.appName);
+		serializer.writeString("version", this.version);
+		serializer.writeString("signer", this.certificateSigner);
+		TimeInstant.writeTo(serializer, "startTime", this.startTime);
+		TimeInstant.writeTo(serializer, "currentTime", this.getCurrentTime());
 	}
-
 }

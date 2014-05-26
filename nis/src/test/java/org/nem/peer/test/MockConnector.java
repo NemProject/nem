@@ -20,8 +20,12 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	private AtomicInteger numGetInfoCalls = new AtomicInteger();
 	private AtomicInteger numGetKnownPeerCalls = new AtomicInteger();
 	private AtomicInteger numAnnounceCalls = new AtomicInteger();
+	private AtomicInteger numGetLocalNodeInfoCalls = new AtomicInteger();
 
 	private Map<String, TriggerAction> getInfoTriggers = new HashMap<>();
+
+	private Map<String, TriggerAction> getLocalNodeInfoTriggers = new HashMap<>();
+	private NodeEndpoint getLocalNodeInfoEndpoint;
 
 	private String getKnownPeersErrorTrigger;
 	private TriggerAction getKnownPeersErrorTriggerAction;
@@ -95,6 +99,15 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	/**
+	 * Gets the number of times getLocalNodeInfo was called.
+	 *
+	 * @return The number of times getLocalNodeInfo was called.
+	 */
+	public int getNumGetLocalNodeInfoCalls() {
+		return this.numGetLocalNodeInfoCalls.get();
+	}
+
+	/**
 	 * Gets the last announcement id passed to announce.
 	 *
 	 * @return The last announcement id passed to announce.
@@ -120,6 +133,25 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	 */
 	public void setGetInfoError(final String trigger, final TriggerAction action) {
 		this.getInfoTriggers.put(trigger, action);
+	}
+
+	/**
+	 * Triggers a specific action in getLocalNodeInfo.
+	 *
+	 * @param trigger The endpoint hostname that should cause the action.
+	 * @param action  The action.
+	 */
+	public void setGetLocalNodeInfoError(final String trigger, final TriggerAction action) {
+		this.getLocalNodeInfoTriggers.put(trigger, action);
+	}
+
+	/**
+	 * Sets the endpoint that should be returned by getLocalNodeInfo.
+	 *
+	 * @param endpoint The endpoint that should be returned.
+	 */
+	public void setGetLocalNodeInfoEndpoint(final NodeEndpoint endpoint) {
+		this.getLocalNodeInfoEndpoint = endpoint;
 	}
 
 	/**
@@ -205,9 +237,16 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<YourNode> getYourNode(NodeEndpoint endpoint) {
-		// TODO Auto-generated method stub
-		return null;
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint) {
+		this.numGetLocalNodeInfoCalls.incrementAndGet();
+
+		return CompletableFuture.supplyAsync(() -> {
+			final TriggerAction action = this.getLocalNodeInfoTriggers.get(endpoint.getBaseUrl().getHost());
+			if (null != action)
+				triggerGeneralAction(action);
+
+			return this.getLocalNodeInfoEndpoint;
+		});
 	}
 
 	@Override
@@ -229,7 +268,6 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	private static void triggerGeneralAction(final TriggerAction action) {
-
 		if (action == TriggerAction.SLEEP_INACTIVE)
 			pauseThread();
 

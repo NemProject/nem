@@ -2,12 +2,16 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
+import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.score.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 public class NodeControllerTest {
@@ -20,10 +24,24 @@ public class NodeControllerTest {
 		final NodeController controller = new NodeController(host);
 
 		// Act:
-		final Node node = controller.getInfo();
+		final Node node = controller.getInfo().getNode();
 
 		// Assert:
 		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));
+	}
+
+	@Test
+	public void getInfoReturnsCommonStarterApplicationMetaData() {
+		// Arrange:
+		final MockPeerNetwork network = new MockPeerNetwork();
+		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
+		final NodeController controller = new NodeController(host);
+
+		// Act:
+		final ApplicationMetaData appMetaData = controller.getInfo().getAppMetaData();
+
+		// Assert:
+		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
 	}
 
 	@Test
@@ -86,6 +104,25 @@ public class NodeControllerTest {
 		final NodeExperience experience = nodeExperiences.getNodeExperience(sourceNode, partnerNode);
 		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(12L));
 		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(34L));
+	}
+
+	@Test
+	public void canYouSeeMeReturnsTheRemoteAddress() {
+		// Arrange:
+		final MockPeerNetwork network = new MockPeerNetwork();
+		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
+		final NodeController controller = new NodeController(host);
+
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getProtocol()).thenReturn("https");
+		Mockito.when(request.getRemoteAddr()).thenReturn("10.0.0.123");
+		Mockito.when(request.getRemotePort()).thenReturn(97);
+
+		// Act:
+		final NodeEndpoint endpoint = controller.canYouSeeMe(request);
+
+		// Assert:
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 97)));
 	}
 
 	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {

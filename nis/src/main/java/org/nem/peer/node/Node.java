@@ -1,7 +1,6 @@
 package org.nem.peer.node;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.StringUtils;
 
 /**
  * Represents a node in the NEM network.
@@ -12,9 +11,7 @@ public class Node implements SerializableEntity {
 	private final static int DEFAULT_VERSION = 2;
 	private final static String DEFAULT_PLATFORM = "PC";
 
-	//Had to remove final since endpoint can be changed by auto configuration
-	//JNLP started NIS server uses auto configuration of endpoint.
-	private NodeEndpoint endpoint;
+	private final NodeEndpoint endpoint;
 	private final String platform;
 	private final Integer version;
 	private final String application;
@@ -42,12 +39,7 @@ public class Node implements SerializableEntity {
 	public Node(final Deserializer deserializer) {
 		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
 
-		String tmpStr = deserializer.readString("platform");
-		if(StringUtils.isNullOrEmpty(this.platform)) {
-			this.platform = String.format("%s (%s) on %s", System.getenv("java.vendor"), System.getenv("java.version"), System.getenv("os.name"));
-		} else {
-			this.platform = tmpStr;
-		}
+		this.platform = deserializer.readString("platform");
 
 		final Integer version = deserializer.readInt("version");
 		this.version = null == version ? DEFAULT_VERSION : version;
@@ -100,15 +92,6 @@ public class Node implements SerializableEntity {
 	 */
 	public String getApplication() {
 		return this.application;
-	}
-
-	/**
-	 * Sets the endpoint and validates it.
-	 *
-	 */
-	public void setEndpoint(NodeEndpoint endpoint) {
-		this.endpoint = endpoint;
-		ensureValidity();
 	}
 
 	//endregion

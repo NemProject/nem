@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import org.nem.core.serialization.*;
+import org.nem.core.utils.StringEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
@@ -56,7 +57,7 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 		serializableEntity.serialize(serializer);
 
 		final String rawJson = serializer.getObject().toJSONString() + "\r\n";
-		httpOutputMessage.getBody().write(rawJson.getBytes());
+		httpOutputMessage.getBody().write(StringEncoder.getBytes(rawJson));
 	}
 
 	private <T> Constructor<T> getConstructor(final Class<T> aClass) {

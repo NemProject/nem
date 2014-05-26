@@ -5,7 +5,7 @@ package org.nem.core.model;
  */
 public class NetworkInfo {
 
-//	private static NetworkInfo mainNetworkInfo = createMainNetworkInfo();
+	private static NetworkInfo mainNetworkInfo = createMainNetworkInfo();
 	private static NetworkInfo testNetworkInfo = createTestNetworkInfo();
 
 	private byte version;
@@ -54,9 +54,9 @@ public class NetworkInfo {
 	 *
 	 * @return Information about the MAIN network.
 	 */
-//	public static NetworkInfo getMainNetworkInfo() {
-//		return mainNetworkInfo;
-//	}
+	public static NetworkInfo getMainNetworkInfo() {
+		return mainNetworkInfo;
+	}
 
 	/**
 	 * Gets information about the TEST network.
@@ -76,24 +76,25 @@ public class NetworkInfo {
 		return getTestNetworkInfo();
 	}
 
-//	private static NetworkInfo createMainNetworkInfo() {
-//		final NetworkInfo info = new NetworkInfo();
-//		info.version = 0x68;
-//		info.addressStartChar = 'N';
-//		info.genesisAccountId = "NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
-//		info.genesisRecipientAccountIds = new String[] {
-//				"NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
-//				"NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
-//				"NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
-//				"NAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL5KYTTX7",
-//				"NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
-//				"NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
-//				"NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
-//				"NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
-//		};
-//
-//		return info;
-//	}
+	private static NetworkInfo createMainNetworkInfo() {
+		final NetworkInfo info = new NetworkInfo();
+		info.version = 0x68;
+		info.addressStartChar = 'N';
+		// TODO: change to real addresses before changing to main-net
+		info.genesisAccountId = "Not-a-real-address-0";//"NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
+		info.genesisRecipientAccountIds = new String[] {
+				"Not-a-real-address-1", // "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
+				"Not-a-real-address-2", // "NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
+				"Not-a-real-address-3", // "NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
+				"Not-a-real-address-4", // "NAUULYJ4MSHXON3GDQVUN4WFRTAQNADYL5KYTTX7",
+				"Not-a-real-address-5", // "NBT7M43C4X25VDNSL34IRQO5IRKO6WXSMSJ4PCFP",
+				"Not-a-real-address-6", // "NAXNGGK5JEU7EXXFLV4L2NCGNJAWBGEOPEI4XHUN",
+				"Not-a-real-address-7", // "NCVRRAC4GIGMY5BIHDQZO3K6HLAJIDKYZDF7RO5H",
+				"Not-a-real-address-8", // "NBMSVDI52MR3KSO7RGIJEGGMGZAGSKV4A3ZNJJSM"
+		};
+
+		return info;
+	}
 
 	private static NetworkInfo createTestNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();

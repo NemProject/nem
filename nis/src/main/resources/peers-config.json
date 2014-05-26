@@ -8,7 +8,6 @@
 	},
 
     "application": "NIS",
-	"platform": "ARM BeagleBoard",
 
 	"knownPeers": [
         { "protocol": "http", "host": "37.187.70.29", "port" : 7890 },

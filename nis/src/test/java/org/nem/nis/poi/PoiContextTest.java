@@ -42,8 +42,8 @@ public class PoiContextTest {
 	@Test
 	public void importanceVectorIsInitializedCorrectly() {
 		// Act:
-		// (0, 1, 6), (0, 2, 4)
-		// (1, 0, 2)
+		// (0, 1, 8), (0, 2, 4)
+		// (1, 0, 2), (1, 2, 6)
 		// (3, 0, 3), (3, 2, 5)
 		final PoiContext context = createTestPoiContextWithAccountLinks();
 
@@ -51,8 +51,8 @@ public class PoiContextTest {
 		// (1) importance vector is initially set to row sum vector of the out-link matrix
 		// (2) importance vector is normalized
 		Assert.assertThat(
-				context.getImportanceVector().roundTo(3),
-				IsEqual.equalTo(new ColumnVector(0.188, 0.25, 0.563, 0)));
+				context.getImportanceVector(),
+				IsEqual.equalTo(new ColumnVector(0.375 / 3, 0.6 / 3, 2.025 / 3, 0)));
 	}
 
 	@Test
@@ -106,17 +106,17 @@ public class PoiContextTest {
 	@Test
 	public void outlinkMatrixIsInitializedCorrectly() {
 		// Act:
-		// (0, 1, 6), (0, 2, 4)
-		// (1, 0, 2)
+		// (0, 1, 8), (0, 2, 4)
+		// (1, 0, 2), (1, 2, 6)
 		// (3, 0, 3), (3, 2, 5)
 		final PoiContext context = createTestPoiContextWithAccountLinks();
 
 		// Assert:
 		// (1) account link weights are normalized
 		final Matrix expectedAccountLinks = new DenseMatrix(4, 4);
-		expectedAccountLinks.setAt(1, 0, 0.5);
-		expectedAccountLinks.setAt(2, 0, 0.5);
-		expectedAccountLinks.setAt(0, 1, 0.0);
+		expectedAccountLinks.setAt(1, 0, 0.6);
+		expectedAccountLinks.setAt(2, 0, 0.4);
+		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(0, 3, 0.375);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
@@ -183,9 +183,10 @@ public class PoiContextTest {
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
 
 		// set up account links
-		addAccountLink(height, accounts.get(0), accounts.get(1), 6);
+		addAccountLink(height, accounts.get(0), accounts.get(1), 8);
 		addAccountLink(height, accounts.get(0), accounts.get(2), 4);
 		addAccountLink(height, accounts.get(1), accounts.get(0), 2);
+		addAccountLink(height, accounts.get(1), accounts.get(2), 6);
 		addAccountLink(height, accounts.get(3), accounts.get(0), 3);
 		addAccountLink(height, accounts.get(3), accounts.get(2), 5);
 

@@ -167,8 +167,19 @@ public class SerializableEntityHttpMessageConverterTest {
 	@Test
 	public void writeCreatesJsonStringThatCanBeRoundTripped() throws Exception {
 		// Arrange:
+		assertWriteCanRoundTripEntityWithString("foo");
+	}
+
+	@Test
+	public void writeCreatesUtf8JsonStringThatCanBeRoundTripped() throws Exception {
+		// Arrange:
+		assertWriteCanRoundTripEntityWithString("$¢€");
+	}
+
+	private static void assertWriteCanRoundTripEntityWithString(final String str) throws Exception {
+		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
+		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, str, 3);
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 		final MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
 
