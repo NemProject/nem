@@ -82,7 +82,8 @@ public class PushController {
 			throw new IllegalArgumentException("block must be verifiable");
 
 		// validate block and broadcast (async)
-		this.blockChain.processBlock(block);
-		this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+		if (this.blockChain.processBlock(block)) {
+			this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+		}
 	}
 }
