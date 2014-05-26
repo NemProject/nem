@@ -102,7 +102,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
+		final BlockChainSyncContext context = this.createSyncContext();
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer);
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
@@ -166,7 +166,7 @@ public class BlockChain implements BlockSynchronizer {
 //			return false;
 //		}
 
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
+		final BlockChainSyncContext context = this.createSyncContext();
 
 		// EVIL hack, see issue#70
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
@@ -188,8 +188,12 @@ public class BlockChain implements BlockSynchronizer {
 		return context.updateOurChain(this.foraging, parent, peerChain, ourScore, hasOwnChain);
 	}
 
-	private BlockChainSyncContext createSyncContext(final AccountAnalyzer accountAnalyzer, AccountAnalyzer originalAnalyzer) {
-		return new BlockChainSyncContext(accountAnalyzer, originalAnalyzer, this.blockChainLastBlockLayer, this.blockDao);
+	private BlockChainSyncContext createSyncContext() {
+		return new BlockChainSyncContext(
+				this.accountAnalyzer.copy(),
+				this.accountAnalyzer,
+				this.blockChainLastBlockLayer,
+				this.blockDao);
 	}
 
 	//region BlockChainSyncContext
