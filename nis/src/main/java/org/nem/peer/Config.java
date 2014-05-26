@@ -28,6 +28,15 @@ public class Config {
 	 * @param jsonConfig A JSON configuration object.
 	 */
 	public Config(final JSONObject jsonConfig) {
+		if (!jsonConfig.containsKey("platform")) {
+			final String defaultPlatform = String.format(
+					"%s (%s) on %s",
+					System.getProperty("java.vendor"),
+					System.getProperty("java.version"),
+					System.getProperty("os.name"));
+			jsonConfig.put("platform", defaultPlatform);
+		}
+
 		final JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
 		this.localNode = parseLocalNode(deserializer);
 		this.preTrustedNodes = parseWellKnownPeers(deserializer);

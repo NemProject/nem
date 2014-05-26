@@ -37,6 +37,28 @@ public class ConfigTest {
 	}
 
 	@Test
+	public void localNodeIsGivenDefaultPlatformIfOmitted() throws Exception {
+		// Arrange:
+		final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
+		jsonConfig.remove("platform");
+		final Config config = new Config(jsonConfig);
+
+		// Act:
+		final Node node = config.getLocalNode();
+
+		// Assert:
+		final String expectedPlatform = String.format(
+				"%s (%s) on %s",
+				System.getProperty("java.vendor"),
+				System.getProperty("java.version"),
+				System.getProperty("os.name"));
+		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
+		Assert.assertThat(node.getPlatform(), IsEqual.equalTo(expectedPlatform));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
+	}
+
+	@Test
 	public void wellKnownPeersAreInitializedCorrectly() {
 		// Arrange:
 		final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.8", "10.0.0.3" };
