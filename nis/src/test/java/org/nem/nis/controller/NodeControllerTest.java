@@ -3,6 +3,8 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
@@ -26,6 +28,20 @@ public class NodeControllerTest {
 
 		// Assert:
 		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));
+	}
+
+	@Test
+	public void getInfoReturnsCommonStarterApplicationMetaData() {
+		// Arrange:
+		final MockPeerNetwork network = new MockPeerNetwork();
+		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
+		final NodeController controller = new NodeController(host);
+
+		// Act:
+		final ApplicationMetaData appMetaData = controller.getInfo().getAppMetaData();
+
+		// Assert:
+		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
 	}
 
 	@Test

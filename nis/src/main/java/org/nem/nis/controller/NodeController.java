@@ -33,7 +33,6 @@ public class NodeController {
 	@P2PApi
 	@PublicApi
 	public NisNodeInfo getInfo() {
-		// TODO: test the NisInfoPart
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
 
