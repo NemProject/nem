@@ -3,15 +3,18 @@ package org.nem.core.metadata;
 import java.security.cert.X509Certificate;
 
 import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
 /**
  * Meta data information about the application.
  */
 public class ApplicationMetaData implements SerializableEntity {
-	final private String appName;
-	final private String version;
-	final private String certificateSigner;
-	final private long startTime;
+	private final String appName;
+	private final String version;
+	private final String certificateSigner;
+	private final TimeProvider timeProvider;
+	private final TimeInstant startTime;
+	private final TimeInstant currentTime;
 
 	/**
 	 * Creates a new application meta data instance.
@@ -19,17 +22,19 @@ public class ApplicationMetaData implements SerializableEntity {
 	 * @param appName The application name.
 	 * @param version The application version.
 	 * @param certificate The application certificate.
-	 * @param startTime The time that the application was started.
+	 * @param timeProvider The time provider.
 	 */
 	public ApplicationMetaData(
 			final String appName,
 			final String version,
 			final X509Certificate certificate,
-			final long startTime) {
+			final TimeProvider timeProvider) {
 		this.appName = appName;
 		this.version = version;
 		this.certificateSigner = null == certificate ? null : certificate.getIssuerX500Principal().getName();
-		this.startTime = startTime;
+		this.timeProvider = timeProvider;
+		this.startTime = this.timeProvider.getCurrentTime();
+		this.currentTime = TimeInstant.ZERO;
 	}
 
 	/**
@@ -41,7 +46,9 @@ public class ApplicationMetaData implements SerializableEntity {
 		this.appName = deserializer.readString("application");
 		this.version = deserializer.readString("version");
 		this.certificateSigner = deserializer.readString("signer");
-		this.startTime = deserializer.readLong("startTime");
+		this.startTime = TimeInstant.readFrom(deserializer, "startTime");
+		this.currentTime = TimeInstant.readFrom(deserializer, "currentTime");
+		this.timeProvider = null;
 	}
 
 	/**
@@ -76,17 +83,25 @@ public class ApplicationMetaData implements SerializableEntity {
 	 *
 	 * @return The start time of the application.
 	 */
-	public long getStartTime() {
+	public TimeInstant getStartTime() {
 		return this.startTime;
 	}
 
+	/**
+	 * Gets the current time of the application.
+	 *
+	 * @return The current time of the application.
+	 */
+	public TimeInstant getCurrentTime() {
+		return null == this.timeProvider ? this.currentTime : this.timeProvider.getCurrentTime();
+	}
+
 	@Override
-	public void serialize(Serializer serializer) {
-		//
+	public void serialize(final Serializer serializer) {
 		serializer.writeString("application", this.appName);
 		serializer.writeString("version", this.version);
 		serializer.writeString("signer", this.certificateSigner);
-		serializer.writeLong("startTime", this.startTime);
+		TimeInstant.writeTo(serializer, "startTime", this.startTime);
+		TimeInstant.writeTo(serializer, "currentTime", this.getCurrentTime());
 	}
-
 }

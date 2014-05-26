@@ -3,7 +3,9 @@ package org.nem.peer.node;
 import org.hamcrest.core.*;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.time.TimeProvider;
 import org.nem.peer.test.Utils;
 
 public class NisNodeInfoTest {
@@ -12,7 +14,7 @@ public class NisNodeInfoTest {
 	public void nodeInfoExposesAllConstructorParameters() {
 		// Arrange:
 		final Node node = Utils.createNodeWithPort(7);
-		final ApplicationMetaData appMetaData = new ApplicationMetaData("nem", "1.0", null, 14);
+		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
 		final NisNodeInfo nodeInfo = new NisNodeInfo(node, appMetaData);
@@ -26,7 +28,7 @@ public class NisNodeInfoTest {
 	public void canRoundtripNodeInfoMetaData() {
 		// Arrange:
 		final Node node = Utils.createNodeWithPort(17);
-		final ApplicationMetaData appMetaData = new ApplicationMetaData("nem", "1.0", null, 14);
+		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
 		final NisNodeInfo nodeInfo = roundtripNodeInfo(new NisNodeInfo(node, appMetaData));
@@ -38,5 +40,10 @@ public class NisNodeInfoTest {
 
 	private static NisNodeInfo roundtripNodeInfo(final NisNodeInfo nodeInfo) {
 		return new NisNodeInfo(org.nem.core.test.Utils.roundtripSerializableEntity(nodeInfo, null));
+	}
+
+	private static ApplicationMetaData createAppMetaData(final String name, final String version) {
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		return new ApplicationMetaData(name, version, null, timeProvider);
 	}
 }
