@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.connect.*;
+import org.nem.core.model.Block;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;
@@ -101,7 +102,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy());
+		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer);
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
@@ -165,7 +166,7 @@ public class BlockChain implements BlockSynchronizer {
 //			return false;
 //		}
 
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy());
+		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
 
 		// EVIL hack, see issue#70
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
@@ -187,24 +188,26 @@ public class BlockChain implements BlockSynchronizer {
 		return context.updateOurChain(this.foraging, parent, peerChain, ourScore, hasOwnChain);
 	}
 
-	private BlockChainSyncContext createSyncContext(final AccountAnalyzer accountAnalyzer) {
-		return new BlockChainSyncContext(accountAnalyzer, this.blockChainLastBlockLayer, this.blockDao);
+	private BlockChainSyncContext createSyncContext(final AccountAnalyzer accountAnalyzer, AccountAnalyzer originalAnalyzer) {
+		return new BlockChainSyncContext(accountAnalyzer, originalAnalyzer, this.blockChainLastBlockLayer, this.blockDao);
 	}
 
 	//region BlockChainSyncContext
 
 	private static class BlockChainSyncContext {
-
 		private final AccountAnalyzer accountAnalyzer;
+		private final AccountAnalyzer originalAnalyzer;
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
 
 		private BlockChainSyncContext(
 				final AccountAnalyzer accountAnalyzer,
+				final AccountAnalyzer originalAnalyzer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao) {
 			this.accountAnalyzer = accountAnalyzer;
+			this.originalAnalyzer = originalAnalyzer;
 			this.blockScorer = new BlockScorer(this.accountAnalyzer);
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
@@ -246,6 +249,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
 					this.accountAnalyzer,
+					this.originalAnalyzer,
 					this.blockScorer,
 					this.blockChainLastBlockLayer,
 					this.blockDao,
@@ -274,6 +278,7 @@ public class BlockChain implements BlockSynchronizer {
 	private static class BlockChainUpdateContext {
 
 		private final AccountAnalyzer accountAnalyzer;
+		private final AccountAnalyzer originalAnalyzer;
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
@@ -285,10 +290,11 @@ public class BlockChain implements BlockSynchronizer {
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
-			   	final AccountAnalyzer accountAnalyzer,
+				final AccountAnalyzer accountAnalyzer,
+				final AccountAnalyzer originalAnalyzer,
 				final BlockScorer blockScorer,
-			   	final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			   	final BlockDao blockDao,
+				final BlockChainLastBlockLayer blockChainLastBlockLayer,
+				final BlockDao blockDao,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
@@ -296,6 +302,7 @@ public class BlockChain implements BlockSynchronizer {
 				final boolean hasOwnChain) {
 
 			this.accountAnalyzer = accountAnalyzer;
+			this.originalAnalyzer = originalAnalyzer;
 			this.blockScorer = blockScorer;
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
@@ -397,7 +404,7 @@ public class BlockChain implements BlockSynchronizer {
 			}
 
 			synchronized (this.blockChainLastBlockLayer) {
-				this.accountAnalyzer.shallowCopyTo(this.accountAnalyzer);
+				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
 				if (this.hasOwnChain) {
 					// mind that we're using "new" (replaced) accountAnalyzer
@@ -408,7 +415,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.addRevertedTransactionsAsUnconfirmed(
 							transactionHashes,
 							this.parentBlock.getHeight().getRaw(),
-							this.accountAnalyzer);
+							this.originalAnalyzer);
 				}
 
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
