@@ -34,7 +34,7 @@ public class EigenTrustConvergencePolicyTest {
 	}
 
 	@Test
-	public void convergeStopsAfterIterationChangeIsLessThanThanEpsilon() {
+	public void convergeStopsAfterIterationChangeIsLessThanEpsilon() {
 		// Arrange:
 		final EigenTrustConvergencePolicy policy = createTestPolicy(1000, 0.0001);
 

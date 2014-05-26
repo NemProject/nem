@@ -133,7 +133,7 @@ public class BlockChainTest {
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
-				retriveAccount(1, parentBlock.getSigner())
+				retrieveAccount(1, parentBlock.getSigner())
 		);
 		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
 		org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
@@ -160,7 +160,7 @@ public class BlockChainTest {
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
 	}
 
-	private org.nem.nis.dbmodel.Account retriveAccount(long i, Account signer) {
+	private org.nem.nis.dbmodel.Account retrieveAccount(long i, Account signer) {
 		org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getKeyPair().getPublicKey());
 		ret.setId(i);
 		return ret;
