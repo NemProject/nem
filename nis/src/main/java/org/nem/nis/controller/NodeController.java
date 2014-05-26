@@ -37,9 +37,11 @@ public class NodeController {
 	}
 
 	/**
-	 * Gets a list of the active and inactive nodes currently known  by the running node.
+	 * Gets a list of the active and inactive nodes currently known by the
+	 * running node.
 	 *
-	 * @return A list of the active and inactive nodes currently known  by the running node.
+	 * @return A list of the active and inactive nodes currently known by the
+	 *         running node.
 	 */
 	@RequestMapping(value = "/node/peer-list", method = RequestMethod.GET)
 	@P2PApi
@@ -51,7 +53,9 @@ public class NodeController {
 	/**
 	 * Ping that means the pinging node is part of the NEM P2P network.
 	 *
-	 * @param nodeExperiencesPair Information about the experiences the pinging node has had with other nodes.
+	 * @param nodeExperiencesPair
+	 *            Information about the experiences the pinging node has had
+	 *            with other nodes.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
@@ -63,14 +67,26 @@ public class NodeController {
 
 	/**
 	 * Just return the Node info the requester "Can You See Me" using the IP
-	 * address from the request.
+	 * address from the request. If the port is not the default NIS port where
+	 * the requesting node is listening it has to be passed as parameter
+	 * "myNisPort"
 	 */
 	@RequestMapping(value = "/node/cysm", method = RequestMethod.GET)
 	@P2PApi
 	public NodeEndpoint canYouSeeMe(final HttpServletRequest request) {
-		return new NodeEndpoint(
-				request.getScheme(),
-				request.getRemoteAddr(),
-				request.getRemotePort());
+		String portStr = request.getParameter("myNisPort");
+		int portNr = 7890;
+		if (portStr != null) {
+			try {
+				portNr = Integer.parseInt(portStr);
+			} catch (NumberFormatException nfe) {
+				// we stick with the default for NIS
+			}
+		}
+		return new NodeEndpoint(request.getScheme(), request.getRemoteAddr(),
+		// remote port is never the
+		// port on which node is listening
+		// Maybe it has to be passed by the request get
+				portNr);
 	}
 }
