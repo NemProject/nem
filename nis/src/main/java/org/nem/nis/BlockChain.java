@@ -45,6 +45,20 @@ public class BlockChain implements BlockSynchronizer {
 		this.foraging = foraging;
 	}
 
+	/**
+	 * Checks if given block follows last block in the chain
+	 *
+	 * @param block The block to check.
+	 * @return true if block can be next in chain
+	 */
+	public boolean isNextBlock(final Block block) {
+		boolean result = false;
+		synchronized (blockChainLastBlockLayer) {
+			this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
+		}
+		return result;
+	}
+
 	public Block forageBlock() {
 		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer);
 		final Block block = this.foraging.forageBlock(scorer);
@@ -134,6 +148,10 @@ public class BlockChain implements BlockSynchronizer {
 		 return NodeExperience.Code.SUCCESS;
 	}
 
+	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		block.setGenerationHash(parent.getGenerationHash());
+	}
+
 	/**
 	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
@@ -175,6 +193,8 @@ public class BlockChain implements BlockSynchronizer {
 //		}
 
 		final BlockChainSyncContext context = this.createSyncContext();
+
+		fixGenerationHash(receivedBlock, parent);
 
 		// EVIL hack, see issue#70
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));

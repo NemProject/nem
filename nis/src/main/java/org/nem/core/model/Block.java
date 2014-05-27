@@ -152,11 +152,14 @@ public class Block extends VerifiableEntity {
 	 * @param prevBlock The previous block.
 	 */
 	public void setPrevious(final Block prevBlock) {
-		this.generationHash = HashUtils.nextHash(
-				prevBlock.getGenerationHash(),
-				this.getSigner().getKeyPair().getPublicKey());
-
+		setGenerationHash(prevBlock.getGenerationHash());
 		this.prevBlockHash = HashUtils.calculateHash(prevBlock);
+	}
+
+	public void setGenerationHash(final Hash previousBlockHash) {
+		this.generationHash = HashUtils.nextHash(
+				previousBlockHash,
+				this.getSigner().getKeyPair().getPublicKey());
 	}
 
 	protected void setPrevious(final Hash generationHash, final Hash prevBlockHash) {

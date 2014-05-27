@@ -98,7 +98,7 @@ public class PushController {
 		Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
 		// TODO: if the remote node is null, do we want to create a new node? I guess yes.
 
-		if (!block.verify()) {
+		if (!this.blockChain.isNextBlock(block) || !block.verify()) {
 			// Bad experience with the remote node.
 			if (remoteNode != null) {
 				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
