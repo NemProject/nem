@@ -218,13 +218,20 @@ public class PeerNetwork {
 		//LOGGER.info("synchronizing with: " + partnerNode);
 		System.out.println("synchronizing with: " + partnerNode);
 		int code = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
-		this.updateExperience(partnerNodePair.getExperience(), code);
+		this.updateExperience(partnerNodePair.getNode(), code);
 	}
-
-	public void updateExperience(final NodeExperience experience, int code) {
-		if (code == NodeExperience.Code.SUCCESS) { 
+	
+	public void updateExperience(final Node node, int code) {
+		if (code == NodeExperience.Code.NEUTRAL) {
+			return;
+		}
+		System.out.print("Updating experience with " + node + ": ");
+		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
+		if (code == NodeExperience.Code.SUCCESS) {
+			System.out.println("success");
 			experience.successfulCalls().increment();
 		} else if (code == NodeExperience.Code.FAILURE) {
+			System.out.println("failure");
 			experience.failedCalls().increment();
 		}
 	}

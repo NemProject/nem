@@ -245,6 +245,46 @@ public class NodeCollectionTest {
 
 	//endregion
 
+	//region retrieval
+
+	@Test
+	public void activeNodeCanBeRetrievedByIP() {
+		// Arrange:
+		final NodeCollection nodes = new NodeCollection();
+		nodes.update(createNode("A", "37.128.23.2", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "37.123.25.5", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "37.121.27.7", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.INACTIVE);
+		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.INACTIVE);
+		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.INACTIVE);
+
+		// Act: 
+		Node node = nodes.getNode("37.123.25.5");
+		
+		// Assert:
+		Assert.assertThat(node.getEndpoint().toString(), IsEqual.equalTo("http://37.123.25.5:7890/"));
+	}
+
+	@Test
+	public void inactiveNodeCanBeRetrievedByIP() {
+		// Arrange:
+		final NodeCollection nodes = new NodeCollection();
+		nodes.update(createNode("A", "37.128.23.2", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "37.123.25.5", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "37.121.27.7", 7890), NodeStatus.ACTIVE);
+		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.INACTIVE);
+		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.INACTIVE);
+		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.INACTIVE);
+
+		// Act: 
+		Node node = nodes.getNode("38.181.87.7");
+		
+		// Assert:
+		Assert.assertThat(node.getEndpoint().toString(), IsEqual.equalTo("http://38.181.87.7:7890/"));
+	}
+
+	//endregion
+
 	private static Node createNode(final String platform) {
 		// Arrange:
 		return createNode(platform, platform.charAt(0));
@@ -253,6 +293,11 @@ public class NodeCollectionTest {
 	private static Node createNode(final String platform, final char port) {
 		// Arrange:
 		return new Node(new NodeEndpoint("http", "localhost", port), platform, "FooBar");
+	}
+
+	private static Node createNode(final String platform, final String host, final int port) {
+		// Arrange:
+		return new Node(new NodeEndpoint("http", host, port), platform, "FooBar");
 	}
 
 	private static NodeCollection createNodeCollectionWithMultipleNodes() {
