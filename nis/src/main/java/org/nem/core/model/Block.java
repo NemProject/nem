@@ -19,7 +19,6 @@ public class Block extends VerifiableEntity {
 
 	private final BlockHeight height;
 	private Hash prevBlockHash;
-	private Amount totalFee = Amount.ZERO;
 
 	private final List<Transaction> transactions;
 	private final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
@@ -78,7 +77,6 @@ public class Block extends VerifiableEntity {
 
 		this.prevBlockHash = deserializer.readObject("prevBlockHash", Hash.DESERIALIZER);
 		this.height = BlockHeight.readFrom(deserializer, "height");
-		this.totalFee = Amount.readFrom(deserializer, "totalFee");
 
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 
@@ -103,7 +101,11 @@ public class Block extends VerifiableEntity {
 	 * @return The total amount of fees of all transactions stored in this block.
 	 */
 	public Amount getTotalFee() {
-		return this.totalFee;
+		return Amount.fromMicroNem(
+				this.transactions.stream()
+						.map(tx -> tx.getFee().getNumMicroNem())
+						.reduce(0L, Long::sum)
+		);
 	}
 
 	/**
@@ -180,7 +182,6 @@ public class Block extends VerifiableEntity {
 	 */
 	public void addTransaction(final Transaction transaction) {
 		this.transactions.add(transaction);
-		this.totalFee = this.totalFee.add(transaction.getFee());
 	}
 
 	/**
@@ -243,7 +244,6 @@ public class Block extends VerifiableEntity {
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeObject("prevBlockHash", this.prevBlockHash);
 		BlockHeight.writeTo(serializer, "height", this.height);
-		Amount.writeTo(serializer, "totalFee", this.totalFee);
 
 		serializer.writeObjectArray("transactions", this.transactions);
 	}
