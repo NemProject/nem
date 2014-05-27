@@ -52,13 +52,13 @@ public class PushController {
 
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
-	public void pushTransaction(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
+	public void pushTransaction(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 		LOGGER.info(request.getRemoteAddr());
-		Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
+		final Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
 
 		// transaction timestamp is checked inside processTransaction
 		if (!transaction.isValid() || !transaction.verify()) {
@@ -88,7 +88,7 @@ public class PushController {
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
-	public void pushBlock(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
+	public void pushBlock(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
 		// TODO: refactor logging

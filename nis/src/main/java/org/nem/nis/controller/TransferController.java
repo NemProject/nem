@@ -5,10 +5,16 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
+import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.peer.PeerNetwork;
+import org.nem.peer.node.Node;
+import org.nem.peer.node.NodeApiId;
+import org.nem.peer.trust.score.NodeExperience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 // TODO: add tests
@@ -18,13 +24,16 @@ public class TransferController {
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
+	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	TransferController(
 			final AccountAnalyzer accountAnalyzer,
-			final Foraging foraging) {
+			final Foraging foraging,
+			final NisPeerNetworkHost host) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.foraging = foraging;
+		this.host = host;
 	}
 
 	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
@@ -39,21 +48,42 @@ public class TransferController {
 		return new RequestPrepare(transferData);
 	}
 
+	// TODO make it common with push/transfer?
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
+	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce, final HttpServletRequest request) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 
 		LOGGER.info("   signer: " + transfer.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("recipient: " + transfer.getRecipient().getAddress().getEncoded());
 		LOGGER.info("   verify: " + Boolean.toString(transfer.verify()));
+		final Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
 
-		if (!transfer.isValid() || !transfer.verify())
+		if (!transfer.isValid() || !transfer.verify()) {
+			// Bad experience with the remote node.
+			if (remoteNode != null) {
+				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
+			}
+
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
+		}
 
 		// add to unconfirmed transactions
-        foraging.processTransaction(transfer);
+
+		final PeerNetwork network = this.host.getNetwork();
+		// add to unconfirmed transactions
+		if (this.foraging.processTransaction(transfer)) {
+			// Good experience with the remote node.
+			if (remoteNode != null) {
+				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
+			}
+
+			// propagate transactions
+			// this returns immediately, so that client who
+			// actually has sent /transfer/announce won't wait for this...
+			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transfer);
+		}
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
