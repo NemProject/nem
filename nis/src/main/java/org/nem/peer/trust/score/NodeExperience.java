@@ -7,23 +7,6 @@ import org.nem.core.serialization.*;
  */
 public class NodeExperience implements SerializableEntity {
 
-	public class Code {
-		/**
-		 * Flag indicating that the experience was neutral.
-		 */
-		public static final int NEUTRAL = 0;
-		
-		/**
-		 * Flag indicating that the experience was good.
-		 */
-		public static final int SUCCESS = 1;
-
-		/**
-		 * Flag indicating that the experience was bad.
-		 */
-		public static final int FAILURE = 2;
-	}
-	
 	private PositiveLong successfulCalls = new PositiveLong(0);
 	private PositiveLong failedCalls = new PositiveLong(0);
 

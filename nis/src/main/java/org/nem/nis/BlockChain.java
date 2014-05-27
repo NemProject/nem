@@ -92,11 +92,11 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param node The other node.
 	 */
 	@Override
-	public int synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
 		} catch (InactivePeerException | FatalPeerException ex) {
-			return NodeExperience.Code.FAILURE;
+			return NodeInteractionResult.FAILURE;
 		}
 	}
 
@@ -115,13 +115,13 @@ public class BlockChain implements BlockSynchronizer {
 		return result;
 	}
 
-	private int synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
+	private NodeInteractionResult synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
 		final BlockChainSyncContext context = this.createSyncContext();
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer);
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			return mapComparisonResultCodeToNodeExperienceCode(result.getCode());
+			return mapComparisonResultCodeToNodeInteractionResult(result.getCode());
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -138,18 +138,18 @@ public class BlockChain implements BlockSynchronizer {
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		 return context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent())
-				 ? NodeExperience.Code.SUCCESS
-				 : NodeExperience.Code.FAILURE;
+				 ? NodeInteractionResult.SUCCESS
+				 : NodeInteractionResult.FAILURE;
 	}
 
-	private int mapComparisonResultCodeToNodeExperienceCode(final int comparisonResultCode) {
+	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
 		switch (comparisonResultCode) {
 			case ComparisonResult.Code.REMOTE_IS_SYNCED:
             case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
-				return NodeExperience.Code.NEUTRAL;
+				return NodeInteractionResult.NEUTRAL;
 		}
 
-		return NodeExperience.Code.FAILURE;
+		return NodeInteractionResult.FAILURE;
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {

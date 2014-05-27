@@ -10,10 +10,10 @@ import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.peer.*;
 import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
-import org.nem.peer.trust.score.NodeExperience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,68 +53,64 @@ public class PushController {
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
-		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
+		boolean result = this.pushEntity(
+				TransactionFactory.VERIFIABLE.deserialize(deserializer),
+				transaction -> transaction.isValid() && transaction.verify(),
+				this.foraging::processTransaction,
+				NodeApiId.REST_PUSH_TRANSACTION,
+				request);
 
-		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
-		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
-		LOGGER.info(request.getRemoteAddr());
-		Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
-
-		// transaction timestamp is checked inside processTransaction
-		if (!transaction.isValid() || !transaction.verify()) {
-			// Bad experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
-			}
-			
+		if (!result)
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
-		}
-
-		final PeerNetwork network = this.host.getNetwork();
-
-		// add to unconfirmed transactions
-		if (this.foraging.processTransaction(transaction)) {
-			// Good experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
-			}
-			
-			// propagate transactions
-			// this returns immediately, so that client who
-			// actually has sent /transfer/announce won't wait for this...
-			network.broadcast(NodeApiId.REST_PUSH_TRANSACTION, transaction);
-		}
 	}
 
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
 	public void pushBlock(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
-		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
+		boolean result = this.pushEntity(
+				BlockFactory.VERIFIABLE.deserialize(deserializer),
+				block -> this.blockChain.isNextBlock(block) && block.verify(),
+				this.blockChain::processBlock,
+				NodeApiId.REST_PUSH_BLOCK,
+				request);
 
-		// TODO: refactor logging
-		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
-		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
-		LOGGER.info(request.getRemoteAddr());
-		Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
-		// TODO: if the remote node is null, do we want to create a new node? I guess yes.
-
-		if (!this.blockChain.isNextBlock(block) || !block.verify()) {
-			// Bad experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
-			}
-			
+		if (!result)
 			throw new IllegalArgumentException("block must be verifiable");
+	}
+
+	private <T extends VerifiableEntity> boolean pushEntity(
+			final T entity,
+			final Predicate<T> isValid,
+			final Predicate<T> isAccepted,
+			final NodeApiId broadcastId,
+			final HttpServletRequest request) {
+		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
+		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
+		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
+
+		// TODO: if the remote node is null, do we want to create a new node? I guess yes.
+		final PeerNetwork network = this.host.getNetwork();
+		final Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
+
+		if (!isValid.test(entity)) {
+			// Bad experience with the remote node.
+			if (null != remoteNode) {
+				network.updateExperience(remoteNode, NodeInteractionResult.FAILURE);
+			}
+
+			return false;
 		}
 
 		// validate block and broadcast (async)
-		if (this.blockChain.processBlock(block)) {
+		if (isAccepted.test(entity)) {
 			// Good experience with the remote node.
 			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
+				network.updateExperience(remoteNode, NodeInteractionResult.SUCCESS);
 			}
-			
-			this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+
+			network.broadcast(broadcastId, entity);
 		}
+
+		return true;
 	}
 }

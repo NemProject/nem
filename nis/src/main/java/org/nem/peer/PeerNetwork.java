@@ -206,6 +206,9 @@ public class PeerNetwork {
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 	}
 
+	/**
+	 * Synchronizes this node with another node in the network.
+	 */
 	public void synchronize() {
 		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
 		if (null == partnerNodePair) {
@@ -215,24 +218,23 @@ public class PeerNetwork {
 
 		final Node partnerNode = partnerNodePair.getNode();
 		LOGGER.info("synchronizing with: " + partnerNode);
-		int code = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
-		this.updateExperience(partnerNodePair.getNode(), code);
+		final NodeInteractionResult result = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
+		this.updateExperience(partnerNodePair.getNode(), result);
 	}
-	
-	public void updateExperience(final Node node, int code) {
-		if (code == NodeExperience.Code.NEUTRAL) {
-			return;
-		}
 
-		System.out.print("Updating experience with " + node + ": ");
+	/**
+	 * Updates the local node's experience with the specified node.
+	 *
+	 * @param node The remote node that was interacted with.
+	 * @param result The interaction result.
+	 */
+	public void updateExperience(final Node node, final NodeInteractionResult result) {
+		if (NodeInteractionResult.NEUTRAL == result)
+			return;
+
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
-		if (code == NodeExperience.Code.SUCCESS) {
-			LOGGER.info("Updating experience with " + node + ": success");
-			experience.successfulCalls().increment();
-		} else if (code == NodeExperience.Code.FAILURE) {
-			LOGGER.info("Updating experience with " + node + ": failure");
-			experience.failedCalls().increment();
-		}
+		(NodeInteractionResult.SUCCESS == result ? experience.successfulCalls() : experience.failedCalls()).increment();
+		LOGGER.info(String.format("Updating experience with %s: %s", node, result));
 	}
 
 	private static class NodeRefresher {

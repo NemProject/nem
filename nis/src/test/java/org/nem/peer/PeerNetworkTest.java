@@ -482,7 +482,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizeSyncsWithActiveNode() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
+		final SynchronizeResult result = synchronizeActiveNode(NodeInteractionResult.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(
@@ -491,9 +491,9 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void synchronizePartnerExperienceOnSuccess() {
+	public void synchronizeUpdatesPartnerExperienceOnSuccess() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
+		final SynchronizeResult result = synchronizeActiveNode(NodeInteractionResult.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(1L));
@@ -502,9 +502,9 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void synchronizePartnerExperienceOnFailure() {
+	public void synchronizeUpdatesPartnerExperienceOnFailure() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.FAILURE);
+		final SynchronizeResult result = synchronizeActiveNode(NodeInteractionResult.FAILURE);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -513,9 +513,9 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void synchronizePartnerExperienceOnNeutral() {
+	public void synchronizeDoesNotUpdatePartnerExperienceOnNeutral() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.NEUTRAL);
+		final SynchronizeResult result = synchronizeActiveNode(NodeInteractionResult.NEUTRAL);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -528,7 +528,7 @@ public class PeerNetworkTest {
 		private NodeExperience experience;
 	}
 
-	private static SynchronizeResult synchronizeActiveNode(int synchronizeNodeResult) {
+	private static SynchronizeResult synchronizeActiveNode(final NodeInteractionResult synchronizeNodeResult) {
 		// Arrange:
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 
