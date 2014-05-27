@@ -111,13 +111,22 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		this.balance = this.balance.add(amount);
 	}
 
+	private BigInteger scaleUnvestedAmount(final Amount amount) {
+		if (this.balance.getNumMicroNem() == 0) {
+			return BigInteger.valueOf(amount.getNumMicroNem());
+		}
+		final BigInteger sum = this.vestedBalance.add(this.unvestedBalance);
+		final BigInteger balance = BigInteger.valueOf(this.balance.getNumMicroNem());
+		return sum.multiply(BigInteger.valueOf(amount.getNumMicroNem())).divide(balance);
+	}
+
 	/**
 	 * Notifies this balance that an amount was received.
 	 *
 	 * @param amount The amount.
 	 */
 	public void receive(final Amount amount) {
-		this.unvestedBalance = this.unvestedBalance.add(BigInteger.valueOf(amount.getNumMicroNem()));
+		this.unvestedBalance = this.unvestedBalance.add(scaleUnvestedAmount(amount));
 		this.balance = this.balance.add(amount);
 	}
 
@@ -130,7 +139,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		if (amount.compareTo(getUnvestedBalance()) > 0)
 			throw new IllegalArgumentException("amount must be non-negative");
 
-		this.unvestedBalance = this.unvestedBalance.subtract(BigInteger.valueOf(amount.getNumMicroNem()));
+		this.unvestedBalance = this.unvestedBalance.subtract(scaleUnvestedAmount(amount));
 		this.balance = this.balance.subtract(amount);
 	}
 
