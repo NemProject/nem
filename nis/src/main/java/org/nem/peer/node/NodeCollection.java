@@ -2,8 +2,6 @@ package org.nem.peer.node;
 
 import org.nem.core.serialization.*;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 

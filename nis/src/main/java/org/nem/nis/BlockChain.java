@@ -15,7 +15,6 @@ import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
-import org.nem.peer.trust.score.NodeExperience;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

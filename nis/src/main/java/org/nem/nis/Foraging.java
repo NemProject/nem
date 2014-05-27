@@ -130,7 +130,7 @@ public class Foraging  {
 			return null;
 		}
 
-		//LOGGER.info("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
+		LOGGER.fine("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
 
 		Block bestBlock = null;
 		long bestScore = Long.MIN_VALUE;
