@@ -121,11 +121,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			if (result.getCode() == ComparisonResult.Code.REMOTE_IS_SYNCED ||
-				result.getCode() == ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND) {
-				return NodeExperience.Code.NEUTRAL;
-			}
-			return NodeExperience.Code.FAILURE;
+			return mapComparisonResultCodeToNodeExperienceCode(result.getCode());
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -141,11 +137,19 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		 if (!context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent())) {
-			 return NodeExperience.Code.FAILURE;
-		 }
-		 
-		 return NodeExperience.Code.SUCCESS;
+		 return context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent())
+				 ? NodeExperience.Code.SUCCESS
+				 : NodeExperience.Code.FAILURE;
+	}
+
+	private int mapComparisonResultCodeToNodeExperienceCode(final int comparisonResultCode) {
+		switch (comparisonResultCode) {
+			case ComparisonResult.Code.REMOTE_IS_SYNCED:
+            case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
+				return NodeExperience.Code.NEUTRAL;
+		}
+
+		return NodeExperience.Code.FAILURE;
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
@@ -368,7 +372,7 @@ public class BlockChain implements BlockSynchronizer {
 				// we could get peer's score upfront, if it mismatches with
 				// what we calculated, we could penalize peer.
 				// BR: this is not evil. To indicate this, return true (although nothing was updated)
-				// TODO: is that ok?
+				// TODO: why is this not evil?
 				return true;
 			}
 

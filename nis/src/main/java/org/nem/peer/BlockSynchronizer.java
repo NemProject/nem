@@ -13,7 +13,7 @@ public interface BlockSynchronizer {
 	 *
 	 * @param connector The connector pool.
 	 * @param node The other node.
-	 * @return the node experience code.
+	 * @return The node experience code.
 	 */
 	public int synchronizeNode(final SyncConnectorPool connector, final Node node);
 }
