@@ -17,7 +17,7 @@ public interface PeerConnector {
 	 *
 	 * @return Information about the specified node.
 	 */
-	public CompletableFuture<NisNodeInfo> getInfo(final NodeEndpoint endpoint);
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint);
 
 	/**
 	 * Requests information about all known peers from the specified node.

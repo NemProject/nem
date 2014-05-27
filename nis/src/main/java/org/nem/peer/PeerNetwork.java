@@ -278,7 +278,7 @@ public class PeerNetwork {
 			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
 					.thenApply(n -> {
 						// if the node returned inconsistent information, drop it for this round
-						if (!areCompatible(node, n.getNode()))
+						if (!areCompatible(node, n))
 							throw new FatalPeerException("node response is not compatible with node identity");
 
 						return NodeStatus.ACTIVE;

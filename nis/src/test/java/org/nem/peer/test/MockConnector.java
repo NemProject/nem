@@ -215,7 +215,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NisNodeInfo> getInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
 		this.numGetInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -231,7 +231,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 				}
 			}
 
-			return new NisNodeInfo(new Node(endpointAfterChange, "P", "A"), CommonStarter.META_DATA);
+			return new Node(endpointAfterChange, "P", "A");
 		});
 	}
 	

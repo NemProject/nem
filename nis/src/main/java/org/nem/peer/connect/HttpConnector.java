@@ -37,9 +37,9 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//region PeerConnector
 
 	@Override
-	public CompletableFuture<NisNodeInfo> getInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_INFO);
-		return this.getAsync(url).getFuture().thenApply(NisNodeInfo::new);
+		return this.getAsync(url).getFuture().thenApply(Node::new);
 	}
 
 	@Override
