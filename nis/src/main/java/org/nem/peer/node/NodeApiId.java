@@ -4,15 +4,51 @@ package org.nem.peer.node;
  * IDs of node-related APIs.
  */
 public enum NodeApiId {
+
+	//region block/*
+
+	/**
+	 * The block/at API.
+	 */
+	REST_BLOCK_AT,
+
+	//endregion
+
+	//region chain/*
+
+	/**
+	 * The chain/blocks-after API.
+	 */
+	REST_CHAIN_BLOCKS_AFTER,
+
+	/**
+	 * The chain/hashes-from API
+	 */
+	REST_CHAIN_HASHES_FROM,
+
+	/**
+	 * The chain/last-block API.
+	 */
+	REST_CHAIN_LAST_BLOCK,
+
+	//endregion
+
+	//region node/*
+
+	/**
+	 * The node/cysm API.
+	 */
+	REST_NODE_CAN_YOU_SEE_ME,
+
+	/**
+	 * The node/extended-info API.
+	 */
+	REST_NODE_EXTENDED_INFO,
+
 	/**
 	 * The node/info API.
 	 */
 	REST_NODE_INFO,
-
-	/**
-	 * The node/ping API.
-	 */
-	REST_NODE_PING,
 
 	/**
 	 * The node/peer-list API.
@@ -20,37 +56,23 @@ public enum NodeApiId {
 	REST_NODE_PEER_LIST,
 
 	/**
-	 * Transaction announcement.
+	 * The node/ping API.
 	 */
-	REST_PUSH_TRANSACTION,
+	REST_NODE_PING,
+
+	//endregion
+
+	//region push/*
 
 	/**
-	 * Block announcement.
+	 * The push/block API.
 	 */
 	REST_PUSH_BLOCK,
 
 	/**
-	 * The chain API - last block.
+	 * The push/transaction API.
 	 */
-	REST_CHAIN_LAST_BLOCK,
+	REST_PUSH_TRANSACTION,
 
-	/**
-	 * The chain API - block at height
-	 */
-	REST_CHAIN_BLOCK_AT,
-
-	/**
-	 * get blocks after
-	 */
-	REST_CHAIN_BLOCKS_AFTER,
-
-	/**
-	 * get hashes of blocks after given height
-	 */
-	REST_CHAIN_HASHES_FROM,
-	
-	/**
-	 * get the node information from requester
-	 */
-	REST_CAN_YOU_SEE_ME,
+	//endregion
 }

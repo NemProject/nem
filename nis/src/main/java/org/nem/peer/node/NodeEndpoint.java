@@ -94,16 +94,17 @@ public class NodeEndpoint implements SerializableEntity {
 	private Dictionary<NodeApiId, URL> createUrlMap() {
 		try {
 			Dictionary<NodeApiId, URL> nodeApiToUrlMap = new Hashtable<>();
-			nodeApiToUrlMap.put(NodeApiId.REST_NODE_INFO, new URL(this.url, "node/info"));
-			nodeApiToUrlMap.put(NodeApiId.REST_NODE_PING, new URL(this.url, "node/ping"));
-			nodeApiToUrlMap.put(NodeApiId.REST_NODE_PEER_LIST, new URL(this.url, "node/peer-list"));
-			nodeApiToUrlMap.put(NodeApiId.REST_CAN_YOU_SEE_ME, new URL(this.url, "node/cysm"));
-			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
-			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
-			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, new URL(this.url, "chain/last-block"));
+			nodeApiToUrlMap.put(NodeApiId.REST_BLOCK_AT, new URL(this.url, "block/at"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, new URL(this.url, "chain/blocks-after"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, new URL(this.url, "chain/hashes-from"));
-			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_BLOCK_AT, new URL(this.url, "block/at"));
+			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, new URL(this.url, "chain/last-block"));
+			nodeApiToUrlMap.put(NodeApiId.REST_NODE_CAN_YOU_SEE_ME, new URL(this.url, "node/cysm"));
+			nodeApiToUrlMap.put(NodeApiId.REST_NODE_EXTENDED_INFO, new URL(this.url, "node/extended-info"));
+			nodeApiToUrlMap.put(NodeApiId.REST_NODE_INFO, new URL(this.url, "node/info"));
+			nodeApiToUrlMap.put(NodeApiId.REST_NODE_PEER_LIST, new URL(this.url, "node/peer-list"));
+			nodeApiToUrlMap.put(NodeApiId.REST_NODE_PING, new URL(this.url, "node/ping"));
+			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
+			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
 			return nodeApiToUrlMap;
 
 		} catch (MalformedURLException e) {

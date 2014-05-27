@@ -50,7 +50,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	@Override
 	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CAN_YOU_SEE_ME);
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
 		return this.getAsync(url).getFuture().thenApply(NodeEndpoint::new);
 	}
 
@@ -72,7 +72,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	@Override
 	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT);
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_BLOCK_AT);
 		return BlockFactory.VERIFIABLE.deserialize(this.post(url, height));
 	}
 

@@ -32,7 +32,19 @@ public class NodeController {
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public NisNodeInfo getInfo() {
+	public Node getInfo() {
+		return this.host.getNetwork().getLocalNode();
+	}
+
+	/**
+	 * Gets extended information about the running node.
+	 *
+	 * @return Extended information about the running node.
+	 */
+	@RequestMapping(value = "/node/extended-info", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
+	public NisNodeInfo getExtendedInfo() {
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
 

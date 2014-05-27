@@ -24,21 +24,35 @@ public class NodeControllerTest {
 		final NodeController controller = new NodeController(host);
 
 		// Act:
-		final Node node = controller.getInfo().getNode();
+		final Node node = controller.getExtendedInfo().getNode();
 
 		// Assert:
 		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));
 	}
 
 	@Test
-	public void getInfoReturnsCommonStarterApplicationMetaData() {
+	public void getExtendedInfoReturnsNetworkLocalNode() {
 		// Arrange:
 		final MockPeerNetwork network = new MockPeerNetwork();
 		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
 		final NodeController controller = new NodeController(host);
 
 		// Act:
-		final ApplicationMetaData appMetaData = controller.getInfo().getAppMetaData();
+		final Node node = controller.getExtendedInfo().getNode();
+
+		// Assert:
+		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));
+	}
+
+	@Test
+	public void getExtendedInfoReturnsCommonStarterApplicationMetaData() {
+		// Arrange:
+		final MockPeerNetwork network = new MockPeerNetwork();
+		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
+		final NodeController controller = new NodeController(host);
+
+		// Act:
+		final ApplicationMetaData appMetaData = controller.getExtendedInfo().getAppMetaData();
 
 		// Assert:
 		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
