@@ -91,7 +91,7 @@ public class PeerNetwork {
 		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
 		config.getPreTrustedNodes().getNodes().stream()
 				.map(node ->
-						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint())
+						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint(), configLocalNode.getEndpoint())
 								.exceptionally(e -> null)
 								.thenAccept(endpoint -> {
 									if (null == endpoint && 0 != numOutstandingRequests.decrementAndGet())

@@ -112,17 +112,20 @@ public class NodeControllerTest {
 	public void canYouSeeMeReturnsTheRemoteAddress() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final NodeEndpoint localEndpoint = new NodeEndpoint("ftp", "localhost", 123);
 
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		Mockito.when(request.getProtocol()).thenReturn("https");
+		Mockito.when(request.getScheme()).thenReturn("https");
 		Mockito.when(request.getRemoteAddr()).thenReturn("10.0.0.123");
 		Mockito.when(request.getRemotePort()).thenReturn(97);
 
 		// Act:
-		final NodeEndpoint endpoint = context.controller.canYouSeeMe(request);
+		final NodeEndpoint endpoint = context.controller.canYouSeeMe(localEndpoint, request);
 
 		// Assert:
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 97)));
+		// (1) scheme and address come from the servlet request
+		// (2) port comes from the original local node endpoint
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 123)));
 	}
 
 	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {

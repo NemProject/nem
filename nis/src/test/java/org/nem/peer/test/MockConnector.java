@@ -26,6 +26,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private Map<String, TriggerAction> getLocalNodeInfoTriggers = new HashMap<>();
 	private NodeEndpoint getLocalNodeInfoEndpoint;
+	private NodeEndpoint lastGetLocalNodeInfoLocalEndpoint;
 
 	private String getKnownPeersErrorTrigger;
 	private TriggerAction getKnownPeersErrorTriggerAction;
@@ -123,6 +124,15 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	 */
 	public SerializableEntity getLastAnnounceEntity() {
 		return this.lastAnnounceEntity;
+	}
+
+	/**
+	 * Gets the last local endpoint passed to getLocalNodeInfo.
+	 *
+	 * @return The last local endpoint passed to getLocalNodeInfo.
+	 */
+	public NodeEndpoint getLastGetLocalNodeInfoLocalEndpoint() {
+		return this.lastGetLocalNodeInfoLocalEndpoint;
 	}
 
 	/**
@@ -237,7 +247,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint, final NodeEndpoint localEndpoint) {
 		this.numGetLocalNodeInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -245,6 +255,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 			if (null != action)
 				triggerGeneralAction(action);
 
+			this.lastGetLocalNodeInfoLocalEndpoint = localEndpoint;
 			return this.getLocalNodeInfoEndpoint;
 		});
 	}
