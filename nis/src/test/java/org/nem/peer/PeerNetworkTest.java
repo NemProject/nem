@@ -482,7 +482,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizeSyncsWithActiveNode() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(true);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(
@@ -493,7 +493,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizePartnerExperienceOnSuccess() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(true);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(1L));
@@ -504,7 +504,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizePartnerExperienceOnFailure() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(false);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.FAILURE);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -512,12 +512,23 @@ public class PeerNetworkTest {
 		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(1L));
 	}
 
+	@Test
+	public void synchronizePartnerExperienceOnNeutral() {
+		// Act:
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.NEUTRAL);
+
+		// Assert:
+		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.failedCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(0L));
+	}
+
 	private static class SynchronizeResult {
 		private Node node;
 		private NodeExperience experience;
 	}
 
-	private static SynchronizeResult synchronizeActiveNode(boolean synchronizeNodeResult) {
+	private static SynchronizeResult synchronizeActiveNode(int synchronizeNodeResult) {
 		// Arrange:
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 

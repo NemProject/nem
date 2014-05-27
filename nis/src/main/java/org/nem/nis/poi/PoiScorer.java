@@ -53,9 +53,9 @@ public class PoiScorer {
 			final ScoringAlg scoringAlg) {
 
 		//TODO: For testing use, take out when final scoring alg is decided
-		System.out.println("outlinkVector" + outlinkVector);
-		System.out.println("importanceVector" + importanceVector);
-		System.out.println("vestedBalanceVector" + vestedBalanceVector);
+//		System.out.println("outlinkVector" + outlinkVector);
+//		System.out.println("importanceVector" + importanceVector);
+//		System.out.println("vestedBalanceVector" + vestedBalanceVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,

@@ -134,12 +134,12 @@ public class AsyncTimer implements Closeable {
 	}
 
 	private void log(final String message) {
-		LOGGER.info(String.format(
-				"[%d] Timer %s: %s (%d)",
-				Thread.currentThread().getId(),
-				this.getName(),
-				message,
-				this.numExecutions));
+//		LOGGER.info(String.format(
+//				"[%d] Timer %s: %s (%d)",
+//				Thread.currentThread().getId(),
+//				this.getName(),
+//				message,
+//				this.numExecutions));
 	}
 
 	private static class SleepRunnable implements Runnable {

@@ -13,7 +13,7 @@ public interface BlockSynchronizer {
 	 *
 	 * @param connector The connector pool.
 	 * @param node The other node.
-	 * @return true if the sync succeeded; false if there was a fatal error.
+	 * @return the node experience code.
 	 */
-	public boolean synchronizeNode(final SyncConnectorPool connector, final Node node);
+	public int synchronizeNode(final SyncConnectorPool connector, final Node node);
 }

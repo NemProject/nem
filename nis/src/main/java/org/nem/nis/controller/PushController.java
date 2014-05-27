@@ -55,13 +55,18 @@ public class PushController {
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 
 		// transaction timestamp is checked inside processTransaction
-		if (!transaction.isValid() || !transaction.verify())
+		if (!transaction.isValid() || !transaction.verify()) {
+			// Bad experience with the sending node.
+			
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
+		}
 
 		final PeerNetwork network = this.host.getNetwork();
 
 		// add to unconfirmed transactions
 		if (this.foraging.processTransaction(transaction)) {
+			// Good experience with the sending node.
+
 			// propagate transactions
 			// this returns immediately, so that client who
 			// actually has sent /transfer/announce won't wait for this...
@@ -78,11 +83,16 @@ public class PushController {
 		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 
-		if (!block.verify())
+		if (!block.verify()) {
+			// Bad experience with the sending node.
+			
 			throw new IllegalArgumentException("block must be verifiable");
+		}
 
 		// validate block and broadcast (async)
 		if (this.blockChain.processBlock(block)) {
+			// Good experience with the sending node.
+			
 			this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
 		}
 	}
