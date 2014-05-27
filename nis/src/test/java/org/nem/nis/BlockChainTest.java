@@ -2,9 +2,10 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
+import org.nem.core.model.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
@@ -17,6 +18,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.poi.PoiImportanceGenerator;
+import org.nem.nis.poi.PoiScorer.ScoringAlg;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
@@ -40,7 +42,6 @@ public class BlockChainTest {
 	private static org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
 	private static org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
-
 
 	final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
@@ -106,6 +107,7 @@ public class BlockChainTest {
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
 		a.incrementBalance(Amount.fromNem(1_000));
+		a.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 		temp = accountAnalyzer.addAccountToCache(a.getAddress());
 		temp.incrementBalance(Amount.fromNem(1_000));
 		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
@@ -121,7 +123,18 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
+		// BR: The mockito.mock version doesn't seems to work
+		//     Why use mock if we can supply a dummy ourself?
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiImportanceGenerator() {
+			
+			@Override
+			public ColumnVector getAccountImportances(BlockHeight blockHeight,
+					Collection<Account> accounts, ScoringAlg scoringAlg) {
+				ColumnVector importances = new ColumnVector(accounts.size());
+				importances.setAll(1.0/accounts.size());
+				return importances;
+			}
+		});
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
 		final Account signer = accounts.get(0);
 
