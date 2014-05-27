@@ -91,7 +91,7 @@ public class PeerNetwork {
 		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
 		config.getPreTrustedNodes().getNodes().stream()
 				.map(node ->
-						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint())
+						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint(), configLocalNode.getEndpoint())
 								.exceptionally(e -> null)
 								.thenAccept(endpoint -> {
 									if (null == endpoint && 0 != numOutstandingRequests.decrementAndGet())
@@ -209,18 +209,31 @@ public class PeerNetwork {
 	public void synchronize() {
 		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
 		if (null == partnerNodePair) {
-			LOGGER.warning("no suitable peers found to sync with");
+			//LOGGER.warning("no suitable peers found to sync with");
+			System.out.println("no suitable peers found to sync with");
 			return;
 		}
 
 		final Node partnerNode = partnerNodePair.getNode();
-		LOGGER.info("synchronizing with: " + partnerNode);
-		boolean isSyncSuccess = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
-		this.updateExperience(partnerNodePair.getExperience(), isSyncSuccess);
+		//LOGGER.info("synchronizing with: " + partnerNode);
+		System.out.println("synchronizing with: " + partnerNode);
+		int code = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
+		this.updateExperience(partnerNodePair.getNode(), code);
 	}
-
-	private void updateExperience(final NodeExperience experience, boolean isSyncSuccess) {
-		(isSyncSuccess ? experience.successfulCalls() : experience.failedCalls()).increment();
+	
+	public void updateExperience(final Node node, int code) {
+		if (code == NodeExperience.Code.NEUTRAL) {
+			return;
+		}
+		System.out.print("Updating experience with " + node + ": ");
+		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
+		if (code == NodeExperience.Code.SUCCESS) {
+			System.out.println("success");
+			experience.successfulCalls().increment();
+		} else if (code == NodeExperience.Code.FAILURE) {
+			System.out.println("failure");
+			experience.failedCalls().increment();
+		}
 	}
 
 	private static class NodeRefresher {

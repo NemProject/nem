@@ -49,13 +49,18 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CAN_YOU_SEE_ME);
-		return this.getAsync(url).getFuture().thenApply(NodeEndpoint::new);
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(
+			final NodeEndpoint endpoint,
+			final NodeEndpoint localEndpoint) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
+		return this.post(url, localEndpoint).getFuture().thenApply(NodeEndpoint::new);
 	}
 
 	@Override
-	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+	public CompletableFuture announce(
+			final NodeEndpoint endpoint,
+			final NodeApiId announceId,
+			final SerializableEntity entity) {
 		final URL url = endpoint.getApiUrl(announceId);
 		return this.postVoidAsync(url, entity).getFuture();
 	}
@@ -72,21 +77,21 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	@Override
 	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCK_AT);
-		return BlockFactory.VERIFIABLE.deserialize(this.post(url, height));
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_BLOCK_AT);
+		return BlockFactory.VERIFIABLE.deserialize(this.post(url, height).get());
 	}
 
 	@Override
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
-		final Deserializer deserializer = this.post(url, height);
+		final Deserializer deserializer = this.post(url, height).get();
 		return deserializer.readObjectArray("data", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
 	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		return new HashChain(this.post(url, height));
+		return new HashChain(this.post(url, height).get());
 	}
 
 	//endregion
@@ -99,8 +104,8 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 		return this.httpMethodClient.get(url, this.responseStrategy);
 	}
 
-	private Deserializer post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy).get();
+	private HttpMethodClient.AsyncToken<Deserializer> post(final URL url, final SerializableEntity entity) {
+		return this.httpMethodClient.post(url, entity, this.responseStrategy);
 	}
 
 	private HttpMethodClient.AsyncToken<Deserializer> postVoidAsync(final URL url, final SerializableEntity entity) {

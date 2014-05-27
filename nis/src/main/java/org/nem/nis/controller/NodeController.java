@@ -32,7 +32,19 @@ public class NodeController {
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public NisNodeInfo getInfo() {
+	public Node getInfo() {
+		return this.host.getNetwork().getLocalNode();
+	}
+
+	/**
+	 * Gets extended information about the running node.
+	 *
+	 * @return Extended information about the running node.
+	 */
+	@RequestMapping(value = "/node/extended-info", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
+	public NisNodeInfo getExtendedInfo() {
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
 
@@ -67,26 +79,21 @@ public class NodeController {
 
 	/**
 	 * Just return the Node info the requester "Can You See Me" using the IP
-	 * address from the request. If the port is not the default NIS port where
-	 * the requesting node is listening it has to be passed as parameter
-	 * "myNisPort"
+	 * address from the request.
+	 *
+	 * @param localEndpoint The local endpoint (what the local node knows about itself).
+	 * @param request The http servlet request.
 	 */
-	@RequestMapping(value = "/node/cysm", method = RequestMethod.GET)
+	@RequestMapping(value = "/node/cysm", method = RequestMethod.POST)
 	@P2PApi
-	public NodeEndpoint canYouSeeMe(final HttpServletRequest request) {
-		String portStr = request.getParameter("myNisPort");
-		int portNr = 7890;
-		if (portStr != null) {
-			try {
-				portNr = Integer.parseInt(portStr);
-			} catch (NumberFormatException nfe) {
-				// we stick with the default for NIS
-			}
-		}
-		return new NodeEndpoint(request.getScheme(), request.getRemoteAddr(),
-		// remote port is never the
-		// port on which node is listening
-		// Maybe it has to be passed by the request get
-				portNr);
+	public NodeEndpoint canYouSeeMe(
+			@RequestBody final NodeEndpoint localEndpoint,
+			final HttpServletRequest request) {
+		// request.getRemotePort() is never the port on which the node is listening,
+		// so let the client specify its desired port
+		return new NodeEndpoint(
+				request.getScheme(),
+				request.getRemoteAddr(),
+				localEndpoint.getBaseUrl().getPort());
 	}
 }

@@ -482,7 +482,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizeSyncsWithActiveNode() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(true);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(
@@ -493,7 +493,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizePartnerExperienceOnSuccess() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(true);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(1L));
@@ -504,7 +504,7 @@ public class PeerNetworkTest {
 	@Test
 	public void synchronizePartnerExperienceOnFailure() {
 		// Act:
-		final SynchronizeResult result = synchronizeActiveNode(false);
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.FAILURE);
 
 		// Assert:
 		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -512,12 +512,23 @@ public class PeerNetworkTest {
 		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(1L));
 	}
 
+	@Test
+	public void synchronizePartnerExperienceOnNeutral() {
+		// Act:
+		final SynchronizeResult result = synchronizeActiveNode(NodeExperience.Code.NEUTRAL);
+
+		// Assert:
+		Assert.assertThat(result.experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.failedCalls().get(), IsEqual.equalTo(0L));
+		Assert.assertThat(result.experience.totalCalls(), IsEqual.equalTo(0L));
+	}
+
 	private static class SynchronizeResult {
 		private Node node;
 		private NodeExperience experience;
 	}
 
-	private static SynchronizeResult synchronizeActiveNode(boolean synchronizeNodeResult) {
+	private static SynchronizeResult synchronizeActiveNode(int synchronizeNodeResult) {
 		// Arrange:
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 
@@ -667,19 +678,32 @@ public class PeerNetworkTest {
 	//region createWithVerificationOfLocalNode
 
 	@Test
-	public void createWithVerificationOfLocalNodeCallsGetYourNodeForAllActiveNodes() throws Exception {
+	public void createWithVerificationOfLocalNodeCallsGetLocalNodeInfoForAllActiveNodes() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 
 		// Act:
-		createPeerNetworkWithVerificationOfLocalNode(connector);
+		createPeerNetworkWithVerificationOfLocalNode(connector).join();
 
 		// Assert:
 		Assert.assertThat(connector.getNumGetLocalNodeInfoCalls(), IsEqual.equalTo(3));
 	}
 
 	@Test
-	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfNoCallSucceeds () throws Exception {
+	public void createWithVerificationOfLocalNodePassesConfigEndpointToGetLocalNodeInfo() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+
+		// Act:
+		createPeerNetworkWithVerificationOfLocalNode(connector).join();
+		final NodeEndpoint lastLocalEndpoint = connector.getLastGetLocalNodeInfoLocalEndpoint();
+
+		// Assert:
+		assertNodeEndpointIsConfigLocalNodeEndpoint(lastLocalEndpoint);
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfNoCallSucceeds() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		connector.setGetLocalNodeInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
@@ -687,34 +711,26 @@ public class PeerNetworkTest {
 		connector.setGetLocalNodeInfoError("10.0.0.3", MockConnector.TriggerAction.INACTIVE);
 
 		// Act:
-		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).join();
 
 		// Assert:
-		final Node localNode = network.getLocalNode();
-		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
-		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
-		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+		assertNodeIsConfigLocalNode(network.getLocalNode());
 	}
 
 	@Test
-	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfAllCallsReturnNull () throws Exception {
+	public void createWithVerificationOfLocalNodeUsesConfigEndpointIfAllCallsReturnNull()  {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 
 		// Act:
-		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).join();
 
 		// Assert:
-		final Node localNode = network.getLocalNode();
-		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
-		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
-		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+		assertNodeIsConfigLocalNode(network.getLocalNode());
 	}
 
 	@Test
-	public void createWithVerificationOfLocalNodeUsesReportedEndpointIfAtLeastOneCallSucceeds() throws Exception {
+	public void createWithVerificationOfLocalNodeUsesReportedEndpointIfAtLeastOneCallSucceeds() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		connector.setGetLocalNodeInfoError("10.0.0.1", MockConnector.TriggerAction.FATAL);
@@ -722,7 +738,7 @@ public class PeerNetworkTest {
 		connector.setGetLocalNodeInfoEndpoint(new NodeEndpoint("http", "10.0.0.25", 8990)) ;
 
 		// Act:
-		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).get();
+		final PeerNetwork network = createPeerNetworkWithVerificationOfLocalNode(connector).join();
 
 		// Assert:
 		final Node localNode = network.getLocalNode();
@@ -733,7 +749,7 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void createWithVerificationOfLocalNodeIsAsync() throws Exception {
+	public void createWithVerificationOfLocalNodeIsAsync() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 
@@ -742,6 +758,19 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Assert.assertThat(networkCompletable.isDone(), IsEqual.equalTo(false));
+	}
+
+	private void assertNodeEndpointIsConfigLocalNodeEndpoint(final NodeEndpoint endpoint) {
+		// Assert:
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
+	}
+
+	private void assertNodeIsConfigLocalNode(final Node node) {
+		// Assert:
+		assertNodeEndpointIsConfigLocalNodeEndpoint(node.getEndpoint());
+		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
 	public static CompletableFuture<PeerNetwork> createPeerNetworkWithVerificationOfLocalNode(final PeerConnector connector) {

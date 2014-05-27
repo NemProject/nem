@@ -4,6 +4,7 @@ import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.deploy.CommonStarter;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 
@@ -26,6 +27,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private Map<String, TriggerAction> getLocalNodeInfoTriggers = new HashMap<>();
 	private NodeEndpoint getLocalNodeInfoEndpoint;
+	private NodeEndpoint lastGetLocalNodeInfoLocalEndpoint;
 
 	private String getKnownPeersErrorTrigger;
 	private TriggerAction getKnownPeersErrorTriggerAction;
@@ -126,6 +128,15 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	/**
+	 * Gets the last local endpoint passed to getLocalNodeInfo.
+	 *
+	 * @return The last local endpoint passed to getLocalNodeInfo.
+	 */
+	public NodeEndpoint getLastGetLocalNodeInfoLocalEndpoint() {
+		return this.lastGetLocalNodeInfoLocalEndpoint;
+	}
+
+	/**
 	 * Triggers a specific action in getInfo.
 	 *
 	 * @param trigger The endpoint hostname that should cause the action.
@@ -223,7 +234,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 			return new Node(endpointAfterChange, "P", "A");
 		});
 	}
-
+	
 	@Override
 	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
 		this.numGetKnownPeerCalls.incrementAndGet();
@@ -237,7 +248,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint, final NodeEndpoint localEndpoint) {
 		this.numGetLocalNodeInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -245,6 +256,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 			if (null != action)
 				triggerGeneralAction(action);
 
+			this.lastGetLocalNodeInfoLocalEndpoint = localEndpoint;
 			return this.getLocalNodeInfoEndpoint;
 		});
 	}

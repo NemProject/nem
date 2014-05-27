@@ -19,26 +19,34 @@ public class NodeControllerTest {
 	@Test
 	public void getInfoReturnsNetworkLocalNode() {
 		// Arrange:
-		final MockPeerNetwork network = new MockPeerNetwork();
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
 
 		// Act:
-		final Node node = controller.getInfo().getNode();
+		final Node node = context.controller.getExtendedInfo().getNode();
 
 		// Assert:
-		Assert.assertThat(node, IsSame.sameInstance(network.getLocalNode()));
+		Assert.assertThat(node, IsSame.sameInstance(context.network.getLocalNode()));
 	}
 
 	@Test
-	public void getInfoReturnsCommonStarterApplicationMetaData() {
+	public void getExtendedInfoReturnsNetworkLocalNode() {
 		// Arrange:
-		final MockPeerNetwork network = new MockPeerNetwork();
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
 
 		// Act:
-		final ApplicationMetaData appMetaData = controller.getInfo().getAppMetaData();
+		final Node node = context.controller.getExtendedInfo().getNode();
+
+		// Assert:
+		Assert.assertThat(node, IsSame.sameInstance(context.network.getLocalNode()));
+	}
+
+	@Test
+	public void getExtendedInfoReturnsCommonStarterApplicationMetaData() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final ApplicationMetaData appMetaData = context.controller.getExtendedInfo().getAppMetaData();
 
 		// Assert:
 		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
@@ -47,44 +55,38 @@ public class NodeControllerTest {
 	@Test
 	public void getPeerListReturnsNetworkNodes() {
 		// Arrange:
-		final MockPeerNetwork network = new MockPeerNetwork();
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
 
 		// Act:
-		final NodeCollection nodes = controller.getPeerList();
+		final NodeCollection nodes = context.controller.getPeerList();
 
 		// Assert:
-		Assert.assertThat(nodes, IsSame.sameInstance(network.getNodes()));
+		Assert.assertThat(nodes, IsSame.sameInstance(context.network.getNodes()));
 	}
 
 	@Test
 	public void pingActivatesSourceNode() {
 		// Arrange:
-		final MockPeerNetwork network = new MockPeerNetwork();
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
+		final NodeCollection nodes = context.network.getNodes();
 
 		final Node sourceNode = Utils.createNodeWithPort(111);
 		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
 
 		// Arrange: sanity
-		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));
+		Assert.assertThat(nodes.getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));
 
 		// Act:
-		controller.ping(pair);
+		context.controller.ping(pair);
 
 		// Assert:
-		Assert.assertThat(network.getNodes().getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
 	public void pingSetsSourceNodeExperiences() {
 		// Arrange:
-		final NodeExperiences nodeExperiences = new NodeExperiences();
-		final MockPeerNetwork network = new MockPeerNetwork(nodeExperiences);
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
 
 		final Node sourceNode = Utils.createNodeWithPort(111);
 		final Node partnerNode = Utils.createNodeWithPort(222);
@@ -94,14 +96,14 @@ public class NodeControllerTest {
 
 		// Arrange: sanity
 		Assert.assertThat(
-				nodeExperiences.getNodeExperience(sourceNode, partnerNode).successfulCalls().get(),
+				context.nodeExperiences.getNodeExperience(sourceNode, partnerNode).successfulCalls().get(),
 				IsEqual.equalTo(0L));
 
 		// Act:
-		controller.ping(pair);
+		context.controller.ping(pair);
 
 		// Assert:
-		final NodeExperience experience = nodeExperiences.getNodeExperience(sourceNode, partnerNode);
+		final NodeExperience experience = context.nodeExperiences.getNodeExperience(sourceNode, partnerNode);
 		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(12L));
 		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(34L));
 	}
@@ -109,20 +111,21 @@ public class NodeControllerTest {
 	@Test
 	public void canYouSeeMeReturnsTheRemoteAddress() {
 		// Arrange:
-		final MockPeerNetwork network = new MockPeerNetwork();
-		final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(network);
-		final NodeController controller = new NodeController(host);
+		final TestContext context = new TestContext();
+		final NodeEndpoint localEndpoint = new NodeEndpoint("ftp", "localhost", 123);
 
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		Mockito.when(request.getProtocol()).thenReturn("https");
+		Mockito.when(request.getScheme()).thenReturn("https");
 		Mockito.when(request.getRemoteAddr()).thenReturn("10.0.0.123");
 		Mockito.when(request.getRemotePort()).thenReturn(97);
 
 		// Act:
-		final NodeEndpoint endpoint = controller.canYouSeeMe(request);
+		final NodeEndpoint endpoint = context.controller.canYouSeeMe(localEndpoint, request);
 
 		// Assert:
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 97)));
+		// (1) scheme and address come from the servlet request
+		// (2) port comes from the original local node endpoint
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 123)));
 	}
 
 	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {
@@ -132,18 +135,17 @@ public class NodeControllerTest {
 		return experience;
 	}
 
-	/**
-	 * Mock NisPeerNetworkHost implementation.
-	 */
+	private static class TestContext {
+		private final NodeExperiences nodeExperiences = new NodeExperiences();
+		private final MockPeerNetwork network = new MockPeerNetwork(this.nodeExperiences);
+		private final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(this.network);
+		private final NodeController controller = new NodeController(this.host);
+	}
+
 	private static class MockNisPeerNetworkHost extends NisPeerNetworkHost {
 
 		private final PeerNetwork peerNetwork;
 
-		/**
-		 * Creates a mock NIS peer network host.
-		 *
-		 * @param peerNetwork The peer network to host.
-		 */
 		public MockNisPeerNetworkHost(final PeerNetwork peerNetwork) {
 			super(null, null);
 			this.peerNetwork = peerNetwork;

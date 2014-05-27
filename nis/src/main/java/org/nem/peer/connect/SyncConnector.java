@@ -21,7 +21,7 @@ public interface SyncConnector {
 	/**
 	 * Requests information about the block at the specified height from the specified node.
 	 *
-	 * @param endpoint The endpoint.
+	 * @param endpoint The remote endpoint.
 	 * @param height The block height.
 	 * @return The block at the specified height
 	 */
@@ -31,7 +31,7 @@ public interface SyncConnector {
 	 * Requests information about the hashes of all blocks in the chain after the specified height
 	 * from the specified node.
 	 *
-	 * @param endpoint The endpoint.
+	 * @param endpoint The remote endpoint.
 	 * @param height The block height
 	 * @return The hashes of all blocks in the chain after the specified height.
 	 */
@@ -41,7 +41,7 @@ public interface SyncConnector {
 	 * Requests information about all blocks in the chain after the specified height
 	 * from the specified node.
 	 *
-	 * @param endpoint The endpoint.
+	 * @param endpoint The remote endpoint.
 	 * @param height The block height.
 	 * @return All blocks in the chain after the specified height.
 	 */

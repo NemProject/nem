@@ -15,6 +15,7 @@ import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
+import org.nem.peer.trust.score.NodeExperience;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -77,12 +78,11 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param node The other node.
 	 */
 	@Override
-	public boolean synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public int synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
-			this.synchronizeNodeInternal(connectorPool, node);
-			return true;
+			return this.synchronizeNodeInternal(connectorPool, node);
 		} catch (InactivePeerException | FatalPeerException ex) {
-			return false;
+			return NodeExperience.Code.FAILURE;
 		}
 	}
 
@@ -101,13 +101,17 @@ public class BlockChain implements BlockSynchronizer {
 		return result;
 	}
 
-	private void synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
+	private int synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
+		final BlockChainSyncContext context = this.createSyncContext();
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer);
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			return;
+			if (result.getCode() == ComparisonResult.Code.REMOTE_IS_SYNCED ||
+				result.getCode() == ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND) {
+				return NodeExperience.Code.NEUTRAL;
+			}
+			return NodeExperience.Code.FAILURE;
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -123,7 +127,11 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent());
+		 if (!context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent())) {
+			 return NodeExperience.Code.FAILURE;
+		 }
+		 
+		 return NodeExperience.Code.SUCCESS;
 	}
 
 	/**
@@ -166,7 +174,7 @@ public class BlockChain implements BlockSynchronizer {
 //			return false;
 //		}
 
-		final BlockChainSyncContext context = this.createSyncContext(this.accountAnalyzer.copy(), this.accountAnalyzer);
+		final BlockChainSyncContext context = this.createSyncContext();
 
 		// EVIL hack, see issue#70
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
@@ -188,8 +196,12 @@ public class BlockChain implements BlockSynchronizer {
 		return context.updateOurChain(this.foraging, parent, peerChain, ourScore, hasOwnChain);
 	}
 
-	private BlockChainSyncContext createSyncContext(final AccountAnalyzer accountAnalyzer, AccountAnalyzer originalAnalyzer) {
-		return new BlockChainSyncContext(accountAnalyzer, originalAnalyzer, this.blockChainLastBlockLayer, this.blockDao);
+	private BlockChainSyncContext createSyncContext() {
+		return new BlockChainSyncContext(
+				this.accountAnalyzer.copy(),
+				this.accountAnalyzer,
+				this.blockChainLastBlockLayer,
+				this.blockDao);
 	}
 
 	//region BlockChainSyncContext
@@ -335,7 +347,9 @@ public class BlockChain implements BlockSynchronizer {
 			if (peerScore < this.ourScore) {
 				// we could get peer's score upfront, if it mismatches with
 				// what we calculated, we could penalize peer.
-				return false;
+				// BR: this is not evil. To indicate this, return true (although nothing was updated)
+				// TODO: is that ok?
+				return true;
 			}
 
 			this.updateOurChain();
