@@ -150,16 +150,15 @@ public class Foraging  {
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
 
-					//LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
+					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
 
 					final BigInteger hit = blockScorer.calculateHit(newBlock);
-					System.out.println("   hit: 0x" + hit.toString(16));
+					LOGGER.info("   hit: 0x" + hit.toString(16));
 					final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
-					System.out.println("target: 0x" + target.toString(16));
+					LOGGER.info("target: 0x" + target.toString(16));
 
 					if (hit.compareTo(target) < 0) {
-						System.out.println(" HIT ");
-						System.out.println("last block: " + dbLastBlock.getShortId());
+						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());
 
 						final long score = blockScorer.calculateBlockScore(lastBlock, newBlock);
 						if (score > bestScore) {

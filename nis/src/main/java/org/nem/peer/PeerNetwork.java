@@ -209,14 +209,12 @@ public class PeerNetwork {
 	public void synchronize() {
 		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
 		if (null == partnerNodePair) {
-			//LOGGER.warning("no suitable peers found to sync with");
-			System.out.println("no suitable peers found to sync with");
+			LOGGER.warning("no suitable peers found to sync with");
 			return;
 		}
 
 		final Node partnerNode = partnerNodePair.getNode();
-		//LOGGER.info("synchronizing with: " + partnerNode);
-		System.out.println("synchronizing with: " + partnerNode);
+		LOGGER.info("synchronizing with: " + partnerNode);
 		int code = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
 		this.updateExperience(partnerNodePair.getNode(), code);
 	}
@@ -225,13 +223,14 @@ public class PeerNetwork {
 		if (code == NodeExperience.Code.NEUTRAL) {
 			return;
 		}
+
 		System.out.print("Updating experience with " + node + ": ");
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
 		if (code == NodeExperience.Code.SUCCESS) {
-			System.out.println("success");
+			LOGGER.info("Updating experience with " + node + ": success");
 			experience.successfulCalls().increment();
 		} else if (code == NodeExperience.Code.FAILURE) {
-			System.out.println("failure");
+			LOGGER.info("Updating experience with " + node + ": failure");
 			experience.failedCalls().increment();
 		}
 	}

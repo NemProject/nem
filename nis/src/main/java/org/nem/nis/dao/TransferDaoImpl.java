@@ -89,10 +89,8 @@ public class TransferDaoImpl implements TransferDao {
 					i = 0;
 				}
 			}
-			System.out.println("saving...");
-			tx.commit();
-			System.out.println("done...");
 
+			tx.commit();
 		} catch (RuntimeException e) {
 			if (tx != null) tx.rollback();
 			e.printStackTrace();
