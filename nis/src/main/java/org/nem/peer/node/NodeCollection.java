@@ -2,6 +2,8 @@ package org.nem.peer.node;
 
 import org.nem.core.serialization.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,6 +69,27 @@ public class NodeCollection implements SerializableEntity {
 		allNodes.addAll(this.getActiveNodes());
 		allNodes.addAll(this.getInactiveNodes());
 		return allNodes;
+	}
+
+	/**
+	 * Gets a node with a given ip.
+	 *
+	 * @return The nodes or null if not found.
+	 */
+	public Node getNode(String remoteAddress) {
+		// TODO : public available constants for http and 7890?
+		NodeEndpoint endpoint = new NodeEndpoint("http", remoteAddress, 7890);
+		for (Node node : this.activeNodes) {
+			if (node.getEndpoint().equals(endpoint)) {
+				return node;
+			}
+		}
+		for (Node node : this.inactiveNodes) {
+			if (node.getEndpoint().equals(endpoint)) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 	/**

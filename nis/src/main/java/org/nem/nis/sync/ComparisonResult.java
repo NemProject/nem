@@ -24,7 +24,7 @@ public class ComparisonResult {
 		public static final int UNKNOWN = 0;
 
 		/**
-		 * The remote node has not blocks.
+		 * The remote node has no blocks.
 		 */
 		public static final int REMOTE_HAS_NO_BLOCKS = 1;
 

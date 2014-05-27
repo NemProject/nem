@@ -4,6 +4,7 @@ import org.nem.core.connect.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.deploy.CommonStarter;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 
@@ -214,7 +215,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<NisNodeInfo> getInfo(final NodeEndpoint endpoint) {
 		this.numGetInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -230,10 +231,10 @@ public class MockConnector implements PeerConnector, SyncConnector {
 				}
 			}
 
-			return new Node(endpointAfterChange, "P", "A");
+			return new NisNodeInfo(new Node(endpointAfterChange, "P", "A"), CommonStarter.META_DATA);
 		});
 	}
-
+	
 	@Override
 	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
 		this.numGetKnownPeerCalls.incrementAndGet();
