@@ -65,15 +65,11 @@ public class BlockChain implements BlockSynchronizer {
 
 		// make a full-blown analysis
 		// TODO: we can call it thanks to the "hack" inside processBlock
-		if (block != null && this.processBlock(block)) {
+		if (block != null && this.processBlock(block) == NodeExperience.Code.SUCCESS) {
 			return block;
 		}
 
 		return null;
-	}
-
-	private void penalize(Node node) {
-		// TODO: need to do something here!
 	}
 
 	/**
@@ -133,6 +129,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
+			System.out.println("Chain inconsistent: calling undoTxesAndGetScore().");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight.getRaw());
 		}
 		//endregion
@@ -141,11 +138,7 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		 if (!context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent())) {
-			 return NodeExperience.Code.FAILURE;
-		 }
-		 
-		 return NodeExperience.Code.SUCCESS;
+		 return context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent());
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
@@ -157,9 +150,9 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @param receivedBlock - receivedBlock that's going to be processed
 	 *
-	 * @return false if receivedBlock was known or invalid, true if ok and added to db
+	 * @return Node experience code which indicates the status of the operation
 	 */
-	public boolean processBlock(Block receivedBlock) {
+	public int processBlock(Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
@@ -169,13 +162,15 @@ public class BlockChain implements BlockSynchronizer {
 		// to us, so we can add quite strict rule here
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
-			return false;
+			// This really should not happen
+			return NodeExperience.Code.FAILURE;
 		}
 
 		// receivedBlock already seen
 		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
-				return false;
+				// This will happen frequently and is ok
+				return NodeExperience.Code.NEUTRAL;
 			}
 
 			// check if we know previous receivedBlock
@@ -184,7 +179,8 @@ public class BlockChain implements BlockSynchronizer {
 
 		// if we don't have parent, we can't do anything with this receivedBlock
 		if (parent == null) {
-			return false;
+			// We might be on a fork, don't punish remote node
+			return NodeExperience.Code.NEUTRAL;
 		}
 
 		// TODO: we should have some time limit set
@@ -272,7 +268,7 @@ public class BlockChain implements BlockSynchronizer {
 			return scoreVisitor.getScore();
 		}
 
-		public boolean updateOurChain(
+		public int updateOurChain(
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
@@ -348,32 +344,28 @@ public class BlockChain implements BlockSynchronizer {
 			this.hasOwnChain = hasOwnChain;
 		}
 
-		public boolean update() {
+		public int update() {
 
 			// do not trust peer, take first block from our db and convert it
 			if (!this.validatePeerChain()) {
-				// penalty?
-				return false;
+				return NodeExperience.Code.FAILURE;
 			}
 
 			// warning: this changes number of foraged blocks
 			long peerScore = this.getPeerChainScore();
 			if (peerScore < 0) {
-				// penalty?
-				return false;
+				return NodeExperience.Code.FAILURE;
 			}
 
 			LOGGER.info("our score: " + Long.toString(this.ourScore) + " peer's score: " + Long.toString(peerScore));
 			if (peerScore < this.ourScore) {
 				// we could get peer's score upfront, if it mismatches with
 				// what we calculated, we could penalize peer.
-				// BR: this is not evil. To indicate this, return true (although nothing was updated)
-				// TODO: is that ok?
-				return true;
+				return NodeExperience.Code.NEUTRAL;
 			}
-
 			this.updateOurChain();
-			return true;
+			
+			return NodeExperience.Code.SUCCESS;
 		}
 
 		/**

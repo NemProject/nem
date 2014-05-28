@@ -156,6 +156,7 @@ public class Foraging  {
 					System.out.println("   hit: 0x" + hit.toString(16));
 					final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
 					System.out.println("target: 0x" + target.toString(16));
+					System.out.println("difficulty: " + (difficulty.getRaw() * 100L)/BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
 					if (hit.compareTo(target) < 0) {
 						System.out.println(" HIT ");
