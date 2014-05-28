@@ -11,6 +11,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 
+import org.nem.peer.NodeInteractionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -101,18 +102,18 @@ public class Foraging  {
 	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
-	public boolean processTransaction(Transaction transaction) {
+	public NodeInteractionResult processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		//TODO: 30 seconds should probably be a constant instead of a magic number, below
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
-			return false;
+			return NodeInteractionResult.NEUTRAL;
 		}
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
-			return false;
+			return NodeInteractionResult.NEUTRAL;
 		}
 
-		return addUnconfirmedTransaction(transaction);
+		return addUnconfirmedTransaction(transaction) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.NEUTRAL;
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
@@ -156,6 +157,7 @@ public class Foraging  {
 					LOGGER.info("   hit: 0x" + hit.toString(16));
 					final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
 					LOGGER.info("target: 0x" + target.toString(16));
+					LOGGER.info("difficulty: " + (difficulty.getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
 					if (hit.compareTo(target) < 0) {
 						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());

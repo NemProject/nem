@@ -21,6 +21,8 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
 import org.nem.nis.test.MockForaging;
+import org.nem.peer.NodeInteractionResult;
+import org.nem.peer.trust.score.NodeExperience;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -151,14 +153,14 @@ public class BlockChainTest {
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));
-		boolean result = blockChain.processBlock(block);
+		NodeInteractionResult result = blockChain.processBlock(block);
 		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer);
 		TransferTransaction transaction;
 
 		// Assert:
 		// TODO: clean up all the accounts and check amount of nems
 		// TODO: add all sorts of different checks
-		Assert.assertTrue(result);
+		Assert.assertTrue(result == NodeInteractionResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);

@@ -10,6 +10,7 @@ public class Node implements SerializableEntity {
 
 	private final static int DEFAULT_VERSION = 2;
 	private final static String DEFAULT_PLATFORM = "PC";
+	private final static String DEFAULT_APPLICATION = "Unknown";
 
 	private final NodeEndpoint endpoint;
 	private final String platform;
@@ -26,7 +27,7 @@ public class Node implements SerializableEntity {
 	public Node(final NodeEndpoint endpoint, final String platform, final String application) {
 		this.endpoint = endpoint;
 		this.platform = null == platform ? DEFAULT_PLATFORM : platform;
-		this.application = application;
+		this.application = null == application ? DEFAULT_APPLICATION : application;
 		this.version = DEFAULT_VERSION;
 		this.ensureValidity();
 	}

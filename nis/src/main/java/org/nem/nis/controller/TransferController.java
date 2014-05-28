@@ -74,12 +74,12 @@ public class TransferController {
 
 		final PeerNetwork network = this.host.getNetwork();
 		// add to unconfirmed transactions
-		if (this.foraging.processTransaction(transfer)) {
+		final NodeInteractionResult status = this.foraging.processTransaction(transfer);
+		if (status == NodeInteractionResult.SUCCESS || status == NodeInteractionResult.FAILURE) {
 			// Good experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeInteractionResult.SUCCESS);
-			}
-
+			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, status);
+		}
+		if (status == NodeInteractionResult.SUCCESS) {
 			// propagate transactions
 			// this returns immediately, so that client who
 			// actually has sent /transfer/announce won't wait for this...

@@ -14,6 +14,7 @@ import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
+import org.nem.peer.NodeInteractionResult;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -64,12 +65,12 @@ public class ForagingTest {
 		tx.sign();
 
 		// Act:
-		boolean result1 = foraging.processTransaction(tx);
-		boolean result2 = foraging.processTransaction(tx);
+		final NodeInteractionResult result1 = foraging.processTransaction(tx);
+		final NodeInteractionResult result2 = foraging.processTransaction(tx);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
+		Assert.assertThat(result1, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
 		Assert.assertThat(foraging.getNumUnconfirmedTransactions(), IsEqual.equalTo(1));
 	}
 
@@ -108,11 +109,11 @@ public class ForagingTest {
 		// Act:
 		Transaction transaction = dummyTransaction(recipient, 123);
 		transaction.sign();
-		boolean result = foraging.processTransaction(transaction);
+		final NodeInteractionResult result = foraging.processTransaction(transaction);
 
 		// Assert:
 		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 	}
 
 	@Test
@@ -126,13 +127,13 @@ public class ForagingTest {
 		// Act:
 		TransferTransaction transaction = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
 
-		boolean result1 = foraging.processTransaction(transaction);
-		boolean result2 = foraging.processTransaction(transaction);
+		final NodeInteractionResult result1 = foraging.processTransaction(transaction);
+		final NodeInteractionResult result2 = foraging.processTransaction(transaction);
 
 		// Assert:
 		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
+		Assert.assertThat(result1, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
 	}
 
 	@Test
@@ -147,16 +148,16 @@ public class ForagingTest {
 		TransferTransaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now);
 		TransferTransaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(20));
 
-		boolean result1 = foraging.processTransaction(transaction1);
-		boolean result2 = foraging.processTransaction(transaction2);
+		final NodeInteractionResult result1 = foraging.processTransaction(transaction1);
+		final NodeInteractionResult result2 = foraging.processTransaction(transaction2);
 
 		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(10));
 
 		// Assert
 		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
 		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(result1, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(1));
 	}
 
@@ -175,8 +176,8 @@ public class ForagingTest {
 		final Hash transactionHash1 = HashUtils.calculateHash(transaction1);
 		final Hash transactionHash2 = HashUtils.calculateHash(transaction2);
 
-		boolean result1 = foraging.processTransaction(transaction1);
-		boolean result2 = foraging.processTransaction(transaction2);
+		final NodeInteractionResult result1 = foraging.processTransaction(transaction1);
+		final NodeInteractionResult result2 = foraging.processTransaction(transaction2);
 
 		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
 
@@ -184,8 +185,8 @@ public class ForagingTest {
 		// this indicates wrong amounts or fees
 		Assert.assertThat(transactionHash1, IsNot.not(IsEqual.equalTo(transactionHash2)));
 
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(result1, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
 		// higher fee goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));
@@ -204,14 +205,14 @@ public class ForagingTest {
 		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
 		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
 
-		boolean result1 = foraging.processTransaction(transaction1);
-		boolean result2 = foraging.processTransaction(transaction2);
+		final NodeInteractionResult result1 = foraging.processTransaction(transaction1);
+		final NodeInteractionResult result2 = foraging.processTransaction(transaction2);
 
 		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
 
 		// Assert
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
+		Assert.assertThat(result1, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(2));
 		// earlier transaction goes first
 		Assert.assertThat(transactionsList.get(0), IsEqual.equalTo(transaction2));

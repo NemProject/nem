@@ -137,6 +137,18 @@ public class PeerNetwork {
 		return this.nodes;
 	}
 
+	public Node addActiveNode(String host) {
+		// TODO: Is this check overkill?
+		Node node = this.nodes.getNode(host);
+		if (node != null) {
+			return node;
+		}
+		node = new Node(new NodeEndpoint("http", host, 7890), null, null);
+		LOGGER.info("Adding " + node + " to active nodes.");
+		this.nodes.getActiveNodes().add(node);
+		return node;
+	}
+	
 	/**
 	 * Gets the local node and information about its current experiences.
 	 *
@@ -229,8 +241,9 @@ public class PeerNetwork {
 	 * @param result The interaction result.
 	 */
 	public void updateExperience(final Node node, final NodeInteractionResult result) {
-		if (NodeInteractionResult.NEUTRAL == result)
+		if (NodeInteractionResult.NEUTRAL == result || node.equals(this.localNode)) {
 			return;
+		}
 
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
 		(NodeInteractionResult.SUCCESS == result ? experience.successfulCalls() : experience.failedCalls()).increment();

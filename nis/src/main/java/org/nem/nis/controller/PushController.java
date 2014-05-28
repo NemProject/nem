@@ -78,39 +78,38 @@ public class PushController {
 			throw new IllegalArgumentException("block must be verifiable");
 	}
 
+	@FunctionalInterface
+	private interface ImportanceAccepter<T> {
+		NodeInteractionResult test(T testedObject);
+	}
 	private <T extends VerifiableEntity> boolean pushEntity(
 			final T entity,
 			final Predicate<T> isValid,
-			final Predicate<T> isAccepted,
+			final ImportanceAccepter<T> isAccepted,
 			final NodeApiId broadcastId,
 			final HttpServletRequest request) {
 		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
 		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
 
-		// TODO: if the remote node is null, do we want to create a new node? I guess yes.
 		final PeerNetwork network = this.host.getNetwork();
 		final Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
 
 		if (!isValid.test(entity)) {
 			// Bad experience with the remote node.
-			if (null != remoteNode) {
-				network.updateExperience(remoteNode, NodeInteractionResult.FAILURE);
-			}
-
+			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, NodeInteractionResult.FAILURE);
 			return false;
 		}
 
 		// validate block and broadcast (async)
-		if (isAccepted.test(entity)) {
+		final NodeInteractionResult status = isAccepted.test(entity);
+		if (status == NodeInteractionResult.SUCCESS || status == NodeInteractionResult.FAILURE) {
 			// Good experience with the remote node.
-			if (remoteNode != null) {
-				network.updateExperience(remoteNode, NodeInteractionResult.SUCCESS);
-			}
-
+			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, status);
+		}
+		if (status == NodeInteractionResult.SUCCESS) {
 			network.broadcast(broadcastId, entity);
 		}
-
 		return true;
 	}
 }
