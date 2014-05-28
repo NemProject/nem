@@ -125,7 +125,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		long ourScore = 0L;
 		if (!result.areChainsConsistent()) {
-			System.out.println("Chain inconsistent: calling undoTxesAndGetScore().");
+			LOGGER.info("Chain inconsistent: calling undoTxesAndGetScore().");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight.getRaw());
 		}
 		//endregion
