@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
@@ -85,9 +86,10 @@ public class NisMain {
 
 		this.populateDb();
 
-		this.analyzeBlocks();
-
-		this.networkHost.boot();
+		final CompletableFuture analyzeBlocksFuture = CompletableFuture.runAsync(this::analyzeBlocks);
+		final CompletableFuture networkHostBootFuture = this.networkHost.boot();
+		final CompletableFuture allFutures = CompletableFuture.allOf(analyzeBlocksFuture, networkHostBootFuture);
+		allFutures.join();
 	}
 
 	private static void logGenesisInformation() {
