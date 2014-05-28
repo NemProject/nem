@@ -21,7 +21,7 @@ public class NisMain {
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
-	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
+	private static Block GENESIS_BLOCK = GenesisBlock.create();
 	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
 
 	@Autowired

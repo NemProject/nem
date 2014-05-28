@@ -752,6 +752,7 @@ public class PeerNetworkTest {
 	public void createWithVerificationOfLocalNodeIsAsync() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
+		connector.setGetLocalNodeInfoError("10.0.0.1", MockConnector.TriggerAction.SLEEP_INACTIVE);
 
 		// Act:
 		final CompletableFuture<PeerNetwork> networkCompletable = createPeerNetworkWithVerificationOfLocalNode(connector);
