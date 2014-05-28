@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.KeyPair;
@@ -21,7 +22,7 @@ public class NisMain {
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
-	private static Block GENESIS_BLOCK = new GenesisBlock(TIME_PROVIDER.getEpochTime());
+	private static Block GENESIS_BLOCK = GenesisBlock.create();
 	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
 
 	@Autowired
@@ -44,12 +45,11 @@ public class NisMain {
 
 	private void analyzeBlocks() {
 		Long curBlockId;
-		System.out.println("starting analysis...");
+		LOGGER.info("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
 		LOGGER.info("hex: " + HexEncoder.getString(dbBlock.getGenerationHash().getRaw()));
-		if (null == dbBlock ||
-				! dbBlock.getGenerationHash().equals(new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8")))) {
+		if (!dbBlock.getGenerationHash().equals(new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8")))) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}
@@ -86,9 +86,10 @@ public class NisMain {
 
 		this.populateDb();
 
-		this.analyzeBlocks();
-
-		this.networkHost.boot();
+		final CompletableFuture analyzeBlocksFuture = CompletableFuture.runAsync(this::analyzeBlocks);
+		final CompletableFuture networkHostBootFuture = this.networkHost.boot();
+		final CompletableFuture allFutures = CompletableFuture.allOf(analyzeBlocksFuture, networkHostBootFuture);
+		allFutures.join();
 	}
 
 	private static void logGenesisInformation() {

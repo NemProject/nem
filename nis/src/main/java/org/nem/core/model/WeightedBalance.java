@@ -112,9 +112,10 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	private BigInteger scaleUnvestedAmount(final Amount amount) {
-		if (this.balance.getNumMicroNem() == 0) {
+		if (this.balance.equals(Amount.ZERO)) {
 			return BigInteger.valueOf(amount.getNumMicroNem());
 		}
+
 		final BigInteger sum = this.vestedBalance.add(this.unvestedBalance);
 		final BigInteger balance = BigInteger.valueOf(this.balance.getNumMicroNem());
 		return sum.multiply(BigInteger.valueOf(amount.getNumMicroNem())).divide(balance);

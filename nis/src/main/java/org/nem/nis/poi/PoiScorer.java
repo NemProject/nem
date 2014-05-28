@@ -3,11 +3,14 @@ package org.nem.nis.poi;
 import org.nem.core.math.ColumnVector;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Helper class that contains functions for calculating POI scores
  */
 public class PoiScorer {
+
+	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
 	public enum ScoringAlg {
 		BLOODYROOKIEOLD,
@@ -53,9 +56,9 @@ public class PoiScorer {
 			final ScoringAlg scoringAlg) {
 
 		//TODO: For testing use, take out when final scoring alg is decided
-//		System.out.println("outlinkVector" + outlinkVector);
-//		System.out.println("importanceVector" + importanceVector);
-//		System.out.println("vestedBalanceVector" + vestedBalanceVector);
+		LOGGER.finer("outlinkVector" + outlinkVector);
+		LOGGER.finer("importanceVector" + importanceVector);
+		LOGGER.finer("vestedBalanceVector" + vestedBalanceVector);
 
 		final ColumnVector finalScoreVector = calculateNonNormalizedScoreVector(
 				importanceVector,

@@ -222,14 +222,14 @@ public class WeightedBalanceTest {
 
 		// Act / Assert:
 		balance = balance.next();
-		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(110_700_000)));
+		assertWeightedBalance(balance, 2880, Amount.fromMicroNem(12_300_000), Amount.fromMicroNem(110_700_000));
 
 		balance = balance.next();
-		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(99_630_000)));
+		assertWeightedBalance(balance, 4320, Amount.fromMicroNem(23_370_000), Amount.fromMicroNem(99_630_000));
 
-		// TODO: why is receive increasing vested balance?
+		// Assert: receive does not change vested balance
 		balance.receive(Amount.fromNem(345));
-		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(444_630_000)));
+		assertWeightedBalance(balance, 4320, Amount.fromMicroNem(23_370_000), Amount.fromMicroNem(444_630_000));
 	}
 
 	private static WeightedBalance advanceDays(WeightedBalance weightedBalance, int numDays) {

@@ -76,9 +76,9 @@ public class BlockScorer {
 		final long multiplier = 4_000_000_000L * 10; // TODO: remove 10 before open alpha
 		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 		return BigInteger.valueOf(timeStampDifference)
-						 .multiply(BigInteger.valueOf(forgerBalance))
-						 .multiply(TWO_TO_THE_POWER_OF_64)
-						 .divide(block.getDifficulty().asBigInteger());
+				 .multiply(BigInteger.valueOf(forgerBalance))
+				 .multiply(TWO_TO_THE_POWER_OF_64)
+				 .divide(block.getDifficulty().asBigInteger());
 	}
 
 	/**

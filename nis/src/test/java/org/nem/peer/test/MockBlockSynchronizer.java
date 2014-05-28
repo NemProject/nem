@@ -12,7 +12,7 @@ public class MockBlockSynchronizer implements BlockSynchronizer {
 	private int numSynchronizeNodeCalls;
 	private SyncConnectorPool lastConnectorPool;
 	private Node lastNode;
-	private int synchronizeNodeResult;
+	private NodeInteractionResult synchronizeNodeResult;
 
 	/**
 	 * Gets the number of times synchronizeNode was called.
@@ -46,12 +46,12 @@ public class MockBlockSynchronizer implements BlockSynchronizer {
 	 *
 	 * @param result The result.
 	 */
-	public void setSynchronizeNodeResult(int result) {
+	public void setSynchronizeNodeResult(final NodeInteractionResult result) {
 		this.synchronizeNodeResult = result;
 	}
 
 	@Override
-	public int synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		++this.numSynchronizeNodeCalls;
 		this.lastConnectorPool = connectorPool;
 		this.lastNode = node;

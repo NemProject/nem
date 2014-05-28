@@ -123,13 +123,13 @@ public class UnconfirmedTransactionsTest {
 		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
 
 		boolean result = transactions.remove(toRemove);
-		final List<Transaction> transactionList = transactions.getTransactionsBefore(txTime.addMinutes(5));
+		final List<Amount> amountList = getAmountsBeforeAsList(transactions, txTime.addMinutes(5));
 
 		// Assert:
 		Assert.assertTrue(result);
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
-		Assert.assertThat(((TransferTransaction)transactionList.get(0)).getAmount(), IsEqual.equalTo(Amount.fromNem(9)));
-		Assert.assertThat(((TransferTransaction)transactionList.get(1)).getAmount(), IsEqual.equalTo(Amount.fromNem(7)));
+
+		final Amount[] expectedAmounts = new Amount[] { Amount.fromNem(9), Amount.fromNem(7) };
+		Assert.assertThat(amountList, IsEquivalent.equivalentTo(expectedAmounts));
 	}
 
 	@Test
@@ -154,15 +154,12 @@ public class UnconfirmedTransactionsTest {
 		temp.setDeadline(currentTime.addSeconds(1));
 		transactions.add(temp);
 
-
 		transactions.dropExpiredTransactions(currentTime);
-		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
+		final List<Amount> amountList = getAmountsBeforeAsList(transactions, currentTime.addSeconds(1));
 
 		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(3));
-		Assert.assertThat(((TransferTransaction )transactionList.get(0)).getAmount(), IsEqual.equalTo(Amount.fromNem(11)));
-		Assert.assertThat(((TransferTransaction )transactionList.get(1)).getAmount(), IsEqual.equalTo(Amount.fromNem(9)));
-		Assert.assertThat(((TransferTransaction )transactionList.get(2)).getAmount(), IsEqual.equalTo(Amount.fromNem(7)));
+		final Amount[] expectedAmounts = new Amount[] { Amount.fromNem(7), Amount.fromNem(9), Amount.fromNem(11) };
+		Assert.assertThat(amountList, IsEquivalent.equivalentTo(expectedAmounts));
 	}
 	//endregion
 
@@ -234,11 +231,8 @@ public class UnconfirmedTransactionsTest {
 		final List<Transaction> filtered = transactions.removeConflictingTransactions(transactionList);
 
 		// Assert:
-		Assert.assertThat(transactionList.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transactionList.get(0), IsEqual.equalTo(second));
-		Assert.assertThat(transactionList.get(1), IsEqual.equalTo(first));
-		Assert.assertThat(filtered.size(), IsEqual.equalTo(1));
-		Assert.assertThat(filtered.get(0), IsEqual.equalTo(first));
+		Assert.assertThat(transactionList, IsEquivalent.equivalentTo(new Transaction[] { first, second }));
+		Assert.assertThat(filtered, IsEquivalent.equivalentTo(new Transaction[] { first }));
 	}
 	//endregion
 
@@ -305,9 +299,15 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private Account createSenderWithAmount(long nems) {
-		final Account sender =Utils.generateRandomAccount();
+		final Account sender = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(nems);
 		sender.incrementBalance(amount);
 		return sender;
+	}
+
+	private static List<Amount> getAmountsBeforeAsList(final UnconfirmedTransactions transactions, final TimeInstant instant) {
+		return transactions.getTransactionsBefore(instant).stream()
+				.map(transaction -> ((TransferTransaction)transaction).getAmount())
+				.collect(Collectors.toList());
 	}
 }

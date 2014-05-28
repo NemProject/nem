@@ -5,6 +5,7 @@ import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
 import org.nem.peer.test.Utils;
 
@@ -44,6 +45,7 @@ public class NisNodeInfoTest {
 
 	private static ApplicationMetaData createAppMetaData(final String name, final String version) {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(17));
 		return new ApplicationMetaData(name, version, null, timeProvider);
 	}
 }

@@ -18,7 +18,7 @@ public class SparseMatrixPerfTest {
 	@Test
 	public void timeNormalizeColumnsFewRepetitions() {
 		LOGGER.info("timeNormalizeColumnsFewRepetitions");
-		timeNormalizeColumns(1000000, 50, 4);
+		timeNormalizeColumns(1000000, 10, 4);
 	}
 
 	private static void timeNormalizeColumns(final int numRows, final int numTries, final int maxEntriesPerRow) {
@@ -32,7 +32,7 @@ public class SparseMatrixPerfTest {
 	@Test
 	public void timeMatrixVectorMultiplyFewRepetitions() {
 		LOGGER.info("timeMatrixVectorMultiplyFewRepetitions");
-		timeMatrixVectorMultiply(1000000, 50, 4);
+		timeMatrixVectorMultiply(1000000, 10, 4);
 	}
 
 	public static void timeMatrixVectorMultiply(final int numRows, final int numTries, final int maxEntriesPerRow) {
@@ -196,11 +196,11 @@ public class SparseMatrixPerfTest {
 					final Matrix matrix = new SparseMatrix(rows, rows, entriesPerRow);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "SparseMatrix");
 				},
-				(rows, entriesPerRow, bytes) -> {
-					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
-					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
-					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
-				},
+//				(rows, entriesPerRow, bytes) -> {
+//					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
+//					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
+//					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
+//				},
 				(rows, entriesPerRow, bytes) -> {
 					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
 					final Matrix matrix = new TunedMtjSparseMatrix(rows, rows, mtjMatrix);

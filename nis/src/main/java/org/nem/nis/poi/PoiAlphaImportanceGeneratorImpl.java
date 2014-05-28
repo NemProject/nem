@@ -3,9 +3,9 @@ package org.nem.nis.poi;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.BlockHeight;
-import org.nem.nis.poi.*;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * This is a first draft implementation of the POI importance calculation.
@@ -20,6 +20,8 @@ import java.util.Collection;
  *
  */
 public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
+
+	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
 	public static final int DEFAULT_MAX_ITERS = 200;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
@@ -45,7 +47,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		long start = System.currentTimeMillis();
 		iterator.run();
 		long stop = System.currentTimeMillis();
-		System.out.println("POI iterator needed " + (stop-start) + "ms.");
+		LOGGER.info("POI iterator needed " + (stop - start) + "ms.");
 
 		if (!iterator.hasConverged()) {
 			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);

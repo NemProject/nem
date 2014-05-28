@@ -17,8 +17,6 @@ import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.test.Utils;
 import org.nem.core.time.SystemTimeProvider;
-import org.nem.nis.poi.PoiImportanceGenerator;
-import org.nem.nis.poi.PoiScorer.ScoringAlg;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
@@ -123,18 +121,12 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		// BR: The mockito.mock version doesn't seems to work
-		//     Why use mock if we can supply a dummy ourself?
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiImportanceGenerator() {
-			
-			@Override
-			public ColumnVector getAccountImportances(BlockHeight blockHeight,
-					Collection<Account> accounts, ScoringAlg scoringAlg) {
-				ColumnVector importances = new ColumnVector(accounts.size());
-				importances.setAll(1.0/accounts.size());
-				return importances;
-			}
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer((blockHeight, accounts, scoringAlg) -> {
+			ColumnVector importances = new ColumnVector(accounts.size());
+			importances.setAll(1.0 / accounts.size());
+			return importances;
 		});
+
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
 		final Account signer = accounts.get(0);
 
@@ -178,7 +170,6 @@ public class BlockChainTest {
 		ret.setId(i);
 		return ret;
 	}
-
 
 	private static Block createBlock(final Account forger, final AccountLookup accountLookup) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
