@@ -51,9 +51,9 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return true if block can be next in chain
 	 */
 	public boolean isNextBlock(final Block block) {
-		boolean result = false;
+		boolean result;
 		synchronized (blockChainLastBlockLayer) {
-			this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
+			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
 		}
 		return result;
 	}
