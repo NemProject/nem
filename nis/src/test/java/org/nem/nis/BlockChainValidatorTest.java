@@ -71,42 +71,6 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void allBlocksInChainMustHaveCorrectTotalFee() {
-		// Arrange (category create nem attack):
-		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = new ArrayList<>();
-		final Account signer = Utils.generateRandomAccount();
-		Block block = createBlock(signer, parentBlock);
-
-		// Bob likes to create nem out of thin air if he forages a block.
-        try {
-	        final Class c = block.getClass();
-	        final java.lang.reflect.Field field = c.getDeclaredField("totalFee");
-	        field.setAccessible(true);
-        	field.set(block, Amount.fromNem(1000));
-        }
-        catch(Exception e){}
-        block.sign();
-
-        // The process of serialization/deserialization doesn't change the fee nor does it throw an exception
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(signer);
-		JsonSerializer jsonSerializer = new JsonSerializer(true);
-		block.serialize(jsonSerializer);
-		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
-		block = new Block(deserializer.readInt("type"), VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
- 
-		blocks.add(block);
-		signAllBlocks(blocks);
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void allBlocksInChainMustHaveCorrectHeight() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();

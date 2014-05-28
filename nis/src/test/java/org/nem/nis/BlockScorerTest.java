@@ -112,13 +112,21 @@ public class BlockScorerTest {
 		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
 		final Block block = createBlock(accountAnalyzer, blockSigner, 101, 11);
 
+		block.setDifficulty(new BlockDifficulty((long)60E12));
+		accountAnalyzer.recalculateImportances(block.getHeight());
+		blockSigner.getImportanceInfo().setImportance(block.getHeight(), 1572);
+
 		// Act:
 		final BigInteger target = scorer.calculateTarget(previousBlock, block);
 
-		// Assert: (time-difference * block-signer-balance * magic-number)
-		final BigInteger expectedTarget = BigInteger.valueOf(100 * 72)
+		// Assert:
+		// (time-difference [100] * block-signer-importance [72000^] * multiplier * magic-number / difficulty [60e12])
+		// ^ MockBlockScorerAnalyzer calculates importance as balance / 1000
+		final long multiplier = 4_000_000_000L * 10;
+		final BigInteger expectedTarget = BigInteger.valueOf(100)
+				.multiply(BigInteger.valueOf(72000 * multiplier))
 				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BlockDifficulty.INITIAL_DIFFICULTY.asBigInteger());
+				.divide(BigInteger.valueOf((long)60E12));
 
 		Assert.assertThat(target, IsEqual.equalTo(expectedTarget));
 	}

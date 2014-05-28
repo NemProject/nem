@@ -26,20 +26,34 @@ public class PoiScorerTest {
 		// Act:
 		final PoiScorer scorer = new PoiScorer();
 		final ColumnVector finalScoresVector = scorer.calculateFinalScore(
-				new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30),
-				new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00),
-				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0), PoiScorer.ScoringAlg.BLOODYROOKIENEW);
+				new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30), // importance
+				new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00), // outlink
+				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0), // vested-balance
+				PoiScorer.ScoringAlg.MAKOTO);
 
 		// Assert:
-		final double scale = 1 * 9 * 140;
-		final ColumnVector expectedFinalScoresVector = new ColumnVector(
-				1 * 4 * 80 / scale,
-				0.8 * 1 * 5 / scale,
-				0.2 * 7 * 140 / scale,
-				0.5 * 9 * 45 / scale,
-				0.6 * 2 * 40 / scale,
-				0.3 * 5 * 25 / scale);
-		//TODO: this assert fails, but we are still playing around with the scoring alg, so let's wait on this
+		// weighted-outlinks: outlink * 1.05 + vested-balance
+		final ColumnVector weightedOutlinks = new ColumnVector(
+				4.00 * 1.05 + 80.0,
+				1.00 * 1.05 + 5.00,
+				7.00 * 1.05 + 140.,
+				9.00 * 1.05 + 45.0,
+				2.00 * 1.05 + 40.0,
+				5.00 * 1.05 + 25.0);
+
+		// weighted-importance: importance * 0.05
+		final ColumnVector weightedImportance = new ColumnVector(
+				1.00 * 0.05,
+				0.80 * 0.05,
+				0.20 * 0.05,
+				0.50 * 0.05,
+				0.60 * 0.05,
+				0.30 * 0.05);
+
+		// final: l1norm(l1norm(weighted-outlinks) + weighted-importance)
+		weightedOutlinks.normalize();
+		final ColumnVector expectedFinalScoresVector = weightedOutlinks.add(weightedImportance);
+		expectedFinalScoresVector.normalize();
 		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}
 }

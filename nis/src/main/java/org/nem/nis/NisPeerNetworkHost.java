@@ -46,8 +46,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	/**
 	 * Boots the network.
 	 */
-	public void boot() {
-		PeerNetwork.createWithVerificationOfLocalNode(Config.fromFile("peers-config.json"), createNetworkServices())
+	public CompletableFuture boot() {
+		return PeerNetwork.createWithVerificationOfLocalNode(Config.fromFile("peers-config.json"), createNetworkServices())
 				.thenAccept(network -> {
 					this.host = new PeerNetworkHost(network);
 
