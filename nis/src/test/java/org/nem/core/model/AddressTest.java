@@ -72,6 +72,18 @@ public class AddressTest {
 	}
 
 	@Test
+	public void addressesWithDifferentCasingsAreValid() {
+		// Arrange:
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final Address address = Address.fromPublicKey(publicKey);
+
+		// Assert:
+		Assert.assertThat(addressAsLower(address).isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(addressAsUpper(address).isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(addressAsMixed(address).isValid(), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void generatedAddressHas40CharLength() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
@@ -93,6 +105,15 @@ public class AddressTest {
 
 		// Assert:
 		Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo(NetworkInfo.getDefault().getAddressStartChar()));
+	}
+
+	@Test
+	public void addressWithNonBase32CharactersIsNotValid() {
+		// Act:
+		final Address address = Address.fromEncoded("A*B");
+
+		// Assert:
+		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -151,6 +172,9 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Address.fromPublicKey(publicKey), IsEqual.equalTo(address));
 		Assert.assertThat(Address.fromEncoded(address.getEncoded()), IsEqual.equalTo(address));
+		Assert.assertThat(addressAsLower(address), IsEqual.equalTo(address));
+		Assert.assertThat(addressAsUpper(address), IsEqual.equalTo(address));
+		Assert.assertThat(addressAsMixed(address), IsEqual.equalTo(address));
 		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)), IsNot.not(IsEqual.equalTo(address)));
 		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)), IsNot.not(IsEqual.equalTo(address)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(address)));
@@ -167,6 +191,9 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Address.fromPublicKey(publicKey).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(Address.fromEncoded(address.getEncoded()).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(addressAsLower(address).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(addressAsUpper(address).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(addressAsMixed(address).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
@@ -219,4 +246,18 @@ public class AddressTest {
 	}
 
 	//endregion
+
+	private static Address addressAsLower(final Address address) {
+		return Address.fromEncoded(address.getEncoded().toLowerCase());
+	}
+
+	private static Address addressAsUpper(final Address address) {
+		return Address.fromEncoded(address.getEncoded().toUpperCase());
+	}
+
+	private static Address addressAsMixed(final Address address) {
+		return Address.fromEncoded(
+				addressAsLower(address).getEncoded().substring(0, 20) +
+				addressAsUpper(address).getEncoded().substring(20));
+	}
 }

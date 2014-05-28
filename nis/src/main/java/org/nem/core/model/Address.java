@@ -110,7 +110,14 @@ public class Address {
 	 * @return true if the address is valid.
 	 */
 	public boolean isValid() {
-		byte[] encodedBytes = Base32Encoder.getBytes(this.encoded);
+		byte[] encodedBytes;
+
+		try {
+			encodedBytes = Base32Encoder.getBytes(this.encoded.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+
 		if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
 			return false;
 
@@ -126,7 +133,7 @@ public class Address {
 
 	@Override
 	public int hashCode() {
-		return this.encoded.hashCode();
+		return this.encoded.toLowerCase().hashCode();
 	}
 
 	@Override
@@ -135,7 +142,7 @@ public class Address {
 			return false;
 
 		Address rhs = (Address)obj;
-		return this.encoded.equals(rhs.encoded);
+		return this.encoded.equalsIgnoreCase(rhs.encoded);
 	}
 
 	@Override
