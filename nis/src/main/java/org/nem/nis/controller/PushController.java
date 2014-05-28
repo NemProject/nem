@@ -13,7 +13,7 @@ import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,14 +78,10 @@ public class PushController {
 			throw new IllegalArgumentException("block must be verifiable");
 	}
 
-	@FunctionalInterface
-	private interface ImportanceAccepter<T> {
-		NodeInteractionResult test(T testedObject);
-	}
 	private <T extends VerifiableEntity> boolean pushEntity(
 			final T entity,
 			final Predicate<T> isValid,
-			final ImportanceAccepter<T> isAccepted,
+			final Function<T, NodeInteractionResult> isAccepted,
 			final NodeApiId broadcastId,
 			final HttpServletRequest request) {
 		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
@@ -95,21 +91,26 @@ public class PushController {
 		final PeerNetwork network = this.host.getNetwork();
 		final Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
 
+		final Supplier<Node> remoteNodeSupplier = () -> null == remoteNode
+				? network.addActiveNode(request.getRemoteAddr())
+		        : remoteNode;
 		if (!isValid.test(entity)) {
 			// Bad experience with the remote node.
-			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, NodeInteractionResult.FAILURE);
+			network.updateExperience(remoteNodeSupplier.get(), NodeInteractionResult.FAILURE);
 			return false;
 		}
 
 		// validate block and broadcast (async)
-		final NodeInteractionResult status = isAccepted.test(entity);
-		if (status == NodeInteractionResult.SUCCESS || status == NodeInteractionResult.FAILURE) {
+		final NodeInteractionResult status = isAccepted.apply(entity);
+		if (NodeInteractionResult.NEUTRAL != status) {
 			// Good experience with the remote node.
-			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, status);
+			network.updateExperience(remoteNodeSupplier.get(), status);
 		}
+
 		if (status == NodeInteractionResult.SUCCESS) {
 			network.broadcast(broadcastId, entity);
 		}
+
 		return true;
 	}
 }

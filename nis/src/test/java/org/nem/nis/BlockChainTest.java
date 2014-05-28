@@ -22,7 +22,6 @@ import org.nem.nis.test.MockAccountDao;
 import org.nem.nis.test.MockBlockDao;
 import org.nem.nis.test.MockForaging;
 import org.nem.peer.NodeInteractionResult;
-import org.nem.peer.trust.score.NodeExperience;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
