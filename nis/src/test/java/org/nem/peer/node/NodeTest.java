@@ -80,7 +80,7 @@ public class NodeTest {
 		Node node = new Node(DEFAULT_ENDPOINT, "plat", null);
 
 		// Assert:
-		Assert.assertThat(node.getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
 	}
 
 	//region equals / hashCode
