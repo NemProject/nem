@@ -7,6 +7,7 @@ import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.Foraging;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
@@ -63,7 +64,7 @@ public class TransferController {
 		if (!transfer.isValid() || !transfer.verify()) {
 			// Bad experience with the remote node.
 			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
+				host.getNetwork().updateExperience(remoteNode, NodeInteractionResult.FAILURE);
 			}
 
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
@@ -76,7 +77,7 @@ public class TransferController {
 		if (this.foraging.processTransaction(transfer)) {
 			// Good experience with the remote node.
 			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
+				host.getNetwork().updateExperience(remoteNode, NodeInteractionResult.SUCCESS);
 			}
 
 			// propagate transactions
