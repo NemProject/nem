@@ -63,7 +63,7 @@ public class PeerNetworkTest {
 		// Assert:
 		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
 		for (final Node node : nodes.getInactiveNodes())
-			Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
+			Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
 	}
 
 	//endregion
@@ -80,6 +80,43 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Assert.assertThat(network.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
+	}
+
+	//endregion
+
+	//region addActiveNode
+
+	@Test
+	public void addActiveNodeAddsNewNodeToActiveNodesIfNodeIsNotInNodeCollection() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetwork network = new PeerNetwork(config, createMockPeerNetworkServices());
+		Node referenceNode = network.getNodes().getNode("10.0.0.4");
+
+		// Assert:
+		Assert.assertTrue(referenceNode == null);
+
+		// Act:
+		Node node = network.addActiveNode("10.0.0.4");
+		referenceNode = network.getNodes().getNode("10.0.0.4");
+
+		// Assert (same object):
+		Assert.assertTrue(referenceNode == node);
+		Assert.assertTrue(network.getNodes().getActiveNodes().contains(node));
+	}
+
+	@Test
+	public void addActiveNodeReturnsKnownNodeIfNodeIsAlreadyInNodeCollection() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetwork network = new PeerNetwork(config, createMockPeerNetworkServices());
+		Node node = network.addActiveNode("10.0.0.4");
+
+		// Act:
+		Node referenceNode = network.addActiveNode("10.0.0.4");
+
+		// Assert (same object):
+		Assert.assertTrue(referenceNode == node);
 	}
 
 	//endregion

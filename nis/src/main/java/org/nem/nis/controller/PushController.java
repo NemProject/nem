@@ -54,11 +54,12 @@ public class PushController {
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
 		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
+		final PeerNetwork network = this.host.getNetwork();
 
 		LOGGER.info("   signer: " + transaction.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(transaction.verify()));
 		LOGGER.info(request.getRemoteAddr());
-		final Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
+		final Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
 
 		// transaction timestamp is checked inside processTransaction
 		if (!transaction.isValid() || !transaction.verify()) {
@@ -70,14 +71,10 @@ public class PushController {
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
 		}
 
-		final PeerNetwork network = this.host.getNetwork();
-
 		// add to unconfirmed transactions
 		if (this.foraging.processTransaction(transaction)) {
 			// Good experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
-			}
+			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, NodeExperience.Code.SUCCESS);
 			
 			// propagate transactions
 			// this returns immediately, so that client who
@@ -90,31 +87,29 @@ public class PushController {
 	@P2PApi
 	public void pushBlock(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
+		final PeerNetwork network = this.host.getNetwork();
 
 		// TODO: refactor logging
 		LOGGER.info("   signer: " + block.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(block.verify()));
 		LOGGER.info(request.getRemoteAddr());
-		Node remoteNode = host.getNetwork().getNodes().getNode(request.getRemoteAddr());
-		// TODO: if the remote node is null, do we want to create a new node? I guess yes.
+		Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
 
 		if (!this.blockChain.isNextBlock(block) || !block.verify()) {
 			// Bad experience with the remote node.
 			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.FAILURE);
+				network.updateExperience(remoteNode, NodeExperience.Code.FAILURE);
 			}
 			
 			throw new IllegalArgumentException("block must be verifiable");
 		}
 
 		// validate block and broadcast (async)
-		if (this.blockChain.processBlock(block)) {
+		if (this.blockChain.processBlock(block) == NodeExperience.Code.SUCCESS) {
 			// Good experience with the remote node.
-			if (remoteNode != null) {
-				host.getNetwork().updateExperience(remoteNode, NodeExperience.Code.SUCCESS);
-			}
+			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, NodeExperience.Code.SUCCESS);
 			
-			this.host.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+			network.broadcast(NodeApiId.REST_PUSH_BLOCK, block);
 		}
 	}
 }
