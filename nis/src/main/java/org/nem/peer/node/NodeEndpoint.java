@@ -19,6 +19,15 @@ public class NodeEndpoint implements SerializableEntity {
 	private final Dictionary<NodeApiId, URL> nodeApiToUrlMap;
 
 	/**
+	 * Creates a new node endpoint with a default protocol and port.
+	 *
+	 * @param host     The host.
+	 */
+	public NodeEndpoint(final String host) {
+		this("http", host, 7890);
+	}
+
+	/**
 	 * Creates a new node endpoint.
 	 *
 	 * @param protocol The protocol.

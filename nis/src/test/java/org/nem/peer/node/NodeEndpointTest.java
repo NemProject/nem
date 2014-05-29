@@ -24,6 +24,17 @@ public class NodeEndpointTest {
 	}
 
 	@Test
+	public void ctorCanCreateNewNodeEndpointAroundHost() throws Exception {
+		// Act:
+		final NodeEndpoint endpoint = new NodeEndpoint("10.8.8.2");
+
+		// Assert:
+		final URL expectedUrl = new URL("http", "10.8.8.2", 7890, "/");
+		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+		assertApiUrlsAreCorrect(expectedUrl, endpoint);
+	}
+
+	@Test
 	public void nodeEndpointCanBeRoundTripped() throws Exception {
 		// Arrange:
 		final NodeEndpoint originalEndpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);

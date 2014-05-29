@@ -11,7 +11,6 @@ import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
-import org.nem.peer.trust.score.NodeExperience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +48,7 @@ public class TransferController {
 		return new RequestPrepare(transferData);
 	}
 
-	// TODO make it common with push/transfer?
+	// TODO: make it common with push/transfer?
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
 	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce, final HttpServletRequest request) throws Exception {
@@ -77,7 +76,7 @@ public class TransferController {
 		final NodeInteractionResult status = this.foraging.processTransaction(transfer);
 		if (status == NodeInteractionResult.SUCCESS || status == NodeInteractionResult.FAILURE) {
 			// Good experience with the remote node.
-			network.updateExperience(remoteNode == null? network.addActiveNode(request.getRemoteAddr()) : remoteNode, status);
+			network.updateExperience(remoteNode, status);
 		}
 		if (status == NodeInteractionResult.SUCCESS) {
 			// propagate transactions

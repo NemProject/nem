@@ -10,6 +10,7 @@ import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.peer.*;
 import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
+import org.nem.peer.node.NodeEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,14 +90,13 @@ public class PushController {
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
 
 		final PeerNetwork network = this.host.getNetwork();
-		final Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
+		Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
+		if (null == remoteNode)
+			remoteNode = new Node(new NodeEndpoint(request.getRemoteAddr()), null, null);
 
-		final Supplier<Node> remoteNodeSupplier = () -> null == remoteNode
-				? network.addActiveNode(request.getRemoteAddr())
-		        : remoteNode;
 		if (!isValid.test(entity)) {
 			// Bad experience with the remote node.
-			network.updateExperience(remoteNodeSupplier.get(), NodeInteractionResult.FAILURE);
+			network.updateExperience(remoteNode, NodeInteractionResult.FAILURE);
 			return false;
 		}
 
@@ -104,7 +104,7 @@ public class PushController {
 		final NodeInteractionResult status = isAccepted.apply(entity);
 		if (NodeInteractionResult.NEUTRAL != status) {
 			// Good experience with the remote node.
-			network.updateExperience(remoteNodeSupplier.get(), status);
+			network.updateExperience(remoteNode, status);
 		}
 
 		if (status == NodeInteractionResult.SUCCESS) {
