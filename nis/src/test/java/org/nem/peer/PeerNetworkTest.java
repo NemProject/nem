@@ -19,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
 
+	private static final String DEFAULT_LOCAL_NODE_HOST = ConfigFactory.DEFAULT_LOCAL_NODE_HOST;
+
 	//region constructor
 
 	@Test
@@ -328,7 +330,7 @@ public class PeerNetworkTest {
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
 		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.11", 12), "p", "a"), NodeStatus.INACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.8", 12), "p", "a"), NodeStatus.ACTIVE);
+		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -338,7 +340,7 @@ public class PeerNetworkTest {
 		// Assert:
 		NodeCollectionAssert.areHostsEquivalent(
 				nodes,
-				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.8", "10.0.0.15" },
+				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.6", "10.0.0.15" },
 				new String[] { });
 	}
 
@@ -608,7 +610,7 @@ public class PeerNetworkTest {
 	@Test
 	public void updateExperienceDoesNotUpdateLocalNodeExperience() {
 		// Act:
-		final NodeExperience experience = updateExperience("10.0.0.8", NodeInteractionResult.SUCCESS);
+		final NodeExperience experience = updateExperience(DEFAULT_LOCAL_NODE_HOST, NodeInteractionResult.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
@@ -833,7 +835,7 @@ public class PeerNetworkTest {
 
 	private void assertNodeEndpointIsConfigLocalNodeEndpoint(final NodeEndpoint endpoint) {
 		// Assert:
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.8", 7890)));
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890)));
 	}
 
 	private void assertNodeIsConfigLocalNode(final Node node) {

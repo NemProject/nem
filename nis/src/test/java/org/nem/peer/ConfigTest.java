@@ -7,10 +7,12 @@ import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 public class ConfigTest {
+
+	private static final String DEFAULT_LOCAL_NODE_HOST = ConfigFactory.DEFAULT_LOCAL_NODE_HOST;
 
 	@Test
 	public void networkNameIsInitializedCorrectly() {
@@ -30,7 +32,7 @@ public class ConfigTest {
 		final Node node = config.getLocalNode();
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
+		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
 		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
@@ -52,7 +54,7 @@ public class ConfigTest {
 				System.getProperty("java.vendor"),
 				System.getProperty("java.version"),
 				System.getProperty("os.name"));
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("http", "10.0.0.8", 7890, "/")));
+		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo(expectedPlatform));
 		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
@@ -61,7 +63,7 @@ public class ConfigTest {
 	@Test
 	public void wellKnownPeersAreInitializedCorrectly() {
 		// Arrange:
-		final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.8", "10.0.0.3" };
+		final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
 		final Config config = new Config(ConfigFactory.createTestJsonConfig(knownHosts));
 
 		// Act:
@@ -72,7 +74,7 @@ public class ConfigTest {
 		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
 		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.5")), IsEqual.equalTo(true));
-		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.8")), IsEqual.equalTo(true));
+		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.12")), IsEqual.equalTo(true));
 		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.3")), IsEqual.equalTo(true));
 	}
 
@@ -126,6 +128,10 @@ public class ConfigTest {
 
 	private static Config createTestConfig() {
 		return ConfigFactory.createDefaultTestConfig();
+	}
+
+	private static URL getDefaultLocalNodeUrl() throws MalformedURLException {
+		return new URL("http", DEFAULT_LOCAL_NODE_HOST, 7890, "/");
 	}
 
 	//endregion

@@ -10,6 +10,11 @@ import org.nem.peer.trust.TrustProvider;
 public class ConfigFactory {
 
 	/**
+	 * The default local node host.
+	 */
+	public static final String DEFAULT_LOCAL_NODE_HOST = "10.0.0.8";
+
+	/**
 	 * Creates a JSONObject that represents an endpoint.
 	 *
 	 * @param protocol The protocol.
@@ -36,7 +41,7 @@ public class ConfigFactory {
 	public static JSONObject createTestJsonConfig(final String[] hosts) {
 		JSONObject jsonConfig = new JSONObject();
 
-		jsonConfig.put("endpoint", createEndpointJsonObject("http", "10.0.0.8", 7890));
+		jsonConfig.put("endpoint", createEndpointJsonObject("http", DEFAULT_LOCAL_NODE_HOST, 7890));
 
 		jsonConfig.put("platform", "Mac");
 		jsonConfig.put("application", "FooBar");
