@@ -193,6 +193,34 @@ public class JsonSerializerTest {
 	}
 
 	@Test
+	public void canReadIntAsLong() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeInt("long", 447182);
+
+		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final long l = deserializer.readLong("long");
+
+		// Assert:
+		Assert.assertThat(l, IsEqual.equalTo(447182L));
+	}
+
+	@Test
+	public void canReadNullLong() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final Long l = deserializer.readLong("long");
+
+		// Assert:
+		Assert.assertThat(l, IsNull.nullValue());
+	}
+
+	@Test
 	public void canRoundtripBigInteger() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -206,6 +234,19 @@ public class JsonSerializerTest {
 
 		// Assert:
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
+	}
+
+	@Test
+	public void canReadNullBigInteger() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final BigInteger i = deserializer.readBigInteger("BigInteger");
+
+		// Assert:
+		Assert.assertThat(i, IsNull.nullValue());
 	}
 
 	@Test
@@ -294,6 +335,20 @@ public class JsonSerializerTest {
 		// Act:
 		serializer.writeObject("SerializableEntity", null);
 
+		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
+
+		// Assert:
+		Assert.assertThat(object, IsNull.nullValue());
+	}
+
+	@Test
+	public void canReadNullObject() {
+
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
 		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
 		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
 

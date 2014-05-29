@@ -44,29 +44,20 @@ public class JsonDeserializer implements Deserializer {
 		//
 		// additionally, readInt above, would have to be changed to:
 		// ((Long)this.object.get(label)).intValue();
-
-		Object object = this.object.get(label);
-		
-		//Just to avoid throwing NPE
-		if(object == null) {
+		final Object object = this.object.get(label);
+		if (null == object)
 			return null;
-		}
-		
-		if (object instanceof Long) {
+
+		if (object instanceof Long)
 			return (Long)object;
-		}
+
 		return ((Integer)object).longValue();
 	}
 
 	@Override
 	public BigInteger readBigInteger(final String label) {
 		final byte[] bytes = this.readBytes(label);
-		//Just to avoid throwing NPE
-		if(bytes == null) {
-			return null;
-		}
-		
-		return new BigInteger(bytes);
+		return null == bytes ? null : new BigInteger(bytes);
 	}
 
 	@Override
@@ -87,7 +78,7 @@ public class JsonDeserializer implements Deserializer {
 	@Override
 	public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
-		JSONObject childObject = (JSONObject)this.object.get(label);
+		final JSONObject childObject = (JSONObject)this.object.get(label);
 		if (null == childObject)
 			return null;
 
@@ -97,12 +88,12 @@ public class JsonDeserializer implements Deserializer {
 	@Override
 	public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
-		JSONArray jsonArray = (JSONArray)this.object.get(label);
+		final JSONArray jsonArray = (JSONArray)this.object.get(label);
 
 		if (null == jsonArray)
 			return new ArrayList<>();
 
-		List<T> objects = new ArrayList<>();
+		final List<T> objects = new ArrayList<>();
 		for (Object jsonObject : jsonArray)
 			objects.add(this.deserializeObject((JSONObject)jsonObject, activator));
 
@@ -115,7 +106,7 @@ public class JsonDeserializer implements Deserializer {
 	}
 
 	public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
-		JsonDeserializer deserializer = new JsonDeserializer(object, this.context);
+		final JsonDeserializer deserializer = new JsonDeserializer(object, this.context);
 		return 0 == object.size() ? null : activator.deserialize(deserializer);
 	}
 
