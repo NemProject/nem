@@ -8,7 +8,19 @@ import org.nem.core.test.*;
 import java.math.BigInteger;
 import java.util.*;
 
-public class JsonSerializerTest {
+public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {
+
+	@Override
+	protected JsonSerializer createSerializer() {
+		return new JsonSerializer();
+	}
+
+	@Override
+	protected JsonDeserializer createDeserializer(
+			final JsonSerializer serializer,
+			final DeserializationContext context) {
+		return new JsonDeserializer(serializer.getObject(), context);
+	}
 
 	//region Write
 
@@ -147,22 +159,7 @@ public class JsonSerializerTest {
 
 	//endregion
 
-	//region Roundtrip
-
-	@Test
-	public void canRoundtripInt() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeInt("int", 0x09513510);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final int i = deserializer.readInt("int");
-
-		// Assert:
-		Assert.assertThat(i, IsEqual.equalTo(0x09513510));
-	}
+	//region Read
 
 	@Test
 	public void canReadNullInt() {
@@ -170,26 +167,11 @@ public class JsonSerializerTest {
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final Integer i = deserializer.readInt("int");
 
 		// Assert:
 		Assert.assertThat(i, IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripLong() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeLong("long", 0xF239A033CE951350L);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final long l = deserializer.readLong("long");
-
-		// Assert:
-		Assert.assertThat(l, IsEqual.equalTo(0xF239A033CE951350L));
 	}
 
 	@Test
@@ -200,7 +182,7 @@ public class JsonSerializerTest {
 		// Act:
 		serializer.writeInt("long", 447182);
 
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final long l = deserializer.readLong("long");
 
 		// Assert:
@@ -213,27 +195,11 @@ public class JsonSerializerTest {
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final Long l = deserializer.readLong("long");
 
 		// Assert:
 		Assert.assertThat(l, IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripBigInteger() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final BigInteger i = new BigInteger("958A7561F014", 16);
-		serializer.writeBigInteger("BigInteger", i);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
 
 	@Test
@@ -242,104 +208,11 @@ public class JsonSerializerTest {
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final BigInteger i = deserializer.readBigInteger("BigInteger");
 
 		// Assert:
 		Assert.assertThat(i, IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripBytes() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
-		serializer.writeBytes("bytes", bytes);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final byte[] readBytes = deserializer.readBytes("bytes");
-
-		// Assert:
-		Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
-	}
-
-	@Test
-	public void canRoundtripNullBytes() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeBytes("bytes", null);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final byte[] readBytes = deserializer.readBytes("bytes");
-
-		// Assert:
-		Assert.assertThat(readBytes, IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripEmptyBytes() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final byte[] bytes = new byte[] { };
-		serializer.writeBytes("bytes", bytes);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final byte[] readBytes = deserializer.readBytes("bytes");
-
-		// Assert:
-		Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
-	}
-
-	@Test
-	public void canRoundtripString() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeString("String", "BEta GaMMa");
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final String s = deserializer.readString("String");
-
-		// Assert:
-		Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
-	}
-
-	@Test
-	public void canRoundtripObject() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(object, IsEqual.equalTo(new MockSerializableEntity(17, "foo", 42)));
-	}
-
-	@Test
-	public void canRoundtripNullObject() {
-
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeObject("SerializableEntity", null);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(object, IsNull.nullValue());
 	}
 
 	@Test
@@ -349,65 +222,11 @@ public class JsonSerializerTest {
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
 
 		// Assert:
 		Assert.assertThat(object, IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripObjectArray() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		List<SerializableEntity> originalObjects = new ArrayList<>();
-		originalObjects.add(new MockSerializableEntity(17, "foo", 42));
-		originalObjects.add(new MockSerializableEntity(111, "bar", 22));
-		originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
-
-		// Act:
-		serializer.writeObjectArray("SerializableArray", originalObjects);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(3));
-		for (int i = 0; i < objects.size(); ++i)
-			Assert.assertThat(objects.get(i), IsEqual.equalTo(originalObjects.get(i)));
-	}
-
-	@Test
-	public void canRoundtripArrayContainingNullValue() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		List<SerializableEntity> originalObjects = new ArrayList<>();
-		originalObjects.add(null);
-
-		// Act:
-		serializer.writeObjectArray("SerializableArray", originalObjects);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(1));
-		Assert.assertThat(objects.get(0), IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripNullArray() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		serializer.writeObjectArray("oa", null);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("oa", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -415,88 +234,9 @@ public class JsonSerializerTest {
 	//region Roundtrip Multiple
 
 	@Test
-	public void canRoundtripMultipleValues() {
-		// Assert:
-		assertRoundtripMultipleValues(new JsonSerializer());
-	}
-
-	@Test
 	public void canRoundtripMultipleValuesWithOrderingChecksEnabled() {
 		// Assert:
 		assertRoundtripMultipleValues(new JsonSerializer(true));
-	}
-
-	private void assertRoundtripMultipleValues(final JsonSerializer serializer) {
-		// Act:
-		serializer.writeInt("alpha", 0x09513510);
-		serializer.writeLong("zeta", 0xF239A033CE951350L);
-		serializer.writeBytes("beta", new byte[] { 2, 4, 6 });
-		serializer.writeObject("object", new MockSerializableEntity(7, "foo", 5));
-		serializer.writeInt("gamma", 7);
-		serializer.writeString("epsilon", "FooBar");
-		serializer.writeObjectArray("entities", Arrays.asList(
-				new MockSerializableEntity(5, "ooo", 62),
-				new MockSerializableEntity(8, "ala", 15)
-		));
-		serializer.writeBigInteger("bi", new BigInteger("14"));
-		serializer.writeLong("sigma", 8);
-
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
-
-		// Assert:
-		Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
-		Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
-		Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
-
-		final MockSerializableEntity entity = deserializer.readObject(
-				"object",
-				new MockSerializableEntity.Activator());
-		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
-
-		Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
-		Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
-
-		final List<MockSerializableEntity> entities = deserializer.readObjectArray(
-				"entities",
-				new MockSerializableEntity.Activator());
-		Assert.assertThat(entities.get(0), IsEqual.equalTo(new MockSerializableEntity(5, "ooo", 62)));
-		Assert.assertThat(entities.get(1), IsEqual.equalTo(new MockSerializableEntity(8, "ala", 15)));
-
-		Assert.assertThat(deserializer.readBigInteger("bi"), IsEqual.equalTo(new BigInteger("14")));
-		Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
-	}
-
-	//endregion
-
-	//region Context
-
-	@Test
-	public void contextPassedToDeserializerConstructorIsUsed() {
-		// Arrange:
-		DeserializationContext context = new DeserializationContext(new MockAccountLookup());
-
-		// Act:
-		final JsonDeserializer deserializer = new JsonDeserializer(new JSONObject(), context);
-
-		// Assert:
-		Assert.assertThat(deserializer.getContext(), IsEqual.equalTo(context));
-	}
-
-	@Test
-	public void contextPassedToDeserializerConstructorIsPassedToChildDeserializer() {
-		// Arrange:
-		DeserializationContext context = new DeserializationContext(new MockAccountLookup());
-		final JsonSerializer serializer = new JsonSerializer();
-		serializer.writeObject("test", new MockSerializableEntity(7, "a", 12));
-
-		// Act:
-		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), context);
-		MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
-		deserializer.readObject("test", objectDeserializer);
-
-		// Assert:
-		Assert.assertThat(objectDeserializer.getLastContext(), IsEqual.equalTo(context));
-
 	}
 
 	//endregion
@@ -526,7 +266,7 @@ public class JsonSerializerTest {
 		serializer.writeInt("Foo", 17);
 		serializer.writeInt("Bar", 11);
 
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
 		Assert.assertThat(deserializer.readInt("Bar"), IsEqual.equalTo(11));
@@ -560,13 +300,13 @@ public class JsonSerializerTest {
 		serializer.writeInt("Foo", 17);
 		serializer.writeInt("Bar", 11);
 
-		final JsonDeserializer deserializer = createJsonDeserializer(serializer.getObject());
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		deserializer.readInt("Bar");
 	}
 
 	//endregion
 
-	//region serializeToBytes
+	//region serializeToJson
 
 	@Test
 	public void serializeToJsonProducesSameBytesAsEntitySerialize() throws Exception {
@@ -574,7 +314,7 @@ public class JsonSerializerTest {
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
+		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
 		entity.serialize(serializer);
 		JSONObject writeObjectJson = serializer.getObject();
 
@@ -583,8 +323,4 @@ public class JsonSerializerTest {
 	}
 
 	//endregion
-
-	private JsonDeserializer createJsonDeserializer(final JSONObject object) {
-		return new JsonDeserializer(object, null);
-	}
 }

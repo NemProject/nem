@@ -71,6 +71,11 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
 	@Override
 	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects) {
+		if (null == objects) {
+			this.writeInt(null, 0);
+			return;
+		}
+
 		this.writeInt(null, objects.size());
 		for (SerializableEntity object : objects)
 			this.writeBytes(null, serializeObject(object));
