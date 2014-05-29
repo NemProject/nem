@@ -30,6 +30,7 @@
 
 		<hibernate.version>4.3.0.Final</hibernate.version>
 		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
+		<nem-code-base>http://nem.pucchiwerk.eu/nem</nem-code-base>
 	</properties>
 
 	<dependencies>
@@ -368,6 +369,8 @@
 						</manifest>
 						<manifestEntries>
 							<Permissions>all-permissions</Permissions>
+							<Codebase>${nem-code-base}</Codebase>
+							<Application-Name>${project.name}</Application-Name>
 							<Implementation-Build>${project.version}</Implementation-Build>
 							<Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
 						</manifestEntries>
