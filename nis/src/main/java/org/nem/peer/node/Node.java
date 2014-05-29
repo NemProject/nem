@@ -33,6 +33,16 @@ public class Node implements SerializableEntity {
 	}
 
 	/**
+	 * Creates a new node given a host name.
+	 *
+	 * @param host The host.
+	 * @return The node.
+	 */
+	public static Node fromHost(final String host) {
+		return new Node(NodeEndpoint.fromHost(host), null, null);
+	}
+
+	/**
 	 * Deserializes a node.
 	 *
 	 * @param deserializer The deserializer.

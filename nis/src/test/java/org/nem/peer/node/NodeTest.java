@@ -8,34 +8,45 @@ import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
-import java.net.URL;
 
 public class NodeTest {
 
 	private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
 	@Test
-	public void ctorCanCreateNewNode() throws Exception {
+	public void ctorCanCreateNewNode() {
 		// Act:
-		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
+		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
+		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(DEFAULT_ENDPOINT));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat"));
 		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
 	}
 
 	@Test
-	public void nodeCanBeRoundTripped() throws Exception {
-		// Arrange:
-		Node originalNode = new Node(DEFAULT_ENDPOINT, "plat", "app");
-
+	public void nodeCanBeCreatedFromHost() {
 		// Act:
-		Node node = new Node(Utils.roundtripSerializableEntity(originalNode, null));
+		final Node node = Node.fromHost("10.7.6.5");
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(new URL("ftp", "10.8.8.2", 12, "/")));
+		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.7.6.5")));
+		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("PC"));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
+	}
+
+	@Test
+	public void nodeCanBeRoundTripped() {
+		// Arrange:
+		final Node originalNode = new Node(DEFAULT_ENDPOINT, "plat", "app");
+
+		// Act:
+		final Node node = new Node(Utils.roundtripSerializableEntity(originalNode, null));
+
+		// Assert:
+		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(DEFAULT_ENDPOINT));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat"));
 		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
@@ -50,16 +61,16 @@ public class NodeTest {
 	@Test
 	public void currentVersionIsAssumedIfVersionIsNotSpecified() {
 		// Arrange:
-		Node originalNode = new Node(DEFAULT_ENDPOINT, "plat", "app");
-		JsonSerializer serializer = new JsonSerializer();
+		final Node originalNode = new Node(DEFAULT_ENDPOINT, "plat", "app");
+		final JsonSerializer serializer = new JsonSerializer();
 		originalNode.serialize(serializer);
 
-		JSONObject object = serializer.getObject();
+		final JSONObject object = serializer.getObject();
 		object.remove("version");
 
 		// Act:
-		JsonDeserializer deserializer = new JsonDeserializer(object, null);
-		Node node = new Node(deserializer);
+		final JsonDeserializer deserializer = new JsonDeserializer(object, null);
+		final Node node = new Node(deserializer);
 
 		// Assert:
 		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
@@ -68,7 +79,7 @@ public class NodeTest {
 	@Test
 	public void platformIsOptional() {
 		// Act:
-		Node node = new Node(DEFAULT_ENDPOINT, null, "app");
+		final Node node = new Node(DEFAULT_ENDPOINT, null, "app");
 
 		// Assert:
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("PC"));
@@ -77,7 +88,7 @@ public class NodeTest {
 	@Test
 	public void applicationIsOptional() {
 		// Act:
-		Node node = new Node(DEFAULT_ENDPOINT, "plat", null);
+		final Node node = new Node(DEFAULT_ENDPOINT, "plat", null);
 
 		// Assert:
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
@@ -88,7 +99,7 @@ public class NodeTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
+		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
 
 		// Assert:
 		Assert.assertThat(new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app"), IsEqual.equalTo(node));
@@ -102,8 +113,8 @@ public class NodeTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
-		int hashCode = node.hashCode();
+		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
+		final int hashCode = node.hashCode();
 
 		// Assert:
 		Assert.assertThat(
@@ -127,7 +138,7 @@ public class NodeTest {
 	@Test
 	public void toStringIncludesHost() {
 		// Act:
-		Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
+		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app");
 
 		// Assert:
 		Assert.assertThat(node.toString(), IsEqual.equalTo("Node 10.8.8.2"));

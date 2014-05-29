@@ -92,7 +92,7 @@ public class PushController {
 		final PeerNetwork network = this.host.getNetwork();
 		Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
 		if (null == remoteNode)
-			remoteNode = new Node(new NodeEndpoint(request.getRemoteAddr()), null, null);
+			remoteNode = Node.fromHost(request.getRemoteAddr());
 
 		if (!isValid.test(entity)) {
 			// Bad experience with the remote node.

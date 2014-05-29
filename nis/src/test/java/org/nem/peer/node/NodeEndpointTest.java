@@ -24,9 +24,9 @@ public class NodeEndpointTest {
 	}
 
 	@Test
-	public void ctorCanCreateNewNodeEndpointAroundHost() throws Exception {
+	public void nodeEndpointCanBeCreatedFromHost() throws Exception {
 		// Act:
-		final NodeEndpoint endpoint = new NodeEndpoint("10.8.8.2");
+		final NodeEndpoint endpoint = NodeEndpoint.fromHost("10.8.8.2");
 
 		// Assert:
 		final URL expectedUrl = new URL("http", "10.8.8.2", 7890, "/");

@@ -622,7 +622,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 		final PeerNetwork network = createTestNetwork(nodeExperiences);
-		final Node remoteNode = new Node(new NodeEndpoint(host), null, null);
+		final Node remoteNode = Node.fromHost(host);
 
 		// Act:
 		network.updateExperience(remoteNode, result);
