@@ -198,6 +198,7 @@ public class BlockChain implements BlockSynchronizer {
 		fixGenerationHash(receivedBlock, parent);
 
 		// EVIL hack, see issue#70
+		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
 		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer);
 		// EVIL hack end
