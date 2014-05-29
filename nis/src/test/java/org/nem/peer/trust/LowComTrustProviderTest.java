@@ -8,19 +8,13 @@ import org.nem.peer.test.*;
 
 public class LowComTrustProviderTest {
 
-	private static final double EPSILON = 0.00000001;
-
 	@Test
 	public void zeroWeightDoesNotBiasLowComNodes() {
 		// Act:
 		final ColumnVector vector = getAdjustedTrustVector(0, 0, 0);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(3), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	@Test
@@ -29,11 +23,13 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(0, 5, 40);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
-		Assert.assertEquals(0.4, vector.getAt(1), EPSILON);
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
-		Assert.assertEquals(0.4, vector.getAt(3), EPSILON);
-		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
+		final ColumnVector expectedVector = new ColumnVector(
+				0.2 / 1.4,
+				0.4 / 1.4, // this node should be boosted by 0.4/2
+				0.2 / 1.4,
+				0.4 / 1.4, // this node should be boosted by 0.4/2
+				0.2 / 1.4);
+		Assert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 
 	@Test
@@ -42,11 +38,13 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(9, 100, 10);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
-		Assert.assertEquals(0.3, vector.getAt(1), EPSILON);
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(3), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
+		final ColumnVector expectedVector = new ColumnVector(
+				0.2 / 1.1,
+				0.3 / 1.1, // this node should be boosted by 1/10
+				0.2 / 1.1,
+				0.2 / 1.1,
+				0.2 / 1.1);
+		Assert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 
 	@Test
@@ -55,11 +53,7 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(10, 100, 10);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(3), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	@Test
@@ -68,11 +62,7 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(11, 100, 10);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(3), IsEqual.equalTo(0.2));
-		Assert.assertThat(vector.getAt(4), IsEqual.equalTo(0.2));
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	private static ColumnVector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {

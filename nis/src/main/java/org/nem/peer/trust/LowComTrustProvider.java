@@ -28,14 +28,18 @@ public class LowComTrustProvider implements TrustProvider {
 
 	@Override
 	public ColumnVector computeTrust(final TrustContext context) {
-		final ColumnVector trustVector = this.trustProvider.computeTrust(context);
-		trustVector.normalize();
-
 		final ColumnVector lowComVector = computeLowComVector(context);
-		double lowComVectorSum = lowComVector.sum();
-		return 0 == lowComVectorSum
-				? trustVector
-				: trustVector.add(lowComVector.multiply(1.0 / lowComVectorSum * weight / 100.0));
+		final double lowComVectorSum = lowComVector.sum();
+
+		ColumnVector trustVector = this.trustProvider.computeTrust(context);
+		if (0 != lowComVectorSum && 0 != weight) {
+			trustVector.normalize();
+			lowComVector.scale(lowComVectorSum / weight * 100.0);
+			trustVector = trustVector.add(lowComVector);
+		}
+
+		trustVector.normalize();
+		return trustVector;
 	}
 
 	private static ColumnVector computeLowComVector(final TrustContext context) {
