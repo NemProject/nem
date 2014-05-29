@@ -715,13 +715,7 @@ public class AccountTest {
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
 		// Arrange:
-		account.incrementBalance(new Amount(1000));
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.setLabel("Alpha Sigma");
-		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
-		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
+		setAccountValuesForCopyTests(account);
 
 		// Act:
 		final Account copyAccount = account.copy();
@@ -742,6 +736,16 @@ public class AccountTest {
 		return copyAccount;
 	}
 
+	private static void setAccountValuesForCopyTests(final Account account) {
+		account.incrementBalance(new Amount(1000));
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.incrementForagedBlocks();
+		account.setLabel("Alpha Sigma");
+		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
+		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
+	}
+
 	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
 		if (null == actual || null == expected) {
 			Assert.assertThat(actual, IsEqual.equalTo(expected));
@@ -754,6 +758,54 @@ public class AccountTest {
 
 	private static byte[] getEncodedMessageAt(final Account account, final int index) {
 		return account.getMessages().get(index).getEncodedPayload();
+	}
+
+	//endregion
+
+	//region shallow copy
+
+	@Test
+	public void canCreateShallowCopyWithNewAddress() {
+		// Arrange:
+		final Account original = new Account(Utils.generateRandomAddress());
+		setAccountValuesForCopyTests(original);
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		final Account copy = original.shallowCopyWithAddress(address);
+
+		// Assert:
+		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(address));
+		assertKeyPairsAreEquivalent(copy.getKeyPair(), new KeyPair(address.getPublicKey()));
+		assertShallowCopy(original, copy);
+	}
+
+	@Test
+	public void canCreateShallowCopyWithNewKeyPair() {
+		// Arrange:
+		final Account original = new Account(Utils.generateRandomAddress());
+		setAccountValuesForCopyTests(original);
+		final KeyPair keyPair = new KeyPair();
+
+		// Act:
+		final Account copy = original.shallowCopyWithKeyPair(keyPair);
+
+		// Assert:
+		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
+		assertShallowCopy(original, copy);
+
+	}
+
+	private static void assertShallowCopy(final Account original, final Account copy) {
+		// Assert:
+		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
+		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
+		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
+
+		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
+		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
+		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));
 	}
 
 	//endregion
