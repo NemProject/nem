@@ -12,56 +12,131 @@ public class ActiveNodeTrustProviderTest {
 	@Test
 	public void activeNodesAreNotFilteredOut() {
 		// Act:
-		final ColumnVector vector = getFilteredTrustVector(NodeStatus.ACTIVE);
+		final ColumnVector resultVector = getFilteredTrustVectorWithStatusAtThirdNode(NodeStatus.ACTIVE);
 
-		// Assert:
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(1.0));
+		// Assert: (4 nodes are active with equally-distributed initial trust)
+		Assert.assertThat(resultVector.getAt(2), IsEqual.equalTo(0.25));
 	}
 
 	@Test
 	public void inactiveNodesAreFilteredOut() {
 		// Act:
-		final ColumnVector vector = getFilteredTrustVector(NodeStatus.INACTIVE);
+		final ColumnVector resultVector = getFilteredTrustVectorWithStatusAtThirdNode(NodeStatus.INACTIVE);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+		Assert.assertThat(resultVector.getAt(2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
 	public void failureNodesAreFilteredOut() {
 		// Act:
-		final ColumnVector vector = getFilteredTrustVector(NodeStatus.FAILURE);
+		final ColumnVector resultVector = getFilteredTrustVectorWithStatusAtThirdNode(NodeStatus.FAILURE);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+		Assert.assertThat(resultVector.getAt(2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
 	public void localNodeIsFilteredOut() {
 		// Act:
-		final ColumnVector vector = getFilteredTrustVector(NodeStatus.ACTIVE);
+		final ColumnVector resultVector = getFilteredTrustVectorWithStatusAtThirdNode(NodeStatus.ACTIVE);
 
 		// Assert:
-		Assert.assertThat(vector.getAt(vector.size() - 1), IsEqual.equalTo(0.0));
+		Assert.assertThat(resultVector.getAt(resultVector.size() - 1), IsEqual.equalTo(0.0));
 	}
 
-	private static ColumnVector getFilteredTrustVector(final NodeStatus status) {
+	@Test
+	public void zeroVectorIsReturnedWhenAllNodesAreInactive() {
 		// Arrange:
-		final TestTrustContext testContext = new TestTrustContext();
-		final TrustContext context = testContext.getContext();
-		final ColumnVector vector = new ColumnVector(context.getNodes().length);
-		vector.setAll(1);
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector inputVector = new ColumnVector(1, 1, 1, 1, 1);
+
+		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.INACTIVE);
+
+		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+
+		// Act:
+		final ColumnVector resultVector = provider.computeTrust(context);
+
+		// Assert:
+		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(5)));
+	}
+
+	@Test
+	public void untrustedActiveNodesAreNotAutoTrustedIfAtLeastOneActiveNodeHasAnyTrust() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector inputVector = new ColumnVector(0, 0.0001, 0, 0, 1);
 
 		final Node[] nodes = context.getNodes();
-		final NodeCollection nodeCollection = new NodeCollection();
-		for (final Node node : nodes)
-			nodeCollection.update(node, NodeStatus.ACTIVE);
+		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 
-		nodeCollection.update(nodes[2], status);
+		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(vector), nodeCollection);
+		// Act:
+		final ColumnVector resultVector = provider.computeTrust(context);
+
+		// Assert:
+		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(0, 1, 0, 0, 0)));
+	}
+
+	@Test
+	public void untrustedActiveNodesAreAutoTrustedIfNoActiveNodesHaveAnyTrust() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector inputVector = new ColumnVector(0, 0.0001, 0, 0, 1);
+
+		final Node[] nodes = context.getNodes();
+		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
+		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
+
+		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+
+		// Act:
+		final ColumnVector resultVector = provider.computeTrust(context);
+
+		// Assert:
+		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(1.0 / 3, 0, 1.0 / 3, 1.0 / 3, 0)));
+	}
+
+	@Test
+	public void trustIsDistributedProportionallyAmongActiveNodes() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector inputVector = new ColumnVector(3, 1, 5, 2, 1);
+
+		final Node[] nodes = context.getNodes();
+		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
+		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
+
+		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+
+		// Act:
+		final ColumnVector resultVector = provider.computeTrust(context);
+
+		// Assert:
+		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(0.3, 0, 0.5, 0.2, 0)));
+	}
+
+	private static ColumnVector getFilteredTrustVectorWithStatusAtThirdNode(final NodeStatus status) {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final ColumnVector inputVector = new ColumnVector(1, 1, 1, 1, 1);
+
+		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.ACTIVE);
+		nodeCollection.update(context.getNodes()[2], status);
+
+		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		return provider.computeTrust(context);
+	}
+
+	private static NodeCollection createNodeCollection(final Node[] nodes, final NodeStatus status) {
+		final NodeCollection nodeCollection = new NodeCollection();
+		for (final Node node : nodes)
+			nodeCollection.update(node, status);
+
+		return nodeCollection;
 	}
 }

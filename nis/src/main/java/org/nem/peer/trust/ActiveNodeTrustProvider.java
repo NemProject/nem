@@ -24,14 +24,33 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 
 	@Override
 	public ColumnVector computeTrust(final TrustContext context) {
-		final ColumnVector vector = this.trustProvider.computeTrust(context);
-		final Node[] nodes = context.getNodes();
-		for (int i = 0; i < nodes.length; ++i) {
-			final NodeStatus status = this.nodeCollection.getNodeStatus(nodes[i]);
-			if (NodeStatus.ACTIVE != status || nodes[i].equals(context.getLocalNode()))
-				vector.setAt(i, 0);
+		final ColumnVector result = this.trustProvider.computeTrust(context);
+		final boolean[] activeArray = getActiveArray(context.getNodes(), context.getLocalNode());
+		for (int i = 0; i < activeArray.length; ++i) {
+			if (!activeArray[i])
+				result.setAt(i, 0);
 		}
 
-		return vector;
+		if (0 == result.absSum()) {
+			// none of the active nodes have any trust, distribute the trust among untrusted active nodes
+			for (int i = 0; i < activeArray.length; ++i) {
+				if (activeArray[i])
+					result.setAt(i, 1);
+			}
+		}
+
+		result.normalize();
+		return result;
+	}
+
+	final boolean[] getActiveArray(final Node[] nodes, final Node localNode) {
+		final boolean[] result = new boolean[nodes.length];
+		for (int i = 0; i < nodes.length; ++i) {
+			final NodeStatus status = this.nodeCollection.getNodeStatus(nodes[i]);
+			if (NodeStatus.ACTIVE == status && !nodes[i].equals(localNode))
+				result[i] = true;
+		}
+
+		return result;
 	}
 }

@@ -21,7 +21,7 @@ public class BasicNodeSelector implements NodeSelector {
 	public BasicNodeSelector(final TrustProvider trustProvider, final TrustContext context) {
 		this.context = context;
 		this.trustVector = trustProvider.computeTrust(context);
-		trustVector.normalize();
+		this.trustVector.normalize();
 	}
 
 	@Override
