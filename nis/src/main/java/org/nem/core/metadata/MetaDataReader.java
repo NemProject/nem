@@ -28,7 +28,7 @@ public class MetaDataReader {
 		// TODO: timeProvider should be passed in ... not sure if it should be
 		// owned by CommonStarter or NisMain
 		final TimeProvider timeProvider = new SystemTimeProvider();
-		ApplicationMetaData result = new ApplicationMetaData("NEM", "DEVELOPER BUILD", null, timeProvider);
+		ApplicationMetaData result = null;
 
 		CodeSource cs = clazz.getProtectionDomain().getCodeSource();
 		URL jarURL = cs.getLocation();
@@ -44,17 +44,21 @@ public class MetaDataReader {
 			try (InputStream is = jarURL.openStream()) {
 				result = extractMetaDataFromStream(is, cs, timeProvider);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// 
+				LOGGER.info(String.format("Analysing meta data not possible <%s>", e.getMessage()));
 			}
 		} else {
 			// JavaWebStart
 			try (InputStream is = jarURL.openStream()) {
 				result = extractMetaDataFromStream(is, cs, timeProvider);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// 
+				LOGGER.info(String.format("Analysing meta data not possible <%s>", e.getMessage()));
 			}
+		}
+		
+		if(result == null) {
+			result = new ApplicationMetaData("NEM", "DEVELOPER BUILD", null, timeProvider);
 		}
 
 		return result;
