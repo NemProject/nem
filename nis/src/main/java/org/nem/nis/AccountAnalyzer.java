@@ -60,6 +60,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	public void shallowCopyTo(final AccountAnalyzer rhs) {
 		rhs.addressToAccountMap.clear();
 		rhs.addressToAccountMap.putAll(this.addressToAccountMap);
+		rhs.lastPoiRecalc = this.lastPoiRecalc;
 	}
 
 	/**
@@ -138,6 +139,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 			copy.addressToAccountMap.put(entry.getKey(), entry.getValue().copy());
 		}
 
+		copy.lastPoiRecalc = this.lastPoiRecalc;
 		return copy;
 	}
 

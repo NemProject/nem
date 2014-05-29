@@ -224,7 +224,14 @@ public class AccountAnalyzerTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
+		analyzer.recalculateImportances(new BlockHeight(1234));
+
+		final ColumnVector finalImportanceVector = new ColumnVector(3, 6, 1);
+		final ArgumentCaptor<Collection<Account>> argument = createAccountCollectionArgumentCaptor();
+		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(1234)), argument.capture()))
+				.thenReturn(finalImportanceVector);
 
 		final Account account1 = analyzer.addAccountToCache(address1);
 		final Account account2 = analyzer.addAccountToCache(address2);
@@ -237,11 +244,14 @@ public class AccountAnalyzerTest {
 		final Account copyAccount2 = copyAnalyzer.findByAddress(address2);
 		final Account copyAccount3 = copyAnalyzer.findByAddress(address3);
 
+		copyAnalyzer.recalculateImportances(new BlockHeight(1234));
+
 		// Assert:
 		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(3));
 		Assert.assertThat(copyAccount1, IsNot.not(IsSame.sameInstance(account1)));
 		Assert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
 		Assert.assertThat(copyAccount3, IsNot.not(IsSame.sameInstance(account3)));
+		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -273,7 +283,15 @@ public class AccountAnalyzerTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final AccountAnalyzer analyzer = createAccountAnalyzer();
+
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
+		analyzer.recalculateImportances(new BlockHeight(1234));
+
+		final ColumnVector finalImportanceVector = new ColumnVector(3, 6, 1);
+		final ArgumentCaptor<Collection<Account>> argument = createAccountCollectionArgumentCaptor();
+		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(1234)), argument.capture()))
+				.thenReturn(finalImportanceVector);
 
 		final Account account1 = analyzer.addAccountToCache(address1);
 		final Account account2 = analyzer.addAccountToCache(address2);
@@ -287,11 +305,14 @@ public class AccountAnalyzerTest {
 		final Account copyAccount2 = copyAnalyzer.findByAddress(address2);
 		final Account copyAccount3 = copyAnalyzer.findByAddress(address3);
 
+		copyAnalyzer.recalculateImportances(new BlockHeight(1234));
+
 		// Assert:
 		Assert.assertThat(copyAnalyzer.size(), IsEqual.equalTo(3));
 		Assert.assertThat(copyAccount1, IsSame.sameInstance(account1));
 		Assert.assertThat(copyAccount2, IsSame.sameInstance(account2));
 		Assert.assertThat(copyAccount3, IsSame.sameInstance(account3));
+		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 	}
 
 	@Test
