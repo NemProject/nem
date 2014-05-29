@@ -411,6 +411,11 @@
 					<dependencies>
 						<excludes />
 					</dependencies>
+					<updateManifestEntries>
+						<Permissions>all-permissions</Permissions>
+						<Codebase>${nem-code-base}</Codebase>
+						<Application-Name>${project.name}</Application-Name>
+					</updateManifestEntries>
 					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
 					<sign>
 						<keystore>identity.jks</keystore>
