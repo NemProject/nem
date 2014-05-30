@@ -77,6 +77,11 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		});
 	}
 
+
+	public void removeAccountFromCache(final Account account) {
+		addressToAccountMap.remove(account.getAddress());
+	}
+
 	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
 		if (!address.isValid()) {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());

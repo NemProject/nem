@@ -108,6 +108,36 @@ public class AccountAnalyzerTest {
 
 	//endregion
 
+	//region remove
+	@Test
+	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
+
+		// Act:
+		final Account account = analyzer.addAccountToCache(address);
+		analyzer.removeAccountFromCache(account);
+
+		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void accountWithPublicKeyCanBeRemovedFromCache() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		final Account account = analyzer.addAccountToCache(address);
+		analyzer.removeAccountFromCache(account);
+
+		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
+	}
+	//endregion
+
 	//region findByAddress
 
 	@Test(expected = MissingResourceException.class)
