@@ -600,6 +600,30 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
+	//region isZeroMatrix
+
+	@Test
+	public void isZeroMatrixReturnsTrueIfAndOnlyIfAllElementsAreZero() {
+		// Assert:
+		Assert.assertThat(
+				this.createMatrix(3, 2, new double[] { -3, 2, -5, 7, -1, 8 }).isZeroMatrix(),
+				IsEqual.equalTo(false));
+		Assert.assertThat(
+				this.createMatrix(3, 2, new double[] { -3, 2, -5, 0, -1, 8 }).isZeroMatrix(),
+				IsEqual.equalTo(false));
+		Assert.assertThat(
+				this.createMatrix(3, 2, new double[] { 0, 0, -1, 1, 0, 0 }).isZeroMatrix(),
+				IsEqual.equalTo(false));
+		Assert.assertThat(
+				this.createMatrix(3, 2, new double[] { 0, 0, -1, 0, 0, 0 }).isZeroMatrix(),
+				IsEqual.equalTo(false));
+		Assert.assertThat(
+				this.createMatrix(3, 2, new double[] { 0, 0, 0, 0, 0, 0 }).isZeroMatrix(),
+				IsEqual.equalTo(true));
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test

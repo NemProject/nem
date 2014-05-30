@@ -307,6 +307,8 @@ public abstract class Matrix {
 
 	//endregion
 
+	//region predicates
+
 	/**
 	 * Determines if two this matrix and another matrix have the same dimensions.
 	 *
@@ -324,6 +326,17 @@ public abstract class Matrix {
 		if (col < 0 || col >= this.numCols)
 			throw new IndexOutOfBoundsException("Column index out of bounds");
 	}
+
+	/**
+	 * Determines if this matrix is a zero matrix.
+	 *
+	 * @return true if this matrix is a zero matrix.
+	 */
+	public final boolean isZeroMatrix() {
+		return 0 == this.absSum();
+	}
+
+	//endregion
 
 	//region hashCode / equals
 

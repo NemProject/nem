@@ -31,7 +31,7 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 				result.setAt(i, 0);
 		}
 
-		if (0 == result.absSum()) {
+		if (result.isZeroVector()) {
 			// none of the active nodes have any trust, distribute the trust among untrusted active nodes
 			for (int i = 0; i < activeArray.length; ++i) {
 				if (activeArray[i])

@@ -217,6 +217,19 @@ public class ColumnVector {
 
 	//endregion
 
+	//region predicates
+
+	/**
+	 * Determines if this vector is a zero vector.
+	 *
+	 * @return true if this vector is a zero vector.
+	 */
+	public final boolean isZeroVector() {
+		return this.matrix.isZeroMatrix();
+	}
+
+	//endregion
+
 	//endregion
 
 	//region getRaw / setAll
