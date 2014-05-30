@@ -33,7 +33,7 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 
 	@Override
 	public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
-		addToAccountAnalyzer(height, account);
+		// no need to do anything here
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 
 	@Override
 	public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
-		tryRemoveFromAccountAnalyzer(height, account);
+		// no need to do anything here
 	}
 
 	@Override

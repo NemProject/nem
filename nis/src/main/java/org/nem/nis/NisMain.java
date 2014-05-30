@@ -57,6 +57,7 @@ public class NisMain {
 		final Account genesisAccount = accountAnalyzer.addAccountToCache(GenesisBlock.ACCOUNT.getAddress());
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
 		genesisAccount.getWeightedBalances().addReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
+		genesisAccount.setHeight(BlockHeight.ONE);
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
