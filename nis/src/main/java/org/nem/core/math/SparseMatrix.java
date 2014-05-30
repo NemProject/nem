@@ -1,5 +1,9 @@
 package org.nem.core.math;
 
+import org.nem.core.utils.FormatUtils;
+
+import java.text.DecimalFormat;
+
 /**
  * Represents a sparse matrix.
  */
@@ -31,7 +35,7 @@ public class SparseMatrix extends Matrix {
 		this.values = new double[numRows][];
 		this.cols = new int[numRows][];
 		this.maxIndices = new int[numRows];
-		for (int i=0; i<numRows; i++) {
+		for (int i = 0; i < numRows; ++i) {
 			this.values[i] = new double[initialCapacityPerRow];
 			this.cols[i] = new int[initialCapacityPerRow];
 			this.maxIndices[i] = 0;
@@ -47,7 +51,7 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final double getAtUnchecked(final int row, final int col) {
-		for (int i=0; i<this.maxIndices[row]; i++) {
+		for (int i = 0; i < this.maxIndices[row]; ++i) {
 			if (this.cols[row][i] == col) {
 				return this.values[row][i];
 			}
@@ -59,7 +63,7 @@ public class SparseMatrix extends Matrix {
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
 		if (val == 0.0) {
-			for (int i=0; i<this.maxIndices[row]; i++) {
+			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
 					remove(row, i);
 					return;
@@ -67,7 +71,7 @@ public class SparseMatrix extends Matrix {
 			}
 		} else {
 			int size = this.cols[row].length;
-			for (int i=0; i<this.maxIndices[row]; i++) {
+			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
 					this.values[row][i] = val;
 					return;
@@ -166,6 +170,20 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	public String toString() {
-		return String.format("[%d x %d]", this.getRowCount(), this.getColumnCount());
+		final StringBuilder builder = new StringBuilder();
+		builder.append(String.format("[%d x %d]", this.getRowCount(), this.getColumnCount()));
+
+		this.forEach((r, c, v) -> builder.append(formatEntry(r, c, v)));
+		return builder.toString();
+	}
+
+	private static String formatEntry(int row, int col, double value) {
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		return String.format(
+				"%s(%d, %d) -> %s",
+				System.lineSeparator(),
+				row,
+				col,
+				format.format(value));
 	}
 }

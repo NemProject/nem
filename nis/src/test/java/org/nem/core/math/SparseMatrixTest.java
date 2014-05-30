@@ -11,11 +11,17 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	public void sparseMatrixStringRepresentationIsCorrect() {
 		// Arrange:
 		final Matrix matrix = this.createMatrix(3, 2, new double[] {
-				2.1234, 11.1234, 3.2345, 1, 5012.0126, 8
+				2.1234, 11.1234, 0, 1, 5012.0126, 0
 		});
 
 		// Assert:
-		Assert.assertThat(matrix.toString(), IsEqual.equalTo("[3 x 2]"));
+		final String expectedString =
+				"[3 x 2]" + System.lineSeparator()
+				+ "(0, 0) -> 2.123" + System.lineSeparator()
+				+ "(0, 1) -> 11.123" + System.lineSeparator()
+				+ "(1, 1) -> 1.000" + System.lineSeparator()
+				+ "(2, 0) -> 5012.013";
+		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedString));
 	}
 
 	//endregion
