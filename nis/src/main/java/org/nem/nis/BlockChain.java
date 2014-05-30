@@ -112,7 +112,8 @@ public class BlockChain implements BlockSynchronizer {
 
 	private NodeInteractionResult synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
 		final BlockChainSyncContext context = this.createSyncContext();
-		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer);
+		// IMPORTANT: autoCached here
+		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
@@ -433,7 +434,10 @@ public class BlockChain implements BlockSynchronizer {
 		private void updateOurChain() {
 
 			for (final Block block : this.peerChain) {
+				final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
+				block.subscribe(observer);
 				block.execute();
+				block.unsubscribe(observer);
 			}
 
 			synchronized (this.blockChainLastBlockLayer) {

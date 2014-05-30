@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.nem.core.crypto.*;
 import org.nem.core.math.ColumnVector;
@@ -153,6 +154,13 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		return this.addressToAccountMap.values().iterator();
 	}
 
+
+	private Collection<Account> getAccount(final BlockHeight blockHeight) {
+		return this.addressToAccountMap.values().stream()
+				.filter(a -> (a.getHeight() != null && a.getHeight().compareTo(blockHeight)<=0))
+				.collect(Collectors.toList());
+	}
+
 	/**
 	 * Recalculates the importance of all accounts at the specified block height.
 	 *
@@ -162,7 +170,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		if (null != this.lastPoiRecalc && 0 == this.lastPoiRecalc.compareTo(blockHeight))
 			return;
 
-		final Collection<Account> accounts = this.addressToAccountMap.values();
+		final Collection<Account> accounts = this.getAccount(blockHeight);
 		final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
 
 		int i = 0;
