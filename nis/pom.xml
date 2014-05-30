@@ -21,6 +21,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Should be without http so that the code base is valid for http and 
+			https -->
+		<nem-code-base>nem.pucchiwerk.eu</nem-code-base>
 
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.1.3.v20140225</jetty.version>
@@ -30,7 +33,6 @@
 
 		<hibernate.version>4.3.0.Final</hibernate.version>
 		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
-		<nem-code-base>http://nem.pucchiwerk.eu/nem</nem-code-base>
 	</properties>
 
 	<dependencies>
@@ -371,6 +373,7 @@
 							<Permissions>all-permissions</Permissions>
 							<Codebase>${nem-code-base}</Codebase>
 							<Application-Name>${project.name}</Application-Name>
+							<Trusted-Only>true</Trusted-Only>
 							<Implementation-Build>${project.version}</Implementation-Build>
 							<Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
 						</manifestEntries>
