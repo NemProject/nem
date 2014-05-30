@@ -383,6 +383,7 @@ public class BlockChain implements BlockSynchronizer {
 		 */
 		private boolean validatePeerChain() {
 			final BlockChainValidator validator = new BlockChainValidator(
+					this.accountAnalyzer,
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT);
 			this.calculatePeerChainDifficulties();
@@ -432,14 +433,6 @@ public class BlockChain implements BlockSynchronizer {
 		 * 5. update db with "peer's" chain
 		 */
 		private void updateOurChain() {
-
-			for (final Block block : this.peerChain) {
-				final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
-				block.subscribe(observer);
-				block.execute();
-				block.unsubscribe(observer);
-			}
-
 			synchronized (this.blockChainLastBlockLayer) {
 				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
