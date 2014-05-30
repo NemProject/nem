@@ -10,23 +10,20 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 	}
 
 	private void addToAccountAnalyzer(final BlockHeight height, final Account account) {
-		final Account dummy = this.accountAnalyzer.findByAddress(account.getAddress());
-		final Account added = this.accountAnalyzer.addAccountToCache(account.getAddress());
+		final Account found = this.accountAnalyzer.findByAddress(account.getAddress());
 
-		// means it's not yet in AA
-		if (dummy != added) {
-			added.setHeight(height);
+		if (found.getHeight() == null) {
+			found.setHeight(height);
 		}
 	}
 
 
 	private void tryRemoveFromAccountAnalyzer(final BlockHeight height, final Account account) {
-		final Account dummy = this.accountAnalyzer.findByAddress(account.getAddress());
-		final Account added = this.accountAnalyzer.addAccountToCache(account.getAddress());
+		final Account found = this.accountAnalyzer.findByAddress(account.getAddress());
 
-		if (dummy == added) {
-			if (added.getHeight().equals(height)) {
-				this.accountAnalyzer.removeAccountFromCache(added);
+		if (found != null && found.getHeight() != null) {
+			if (found.getHeight().equals(height)) {
+				this.accountAnalyzer.removeAccountFromCache(found);
 			}
 
 		} else {

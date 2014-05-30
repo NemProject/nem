@@ -8,6 +8,7 @@ import org.nem.nis.AccountAnalyzer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AccountsHeightObserverTest {
 	@Test
@@ -16,6 +17,8 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = mock(AccountAnalyzer.class);
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
+		when(accountAnalyzer.findByAddress(account1.getAddress())).thenReturn(account1);
+		when(accountAnalyzer.findByAddress(account2.getAddress())).thenReturn(account2);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
@@ -25,10 +28,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		Mockito.verify(accountAnalyzer, Mockito.times(2)).findByAddress(account1.getAddress());
-		Mockito.verify(accountAnalyzer, Mockito.times(2)).addAccountToCache(account1.getAddress());
-
 		Mockito.verify(accountAnalyzer, Mockito.times(1)).findByAddress(account2.getAddress());
-		Mockito.verify(accountAnalyzer, Mockito.times(1)).addAccountToCache(account2.getAddress());
 	}
 
 	//region adding
@@ -38,6 +38,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifySend(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -55,6 +56,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -74,6 +76,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifySend(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -90,6 +93,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -106,6 +110,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifySend(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -122,6 +127,7 @@ public class AccountsHeightObserverTest {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		final Account account1 = Utils.generateRandomAccount();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 
 		// Act:
 		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
