@@ -149,23 +149,6 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
-	//region isSameSize
-
-	@Test
-	public void isSameSizeReturnsTrueWhenMatriciesHaveSameSize() {
-		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2);
-
-		// Assert:
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 2)), IsEqual.equalTo(true));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(2, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(4, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 1)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 3)), IsEqual.equalTo(false));
-	}
-
-	//endregion
-
 	//region rowSum / columnSum
 
 	@Test
@@ -596,6 +579,23 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		Assert.assertThat(
 				matrix,
 				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 2, 0, 0, 0, 8 })));
+	}
+
+	//endregion
+
+	//region isSameSize
+
+	@Test
+	public void isSameSizeReturnsTrueWhenMatriciesHaveSameSize() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2);
+
+		// Assert:
+		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 2)), IsEqual.equalTo(true));
+		Assert.assertThat(matrix.isSameSize(this.createMatrix(2, 2)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(this.createMatrix(4, 2)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 1)), IsEqual.equalTo(false));
+		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 3)), IsEqual.equalTo(false));
 	}
 
 	//endregion
