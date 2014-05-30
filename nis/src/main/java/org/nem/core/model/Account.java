@@ -21,6 +21,8 @@ public class Account implements SerializableEntity {
 	private final WeightedBalances weightedBalances;
 	private final AccountImportance importance;
 
+	private BlockHeight height;
+
 	/**
 	 * Creates an account around a key pair.
 	 *
@@ -74,6 +76,8 @@ public class Account implements SerializableEntity {
 		this.messages.addAll(rhs.getMessages());
 		this.weightedBalances = rhs.weightedBalances.copy();
 		this.importance = rhs.importance.copy();
+
+		this.height = rhs.getHeight();
 	}
 
 	private Account(final Account rhs, final KeyPair keyPair) {
@@ -87,6 +91,8 @@ public class Account implements SerializableEntity {
 		this.messages = rhs.getMessages();
 		this.weightedBalances = rhs.weightedBalances;
 		this.importance = rhs.importance;
+
+		this.height = rhs.getHeight();
 	}
 
 	/**
@@ -265,6 +271,22 @@ public class Account implements SerializableEntity {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Returns height of an account.
+	 * @return The height of an account - when the account has been created.
+	 */
+	public BlockHeight getHeight() {
+		return height;
+	}
+
+	/**
+	 * Sets height of an account.
+	 * @param height
+	 */
+	public void setHeight(final BlockHeight height) {
+		this.height = height;
 	}
 
 	/**
