@@ -158,6 +158,8 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	private Collection<Account> getAccounts(final BlockHeight blockHeight) {
 		return this.addressToAccountMap.values().stream()
 				.filter(a -> (a.getHeight() != null && a.getHeight().compareTo(blockHeight)<=0))
+				// we  don't want genesis block
+				.filter(a -> !(a.getAddress().getEncoded().equals(GenesisBlock.ACCOUNT.getAddress().getEncoded())))
 				.collect(Collectors.toList());
 	}
 
