@@ -225,7 +225,7 @@ public class BlockChain implements BlockSynchronizer {
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
-		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer);
+		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.asAutoCache());
 		// EVIL hack end
 
 		long ourScore = 0L;
