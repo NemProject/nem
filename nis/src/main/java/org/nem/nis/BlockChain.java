@@ -50,13 +50,36 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param block The block to check.
 	 * @return true if block can be next in chain
 	 */
-	public boolean isNextBlock(final Block block) {
+	private boolean hasLastBlockAsParent(final Block block) {
 		boolean result;
 		synchronized (blockChainLastBlockLayer) {
 			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
 			LOGGER.info("isNextBlock result: " + result);
 		}
 		return result;
+	}
+
+	/**
+	 * Checks if given block has the same parent as last block in the chain
+	 *
+	 * @param block The block to check.
+	 * @return true if block can be next in chain
+	 */
+	private boolean hasSameParent(final Block block) {
+		boolean result;
+		synchronized (blockChainLastBlockLayer) {
+			// it's better to base it on hash of previous block instead of height
+			result = this.blockChainLastBlockLayer.getLastDbBlock().getPrevBlockHash().equals(block.getPreviousBlockHash());
+		}
+		return result;
+	}
+
+	public NodeInteractionResult checkPushedBlock(final Block block) {
+		if (! this.hasLastBlockAsParent(block)) {
+			// if peer tried to send us block that we also generated, there is no sense to punish him
+			return hasSameParent(block) ? NodeInteractionResult.NEUTRAL : NodeInteractionResult.FAILURE;
+		}
+		return block.verify() ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE;
 	}
 
 	public Block forageBlock() {

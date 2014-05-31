@@ -43,7 +43,7 @@ public class PushService {
 	public void pushTransaction(final Transaction entity, final HttpServletRequest request) {
 		boolean result = this.pushEntity(
 				entity,
-				transaction -> transaction.isValid() && transaction.verify(),
+				transaction -> (transaction.isValid() && transaction.verify()) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE,
 				this.foraging::processTransaction,
 				NodeApiId.REST_PUSH_TRANSACTION,
 				request);
@@ -61,7 +61,7 @@ public class PushService {
 	public void pushBlock(final Block entity, final HttpServletRequest request) {
 		boolean result = this.pushEntity(
 				entity,
-				block -> this.blockChain.isNextBlock(block) && block.verify(),
+				this.blockChain::checkPushedBlock,
 				this.blockChain::processBlock,
 				NodeApiId.REST_PUSH_BLOCK,
 				request);
@@ -72,7 +72,7 @@ public class PushService {
 
 	private <T extends VerifiableEntity> boolean pushEntity(
 			final T entity,
-			final Predicate<T> isValid,
+			final Function<T, NodeInteractionResult> isValid,
 			final Function<T, NodeInteractionResult> isAccepted,
 			final NodeApiId broadcastId,
 			final HttpServletRequest request) {
@@ -85,9 +85,10 @@ public class PushService {
 		if (null == remoteNode)
 			remoteNode = Node.fromHost(request.getRemoteAddr());
 
-		if (!isValid.test(entity)) {
+		final NodeInteractionResult isValidStatus = isValid.apply(entity);
+		if (isValidStatus != NodeInteractionResult.SUCCESS) {
 			// Bad experience with the remote node.
-			network.updateExperience(remoteNode, NodeInteractionResult.FAILURE);
+			network.updateExperience(remoteNode, isValidStatus);
 			return false;
 		}
 
