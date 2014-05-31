@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * Represents a collection of all known NEM nodes.
@@ -260,7 +260,7 @@ public class PeerNetwork {
 		}
 
 		public CompletableFuture<Void> refresh() {
-			final List<CompletableFuture> futures = this.nodes.getAllNodes().stream()
+			final List<CompletableFuture> futures = this.getRefreshNodes()
 					.map(this::refreshNodeAsync)
 					.collect(Collectors.toList());
 
@@ -269,6 +269,13 @@ public class PeerNetwork {
 						for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
 							this.nodes.update(entry.getKey(), entry.getValue());
 					});
+		}
+
+		private Stream<Node> getRefreshNodes() {
+			// always include pre-trusted nodes even if they previously resulted in a failure
+			final Set<Node> refreshNodes = new HashSet<>(this.nodes.getAllNodes());
+			refreshNodes.addAll(this.preTrustedNodes.getNodes().stream().collect(Collectors.toList()));
+			return refreshNodes.stream();
 		}
 
 		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
@@ -316,16 +323,11 @@ public class PeerNetwork {
 			return lhs.equals(rhs);
 		}
 
-		private void update(final Node node, NodeStatus status) {
+		private void update(final Node node, final NodeStatus status) {
 			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
-			// Don't remove pretrusted nodes, sometimes it's the only way to recover
-			if (status == NodeStatus.FAILURE &&
-				this.preTrustedNodes.isPreTrusted(node)) {
-				status = NodeStatus.INACTIVE;
-			}
-			LOGGER.info("Updating \"" + node + "\" -> " + status);
+			LOGGER.info(String.format("Updating \"%s\" -> %s", node, status));
 			this.nodesToUpdate.put(node, status);
 		}
 	}

@@ -93,6 +93,37 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.INACTIVE);
+		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.INACTIVE);
+
+		// Act:
+		network.refresh().join();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(4));
+	}
+
+	@Test
+	public void refreshCallsGetInfoForEveryActiveNode() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
+		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.ACTIVE);
+
+		// Act:
+		network.refresh().join();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(4));
+	}
+
+	@Test
+	public void refreshDoesNotCallGetInfoForNonPreTrustedFailedNode() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.FAILURE);
 
 		// Act:
 		network.refresh().join();
@@ -102,17 +133,23 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void refreshCallsGetInfoForEveryActiveNode() {
+	public void refreshCallsGetInfoForPreTrustedFailedNode() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.FAILURE);
 
 		// Act:
-		network.refresh().join(); // transition all nodes to active
 		network.refresh().join();
 
 		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(6));
+		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
+	}
+
+	private static void updateAllNodes(final PeerNetwork network, final NodeStatus status) {
+		// Arrange:
+		final NodeCollection nodes = network.getNodes();
+		nodes.getAllNodes().stream().forEach(node -> nodes.update(node, status));
 	}
 
 	@Test
