@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 /**
  * NIS PeerNetworkHost
@@ -89,9 +90,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 		private final PeerNetwork network;
 		private final AsyncTimer refreshTimer;
-		private final AsyncTimer broadcastTimer;
-		private final AsyncTimer syncTimer;
-		private final AsyncTimer pruneInactiveNodesTimer;
+		private final List<AsyncTimer> secondaryTimers;
 
 		/**
 		 * Creates a host that hosts the specified network.
@@ -107,23 +106,19 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					getRefreshDelayStrategy());
 			this.refreshTimer.setName("REFRESH");
 
-			this.broadcastTimer = AsyncTimer.After(
-					this.refreshTimer,
-					() -> this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
-					new UniformDelayStrategy(BROADCAST_INTERVAL));
-			this.broadcastTimer.setName("BROADCAST");
-
-			this.syncTimer = AsyncTimer.After(
-					this.refreshTimer,
-					() -> CompletableFuture.runAsync(this.network::synchronize),
-					new UniformDelayStrategy(SYNC_INTERVAL));
-			this.syncTimer.setName("SYNC");
-
-			this.pruneInactiveNodesTimer = AsyncTimer.After(
-					this.refreshTimer,
-					() -> CompletableFuture.runAsync(this.network::pruneInactiveNodes),
-					new UniformDelayStrategy(PRUNE_INACTIVE_NODES_DELAY));
-			this.pruneInactiveNodesTimer.setName("PRUNING INACTIVE NODES");
+			this.secondaryTimers = Arrays.asList(
+					this.createSecondaryAsyncTimer(
+							() -> this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+							BROADCAST_INTERVAL,
+							"BROADCAST"),
+					this.createSecondaryAsyncTimer(
+							() -> CompletableFuture.runAsync(this.network::synchronize),
+							SYNC_INTERVAL,
+							"SYNC"),
+					this.createSecondaryAsyncTimer(
+							() -> CompletableFuture.runAsync(this.network::pruneInactiveNodes),
+							PRUNE_INACTIVE_NODES_DELAY,
+							"PRUNING INACTIVE NODES"));
 		}
 
 		private static AbstractDelayStrategy getRefreshDelayStrategy() {
@@ -139,6 +134,18 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			return new AggregateDelayStrategy(subStrategies);
 		}
 
+		private AsyncTimer createSecondaryAsyncTimer(
+				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+				final int delay,
+				final String name) {
+			final AsyncTimer timer = AsyncTimer.After(
+					this.refreshTimer,
+					recurringFutureSupplier,
+					new UniformDelayStrategy(delay));
+			timer.setName(name);
+			return timer;
+		}
+
 		/**
 		 * Gets the hosted network.
 		 *
@@ -151,9 +158,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		@Override
 		public void close() {
 			this.refreshTimer.close();
-			this.broadcastTimer.close();
-			this.syncTimer.close();
-			this.pruneInactiveNodesTimer.close();
+			this.secondaryTimers.forEach(AsyncTimer::close);
 		}
 	}
 }
