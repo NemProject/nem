@@ -97,6 +97,15 @@ public class AccountImportance {
 	}
 
 	/**
+	 * Gets the height at which importance is set.
+	 *
+	 * @return The height of importance.
+	 */
+	public BlockHeight getHeight() {
+		return this.importanceHeight;
+	}
+
+	/**
 	 * Creates a copy of this importance.
 	 *
 	 * @return A copy of this importance.

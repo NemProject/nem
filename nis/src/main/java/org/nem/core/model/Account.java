@@ -126,6 +126,7 @@ public class Account implements SerializableEntity {
 
 	/**
 	 * Deserializes an account.
+	 * Currently this deserializer is used ONLY by NCC
 	 *
 	 * @param deserializer The deserializer.
 	 */
@@ -135,6 +136,10 @@ public class Account implements SerializableEntity {
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
+
+		final BlockHeight importanceHeight = BlockHeight.readFrom(deserializer, "importanceHeight");
+		final Double importanceValue = deserializer.readDouble("importance");
+		this.importance.setImportance(importanceHeight, importanceValue);
 		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
 
@@ -152,6 +157,15 @@ public class Account implements SerializableEntity {
 		Amount.writeTo(serializer, "balance", this.getBalance());
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
+
+		final BlockHeight importanceHeight = this.getImportanceInfo().getHeight();
+		if (importanceHeight != null) {
+			BlockHeight.writeTo(serializer, "importanceHeight", importanceHeight);
+			serializer.writeDouble("importance", this.getImportanceInfo().getImportance(importanceHeight));
+		} else {
+			BlockHeight.writeTo(serializer, "importanceHeight", BlockHeight.ONE);
+			serializer.writeDouble("importance", 0.0);
+		}
 		serializer.writeObjectArray("messages", this.getMessages());
 	}
 

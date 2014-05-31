@@ -33,6 +33,7 @@ public class AccountTest {
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -51,6 +52,7 @@ public class AccountTest {
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -71,6 +73,7 @@ public class AccountTest {
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -134,6 +137,21 @@ public class AccountTest {
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(85)));
 	}
 
+	//endregion
+
+	//region importance
+	@Test
+	public void importanceCanBeSet() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.123);
+
+		// Assert:
+		Assert.assertThat(account.getImportanceInfo().getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(account.getImportanceInfo().getImportance(new BlockHeight(123)), IsEqual.equalTo(0.123));
+	}
 	//endregion
 
 	//region foraged blocks
@@ -466,6 +484,8 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
+		Assert.assertThat(BlockHeight.readFrom(deserializer, "importanceHeight"), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(0.123));
 
 		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
 		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
@@ -481,6 +501,7 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
+		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.123);
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
