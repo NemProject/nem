@@ -73,6 +73,22 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
+	public void canRoundtripDouble() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+		final Double d = 0.999999999534338712692260742187500;
+
+		// Act:
+		serializer.writeDouble("double", d);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final Double l = deserializer.readDouble("double");
+
+		// Assert:
+		Assert.assertThat(l, IsEqual.equalTo(d));
+	}
+
+	@Test
 	public void canRoundtripBigInteger() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
@@ -257,7 +273,9 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeBytes("beta", new byte[] { 2, 4, 6 });
 		serializer.writeObject("object", new MockSerializableEntity(7, "foo", 5));
 		serializer.writeInt("gamma", 7);
-		serializer.writeString("epsilon", "FooBar");
+		serializer.writeDouble("epsilon", Double.MIN_NORMAL);
+		serializer.writeDouble("epsiloner", Double.MIN_VALUE);
+		serializer.writeString("foobar", "FooBar");
 		serializer.writeObjectArray("entities", Arrays.asList(
 				new MockSerializableEntity(5, "ooo", 62),
 				new MockSerializableEntity(8, "ala", 15)
@@ -278,7 +296,9 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
 
 		Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
-		Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
+		Assert.assertThat(deserializer.readDouble("epsilon"), IsEqual.equalTo(Double.MIN_NORMAL));
+		Assert.assertThat(deserializer.readDouble("epsiloner"), IsEqual.equalTo(Double.MIN_VALUE));
+		Assert.assertThat(deserializer.readString("foobar"), IsEqual.equalTo("FooBar"));
 
 		final List<MockSerializableEntity> entities = deserializer.readObjectArray(
 				"entities",

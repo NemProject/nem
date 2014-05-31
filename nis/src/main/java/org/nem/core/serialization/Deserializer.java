@@ -28,6 +28,15 @@ public interface Deserializer {
 	public Long readLong(final String label);
 
 	/**
+	 * Reads a 64-bit double value.
+	 *
+	 * @param label The optional name of the value.
+	 *
+	 * @return The read value.
+	 */
+	public Double readDouble(final String label);
+
+	/**
 	 * Reads a BigInteger value.
 	 *
 	 * @param label The optional name of the value.

@@ -43,6 +43,12 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	}
 
 	@Override
+	public Double readDouble(final String label) {
+		// TODO: this can probably throw (on malformed input)
+		return Double.longBitsToDouble(this.readLong(label));
+	}
+
+	@Override
 	public BigInteger readBigInteger(final String label) {
 		byte[] bytes = this.readBytes(null);
 		return new BigInteger(bytes);

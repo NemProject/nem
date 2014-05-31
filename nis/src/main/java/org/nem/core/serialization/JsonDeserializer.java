@@ -55,6 +55,20 @@ public class JsonDeserializer implements Deserializer {
 	}
 
 	@Override
+	public Double readDouble(final String label) {
+		this.checkLabel(label);
+
+		final Object object = this.object.get(label);
+		if (null == object)
+			return null;
+
+		if (object instanceof Double)
+			return (Double)object;
+
+		return null;
+	}
+
+	@Override
 	public BigInteger readBigInteger(final String label) {
 		final byte[] bytes = this.readBytes(label);
 		return null == bytes ? null : new BigInteger(bytes);

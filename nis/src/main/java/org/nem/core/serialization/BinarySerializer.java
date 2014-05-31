@@ -44,6 +44,11 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 	}
 
 	@Override
+	public void writeDouble(final String label, final Double value) {
+		this.writeLong(label, Double.doubleToLongBits(value));
+	}
+
+	@Override
 	public void writeBigInteger(final String label, final BigInteger i) {
 		this.writeBytes(null, i.toByteArray());
 	}

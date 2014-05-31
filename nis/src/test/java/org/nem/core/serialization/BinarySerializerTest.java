@@ -5,6 +5,8 @@ import org.junit.*;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.*;
 
 public class BinarySerializerTest extends SerializerTest<BinarySerializer, BinaryDeserializer> {
@@ -48,6 +50,21 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x50, 0x13, (byte)0x95, (byte)0xCE,
 					0x33, (byte)0xA0, 0x39, (byte)0xF2
 			};
+			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+		}
+	}
+
+	@Test
+	public void canWriteDouble() throws Exception {
+		// Arrange:
+		try (BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			// print "%.34f" %sum([1.0/2**i for i in xrange(1, 32)])
+			final Double d = 0.999999999534338712692260742187500;
+			serializer.writeDouble("double", d);
+
+			// Assert:
+			final byte[] expectedBytes = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putDouble(d).array();
 			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
