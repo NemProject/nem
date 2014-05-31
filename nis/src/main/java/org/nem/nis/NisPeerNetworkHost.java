@@ -15,13 +15,12 @@ import java.util.concurrent.CompletableFuture;
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
-
 	private static final int ONE_SECOND = 1000;
 	private static final int ONE_MINUTE = 60 * ONE_SECOND;
 	private static final int ONE_HOUR = 60 * ONE_MINUTE;
 
 	private static final int REFRESH_INITIAL_DELAY = 200;
-	private static final int REFRESH_INITIAL_INTERVAL = 1 * ONE_SECOND;
+	private static final int REFRESH_INITIAL_INTERVAL = ONE_SECOND;
 	private static final int REFRESH_PLATEAU_INTERVAL = 5 * ONE_MINUTE;
 	private static final int REFRESH_BACK_OFF_TIME = 12 * ONE_HOUR;
 
@@ -31,6 +30,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
 	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
+
+	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
@@ -90,6 +91,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		private final AsyncTimer refreshTimer;
 		private final AsyncTimer broadcastTimer;
 		private final AsyncTimer syncTimer;
+		private final AsyncTimer pruneInactiveNodesTimer;
 
 		/**
 		 * Creates a host that hosts the specified network.
@@ -116,6 +118,12 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					() -> CompletableFuture.runAsync(this.network::synchronize),
 					new UniformDelayStrategy(SYNC_INTERVAL));
 			this.syncTimer.setName("SYNC");
+
+			this.pruneInactiveNodesTimer = AsyncTimer.After(
+					this.refreshTimer,
+					() -> CompletableFuture.runAsync(this.network::pruneInactiveNodes),
+					new UniformDelayStrategy(PRUNE_INACTIVE_NODES_DELAY));
+			this.pruneInactiveNodesTimer.setName("PRUNING INACTIVE NODES");
 		}
 
 		private static AbstractDelayStrategy getRefreshDelayStrategy() {
@@ -145,6 +153,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.refreshTimer.close();
 			this.broadcastTimer.close();
 			this.syncTimer.close();
+			this.pruneInactiveNodesTimer.close();
 		}
 	}
 }

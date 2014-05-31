@@ -581,7 +581,8 @@ public class PeerNetworkTest {
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
 						synchronizer),
-				nodeExperiences);
+				nodeExperiences,
+				new NodeCollection());
 
 		network.refresh().join();
 
@@ -661,6 +662,23 @@ public class PeerNetworkTest {
 		// Act:
 		network.updateExperience(remoteNode, result);
 		return nodeExperiences.getNodeExperience(network.getLocalNode(), remoteNode);
+	}
+
+	//endregion
+
+	//region pruneInactiveNodes
+
+	@Test
+	public void pruneInactiveNodesDelegatesToNodeCollection() {
+		// Arrange:
+		final NodeCollection nodes = Mockito.mock(NodeCollection.class);
+		final PeerNetwork network = createTestNetwork(nodes);
+
+		// Act:
+		network.pruneInactiveNodes();
+
+		// Assert:
+		Mockito.verify(nodes, Mockito.times(1)).pruneInactiveNodes();
 	}
 
 	//endregion
@@ -922,20 +940,23 @@ public class PeerNetworkTest {
 	private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
 		return new PeerNetwork(
 				ConfigFactory.createDefaultTestConfig(),
-				new PeerNetworkServices(
-						new MockConnector(),
-						Mockito.mock(SyncConnectorPool.class),
-						new MockBlockSynchronizer()),
-				nodeExperiences);
+				createMockPeerNetworkServices(),
+				nodeExperiences,
+				new NodeCollection());
+	}
+
+	private static PeerNetwork createTestNetwork(final NodeCollection nodes) {
+		return new PeerNetwork(
+				ConfigFactory.createDefaultTestConfig(),
+				createMockPeerNetworkServices(),
+				new NodeExperiences(),
+				nodes);
 	}
 
 	private static PeerNetwork createTestNetwork(final TrustProvider provider) {
 		return new PeerNetwork(
 				ConfigFactory.createConfig(provider),
-				new PeerNetworkServices(
-						new MockConnector(),
-						Mockito.mock(SyncConnectorPool.class),
-						new MockBlockSynchronizer()));
+				createMockPeerNetworkServices());
 	}
 
 	private static PeerNetwork createTestNetwork() {

@@ -38,26 +38,29 @@ public class PeerNetwork {
 	 * @param config          The network configuration.
 	 * @param services        The services to use.
 	 * @param nodeExperiences The node experiences to use.
+	 * @param nodeCollection  The node collection to use.
 	 */
 	public PeerNetwork(
 			final Config config,
 			final PeerNetworkServices services,
-			final NodeExperiences nodeExperiences) {
-		this(config, config.getLocalNode(), services, nodeExperiences);
+			final NodeExperiences nodeExperiences,
+			final NodeCollection nodeCollection) {
+		this(config, config.getLocalNode(), services, nodeExperiences, nodeCollection);
 	}
 
 	private PeerNetwork(
 			final Config config,
 			final Node localNode,
 			final PeerNetworkServices services,
-			final NodeExperiences nodeExperiences) {
+			final NodeExperiences nodeExperiences,
+			final NodeCollection nodeCollection) {
 		this.config = config;
 		this.localNode = localNode;
-		this.nodes = new NodeCollection();
 		this.peerConnector = services.getPeerConnector();
 		this.syncConnectorPool = services.getSyncConnectorPool();
 		this.blockSynchronizer = services.getBlockSynchronizer();
 		this.nodeExperiences = nodeExperiences;
+		this.nodes = nodeCollection;
 
 		for (final Node node : config.getPreTrustedNodes().getNodes())
 			nodes.update(node, NodeStatus.INACTIVE);
@@ -70,7 +73,7 @@ public class PeerNetwork {
 	 * @param services The services to use.
 	 */
 	public PeerNetwork(final Config config, final PeerNetworkServices services) {
-		this(config, services, new NodeExperiences());
+		this(config, services, new NodeExperiences(), new NodeCollection());
 	}
 
 	/**
@@ -101,7 +104,8 @@ public class PeerNetwork {
 											config,
 											getLocalNode(configLocalNode, endpoint),
 											services,
-											new NodeExperiences()));
+											new NodeExperiences(),
+											new NodeCollection()));
 								}))
 				.collect(Collectors.toList());
 
@@ -236,6 +240,17 @@ public class PeerNetwork {
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
 		(NodeInteractionResult.SUCCESS == result ? experience.successfulCalls() : experience.failedCalls()).increment();
 		LOGGER.info(String.format("Updating experience with %s: %s", node, result));
+	}
+
+	/**
+	 * Prunes all nodes that have stayed inactive since the last time this function was called.
+	 */
+	public void pruneInactiveNodes() {
+		LOGGER.fine("pruning inactive nodes");
+		final int numInitialInactiveNodes = this.nodes.getInactiveNodes().size();
+		this.nodes.pruneInactiveNodes();
+		final int numNodesPruned = numInitialInactiveNodes - this.nodes.getInactiveNodes().size();
+		LOGGER.info(String.format("%d inactive node(s) were pruned", numNodesPruned));
 	}
 
 	private static class NodeRefresher {

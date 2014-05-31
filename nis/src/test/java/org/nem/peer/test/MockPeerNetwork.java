@@ -6,6 +6,7 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.node.NodeApiId;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
+import org.nem.peer.node.NodeCollection;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.concurrent.CompletableFuture;
@@ -45,7 +46,11 @@ public class MockPeerNetwork extends PeerNetwork {
 	 * @param nodeExperiences The node experiences.
 	 */
 	public MockPeerNetwork(final NodeExperiences nodeExperiences) {
-		super(ConfigFactory.createDefaultTestConfig(), createMockPeerNetworkServices(), nodeExperiences);
+		super(
+				ConfigFactory.createDefaultTestConfig(),
+				createMockPeerNetworkServices(),
+				nodeExperiences,
+				new NodeCollection());
 		this.refreshMonitor = null;
 	}
 
