@@ -155,9 +155,11 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	}
 
 
-	private Collection<Account> getAccount(final BlockHeight blockHeight) {
+	private Collection<Account> getAccounts(final BlockHeight blockHeight) {
 		return this.addressToAccountMap.values().stream()
 				.filter(a -> (a.getHeight() != null && a.getHeight().compareTo(blockHeight)<=0))
+				// we  don't want genesis block
+				.filter(a -> !(a.getAddress().getEncoded().equals(GenesisBlock.ACCOUNT.getAddress().getEncoded())))
 				.collect(Collectors.toList());
 	}
 
@@ -170,7 +172,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		if (null != this.lastPoiRecalc && 0 == this.lastPoiRecalc.compareTo(blockHeight))
 			return;
 
-		final Collection<Account> accounts = this.getAccount(blockHeight);
+		final Collection<Account> accounts = this.getAccounts(blockHeight);
 		final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
 
 		int i = 0;
