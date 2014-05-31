@@ -12,8 +12,8 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
-import org.nem.core.metadata.ApplicationMetaData;
-import org.nem.core.metadata.MetaDataReader;
+import org.nem.core.metadata.*;
+import org.nem.core.time.SystemTimeProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -30,7 +30,9 @@ import org.springframework.web.servlet.DispatcherServlet;
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
-	public final static ApplicationMetaData META_DATA = MetaDataReader.extractMetaData(CommonStarter.class);;
+	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(
+			CommonStarter.class,
+			new SystemTimeProvider());
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");

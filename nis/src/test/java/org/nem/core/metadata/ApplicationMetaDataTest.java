@@ -33,7 +33,7 @@ public class ApplicationMetaDataTest {
 		// Arrange:
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(100), new TimeInstant(125));
-		final X509Certificate certificate = createMockCertificateWithName("CN=Someone,O=NemSoft");
+		final X509Certificate certificate = MetaDataTestUtils.createMockCertificateWithName("CN=Someone,O=NemSoft");
 
 		// Act:
 		final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", certificate, timeProvider);
@@ -51,7 +51,7 @@ public class ApplicationMetaDataTest {
 		// Arrange:
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(100), new TimeInstant(125));
-		final X509Certificate certificate = createMockCertificateWithName("CN=Someone,O=NemSoft");
+		final X509Certificate certificate = MetaDataTestUtils.createMockCertificateWithName("CN=Someone,O=NemSoft");
 		final ApplicationMetaData originalMetaData = new ApplicationMetaData("foo", "12.0", certificate, timeProvider);
 
 		// Act:
@@ -85,12 +85,5 @@ public class ApplicationMetaDataTest {
 
 	private static ApplicationMetaData roundtripMetaData(final ApplicationMetaData metaData) {
 		return new ApplicationMetaData(Utils.roundtripSerializableEntity(metaData, null));
-	}
-
-	private static X509Certificate createMockCertificateWithName(final String name) {
-		final X509Certificate certificate = Mockito.mock(X509Certificate.class);
-		final X500Principal principal = new X500Principal(name);
-		Mockito.when(certificate.getIssuerX500Principal()).thenReturn(principal);
-		return certificate;
 	}
 }
