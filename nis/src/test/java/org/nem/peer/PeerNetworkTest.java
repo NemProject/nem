@@ -276,11 +276,11 @@ public class PeerNetworkTest {
 
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
 		// but the local node can only communicate with 10.0.0.5
-		final NodeCollection knownPeers = new NodeCollection();
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
+		final List<Node> knownPeers = Arrays.asList(
+			new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -305,11 +305,11 @@ public class PeerNetworkTest {
 
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-6 are active
 		// but the local node can only communicate with 10.0.0.5
-		final NodeCollection knownPeers = new NodeCollection();
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
+		final List<Node> knownPeers = Arrays.asList(
+			new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -326,11 +326,9 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
-		final NodeCollection knownPeers = new NodeCollection();
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"), NodeStatus.ACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.7", 12), "p", "a"), NodeStatus.INACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.11", 12), "p", "a"), NodeStatus.INACTIVE);
-		knownPeers.update(new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"), NodeStatus.ACTIVE);
+		final List<Node> knownPeers = Arrays.asList(
+			new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"),
+			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -350,8 +348,7 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 
-		final NodeCollection knownPeers = new NodeCollection();
-		knownPeers.update(network.getLocalNode(), NodeStatus.ACTIVE);
+		final List<Node> knownPeers = Arrays.asList(network.getLocalNode());
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -731,9 +728,9 @@ public class PeerNetworkTest {
 		final Node otherNode1 = Utils.createNodeWithPort(81);
 		final Node otherNode2 = Utils.createNodeWithPort(83);
 
-		final List<NodeExperiencePair> pairs = new ArrayList<>();
-		pairs.add(new NodeExperiencePair(otherNode1, Utils.createNodeExperience(14)));
-		pairs.add(new NodeExperiencePair(otherNode2, Utils.createNodeExperience(44)));
+		final List<NodeExperiencePair> pairs = Arrays.asList(
+				new NodeExperiencePair(otherNode1, Utils.createNodeExperience(14)),
+				new NodeExperiencePair(otherNode2, Utils.createNodeExperience(44)));
 
 		// Act:
 		network.setRemoteNodeExperiences(new NodeExperiencesPair(remoteNode, pairs));

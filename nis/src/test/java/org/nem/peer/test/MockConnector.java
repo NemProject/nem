@@ -36,7 +36,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 	private boolean shouldAnnounceDelay;
 
-	private NodeCollection knownPeers = new NodeCollection();
+	private List<Node> knownPeers = new ArrayList<>();
 
 	//region TriggerAction
 
@@ -176,11 +176,11 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	/**
-	 * Sets the NodeCollection that should be returned by getKnownPeers.
+	 * Sets the list that should be returned by getKnownPeers.
 	 *
-	 * @param nodes The NodeCollection that should be returned by getKnownPeers.
+	 * @param nodes The list that should be returned by getKnownPeers.
 	 */
-	public void setKnownPeers(final NodeCollection nodes) {
+	public void setKnownPeers(final List<Node> nodes) {
 		this.knownPeers = nodes;
 	}
 
@@ -242,7 +242,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 			if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
 				triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
 
-			return new SerializableList<>(this.knownPeers.getActiveNodes());
+			return new SerializableList<>(this.knownPeers);
 		});
 	}
 
