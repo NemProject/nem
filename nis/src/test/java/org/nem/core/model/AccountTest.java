@@ -726,6 +726,7 @@ public class AccountTest {
 		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
 
 		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
+		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 
@@ -738,6 +739,7 @@ public class AccountTest {
 
 	private static void setAccountValuesForCopyTests(final Account account) {
 		account.incrementBalance(new Amount(1000));
+		account.setHeight(new BlockHeight(123));
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
@@ -803,6 +805,7 @@ public class AccountTest {
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
 
+		Assert.assertThat(copy.getHeight(), IsSame.sameInstance(original.getHeight()));
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
 		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));
