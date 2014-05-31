@@ -119,6 +119,6 @@ public class AccountImportance {
 
 	@Override
 	public String toString() {
-		return "(" + this.importanceHeight.getRaw() + ":" + this.importance + ")";
+		return String.format("(%d : %f)", this.importanceHeight == null? null : this.importanceHeight.getRaw(), this.importance);
 	}
 }

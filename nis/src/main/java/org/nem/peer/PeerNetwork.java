@@ -321,7 +321,7 @@ public class PeerNetwork {
 				return;
 
 			// Don't remove pretrusted nodes, sometimes it's the only way to recover
-			if (this.nodes.getNodeStatus(node) == NodeStatus.FAILURE &&
+			if (status == NodeStatus.FAILURE &&
 				this.preTrustedNodes.isPreTrusted(node)) {
 				status = NodeStatus.INACTIVE;
 			}
