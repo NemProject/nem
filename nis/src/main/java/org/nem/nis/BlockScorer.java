@@ -68,7 +68,7 @@ public class BlockScorer {
 			return BigInteger.ZERO;
 
 		//
-		final long backInTime = block.getHeight().getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long backInTime = block.getHeight().getRaw() - 1;
 		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
 		this.accountAnalyzer.recalculateImportances(blockHeight);

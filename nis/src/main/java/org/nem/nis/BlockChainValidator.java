@@ -4,12 +4,15 @@ import org.nem.core.model.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * Helper class for validating a block chain.
  */
 public class BlockChainValidator {
+	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
 
+	private final AccountAnalyzer accountAnalyzer;
 	private final int maxChainSize;
 	private final BlockScorer scorer;
 
@@ -18,7 +21,8 @@ public class BlockChainValidator {
 	 *
 	 * @param scorer The block scorer to use.
 	 */
-	public BlockChainValidator(final BlockScorer scorer, final int maxChainSize) {
+	public BlockChainValidator(final AccountAnalyzer accountAnalyzer, final BlockScorer scorer, final int maxChainSize) {
+		this.accountAnalyzer = accountAnalyzer;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 	}
@@ -34,11 +38,18 @@ public class BlockChainValidator {
 		if (blocks.size() > this.maxChainSize)
 			return false;
 
+		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
+
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
 			block.setPrevious(parentBlock);
-			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
+			if (!expectedHeight.equals(block.getHeight()) || !block.verify()) {
 				return false;
+			}
+			if (!isBlockHit(parentBlock, block)) {
+				LOGGER.fine("hit failed on block " + block.getHeight() + " gen " + block.getGenerationHash());
+				return false;
+			}
 
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.isValid() || !transaction.verify())
@@ -47,8 +58,11 @@ public class BlockChainValidator {
 
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();
-		}
 
+			block.subscribe(observer);
+			block.execute();
+			block.unsubscribe(observer);
+		}
 		return true;
 	}
 
