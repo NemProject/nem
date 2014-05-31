@@ -235,14 +235,14 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
+	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint) {
 		this.numGetKnownPeerCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
 			if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
 				triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
 
-			return this.knownPeers;
+			return new SerializableList<>(this.knownPeers.getActiveNodes());
 		});
 	}
 

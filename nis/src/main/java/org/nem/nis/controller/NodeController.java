@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.nem.core.model.SerializableList;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
@@ -55,11 +56,23 @@ public class NodeController {
 	 * @return A list of the active and inactive nodes currently known by the
 	 *         running node.
 	 */
-	@RequestMapping(value = "/node/peer-list", method = RequestMethod.GET)
+	@RequestMapping(value = "/node/peer-list/all", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
 	public NodeCollection getPeerList() {
 		return this.host.getNetwork().getNodes();
+	}
+
+	/**
+	 * Gets a list of the active nodes currently known by the running node.
+	 *
+	 * @return A list of the active nodes currently known by the running node.
+	 */
+	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
+	@P2PApi
+	@PublicApi
+	public SerializableList<Node> getActivePeerList() {
+		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
 	}
 
 	/**

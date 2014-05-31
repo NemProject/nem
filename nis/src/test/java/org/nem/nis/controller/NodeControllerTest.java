@@ -4,6 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.model.SerializableList;
+import org.nem.core.test.IsEquivalent;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.*;
@@ -62,6 +64,26 @@ public class NodeControllerTest {
 
 		// Assert:
 		Assert.assertThat(nodes, IsSame.sameInstance(context.network.getNodes()));
+	}
+
+	@Test
+	public void getActivePeerListReturnsActiveNetworkNodes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final NodeCollection nodeCollection = context.network.getNodes();
+		nodeCollection.update(Node.fromHost("10.0.0.2"), NodeStatus.INACTIVE);
+		nodeCollection.update(Node.fromHost("10.0.0.4"), NodeStatus.ACTIVE);
+		nodeCollection.update(Node.fromHost("10.0.0.3"), NodeStatus.FAILURE);
+		nodeCollection.update(Node.fromHost("10.0.0.7"), NodeStatus.ACTIVE);
+
+		// Act:
+		final SerializableList<Node> nodes = context.controller.getActivePeerList();
+
+		// Assert:
+		final List<Node> expectedNodes = Arrays.asList(
+				Node.fromHost("10.0.0.4"),
+				Node.fromHost("10.0.0.7"));
+		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
 	@Test

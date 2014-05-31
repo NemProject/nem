@@ -43,9 +43,10 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint) {
+	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint) {
 		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
-		return this.getAsync(url).getFuture().thenApply(NodeCollection::new);
+		return this.getAsync(url).getFuture()
+				.thenApply(deserializer -> new SerializableList<>(deserializer, Node::new));
 	}
 
 	@Override

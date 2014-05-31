@@ -51,9 +51,14 @@ public enum NodeApiId {
 	REST_NODE_INFO,
 
 	/**
-	 * The node/peer-list API.
+	 * The node/peer-list/all API.
 	 */
 	REST_NODE_PEER_LIST,
+
+	/**
+	 * The node/peer-list/active API.
+	 */
+	REST_NODE_PEER_LIST_ACTIVE,
 
 	/**
 	 * The node/ping API.

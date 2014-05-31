@@ -3,13 +3,11 @@ package org.nem.core.model;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class SerializableListTest {
 
@@ -192,6 +190,23 @@ public class SerializableListTest {
 
 	// endregion
 
+	//region asCollection
+
+	@Test
+	public void asCollectionReturnsRawCollection() {
+		// Arrange:
+		final List<MockSerializableEntity> rawList = Arrays.asList(
+			new MockSerializableEntity(12, "a", 12),
+			new MockSerializableEntity(4, "b", 4),
+			new MockSerializableEntity(122, "c", 122));
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList);
+
+		// Assert:
+		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(rawList));
+	}
+
+	//endregion
+
 	//region Serialization
 
 	@Test
@@ -212,6 +227,22 @@ public class SerializableListTest {
 		Assert.assertThat(dataArray.size(), IsEqual.equalTo(2));
 		Assert.assertThat(deserializeFromObject(dataArray.get(0)), IsEqual.equalTo(list1.get(0)));
 		Assert.assertThat(deserializeFromObject(dataArray.get(1)), IsEqual.equalTo(list1.get(1)));
+	}
+
+	@Test
+	public void canRoundTripList() {
+		// Arrange:
+		final SerializableList<MockSerializableEntity> originalList = new SerializableList<>(10);
+		originalList.add(new MockSerializableEntity(5, "foo", 6));
+		originalList.add(new MockSerializableEntity(8, "bar", 7));
+
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
+		final SerializableList<MockSerializableEntity> list =
+				new SerializableList<>(deserializer, MockSerializableEntity::new);
+
+		// Assert:
+		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
 	}
 
 	//endregion

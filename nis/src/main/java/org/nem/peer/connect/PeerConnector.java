@@ -1,5 +1,6 @@
 package org.nem.peer.connect;
 
+import org.nem.core.model.SerializableList;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.node.*;
 
@@ -20,13 +21,13 @@ public interface PeerConnector {
 	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint);
 
 	/**
-	 * Requests information about all known peers from the specified node.
+	 * Requests information about all known active peers from the specified node.
 	 *
 	 * @param endpoint The remote endpoint.
 	 *
-	 * @return A collection of all known peers.
+	 * @return A collection of all known active peers.
 	 */
-	public CompletableFuture<NodeCollection> getKnownPeers(final NodeEndpoint endpoint);
+	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint);
 
 	/**
 	 * Requests information about the local (requesting) node.

@@ -21,13 +21,23 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	}
 
 	/**
-	 * Creates a new list and initializes it with the elements in list.
+	 * Creates a new list and initializes it with the elements in collection.
 	 *
-	 * @param list The list containing the initial elements.
+	 * @param collection The collection containing the initial elements.
 	 */
-	public SerializableList(final List<T> list) {
-		this(list.size());
-		list.forEach(this::add);
+	public SerializableList(final Collection<T> collection) {
+		this(collection.size());
+		collection.forEach(this::add);
+	}
+
+	/**
+	 * Deserializes a serializable list.
+	 *
+	 * @param deserializer The deserializer.
+	 * @param elementDeserializer The element deserializer.
+	 */
+	public SerializableList(final Deserializer deserializer, final ObjectDeserializer<T> elementDeserializer) {
+		this.list = deserializer.readObjectArray("data", elementDeserializer);
 	}
 
 	@Override
@@ -87,6 +97,15 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 		}
 
 		return limit;
+	}
+
+	/**
+	 * Returns the underlying collection.
+	 *
+	 * @return The underlying collection.
+	 */
+	public Collection<T> asCollection() {
+		return this.list;
 	}
 
 	@Override

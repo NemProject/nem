@@ -289,7 +289,7 @@ public class PeerNetwork {
 				future = future
 						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
 						.thenCompose(nodes -> {
-							final List<CompletableFuture> futures = nodes.getActiveNodes().stream()
+							final List<CompletableFuture> futures = nodes.asCollection().stream()
 									.map(n -> this.getNodeInfo(n, false))
 									.collect(Collectors.toList());
 
