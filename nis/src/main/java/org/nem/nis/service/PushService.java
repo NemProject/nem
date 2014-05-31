@@ -86,7 +86,7 @@ public class PushService {
 			remoteNode = Node.fromHost(request.getRemoteAddr());
 
 		final NodeInteractionResult isValidStatus = isValid.apply(entity);
-		if (isValidStatus != NodeInteractionResult.SUCCESS) {
+		if (isValidStatus == NodeInteractionResult.FAILURE) {
 			// Bad experience with the remote node.
 			network.updateExperience(remoteNode, isValidStatus);
 			return false;
