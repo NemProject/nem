@@ -44,7 +44,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	@Override
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST);
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
 		return this.getAsync(url).getFuture()
 				.thenApply(deserializer -> new SerializableList<>(deserializer, Node::new));
 	}
