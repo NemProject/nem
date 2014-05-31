@@ -186,6 +186,7 @@ public class PeerNetwork {
 	public CompletableFuture<Void> refresh() {
 		final NodeRefresher refresher = new NodeRefresher(
 				this.getLocalNode(),
+				this.config.getPreTrustedNodes(),
 				this.getNodes(),
 				this.peerConnector);
 
@@ -239,6 +240,7 @@ public class PeerNetwork {
 
 	private static class NodeRefresher {
 		final Node localNode;
+		final PreTrustedNodes preTrustedNodes;
 		final NodeCollection nodes;
 		final PeerConnector connector;
 		final Map<Node, NodeStatus> nodesToUpdate;
@@ -246,9 +248,11 @@ public class PeerNetwork {
 
 		public NodeRefresher(
 				final Node localNode,
+				final PreTrustedNodes preTrustedNodes,
 				final NodeCollection nodes,
 				final PeerConnector connector) {
 			this.localNode = localNode;
+			this.preTrustedNodes = preTrustedNodes;
 			this.nodes = nodes;
 			this.connector = connector;
 			this.nodesToUpdate = new ConcurrentHashMap<>();
@@ -312,10 +316,15 @@ public class PeerNetwork {
 			return lhs.equals(rhs);
 		}
 
-		private void update(final Node node, final NodeStatus status) {
+		private void update(final Node node, NodeStatus status) {
 			if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
 				return;
 
+			// Don't remove pretrusted nodes, sometimes it's the only way to recover
+			if (this.nodes.getNodeStatus(node) == NodeStatus.FAILURE &&
+				this.preTrustedNodes.isPreTrusted(node)) {
+				status = NodeStatus.INACTIVE;
+			}
 			LOGGER.info("Updating \"" + node + "\" -> " + status);
 			this.nodesToUpdate.put(node, status);
 		}
