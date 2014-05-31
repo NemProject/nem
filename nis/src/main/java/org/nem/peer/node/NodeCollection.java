@@ -14,6 +14,7 @@ public class NodeCollection implements SerializableEntity {
 
 	final Set<Node> activeNodes;
 	final Set<Node> inactiveNodes;
+	Set<Node> inactiveNodesSnapshot;
 
 	/**
 	 * Creates a node collection.
@@ -21,6 +22,7 @@ public class NodeCollection implements SerializableEntity {
 	public NodeCollection() {
 		this.activeNodes = createSet();
 		this.inactiveNodes = createSet();
+		this.inactiveNodesSnapshot = createSet();
 	}
 
 	/**
@@ -118,6 +120,7 @@ public class NodeCollection implements SerializableEntity {
 		switch (status) {
 			case ACTIVE:
 				nodes = this.activeNodes;
+				this.inactiveNodesSnapshot.remove(node);
 				break;
 
 			case INACTIVE:
@@ -130,6 +133,19 @@ public class NodeCollection implements SerializableEntity {
 		}
 
 		nodes.add(node);
+	}
+
+	/**
+	 * Takes a snapshot of all inactive nodes and drops the inactive nodes
+	 * that have stayed inactive since the last time this function was called.
+	 */
+	public void pruneInactiveNodes() {
+		this.getInactiveNodes().stream()
+				.filter(this.inactiveNodesSnapshot::contains)
+				.forEach(node -> this.update(node, NodeStatus.FAILURE));
+
+		this.inactiveNodesSnapshot = createSet();
+		this.inactiveNodesSnapshot.addAll(this.getInactiveNodes());
 	}
 
 	@Override

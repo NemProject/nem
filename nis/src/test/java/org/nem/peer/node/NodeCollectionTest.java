@@ -297,6 +297,102 @@ public class NodeCollectionTest {
 
 	//endregion
 
+	//region pruneInactiveNodes
+
+	@Test
+	public void pruneInactiveNodesDoesNotHaveAnySideEffectInitially() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForPruneInactiveNodesTests();
+
+		// Act:
+		nodes.pruneInactiveNodes(); // inactive: { B }
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
+	}
+
+	@Test
+	public void pruneInactiveNodesRemovesNodesThatHaveStayedInactiveSinceLastCall() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForPruneInactiveNodesTests();
+
+		// Act:
+		nodes.pruneInactiveNodes(); // inactive: { B }
+		nodes.pruneInactiveNodes(); // pruned: { B }
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.FAILURE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
+	}
+
+	@Test
+	public void pruneInactiveNodesDoesNotRemoveNodesThatBecomeActiveSinceLastCall() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForPruneInactiveNodesTests();
+
+		// Act:
+		nodes.pruneInactiveNodes(); // inactive: { B }
+		nodes.update(createNode("B"), NodeStatus.ACTIVE);
+		nodes.pruneInactiveNodes(); // inactive: { }
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
+	}
+
+	@Test
+	public void pruneInactiveNodesDoesNotRemoveNodesThatHaveCycledBetweenActiveAndInactiveSinceLastCall() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForPruneInactiveNodesTests();
+
+		// Act:
+		nodes.pruneInactiveNodes(); // inactive: { B }
+		nodes.update(createNode("B"), NodeStatus.ACTIVE);
+		nodes.update(createNode("B"), NodeStatus.INACTIVE);
+		nodes.pruneInactiveNodes(); // inactive: { B }
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
+	}
+
+	@Test
+	public void pruneInactiveNodesOnlyRemembersMostRecentSnapshot() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForPruneInactiveNodesTests();
+
+		// Act:
+		nodes.pruneInactiveNodes(); // inactive: { B }
+		nodes.update(createNode("B"), NodeStatus.ACTIVE);
+		nodes.update(createNode("A"), NodeStatus.INACTIVE);
+		nodes.pruneInactiveNodes(); // inactive: { A }
+		nodes.update(createNode("B"), NodeStatus.INACTIVE);
+		nodes.update(createNode("D"), NodeStatus.INACTIVE);
+		nodes.pruneInactiveNodes(); // inactive: { B, D }, pruned: { A }
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.FAILURE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.INACTIVE));
+	}
+
+	private static NodeCollection createNodeCollectionForPruneInactiveNodesTests() {
+		// Arrange:
+		final NodeCollection nodes = new NodeCollection();
+		nodes.update(createNode("A"), NodeStatus.ACTIVE);
+		nodes.update(createNode("B"), NodeStatus.INACTIVE);
+		nodes.update(createNode("C"), NodeStatus.FAILURE);
+		return nodes;
+	}
+
+	//endregion
+
 	private static Node createNode(final String platform) {
 		// Arrange:
 		return createNode(platform, platform.charAt(0));
