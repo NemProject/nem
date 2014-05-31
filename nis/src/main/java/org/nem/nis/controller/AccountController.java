@@ -59,11 +59,12 @@ public class AccountController {
 		return this.accountIo.getAccountBlocks(getAddress(nemAddress), timestamp);
 	}
 
-	private Address getAddress(String nemAddress) {
+	private Address getAddress(final String nemAddress) {
 		Address address = Address.fromEncoded(nemAddress);
-		if (! address.isValid()) {
-			return null;
+		if (!address.isValid()) {
+			throw new IllegalArgumentException("address is not valid");
 		}
+
 		return address;
 	}
 }
