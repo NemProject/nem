@@ -29,9 +29,9 @@ public interface Serializer {
 	 * Writes a 64-bit double value.
 	 *
 	 * @param label The optional name of the value.
-	 * @param value The value.
+	 * @param d The value.
 	 */
-	void writeDouble(final String label, final Double value);
+	void writeDouble(final String label, final double d);
 
 	/**
 	 * Writes a BigInteger value.

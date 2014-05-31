@@ -1,7 +1,6 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
-import net.minidev.json.parser.JSONParser;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -57,15 +56,14 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	public void canWriteDouble() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final Double d = 0.999999999534338712692260742187500;
 
 		// Act:
-		serializer.writeDouble("double", d);
+		serializer.writeDouble("double", 0.999999999534338712692260742187500);
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("double"), IsEqual.equalTo(d));
+		Assert.assertThat(object.get("double"), IsEqual.equalTo(0.999999999534338712692260742187500));
 	}
 
 	@Test
@@ -216,6 +214,19 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Assert:
 		Assert.assertThat(l, IsNull.nullValue());
+	}
+
+	@Test
+	public void canReadNullDouble() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		final Double d = deserializer.readDouble("double");
+
+		// Assert:
+		Assert.assertThat(d, IsNull.nullValue());
 	}
 
 	@Test

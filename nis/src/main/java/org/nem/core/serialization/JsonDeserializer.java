@@ -59,13 +59,7 @@ public class JsonDeserializer implements Deserializer {
 		this.checkLabel(label);
 
 		final Object object = this.object.get(label);
-		if (null == object)
-			return null;
-
-		if (object instanceof Double)
-			return (Double)object;
-
-		return null;
+		return (object instanceof Double) ? (Double)object : null;
 	}
 
 	@Override

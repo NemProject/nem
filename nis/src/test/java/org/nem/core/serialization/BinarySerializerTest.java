@@ -28,7 +28,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteInt() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			serializer.writeInt("int", 0x09513510);
 
@@ -41,7 +41,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteLong() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			serializer.writeLong("long", 0xF239A033CE951350L);
 
@@ -57,9 +57,8 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteDouble() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
-			// print "%.34f" %sum([1.0/2**i for i in xrange(1, 32)])
 			final Double d = 0.999999999534338712692260742187500;
 			serializer.writeDouble("double", d);
 
@@ -72,7 +71,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteBigInteger() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			final BigInteger i = new BigInteger("958A7561F014", 16);
 			serializer.writeBigInteger("BigInteger", i);
@@ -89,7 +88,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteBytes() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
 			serializer.writeBytes("bytes", bytes);
@@ -106,7 +105,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteNullBytes() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			serializer.writeBytes("bytes", null);
 
@@ -119,7 +118,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteEmptyBytes() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			final byte[] bytes = new byte[0];
 			serializer.writeBytes("bytes", bytes);
@@ -133,7 +132,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteString() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			serializer.writeString("String", "BEta");
 
@@ -149,7 +148,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteObject() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 
 			// Act:
 			serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
@@ -168,7 +167,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void canWriteObjectArray() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 
 			// Act:
 			List<SerializableEntity> originalObjects = new ArrayList<>();
@@ -204,7 +203,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void deserializerInitiallyHasMoreData() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
 			serializer.writeInt("int", 0x09513510);
 
@@ -248,7 +247,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	@Test
 	public void serializeToBytesProducesSameBytesAsEntitySerialize() throws Exception {
 		// Arrange:
-		try (BinarySerializer serializer = new BinarySerializer()) {
+		try (final BinarySerializer serializer = new BinarySerializer()) {
 
 			// Act:
 			final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);

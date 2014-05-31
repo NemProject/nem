@@ -47,9 +47,9 @@ public class JsonSerializer implements Serializer {
 	}
 
 	@Override
-	public void writeDouble(final String label, final Double l) {
+	public void writeDouble(final String label, final double d) {
 		this.pushLabel(label);
-		this.object.put(label, l);
+		this.object.put(label, d);
 	}
 
 	@Override

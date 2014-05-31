@@ -44,8 +44,8 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 	}
 
 	@Override
-	public void writeDouble(final String label, final Double value) {
-		this.writeLong(label, Double.doubleToLongBits(value));
+	public void writeDouble(final String label, final double d) {
+		this.writeLong(label, Double.doubleToLongBits(d));
 	}
 
 	@Override
