@@ -54,6 +54,7 @@ public class BlockChain implements BlockSynchronizer {
 		boolean result;
 		synchronized (blockChainLastBlockLayer) {
 			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
+			LOGGER.info("isNextBlock result: " + result);
 		}
 		return result;
 	}
@@ -364,7 +365,12 @@ public class BlockChain implements BlockSynchronizer {
 				return NodeInteractionResult.FAILURE;
 			}
 
-			LOGGER.info("our score: " + Long.toString(this.ourScore) + " peer's score: " + Long.toString(peerScore));
+			if (ourScore == 0) {
+				LOGGER.info("new block's score: " + Long.toString(peerScore));
+			} else {
+				LOGGER.info("our score: " + Long.toString(this.ourScore) + " peer's score: " + Long.toString(peerScore));
+			}
+
 			if (peerScore < this.ourScore) {
 				// we could get peer's score upfront, if it mismatches with
 				// what we calculated, we could penalize peer.
@@ -434,6 +440,14 @@ public class BlockChain implements BlockSynchronizer {
 		 */
 		private void updateOurChain() {
 			synchronized (this.blockChainLastBlockLayer) {
+				LOGGER.info("original:");
+				for (final Account account : this.accountAnalyzer) {
+					LOGGER.info(account.getAddress().getEncoded() + " : " + account.getImportanceInfo().toString());
+				}
+				LOGGER.info("new: ");
+				for (final Account account : this.accountAnalyzer) {
+					LOGGER.info(account.getAddress().getEncoded() + " : " + account.getImportanceInfo().toString());
+				}
 				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
 				if (this.hasOwnChain) {

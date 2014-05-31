@@ -4,11 +4,13 @@ import org.nem.core.model.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * Helper class for validating a block chain.
  */
 public class BlockChainValidator {
+	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final int maxChainSize;
@@ -41,8 +43,13 @@ public class BlockChainValidator {
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
 			block.setPrevious(parentBlock);
-			if (!expectedHeight.equals(block.getHeight()) || !block.verify() || !isBlockHit(parentBlock, block))
+			if (!expectedHeight.equals(block.getHeight()) || !block.verify()) {
 				return false;
+			}
+			if (!isBlockHit(parentBlock, block)) {
+				LOGGER.fine("hit failed on block " + block.getHeight() + " gen " + block.getGenerationHash());
+				return false;
+			}
 
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.isValid() || !transaction.verify())

@@ -107,4 +107,9 @@ public class AccountImportance {
 		copy.importanceHeight = this.importanceHeight;
 		return copy;
 	}
+
+	@Override
+	public String toString() {
+		return "(" + this.importanceHeight.getRaw() + ":" + this.importance + ")";
+	}
 }
