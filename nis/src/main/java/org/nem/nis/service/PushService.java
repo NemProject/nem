@@ -81,7 +81,7 @@ public class PushService {
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
 
 		final PeerNetwork network = this.host.getNetwork();
-		Node remoteNode = network.getNodes().getNode(request.getRemoteAddr());
+		Node remoteNode = network.getNodes().findNodeByEndpoint(NodeEndpoint.fromHost(request.getRemoteAddr()));
 		if (null == remoteNode)
 			remoteNode = Node.fromHost(request.getRemoteAddr());
 

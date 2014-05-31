@@ -70,23 +70,16 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	/**
-	 * Gets a node with a given ip.
+	 * Finds a node with a given endpoint.
 	 *
-	 * @return The nodes or null if not found.
+	 * @return The matching node or null if not found.
 	 */
-	public Node getNode(String remoteAddress) {
-		// TODO : public available constants for http and 7890?
-		NodeEndpoint endpoint = new NodeEndpoint("http", remoteAddress, 7890);
-		for (Node node : this.activeNodes) {
-			if (node.getEndpoint().equals(endpoint)) {
+	public Node findNodeByEndpoint(final NodeEndpoint endpoint) {
+		for (final Node node : this.getAllNodes()) {
+			if (node.getEndpoint().equals(endpoint))
 				return node;
-			}
 		}
-		for (Node node : this.inactiveNodes) {
-			if (node.getEndpoint().equals(endpoint)) {
-				return node;
-			}
-		}
+
 		return null;
 	}
 

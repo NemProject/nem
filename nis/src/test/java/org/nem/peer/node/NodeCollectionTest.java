@@ -245,28 +245,45 @@ public class NodeCollectionTest {
 
 	//endregion
 
-	//region retrieval
+	//region findNodeByEndpoint
 
 	@Test
-	public void activeNodeCanBeRetrievedByIP() {
+	public void findNodeByEndpointReturnsActiveNodeMatchingEndpoint() {
 		// Arrange:
-		final NodeCollection nodes = new NodeCollection();
-		nodes.update(createNode("A", "37.128.23.2", 7890), NodeStatus.ACTIVE);
-		nodes.update(createNode("A", "37.123.25.5", 7890), NodeStatus.ACTIVE);
-		nodes.update(createNode("A", "37.121.27.7", 7890), NodeStatus.ACTIVE);
-		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.INACTIVE);
-		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.INACTIVE);
-		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.INACTIVE);
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
 
 		// Act: 
-		Node node = nodes.getNode("37.123.25.5");
+		final Node node = nodes.findNodeByEndpoint(new NodeEndpoint("http", "37.123.25.5", 7890));
 		
 		// Assert:
-		Assert.assertThat(node.getEndpoint().toString(), IsEqual.equalTo("http://37.123.25.5:7890/"));
+		Assert.assertThat(node, IsEqual.equalTo(createNode("A", "37.123.25.5", 7890)));
 	}
 
 	@Test
-	public void inactiveNodeCanBeRetrievedByIP() {
+	public void findNodeByEndpointReturnsInactiveNodeMatchingEndpoint() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
+
+		// Act:
+		final Node node = nodes.findNodeByEndpoint(new NodeEndpoint("http", "38.183.85.5", 7890));
+
+		// Assert:
+		Assert.assertThat(node, IsEqual.equalTo(createNode("A", "38.183.85.5", 7890)));
+	}
+
+	@Test
+	public void findNodeByEndpointReturnsNullIfNoNodeMatchesEndpoint() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
+
+		// Act:
+		final Node node = nodes.findNodeByEndpoint(new NodeEndpoint("http", "37.121.27.7", 7891));
+
+		// Assert:
+		Assert.assertThat(node, IsNull.nullValue());
+	}
+
+	private static NodeCollection createNodeCollectionForFindNodeByEndpointTests() {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(createNode("A", "37.128.23.2", 7890), NodeStatus.ACTIVE);
@@ -275,12 +292,7 @@ public class NodeCollectionTest {
 		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.INACTIVE);
 		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.INACTIVE);
 		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.INACTIVE);
-
-		// Act: 
-		Node node = nodes.getNode("38.181.87.7");
-		
-		// Assert:
-		Assert.assertThat(node.getEndpoint().toString(), IsEqual.equalTo("http://38.181.87.7:7890/"));
+		return nodes;
 	}
 
 	//endregion
