@@ -61,7 +61,7 @@ public class NisMain {
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
-		// it creates accounts for us inside AA but without height, so inside obeserver we'll set height
+		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());

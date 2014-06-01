@@ -41,6 +41,7 @@ public class AccountController {
 		this.foraging.addUnlockedAccount(account);
 	}
 
+	// TODO: test the following functions
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfers(
