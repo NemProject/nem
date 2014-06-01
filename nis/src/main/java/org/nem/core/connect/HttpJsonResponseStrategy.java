@@ -19,7 +19,7 @@ public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrateg
 		try {
 			final int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode != HttpStatus.OK.value())
-				throw new InactivePeerException(String.format("Peer returned: %d", statusCode));
+				throw new FatalPeerException(String.format("Peer returned: %d", statusCode));
 
 			try (final InputStream responseStream = response.getEntity().getContent()) {
 				return this.coerce(JSONValue.parse(responseStream));

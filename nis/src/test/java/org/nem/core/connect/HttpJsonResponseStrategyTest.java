@@ -15,8 +15,8 @@ public class HttpJsonResponseStrategyTest {
 
 	//region HttpJsonResponseStrategy
 
-	@Test(expected = InactivePeerException.class)
-	public void coerceThrowsInactivePeerExceptionOnHttpError() throws Exception {
+	@Test(expected = FatalPeerException.class)
+	public void coerceThrowsFatalPeerExceptionOnHttpError() throws Exception {
 		// Arrange:
 		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(null);
 		final HttpResponse response = Mockito.mock(HttpResponse.class);
