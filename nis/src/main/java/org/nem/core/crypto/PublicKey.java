@@ -1,6 +1,7 @@
 package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
+import org.nem.core.utils.EncodingException;
 import org.nem.core.utils.HexEncoder;
 
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class PublicKey implements SerializableEntity {
 	public static PublicKey fromHexString(final String hex) {
 		try {
 			return new PublicKey(HexEncoder.getBytes(hex));
-		} catch (SerializationException e) {
+		} catch (EncodingException e) {
 			throw new CryptoException(e);
 		}
 	}

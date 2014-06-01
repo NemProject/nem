@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.CryptoException;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ByteUtils;
+import org.nem.core.utils.EncodingException;
 import org.nem.core.utils.HexEncoder;
 
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class Hash implements SerializableEntity {
 	public static Hash fromHexString(final String hex) {
 		try {
 			return new Hash(HexEncoder.getBytes(hex));
-		} catch (SerializationException e) {
+		} catch (EncodingException e) {
 			throw new CryptoException(e);
 		}
 	}

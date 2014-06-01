@@ -38,7 +38,7 @@ public class HashTest {
 		final Hash hash = Hash.fromHexString("227F");
 
 		// Assert:
-		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x7F, 0x22 }));
+		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
 	}
 
 	@Test(expected = CryptoException.class)

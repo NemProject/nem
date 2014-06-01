@@ -27,7 +27,7 @@ public class PublicKeyTest {
 		final PublicKey key = PublicKey.fromHexString("227F");
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x7F, 0x22 }));
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
 	}
 
 	@Test(expected = CryptoException.class)
