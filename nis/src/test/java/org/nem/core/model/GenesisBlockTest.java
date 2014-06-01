@@ -78,7 +78,7 @@ public class GenesisBlockTest {
 		final Block block = GENESIS_BLOCK;
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(GenesisBlock.ACCOUNT));
+		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(GenesisBlock.ADDRESS));
 	}
 
 	//endregion

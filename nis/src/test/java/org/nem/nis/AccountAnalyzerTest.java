@@ -109,6 +109,7 @@ public class AccountAnalyzerTest {
 	//endregion
 
 	//region remove
+
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
@@ -117,7 +118,7 @@ public class AccountAnalyzerTest {
 
 		// Act:
 		final Account account = analyzer.addAccountToCache(address);
-		analyzer.removeAccountFromCache(account);
+		analyzer.removeAccountFromCache(account.getAddress());
 
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
@@ -131,11 +132,26 @@ public class AccountAnalyzerTest {
 
 		// Act:
 		final Account account = analyzer.addAccountToCache(address);
-		analyzer.removeAccountFromCache(account);
+		analyzer.removeAccountFromCache(account.getAddress());
 
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(0));
 	}
+
+	@Test
+	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		analyzer.addAccountToCache(address);
+		analyzer.removeAccountFromCache(Utils.generateRandomAddress());
+
+		// Assert:
+		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
+	}
+
 	//endregion
 
 	//region findByAddress
@@ -416,26 +432,79 @@ public class AccountAnalyzerTest {
 	@Test
 	public void recalculateImportancesDelegatesToImportanceGenerator() {
 		// Arrange:
+		final int height = 70;
 		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
 		final ColumnVector finalImportanceVector = new ColumnVector(3, 6, 1);
-		final ArgumentCaptor<Collection<Account>> argument = createAccountCollectionArgumentCaptor();
-		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(7)), argument.capture()))
-				.thenReturn(finalImportanceVector);
+		final ArgumentCaptor<Collection<Account>> argument = mockFinalImportanceVector(
+				importanceGenerator,
+				new BlockHeight(height),
+				finalImportanceVector);
 
 		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
-		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < finalImportanceVector.size(); ++i)
-			accounts.add(analyzer.addAccountToCache(Utils.generateRandomAddress()));
+		final List<Account> accounts = createAccountsForRecalculateTests(finalImportanceVector.size(), analyzer);
 
 		// Act:
-		analyzer.recalculateImportances(new BlockHeight(7));
+		analyzer.recalculateImportances(new BlockHeight(height));
 
 		// Assert: the generator was called once and passed a collection with three accounts
 		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
-		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
+		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(new Long[]{ 10L, 20L, 30L }));
 
 		Assert.assertThat(
-				importancesAsList(accounts, 7),
+				importancesAsList(accounts, height),
+				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
+	}
+
+	@Test
+	public void recalculateImportancesIgnoresAccountsWithGreaterHeight() {
+		// Arrange:
+		final int height = 20;
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ColumnVector finalImportanceVector = new ColumnVector(4, 17);
+		final ArgumentCaptor<Collection<Account>> argument = mockFinalImportanceVector(
+				importanceGenerator,
+				new BlockHeight(height),
+				finalImportanceVector);
+
+		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
+		final List<Account> accounts = createAccountsForRecalculateTests(finalImportanceVector.size(), analyzer);
+
+		// Act:
+		analyzer.recalculateImportances(new BlockHeight(height));
+
+		// Assert: the generator was called once and passed a collection with two accounts
+		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
+		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(new Long[] { 10L, 20L }));
+
+		Assert.assertThat(
+				importancesAsList(accounts, height),
+				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
+	}
+
+	@Test
+	public void recalculateImportancesIgnoresGenesisAccount() {
+		// Arrange:
+		final int height = 70;
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ColumnVector finalImportanceVector = new ColumnVector(4, 17, 12);
+		final ArgumentCaptor<Collection<Account>> argument = mockFinalImportanceVector(
+				importanceGenerator,
+				new BlockHeight(height),
+				finalImportanceVector);
+
+		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
+		final List<Account> accounts = createAccountsForRecalculateTests(finalImportanceVector.size(), analyzer);
+		accounts.add(analyzer.addAccountToCache(GenesisBlock.ADDRESS));
+
+		// Act:
+		analyzer.recalculateImportances(new BlockHeight(height));
+
+		// Assert: the generator was called once and passed a collection with three accounts (but not the genesis account)
+		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
+		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(new Long[]{ 10L, 20L, 30L }));
+
+		Assert.assertThat(
+				importancesAsList(accounts, height),
 				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
 	}
 
@@ -456,37 +525,66 @@ public class AccountAnalyzerTest {
 	@Test
 	public void recalculateImportancesRecalculatesImportancesForNewBlockHeight() {
 		// Arrange:
+		final int height1 = 70;
+		final int height2 = 80;
 		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(7)), Mockito.any()))
+		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(height1)), Mockito.any()))
 				.thenReturn(new ColumnVector(11, 13, 17));
-		final ColumnVector finalImportanceVector = new ColumnVector(7, 10, 5);
 
-		final ArgumentCaptor<Collection<Account>> argument = createAccountCollectionArgumentCaptor();
-		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(new BlockHeight(8)), argument.capture()))
-				.thenReturn(finalImportanceVector);
+		final ColumnVector finalImportanceVector = new ColumnVector(7, 10, 5);
+		final ArgumentCaptor<Collection<Account>> argument = mockFinalImportanceVector(
+				importanceGenerator,
+				new BlockHeight(height2),
+				finalImportanceVector);
 
 		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
-		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < finalImportanceVector.size(); ++i)
-			accounts.add(analyzer.addAccountToCache(Utils.generateRandomAddress()));
+		final List<Account> accounts = createAccountsForRecalculateTests(finalImportanceVector.size(), analyzer);
 
 		// Act:
-		analyzer.recalculateImportances(new BlockHeight(7));
-		analyzer.recalculateImportances(new BlockHeight(8));
+		analyzer.recalculateImportances(new BlockHeight(height1));
+		analyzer.recalculateImportances(new BlockHeight(height2));
 
 		// Assert: the generator was called twice and passed a collection with three accounts
 		Mockito.verify(importanceGenerator, Mockito.times(2)).getAccountImportances(Mockito.any(), Mockito.any());
-		Assert.assertThat(argument.getValue().size(), IsEqual.equalTo(3));
+		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(new Long[] { 10L, 20L, 30L }));
 
 		Assert.assertThat(
-				importancesAsList(accounts, 8),
+				importancesAsList(accounts, height2),
 				IsEquivalent.equivalentTo(columnVectorAsList(finalImportanceVector)));
+	}
+
+	private static ArgumentCaptor<Collection<Account>> mockFinalImportanceVector(
+			final PoiImportanceGenerator importanceGenerator,
+			final BlockHeight height,
+			final ColumnVector finalImportanceVector) {
+		final ArgumentCaptor<Collection<Account>> argument = createAccountCollectionArgumentCaptor();
+		Mockito.when(importanceGenerator.getAccountImportances(Mockito.eq(height), argument.capture()))
+				.thenReturn(finalImportanceVector);
+		return argument;
+	}
+
+	private static List<Account> createAccountsForRecalculateTests(final int numAccounts, final AccountAnalyzer analyzer) {
+		final List<Account> accounts = new ArrayList<>();
+		for (int i = 0; i < numAccounts; ++i) {
+			accounts.add(analyzer.addAccountToCache(Utils.generateRandomAddress()));
+			accounts.get(i).setHeight(new BlockHeight((i + 1) * 10));
+		}
+
+		return accounts;
+	}
+
+	private List<Long> heightsAsList(final Collection<Account> accounts) {
+		return accounts.stream()
+				.map(a -> a.getHeight().getRaw())
+				.collect(Collectors.toList());
 	}
 
 	private List<Double> importancesAsList(final List<Account> accounts, final long blockHeight) {
 		return accounts.stream()
 				.map(Account::getImportanceInfo)
-				.map(a -> a.getImportance(new BlockHeight(blockHeight))).collect(Collectors.toList());
+				.filter(AccountImportance::isSet)
+				.map(ai -> ai.getImportance(new BlockHeight(blockHeight)))
+				.collect(Collectors.toList());
 	}
 
 	private List<Double> columnVectorAsList(final ColumnVector vector) {

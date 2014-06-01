@@ -5,17 +5,11 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.serialization.DeserializationContext;
-import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
 
 import java.util.*;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class BlockChainValidatorTest {
 
@@ -267,9 +261,9 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		final AccountAnalyzer accountAnalyzer = mock(AccountAnalyzer.class);
-		// ugly
-		when(accountAnalyzer.findByAddress(Mockito.anyObject())).thenReturn(Utils.generateRandomAccount());
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		// TODO: ugly
+		Mockito.when(accountAnalyzer.findByAddress(Mockito.anyObject())).thenReturn(Utils.generateRandomAccount());
 		return new BlockChainValidator(accountAnalyzer, scorer, 21);
 	}
 

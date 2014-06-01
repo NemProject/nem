@@ -67,20 +67,24 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	/**
 	 * Adds an account to the cache if it is not already in the cache
 	 *
-	 * @param address The account's address.
+	 * @param address The address of the account to add.
 	 * @return The account.
 	 */
 	public Account addAccountToCache(final Address address) {
 		return this.findByAddress(address, () -> {
 			final Account account = new Account(address);
-			addressToAccountMap.put(address, account);
+			this.addressToAccountMap.put(address, account);
 			return account;
 		});
 	}
 
-
-	public void removeAccountFromCache(final Account account) {
-		addressToAccountMap.remove(account.getAddress());
+	/**
+	 * Removes an account from the cache if it is in the cache.
+	 *
+	 * @param address The address of the account to remove.
+	 */
+	public void removeAccountFromCache(final Address address) {
+		this.addressToAccountMap.remove(address);
 	}
 
 	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
@@ -100,13 +104,6 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
 			// note that if an account does not have a public key, it can only have a balance
 			// so we only need to copy the balance to the new account
-
-			// this is totally wrong now:
-//			final Amount originalBalance = account.getBalance();
-//			account = new Account(address);
-//			account.incrementBalance(originalBalance);
-//			this.addressToAccountMap.put(address, account);
-
 			account = account.shallowCopyWithAddress(address);
 			this.addressToAccountMap.put(address, account);
 		}
@@ -154,13 +151,16 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		return this.addressToAccountMap.values().iterator();
 	}
 
-
 	private Collection<Account> getAccounts(final BlockHeight blockHeight) {
 		return this.addressToAccountMap.values().stream()
-				.filter(a -> (a.getHeight() != null && a.getHeight().compareTo(blockHeight)<=0))
-				// we  don't want genesis block
-				.filter(a -> !(a.getAddress().getEncoded().equals(GenesisBlock.ACCOUNT.getAddress().getEncoded())))
+				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
 				.collect(Collectors.toList());
+	}
+
+	private static boolean shouldIncludeInImportanceCalculation(final Account account, final BlockHeight blockHeight) {
+		return null != account.getHeight()
+				&& account.getHeight().compareTo(blockHeight) <= 0
+				&& !account.getAddress().equals(GenesisBlock.ADDRESS);
 	}
 
 	/**

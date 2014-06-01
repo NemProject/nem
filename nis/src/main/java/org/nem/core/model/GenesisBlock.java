@@ -16,9 +16,9 @@ import java.io.InputStream;
 public class GenesisBlock extends Block {
 
 	/**
-	 * The genesis account.
+	 * The genesis account address.
 	 */
-	public final static Account ACCOUNT;
+	public final static Address ADDRESS;
 
 	/**
 	 * The amount of NEM in the genesis block.
@@ -43,7 +43,7 @@ public class GenesisBlock extends Block {
 
 	static {
 		final KeyPair genesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
-		ACCOUNT = new Account(genesisKeyPair);
+		ADDRESS = Address.fromPublicKey(genesisKeyPair.getPublicKey());
 	}
 
 	private GenesisBlock(final Deserializer deserializer) {
