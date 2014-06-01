@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class Block extends VerifiableEntity {
 
-	protected final static int BLOCK_TYPE = 1;
+	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
 	private final BlockHeight height;
@@ -101,11 +101,10 @@ public class Block extends VerifiableEntity {
 	 * @return The total amount of fees of all transactions stored in this block.
 	 */
 	public Amount getTotalFee() {
-		return Amount.fromMicroNem(
-				this.transactions.stream()
-						.map(tx -> tx.getFee().getNumMicroNem())
-						.reduce(0L, Long::sum)
-		);
+		final long rawTotalFee = this.transactions.stream()
+                .map(tx -> tx.getFee().getNumMicroNem())
+                .reduce(0L, Long::sum);
+		return Amount.fromMicroNem(rawTotalFee);
 	}
 
 	/**
@@ -152,19 +151,28 @@ public class Block extends VerifiableEntity {
 	 * @param prevBlock The previous block.
 	 */
 	public void setPrevious(final Block prevBlock) {
-		setGenerationHash(prevBlock.getGenerationHash());
+		this.setPreviousGenerationHash(prevBlock.getGenerationHash());
 		this.prevBlockHash = HashUtils.calculateHash(prevBlock);
 	}
 
-	public void setGenerationHash(final Hash previousBlockHash) {
+	/**
+	 * Sets the previous generation hash.
+	 *
+	 * @param previousGenerationHash The previous generation hash.
+	 */
+	public void setPreviousGenerationHash(final Hash previousGenerationHash) {
 		this.generationHash = HashUtils.nextHash(
-				previousBlockHash,
+				previousGenerationHash,
 				this.getSigner().getKeyPair().getPublicKey());
 	}
 
-	protected void setPrevious(final Hash generationHash, final Hash prevBlockHash) {
+	/**
+	 * Sets the generation hash.
+	 *
+	 * @param generationHash The generation hash.
+	 */
+	protected void setGenerationHash(final Hash generationHash) {
 		this.generationHash = generationHash;
-		this.prevBlockHash = prevBlockHash;
 	}
 
 	/**

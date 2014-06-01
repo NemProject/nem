@@ -6,7 +6,7 @@ import org.nem.core.time.TimeInstant;
 
 public class GenesisBlockTest {
 
-	private final GenesisBlock GENESIS_BLOCK = GenesisBlock.create();
+	private final GenesisBlock GENESIS_BLOCK = GenesisBlock.fromResource();
 	private final static String GENESIS_ACCOUNT = NetworkInfo.getDefault().getGenesisAccountId();
 
 	@Test
@@ -16,7 +16,7 @@ public class GenesisBlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getSigner().getAddress().getEncoded(), IsEqual.equalTo(GENESIS_ACCOUNT));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 

@@ -89,6 +89,22 @@ public class BlockTest {
 	}
 
 	@Test
+	public void previousGenerationHashCanBeSet() {
+		// Arrange:
+		final Block block = createBlock(Utils.generateRandomAccount());
+		final Hash previousGenerationHash = Utils.generateRandomHash();
+
+		// Act:
+		block.setPreviousGenerationHash(previousGenerationHash);
+
+		// Assert:
+		final Hash expectedGenerationHash = HashUtils.nextHash(
+				previousGenerationHash,
+				block.getSigner().getKeyPair().getPublicKey());
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+	}
+
+	@Test
 	public void blockDifficultyCanBeSet() {
 		// Arrange:
 		final Block block = createBlock(Utils.generateRandomAccount());

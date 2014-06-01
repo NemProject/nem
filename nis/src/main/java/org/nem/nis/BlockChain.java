@@ -181,7 +181,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		block.setGenerationHash(parent.getGenerationHash());
+		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
 	/**
