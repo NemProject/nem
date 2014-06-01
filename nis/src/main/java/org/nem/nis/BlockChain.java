@@ -444,12 +444,10 @@ public class BlockChain implements BlockSynchronizer {
 		private void calculatePeerChainDifficulties() {
 			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
 			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
-			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(
-					blockHeight,
-					BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(
-					blockHeight,
-					BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+
+			int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), ((long)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
+			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
 			for (final Block block : this.peerChain) {
 				final BlockDifficulty difficulty = this.blockScorer.calculateDifficulty(difficulties, timestamps);
