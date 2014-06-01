@@ -136,6 +136,8 @@ public class BlockChainTest {
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
+		for (final Account account : accountAnalyzer)
+			account.setHeight(BlockHeight.ONE);
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
