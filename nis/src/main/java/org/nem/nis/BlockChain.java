@@ -45,27 +45,27 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Checks if given block follows last block in the chain
+	 * Checks if given block follows last block in the chain.
 	 *
 	 * @param block The block to check.
 	 * @return true if block can be next in chain
 	 */
-	private boolean hasLastBlockAsParent(final Block block) {
+	private boolean isLastBlockParent(final Block block) {
 		boolean result;
 		synchronized (blockChainLastBlockLayer) {
 			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
-			LOGGER.info("isNextBlock result: " + result);
+			LOGGER.info("isLastBlockParent result: " + result);
 		}
 		return result;
 	}
 
 	/**
-	 * Checks if given block has the same parent as last block in the chain
+	 * Checks if given block has the same parent as last block in the chain.
 	 *
 	 * @param block The block to check.
-	 * @return true if block can be next in chain
+	 * @return true if block is a sibling of the last block in the chain.
 	 */
-	private boolean hasSameParent(final Block block) {
+	private boolean isLastBlockSibling(final Block block) {
 		boolean result;
 		synchronized (blockChainLastBlockLayer) {
 			// it's better to base it on hash of previous block instead of height
@@ -74,11 +74,19 @@ public class BlockChain implements BlockSynchronizer {
 		return result;
 	}
 
+	/**
+	 * Checks a block that was received by a peer.
+	 *
+	 * @param block The block.
+	 * @return An appropriate interaction result.
+	 */
 	public NodeInteractionResult checkPushedBlock(final Block block) {
-		if (! this.hasLastBlockAsParent(block)) {
+		if (!this.isLastBlockParent(block)) {
 			// if peer tried to send us block that we also generated, there is no sense to punish him
-			return hasSameParent(block) ? NodeInteractionResult.NEUTRAL : NodeInteractionResult.FAILURE;
+			return this.isLastBlockSibling(block) ? NodeInteractionResult.NEUTRAL : NodeInteractionResult.FAILURE;
 		}
+
+		// the peer returned a block that can be added to our chain
 		return block.verify() ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE;
 	}
 
@@ -388,11 +396,7 @@ public class BlockChain implements BlockSynchronizer {
 				return NodeInteractionResult.FAILURE;
 			}
 
-			if (ourScore == 0) {
-				LOGGER.info("new block's score: " + Long.toString(peerScore));
-			} else {
-				LOGGER.info("our score: " + Long.toString(this.ourScore) + " peer's score: " + Long.toString(peerScore));
-			}
+			logScore(this.ourScore, peerScore);
 
 			if (peerScore < this.ourScore) {
 				// we could get peer's score upfront, if it mismatches with
@@ -403,6 +407,14 @@ public class BlockChain implements BlockSynchronizer {
 			this.updateOurChain();
 			
 			return NodeInteractionResult.SUCCESS;
+		}
+
+		private static void logScore(final long ourScore, final long peerScore) {
+			if (0 == ourScore) {
+				LOGGER.info(String.format("new block's score: %d", peerScore));
+			} else {
+				LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore));
+			}
 		}
 
 		/**
@@ -463,14 +475,8 @@ public class BlockChain implements BlockSynchronizer {
 		 */
 		private void updateOurChain() {
 			synchronized (this.blockChainLastBlockLayer) {
-				LOGGER.info("original:");
-				for (final Account account : this.accountAnalyzer) {
-					LOGGER.info(account.getAddress().getEncoded() + " : " + account.getImportanceInfo().toString());
-				}
-				LOGGER.info("new: ");
-				for (final Account account : this.accountAnalyzer) {
-					LOGGER.info(account.getAddress().getEncoded() + " : " + account.getImportanceInfo().toString());
-				}
+				logAccounts("original", this.originalAnalyzer);
+				logAccounts("new", this.accountAnalyzer);
 				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
 				if (this.hasOwnChain) {
@@ -491,6 +497,13 @@ public class BlockChain implements BlockSynchronizer {
 			this.peerChain.stream()
 					.filter(this.blockChainLastBlockLayer::addBlockToDb)
 					.forEach(this.foraging::removeFromUnconfirmedTransactions);
+		}
+
+		private static void logAccounts(final String heading, final Iterable<Account> accounts) {
+			LOGGER.info(String.format("[%s]", heading));
+			for (final Account account : accounts) {
+				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
+			}
 		}
 
 		private void addRevertedTransactionsAsUnconfirmed(
