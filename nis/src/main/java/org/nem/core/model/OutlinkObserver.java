@@ -23,16 +23,8 @@ public class OutlinkObserver implements TransferObserver {
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-		Amount linkWeight = amount;
-		Account trueSender = this.isExecute? sender : recipient;
-		BigInteger vested = BigInteger.valueOf(trueSender.getWeightedBalances().getVested(this.height).getNumMicroNem());
-		BigInteger unvested = BigInteger.valueOf(trueSender.getWeightedBalances().getUnvested(this.height).getNumMicroNem());
-		if (unvested.compareTo(BigInteger.ZERO) > 0) {
-			linkWeight = Amount.fromMicroNem(BigInteger.valueOf(amount.getNumMicroNem())
-											 .multiply(vested)
-											 .divide(vested.add(unvested))
-											 .longValue());
-		}
+		final Amount linkWeight = calculateLinkWeight(this.isExecute ? sender : recipient, amount);
+
 		if (this.isExecute) {
 			final AccountLink link = new AccountLink(this.height, linkWeight, recipient.getAddress());
 			sender.getImportanceInfo().addOutlink(link);
@@ -41,6 +33,21 @@ public class OutlinkObserver implements TransferObserver {
 			final AccountLink link = new AccountLink(this.height, linkWeight, sender.getAddress());
 			recipient.getImportanceInfo().removeOutlink(link);
 		}
+	}
+
+	private Amount calculateLinkWeight(final Account sender, final Amount amount) {
+		final WeightedBalances weightedBalances = sender.getWeightedBalances();
+		final BigInteger vested = BigInteger.valueOf(weightedBalances.getVested(this.height).getNumMicroNem());
+		final BigInteger unvested = BigInteger.valueOf(weightedBalances.getUnvested(this.height).getNumMicroNem());
+		if (unvested.compareTo(BigInteger.ZERO) <= 0)
+			return amount;
+
+		// only use the vested portion of an account's balance in outlink determination
+        final long rawAdjustedWeight = BigInteger.valueOf(amount.getNumMicroNem())
+                .multiply(vested)
+                .divide(vested.add(unvested))
+                .longValue();
+        return Amount.fromMicroNem(rawAdjustedWeight);
 	}
 
 	@Override
