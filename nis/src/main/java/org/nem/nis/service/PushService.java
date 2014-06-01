@@ -45,6 +45,7 @@ public class PushService {
 				entity,
 				transaction -> (transaction.isValid() && transaction.verify()) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE,
 				this.foraging::processTransaction,
+				transaction -> { },
 				NodeApiId.REST_PUSH_TRANSACTION,
 				request);
 
@@ -63,6 +64,7 @@ public class PushService {
 				entity,
 				this.blockChain::checkPushedBlock,
 				this.blockChain::processBlock,
+				block -> LOGGER.info("   block height: " + entity.getHeight()),
 				NodeApiId.REST_PUSH_BLOCK,
 				request);
 
@@ -74,14 +76,13 @@ public class PushService {
 			final T entity,
 			final Function<T, NodeInteractionResult> isValid,
 			final Function<T, NodeInteractionResult> isAccepted,
+			final Consumer<T> logAdditionalInfo,
 			final NodeApiId broadcastId,
 			final HttpServletRequest request) {
 		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
 		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
-		if (entity instanceof Block) {
-			LOGGER.info("   block height: " + ((Block)entity).getHeight());
-		}
+		logAdditionalInfo.accept(entity);
 
 		final PeerNetwork network = this.host.getNetwork();
 		Node remoteNode = network.getNodes().findNodeByEndpoint(NodeEndpoint.fromHost(request.getRemoteAddr()));

@@ -32,18 +32,18 @@ public class Foraging  {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
-
 	private final UnconfirmedTransactions unconfirmedTransactions;
-
-	private AccountLookup accountLookup;
-
-	private BlockDao blockDao;
-	private BlockChainLastBlockLayer blockChainLastBlockLayer;
-
-	private TransferDao transferDao;
+	private final AccountLookup accountLookup;
+	private final BlockDao blockDao;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final TransferDao transferDao;
 
 	@Autowired(required = true)
-	public Foraging(final AccountLookup accountLookup, final BlockDao blockDao, final BlockChainLastBlockLayer blockChainLastBlockLayer, final TransferDao transferDao) {
+	public Foraging(
+			final AccountLookup accountLookup,
+			final BlockDao blockDao,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final TransferDao transferDao) {
 		this.accountLookup = accountLookup;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
@@ -162,6 +162,7 @@ public class Foraging  {
 					if (hit.compareTo(target) < 0) {
 						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());
 
+						// TODO: refactor
 						int timeStampDifference = newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp());
 						LOGGER.info("timestamp diff: " + timeStampDifference);
 						final long backInTime = newBlock.getHeight().getRaw() - 1;
@@ -205,7 +206,7 @@ public class Foraging  {
 			final BlockDifficulty difficulty) {
 		final Account forger = this.accountLookup.findByAddress(virtualForger.getAddress());
 
-		// Probably better to include difficulty in the block constructor?
+		// TODO: Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
 
 		newBlock.setDifficulty(difficulty);
