@@ -46,8 +46,9 @@ public class BlockChainValidator {
 			if (!expectedHeight.equals(block.getHeight()) || !block.verify()) {
 				return false;
 			}
+
 			if (!isBlockHit(parentBlock, block)) {
-				LOGGER.fine("hit failed on block " + block.getHeight() + " gen " + block.getGenerationHash());
+				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
 			}
 

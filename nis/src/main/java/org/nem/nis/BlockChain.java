@@ -465,14 +465,13 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		/*
-		 * 1. execute all blocks
-		 * 2. replace current accountAnalyzer with contemporaryAccountAnalyzer
-		 * 3. add unconfirmed transactions from "our" chain
+		 * 1. replace current accountAnalyzer with contemporaryAccountAnalyzer
+		 * 2. add unconfirmed transactions from "our" chain
 		 *    (except those transactions, that are included in peer's chain)
 		 *
-		 * 4. drop "our" blocks from the db
+		 * 3. drop "our" blocks from the db
 		 *
-		 * 5. update db with "peer's" chain
+		 * 4. update db with "peer's" chain
 		 */
 		private void updateOurChain() {
 			synchronized (this.blockChainLastBlockLayer) {
