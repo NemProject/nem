@@ -1,7 +1,7 @@
 {
-    "signature":"W8ViQ+Iy1oIm4e86vxX1PcufmcB6X7bilpoZRfmYUWP74ImxUdl0t0QfQE+pdSXoApVTOpRV/DulsiRiv0REJw==",
+    "signature":"bspodfxPWahdMlmcBkgb8XKKNk8ZjKBehpVvi2B2BAOeDQ/ZIn1w1ZO2t6DvBTtRQZFo5iOf0pj80Wiga+6kCA==",
     "prevBlockHash": { "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" },
-    "type":-1,
+    "type":1,
     "version":1,
     "timestamp":0,
     "signer":"A9ZxwAKbqBeBvgVwLfYtBdcRG+IiNlfFuIN5TLeE48A8",

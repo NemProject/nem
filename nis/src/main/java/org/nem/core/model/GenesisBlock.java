@@ -14,7 +14,7 @@ import java.io.InputStream;
  */
 public class GenesisBlock extends Block {
 
-	private final static int GENESIS_BLOCK_TYPE = -1;
+	private final static int GENESIS_BLOCK_TYPE = 1;
 
 	/**
 	 * The genesis account address.
