@@ -3,6 +3,7 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -48,10 +49,10 @@ public class JsonDeserializer implements Deserializer {
 		if (null == object)
 			return null;
 
-		if (object instanceof Long)
-			return (Long)object;
+		if (object instanceof Integer)
+			return ((Integer)object).longValue();
 
-		return ((Integer)object).longValue();
+		return (Long)object;
 	}
 
 	@Override
@@ -59,7 +60,13 @@ public class JsonDeserializer implements Deserializer {
 		this.checkLabel(label);
 
 		final Object object = this.object.get(label);
-		return (object instanceof Double) ? (Double)object : null;
+		if (null == object)
+			return null;
+
+		if (object instanceof BigDecimal)
+			return ((BigDecimal)object).doubleValue();
+
+		return (Double)object;
 	}
 
 	@Override

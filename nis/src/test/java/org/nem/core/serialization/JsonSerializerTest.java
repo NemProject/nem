@@ -5,6 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -214,6 +215,21 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Assert:
 		Assert.assertThat(l, IsNull.nullValue());
+	}
+
+	@Test
+	public void canReadBigDecimalAsDouble() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.getObject().put("BigDecimal", new BigDecimal("4471.82"));
+
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		final double d = deserializer.readDouble("BigDecimal");
+
+		// Assert:
+		Assert.assertThat(d, IsEqual.equalTo(4471.82));
 	}
 
 	@Test
