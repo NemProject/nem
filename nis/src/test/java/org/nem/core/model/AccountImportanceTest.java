@@ -8,6 +8,57 @@ import java.util.*;
 
 public class AccountImportanceTest {
 
+	//region constructor
+
+	@Test
+	public void importanceIsInitiallyUnset() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
+		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
+	}
+
+	//endregion
+
+	//region serialization
+
+	@Test
+	public void canRoundtripUnsetImportance() {
+		// Arrange:
+		final AccountImportance original = new AccountImportance();
+
+		// Act:
+		final AccountImportance ai = roundtripImportance(original);
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
+		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
+	}
+
+	@Test
+	public void canRoundtripSetImportance() {
+		// Arrange:
+		final AccountImportance original = new AccountImportance();
+		original.setImportance(new BlockHeight(5), 17);
+
+		// Act:
+		final AccountImportance ai = roundtripImportance(original);
+		final double importance = ai.getImportance(new BlockHeight(5));
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		Assert.assertThat(importance, IsEqual.equalTo(17.0));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+	}
+
+	private static AccountImportance roundtripImportance(final AccountImportance original) {
+		return new AccountImportance(Utils.roundtripSerializableEntity(original, null));
+	}
+
+	//endregion
+
 	//region out-links
 
 	@Test
@@ -105,7 +156,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(17.0));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
@@ -119,7 +172,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert: the importance was not updated and has its initial value
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(17.0));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
@@ -133,7 +188,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(6));
 
 		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(12.0));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(6)));
 	}
 
 	//endregion
@@ -151,7 +208,9 @@ public class AccountImportanceTest {
 		final double importance = copy.getImportance(new BlockHeight(5));
 
 		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(17.0));
+		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
@@ -191,6 +250,20 @@ public class AccountImportanceTest {
 		// Assert:
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(3));
 		Assert.assertThat(copy.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(4));
+	}
+
+	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringCreatesAppropriateStringRepresentation() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+		ai.setImportance(new BlockHeight(5), 17);
+
+		// Assert:
+		Assert.assertThat(ai.toString(), IsEqual.equalTo("(5 : 17.000000)"));
 	}
 
 	//endregion

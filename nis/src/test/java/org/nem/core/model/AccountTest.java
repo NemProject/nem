@@ -31,9 +31,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+		Assert.assertThat(account.getHeight(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -50,9 +50,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+        Assert.assertThat(account.getHeight(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -71,9 +71,9 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+        Assert.assertThat(account.getHeight(), IsNull.nullValue());
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getImportanceInfo().getHeight(), IsNull.nullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
@@ -139,19 +139,33 @@ public class AccountTest {
 
 	//endregion
 
-	//region importance
+	//region height
+
 	@Test
-	public void importanceCanBeSet() {
+	public void accountHeightCanBeSetIfNull() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 
 		// Act:
-		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.123);
+		account.setHeight(new BlockHeight(17));
 
 		// Assert:
-		Assert.assertThat(account.getImportanceInfo().getHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(account.getImportanceInfo().getImportance(new BlockHeight(123)), IsEqual.equalTo(0.123));
+		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
+
+	@Test
+	public void accountHeightCannotBeUpdatedIfNonNull() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		account.setHeight(new BlockHeight(17));
+		account.setHeight(new BlockHeight(32));
+
+		// Assert:
+		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
+	}
+
 	//endregion
 
 	//region foraged blocks
@@ -382,6 +396,18 @@ public class AccountTest {
 	}
 
 	@Test
+	public void canRoundTripUnsetAccountImportance() {
+		// Arrange:
+		final Account original = Utils.generateRandomAccount();
+
+		// Act:
+		final Account account = new Account(Utils.roundtripSerializableEntity(original, null));
+
+		// Assert:
+		Assert.assertThat(account.getImportanceInfo().isSet(), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void secureMessagesCanBeRoundTrippedWithPrivateKey() {
 		// Arrange: create 3 secure messages from three different senders
 		final List<Account> senders = Arrays.asList(
@@ -484,8 +510,10 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(BlockHeight.readFrom(deserializer, "importanceHeight"), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(0.123));
+
+		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
+		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
 
 		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
 		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
@@ -501,7 +529,7 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
-		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.123);
+		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
@@ -825,8 +853,8 @@ public class AccountTest {
 		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
+		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
 
-		Assert.assertThat(copy.getHeight(), IsSame.sameInstance(original.getHeight()));
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
 		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));

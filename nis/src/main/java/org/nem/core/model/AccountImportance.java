@@ -1,11 +1,15 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.Serializer;
+
 import java.util.Iterator;
 
 /**
  * Encapsulates management of an account's importance.
  */
-public class AccountImportance {
+public class AccountImportance implements SerializableEntity {
 
 	private final HistoricalOutlinks historicalOutlinks;
 
@@ -17,6 +21,21 @@ public class AccountImportance {
 	 */
 	public AccountImportance() {
 		this(new HistoricalOutlinks());
+	}
+
+	/**
+	 * Deserializes an account importance instance.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public AccountImportance(final Deserializer deserializer) {
+		this();
+
+		boolean isSet = 0 != deserializer.readInt("isSet");
+		if (isSet) {
+			this.importance = deserializer.readDouble("score");
+			this.importanceHeight = BlockHeight.readFrom(deserializer, "height");
+		}
 	}
 
 	private AccountImportance(final HistoricalOutlinks historicalOutlinks) {
@@ -106,6 +125,15 @@ public class AccountImportance {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the importance is set.
+	 *
+	 * @return true if the importance is set.
+	 */
+	public boolean isSet() {
+		return null != this.importanceHeight;
+	}
+
+	/**
 	 * Creates a copy of this importance.
 	 *
 	 * @return A copy of this importance.
@@ -118,7 +146,16 @@ public class AccountImportance {
 	}
 
 	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeInt("isSet", this.isSet() ? 1 : 0);
+		if (this.isSet()) {
+			serializer.writeDouble("score", this.importance);
+			BlockHeight.writeTo(serializer, "height", this.importanceHeight);
+		}
+	}
+
+	@Override
 	public String toString() {
-		return String.format("(%d : %f)", this.importanceHeight == null? null : this.importanceHeight.getRaw(), this.importance);
+		return String.format("(%s : %f)", this.getHeight(), this.importance);
 	}
 }

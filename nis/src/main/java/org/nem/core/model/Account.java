@@ -137,9 +137,10 @@ public class Account implements SerializableEntity {
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
 
-		final BlockHeight importanceHeight = BlockHeight.readFrom(deserializer, "importanceHeight");
-		final Double importanceValue = deserializer.readDouble("importance");
-		this.importance.setImportance(importanceHeight, importanceValue);
+		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
+		if (importance.isSet())
+			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
+
 		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
 
@@ -158,14 +159,7 @@ public class Account implements SerializableEntity {
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
 
-		final BlockHeight importanceHeight = this.getImportanceInfo().getHeight();
-		if (importanceHeight != null) {
-			BlockHeight.writeTo(serializer, "importanceHeight", importanceHeight);
-			serializer.writeDouble("importance", this.getImportanceInfo().getImportance(importanceHeight));
-		} else {
-			BlockHeight.writeTo(serializer, "importanceHeight", BlockHeight.ONE);
-			serializer.writeDouble("importance", 0.0);
-		}
+        serializer.writeObject("importance", this.getImportanceInfo());
 		serializer.writeObjectArray("messages", this.getMessages());
 	}
 
@@ -289,18 +283,21 @@ public class Account implements SerializableEntity {
 
 	/**
 	 * Returns height of an account.
+	 *
 	 * @return The height of an account - when the account has been created.
 	 */
 	public BlockHeight getHeight() {
-		return height;
+		return this.height;
 	}
 
 	/**
-	 * Sets height of an account.
-	 * @param height
+	 * Sets height of an account if the account does not already have a height.
+	 *
+	 * @param height The height.
 	 */
 	public void setHeight(final BlockHeight height) {
-		this.height = height;
+		if (null == this.height)
+		    this.height = height;
 	}
 
 	/**
