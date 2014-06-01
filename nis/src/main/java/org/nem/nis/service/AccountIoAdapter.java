@@ -6,6 +6,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.ncc.TransactionMetaData;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.mappers.TransferMapper;

@@ -1,6 +1,5 @@
 package org.nem.core.crypto;
 
-import org.nem.core.model.SerializableList;
 import org.nem.core.serialization.*;
 
 import java.util.*;

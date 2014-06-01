@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.RequiredBlockDao;

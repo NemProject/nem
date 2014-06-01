@@ -1,6 +1,4 @@
-package org.nem.core.model;
-
-import org.nem.core.serialization.*;
+package org.nem.core.serialization;
 
 import java.util.*;
 

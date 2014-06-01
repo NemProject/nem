@@ -1,9 +1,8 @@
-package org.nem.core.model;
+package org.nem.core.serialization;
 
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.test.Utils;
 

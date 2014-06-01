@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
-import org.nem.core.model.SerializableList;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.IsEquivalent;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;

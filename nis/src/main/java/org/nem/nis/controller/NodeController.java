@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.nem.core.model.SerializableList;
+import org.nem.core.serialization.SerializableList;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;

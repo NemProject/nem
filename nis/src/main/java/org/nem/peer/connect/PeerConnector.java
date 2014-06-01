@@ -1,7 +1,6 @@
 package org.nem.peer.connect;
 
-import org.nem.core.model.SerializableList;
-import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 
 import java.util.concurrent.CompletableFuture;
