@@ -73,7 +73,7 @@ public class BlockScorer {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
 		this.accountAnalyzer.recalculateImportances(blockHeight);
 		// TODO: maybe it'd be better to use Genesis.AMOUNT.getNumNem()
-		final long multiplier = 4_000_000_000L * 10; // TODO: remove 10 before open alpha
+		final long multiplier = 1_000_000_000L * 10; // TODO: remove 10 before open alpha
 		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 		return BigInteger.valueOf(timeStampDifference)
 				 .multiply(BigInteger.valueOf(forgerBalance))

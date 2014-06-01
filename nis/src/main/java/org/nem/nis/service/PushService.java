@@ -79,6 +79,9 @@ public class PushService {
 		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
 		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
+		if (entity instanceof Block) {
+			LOGGER.info("   block height: " + ((Block)entity).getHeight());
+		}
 
 		final PeerNetwork network = this.host.getNetwork();
 		Node remoteNode = network.getNodes().findNodeByEndpoint(NodeEndpoint.fromHost(request.getRemoteAddr()));
