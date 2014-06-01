@@ -10,8 +10,8 @@
     "application": "NIS",
 
 	"knownPeers": [
-        { "protocol": "http", "host": "37.187.70.29", "port" : 7890 },
-        { "protocol": "http", "host": "178.254.43.15", "port" : 7890 }
+        { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
+        { "protocol": "http", "host": "trudy.nem.ninja", "port" : 7890 }
     ],
 
 	"_end": "end"
