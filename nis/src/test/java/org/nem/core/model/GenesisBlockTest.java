@@ -1,9 +1,12 @@
 package org.nem.core.model;
 
+import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.time.TimeInstant;
+
+import java.io.*;
 
 public class GenesisBlockTest {
 
@@ -80,6 +83,41 @@ public class GenesisBlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(GenesisBlock.ADDRESS));
+	}
+
+	//endregion
+
+	//region failed construction
+
+	@Test(expected = IllegalArgumentException.class)
+	public void genesisBlockCannotBeLoadedWithIncorrectType() {
+		// Arrange:
+		final JSONObject genesisBlockJson = loadGenesisBlockJsonObject();
+		genesisBlockJson.put("type", 1);
+
+		// Act:
+		GenesisBlock.fromJsonObject(genesisBlockJson);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void genesisBlockCannotBeLoadedFromInvalidJson() throws IOException {
+		// Arrange:
+		final JSONObject genesisBlockJson = loadGenesisBlockJsonObject();
+		final String badJson = "<bad>" + genesisBlockJson.toJSONString();
+		try (final ByteArrayInputStream inputStream = new ByteArrayInputStream(badJson.getBytes())) {
+			// Act:
+			GenesisBlock.fromStream(inputStream);
+		}
+	}
+
+	private static JSONObject loadGenesisBlockJsonObject() {
+		try (final InputStream fin = GenesisBlock.class.getClassLoader().getResourceAsStream("genesis-block.json")) {
+			return (JSONObject)JSONValue.parseStrict(fin);
+		}
+		catch (IOException|net.minidev.json.parser.ParseException e) {
+			Assert.fail("unexpected exception was thrown when parsing genesis block resource");
+			return null;
+		}
 	}
 
 	//endregion

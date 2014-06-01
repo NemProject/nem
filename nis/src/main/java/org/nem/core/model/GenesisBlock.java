@@ -50,17 +50,16 @@ public class GenesisBlock extends Block {
 		this.setGenerationHash(GENESIS_GENERATION_HASH);
 	}
 
-	// TODO: add tests for the factories below
-
 	/**
 	 * Loads the genesis block from the default project resource.
 	 */
 	public static GenesisBlock fromResource() {
-		final InputStream fin = GenesisBlock.class.getClassLoader().getResourceAsStream(GENESIS_BLOCK_FILE);
-		if (null == fin)
-			throw new IllegalArgumentException("genesis block stream is null");
-
-		return fromStream(fin);
+		try (final InputStream fin = GenesisBlock.class.getClassLoader().getResourceAsStream(GENESIS_BLOCK_FILE)) {
+			return fromStream(fin);
+		}
+		catch (IOException e) {
+			throw new IllegalStateException("unable to parse genesis block stream");
+		}
 	}
 
 	/**
