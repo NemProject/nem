@@ -2,6 +2,7 @@ package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ArrayUtils;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.BigInteger;
 
@@ -125,4 +126,9 @@ public class Signature {
 	}
 
 	//endregion
+
+	@Override
+	public String toString() {
+		return HexEncoder.getString(this.getBytes());
+	}
 }

@@ -193,6 +193,22 @@ public class SignatureTest {
 
 	//endregion
 
+	// region toString
+
+	@Test
+	public void toStringReturnsHexRepresentation() {
+		// Arrange:
+		final Signature signature = createSignature(12, 513);
+
+		// Assert:
+		final String expectedSignature =
+				"0c00000000000000000000000000000000000000000000000000000000000000" +
+				"0102000000000000000000000000000000000000000000000000000000000000";
+		Assert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
+	}
+
+	//endregion
+
 	private static Signature createSignature(final String r, final String s) {
 		return new Signature(new BigInteger(r, 16), new BigInteger(s, 16));
 	}

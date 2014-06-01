@@ -74,7 +74,7 @@ public class PrivateKeyTest {
 	@Test(expected = CryptoException.class)
 	public void cannotCreateAroundMalformedHexString() {
 		// Act:
-		PrivateKey.fromDecimalString("22G75");
+		PrivateKey.fromHexString("22G75");
 	}
 
 	//endregion

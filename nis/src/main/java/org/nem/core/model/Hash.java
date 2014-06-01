@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.crypto.CryptoException;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.HexEncoder;
@@ -41,6 +42,20 @@ public class Hash implements SerializableEntity {
 		this.data = deserializer.readBytes("data");
 	}
 
+	/**
+	 * Creates a hash from a hex string.
+	 *
+	 * @param hex The hex string.
+	 *
+	 * @return The new public key.
+	 */
+	public static Hash fromHexString(final String hex) {
+		try {
+			return new Hash(HexEncoder.getBytes(hex));
+		} catch (SerializationException e) {
+			throw new CryptoException(e);
+		}
+	}
 	/**
 	 * Gets the raw hash.
 	 *

@@ -17,7 +17,8 @@ public class HexEncoder {
 	 */
 	public static byte[] getBytes(final String hexString) {
 		final Hex codec = new Hex();
-		final byte[] encodedBytes = StringEncoder.getBytes(hexString);
+		final String paddedHexString = 0 == hexString.length() % 2 ? hexString : "0" + hexString;
+		final byte[] encodedBytes = StringEncoder.getBytes(paddedHexString);
 
 		try {
 			return codec.decode(encodedBytes);

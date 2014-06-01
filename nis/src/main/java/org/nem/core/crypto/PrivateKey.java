@@ -51,7 +51,7 @@ public class PrivateKey implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PrivateKey))
+		if (!(obj instanceof PrivateKey))
 			return false;
 
 		final PrivateKey rhs = (PrivateKey)obj;
@@ -72,9 +72,7 @@ public class PrivateKey implements SerializableEntity {
 	 */
 	public static PrivateKey fromHexString(final String hex) {
 		try {
-			// HexEncoder requires an even-length string
-			final String paddedHex = 0 == hex.length() % 2 ? hex : "0" + hex;
-			return new PrivateKey(new BigInteger(HexEncoder.getBytes(paddedHex)));
+			return new PrivateKey(new BigInteger(HexEncoder.getBytes(hex)));
 		} catch (SerializationException e) {
 			throw new CryptoException(e);
 		}

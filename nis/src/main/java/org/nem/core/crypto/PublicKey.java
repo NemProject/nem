@@ -33,6 +33,21 @@ public class PublicKey implements SerializableEntity {
 	}
 
 	/**
+	 * Creates a public key from a hex string.
+	 *
+	 * @param hex The hex string.
+	 *
+	 * @return The new public key.
+	 */
+	public static PublicKey fromHexString(final String hex) {
+		try {
+			return new PublicKey(HexEncoder.getBytes(hex));
+		} catch (SerializationException e) {
+			throw new CryptoException(e);
+		}
+	}
+
+	/**
 	 * Gets the raw public key value.
 	 *
 	 * @return The raw public key value.

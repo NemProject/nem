@@ -21,6 +21,21 @@ public class PublicKeyTest {
 		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
+	@Test
+	public void canCreateFromHexString() {
+		// Arrange:
+		final PublicKey key = PublicKey.fromHexString("227F");
+
+		// Assert:
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x7F, 0x22 }));
+	}
+
+	@Test(expected = CryptoException.class)
+	public void cannotCreateAroundMalformedHexString() {
+		// Act:
+		PublicKey.fromHexString("22G75");
+	}
+
 	//endregion
 
 	//region serializer

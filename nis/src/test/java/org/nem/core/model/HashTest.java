@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.CryptoException;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -29,6 +30,21 @@ public class HashTest {
 
 		// Assert:
 		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(TEST_BYTES));
+	}
+
+	@Test
+	public void canCreateFromHexString() {
+		// Arrange:
+		final Hash hash = Hash.fromHexString("227F");
+
+		// Assert:
+		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x7F, 0x22 }));
+	}
+
+	@Test(expected = CryptoException.class)
+	public void cannotCreateAroundMalformedHexString() {
+		// Act:
+		Hash.fromHexString("22G75");
 	}
 
 	//endregion
