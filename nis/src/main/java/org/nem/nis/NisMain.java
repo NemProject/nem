@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.utils.HexEncoder;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 
@@ -49,8 +48,8 @@ public class NisMain {
 		LOGGER.info("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
-		LOGGER.info("hex: " + HexEncoder.getString(dbBlock.getGenerationHash().getRaw()));
-		if (!dbBlock.getGenerationHash().equals(new Hash(HexEncoder.getBytes("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8")))) {
+		LOGGER.info(String.format("hex: %s", dbBlock.getGenerationHash()));
+		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
 			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}

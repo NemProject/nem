@@ -6,7 +6,6 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.HexEncoder;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -151,7 +150,7 @@ public class Foraging  {
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
 
-					LOGGER.info("generated signature: " + HexEncoder.getString(newBlock.getSignature().getBytes()));
+					LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
 					final BigInteger hit = blockScorer.calculateHit(newBlock);
 					LOGGER.info("   hit: 0x" + hit.toString(16));

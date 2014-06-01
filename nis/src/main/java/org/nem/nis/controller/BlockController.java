@@ -6,7 +6,6 @@ import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.BlockIo;
 
 import org.nem.core.model.Block;
-import org.nem.core.utils.HexEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,7 @@ public class BlockController {
 	@P2PApi
 	@PublicApi
 	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) {
-		final Hash blockHash = new Hash(HexEncoder.getBytes(blockHashString));
+		final Hash blockHash = Hash.fromHexString(blockHashString);
 		return blockIo.getBlock(blockHash);
 	}
 
