@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;

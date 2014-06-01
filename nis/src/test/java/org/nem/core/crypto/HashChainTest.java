@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.core.crypto;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;

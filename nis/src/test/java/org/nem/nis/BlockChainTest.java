@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;

@@ -1,6 +1,7 @@
 package org.nem.peer.test;
 
 import org.nem.core.connect.*;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.utils.ExceptionUtils;

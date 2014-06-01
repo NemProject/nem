@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;

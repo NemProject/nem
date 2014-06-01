@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.test.*;

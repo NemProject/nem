@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;

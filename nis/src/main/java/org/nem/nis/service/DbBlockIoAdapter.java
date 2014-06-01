@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.BlockHeight;
-import org.nem.core.model.Hash;
+import org.nem.core.crypto.Hash;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;

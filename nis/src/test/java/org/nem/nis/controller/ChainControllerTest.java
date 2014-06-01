@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.BlockHeight;
-import org.nem.core.model.HashChain;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.service.BlockChainLastBlockLayer;

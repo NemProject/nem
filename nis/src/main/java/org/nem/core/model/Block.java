@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
+import org.nem.core.crypto.Hash;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 

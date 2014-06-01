@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.model.BlockHeight;
-import org.nem.core.model.Hash;
+import org.nem.core.crypto.Hash;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.BlockIo;
 

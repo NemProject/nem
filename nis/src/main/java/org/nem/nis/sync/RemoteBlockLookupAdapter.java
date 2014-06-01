@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.peer.connect.SyncConnector;
 import org.nem.peer.node.*;

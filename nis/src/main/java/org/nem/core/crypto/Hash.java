@@ -1,6 +1,5 @@
-package org.nem.core.model;
+package org.nem.core.crypto;
 
-import org.nem.core.crypto.CryptoException;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ByteUtils;
 import org.nem.core.utils.EncodingException;

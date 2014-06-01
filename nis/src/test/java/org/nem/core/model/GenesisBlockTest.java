@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.time.TimeInstant;
 
 public class GenesisBlockTest {

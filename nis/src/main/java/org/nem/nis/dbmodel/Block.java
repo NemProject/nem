@@ -1,7 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.Cascade;
-import org.nem.core.model.Hash;
+import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
 import java.util.List;

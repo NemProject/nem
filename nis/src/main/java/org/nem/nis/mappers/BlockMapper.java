@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;

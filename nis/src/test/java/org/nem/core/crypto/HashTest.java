@@ -1,8 +1,7 @@
-package org.nem.core.model;
+package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.CryptoException;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 

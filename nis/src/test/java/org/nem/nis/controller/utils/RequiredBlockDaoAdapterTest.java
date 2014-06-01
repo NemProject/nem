@@ -2,6 +2,8 @@ package org.nem.nis.controller.utils;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.Block;

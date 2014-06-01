@@ -4,7 +4,6 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
-import org.nem.core.utils.HexEncoder;
 import org.nem.nis.AccountAnalyzer;
 
 import java.io.IOException;

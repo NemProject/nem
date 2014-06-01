@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Hashes;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.serialization.BinarySerializer;

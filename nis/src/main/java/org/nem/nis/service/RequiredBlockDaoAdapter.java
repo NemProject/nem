@@ -1,5 +1,7 @@
 package org.nem.nis.service;
 
+import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.nis.dao.BlockDao;
 import org.springframework.beans.factory.annotation.Autowired;

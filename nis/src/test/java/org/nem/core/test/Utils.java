@@ -1,6 +1,7 @@
 package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.crypto.PublicKey;

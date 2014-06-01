@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.dao.AccountDao;
