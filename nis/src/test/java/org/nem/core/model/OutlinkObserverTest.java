@@ -17,8 +17,8 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notifyTransfer(context.account1, context.account2, new Amount(752));
 
-		// Assert:
-		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(752), context.account2.getAddress());
+		// Assert (752 * 0.3 = 225.5):
+		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
 		Mockito.verify(context.importance1, Mockito.times(1)).addOutlink(expectedLink);
 		verifyCallCounts(context.importance1, 1, 0);
 		verifyCallCounts(context.importance2, 0, 0);
@@ -33,8 +33,8 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notifyTransfer(context.account2, context.account1, new Amount(752));
 
-		// Assert:
-		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(752), context.account2.getAddress());
+		// Assert (752 * 0.3 = 225.5):
+		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
 		Mockito.verify(context.importance1, Mockito.times(1)).removeOutlink(expectedLink);
 		verifyCallCounts(context.importance1, 0, 1);
 		verifyCallCounts(context.importance2, 0, 0);
@@ -111,20 +111,28 @@ public class OutlinkObserverTest {
 		private final Account account2;
 		private final AccountImportance importance1;
 		private final AccountImportance importance2;
+		private final WeightedBalances weightedBalances1;
+		private final WeightedBalances weightedBalances2;
 
 		public TestContext() {
+			BlockHeight height = new BlockHeight(111);
 			this.account1 = Mockito.mock(Account.class);
 			this.importance1 = Mockito.mock(AccountImportance.class);
-			this.hook(this.account1, this.importance1);
+			this.weightedBalances1 = Mockito.mock(WeightedBalances.class);
+			this.hook(this.account1, this.importance1, this.weightedBalances1, height);
 
 			this.account2 = Mockito.mock(Account.class);
 			this.importance2 = Mockito.mock(AccountImportance.class);
-			this.hook(this.account2, this.importance2);
+			this.weightedBalances2 = Mockito.mock(WeightedBalances.class);
+			this.hook(this.account2, this.importance2, this.weightedBalances2, height);
 		}
 
-		private void hook(final Account account, final AccountImportance importance) {
+		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
 			Mockito.when(account.getAddress()).thenReturn(Utils.generateRandomAddress());
 			Mockito.when(account.getImportanceInfo()).thenReturn(importance);
+			Mockito.when(account.getWeightedBalances()).thenReturn(weightedBalances);
+			Mockito.when(weightedBalances.getUnvested(height)).thenReturn(Amount.fromNem(7));
+			Mockito.when(weightedBalances.getVested(height)).thenReturn(Amount.fromNem(3));
 		}
 	}
 }

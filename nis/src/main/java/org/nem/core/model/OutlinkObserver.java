@@ -30,7 +30,7 @@ public class OutlinkObserver implements TransferObserver {
 		if (unvested.compareTo(BigInteger.ZERO) > 0) {
 			linkWeight = Amount.fromMicroNem(BigInteger.valueOf(amount.getNumMicroNem())
 											 .multiply(vested)
-											 .divide(unvested)
+											 .divide(vested.add(unvested))
 											 .longValue());
 		}
 		if (this.isExecute) {
