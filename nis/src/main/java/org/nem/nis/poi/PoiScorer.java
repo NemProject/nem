@@ -180,7 +180,7 @@ public class PoiScorer {
 			final ColumnVector vestedBalanceVector) {
 		
 		// alg is: l1norm(stakes + outlinkWeight*outlinkVector) + importanceWeight * l1norm(PR)
-		double outlinkWeight = 1.05;
+		double outlinkWeight = 1.25;
 		double importanceWeight = 0.05;
 
 		ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).add(vestedBalanceVector);
