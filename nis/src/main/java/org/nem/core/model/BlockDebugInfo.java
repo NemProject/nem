@@ -29,7 +29,7 @@ public class BlockDebugInfo  implements SerializableEntity {
 	}
 	
 	/**
-	 * Deserializes a meta data.
+	 * Deserializes a block debug info object.
 	 *
 	 * @param deserializer The deserializer.
 	 */
@@ -41,10 +41,55 @@ public class BlockDebugInfo  implements SerializableEntity {
 		this.hit = new BigInteger(deserializer.readString("hit"));
 	}
 
+	/**
+	 * Returns the height of the block
+	 *
+	 * @return the height
+	 */
+	public BlockHeight getHeight() {
+		return this.height;
+	}
+	
+	/**
+	 * Returns the address of the forager of the block
+	 *
+	 * @return the address
+	 */
+	public Address getForagerAddress() {
+		return this.foragerAddress;
+	}
+	
+	/**
+	 * Returns the timestamp of the block
+	 *
+	 * @return the timestamp
+	 */
+	public TimeInstant getTimeInstant() {
+		return this.timestamp;
+	}
+	
+	/**
+	 * Returns the difficulty of the block
+	 *
+	 * @return the difficulty
+	 */
+	public BlockDifficulty getDifficulty() {
+		return this.difficulty;
+	}
+	
+	/**
+	 * Returns the hit for the block
+	 *
+	 * @return the hit
+	 */
+	public BigInteger getHit() {
+		return this.hit;
+	}
+	
 	@Override
 	public void serialize(Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
-		Address.writeTo(serializer, "forager", foragerAddress);
+		Address.writeTo(serializer, "foragerAddress", foragerAddress);
 		TimeInstant.writeTo(serializer, "timestamp", this.timestamp);
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());
