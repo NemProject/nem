@@ -67,6 +67,24 @@ public class NodeControllerTest {
 	}
 
 	@Test
+	public void getExperiencesReturnsLocalNodeExperiences() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final PeerNetwork network = context.network;
+		network.updateExperience(Node.fromHost("10.0.0.2"), NodeInteractionResult.FAILURE);
+		network.updateExperience(Node.fromHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(Node.fromHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
+		final List<NodeExperiencePair> originalExperiences = network.getLocalNodeAndExperiences().getExperiences();
+
+		// Act:
+		final Collection<NodeExperiencePair> experiences = context.controller.getExperiences().asCollection();
+
+		// Assert:
+		Assert.assertThat(originalExperiences.size(), IsEqual.equalTo(3));
+		Assert.assertThat(experiences, IsEquivalent.equivalentTo(originalExperiences));
+	}
+
+	@Test
 	public void getActivePeerListReturnsActiveNetworkNodes() {
 		// Arrange:
 		final TestContext context = new TestContext();
