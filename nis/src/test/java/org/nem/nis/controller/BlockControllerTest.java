@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockScorer;
+import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.service.BlockIo;
 import org.nem.nis.test.*;
 

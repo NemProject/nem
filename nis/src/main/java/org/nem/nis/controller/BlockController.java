@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.BlockDebugInfo;
+import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.crypto.Hash;
 import org.nem.nis.BlockScorer;

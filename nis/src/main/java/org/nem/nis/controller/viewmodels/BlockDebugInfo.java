@@ -1,7 +1,8 @@
-package org.nem.core.model;
+package org.nem.nis.controller.viewmodels;
 
 import java.math.BigInteger;
 
+import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
