@@ -6,6 +6,7 @@ import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -42,23 +43,18 @@ public class AccountController {
 		this.foraging.addUnlockedAccount(account);
 	}
 
-	// TODO: test the following functions
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfers(
-			@RequestParam(value = "address") final String nemAddress
-			, @RequestParam(value = "timestamp", required = false) final String timestamp
-	) {
-		return this.accountIo.getAccountTransfers(getAddress(nemAddress), timestamp);
+	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
 	}
 
 	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Block> accountBlocks(
-			@RequestParam(value = "address") final String nemAddress
-			, @RequestParam(value = "timestamp", required = false) final String timestamp
-	) {
-		return this.accountIo.getAccountBlocks(getAddress(nemAddress), timestamp);
+	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return this.accountIo.getAccountBlocks(page.getAddress(), page.getTimestamp());
 	}
 
 	private Address getAddress(final String nemAddress) {
