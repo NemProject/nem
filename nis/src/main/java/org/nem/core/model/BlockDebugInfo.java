@@ -2,12 +2,13 @@ package org.nem.core.model;
 
 import java.math.BigInteger;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-public class BlockDebugInfo  implements SerializableEntity {
+/**
+ * Debug information about a block.
+ */
+public class BlockDebugInfo implements SerializableEntity {
 
 	private final BlockHeight height;
 	private final Address foragerAddress;
@@ -19,8 +20,17 @@ public class BlockDebugInfo  implements SerializableEntity {
 	 * Creates a new block debug info.
 	 *
 	 * @param blockHeight The block height.
+	 * @param foragerAddress The address of the forager of the block.
+	 * @param timestamp The block timestamp.
+	 * @param difficulty The block difficulty.
+	 * @param hit The block hit.
 	 */
-	public BlockDebugInfo(final BlockHeight blockHeight, final Address foragerAddress, final TimeInstant timestamp, BlockDifficulty difficulty, BigInteger hit) {
+	public BlockDebugInfo(
+			final BlockHeight blockHeight,
+			final Address foragerAddress,
+			final TimeInstant timestamp,
+			final BlockDifficulty difficulty,
+			final BigInteger hit) {
 		this.height = blockHeight;
 		this.foragerAddress = foragerAddress;
 		this.timestamp = timestamp;
@@ -42,45 +52,45 @@ public class BlockDebugInfo  implements SerializableEntity {
 	}
 
 	/**
-	 * Returns the height of the block
+	 * Returns the height of the block.
 	 *
-	 * @return the height
+	 * @return the height.
 	 */
 	public BlockHeight getHeight() {
 		return this.height;
 	}
 	
 	/**
-	 * Returns the address of the forager of the block
+	 * Returns the address of the forager of the block.
 	 *
-	 * @return the address
+	 * @return The address.
 	 */
 	public Address getForagerAddress() {
 		return this.foragerAddress;
 	}
 	
 	/**
-	 * Returns the timestamp of the block
+	 * Returns the timestamp of the block.
 	 *
-	 * @return the timestamp
+	 * @return The timestamp.
 	 */
 	public TimeInstant getTimeInstant() {
 		return this.timestamp;
 	}
 	
 	/**
-	 * Returns the difficulty of the block
+	 * Returns the difficulty of the block.
 	 *
-	 * @return the difficulty
+	 * @return The difficulty
 	 */
 	public BlockDifficulty getDifficulty() {
 		return this.difficulty;
 	}
 	
 	/**
-	 * Returns the hit for the block
+	 * Returns The hit for the block
 	 *
-	 * @return the hit
+	 * @return The hit.
 	 */
 	public BigInteger getHit() {
 		return this.hit;
@@ -94,5 +104,4 @@ public class BlockDebugInfo  implements SerializableEntity {
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());
 	}
-
 }

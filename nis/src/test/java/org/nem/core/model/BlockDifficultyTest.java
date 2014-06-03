@@ -1,7 +1,10 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 
@@ -50,6 +53,8 @@ public class BlockDifficultyTest {
 
 	//endregion
 
+	//region converters
+
 	@Test
 	public void valueCanBeReturnedAsBigInteger() {
 		// Arrange:
@@ -58,4 +63,41 @@ public class BlockDifficultyTest {
 		// Assert:
 		Assert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("79876543211237")));
 	}
+
+	//endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteBlockDifficulty() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final BlockDifficulty difficulty = new BlockDifficulty(79_876_543_211_237L);
+
+		// Act:
+		BlockDifficulty.writeTo(serializer, "difficulty", difficulty);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("difficulty"), IsEqual.equalTo(79_876_543_211_237L));
+	}
+
+	@Test
+	public void canRoundtripBlockHeight() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final BlockDifficulty originalDifficulty = new BlockDifficulty(79_876_543_211_237L);
+
+		// Act:
+		BlockDifficulty.writeTo(serializer, "difficulty", originalDifficulty);
+
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final BlockDifficulty difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
+
+		// Assert:
+		Assert.assertThat(difficulty, IsEqual.equalTo(originalDifficulty));
+	}
+
+	//endregion
 }
