@@ -11,6 +11,9 @@ import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.*;
+
 /**
  * REST API for interacting with Account objects.
  */
@@ -76,5 +79,20 @@ public class AccountController {
 		}
 
 		return address;
+	}
+
+	/**
+	 * Gets the current account importance information for all accounts.
+	 *
+	 * @return Account importance information.
+	 */
+	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<AccountImportanceViewModel> getImportances() {
+		final List<AccountImportanceViewModel> accounts = StreamSupport.stream(this.accountIo.spliterator(), false)
+				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
+				.collect(Collectors.toList());
+
+		return new SerializableList<>(accounts);
 	}
 }

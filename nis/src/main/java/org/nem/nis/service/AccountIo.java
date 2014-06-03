@@ -7,7 +7,7 @@ import org.nem.core.serialization.SerializableList;
 /**
  * An account input / output service.
  */
-public interface AccountIo {
+public interface AccountIo extends Iterable<Account> {
 
 	/**
 	 * Finds an account given an address.

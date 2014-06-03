@@ -6,15 +6,13 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.*;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.core.test.IsEquivalent;
 import org.nem.core.test.Utils;
 import org.nem.nis.Foraging;
-import org.nem.nis.controller.viewmodels.AccountPageBuilder;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.*;
 
 import java.util.*;
-
-import static org.mockito.Mockito.mock;
 
 public class AccountControllerTest {
 
@@ -37,9 +35,9 @@ public class AccountControllerTest {
 	public void accountGetDelegatesToAccountIoAdapter() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final TestContext context = new TestContext(accountLookup);
-		accountLookup.setMockAccount(account);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
+		final TestContext context = new TestContext(accountIoAdapter);
 
 		// Act:
 		final Account resultAccount = context.controller.accountGet(account.getAddress().getEncoded());
@@ -102,19 +100,58 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountBlocks(address, "12345");
 	}
 
+	@Test
+	public void getImportancesReturnsImportanceInformationForAllAccounts() {
+		// Arrange:
+		final List<Account> accounts = Arrays.asList(
+				createAccount("alpha", 12, 45),
+				createAccount("gamma", 0, 0),
+				createAccount("sigma", 4, 88));
+
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.spliterator()).thenReturn(accounts.spliterator());
+
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		// Act:
+		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
+
+		// Assert:
+		final List<AccountImportanceViewModel> expectedViewModels = Arrays.asList(
+				createAccountImportanceViewModel("alpha", 12, 45),
+				createAccountImportanceViewModel("gamma", 0, 0),
+				createAccountImportanceViewModel("sigma", 4, 88));
+		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
+	}
+
+	private static Account createAccount(
+			final String encodedAddress,
+			final int blockHeight,
+			final int importance) {
+		final Account account = new Account(Address.fromEncoded(encodedAddress));
+		if (blockHeight > 0)
+			account.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
+
+		return account;
+	}
+
+	private static AccountImportanceViewModel createAccountImportanceViewModel(
+			final String encodedAddress,
+			final int blockHeight,
+			final int importance) {
+		final AccountImportance ai = new AccountImportance();
+		if (blockHeight > 0)
+			ai.setImportance(new BlockHeight(blockHeight), importance);
+
+		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
+	}
+
 	private static class TestContext {
 		private final MockForaging foraging = new MockForaging();
 		private final AccountController controller;
 
 		public TestContext() {
-			this(new MockAccountLookup());
-		}
-
-		public TestContext(final AccountLookup accountLookup) {
-			this(new AccountIoAdapter(
-					mock(RequiredTransferDao.class),
-					mock(RequiredBlockDao.class),
-					accountLookup));
+			this(Mockito.mock(AccountIoAdapter.class));
 		}
 
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
