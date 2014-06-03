@@ -2,10 +2,12 @@ package org.nem.core.model;
 
 import java.math.BigInteger;
 
+import org.nem.core.serialization.*;
+
 /**
- * Represents a NEM block height.
+ * Represents a NEM block difficulty.
  */
-public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
+public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> implements SerializableEntity {
 
 	/**
 	 * The initial block difficulty.
@@ -37,6 +39,15 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
 	}
 
 	/**
+	 * Deserializes a block difficulty.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public BlockDifficulty(final Deserializer deserializer) {
+		this(deserializer.readLong("difficulty"));
+	}
+
+	/**
 	 * Returns the underlying difficulty.
 	 *
 	 * @return The underlying difficulty.
@@ -55,4 +66,36 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
 	private static long Clamp(long difficulty) {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));
 	}
+
+	@Override
+	public void serialize(Serializer serializer) {
+		serializer.writeLong("difficulty", this.getRaw());
+	}
+
+	//region inline serialization
+
+	/**
+	 * Writes a block difficulty object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label      The optional label.
+	 * @param difficulty     The object.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final BlockDifficulty difficulty) {
+		serializer.writeLong(label, difficulty.getRaw());
+	}
+
+	/**
+	 * Reads a block difficulty object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label        The optional label.
+	 *
+	 * @return The read object.
+	 */
+	public static BlockDifficulty readFrom(final Deserializer deserializer, final String label) {
+		return new BlockDifficulty(deserializer.readLong(label));
+	}
+
+	//endregion
 }
