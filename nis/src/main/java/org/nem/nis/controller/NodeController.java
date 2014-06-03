@@ -6,11 +6,15 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST node controller.
@@ -83,9 +87,21 @@ public class NodeController {
 	@RequestMapping(value = "/node/experiences", method = RequestMethod.GET)
 	@P2PApi
 	@PublicApi
-	public SerializableList<NodeExperiencePair> getExperiences() {
+	public SerializableList<ExtendedNodeExperiencePair> getExperiences() {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
-		return new SerializableList<>(pair.getExperiences());
+
+		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = pair.getExperiences().stream()
+				.map(this::extend)
+				.collect(Collectors.toList());
+
+		return new SerializableList<>(nodeExperiencePairs);
+	}
+
+	private ExtendedNodeExperiencePair extend(final NodeExperiencePair pair) {
+		return new ExtendedNodeExperiencePair(
+				pair.getNode(),
+				pair.getExperience(),
+				this.host.getSyncAttempts(pair.getNode()));
 	}
 
 	/**
