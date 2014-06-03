@@ -43,6 +43,12 @@ public class AccountController {
 		this.foraging.addUnlockedAccount(account);
 	}
 
+	/**
+	 * Gets transaction information for the specified account starting at the specified time.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching transactions.
+	 */
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
@@ -50,6 +56,12 @@ public class AccountController {
 		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
 	}
 
+	/**
+	 * Gets block information for the specified account starting at the specified time.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching blocks.
+	 */
 	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
