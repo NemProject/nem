@@ -186,7 +186,7 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		final byte[] signersKey = HexEncoder.getBytes("02f25538f7fbdb0dbe7d3363be67f9edac8033c777cf3fc10ededae1a990c5459f");
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
