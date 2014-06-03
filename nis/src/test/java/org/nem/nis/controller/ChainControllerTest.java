@@ -24,7 +24,7 @@ public class ChainControllerTest {
 		final MockBlockDao blockDao = new MockBlockDao(null);
 		final RequiredBlockDaoAdapter requiredBlockDao = new RequiredBlockDaoAdapter(blockDao);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		when(blockChainLastBlockLayer.getLastDbBlock()).thenReturn(NisUtils.createBlockWithTimeStamp(443));
+		when(blockChainLastBlockLayer.getLastDbBlock()).thenReturn(NisUtils.createDbBlockWithTimeStamp(443));
 		final ChainController controller = new ChainController(requiredBlockDao, accountLookup, blockChainLastBlockLayer);
 
 		// Act:
