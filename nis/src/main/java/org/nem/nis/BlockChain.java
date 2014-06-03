@@ -491,11 +491,11 @@ public class BlockChain implements BlockSynchronizer {
 				}
 
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
-			}
 
-			this.peerChain.stream()
-					.filter(this.blockChainLastBlockLayer::addBlockToDb)
-					.forEach(this.foraging::removeFromUnconfirmedTransactions);
+				this.peerChain.stream()
+						.filter(this.blockChainLastBlockLayer::addBlockToDb)
+						.forEach(this.foraging::removeFromUnconfirmedTransactions);
+			}
 		}
 
 		private static void logAccounts(final String heading, final Iterable<Account> accounts) {

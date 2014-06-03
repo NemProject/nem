@@ -64,8 +64,6 @@ public class BlockChainLastBlockLayer {
 	 * @return always true
 	 */
 	public boolean addBlockToDb(Block block) {
-		synchronized (this) {
-
 			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
 
 			// hibernate will save both block AND transactions
@@ -77,8 +75,6 @@ public class BlockChainLastBlockLayer {
 			blockDao.updateLastBlockId(lastBlock);
 
 			lastBlock = dbBlock;
-
-		} // synchronized
 
 		return true;
 	}
