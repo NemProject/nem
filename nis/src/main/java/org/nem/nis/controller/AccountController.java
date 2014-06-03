@@ -6,9 +6,13 @@ import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.*;
 
 /**
  * REST API for interacting with Account objects.
@@ -42,23 +46,30 @@ public class AccountController {
 		this.foraging.addUnlockedAccount(account);
 	}
 
-	// TODO: test the following functions
+	/**
+	 * Gets transaction information for the specified account starting at the specified time.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching transactions.
+	 */
 	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfers(
-			@RequestParam(value = "address") final String nemAddress
-			, @RequestParam(value = "timestamp", required = false) final String timestamp
-	) {
-		return this.accountIo.getAccountTransfers(getAddress(nemAddress), timestamp);
+	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
 	}
 
+	/**
+	 * Gets block information for the specified account starting at the specified time.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching blocks.
+	 */
 	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Block> accountBlocks(
-			@RequestParam(value = "address") final String nemAddress
-			, @RequestParam(value = "timestamp", required = false) final String timestamp
-	) {
-		return this.accountIo.getAccountBlocks(getAddress(nemAddress), timestamp);
+	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return this.accountIo.getAccountBlocks(page.getAddress(), page.getTimestamp());
 	}
 
 	private Address getAddress(final String nemAddress) {
@@ -68,5 +79,20 @@ public class AccountController {
 		}
 
 		return address;
+	}
+
+	/**
+	 * Gets the current account importance information for all accounts.
+	 *
+	 * @return Account importance information.
+	 */
+	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<AccountImportanceViewModel> getImportances() {
+		final List<AccountImportanceViewModel> accounts = StreamSupport.stream(this.accountIo.spliterator(), false)
+				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
+				.collect(Collectors.toList());
+
+		return new SerializableList<>(accounts);
 	}
 }

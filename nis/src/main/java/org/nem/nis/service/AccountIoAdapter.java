@@ -5,8 +5,8 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.ncc.TransactionMetaData;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.mappers.TransferMapper;
@@ -14,24 +14,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
 	private final RequiredTransferDao transferDao;
 	private final RequiredBlockDao blockDao;
-	private final AccountLookup accountLookup;
+	private final AccountAnalyzer accountAnalyzer;
 
 	@Autowired(required = true)
-	public AccountIoAdapter(final RequiredTransferDao transferDao, final RequiredBlockDao blockDao, final AccountLookup accountLookup) {
+	public AccountIoAdapter(
+			final RequiredTransferDao transferDao,
+			final RequiredBlockDao blockDao,
+			final AccountAnalyzer accountAnalyzer) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
+		this.accountAnalyzer = accountAnalyzer;
 	}
 
 	@Override
 	public Account findByAddress(Address address) {
-		return this.accountLookup.findByAddress(address);
+		return this.accountAnalyzer.findByAddress(address);
 	}
 
 	private Integer intOrMaxInt(String timestamp) {
@@ -53,14 +57,14 @@ public class AccountIoAdapter implements AccountIo {
 		// TODO: probably it'll be better to a) ask accountDao about account
 		// TODO: b) pass obtained db-account to getTransactionsForAccount
 
-		final Account account = this.accountLookup.findByAddress(address);
+		final Account account = this.accountAnalyzer.findByAddress(address);
 		final Integer intTimestamp = intOrMaxInt(timestamp);
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimestamp, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
 				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountLookup),
+						TransferMapper.toModel((Transfer)tr[0], this.accountAnalyzer),
 						new TransactionMetaData(new BlockHeight((long)tr[1]))
 				))
 				.forEach(transactionList::add);
@@ -69,7 +73,7 @@ public class AccountIoAdapter implements AccountIo {
 
 	@Override
 	public SerializableList<Block> getAccountBlocks(final Address address, final String timestamp) {
-		final Account account = this.accountLookup.findByAddress(address);
+		final Account account = this.accountAnalyzer.findByAddress(address);
 		final Integer intTimestamp = intOrMaxInt(timestamp);
 		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
 
@@ -78,8 +82,13 @@ public class AccountIoAdapter implements AccountIo {
 				.forEach(bl -> bl.setBlockTransfers(new LinkedList<>()));
 
 		blocks.stream()
-				.map(bl -> BlockMapper.toModel(bl, this.accountLookup))
+				.map(bl -> BlockMapper.toModel(bl, this.accountAnalyzer))
 				.forEach(blockList::add);
 		return blockList;
+	}
+
+	@Override
+	public Iterator<Account> iterator() {
+		return this.accountAnalyzer.iterator();
 	}
 }

@@ -8,6 +8,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.IsEquivalent;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
@@ -64,6 +65,30 @@ public class NodeControllerTest {
 
 		// Assert:
 		Assert.assertThat(nodes, IsSame.sameInstance(context.network.getNodes()));
+	}
+
+	@Test
+	public void getExperiencesReturnsExtendedLocalNodeExperiences() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final PeerNetwork network = context.network;
+		network.updateExperience(Node.fromHost("10.0.0.2"), NodeInteractionResult.FAILURE);
+		network.updateExperience(Node.fromHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(Node.fromHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
+
+		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.2"))).thenReturn(7);
+		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.7"))).thenReturn(0);
+		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.4"))).thenReturn(2);
+
+		// Act:
+		final Collection<ExtendedNodeExperiencePair> pairs = context.controller.getExperiences().asCollection();
+
+		// Assert:
+		final List<ExtendedNodeExperiencePair> expectedPairs = Arrays.asList(
+				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.2"), new NodeExperience(0, 1), 7),
+				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.7"), new NodeExperience(1, 0), 0),
+				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.4"), new NodeExperience(1, 0), 2));
+		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -160,22 +185,14 @@ public class NodeControllerTest {
 	private static class TestContext {
 		private final NodeExperiences nodeExperiences = new NodeExperiences();
 		private final MockPeerNetwork network = new MockPeerNetwork(this.nodeExperiences);
-		private final MockNisPeerNetworkHost host = new MockNisPeerNetworkHost(this.network);
-		private final NodeController controller = new NodeController(this.host);
-	}
+		private final NisPeerNetworkHost host;
+		private final NodeController controller;
 
-	private static class MockNisPeerNetworkHost extends NisPeerNetworkHost {
+		private TestContext() {
+			this.host = Mockito.mock(NisPeerNetworkHost.class);
+			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-		private final PeerNetwork peerNetwork;
-
-		public MockNisPeerNetworkHost(final PeerNetwork peerNetwork) {
-			super(null, null);
-			this.peerNetwork = peerNetwork;
-		}
-
-		@Override
-		public PeerNetwork getNetwork() {
-			return this.peerNetwork;
+			this.controller = new NodeController(this.host);
 		}
 	}
 }

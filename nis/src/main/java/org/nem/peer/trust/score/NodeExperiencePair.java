@@ -55,4 +55,23 @@ public class NodeExperiencePair implements SerializableEntity {
 		serializer.writeObject("node", this.node);
 		serializer.writeObject("experience", this.experience);
 	}
+
+	@Override
+	public int hashCode() {
+		return this.node.hashCode() ^ this.experience.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof NodeExperiencePair))
+			return false;
+
+		final NodeExperiencePair rhs = (NodeExperiencePair)obj;
+		return this.node.equals(rhs.node) && this.experience.equals(rhs.experience);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("[%s] @ [%s]", this.getExperience(), this.getNode());
+	}
 }

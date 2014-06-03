@@ -5,6 +5,7 @@ import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,6 +37,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
+	private final CountingBlockSynchronizer synchronizer;
 	private AsyncTimer foragingTimer;
 	private PeerNetworkHost host;
 
@@ -43,6 +45,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
 		this.accountLookup = accountLookup;
 		this.blockChain = blockChain;
+		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
 
 	/**
@@ -74,6 +77,16 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		return this.host.getNetwork();
 	}
 
+	/**
+	 * Gets the number of sync attempts with the specified node.
+	 *
+	 * @param node The node to sync with.
+	 * @return The number of sync attempts with the specified node.
+	 */
+	public int getSyncAttempts(final Node node) {
+		return this.synchronizer.getSyncAttempts(node);
+	}
+
 	@Override
 	public void close() {
 		this.foragingTimer.close();
@@ -83,7 +96,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetworkServices createNetworkServices() {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool();
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
-		return new PeerNetworkServices(connector, connectorPool, this.blockChain);
+		return new PeerNetworkServices(connector, connectorPool, this.synchronizer);
 	}
 
 	private static class PeerNetworkHost implements AutoCloseable {
