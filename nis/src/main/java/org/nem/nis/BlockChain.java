@@ -400,7 +400,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			logScore(this.ourScore, peerScore);
 
-			if (peerScore < this.ourScore) {
+			if (peerScore <= this.ourScore) {
 				// we could get peer's score upfront, if it mismatches with
 				// what we calculated, we could penalize peer.
 				return NodeInteractionResult.NEUTRAL;
