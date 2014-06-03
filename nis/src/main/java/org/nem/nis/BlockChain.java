@@ -121,7 +121,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param node The other node.
 	 */
 	@Override
-	public NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public synchronized NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
 		} catch (InactivePeerException | FatalPeerException ex) {
@@ -192,7 +192,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return Node experience code which indicates the status of the operation
 	 */
-	public NodeInteractionResult processBlock(Block receivedBlock) {
+	public synchronized NodeInteractionResult processBlock(Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
