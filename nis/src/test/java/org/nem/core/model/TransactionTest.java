@@ -67,7 +67,7 @@ public class TransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class TransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp());
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class TransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class TransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class TransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 	}
 
 	//endregion

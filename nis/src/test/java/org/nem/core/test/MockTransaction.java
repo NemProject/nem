@@ -161,13 +161,8 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid() {
-		return super.isValid();
-	}
-
-	@Override
-	public boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate) {
-		return true;
+	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
+		return ValidationResult.SUCCESS;
 	}
 
 	@Override

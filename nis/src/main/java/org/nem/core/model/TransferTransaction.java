@@ -79,16 +79,16 @@ public class TransferTransaction extends Transaction {
 		return null == this.message ? 0 : this.message.getEncodedPayload().length;
 	}
 
-	@Override
-	public boolean isValid() {
-		return this.isValid((account, amount) -> account.getBalance().compareTo(amount) >= 0);
-	}
 
 	@Override
-	public boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate) {
-		return super.isValid()
-				&& canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee()))
-				&& this.getMessageLength() <= MAX_MESSAGE_SIZE;
+	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
+		if (!canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee())))
+			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+
+		if (this.getMessageLength() > MAX_MESSAGE_SIZE)
+			return ValidationResult.FAILURE_MESSAGE_TOO_LARGE;
+
+		return ValidationResult.SUCCESS;
 	}
 
 	@Override

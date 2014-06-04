@@ -161,17 +161,34 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *                          has a balance of at least the second parameter (amount).
 	 * @return true if this transaction is valid.
 	 */
-	public abstract boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate);
+	public final ValidationResult checkValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
+		if (this.getTimeStamp().compareTo(this.deadline) >= 0)
+			return ValidationResult.FAILURE_PAST_DEADLINE;
+
+		if (this.deadline.compareTo(this.getTimeStamp().addDays(1)) > 0)
+			return ValidationResult.FAILURE_FUTURE_DEADLINE;
+
+		return this.checkDerivedValidity(canDebitPredicate);
+	}
 
 	/**
-	 * Determines if this transaction is valid.
+	 * Checks the validity of this transaction.
 	 *
+	 * @return The validation result.
+	 */
+	public final ValidationResult checkValidity() {
+		return this.checkValidity((account, amount) -> account.getBalance().compareTo(amount) >= 0);
+	}
+
+	/**
+	 * Determines if this transaction is valid using a custom can-debit predicate
+	 * by performing custom, implementation-specific validation checks.
+	 *
+	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
+	 *                          has a balance of at least the second parameter (amount).
 	 * @return true if this transaction is valid.
 	 */
-	public boolean isValid() {
-		return this.deadline.compareTo(this.getTimeStamp()) > 0
-				&& this.deadline.compareTo(this.getTimeStamp().addDays(1)) < 1;
-	}
+	protected abstract ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate);
 
 	/**
 	 * Gets the minimum fee for this transaction.

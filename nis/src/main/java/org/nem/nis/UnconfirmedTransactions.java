@@ -56,7 +56,7 @@ public class UnconfirmedTransactions {
 
 		// not sure if adding to cache here is a good idea...
 		addToCache(transaction.getSigner());
-		if (!transaction.isValid((account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0)) {
+		if (!isValid(transaction)) {
 			return false;
 		}
 
@@ -64,6 +64,11 @@ public class UnconfirmedTransactions {
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	private boolean isValid(final Transaction transaction) {
+		return ValidationResult.SUCCESS == transaction.checkValidity(
+				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
 	}
 
 	boolean remove(final Transaction transaction) {
