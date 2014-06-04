@@ -96,6 +96,12 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 		return new HashChain(this.post(url, height).get());
 	}
 
+	@Override
+	public BlockChainScore getChainScore(NodeEndpoint endpoint) {
+		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_SCORE);
+		return new BlockChainScore(this.get(url));
+	}
+
 	//endregion
 
 	private Deserializer get(final URL url) {

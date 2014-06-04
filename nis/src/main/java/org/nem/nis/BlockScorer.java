@@ -90,8 +90,6 @@ public class BlockScorer {
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		final Account account = currentBlock.getSigner();
-		final long foragedBlocks = account.getForagedBlocks().getRaw();
 		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
 	}
 

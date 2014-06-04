@@ -30,6 +30,7 @@ public class BlockChain implements BlockSynchronizer {
 	private final BlockDao blockDao;
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
+	private BlockChainScore score;
 
 	@Autowired(required = true)
 	public BlockChain(
@@ -43,8 +44,26 @@ public class BlockChain implements BlockSynchronizer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.foraging = foraging;
+		this.score = BlockChainScore.ZERO;
+	}
+	
+	/**
+	 * Returns the overall score for the chain.
+	 * 
+	 * @return the score.
+	 */
+	public BlockChainScore getScore() {
+		return this.score;
 	}
 
+	/**
+	 * Sets the score for the chain.
+	 * 
+	 * @param score the score for the chain.
+	 */
+	public void setScore(final BlockChainScore score) {
+		this.score = score;
+	}
 	/**
 	 * Checks if given block follows last block in the chain.
 	 *
@@ -148,6 +167,11 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
+		final BlockChainScore peerChainScore = connector.getChainScore(node.getEndpoint());
+		if (peerChainScore.compareTo(this.score) <= 0) {
+			return NodeInteractionResult.NEUTRAL;
+		}
+		
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
@@ -157,7 +181,7 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
 
 		//region revert TXes inside contemporaryAccountAnalyzer
-		long ourScore = 0L;
+		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
 			LOGGER.info("Chain inconsistent: calling undoTxesAndGetScore().");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight.getRaw());
@@ -168,7 +192,12 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
-		 return context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent());
+		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent());
+		if (interactionResult == NodeInteractionResult.SUCCESS) {
+			this.score = peerChainScore;
+		}
+		
+		return interactionResult;
 	}
 
 	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
@@ -238,7 +267,7 @@ public class BlockChain implements BlockSynchronizer {
 		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.asAutoCache());
 		// EVIL hack end
 
-		long ourScore = 0L;
+		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (parent.getNextBlockId() != null) {
@@ -251,6 +280,13 @@ public class BlockChain implements BlockSynchronizer {
 		peerChain.add(receivedBlock);
 
 		return context.updateOurChain(this.foraging, parent, peerChain, ourScore, hasOwnChain);
+	}
+
+	private static BlockChainScore getBlockChainScore(Block parentBlock, List<Block> chain) {
+		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
+				new BlockScorer(null));
+		BlockIterator.all(parentBlock, chain, scoreVisitor);
+		return scoreVisitor.getScore();
 	}
 
 	private BlockChainSyncContext createSyncContext() {
@@ -290,10 +326,9 @@ public class BlockChain implements BlockSynchronizer {
 		 *
 		 * @return score for iterated blocks.
 		 */
-		public long undoTxesAndGetScore(long commonBlockHeight) {
+		public BlockChainScore undoTxesAndGetScore(long commonBlockHeight) {
 			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-					this.blockScorer,
-					PartialWeightedScoreVisitor.BlockOrder.Reverse);
+					this.blockScorer);
 
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
@@ -313,7 +348,7 @@ public class BlockChain implements BlockSynchronizer {
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
-				final long ourScore,
+				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
@@ -355,7 +390,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		private Block parentBlock;
 		private final List<Block> peerChain;
-		private final long ourScore;
+		private final BlockChainScore ourScore;
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
@@ -367,7 +402,7 @@ public class BlockChain implements BlockSynchronizer {
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
-				final long ourScore,
+				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
 			this.accountAnalyzer = accountAnalyzer;
@@ -393,26 +428,21 @@ public class BlockChain implements BlockSynchronizer {
 			}
 
 			// warning: this changes number of foraged blocks
-			long peerScore = this.getPeerChainScore();
-			if (peerScore < 0) {
+			// BR: old comment?
+			BlockChainScore peerScore = BlockChain.getBlockChainScore(this.parentBlock, this.peerChain);
+			if (peerScore.compareTo(this.ourScore) <= 0) {
 				return NodeInteractionResult.FAILURE;
 			}
 
 			logScore(this.ourScore, peerScore);
-
-			if (peerScore <= this.ourScore) {
-				// we could get peer's score upfront, if it mismatches with
-				// what we calculated, we could penalize peer.
-				return NodeInteractionResult.NEUTRAL;
-			}
 
 			this.updateOurChain();
 			
 			return NodeInteractionResult.SUCCESS;
 		}
 
-		private static void logScore(final long ourScore, final long peerScore) {
-			if (0 == ourScore) {
+		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
+			if (ourScore.getRaw() == 0) {
 				LOGGER.info(String.format("new block's score: %d", peerScore));
 			} else {
 				LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore));
@@ -431,14 +461,6 @@ public class BlockChain implements BlockSynchronizer {
 					BlockChainConstants.BLOCKS_LIMIT);
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
-		}
-
-		private long getPeerChainScore() {
-			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-					this.blockScorer,
-					PartialWeightedScoreVisitor.BlockOrder.Forward);
-			BlockIterator.all(this.parentBlock, this.peerChain, scoreVisitor);
-			return scoreVisitor.getScore();
 		}
 
 		private void calculatePeerChainDifficulties() {

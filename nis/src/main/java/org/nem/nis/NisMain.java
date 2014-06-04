@@ -54,6 +54,9 @@ public class NisMain {
 			System.exit(-1);
 		}
 
+		final BlockScorer scorer = new BlockScorer(null);
+		BlockChainScore score = BlockChainScore.ZERO;
+		Block parentBlock = null;
 		final Account genesisAccount = this.accountAnalyzer.addAccountToCache(GenesisBlock.ADDRESS);
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
 		genesisAccount.getWeightedBalances().addReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
@@ -65,6 +68,9 @@ public class NisMain {
 		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
+			
+			score = score.incrementBy(parentBlock == null? 0 : scorer.calculateBlockScore(parentBlock, block));
+			parentBlock = block;
 			block.subscribe(observer);
 			block.execute();
 			block.unsubscribe(observer);
@@ -81,6 +87,7 @@ public class NisMain {
 				System.exit(-1);
 			}
 		} while (dbBlock != null);
+		blockChain.setScore(score);
 
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 	}
