@@ -218,6 +218,42 @@ public class WeightedBalanceTest {
 
 	//endregion
 
+	//region receive/undoReceive
+
+	@Test
+	public void undoReceiveRestoresValuesMultipleReceives() {
+		// Arrange:
+		for (int i = 1; i <= 10; ++i) {
+			final WeightedBalance weightedBalance = prepareUnvestedForReceiving(1_000_000);
+
+			// Act:
+			final Amount vested1 = weightedBalance.getVestedBalance();
+			final Amount unvested1 = weightedBalance.getUnvestedBalance();
+			for (int j = 0; j < i; ++j) {
+				weightedBalance.receive(Amount.fromMicroNem(20_000 + j));
+			}
+			for (int j = 0; j < i; ++j) {
+				weightedBalance.undoReceive(Amount.fromMicroNem(20_000 + (i - j - 1)));
+			}
+			final Amount vested2 = weightedBalance.getVestedBalance();
+			final Amount unvested2 = weightedBalance.getUnvestedBalance();
+
+			// Assert:
+			Assert.assertThat(vested2, IsEqual.equalTo(vested1));
+			Assert.assertThat(unvested2, IsEqual.equalTo(unvested1));
+		}
+	}
+
+	private static WeightedBalance prepareUnvestedForReceiving(long amount) {
+		// Arrange:
+		final WeightedBalance weightedBalance = new WeightedBalance(BlockHeight.ONE, Amount.fromMicroNem(amount));
+
+		// Act:
+		return advanceDays(weightedBalance, 30);
+	}
+
+	//endregion
+
 	@Test
 	public void vestedBalanceCanBeCompared() {
 		// Arrange:
