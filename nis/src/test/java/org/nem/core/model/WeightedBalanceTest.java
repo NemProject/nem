@@ -66,6 +66,21 @@ public class WeightedBalanceTest {
 		weightedBalance.undoReceive(Amount.fromNem(100_001));
 	}
 
+	@Test
+	public void canUndoReceiveToVestedBalanceIfPartiallyVested() {
+		// Arrange:
+		WeightedBalance weightedBalance = new WeightedBalance(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		weightedBalance = advanceDays(weightedBalance, 10);
+		weightedBalance.send(Amount.fromNem(100_000));
+
+		// Act (at this point gcd(balance, vested+unvested) != balance):
+		weightedBalance.undoReceive(Amount.fromNem(100_000));
+
+		// Assert (ratio vested/unvested should be 2.7416293421830850665769733133716):
+		Assert.assertThat(weightedBalance.getVestedBalance().getNumMicroNem(), IsEqual.equalTo(586_189_403_910L));
+		Assert.assertThat(weightedBalance.getUnvestedBalance().getNumMicroNem(), IsEqual.equalTo(213_810_596_090L));
+	}
+
 	//endregion
 
 	//region next/prev
