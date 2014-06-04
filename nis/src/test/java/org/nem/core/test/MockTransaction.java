@@ -4,9 +4,8 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * A mock Transaction implementation.
@@ -167,7 +166,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid(final TransactionValidator transactionValidator) {
+	public boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate) {
 		return true;
 	}
 

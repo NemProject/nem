@@ -219,27 +219,23 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void isValidFailsWithFailingValidator() {
-		// Arrange:
+	public void isValidGivesPrecedenceToFailingCanDebitPredicate() {
+		// Arrange: (sender-balance == amount + fee)
 		final Transaction transaction = createTransaction(2, 1, 1);
-		final TransactionValidator failingTransactionValidator =
-				(sender, recipient, amount) -> false;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.isValid((account, amount) -> false), IsEqual.equalTo(false));
 	}
 
 	@Test
-	public void isValidSucceedsWithSucceedingValidator() {
-		// Arrange:
+	public void isValidGivesPrecedenceToSucceedingCanDebitPredicate() {
+		// Arrange: (sender-balance < amount + fee)
 		final Transaction transaction = createTransaction(2, 2, 1);
-		final TransactionValidator failingTransactionValidator =
-				(sender, recipient, amount) -> true;
 
 		// Assert:
 		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.isValid((account, amount) -> true), IsEqual.equalTo(true));
 	}
 
 	@Test

@@ -4,15 +4,14 @@ import org.nem.core.messages.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.function.BiPredicate;
+
 /**
  * A transaction that represents the exchange of funds and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 512;
-
-	private static final TransactionValidator DEFAULT_TRANSFER_VERIFIER =
-			(final Account sender, final Account recipient, final Amount amount) -> sender.getBalance().compareTo(amount) >= 0;
 
 	private Amount amount;
 	private Message message;
@@ -81,15 +80,14 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public boolean isValid()
-	{
-		return this.isValid(DEFAULT_TRANSFER_VERIFIER);
+	public boolean isValid() {
+		return this.isValid((account, amount) -> account.getBalance().compareTo(amount) >= 0);
 	}
 
 	@Override
-	public boolean isValid(final TransactionValidator transactionValidator) {
+	public boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate) {
 		return super.isValid()
-				&& transactionValidator.validateTransfer(this.getSigner(), this.getRecipient(), this.amount.add(this.getFee()))
+				&& canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee()))
 				&& this.getMessageLength() <= MAX_MESSAGE_SIZE;
 	}
 

@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.function.BiPredicate;
+
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
@@ -153,11 +155,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract void transfer(final TransferObserver observer);
 
 	/**
-	 * Determine if transaction is valid using given transaction validator
-	 * @param transactionValidator transaction validator to use for validation
-	 * @return true if transaction is valid
+	 * Determines if this transaction is valid using a custom can-debit predicate.
+	 *
+	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
+	 *                          has a balance of at least the second parameter (amount).
+	 * @return true if this transaction is valid.
 	 */
-	public abstract boolean isValid(final TransactionValidator transactionValidator);
+	public abstract boolean isValid(final BiPredicate<Account, Amount> canDebitPredicate);
 
 	/**
 	 * Determines if this transaction is valid.
