@@ -118,9 +118,14 @@ public class PeerNetwork {
 				configLocalNode.getEndpoint(),
 				reportedEndpoint));
 
-		return null == reportedEndpoint
-				? configLocalNode
-				: new Node(reportedEndpoint, configLocalNode.getPlatform(), configLocalNode.getApplication());
+		if (null == reportedEndpoint)
+			return configLocalNode;
+
+		return new Node(
+				reportedEndpoint,
+				configLocalNode.getPlatform(),
+				configLocalNode.getApplication(),
+				configLocalNode.getVersion());
 	}
 
 	/**

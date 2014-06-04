@@ -8,13 +8,9 @@ import org.nem.core.serialization.*;
  */
 public class Node implements SerializableEntity {
 
-	private final static int DEFAULT_VERSION = 2;
-	private final static String DEFAULT_PLATFORM = "PC";
-	private final static String DEFAULT_APPLICATION = "Unknown";
-
 	private final NodeEndpoint endpoint;
 	private final String platform;
-	private final Integer version;
+	private final String version;
 	private final String application;
 
 	/**
@@ -24,11 +20,15 @@ public class Node implements SerializableEntity {
 	 * @param platform    The platform.
 	 * @param application The application.
 	 */
-	public Node(final NodeEndpoint endpoint, final String platform, final String application) {
+	public Node(
+			final NodeEndpoint endpoint,
+			final String platform,
+			final String application,
+			final String version) {
 		this.endpoint = endpoint;
-		this.platform = null == platform ? DEFAULT_PLATFORM : platform;
-		this.application = null == application ? DEFAULT_APPLICATION : application;
-		this.version = DEFAULT_VERSION;
+		this.platform = platform;
+		this.application = application;
+		this.version = version;
 		this.ensureValidity();
 	}
 
@@ -39,7 +39,17 @@ public class Node implements SerializableEntity {
 	 * @return The node.
 	 */
 	public static Node fromHost(final String host) {
-		return new Node(NodeEndpoint.fromHost(host), null, null);
+		return fromEndpoint(NodeEndpoint.fromHost(host));
+	}
+
+	/**
+	 * Creates a new node given an endpoint.
+	 *
+	 * @param endpoint The endpoint.
+	 * @return The node.
+	 */
+	public static Node fromEndpoint(final NodeEndpoint endpoint) {
+		return new Node(endpoint, null, null, null);
 	}
 
 	/**
@@ -49,12 +59,8 @@ public class Node implements SerializableEntity {
 	 */
 	public Node(final Deserializer deserializer) {
 		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
-
 		this.platform = deserializer.readString("platform");
-
-		final Integer version = deserializer.readInt("version");
-		this.version = null == version ? DEFAULT_VERSION : version;
-
+		this.version = deserializer.readString("version");
 		this.application = deserializer.readString("application");
 		this.ensureValidity();
 	}
@@ -63,7 +69,7 @@ public class Node implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("endpoint", this.endpoint);
 		serializer.writeString("platform", this.platform);
-		serializer.writeInt("version", this.version);
+		serializer.writeString("version", this.version);
 		serializer.writeString("application", this.application);
 	}
 
@@ -92,7 +98,7 @@ public class Node implements SerializableEntity {
 	 *
 	 * @return The version.
 	 */
-	public int getVersion() {
+	public String getVersion() {
 		return this.version;
 	}
 

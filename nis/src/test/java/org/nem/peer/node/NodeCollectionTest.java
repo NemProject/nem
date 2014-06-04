@@ -197,6 +197,24 @@ public class NodeCollectionTest {
 		NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { (int)'A', (int)'F' }, new Integer[] { (int)'B', (int)'C', (int)'D' });
 	}
 
+	@Test
+	public void updateSelectsNodeMetaDataFromUpdatedNode() {
+		// Arrange:
+		final Node node1 = new Node(NodeEndpoint.fromHost("10.0.0.0"), "plat", "app", "ver");
+		final Node node2 = new Node(NodeEndpoint.fromHost("10.0.0.0"), "plat2", "app2", "ver2");
+		final NodeCollection nodes = new NodeCollection();
+
+		// Act:
+		nodes.update(node1, NodeStatus.ACTIVE);
+		nodes.update(node2, NodeStatus.ACTIVE);
+		final Node node = nodes.findNodeByEndpoint(NodeEndpoint.fromHost("10.0.0.0"));
+
+		// Assert:
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo("ver2"));
+		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app2"));
+		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat2"));
+	}
+
 	//endregion
 
 	//region concurrency
@@ -400,12 +418,12 @@ public class NodeCollectionTest {
 
 	private static Node createNode(final String platform, final char port) {
 		// Arrange:
-		return new Node(new NodeEndpoint("http", "localhost", port), platform, "FooBar");
+		return new Node(new NodeEndpoint("http", "localhost", port), platform, "FooBar", "1.0");
 	}
 
 	private static Node createNode(final String platform, final String host, final int port) {
 		// Arrange:
-		return new Node(new NodeEndpoint("http", host, port), platform, "FooBar");
+		return new Node(new NodeEndpoint("http", host, port), platform, "FooBar", "1.0");
 	}
 
 	private static NodeCollection createNodeCollectionWithMultipleNodes() {

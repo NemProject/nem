@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.deploy.CommonStarter;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
@@ -52,7 +53,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * Boots the network.
 	 */
 	public CompletableFuture boot() {
-		return PeerNetwork.createWithVerificationOfLocalNode(Config.fromFile("peers-config.json"), createNetworkServices())
+		final Config config = Config.fromFile("peers-config.json", CommonStarter.META_DATA.getVersion());
+		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
 				.thenAccept(network -> {
 					this.host = new PeerNetworkHost(network);
 

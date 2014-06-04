@@ -26,8 +26,10 @@ public class Config {
 	 * Creates a new configuration object from a JSON configuration object.
 	 *
 	 * @param jsonConfig A JSON configuration object.
+	 * @param applicationVersion The application version.
 	 */
-	public Config(final JSONObject jsonConfig) {
+	public Config(final JSONObject jsonConfig, final String applicationVersion) {
+		jsonConfig.put("version", applicationVersion);
 		if (!jsonConfig.containsKey("platform")) {
 			final String defaultPlatform = String.format(
 					"%s (%s) on %s",
@@ -48,16 +50,17 @@ public class Config {
 	 * Loads configuration from a file.
 	 *
 	 * @param configFileName The configuration file name.
+	 * @param applicationVersion The application version.
 	 *
 	 * @return The configuration.
 	 */
-	public static Config fromFile(final String configFileName) {
+	public static Config fromFile(final String configFileName, final String applicationVersion) {
 		try {
 			try (final InputStream fin = Config.class.getClassLoader().getResourceAsStream(configFileName)) {
 				if (null == fin)
 					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
 
-				return new Config((JSONObject)JSONValue.parse(fin));
+				return new Config((JSONObject)JSONValue.parse(fin), applicationVersion);
 			}
 		} catch (Exception e) {
 			throw new FatalConfigException("Exception encountered while loading config", e);
@@ -117,7 +120,7 @@ public class Config {
 		final List<NodeEndpoint> wellKnownEndpoints = deserializer.readObjectArray("knownPeers", NodeEndpoint.DESERIALIZER);
 
 		final Set<Node> wellKnownNodes = wellKnownEndpoints.stream()
-				.map(endpoint -> new Node(endpoint, DEFAULT_PLATFORM, DEFAULT_APPLICATION))
+				.map(Node::fromEndpoint)
 				.collect(Collectors.toSet());
 
 		return new PreTrustedNodes(wellKnownNodes);

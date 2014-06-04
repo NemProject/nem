@@ -12,7 +12,7 @@ public class Utils {
 	 * @return The new node.
 	 */
 	public static Node createNodeWithPort(final int port) {
-		return new Node(new NodeEndpoint("http", "localhost", port), "P", "A");
+		return new Node(new NodeEndpoint("http", "localhost", port), "P", "A", "V");
 	}
 
 	/**
