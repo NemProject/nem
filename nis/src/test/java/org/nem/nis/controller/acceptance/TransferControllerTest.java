@@ -181,7 +181,31 @@ public class TransferControllerTest {
 	public void transferCorrectTransaction() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
+		final JSONObject obj = createValidTransaction();
 
+		// Act:
+		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+
+		// Assert:
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+	}
+
+	@Test
+	public void transferFailsIfDeadlineIsInThePast() {
+		// Arrange:
+		final LocalHostConnector connector = new LocalHostConnector();
+		final JSONObject obj = createValidTransaction();
+		obj.put("timestamp", 100);
+
+		// Act:
+		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+
+		// Assert:
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(result.getBodyAsErrorResponse().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
+	}
+
+	private static JSONObject createValidTransaction() {
 		final JSONObject obj = new JSONObject();
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
@@ -196,12 +220,7 @@ public class TransferControllerTest {
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
 		obj.put("message", message);
-
-		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
-
-		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		return obj;
 	}
 
 	private static String getRecipientAccountId() {

@@ -33,9 +33,9 @@ public class TransferController {
 	public RequestPrepare transferPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
-		// TODO: update this
+		final ValidationResult validationResult = transfer.checkValidity();
 		if (ValidationResult.SUCCESS != transfer.checkValidity())
-			throw new IllegalArgumentException("transfer must be valid");
+			throw new IllegalArgumentException(validationResult.toString());
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
 		return new RequestPrepare(transferData);
