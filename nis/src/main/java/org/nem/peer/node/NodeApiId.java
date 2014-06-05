@@ -32,7 +32,7 @@ public enum NodeApiId {
 	REST_CHAIN_LAST_BLOCK,
 
 	/**
-	 * The chain/last-block API.
+	 * The chain/score API.
 	 */
 	REST_CHAIN_SCORE,
 

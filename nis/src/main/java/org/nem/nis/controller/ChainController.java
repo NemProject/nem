@@ -21,7 +21,7 @@ public class ChainController {
 	private BlockChain blockChain;
 
 	@Autowired(required = true)
-	ChainController(
+	public ChainController(
 			final RequiredBlockDao blockDao, 
 			final AccountLookup accountLookup, 
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
@@ -70,5 +70,4 @@ public class ChainController {
 	public BlockChainScore chainScore() {
 		return this.blockChain.getScore();
 	}
-
 }

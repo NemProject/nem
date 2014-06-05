@@ -47,8 +47,11 @@ public class BlockChainScoreTest {
 		final BlockChainScore score1 = new BlockChainScore(17);
 		final BlockChainScore score2 = new BlockChainScore(3);
 
+		// Act:
+		final BlockChainScore result = score1.add(score2);
+
 		// Assert:
-		Assert.assertThat(20L, IsEqual.equalTo(score1.add(score2).getRaw()));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(20)));
 	}
 
 	@Test
@@ -57,8 +60,11 @@ public class BlockChainScoreTest {
 		final BlockChainScore score1 = new BlockChainScore(17);
 		final BlockChainScore score2 = new BlockChainScore(3);
 
+		// Act:
+		final BlockChainScore result = score1.subtract(score2);
+
 		// Assert:
-		Assert.assertThat(14L, IsEqual.equalTo(score1.subtract(score2).getRaw()));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(14)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -86,6 +92,7 @@ public class BlockChainScoreTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
 		Assert.assertThat(jsonObject.get("score"), IsEqual.equalTo(142L));
 	}
 
@@ -95,7 +102,7 @@ public class BlockChainScoreTest {
 		final BlockChainScore score = createRoundTrippedScore(new BlockChainScore(142));
 
 		// Assert:
-		Assert.assertThat(score.getRaw(), IsEqual.equalTo(142L));
+		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(142)));
 	}
 
 	private static BlockChainScore createRoundTrippedScore(final BlockChainScore originalScore) {

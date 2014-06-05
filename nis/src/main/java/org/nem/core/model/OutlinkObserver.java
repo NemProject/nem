@@ -1,13 +1,11 @@
 package org.nem.core.model;
 
 import java.math.BigInteger;
-import java.util.logging.Logger;
 
 /**
  * A transfer observer that updates outlink information.
  */
 public class OutlinkObserver implements TransferObserver {
-	private static final Logger LOGGER = Logger.getLogger(OutlinkObserver.class.getName());
 
 	private final BlockHeight height;
 	private final boolean isExecute;

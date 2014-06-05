@@ -4,7 +4,11 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
 
+/**
+ * Represents a score for an entire block chain.
+ */
 public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implements SerializableEntity {
+
 	/**
 	 * Value representing initial score.
 	 */
@@ -43,7 +47,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	/**
 	 * Creates a new BlockChainScore by adding the given value to this score.
 	 *
-	 * @param value the value to add.
+	 * @param score The value to add.
 	 * @return The new score.
 	 */
 	public BlockChainScore add(final BlockChainScore score) {
@@ -51,9 +55,9 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	}
 	
 	/**
-	 * Creates a new BlockChainScore by adding the given value to this score.
+	 * Creates a new BlockChainScore by subtracting the given value from this score.
 	 *
-	 * @param value the value to add.
+	 * @param score The value to subtract.
 	 * @return The new score.
 	 */
 	public BlockChainScore subtract(final BlockChainScore score) {

@@ -216,7 +216,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public BlockChainScore getChainScore(NodeEndpoint endpoint) {
+	public BlockChainScore getChainScore(final NodeEndpoint endpoint) {
 		return null;
 	}
 	

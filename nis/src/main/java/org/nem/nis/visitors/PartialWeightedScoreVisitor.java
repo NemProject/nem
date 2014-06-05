@@ -8,23 +8,9 @@ import org.nem.nis.BlockScorer;
  * Block visitor that visits all blocks in a chain and calculates
  * a partial chain score.
  *
-  */
+ * All blocks are weighted equally.
+ */
 public class PartialWeightedScoreVisitor implements BlockVisitor {
-
-	/**
-	 * The order of blocks passed to the visitor.
-	 */
-	public enum BlockOrder {
-		/**
-		 * The blocks are passed in forward order.
-		 */
-		Forward,
-
-		/**
-		 * The blocks are passed in reverse order.
-		 */
-		Reverse
-	}
 
 	private final BlockScorer blockScorer;
 
@@ -36,7 +22,6 @@ public class PartialWeightedScoreVisitor implements BlockVisitor {
 	 * Creates a new visitor.
 	 *
 	 * @param scorer The scorer.
-	 * @param order The order of visited blocks.
 	 */
 	public PartialWeightedScoreVisitor(final BlockScorer scorer) {
 		this.blockScorer = scorer;

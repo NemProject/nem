@@ -14,25 +14,27 @@ public class PartialWeightedScoreVisitorTest {
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(scorer);
 
-		// Assert:
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(0L));
+		// Assert: score is initially zero
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(BlockChainScore.ZERO));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 1);
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(1L));
+		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(1)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 4);
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(5L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(new BlockChainScore(5)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 14);
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(19L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(new BlockChainScore(19)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 7);
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(26L));
-		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(26L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(new BlockChainScore(26)));
+
+		// Assert: scores are unchanged in-between visits
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(new BlockChainScore(26)));
 	}
 
 	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {
