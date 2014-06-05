@@ -131,16 +131,8 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer, final Direction direction) {
-		if (direction == Direction.Execute) {
-			observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-			observer.notifyDebit(this.getSigner(), this.getFee());
-
-		} else {
-			// order MATTERS
-			observer.notifyDebit(this.getSigner(), this.getFee());
-			// notifyTransfer here is actually ReverseTransferObserver.notifyTransfer, so this should be fine
-			observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		}
+	protected void transfer(final TransferObserver observer) {
+		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		observer.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

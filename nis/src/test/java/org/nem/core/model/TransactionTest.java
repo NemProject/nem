@@ -301,6 +301,42 @@ public class TransactionTest {
 		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
 	}
 
+	@Test
+	public void undoCommitAppliesTransactionsInReverseOrder() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setTransferAction(to -> {
+			// for the account to say in the black, the debit (reverse credit) must occur before the credit (reverse debit)
+			to.notifyCredit(account1, Amount.fromNem(9));
+			to.notifyDebit(account1, Amount.fromNem(11));
+		});
+
+		// Act:
+		transaction.undo();
+
+		// Assert:
+		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(2)));
+	}
+
+	@Test
+	public void executeCommitAppliesTransactionsInForwardOrder() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+		transaction.setTransferAction(to -> {
+			// for the account to say in the black, the credit must occur before the debit
+			to.notifyCredit(account1, Amount.fromNem(11));
+			to.notifyDebit(account1, Amount.fromNem(9));
+		});
+
+		// Act:
+		transaction.execute();
+
+		// Assert:
+		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(2)));
+	}
+
 	//endregion
 
 	private MockTransaction createRoundTrippedTransaction(
