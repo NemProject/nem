@@ -55,7 +55,7 @@ public class PeerNetworkTest {
 		for (final Node node : nodes.getInactiveNodes()) {
 			Assert.assertThat(node.getVersion(), IsNull.nullValue());
 			Assert.assertThat(node.getPlatform(), IsNull.nullValue());
-			Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
+			Assert.assertThat(node.getApplication(), IsNull.nullValue());
 		}
 	}
 
