@@ -9,61 +9,30 @@ import org.nem.nis.test.NisUtils;
 public class PartialWeightedScoreVisitorTest {
 
 	@Test
-	public void scoresAreCalculatedCorrectlyForForwardChains() {
+	public void scoresAreCalculatedCorrectly() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
-		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(
-				scorer,
-				PartialWeightedScoreVisitor.BlockOrder.Forward);
+		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(scorer);
 
 		// Assert:
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(0L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(0L));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 1);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(2L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(1L));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 4);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(6L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(5L));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 14);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(20L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(19L));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 7);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(27L));
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(27L));
-	}
-
-	@Test
-	public void scoresAreCalculatedCorrectlyForReverseChains() {
-		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(
-				scorer,
-				PartialWeightedScoreVisitor.BlockOrder.Reverse);
-
-		// Assert:
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(0L));
-
-		// Act / Assert:
-		visitBlockWithScore(visitor, scorer, 1);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(2L));
-
-		// Act / Assert:
-		visitBlockWithScore(visitor, scorer, 4);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(9L));
-
-		// Act / Assert:
-		visitBlockWithScore(visitor, scorer, 14);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(33L));
-
-		// Act / Assert:
-		visitBlockWithScore(visitor, scorer, 6);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(31L));
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(31L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(26L));
+		Assert.assertThat(visitor.getScore().getRaw(), IsEqual.equalTo(26L));
 	}
 
 	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {

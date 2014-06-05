@@ -55,7 +55,7 @@ public class NisMain {
 		}
 
 		final BlockScorer scorer = new BlockScorer(null);
-		BlockChainScore score = BlockChainScore.ZERO;
+		long score = 0L;
 		Block parentBlock = null;
 		final Account genesisAccount = this.accountAnalyzer.addAccountToCache(GenesisBlock.ADDRESS);
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
@@ -69,7 +69,7 @@ public class NisMain {
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 			
-			score = score.incrementBy(parentBlock == null? 0 : scorer.calculateBlockScore(parentBlock, block));
+			score += parentBlock == null? 0 : scorer.calculateBlockScore(parentBlock, block);
 			parentBlock = block;
 			block.subscribe(observer);
 			block.execute();
@@ -87,7 +87,7 @@ public class NisMain {
 				System.exit(-1);
 			}
 		} while (dbBlock != null);
-		blockChain.setScore(score);
+		blockChain.setScore(new BlockChainScore(score));
 
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 	}

@@ -18,8 +18,8 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	public BlockChainScore(final long score) {
 		super(score, BlockChainScore.class);
 
-		if (this.getRaw() <= 0)
-			throw new IllegalArgumentException("block chain score must be positive");
+		if (this.getRaw() < 0)
+			throw new IllegalArgumentException("block chain score can't be negative");
 	}
 
 	/**
@@ -46,8 +46,8 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 * @param value the value to add.
 	 * @return The new score.
 	 */
-	public BlockChainScore incrementBy(long value) {
-		return new BlockChainScore(getValue() + value);
+	public BlockChainScore add(final BlockChainScore score) {
+		return new BlockChainScore(this.getRaw() + score.getRaw());
 	}
 	
 	/**
@@ -56,8 +56,8 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 * @param value the value to add.
 	 * @return The new score.
 	 */
-	public BlockChainScore decrementBy(long value) {
-		return new BlockChainScore(getValue() - value);
+	public BlockChainScore subtract(final BlockChainScore score) {
+		return new BlockChainScore(this.getRaw() - score.getRaw());
 	}
 
 	@Override

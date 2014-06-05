@@ -179,22 +179,27 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
+		// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
+		//     which changes the peer chain's score. He will get punished because the promised score is not
+		//     equal to the actual peer chain score.
+		// TODO: can this be improved without breaking the design?
+		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
 			LOGGER.info("Chain inconsistent: calling undoTxesAndGetScore().");
-			ourScore = context.undoTxesAndGetScore(commonBlockHeight.getRaw());
+			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
 
 		//region verify peer's chain
 		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
-		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		final Block ourBlock = BlockMapper.toModel(ourDbBlock, context.accountAnalyzer.asAutoCache());
 
-		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, ourDbBlock, peerChain, ourScore, !result.areChainsConsistent());
+		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, ourBlock, peerChain, ourScore, peerChainScore, !result.areChainsConsistent());
 		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = peerChainScore;
+			this.score = new BlockChainScore(this.score.subtract(ourScore).add(peerChainScore).getRaw());
 		}
 		
 		return interactionResult;
@@ -225,7 +230,7 @@ public class BlockChain implements BlockSynchronizer {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
-		final org.nem.nis.dbmodel.Block parent;
+		final org.nem.nis.dbmodel.Block dbParent;
 
 		// this method processes only blocks that have been sent directly (pushed)
 		// to us, so we can add quite strict rule here
@@ -243,11 +248,11 @@ public class BlockChain implements BlockSynchronizer {
 			}
 
 			// check if we know previous receivedBlock
-			parent = blockDao.findByHash(parentHash);
+			dbParent = blockDao.findByHash(parentHash);
 		}
 
 		// if we don't have parent, we can't do anything with this receivedBlock
-		if (parent == null) {
+		if (dbParent == null) {
 			// We might be on a fork, don't punish remote node
 			return NodeInteractionResult.NEUTRAL;
 		}
@@ -259,7 +264,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		final BlockChainSyncContext context = this.createSyncContext();
 
-		fixGenerationHash(receivedBlock, parent);
+		fixGenerationHash(receivedBlock, dbParent);
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
@@ -267,19 +272,25 @@ public class BlockChain implements BlockSynchronizer {
 		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.asAutoCache());
 		// EVIL hack end
 
+		Block parent = BlockMapper.toModel(dbParent, context.accountAnalyzer.asAutoCache());
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
-		if (parent.getNextBlockId() != null) {
-			// warning: this changes number of foraged blocks
+		if (dbParent.getNextBlockId() != null) {
 			ourScore = context.undoTxesAndGetScore(parent.getHeight());
 			hasOwnChain = true;
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
+		BlockChainScore peerChainScore = getBlockChainScore(parent, peerChain);
 
-		return context.updateOurChain(this.foraging, parent, peerChain, ourScore, hasOwnChain);
+		NodeInteractionResult interactionResult = context.updateOurChain(this.foraging, parent, peerChain, ourScore, peerChainScore, hasOwnChain);
+		if (interactionResult == NodeInteractionResult.SUCCESS) {
+			this.score = peerChainScore;
+		}
+		
+		return interactionResult;
 	}
 
 	private static BlockChainScore getBlockChainScore(Block parentBlock, List<Block> chain) {
@@ -326,7 +337,7 @@ public class BlockChain implements BlockSynchronizer {
 		 *
 		 * @return score for iterated blocks.
 		 */
-		public BlockChainScore undoTxesAndGetScore(long commonBlockHeight) {
+		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
 			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
 					this.blockScorer);
 
@@ -338,7 +349,7 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 			BlockIterator.unwindUntil(
 					this.createLocalBlockLookup(),
-					new BlockHeight(commonBlockHeight),
+					commonBlockHeight,
 					visitor);
 
 			return scoreVisitor.getScore();
@@ -346,9 +357,10 @@ public class BlockChain implements BlockSynchronizer {
 
 		public NodeInteractionResult updateOurChain(
 				final Foraging foraging,
-				final org.nem.nis.dbmodel.Block dbParentBlock,
+				final Block parentBlock,
 				final List<Block> peerChain,
 				final BlockChainScore ourScore,
+				final BlockChainScore promisedScore,
 				final boolean hasOwnChain) {
 
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
@@ -358,9 +370,10 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockChainLastBlockLayer,
 					this.blockDao,
 					foraging,
-					dbParentBlock,
+					parentBlock,
 					peerChain,
 					ourScore,
+					promisedScore,
 					hasOwnChain);
 
 			return updateContext.update();
@@ -387,10 +400,10 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
 		private final Foraging foraging;
-
-		private Block parentBlock;
+		private final Block parentBlock;
 		private final List<Block> peerChain;
 		private final BlockChainScore ourScore;
+		private final BlockChainScore promisedScore;
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
@@ -400,9 +413,10 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
 				final Foraging foraging,
-				final org.nem.nis.dbmodel.Block dbParentBlock,
+				final Block parentBlock,
 				final List<Block> peerChain,
 				final BlockChainScore ourScore,
+				final BlockChainScore promisedScore,
 				final boolean hasOwnChain) {
 
 			this.accountAnalyzer = accountAnalyzer;
@@ -411,12 +425,10 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
 			this.foraging = foraging;
-
-			// do not trust peer, take first block from our db and convert it
-			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer);
-
+			this.parentBlock = parentBlock;
 			this.peerChain = peerChain;
 			this.ourScore = ourScore;
+			this.promisedScore = promisedScore;
 			this.hasOwnChain = hasOwnChain;
 		}
 
@@ -427,10 +439,8 @@ public class BlockChain implements BlockSynchronizer {
 				return NodeInteractionResult.FAILURE;
 			}
 
-			// warning: this changes number of foraged blocks
-			// BR: old comment?
 			BlockChainScore peerScore = BlockChain.getBlockChainScore(this.parentBlock, this.peerChain);
-			if (peerScore.compareTo(this.ourScore) <= 0) {
+			if (peerScore.compareTo(this.promisedScore) != 0) {
 				return NodeInteractionResult.FAILURE;
 			}
 
