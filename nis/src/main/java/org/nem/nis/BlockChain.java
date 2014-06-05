@@ -179,11 +179,14 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
+		final org.nem.nis.dbmodel.Block dbParent = blockDao.findByHeight(commonBlockHeight);
+		final Block parent = BlockMapper.toModel(dbParent, context.accountAnalyzer.asAutoCache());
 		// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
 		//     which changes the peer chain's score. He will get punished because the promised score is not
 		//     equal to the actual peer chain score.
 		// TODO: can this be improved without breaking the design?
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		calculateChainDifficulties(parent, peerChain);
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -194,12 +197,10 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region verify peer's chain
-		final org.nem.nis.dbmodel.Block ourDbBlock = blockDao.findByHeight(commonBlockHeight);
-		final Block ourBlock = BlockMapper.toModel(ourDbBlock, context.accountAnalyzer.asAutoCache());
 
-		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, ourBlock, peerChain, ourScore, peerChainScore, !result.areChainsConsistent());
+		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, parent, peerChain, ourScore, peerChainScore, !result.areChainsConsistent());
 		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = new BlockChainScore(this.score.subtract(ourScore).add(peerChainScore).getRaw());
+			this.score = this.score.subtract(ourScore).add(peerChainScore);
 		}
 		
 		return interactionResult;
@@ -258,6 +259,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		// TODO: we should have some time limit set
+		// BR: Why that? Could just be bad luck.
 //		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
 //			return false;
 //		}
@@ -283,11 +285,12 @@ public class BlockChain implements BlockSynchronizer {
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
+		calculateChainDifficulties(parent, peerChain);
 		BlockChainScore peerChainScore = getBlockChainScore(parent, peerChain);
 
 		NodeInteractionResult interactionResult = context.updateOurChain(this.foraging, parent, peerChain, ourScore, peerChainScore, hasOwnChain);
 		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = peerChainScore;
+			this.score = this.score.subtract(ourScore).add(peerChainScore);
 		}
 		
 		return interactionResult;
@@ -298,6 +301,29 @@ public class BlockChain implements BlockSynchronizer {
 				new BlockScorer(null));
 		BlockIterator.all(parentBlock, chain, scoreVisitor);
 		return scoreVisitor.getScore();
+	}
+
+	private void calculateChainDifficulties(Block parent, List<Block> chain) {
+		final BlockScorer blockScorer = new BlockScorer(null);
+		final long blockDifference = parent.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
+
+		int limit = (int)Math.min(parent.getHeight().getRaw(), ((long)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
+		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
+
+		for (final Block block : chain) {
+			final BlockDifficulty difficulty = blockScorer.calculateDifficulty(difficulties, timestamps);
+			block.setDifficulty(difficulty);
+
+			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
+			difficulties.add(difficulty);
+			timestamps.add(block.getTimeStamp());
+			if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
+				difficulties.remove(0);
+				timestamps.remove(0);
+			}
+		}
 	}
 
 	private BlockChainSyncContext createSyncContext() {
@@ -433,18 +459,17 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		public NodeInteractionResult update() {
-
-			// do not trust peer, take first block from our db and convert it
-			if (!this.validatePeerChain()) {
-				return NodeInteractionResult.FAILURE;
-			}
-
+			// Check promisedScore == peerScore first because it is less expensive
 			BlockChainScore peerScore = BlockChain.getBlockChainScore(this.parentBlock, this.peerChain);
 			if (peerScore.compareTo(this.promisedScore) != 0) {
 				return NodeInteractionResult.FAILURE;
 			}
 
 			logScore(this.ourScore, peerScore);
+
+			if (!this.validatePeerChain()) {
+				return NodeInteractionResult.FAILURE;
+			}
 
 			this.updateOurChain();
 			
@@ -453,9 +478,9 @@ public class BlockChain implements BlockSynchronizer {
 
 		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
 			if (ourScore.getRaw() == 0) {
-				LOGGER.info(String.format("new block's score: %d", peerScore));
+				LOGGER.info(String.format("new block's score: %d", peerScore.getRaw()));
 			} else {
-				LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore));
+				LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore.getRaw()));
 			}
 		}
 
@@ -469,30 +494,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.accountAnalyzer,
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT);
-			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
-		}
-
-		private void calculatePeerChainDifficulties() {
-			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
-			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
-
-			int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), ((long)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
-			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
-			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-
-			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.calculateDifficulty(difficulties, timestamps);
-				block.setDifficulty(difficulty);
-
-				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-				difficulties.add(difficulty);
-				timestamps.add(block.getTimeStamp());
-				if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
-					difficulties.remove(0);
-					timestamps.remove(0);
-				}
-			}
 		}
 
 		/*

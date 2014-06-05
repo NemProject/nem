@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.BlockChainScore;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.test.*;
@@ -56,5 +57,20 @@ public class ChainControllerTest {
 		Assert.assertThat(blockDao.getNumGetHashesFromCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(blockDao.getLastGetHashesFromHeight(), IsEqual.equalTo(new BlockHeight(44)));
 		Assert.assertThat(blockDao.getLastGetHashesFromLimit(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
+	}
+
+	@Test
+	public void chainScoreReturnsScore() {
+		// Arrange:
+		final BlockChain blockChain = mock(BlockChain.class);
+		when(blockChain.getScore()).thenReturn(new BlockChainScore(21));
+		final ChainController controller = new ChainController(null, null, null, blockChain);
+
+		// Act:
+		final BlockChainScore score = controller.chainScore();
+
+		// Assert:
+		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(21)));
+		Mockito.verify(blockChain, Mockito.times(1)).getScore();
 	}
 }
