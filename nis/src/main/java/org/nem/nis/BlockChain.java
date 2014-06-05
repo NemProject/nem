@@ -187,6 +187,9 @@ public class BlockChain implements BlockSynchronizer {
 		// TODO: can this be improved without breaking the design?
 		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
 		calculateChainDifficulties(parent, peerChain);
+		
+		// Usually only part of the remote chain.
+		BlockChainScore peerPartialScore = BlockChain.getBlockChainScore(parent, peerChain);
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -195,12 +198,19 @@ public class BlockChain implements BlockSynchronizer {
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
+		
+		// Got fooled?
+		if (peerPartialScore.compareTo(ourScore) <= 0) {
+			return NodeInteractionResult.FAILURE;
+		}
+
+		logScore(ourScore, peerPartialScore);
 
 		//region verify peer's chain
 
-		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, parent, peerChain, ourScore, peerChainScore, !result.areChainsConsistent());
+		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, parent, peerChain, !result.areChainsConsistent());
 		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = this.score.subtract(ourScore).add(peerChainScore);
+			this.score = this.score.subtract(ourScore).add(peerPartialScore);
 		}
 		
 		return interactionResult;
@@ -286,11 +296,17 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 		calculateChainDifficulties(parent, peerChain);
-		BlockChainScore peerChainScore = getBlockChainScore(parent, peerChain);
+		BlockChainScore peerPartialScore = getBlockChainScore(parent, peerChain);
+		if (peerPartialScore.compareTo(ourScore) <= 0) {
+			// Don't punish, the node didn't promise to deliver a better block than ours
+			return NodeInteractionResult.NEUTRAL;
+		}
 
-		NodeInteractionResult interactionResult = context.updateOurChain(this.foraging, parent, peerChain, ourScore, peerChainScore, hasOwnChain);
+		logScore(ourScore, peerPartialScore);
+
+		NodeInteractionResult interactionResult = context.updateOurChain(this.foraging, parent, peerChain, hasOwnChain);
 		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = this.score.subtract(ourScore).add(peerChainScore);
+			this.score = this.score.subtract(ourScore).add(peerPartialScore);
 		}
 		
 		return interactionResult;
@@ -323,6 +339,14 @@ public class BlockChain implements BlockSynchronizer {
 				difficulties.remove(0);
 				timestamps.remove(0);
 			}
+		}
+	}
+
+	private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
+		if (ourScore.getRaw() == 0) {
+			LOGGER.info(String.format("new block's score: %d", peerScore.getRaw()));
+		} else {
+			LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore.getRaw()));
 		}
 	}
 
@@ -385,8 +409,6 @@ public class BlockChain implements BlockSynchronizer {
 				final Foraging foraging,
 				final Block parentBlock,
 				final List<Block> peerChain,
-				final BlockChainScore ourScore,
-				final BlockChainScore promisedScore,
 				final boolean hasOwnChain) {
 
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
@@ -398,8 +420,6 @@ public class BlockChain implements BlockSynchronizer {
 					foraging,
 					parentBlock,
 					peerChain,
-					ourScore,
-					promisedScore,
 					hasOwnChain);
 
 			return updateContext.update();
@@ -428,8 +448,6 @@ public class BlockChain implements BlockSynchronizer {
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final List<Block> peerChain;
-		private final BlockChainScore ourScore;
-		private final BlockChainScore promisedScore;
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
@@ -441,8 +459,6 @@ public class BlockChain implements BlockSynchronizer {
 				final Foraging foraging,
 				final Block parentBlock,
 				final List<Block> peerChain,
-				final BlockChainScore ourScore,
-				final BlockChainScore promisedScore,
 				final boolean hasOwnChain) {
 
 			this.accountAnalyzer = accountAnalyzer;
@@ -453,20 +469,10 @@ public class BlockChain implements BlockSynchronizer {
 			this.foraging = foraging;
 			this.parentBlock = parentBlock;
 			this.peerChain = peerChain;
-			this.ourScore = ourScore;
-			this.promisedScore = promisedScore;
 			this.hasOwnChain = hasOwnChain;
 		}
 
 		public NodeInteractionResult update() {
-			// Check promisedScore == peerScore first because it is less expensive
-			BlockChainScore peerScore = BlockChain.getBlockChainScore(this.parentBlock, this.peerChain);
-			if (peerScore.compareTo(this.promisedScore) != 0) {
-				return NodeInteractionResult.FAILURE;
-			}
-
-			logScore(this.ourScore, peerScore);
-
 			if (!this.validatePeerChain()) {
 				return NodeInteractionResult.FAILURE;
 			}
@@ -474,14 +480,6 @@ public class BlockChain implements BlockSynchronizer {
 			this.updateOurChain();
 			
 			return NodeInteractionResult.SUCCESS;
-		}
-
-		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
-			if (ourScore.getRaw() == 0) {
-				LOGGER.info(String.format("new block's score: %d", peerScore.getRaw()));
-			} else {
-				LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore.getRaw()));
-			}
 		}
 
 		/**
