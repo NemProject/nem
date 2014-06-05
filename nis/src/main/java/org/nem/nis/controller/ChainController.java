@@ -66,6 +66,7 @@ public class ChainController {
 
 	@RequestMapping(value = "/chain/score", method = RequestMethod.GET)
 	@P2PApi
+	@PublicApi
 	public BlockChainScore chainScore() {
 		return this.blockChain.getScore();
 	}
