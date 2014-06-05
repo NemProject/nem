@@ -3,6 +3,7 @@ package org.nem.core.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
  * Methods of this class, assume, that they are called in paired order
  */
 public class WeightedBalances {
+	private static final Logger LOGGER = Logger.getLogger(WeightedBalances.class.getName());
 
 	/**
 	 * Limit of history of balances (just not to let the list grow infinitely)
@@ -53,6 +55,10 @@ public class WeightedBalances {
 		return parent.createSend(blockHeight, amount);
 	}
 
+	public void addFullyVested(final BlockHeight height, final Amount amount) {
+		this.historicalBalances.add(height, amount);
+		this.balances.add(WeightedBalance.ZERO.createVested(height, amount));
+	}
 	/**
 	 * Adds receive operation of amount at height.
 	 *

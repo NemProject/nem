@@ -200,7 +200,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer) {
+	protected void transfer(final TransferObserver observer, final Direction dir) {
 		this.transferAction.accept(observer);
 		++this.numTransferCalls;
 	}

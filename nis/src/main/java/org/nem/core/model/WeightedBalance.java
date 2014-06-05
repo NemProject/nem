@@ -37,6 +37,10 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		return new WeightedBalance(amount, blockHeight, balance, unvested, this.vestedBalance);
 	}
 
+	public WeightedBalance createVested(final BlockHeight height, final Amount amount) {
+		return new WeightedBalance(amount, height, amount, 0, amount.getNumMicroNem());
+	}
+
 	private WeightedBalance(
 			final Amount amount,
 			final BlockHeight blockHeight,
