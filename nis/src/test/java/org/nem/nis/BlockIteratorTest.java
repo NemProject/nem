@@ -15,7 +15,7 @@ public class BlockIteratorTest {
 	@Test
 	public void unwindDoesNotVisitAnyBlocksIfLastBlockHasDesiredHeight() {
 		// Arrange:
-		final MockBlockLookup lookup = new MockBlockLookup(NisUtils.createRandomBlock(7));
+		final MockBlockLookup lookup = new MockBlockLookup(NisUtils.createRandomBlockWithHeight(7));
 		final MockBlockVisitor visitor = new MockBlockVisitor();
 
 		// Act:
@@ -28,11 +28,11 @@ public class BlockIteratorTest {
 	@Test
 	public void unwindVisitsAllBlocksWithHeightGreaterThanDesiredHeight() {
 		// Arrange:
-		final MockBlockLookup lookup = new MockBlockLookup(NisUtils.createRandomBlock(7));
-		lookup.addBlock(NisUtils.createRandomBlock(6));
-		lookup.addBlock(NisUtils.createRandomBlock(5));
-		lookup.addBlock(NisUtils.createRandomBlock(4));
-		lookup.addBlock(NisUtils.createRandomBlock(3));
+		final MockBlockLookup lookup = new MockBlockLookup(NisUtils.createRandomBlockWithHeight(7));
+		lookup.addBlock(NisUtils.createRandomBlockWithHeight(6));
+		lookup.addBlock(NisUtils.createRandomBlockWithHeight(5));
+		lookup.addBlock(NisUtils.createRandomBlockWithHeight(4));
+		lookup.addBlock(NisUtils.createRandomBlockWithHeight(3));
 		final MockBlockVisitor visitor = new MockBlockVisitor();
 
 		// Act:
@@ -47,14 +47,14 @@ public class BlockIteratorTest {
 	public void allVisitsAllBlocksInOrder() {
 		// Arrange:
 		final List<Block> blocks = new ArrayList<>();
-		blocks.add(NisUtils.createRandomBlock(7));
-		blocks.add(NisUtils.createRandomBlock(11));
-		blocks.add(NisUtils.createRandomBlock(8));
+		blocks.add(NisUtils.createRandomBlockWithHeight(7));
+		blocks.add(NisUtils.createRandomBlockWithHeight(11));
+		blocks.add(NisUtils.createRandomBlockWithHeight(8));
 
 		final MockBlockVisitor visitor = new MockBlockVisitor();
 
 		// Act:
-		BlockIterator.all(NisUtils.createRandomBlock(12), blocks, visitor);
+		BlockIterator.all(NisUtils.createRandomBlockWithHeight(12), blocks, visitor);
 
 		// Assert:
 		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 11L, 8L)));

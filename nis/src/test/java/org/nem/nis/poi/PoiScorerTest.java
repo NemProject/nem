@@ -34,12 +34,12 @@ public class PoiScorerTest {
 		// Assert:
 		// weighted-outlinks: outlink * 1.05 + vested-balance
 		final ColumnVector weightedOutlinks = new ColumnVector(
-				4.00 * 1.05 + 80.0,
-				1.00 * 1.05 + 5.00,
-				7.00 * 1.05 + 140.,
-				9.00 * 1.05 + 45.0,
-				2.00 * 1.05 + 40.0,
-				5.00 * 1.05 + 25.0);
+				4.00 * 1.25 + 80.0,
+				1.00 * 1.25 + 5.00,
+				7.00 * 1.25 + 140.,
+				9.00 * 1.25 + 45.0,
+				2.00 * 1.25 + 40.0,
+				5.00 * 1.25 + 25.0);
 
 		// weighted-importance: importance * 0.05
 		final ColumnVector weightedImportance = new ColumnVector(

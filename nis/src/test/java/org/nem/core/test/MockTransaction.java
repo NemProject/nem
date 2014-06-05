@@ -4,9 +4,8 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * A mock Transaction implementation.
@@ -25,9 +24,11 @@ public class MockTransaction extends Transaction {
 	private List<Integer> undoList = new ArrayList<>();
 	private Consumer<TransferObserver> transferAction = to -> { };
 
-	public int numExecuteCommitCalls;
-	public int numUndoCommitCalls;
-	public int numTransferCalls;
+	private int numExecuteCommitCalls;
+	private int numUndoCommitCalls;
+	private int numTransferCalls;
+
+	private ValidationResult validationResult = ValidationResult.SUCCESS;
 
 	/**
 	 * Creates a mock transaction.
@@ -161,14 +162,18 @@ public class MockTransaction extends Transaction {
 		this.transferAction = transferAction;
 	}
 
-	@Override
-	public boolean isValid() {
-		return super.isValid();
+	/**
+	 * Sets the validation result that should be returned from checkDerivedValidity.
+	 *
+	 * @param validationResult The validation result.
+	 */
+	public void setValidationResult(final ValidationResult validationResult) {
+		this.validationResult = validationResult;
 	}
 
 	@Override
-	public boolean isValid(final TransactionValidator transactionValidator) {
-		return true;
+	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
+		return this.validationResult;
 	}
 
 	@Override

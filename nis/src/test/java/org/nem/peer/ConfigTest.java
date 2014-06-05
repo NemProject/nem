@@ -34,7 +34,7 @@ public class ConfigTest {
 		// Assert:
 		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
@@ -43,7 +43,7 @@ public class ConfigTest {
 		// Arrange:
 		final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
 		jsonConfig.remove("platform");
-		final Config config = new Config(jsonConfig);
+		final Config config = new Config(jsonConfig, "2.0");
 
 		// Act:
 		final Node node = config.getLocalNode();
@@ -56,7 +56,7 @@ public class ConfigTest {
 				System.getProperty("os.name"));
 		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo(expectedPlatform));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
@@ -64,7 +64,7 @@ public class ConfigTest {
 	public void wellKnownPeersAreInitializedCorrectly() {
 		// Arrange:
 		final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
-		final Config config = new Config(ConfigFactory.createTestJsonConfig(knownHosts));
+		final Config config = new Config(ConfigFactory.createTestJsonConfig(knownHosts), "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -83,7 +83,7 @@ public class ConfigTest {
 		// Arrange:
 		final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
 		jsonConfig.remove("knownPeers");
-		final Config config = new Config(jsonConfig);
+		final Config config = new Config(jsonConfig, "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -123,7 +123,7 @@ public class ConfigTest {
 	//region Factories
 
 	private static Node createConfigNode(final String host) {
-		return new Node(new NodeEndpoint("ftp", host, 12), "plat", "app");
+		return new Node(new NodeEndpoint("ftp", host, 12), "plat", "app", "ver");
 	}
 
 	private static Config createTestConfig() {

@@ -181,12 +181,36 @@ public class TransferControllerTest {
 	public void transferCorrectTransaction() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
+		final JSONObject obj = createValidTransaction();
 
+		// Act:
+		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+
+		// Assert:
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+	}
+
+	@Test
+	public void transferFailsIfDeadlineIsInThePast() {
+		// Arrange:
+		final LocalHostConnector connector = new LocalHostConnector();
+		final JSONObject obj = createValidTransaction();
+		obj.put("timestamp", 100);
+
+		// Act:
+		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+
+		// Assert:
+		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(result.getBodyAsErrorResponse().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
+	}
+
+	private static JSONObject createValidTransaction() {
 		final JSONObject obj = new JSONObject();
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		final byte[] signersKey = HexEncoder.getBytes("02f25538f7fbdb0dbe7d3363be67f9edac8033c777cf3fc10ededae1a990c5459f");
 		obj.put("signer", Base64Encoder.getString(signersKey));
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
@@ -196,12 +220,7 @@ public class TransferControllerTest {
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
 		obj.put("message", message);
-
-		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
-
-		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		return obj;
 	}
 
 	private static String getRecipientAccountId() {

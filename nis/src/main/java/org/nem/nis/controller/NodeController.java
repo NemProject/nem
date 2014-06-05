@@ -105,6 +105,7 @@ public class NodeController {
 		return new SerializableList<>(nodeExperiencePairs);
 	}
 
+	// TODO: is this temporary?
 	@RequestMapping(value = "/node/fixer", method = RequestMethod.GET)
 	public String nodeFixer(@RequestParam(value = "data") final String sig) {
 		final byte[] data = ArrayUtils.concat(

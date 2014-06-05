@@ -37,8 +37,8 @@ public class OutlinkObserver implements TransferObserver {
 
 	private Amount calculateLinkWeight(final Account sender, final Amount amount) {
 		final WeightedBalances weightedBalances = sender.getWeightedBalances();
-		final BigInteger vested = BigInteger.valueOf(weightedBalances.getVested(this.height).getNumMicroNem());
-		final BigInteger unvested = BigInteger.valueOf(weightedBalances.getUnvested(this.height).getNumMicroNem());
+		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(this.height)));
+		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(this.height)));
 		if (unvested.compareTo(BigInteger.ZERO) <= 0)
 			return amount;
 
@@ -48,6 +48,10 @@ public class OutlinkObserver implements TransferObserver {
                 .divide(vested.add(unvested))
                 .longValue();
         return Amount.fromMicroNem(rawAdjustedWeight);
+	}
+
+	private static long getNumMicroNem(final Amount amount) {
+		return null == amount ? 0 : amount.getNumMicroNem();
 	}
 
 	@Override

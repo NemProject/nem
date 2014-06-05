@@ -237,7 +237,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 				}
 			}
 
-			return new Node(endpointAfterChange, "P", "A");
+			return new Node(endpointAfterChange, "P", "A", "V");
 		});
 	}
 

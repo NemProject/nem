@@ -45,27 +45,18 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void ctorInitializesNodePlatformToUnknown() {
+	public void ctorInitializesNodeMetaDataToDefaultValues() {
 		// Act:
 		final PeerNetwork network = createTestNetwork();
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
 		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
-		for (final Node node : nodes.getInactiveNodes())
-			Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Unknown"));
-	}
-
-	@Test
-	public void ctorInitializesNodeApplicationToUnknown() {
-		// Act:
-		final PeerNetwork network = createTestNetwork();
-		final NodeCollection nodes = network.getNodes();
-
-		// Assert:
-		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
-		for (final Node node : nodes.getInactiveNodes())
-			Assert.assertThat(node.getApplication(), IsEqual.equalTo("Unknown"));
+		for (final Node node : nodes.getInactiveNodes()) {
+			Assert.assertThat(node.getVersion(), IsNull.nullValue());
+			Assert.assertThat(node.getPlatform(), IsNull.nullValue());
+			Assert.assertThat(node.getApplication(), IsNull.nullValue());
+		}
 	}
 
 	//endregion
@@ -314,10 +305,10 @@ public class PeerNetworkTest {
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
 		// but the local node can only communicate with 10.0.0.5
 		final List<Node> knownPeers = Arrays.asList(
-			new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
+				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.2", 12)),
+                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.4", 12)),
+                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.5", 12)),
+                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -343,10 +334,10 @@ public class PeerNetworkTest {
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-6 are active
 		// but the local node can only communicate with 10.0.0.5
 		final List<Node> knownPeers = Arrays.asList(
-			new Node(new NodeEndpoint("ftp", "10.0.0.2", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.4", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.5", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
+				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.2", 12)),
+				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.4", 12)),
+				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.5", 12)),
+				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -364,8 +355,8 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		final List<Node> knownPeers = Arrays.asList(
-			new Node(new NodeEndpoint("ftp", "10.0.0.15", 12), "p", "a"),
-			new Node(new NodeEndpoint("ftp", "10.0.0.6", 12), "p", "a"));
+                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.15", 12)),
+                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -868,7 +859,7 @@ public class PeerNetworkTest {
 		final Node localNode = network.getLocalNode();
 		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.25", 8990)));
 		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo("2.0"));
 		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
@@ -894,7 +885,7 @@ public class PeerNetworkTest {
 		// Assert:
 		assertNodeEndpointIsConfigLocalNodeEndpoint(node.getEndpoint());
 		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo(2));
+		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
 		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 

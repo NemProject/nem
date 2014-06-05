@@ -17,8 +17,6 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
-	private final TransactionValidator UNCONFIRMED_TRANSACTION_VALIDATOR =
-			(final Account sender, final Account recipient, final Amount amount) -> unconfirmedBalances.get(sender).compareTo(amount) >= 0;
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -58,7 +56,7 @@ public class UnconfirmedTransactions {
 
 		// not sure if adding to cache here is a good idea...
 		addToCache(transaction.getSigner());
-		if (!transaction.isValid(UNCONFIRMED_TRANSACTION_VALIDATOR)) {
+		if (!isValid(transaction)) {
 			return false;
 		}
 
@@ -66,6 +64,11 @@ public class UnconfirmedTransactions {
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction;
+	}
+
+	private boolean isValid(final Transaction transaction) {
+		return ValidationResult.SUCCESS == transaction.checkValidity(
+				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
 	}
 
 	boolean remove(final Transaction transaction) {

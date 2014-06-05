@@ -53,7 +53,7 @@ public class BlockChainValidator {
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
-				if (!transaction.isValid() || !transaction.verify())
+				if (ValidationResult.SUCCESS != transaction.checkValidity() || !transaction.verify())
 					return false;
 			}
 
