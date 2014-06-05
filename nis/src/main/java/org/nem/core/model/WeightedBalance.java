@@ -1,40 +1,57 @@
 package org.nem.core.model;
 
-import java.math.BigInteger;
-
 /**
  * Calculates vested and unvested balances at a specified block height.
  */
 public class WeightedBalance implements Comparable<WeightedBalance> {
-	public static final long DECAY_NUMERATOR = 9;
-	public static final long DECAY_DENOMINATOR = 10;
-	
+	public static final long DECAY_NUMERATOR = 98;
+	public static final long DECAY_DENOMINATOR = 100;
+	public static final WeightedBalance ZERO =  new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
+
 	private final BlockHeight blockHeight;
-	private BigInteger unvestedBalance;
-	private BigInteger vestedBalance;
+	private long unvestedBalance;
+	private long vestedBalance;
 	private Amount balance;
+	private Amount amount;
 
 	/**
 	 * Creates a new weighted balance.
 	 *
 	 * @param blockHeight The block height.
-	 * @param unvestedBalance The unvested balance.
+	 * @param amount The unvested balance.
 	 */
-	public WeightedBalance(final BlockHeight blockHeight, final Amount unvestedBalance) {
-		this(blockHeight, unvestedBalance, BigInteger.valueOf(unvestedBalance.getNumMicroNem()), BigInteger.ZERO);
+
+	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
+		final Amount balance = this.balance.subtract(amount);
+		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
+		final long sendUv = (long)(ratio * amount.getNumMicroNem());
+		// TODO: this probably can hit negative, which probably won't do us anything good
+		final long unvested = this.unvestedBalance - sendUv;
+		final long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
+	}
+
+	public WeightedBalance createReceive(final BlockHeight blockHeight, final Amount amount) {
+		final Amount balance = this.balance.add(amount);
+		final long unvested = this.unvestedBalance + amount.getNumMicroNem();
+		return new WeightedBalance(amount, blockHeight, balance, unvested, this.vestedBalance);
+	}
+
+	public WeightedBalance createVested(final BlockHeight height, final Amount amount) {
+		return new WeightedBalance(amount, height, amount, 0, amount.getNumMicroNem());
 	}
 
 	private WeightedBalance(
+			final Amount amount,
 			final BlockHeight blockHeight,
 			final Amount balance,
-			final BigInteger unvestedBalance,
-			final BigInteger vestedBalance) {
+			final long unvestedBalance,
+			final long vestedBalance) {
+		this.amount = amount;
 		this.blockHeight = blockHeight;
 		this.unvestedBalance = unvestedBalance;
 		this.vestedBalance = vestedBalance;
 		this.balance = balance;
-
-		reduce();
 	}
 
 	/**
@@ -43,18 +60,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return A copy of this weighted balance.
 	 */
 	public WeightedBalance copy() {
-		return new WeightedBalance(this.blockHeight, this.balance, this.unvestedBalance, this.vestedBalance);
-	}
-
-	private void reduce() {
-		final BigInteger gcd = this.vestedBalance.gcd(this.unvestedBalance);
-		if (gcd.equals(BigInteger.ZERO)) {
-			return;
-		}
-
-		// last multiply, in order to always keep vested/unvested balance > balance
-		this.vestedBalance = this.vestedBalance.divide(gcd).multiply(BigInteger.valueOf(this.balance.getNumMicroNem()));
-		this.unvestedBalance = this.unvestedBalance.divide(gcd).multiply(BigInteger.valueOf(this.balance.getNumMicroNem()));
+		return new WeightedBalance(this.amount, this.blockHeight, this.balance, this.unvestedBalance, this.vestedBalance);
 	}
 
 	/**
@@ -63,100 +69,19 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The next weighted balance.
 	 */
 	public WeightedBalance next() {
-		final BigInteger base = BigInteger.valueOf(DECAY_DENOMINATOR);
-		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(DECAY_NUMERATOR));
-		final BigInteger move = this.unvestedBalance.multiply(base).subtract(newUv);
+		final long newUv = this.unvestedBalance * DECAY_NUMERATOR / DECAY_DENOMINATOR;
+		final long move = this.unvestedBalance - newUv;
+
+		final long h = this.blockHeight.getRaw();
+		final BlockHeight height = new BlockHeight(1 + ((h + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1)/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)* BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY);
 
 		return new WeightedBalance(
-				new BlockHeight(this.blockHeight.getRaw() + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
+				Amount.ZERO,
+				height,
 				this.balance,
-				this.unvestedBalance.multiply(base).subtract(move),
-				this.vestedBalance.multiply(base).add(move)
+				this.unvestedBalance - move,
+				this.vestedBalance + move
 		);
-	}
-
-	/**
-	 * Gets the previous weighted balance one day in the past.
-	 *
-	 * @return The previous weighted balance.
-	 */
-	public WeightedBalance previous() {
-		final BigInteger base = BigInteger.valueOf(DECAY_NUMERATOR);
-		final BigInteger newUv = this.unvestedBalance.multiply(BigInteger.valueOf(DECAY_DENOMINATOR));
-		final BigInteger move = newUv.subtract(this.unvestedBalance.multiply(base));
-
-		return new WeightedBalance(
-				new BlockHeight(this.blockHeight.getRaw() - BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
-				this.balance,
-				this.unvestedBalance.multiply(base).add(move),
-				this.vestedBalance.multiply(base).subtract(move));
-	}
-
-	/**
-	 * Notifies this balance that an amount was sent.
-	 *
-	 * @param amount The amount.
-	 */
-	public void send(final Amount amount) {
-		// no need to do anything, send keeps the ratio
-		this.balance = this.balance.subtract(amount);
-	}
-
-	/**
-	 * Notifies this balance that an amount that was sent was undone.
-	 *
-	 * @param amount The amount.
-	 */
-	public void undoSend(final Amount amount) {
-		this.balance = this.balance.add(amount);
-	}
-	
-	private BigInteger scale(final Amount amount) {
-		if (this.balance.equals(Amount.ZERO)) {
-			return BigInteger.valueOf(amount.getNumMicroNem());
-		}
-
-		// lcm=least common multiplier
-		// scale amount by lcm(balance, unvested+vested)/balance
-		final BigInteger balance = BigInteger.valueOf(this.balance.getNumMicroNem());
-		final BigInteger sum = this.vestedBalance.add(this.unvestedBalance);
-		final BigInteger lcm = balance.multiply(sum)
-									  .divide(balance.gcd(sum));
-		this.vestedBalance = this.vestedBalance.multiply(lcm)
-				   							   .divide(sum);
-		this.unvestedBalance = this.unvestedBalance.multiply(lcm)
-												   .divide(sum);
-		BigInteger scaledAmount = BigInteger.valueOf(amount.getNumMicroNem())
-											.multiply(lcm)
-											.divide(balance);
-		return scaledAmount;
-	}
-
-	/**
-	 * Notifies this balance that an amount was received.
-	 *
-	 * @param amount The amount.
-	 */
-	public void receive(final Amount amount) {
-		// Beware: this.unvestedBalance = this.unvestedBalance.add(scale(amount)); is wrong!
-		BigInteger scaledAmount = scale(amount);
-		this.unvestedBalance = this.unvestedBalance.add(scaledAmount);
-		this.balance = this.balance.add(amount);
-	}
-
-	/**
-	 * Notifies this balance that an amount that was received was undone.
-	 *
-	 * @param amount The amount.
-	 */
-	public void undoReceive(final Amount amount) {
-		if (amount.compareTo(getUnvestedBalance()) > 0)
-			throw new IllegalArgumentException("amount must be non-negative");
-
-		// Beware: this.unvestedBalance = this.unvestedBalance.subtract(scale(amount)); is wrong!
-		BigInteger scaledAmount = scale(amount);
-		this.unvestedBalance = this.unvestedBalance.subtract(scaledAmount);
-		this.balance = this.balance.subtract(amount);
 	}
 
 	/**
@@ -174,13 +99,11 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The vested balance.
 	 */
 	public Amount getVestedBalance() {
-		final BigInteger sum = this.vestedBalance.add(this.unvestedBalance);
-		if (sum.compareTo(BigInteger.ZERO) == 0) {
+		if (this.balance.equals(Amount.ZERO) || (this.vestedBalance + this.unvestedBalance) == 0) {
 			return Amount.ZERO;
 		}
-		return Amount.fromMicroNem(
-				this.vestedBalance.multiply(BigInteger.valueOf(this.balance.getNumMicroNem())).divide(sum).longValue()
-		);
+
+		return Amount.fromMicroNem(this.vestedBalance);
 	}
 
 	/**
@@ -195,5 +118,9 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	@Override
 	public int compareTo(final WeightedBalance o) {
 		return this.blockHeight.compareTo(o.blockHeight);
+	}
+
+	public Amount getAmount() {
+		return amount;
 	}
 }

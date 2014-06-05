@@ -116,7 +116,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The observer to use.
 	 */
 	public final void execute(final TransferObserver observer) {
-		this.transfer(observer);
+		this.transfer(observer, Direction.Execute);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The observer to use.
 	 */
 	public final void undo(final TransferObserver observer) {
-		this.transfer(new ReverseTransferObserver(observer));
+		this.transfer(new ReverseTransferObserver(observer), Direction.Undo);
 	}
 
 	/**
@@ -147,12 +147,16 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract void undoCommit();
 
+	public enum Direction {
+		Execute,
+		Undo
+	}
 	/**
 	 * Executes all transfers using the specified observer.
 	 *
 	 * @param observer The transfer observer.
 	 */
-	protected abstract void transfer(final TransferObserver observer);
+	protected abstract void transfer(final TransferObserver observer, final Direction direction);
 
 	/**
 	 * Determines if this transaction is valid using a custom can-debit predicate.
