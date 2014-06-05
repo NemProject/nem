@@ -207,18 +207,6 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void checkValidityChecksSuperValidity() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, Amount.fromNem(1), null);
-		transaction.setDeadline(TimeInstant.ZERO);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-	}
-
-	@Test
 	public void checkValidityGivesPrecedenceToFailingCanDebitPredicate() {
 		// Arrange: (sender-balance == amount + fee)
 		final Transaction transaction = createTransaction(2, 1, 1);

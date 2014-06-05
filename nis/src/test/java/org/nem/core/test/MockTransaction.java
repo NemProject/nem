@@ -24,9 +24,11 @@ public class MockTransaction extends Transaction {
 	private List<Integer> undoList = new ArrayList<>();
 	private Consumer<TransferObserver> transferAction = to -> { };
 
-	public int numExecuteCommitCalls;
-	public int numUndoCommitCalls;
-	public int numTransferCalls;
+	private int numExecuteCommitCalls;
+	private int numUndoCommitCalls;
+	private int numTransferCalls;
+
+	private ValidationResult validationResult = ValidationResult.SUCCESS;
 
 	/**
 	 * Creates a mock transaction.
@@ -160,9 +162,18 @@ public class MockTransaction extends Transaction {
 		this.transferAction = transferAction;
 	}
 
+	/**
+	 * Sets the validation result that should be returned from checkDerivedValidity.
+	 *
+	 * @param validationResult The validation result.
+	 */
+	public void setValidationResult(final ValidationResult validationResult) {
+		this.validationResult = validationResult;
+	}
+
 	@Override
 	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		return ValidationResult.SUCCESS;
+		return this.validationResult;
 	}
 
 	@Override
