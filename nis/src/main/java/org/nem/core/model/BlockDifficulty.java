@@ -7,7 +7,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a NEM block difficulty.
  */
-public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> implements SerializableEntity {
+public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
 
 	/**
 	 * The initial block difficulty.
@@ -39,15 +39,6 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> implemen
 	}
 
 	/**
-	 * Deserializes a block difficulty.
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public BlockDifficulty(final Deserializer deserializer) {
-		this(deserializer.readLong("difficulty"));
-	}
-
-	/**
 	 * Returns the underlying difficulty.
 	 *
 	 * @return The underlying difficulty.
@@ -65,11 +56,6 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> implemen
 
 	private static long Clamp(long difficulty) {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));
-	}
-
-	@Override
-	public void serialize(Serializer serializer) {
-		serializer.writeLong("difficulty", this.getRaw());
 	}
 
 	//region inline serialization
@@ -90,7 +76,6 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> implemen
 	 *
 	 * @param deserializer The deserializer to use.
 	 * @param label        The optional label.
-	 *
 	 * @return The read object.
 	 */
 	public static BlockDifficulty readFrom(final Deserializer deserializer, final String label) {

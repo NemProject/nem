@@ -43,6 +43,7 @@ public class ConfigFactory {
 
 		jsonConfig.put("endpoint", createEndpointJsonObject("http", DEFAULT_LOCAL_NODE_HOST, 7890));
 
+		jsonConfig.put("version", "1.0"); // note that the Config constructor parameter should take precedence
 		jsonConfig.put("platform", "Mac");
 		jsonConfig.put("application", "FooBar");
 
@@ -70,7 +71,7 @@ public class ConfigFactory {
 	 * @return A default Config object.
 	 */
 	public static Config createDefaultTestConfig() {
-		return new Config(createTestJsonConfig());
+		return new Config(createTestJsonConfig(), "2.0");
 	}
 
 
@@ -84,7 +85,7 @@ public class ConfigFactory {
 
 		class MockConfig extends Config {
 			public MockConfig() {
-				super(createTestJsonConfig());
+				super(createTestJsonConfig(), "2.0");
 			}
 
 			@Override

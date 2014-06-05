@@ -55,7 +55,7 @@ public class LocalHostConnector {
 		 *
 		 * @return The response body as an ErrorResponse.
 		 */
-		public ErrorResponse getBodyAsErrorResponse() { return (ErrorResponse)this.body; }
+		public ErrorResponse getBodyAsErrorResponse() { return new ErrorResponse(this.getBodyAsDeserializer()); }
 
 		/**
 		 * Gets the response body as a Deserializer.

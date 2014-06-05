@@ -43,7 +43,7 @@ public class PushService {
 	public void pushTransaction(final Transaction entity, final HttpServletRequest request) {
 		boolean result = this.pushEntity(
 				entity,
-				transaction -> (transaction.isValid() && transaction.verify()) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE,
+				PushService::checkTransaction,
 				this.foraging::processTransaction,
 				transaction -> { },
 				NodeApiId.REST_PUSH_TRANSACTION,
@@ -51,6 +51,11 @@ public class PushService {
 
 		if (!result)
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
+	}
+
+	private static NodeInteractionResult checkTransaction(final Transaction transaction) {
+		final boolean isValid = ValidationResult.SUCCESS == transaction.checkValidity() && transaction.verify();
+		return isValid ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE;
 	}
 
 	/**

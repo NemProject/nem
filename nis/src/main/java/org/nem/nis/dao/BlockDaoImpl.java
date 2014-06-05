@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.*;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.nem.core.crypto.Hash;
@@ -135,6 +136,7 @@ public class BlockDaoImpl implements BlockDao {
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
 				.add(Restrictions.le("timestamp", timestamp))
+				.addOrder(Order.desc("timestamp"))
 				.setMaxResults(limit)
 				// nested criteria
 				.createCriteria("forger", "f")

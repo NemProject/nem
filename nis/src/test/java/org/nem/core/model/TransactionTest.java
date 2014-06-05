@@ -48,11 +48,11 @@ public class TransactionTest {
 
 	//endregion
 
-	//region Deadline
+	//region Validation
 
 	@Test
 	public void transactionDeadlineCanBeSet() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(726));
 
@@ -62,52 +62,63 @@ public class TransactionTest {
 
 	@Test
 	public void transactionWithDeadlineInRangeIsValid() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void transactionWithLessThanMinimumDeadlineIsInvalid() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(transaction.getTimeStamp());
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
 	@Test
 	public void transactionWithMinimumDeadlineIsValid() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void transactionWithMaximumDeadlineIsValid() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
-		// Act:
+		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+	}
+
+	@Test
+	public void checkValidityDelegatesToCheckDerivedValidity() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction();
+		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
+		transaction.setValidationResult(ValidationResult.FAILURE_UNKNOWN);
+
+		// Assert:
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 	}
 
 	//endregion

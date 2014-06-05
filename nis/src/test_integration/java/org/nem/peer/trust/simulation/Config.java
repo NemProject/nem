@@ -122,8 +122,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			NodeEndpoint endpoint = new NodeEndpoint("http", address, 8000);
-			this.node = new Node(endpoint, "PC", "NEM SIMULATOR");
+			this.node = Node.fromHost(address);
 		}
 
 		public Entry(final String line) {
@@ -145,8 +144,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			NodeEndpoint endpoint = new NodeEndpoint("http", nodeAttributes[0], 8000);
-			this.node = new Node(endpoint, "PC", "NEM SIMULATOR");
+			this.node = Node.fromHost(nodeAttributes[0]);
 		}
 
 		public boolean isPreTrusted() {

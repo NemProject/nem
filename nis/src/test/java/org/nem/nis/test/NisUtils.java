@@ -19,7 +19,7 @@ public class NisUtils {
 	 * @param timeStamp The block timestamp.
 	 * @return The db block.
 	 */
-	public static org.nem.nis.dbmodel.Block createBlockWithTimeStamp(final int timeStamp) {
+	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStamp(final int timeStamp) {
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
 		account.setPublicKey(Utils.generateRandomPublicKey());
 
@@ -47,13 +47,25 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified height.
 	 */
-	public static Block createRandomBlock(long height) {
+	public static Block createRandomBlockWithHeight(long height) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
 				new BlockHeight(height));
+	}
+
+	/**
+	 * Creates a new random Block with the specified timestamp.
+	 */
+	public static Block createRandomBlockWithTimeStamp(int timestamp) {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				new TimeInstant(timestamp),
+				BlockHeight.ONE);
 	}
 
 	/**

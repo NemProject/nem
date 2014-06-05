@@ -66,9 +66,12 @@ public class TransferDaoImpl implements TransferDao {
 	public Collection<Object[]> getTransactionsForAccount(final Account address, final Integer timestamp, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		Query query = getCurrentSession()
-				.createQuery("select t, t.block.id from Transfer t where t.timestamp <= :timestamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey)")
+				.createQuery("select t, t.block.id from Transfer t " +
+						"where t.timestamp <= :timestamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
+						"order by t.timestamp desc")
 				.setParameter("timestamp", timestamp)
-				.setParameter("pubkey", address.getAddress().getEncoded());
+				.setParameter("pubkey", address.getAddress().getEncoded())
+				.setMaxResults(limit);
 		return listAndCast(query);
 	}
 

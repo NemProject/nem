@@ -87,7 +87,7 @@ public class ForagingTest {
 		tx.sign();
 
 		// Assert:
-		Assert.assertThat(tx.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(tx.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		foraging.processTransaction(tx);

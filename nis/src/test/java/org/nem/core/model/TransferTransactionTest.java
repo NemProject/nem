@@ -176,7 +176,7 @@ public class TransferTransactionTest {
 	//region Valid
 
 	@Test
-	public void isValidChecksForMinimumFee() {
+	public void checkValidityChecksForMinimumFee() {
 		// Arrange (category spam attack):
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
@@ -186,7 +186,7 @@ public class TransferTransactionTest {
 		transaction.setFee(transaction.getMinimumFee());
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Bob prefers a more user friendly fee structure
 		transaction.setFee(Amount.fromMicroNem(0));
@@ -203,67 +203,58 @@ public class TransferTransactionTest {
 		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 		
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
-	public void isValidChecksSuperValidity() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, Amount.fromNem(1), null);
-		transaction.setDeadline(TimeInstant.ZERO);
-
-		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void isValidFailsWithFailingValidator() {
-		// Arrange:
+	public void checkValidityGivesPrecedenceToFailingCanDebitPredicate() {
+		// Arrange: (sender-balance == amount + fee)
 		final Transaction transaction = createTransaction(2, 1, 1);
-		final TransactionValidator failingTransactionValidator =
-				(sender, recipient, amount) -> false;
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(false));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(
+				transaction.checkValidity((account, amount) -> false),
+				IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 	}
 
 	@Test
-	public void isValidSucceedsWithSucceedingValidator() {
-		// Arrange:
+	public void checkValidityGivesPrecedenceToSucceedingCanDebitPredicate() {
+		// Arrange: (sender-balance < amount + fee)
 		final Transaction transaction = createTransaction(2, 2, 1);
-		final TransactionValidator failingTransactionValidator =
-				(sender, recipient, amount) -> true;
 
 		// Assert:
-		Assert.assertThat(transaction.isValid(), IsEqual.equalTo(false));
-		Assert.assertThat(transaction.isValid(failingTransactionValidator), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+		Assert.assertThat(
+				transaction.checkValidity((account, amount) -> true),
+				IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void transactionsWithNonNegativeAmountAreValid() {
 		// Assert:
-		Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(true));
-		Assert.assertThat(isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(true));
+		final ValidationResult expectedResult = ValidationResult.SUCCESS;
+		Assert.assertThat(isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
 	public void transactionsUpToSignerBalanceAreValid() {
 		// Assert:
-		Assert.assertThat(isTransactionAmountValid(100, 10, 1), IsEqual.equalTo(true));
-		Assert.assertThat(isTransactionAmountValid(1000, 990, 10), IsEqual.equalTo(true));
-		Assert.assertThat(isTransactionAmountValid(1000, 50, 950), IsEqual.equalTo(true));
+		final ValidationResult expectedResult = ValidationResult.SUCCESS;
+		Assert.assertThat(isTransactionAmountValid(100, 10, 1), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 990, 10), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 50, 950), IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
 	public void transactionsExceedingSignerBalanceAreInvalid() {
 		// Assert:
-		Assert.assertThat(isTransactionAmountValid(1000, 990, 11), IsEqual.equalTo(false));
-		Assert.assertThat(isTransactionAmountValid(1000, 51, 950), IsEqual.equalTo(false));
-		Assert.assertThat(isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(false));
-		Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(false));
+		final ValidationResult expectedResult = ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+		Assert.assertThat(isTransactionAmountValid(1000, 990, 11), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 51, 950), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(expectedResult));
 	}
 
 
@@ -279,31 +270,31 @@ public class TransferTransactionTest {
 		return transaction;
 	}
 
-	private boolean isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+	private ValidationResult isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
 		// Arrange:
-		TransferTransaction transaction = createTransaction(senderBalance, amount, fee);
+		final TransferTransaction transaction = createTransaction(senderBalance, amount, fee);
 
 		// Act:
-		return transaction.isValid();
+		return transaction.checkValidity();
 	}
 
 	@Test
 	public void smallMessagesAreValid() {
 		// Assert:
-		Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(true));
-		Assert.assertThat(isMessageSizeValid(1), IsEqual.equalTo(true));
-		Assert.assertThat(isMessageSizeValid(511), IsEqual.equalTo(true));
-		Assert.assertThat(isMessageSizeValid(512), IsEqual.equalTo(true));
+		Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(isMessageSizeValid(1), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(isMessageSizeValid(511), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(isMessageSizeValid(512), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		Assert.assertThat(isMessageSizeValid(513), IsEqual.equalTo(false));
-		Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(false));
+		Assert.assertThat(isMessageSizeValid(513), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+		Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
 	}
 
-	private boolean isMessageSizeValid(final int messageSize) {
+	private ValidationResult isMessageSizeValid(final int messageSize) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
@@ -313,7 +304,7 @@ public class TransferTransactionTest {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Act:
-		return transaction.isValid();
+		return transaction.checkValidity();
 	}
 
 	//endregion
