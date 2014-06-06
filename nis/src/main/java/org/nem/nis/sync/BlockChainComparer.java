@@ -123,6 +123,11 @@ public class BlockChainComparer {
 			}
 
 			if (remoteHashes.size() == firstDifferenceIndex) {
+				if (remoteHashes.size() < localHashes.size()) {
+					// The remote node lied
+					return ComparisonResult.Code.REMOTE_IS_EVIL;
+				}
+
 				// nothing to do, we have all of peers blocks
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 			}
