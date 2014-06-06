@@ -57,13 +57,16 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Sets the score for the chain.
-	 * 
-	 * @param score the score for the chain.
+	 * Updates the score of this chain by adding the score derived from the specified block and parent block.
+	 *
+	 * @param parentBlock The parent block.
+	 * @param block The block.
 	 */
-	public void setScore(final BlockChainScore score) {
-		this.score = score;
+	public void updateScore(final Block parentBlock, final Block block) {
+		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer);
+		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
+
 	/**
 	 * Checks if given block follows last block in the chain.
 	 *
@@ -167,11 +170,6 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
-		final BlockChainScore peerChainScore = connector.getChainScore(node.getEndpoint());
-		if (peerChainScore.compareTo(this.score) <= 0) {
-			return NodeInteractionResult.NEUTRAL;
-		}
-		
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
@@ -179,17 +177,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-		final org.nem.nis.dbmodel.Block dbParent = blockDao.findByHeight(commonBlockHeight);
-		final Block parent = BlockMapper.toModel(dbParent, context.accountAnalyzer.asAutoCache());
-		// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
-		//     which changes the peer chain's score. He will get punished because the promised score is not
-		//     equal to the actual peer chain score.
-		// TODO: can this be improved without breaking the design?
-		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
-		calculateChainDifficulties(parent, peerChain);
-		
-		// Usually only part of the remote chain.
-		BlockChainScore peerPartialScore = BlockChain.getBlockChainScore(parent, peerChain);
+		final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
 
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -198,22 +186,10 @@ public class BlockChain implements BlockSynchronizer {
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
-		
-		// Got fooled?
-		if (peerPartialScore.compareTo(ourScore) <= 0) {
-			return NodeInteractionResult.FAILURE;
-		}
-
-		logScore(ourScore, peerPartialScore);
 
 		//region verify peer's chain
-
-		NodeInteractionResult interactionResult =  context.updateOurChain(this.foraging, parent, peerChain, !result.areChainsConsistent());
-		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = this.score.subtract(ourScore).add(peerPartialScore);
-		}
-		
-		return interactionResult;
+		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		return updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 	}
 
 	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
@@ -284,70 +260,18 @@ public class BlockChain implements BlockSynchronizer {
 		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.asAutoCache());
 		// EVIL hack end
 
-		Block parent = BlockMapper.toModel(dbParent, context.accountAnalyzer.asAutoCache());
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (dbParent.getNextBlockId() != null) {
-			ourScore = context.undoTxesAndGetScore(parent.getHeight());
+			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
-		calculateChainDifficulties(parent, peerChain);
-		BlockChainScore peerPartialScore = getBlockChainScore(parent, peerChain);
-		if (peerPartialScore.compareTo(ourScore) <= 0) {
-			// Don't punish, the node didn't promise to deliver a better block than ours
-			return NodeInteractionResult.NEUTRAL;
-		}
 
-		logScore(ourScore, peerPartialScore);
-
-		NodeInteractionResult interactionResult = context.updateOurChain(this.foraging, parent, peerChain, hasOwnChain);
-		if (interactionResult == NodeInteractionResult.SUCCESS) {
-			this.score = this.score.subtract(ourScore).add(peerPartialScore);
-		}
-		
-		return interactionResult;
-	}
-
-	private static BlockChainScore getBlockChainScore(Block parentBlock, List<Block> chain) {
-		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-				new BlockScorer(null));
-		BlockIterator.all(parentBlock, chain, scoreVisitor);
-		return scoreVisitor.getScore();
-	}
-
-	private void calculateChainDifficulties(Block parent, List<Block> chain) {
-		final BlockScorer blockScorer = new BlockScorer(null);
-		final long blockDifference = parent.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
-		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
-
-		int limit = (int)Math.min(parent.getHeight().getRaw(), ((long)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
-		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
-		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-
-		for (final Block block : chain) {
-			final BlockDifficulty difficulty = blockScorer.calculateDifficulty(difficulties, timestamps);
-			block.setDifficulty(difficulty);
-
-			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-			difficulties.add(difficulty);
-			timestamps.add(block.getTimeStamp());
-			if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
-				difficulties.remove(0);
-				timestamps.remove(0);
-			}
-		}
-	}
-
-	private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
-		if (ourScore.getRaw() == 0) {
-			LOGGER.info(String.format("new block's score: %d", peerScore.getRaw()));
-		} else {
-			LOGGER.info(String.format("our score: %d, peer's score: %d", ourScore, peerScore.getRaw()));
-		}
+		return updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
 	}
 
 	private BlockChainSyncContext createSyncContext() {
@@ -355,8 +279,45 @@ public class BlockChain implements BlockSynchronizer {
 				this.accountAnalyzer.copy(),
 				this.accountAnalyzer,
 				this.blockChainLastBlockLayer,
-				this.blockDao);
+				this.blockDao,
+				this.score);
 	}
+
+	private NodeInteractionResult updateOurChain(
+			final BlockChainSyncContext context,
+			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final List<Block> peerChain,
+			final BlockChainScore ourScore,
+			final boolean hasOwnChain,
+			final boolean shouldPunishLowerPeerScore) {
+		final UpdateChainResult updateResult = context.updateOurChain(
+				this.foraging,
+				dbParentBlock,
+				peerChain,
+				ourScore,
+				hasOwnChain);
+
+		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) < 0) {
+			// if we got here, the peer lied about his score, so penalize him
+			return NodeInteractionResult.FAILURE;
+		}
+
+		if (NodeInteractionResult.SUCCESS == updateResult.interactionResult) {
+			this.score = updateResult.peerScore;
+		}
+
+		return updateResult.interactionResult;
+	}
+
+	//region UpdateChainResult
+
+	private static class UpdateChainResult {
+		public NodeInteractionResult interactionResult;
+		public BlockChainScore ourScore;
+		public BlockChainScore peerScore;
+	}
+
+	//endregion
 
 	//region BlockChainSyncContext
 
@@ -366,17 +327,20 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
+		private final BlockChainScore ourScore;
 
 		private BlockChainSyncContext(
 				final AccountAnalyzer accountAnalyzer,
 				final AccountAnalyzer originalAnalyzer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
-				final BlockDao blockDao) {
+				final BlockDao blockDao,
+				final BlockChainScore ourScore) {
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
 			this.blockScorer = new BlockScorer(this.accountAnalyzer);
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
+			this.ourScore = ourScore;
 		}
 
 		/**
@@ -388,8 +352,7 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score for iterated blocks.
 		 */
 		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
-			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(
-					this.blockScorer);
+			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
 
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
@@ -405,10 +368,11 @@ public class BlockChain implements BlockSynchronizer {
 			return scoreVisitor.getScore();
 		}
 
-		public NodeInteractionResult updateOurChain(
+		public UpdateChainResult updateOurChain(
 				final Foraging foraging,
-				final Block parentBlock,
+				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
+				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
@@ -418,11 +382,16 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockChainLastBlockLayer,
 					this.blockDao,
 					foraging,
-					parentBlock,
+					dbParentBlock,
 					peerChain,
+					ourScore,
 					hasOwnChain);
 
-			return updateContext.update();
+			final UpdateChainResult result = new UpdateChainResult();
+			result.interactionResult = updateContext.update();
+			result.ourScore = updateContext.ourScore;
+			result.peerScore = updateContext.peerScore;
+			return result;
 		}
 
 		private BlockLookup createLocalBlockLookup() {
@@ -430,6 +399,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockDao,
 					this.accountAnalyzer,
 					this.blockChainLastBlockLayer.getLastDbBlock(),
+					this.ourScore,
 					BlockChainConstants.BLOCKS_LIMIT);
 		}
 	}
@@ -448,6 +418,8 @@ public class BlockChain implements BlockSynchronizer {
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final List<Block> peerChain;
+		private final BlockChainScore ourScore;
+		private final BlockChainScore peerScore;
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
@@ -457,8 +429,9 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
 				final Foraging foraging,
-				final Block parentBlock,
+				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final List<Block> peerChain,
+				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
 			this.accountAnalyzer = accountAnalyzer;
@@ -467,19 +440,42 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
 			this.foraging = foraging;
-			this.parentBlock = parentBlock;
+
+			// do not trust peer, take first block from our db and convert it
+			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer);
+
 			this.peerChain = peerChain;
+			this.ourScore = ourScore;
+			this.peerScore = this.getPeerChainScore();
 			this.hasOwnChain = hasOwnChain;
 		}
 
 		public NodeInteractionResult update() {
+			// do not trust peer, take first block from our db and convert it
 			if (!this.validatePeerChain()) {
 				return NodeInteractionResult.FAILURE;
 			}
 
+			// warning: this changes number of foraged blocks
+			logScore(this.ourScore, this.peerScore);
+			if (BlockChainScore.ZERO.equals(this.peerScore)) {
+				return NodeInteractionResult.FAILURE;
+			}
+
+			if (this.peerScore.compareTo(this.ourScore) < 0) {
+				return NodeInteractionResult.NEUTRAL;
+			}
+
 			this.updateOurChain();
-			
 			return NodeInteractionResult.SUCCESS;
+		}
+
+		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
+			if (BlockChainScore.ZERO.equals(ourScore)) {
+				LOGGER.info(String.format("new block's score: %s", peerScore));
+			} else {
+				LOGGER.info(String.format("our score: %s, peer's score: %s", ourScore, peerScore));
+			}
 		}
 
 		/**
@@ -492,7 +488,36 @@ public class BlockChain implements BlockSynchronizer {
 					this.accountAnalyzer,
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT);
+			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
+		}
+
+		private BlockChainScore getPeerChainScore() {
+			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
+			BlockIterator.all(this.parentBlock, this.peerChain, scoreVisitor);
+			return scoreVisitor.getScore();
+		}
+
+		private void calculatePeerChainDifficulties() {
+			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
+			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
+
+			int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
+
+			for (final Block block : this.peerChain) {
+				final BlockDifficulty difficulty = this.blockScorer.calculateDifficulty(difficulties, timestamps);
+				block.setDifficulty(difficulty);
+
+				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
+				difficulties.add(difficulty);
+				timestamps.add(block.getTimeStamp());
+				if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
+					difficulties.remove(0);
+					timestamps.remove(0);
+				}
+			}
 		}
 
 		/*

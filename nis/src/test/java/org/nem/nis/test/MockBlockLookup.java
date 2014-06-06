@@ -14,6 +14,7 @@ import java.util.Map;
 public class MockBlockLookup implements BlockLookup {
 
 	private final Block lastBlock;
+	private final BlockChainScore chainScore;
 	private final HashChain chain;
 	private final Map<BlockHeight, Block> heightToBlockMap = new HashMap<>();
 
@@ -30,10 +31,32 @@ public class MockBlockLookup implements BlockLookup {
 	 * Creates a new mock block lookup.
 	 *
 	 * @param lastBlock The last block.
+	 * @param chainScore The chain score.
+	 */
+	public MockBlockLookup(final Block lastBlock, final BlockChainScore chainScore) {
+		this(lastBlock, chainScore, 1);
+	}
+
+	/**
+	 * Creates a new mock block lookup.
+	 *
+	 * @param lastBlock The last block.
 	 * @param numHashesToReturn The number of hashes to return from getHashesFrom.
 	 */
 	public MockBlockLookup(final Block lastBlock, int numHashesToReturn) {
+		this(lastBlock, new BlockChainScore(1), numHashesToReturn);
+	}
+
+	/**
+	 * Creates a new mock block lookup.
+	 *
+	 * @param lastBlock The last block.
+	 * @param chainScore The chain score.
+	 * @param numHashesToReturn The number of hashes to return from getHashesFrom.
+	 */
+	public MockBlockLookup(final Block lastBlock, final BlockChainScore chainScore, int numHashesToReturn) {
 		this.lastBlock = lastBlock;
+		this.chainScore = chainScore;
 
 		this.chain = new HashChain(numHashesToReturn);
 		for (int i = 0; i < numHashesToReturn; ++i)
@@ -49,6 +72,7 @@ public class MockBlockLookup implements BlockLookup {
 	public MockBlockLookup(final Block lastBlock, final HashChain hashChain) {
 		this.lastBlock = lastBlock;
 		this.chain = hashChain;
+		this.chainScore = new BlockChainScore(1);
 	}
 
 	/**
@@ -63,6 +87,11 @@ public class MockBlockLookup implements BlockLookup {
 	@Override
 	public Block getLastBlock() {
 		return this.lastBlock;
+	}
+
+	@Override
+	public BlockChainScore getChainScore() {
+		return this.chainScore;
 	}
 
 	@Override

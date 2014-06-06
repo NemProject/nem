@@ -160,17 +160,8 @@ public class Foraging  {
 
 					if (hit.compareTo(target) < 0) {
 						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());
-
-						// TODO: refactor
-						int timeStampDifference = newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp());
-						LOGGER.info("timestamp diff: " + timeStampDifference);
-						final long backInTime = newBlock.getHeight().getRaw() - 1;
-						final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
-						final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
-						final long multiplier = 1_000_000_000L * 10;
-						long forgerBalance = (long)(newBlock.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
-						LOGGER.info("forger balance: " + forgerBalance);
-						LOGGER.info("block diff: " + newBlock.getDifficulty());
+						LOGGER.info("[HIT] timestamp diff: " + newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp()));
+						LOGGER.info("[HIT] block diff: " + newBlock.getDifficulty());
 
 						final long score = blockScorer.calculateBlockScore(lastBlock, newBlock);
 						if (score > bestScore) {
@@ -178,7 +169,6 @@ public class Foraging  {
 							bestScore = score;
 						}
 					}
-
 				}
 			} // synchronized
 

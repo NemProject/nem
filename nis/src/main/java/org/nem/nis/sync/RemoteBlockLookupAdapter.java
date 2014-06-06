@@ -25,17 +25,22 @@ public class RemoteBlockLookupAdapter implements BlockLookup {
 	}
 
 	@Override
+	public BlockChainScore getChainScore() {
+		return this.connector.getChainScore(this.remoteEndpoint);
+	}
+
+	@Override
 	public Block getLastBlock() {
-		return this.connector.getLastBlock(remoteEndpoint);
+		return this.connector.getLastBlock(this.remoteEndpoint);
 	}
 
 	@Override
 	public Block getBlockAt(final BlockHeight height) {
-		return this.connector.getBlockAt(remoteEndpoint, height);
+		return this.connector.getBlockAt(this.remoteEndpoint, height);
 	}
 
 	@Override
 	public HashChain getHashesFrom(final BlockHeight height) {
-		return this.connector.getHashesFrom(remoteEndpoint, height);
+		return this.connector.getHashesFrom(this.remoteEndpoint, height);
 	}
 }
