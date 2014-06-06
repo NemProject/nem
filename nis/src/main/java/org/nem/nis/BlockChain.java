@@ -196,6 +196,7 @@ public class BlockChain implements BlockSynchronizer {
 		switch (comparisonResultCode) {
 			case ComparisonResult.Code.REMOTE_IS_SYNCED:
             case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
+            case ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE:
 				return NodeInteractionResult.NEUTRAL;
 		}
 
