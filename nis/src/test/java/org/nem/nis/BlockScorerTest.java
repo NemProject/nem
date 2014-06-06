@@ -2,23 +2,19 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PublicKey;
+import org.mockito.Mockito;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorerAnalyzer;
+import org.nem.nis.test.*;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.logging.Logger;
 
 public class BlockScorerTest {
-	private static final Logger LOGGER = Logger.getLogger(BlockScorerTest.class.getName());
 
 	private static final byte[] PUBKEY_BYTES = new byte[] {
 			(byte) 0x02,
@@ -151,11 +147,55 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
+	//region calculateForgerBalance
+
+	@Test
+	public void calculateForgerBalanceDerivesBalanceFromImportance() {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final Block block = NisUtils.createRandomBlockWithHeight(94);
+		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(94), 0.75);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+
+		// Act:
+		final long balance = scorer.calculateForgerBalance(block);
+
+		// Assert:
+		Assert.assertThat(balance, IsEqual.equalTo(7_500_000_000L));
+	}
+
+	@Test
+	public void calculateForgerBalanceCallsRecalculateImportancesForGroupedBlock() {
+		// Arrange:
+		assertRecalculateImportancesCalledForHeight(1, 1);
+		assertRecalculateImportancesCalledForHeight(30, 1);
+		assertRecalculateImportancesCalledForHeight(31, 1);
+		assertRecalculateImportancesCalledForHeight(32, 32);
+		assertRecalculateImportancesCalledForHeight(33, 32);
+		assertRecalculateImportancesCalledForHeight(90, 63);
+		assertRecalculateImportancesCalledForHeight(111, 94);
+	}
+
+	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final Block block = NisUtils.createRandomBlockWithHeight(height);
+		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(groupedHeight), 0.75);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+
+		// Act:
+		scorer.calculateForgerBalance(block);
+
+		// Assert:
+		Mockito.verify(accountAnalyzer, Mockito.times(1)).recalculateImportances(new BlockHeight(groupedHeight));
+	}
+
+	//endregion
+
 	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
-		final SerializableEntity entity = block;
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(block, accountLookup);
 		Block b = new Block(deserializer.readInt("type"), options, deserializer);
 
 		Field field = b.getClass().getDeclaredField("generationHash");

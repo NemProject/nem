@@ -153,7 +153,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The balance.
 	 */
 	public Amount getBalance() {
-		return balance;
+		return this.balance;
 	}
 
 	@Override

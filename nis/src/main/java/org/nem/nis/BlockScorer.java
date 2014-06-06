@@ -75,17 +75,16 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Calculates forger balance for block at given height
+	 * Calculates forager balance for block.
 	 *
-	 * @param block signed, "hitted" block
-	 * @return forger balance
+	 * @param block The signed, "hit" block.
+	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
 		final long backInTime = block.getHeight().getRaw() - 1;
-		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
-		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
+		final long grouped = (backInTime / BlockChainConstants.POI_GROUPING) * BlockChainConstants.POI_GROUPING;
+		final BlockHeight blockHeight = new BlockHeight(grouped + 1);
 		this.accountAnalyzer.recalculateImportances(blockHeight);
-		// TODO: maybe it'd be better to use Genesis.AMOUNT.getNumNem()
 		final long multiplier = 1_000_000_000L * 10; // TODO: remove 10 before open alpha
 		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 	}

@@ -1,12 +1,10 @@
 package org.nem.core.async;
 
 import java.io.Closeable;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * Timer that executes a future given on an interval.
@@ -126,10 +124,10 @@ public class AsyncTimer implements Closeable {
 		++this.numExecutions;
 		return this.recurringFutureSupplier.get()
 				.exceptionally(e -> {
-					LOGGER.warning(String.format("Timer %s raised exception: %s", this.getName(), e.getMessage()));
-					StringWriter sw = new StringWriter();
-					e.printStackTrace(new PrintWriter(sw));
-					LOGGER.warning("STACKTRACE FOLLOWS: " + sw.toString());
+					LOGGER.log(
+                            Level.WARNING,
+							String.format("Timer %s raised exception: %s", this.getName(), e.getMessage()),
+							e);
 					return null;
 				})
 				.thenCompose(v -> {
