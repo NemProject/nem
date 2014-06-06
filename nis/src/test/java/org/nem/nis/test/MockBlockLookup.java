@@ -70,9 +70,20 @@ public class MockBlockLookup implements BlockLookup {
 	 * @param hashChain The hashes to return from getHashesFrom.
 	 */
 	public MockBlockLookup(final Block lastBlock, final HashChain hashChain) {
+		this(lastBlock, new BlockChainScore(1), hashChain);
+	}
+
+	/**
+	 * Creates a new mock block lookup.
+	 *
+	 * @param lastBlock The last block.
+	 * @param chainScore The chain score.
+	 * @param hashChain The hashes to return from getHashesFrom.
+	 */
+	public MockBlockLookup(final Block lastBlock, final BlockChainScore chainScore, final HashChain hashChain) {
 		this.lastBlock = lastBlock;
 		this.chain = hashChain;
-		this.chainScore = new BlockChainScore(1);
+		this.chainScore = chainScore;
 	}
 
 	/**

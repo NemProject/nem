@@ -62,6 +62,11 @@ public class ComparisonResult {
 		 * The remote node has returned invalid hashes.
 		 */
 		public static final int REMOTE_RETURNED_INVALID_HASHES = REMOTE_IS_EVIL | 3;
+
+		/**
+		 * The remote node lied about having a higher chain score.
+		 */
+		public static final int REMOTE_LIED_ABOUT_CHAIN_SCORE = REMOTE_IS_EVIL | 4;
 	}
 
 	private final int code;

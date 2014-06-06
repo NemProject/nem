@@ -124,8 +124,9 @@ public class BlockChainComparer {
 
 			if (remoteHashes.size() == firstDifferenceIndex) {
 				if (remoteHashes.size() < localHashes.size()) {
-					// The remote node lied
-					return ComparisonResult.Code.REMOTE_IS_EVIL;
+					// The remote node lied because all the hashes match, so the shorter remote chain
+					// can't have a higher score
+					return ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE;
 				}
 
 				// nothing to do, we have all of peers blocks
