@@ -184,6 +184,19 @@ public class WeightedBalances {
 		return this.balances.get(index).getUnvestedBalance();
 	}
 
+	public int size() {
+		return this.balances.size();
+	}
+
+	public void convertToFullyVested() {
+		if (this.balances.size() > 1) {
+			throw new IllegalArgumentException("invalid call to convertToFullyVested " + this.balances.size());
+		}
+		final WeightedBalance weightedBalance =  this.balances.get(0);
+		this.undoReceive(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
+		addFullyVested(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
+	}
+
 	private int findLast(final List<WeightedBalance> balances, int index) {
 		final BlockHeight current = balances.get(index).getBlockHeight();
 		while (index < balances.size() - 1) {

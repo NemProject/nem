@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -70,10 +71,20 @@ public class NisMain {
 			if (parentBlock != null) {
 				this.blockChain.updateScore(parentBlock, block);
 			}
-			parentBlock = block;
 			block.subscribe(observer);
 			block.execute();
 			block.unsubscribe(observer);
+			if (parentBlock == null) {
+				for (final Iterator<Account> accountIterator= this.accountAnalyzer.iterator(); accountIterator.hasNext(); ) {
+					final Account account = accountIterator.next();
+					if (account.equals(genesisAccount)) {
+						continue;
+					}
+
+					account.getWeightedBalances().convertToFullyVested();
+				}
+			}
+			parentBlock = block;
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {

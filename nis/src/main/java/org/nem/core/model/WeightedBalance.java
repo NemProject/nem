@@ -147,6 +147,15 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		return this.amount;
 	}
 
+	/**
+	 * Gets total balance
+	 *
+	 * @return The balance.
+	 */
+	public Amount getBalance() {
+		return balance;
+	}
+
 	@Override
 	public int compareTo(final WeightedBalance o) {
 		return this.blockHeight.compareTo(o.blockHeight);
