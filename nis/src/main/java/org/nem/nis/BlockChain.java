@@ -376,7 +376,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
-			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
+				final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
 					this.accountAnalyzer,
 					this.originalAnalyzer,
 					this.blockScorer,
@@ -420,7 +420,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final Block parentBlock;
 		private final List<Block> peerChain;
 		private final BlockChainScore ourScore;
-		private final BlockChainScore peerScore;
+		private BlockChainScore peerScore;
 		private final boolean hasOwnChain;
 
 		public BlockChainUpdateContext(
@@ -447,7 +447,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			this.peerChain = peerChain;
 			this.ourScore = ourScore;
-			this.peerScore = this.getPeerChainScore();
+			this.peerScore = null;
 			this.hasOwnChain = hasOwnChain;
 		}
 
@@ -456,6 +456,8 @@ public class BlockChain implements BlockSynchronizer {
 			if (!this.validatePeerChain()) {
 				return NodeInteractionResult.FAILURE;
 			}
+
+			this.peerScore = this.getPeerChainScore();
 
 			// warning: this changes number of foraged blocks
 			logScore(this.ourScore, this.peerScore);
