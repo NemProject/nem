@@ -97,9 +97,12 @@ public class NisMain {
 
 		this.populateDb();
 
-		final CompletableFuture analyzeBlocksFuture = CompletableFuture.runAsync(this::analyzeBlocks);
+		// TODO: this is a temporary hack to run analyzeBlocks before syncing starts ...
+		// TODO: really, loading the blocks from the db should be done in parallel with network discovery
+		this.analyzeBlocks();
+
 		final CompletableFuture networkHostBootFuture = this.networkHost.boot();
-		final CompletableFuture allFutures = CompletableFuture.allOf(analyzeBlocksFuture, networkHostBootFuture);
+		final CompletableFuture allFutures = CompletableFuture.allOf(networkHostBootFuture);
 		allFutures.join();
 	}
 
