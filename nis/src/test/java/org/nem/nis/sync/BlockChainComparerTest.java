@@ -13,11 +13,19 @@ public class BlockChainComparerTest {
 	//region chain score is compared
 
 	@Test
-	public void remoteReportedLowerChainScoreIfRemoteChainScoreIsLessThanLocalChainScore() {
+	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsLessThanLocalChainScore() {
 		// Assert:
 		Assert.assertThat(
 				compareDifferentChainScores(10, 9),
-				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE));
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
+	}
+
+	@Test
+	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsEqualToLocalChainScore() {
+		// Assert:
+		Assert.assertThat(
+				compareDifferentChainScores(10, 10),
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
 	}
 
 	@Test
