@@ -54,7 +54,7 @@ public class NisMain {
 			System.exit(-1);
 		}
 
-		Block parentBlock;
+		Block parentBlock=null;
 		final Account genesisAccount = this.accountAnalyzer.addAccountToCache(GenesisBlock.ADDRESS);
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
 		genesisAccount.getWeightedBalances().addFullyVested(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
@@ -67,12 +67,14 @@ public class NisMain {
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 
+			if (parentBlock != null) {
+				this.blockChain.updateScore(parentBlock, block);
+			}
 			parentBlock = block;
 			block.subscribe(observer);
 			block.execute();
 			block.unsubscribe(observer);
 
-			this.blockChain.updateScore(parentBlock, block);
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
