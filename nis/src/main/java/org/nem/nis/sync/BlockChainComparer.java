@@ -98,8 +98,8 @@ public class BlockChainComparer {
 		}
 
 		private int compareChainScores() {
-			return this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore()) < 0
-					? ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE
+			return this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore()) <= 0
+					? ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE
 					: ComparisonResult.Code.UNKNOWN;
 		}
 

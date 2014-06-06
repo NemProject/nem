@@ -297,13 +297,13 @@ public class BlockChain implements BlockSynchronizer {
 				ourScore,
 				hasOwnChain);
 
-		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) < 0) {
+		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) <= 0) {
 			// if we got here, the peer lied about his score, so penalize him
 			return NodeInteractionResult.FAILURE;
 		}
 
 		if (NodeInteractionResult.SUCCESS == updateResult.interactionResult) {
-			this.score = updateResult.peerScore;
+			this.score = this.score.subtract(updateResult.ourScore).add(updateResult.peerScore);
 		}
 
 		return updateResult.interactionResult;
