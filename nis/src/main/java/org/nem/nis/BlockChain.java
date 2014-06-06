@@ -358,7 +358,7 @@ public class BlockChain implements BlockSynchronizer {
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
 			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(this.accountAnalyzer));
+			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer)));
 			visitors.add(scoreVisitor);
 			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 			BlockIterator.unwindUntil(
