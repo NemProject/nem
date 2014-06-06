@@ -67,18 +67,27 @@ public class BlockScorer {
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		//
+		long forgerBalance = calculateForgerBalance(block);
+		return BigInteger.valueOf(timeStampDifference)
+				 .multiply(BigInteger.valueOf(forgerBalance))
+				 .multiply(TWO_TO_THE_POWER_OF_64)
+				 .divide(block.getDifficulty().asBigInteger());
+	}
+
+	/**
+	 * Calculates forger balance for block at given height
+	 *
+	 * @param block signed, "hitted" block
+	 * @return forger balance
+	 */
+	public long calculateForgerBalance(final Block block) {
 		final long backInTime = block.getHeight().getRaw() - 1;
 		final long grouped = (backInTime/BlockChainConstants.POI_GROUPING)*BlockChainConstants.POI_GROUPING;
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1, grouped));
 		this.accountAnalyzer.recalculateImportances(blockHeight);
 		// TODO: maybe it'd be better to use Genesis.AMOUNT.getNumNem()
 		final long multiplier = 1_000_000_000L * 10; // TODO: remove 10 before open alpha
-		long forgerBalance = (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
-		return BigInteger.valueOf(timeStampDifference)
-				 .multiply(BigInteger.valueOf(forgerBalance))
-				 .multiply(TWO_TO_THE_POWER_OF_64)
-				 .divide(block.getDifficulty().asBigInteger());
+		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 	}
 
 	/**

@@ -159,6 +159,7 @@ public class Foraging  {
 					LOGGER.info("difficulty: " + (difficulty.getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
 					if (hit.compareTo(target) < 0) {
+						LOGGER.info("[HIT] forger balance: " + blockScorer.calculateForgerBalance(newBlock));
 						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());
 						LOGGER.info("[HIT] timestamp diff: " + newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp()));
 						LOGGER.info("[HIT] block diff: " + newBlock.getDifficulty());
