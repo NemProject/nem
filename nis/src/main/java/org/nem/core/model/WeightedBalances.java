@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
+import java.util.*;
 import java.util.stream.Collectors;
+
+// TODO: needs more comprehensive tests around edge cases
 
 /**
  * Container for vested balances.
@@ -12,12 +11,6 @@ import java.util.stream.Collectors;
  * Methods of this class, assume, that they are called in paired order
  */
 public class WeightedBalances {
-	private static final Logger LOGGER = Logger.getLogger(WeightedBalances.class.getName());
-
-	/**
-	 * Limit of history of balances (just not to let the list grow infinitely)
-	 */
-	public final long MAX_HISTORY = 1 + BlockChainConstants.REWRITE_LIMIT;
 
 	private final List<WeightedBalance> balances;
 	// TODO: this should not be a public field
@@ -42,8 +35,7 @@ public class WeightedBalances {
 	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
-				balances.stream()
-						.map(WeightedBalance::copy).collect(Collectors.toList()),
+				balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()),
 				this.historicalBalances.copy());
 	}
 
@@ -55,9 +47,15 @@ public class WeightedBalances {
 		return parent.createSend(blockHeight, amount);
 	}
 
+	/**
+	 * Adds fully vested amount at height.
+	 *
+	 * @param height The height.
+	 * @param amount The amount.
+	 */
 	public void addFullyVested(final BlockHeight height, final Amount amount) {
 		this.historicalBalances.add(height, amount);
-		this.balances.add(WeightedBalance.ZERO.createVested(height, amount));
+		this.balances.add(WeightedBalance.createVested(height, amount));
 	}
 	/**
 	 * Adds receive operation of amount at height.

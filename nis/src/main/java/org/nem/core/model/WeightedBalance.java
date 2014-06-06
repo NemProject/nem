@@ -6,38 +6,38 @@ package org.nem.core.model;
 public class WeightedBalance implements Comparable<WeightedBalance> {
 	public static final long DECAY_NUMERATOR = 98;
 	public static final long DECAY_DENOMINATOR = 100;
-	public static final WeightedBalance ZERO =  new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
+	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
 
 	private final BlockHeight blockHeight;
 	private long unvestedBalance;
 	private long vestedBalance;
 	private Amount balance;
+
+	// TODO: do why do we need amount? we seem to only be using it as a id, which seems odd
+	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
 	private Amount amount;
 
+	//region createUnvested / createVested
+
 	/**
-	 * Creates a new weighted balance.
+	 * Creates a weighted balance that is fully unvested.
 	 *
-	 * @param blockHeight The block height.
-	 * @param amount The unvested balance.
+	 * @param height The block height.
+	 * @param amount The amount.
+	 * @return The new weighted balance.
 	 */
-
-	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
-		final Amount balance = this.balance.subtract(amount);
-		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
-		final long sendUv = (long)(ratio * amount.getNumMicroNem());
-		// TODO: this probably can hit negative, which probably won't do us anything good
-		final long unvested = this.unvestedBalance - sendUv;
-		final long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
-		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
+	public static WeightedBalance createUnvested(final BlockHeight height, final Amount amount) {
+		return new WeightedBalance(amount, height, amount, amount.getNumMicroNem(), 0);
 	}
 
-	public WeightedBalance createReceive(final BlockHeight blockHeight, final Amount amount) {
-		final Amount balance = this.balance.add(amount);
-		final long unvested = this.unvestedBalance + amount.getNumMicroNem();
-		return new WeightedBalance(amount, blockHeight, balance, unvested, this.vestedBalance);
-	}
-
-	public WeightedBalance createVested(final BlockHeight height, final Amount amount) {
+	/**
+	 * Creates a weighted balance that is fully vested.
+	 *
+	 * @param height The block height.
+	 * @param amount The amount.
+	 * @return The new weighted balance.
+	 */
+	public static WeightedBalance createVested(final BlockHeight height, final Amount amount) {
 		return new WeightedBalance(amount, height, amount, 0, amount.getNumMicroNem());
 	}
 
@@ -52,6 +52,33 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		this.unvestedBalance = unvestedBalance;
 		this.vestedBalance = vestedBalance;
 		this.balance = balance;
+	}
+
+	//endregion
+
+	/**
+	 * Creates a new weighted balance.
+	 *
+	 * @param blockHeight The block height.
+	 * @param amount The unvested balance.
+	 */
+
+	// TODO: rename to send
+	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
+		final Amount balance = this.balance.subtract(amount);
+		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
+		final long sendUv = (long)(ratio * amount.getNumMicroNem());
+		// TODO: this probably can hit negative, which probably won't do us anything good
+		final long unvested = this.unvestedBalance - sendUv;
+		final long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
+	}
+
+	// TODO: rename to receive
+	public WeightedBalance createReceive(final BlockHeight blockHeight, final Amount amount) {
+		final Amount balance = this.balance.add(amount);
+		final long unvested = this.unvestedBalance + amount.getNumMicroNem();
+		return new WeightedBalance(amount, blockHeight, balance, unvested, this.vestedBalance);
 	}
 
 	/**
@@ -72,16 +99,16 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		final long newUv = this.unvestedBalance * DECAY_NUMERATOR / DECAY_DENOMINATOR;
 		final long move = this.unvestedBalance - newUv;
 
-		final long h = this.blockHeight.getRaw();
-		final BlockHeight height = new BlockHeight(1 + ((h + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1)/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)* BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY);
+		final long blocksPerDay = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long originalHeight = this.blockHeight.getRaw();
+		final BlockHeight height = new BlockHeight(1 + ((originalHeight + blocksPerDay - 1)/blocksPerDay)* blocksPerDay);
 
 		return new WeightedBalance(
 				Amount.ZERO,
 				height,
 				this.balance,
 				this.unvestedBalance - move,
-				this.vestedBalance + move
-		);
+				this.vestedBalance + move);
 	}
 
 	/**
@@ -99,10 +126,6 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The vested balance.
 	 */
 	public Amount getVestedBalance() {
-		if (this.balance.equals(Amount.ZERO) || (this.vestedBalance + this.unvestedBalance) == 0) {
-			return Amount.ZERO;
-		}
-
 		return Amount.fromMicroNem(this.vestedBalance);
 	}
 
@@ -115,12 +138,17 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		return this.balance.subtract(getVestedBalance());
 	}
 
+	/**
+	 * Gets the total amount.
+	 *
+	 * @return The total amount.
+	 */
+	public Amount getAmount() {
+		return this.amount;
+	}
+
 	@Override
 	public int compareTo(final WeightedBalance o) {
 		return this.blockHeight.compareTo(o.blockHeight);
-	}
-
-	public Amount getAmount() {
-		return amount;
 	}
 }

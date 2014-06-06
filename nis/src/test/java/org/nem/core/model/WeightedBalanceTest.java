@@ -5,71 +5,95 @@ import org.junit.*;
 
 public class WeightedBalanceTest {
 
-	private static final int ESTIMATED_BLOCKS_PER_DAY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	//region createUnvested / createVested
 
-	//region ctor
 	@Test
-	public void vestedBalanceCanBeConstructed() {
+	public void fullyUnvestedBalanceCanBeCreated() {
 		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(new BlockHeight(120), Amount.fromNem(1_000_000));
+		final WeightedBalance weightedBalance = WeightedBalance.createUnvested(new BlockHeight(120), Amount.fromNem(1_000_000));
 
 		// Assert
 		assertWeightedBalance(weightedBalance, 120, Amount.ZERO, Amount.fromNem(1_000_000));
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
-	//endregion ctor
-
-	//region add/sub
 
 	@Test
-	public void canReceiveToVestedBalance() {
+	public void fullyVestedBalanceCanBeCreated() {
 		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		final WeightedBalance weightedBalance = WeightedBalance.createVested(new BlockHeight(120), Amount.fromNem(1_000_000));
+
+		// Assert
+		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.ZERO);
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+	}
+
+	//endregion ctor
+
+	//region receive
+
+	@Test
+	public void canReceiveIfBalanceIsFullyUnvested() {
+		// Arrange:
+		final WeightedBalance original = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromNem(1_000_000));
 
 		// Act:
-		final WeightedBalance result = weightedBalance.createReceive(BlockHeight.ONE, Amount.fromNem(100_000));
+		final WeightedBalance result = original.createReceive(BlockHeight.ONE, Amount.fromNem(100_000));
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(1_100_000));
 	}
 
 	@Test
-	public void canReceiveToVestedBalanceIfPartiallyVested() {
+	public void canReceiveIfBalanceIsPartiallyVested() {
 		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromNem(1_000_000));
-		final WeightedBalance result1 = advanceDays(weightedBalance, 10);
-		final WeightedBalance result2 = result1.createSend(result1.getBlockHeight(), Amount.fromNem(100_000));
+		final WeightedBalance original = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		final WeightedBalance balance2 = advanceDays(original, 10); // UV[2] ~ 1M *(.98^10)
 
-		// Act
-		final WeightedBalance result3 = result2.createReceive(result2.getBlockHeight(), Amount.fromNem(100_000));
+		// Act:
+		final WeightedBalance balance3 = balance2.createSend(balance2.getBlockHeight(), Amount.fromNem(100_000)); // UV[3] ~ UV[2] * .9
+		final WeightedBalance result = balance3.createReceive(balance3.getBlockHeight(), Amount.fromNem(100_000)); // UV[4] ~ UV[3] + 100000
 
-		// Assert
-		Assert.assertThat(result3.getVestedBalance().getNumMicroNem(), IsEqual.equalTo(164_634_473_802L));
-		Assert.assertThat(result3.getUnvestedBalance().getNumMicroNem(), IsEqual.equalTo(835_365_526_198L));
+		// Assert:
+		assertWeightedBalance(result, 14401, Amount.fromMicroNem(164_634_473_802L), Amount.fromMicroNem(835_365_526_198L));
 	}
 
-//	 WTH?
-//	@Test
-//	public void canUndoReceiveToVestedBalanceIfPartiallyVested() {
-//		// Arrange:
-//		WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromNem(1_000_000));
-//		weightedBalance = advanceDays(weightedBalance, 10);
-//		weightedBalance.send(Amount.fromNem(100_000));
-//
-//		// Act (at this point gcd(balance, vested+unvested) != balance):
-//		weightedBalance.undoReceive(Amount.fromNem(100_000));
-//
-//		// Assert (ratio vested/unvested should be 2.7416293421830850665769733133716):
-//		Assert.assertThat(weightedBalance.getVestedBalance().getNumMicroNem(), IsEqual.equalTo(586_189_403_910L));
-//		Assert.assertThat(weightedBalance.getUnvestedBalance().getNumMicroNem(), IsEqual.equalTo(213_810_596_090L));
-//	}
+	@Test
+	public void canReceiveIfBalanceIsFullyVested() {
+		// Arrange:
+		final WeightedBalance original = WeightedBalance.createVested(BlockHeight.ONE, Amount.fromNem(1_000_000));
+
+		// Act:
+		final WeightedBalance result = original.createReceive(BlockHeight.ONE, Amount.fromNem(100_000));
+
+		// Assert:
+		assertWeightedBalance(result, 1, Amount.fromNem(1_000_000), Amount.fromNem(100_000));
+	}
+
+	@Test
+	public void multipleAmountsCanBeReceivedOverTime() {
+		// Arrange:
+		final WeightedBalance balance = WeightedBalance.createUnvested(new BlockHeight(1440), Amount.fromNem(123));
+
+		// Act / Assert:
+		final WeightedBalance result1 = balance.next(); // UV = 123 * .98
+		assertWeightedBalance(result1, 1441, Amount.fromMicroNem(2_460_000L), Amount.fromMicroNem(120_540_000L));
+
+		final WeightedBalance result2 = result1.next(); // UV = 123 * .98^2
+		assertWeightedBalance(result2, 2881, Amount.fromMicroNem(4_870_800L), Amount.fromMicroNem(118_129_200L));
+
+		// Assert: receive does not change vested balance
+		final WeightedBalance result3 = result2.createReceive(result2.getBlockHeight(), Amount.fromNem(345)); // UV = 123 * .98^2 + 345
+		assertWeightedBalance(result3, 2881, Amount.fromMicroNem(4_870_800L), Amount.fromMicroNem(463_129_200));
+	}
 
 	//endregion
 
-	//region next/prev
+	//region next
+
 	@Test
-	public void vestedBalanceCanBeIterated() {
+	public void balanceCanBeAdvancedOneDay() {
 		// Arrange:
-		final WeightedBalance initialBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromMicroNem(1000));
+		final WeightedBalance initialBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(1000));
 
 		// Act
 		final WeightedBalance weightedBalance = initialBalance.next();
@@ -83,9 +107,25 @@ public class WeightedBalanceTest {
 	}
 
 	@Test
-	public void vestedBalanceAfter50Days() {
+	public void balanceIsAdvancedToDayBoundary() { // TODO: is this a bug?
 		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromMicroNem(1000));
+		final WeightedBalance initialBalance = WeightedBalance.createUnvested(new BlockHeight(770), Amount.fromMicroNem(1000));
+
+		// Act
+		final WeightedBalance weightedBalance = initialBalance.next();
+
+		// Assert:
+		assertWeightedBalance(
+				weightedBalance,
+				1441,
+				Amount.fromMicroNem(20),
+				Amount.fromMicroNem(980));
+	}
+
+	@Test
+	public void balanceCanBeAdvancedFiftyDays() {
+		// Arrange:
+		final WeightedBalance weightedBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(1000));
 
 		// Act
 		final WeightedBalance result = advanceDays(weightedBalance, 50);
@@ -95,33 +135,92 @@ public class WeightedBalanceTest {
 				result,
 				50*1440+1,
 				Amount.fromMicroNem(652),
-				Amount.fromMicroNem(348));
+				Amount.fromMicroNem(348)); // ~ 1000 * .98 ^ 50
 	}
 
 	@Test
-	public void amountsAreNotLostDuringIterationOfTinyAmounts() {
+	public void amountsAreNotLostDuringAdvancementOfTinyAmounts() {
 		// Arrange:
-		final WeightedBalance balance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromMicroNem(75));
-
-		WeightedBalance result = balance;
+		WeightedBalance balance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(75));
 		for (int i = 1; i < 75; ++i) {
 			// Act
-			result = result.next();
+			balance = balance.next();
 
 			// Assert:
-			Assert.assertThat(result.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440*i + 1)));
-			final Amount sum = result.getVestedBalance().add(result.getUnvestedBalance());
+			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440*i + 1)));
+			final Amount sum = balance.getVestedBalance().add(balance.getUnvestedBalance());
 			Assert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
 		}
 	}
+
 	//endregion
 
-	//region send/undoSend
+	//region send
+
+	@Test
+	public void canSendIfBalanceIsFullyUnvested() {
+		// Arrange:
+		final WeightedBalance original = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromNem(1_000_000));
+
+		// Act:
+		final WeightedBalance result = original.createSend(BlockHeight.ONE, Amount.fromNem(100_000));
+
+		// Assert:
+		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(900_000));
+	}
+
+	@Test
+	public void canSendIfBalanceIsPartiallyVested() {
+		// Arrange:
+		final WeightedBalance original = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		final WeightedBalance balance2 = advanceDays(original, 10); // UV[2] ~ 1M *(.98^10)
+
+		// Act:
+		final WeightedBalance result = balance2.createSend(balance2.getBlockHeight(), Amount.fromNem(100_000)); // UV[3] ~ UV[2] * .9
+
+		// Assert:
+		assertWeightedBalance(result, 14401, Amount.fromMicroNem(164_634_473_802L), Amount.fromMicroNem(735_365_526_198L));
+	}
+
+	@Test
+	public void canSendIfBalanceIsFullyVested() {
+		// Arrange:
+		final WeightedBalance original = WeightedBalance.createVested(BlockHeight.ONE, Amount.fromNem(1_000_000));
+
+		// Act:
+		final WeightedBalance result = original.createSend(BlockHeight.ONE, Amount.fromNem(100_000));
+
+		// Assert:
+		assertWeightedBalance(result, 1, Amount.fromNem(900_000), Amount.ZERO);
+	}
+
+	@Test
+	public void canSendIfAmountIsEqualToBalance() {
+		// Arrange:
+		WeightedBalance original = WeightedBalance.createVested(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		original = advanceDays(original, 7);
+
+		// Act:
+		final WeightedBalance result = original.createSend(BlockHeight.ONE, Amount.fromNem(1_000_000));
+
+		// Assert:
+		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void cannotSendIfAmountIsLargerThanBalance() {
+		// Arrange:
+		WeightedBalance original = WeightedBalance.createVested(BlockHeight.ONE, Amount.fromNem(1_000_000));
+		original = advanceDays(original, 7);
+
+		// Act:
+		original.createSend(BlockHeight.ONE, Amount.fromNem(1_000_001));
+	}
 
 	@Test
 	public void sendingKeepsRatio() {
 		// Arrange:
-		final WeightedBalance weightedBalance = prepareVestedForSending(10_000);
+		final WeightedBalance weightedBalance = WeightedBalance.createVested(BlockHeight.ONE, Amount.fromNem(10_000));
 
 		// Act:
 		final Amount vested1 = weightedBalance.getVestedBalance();
@@ -144,21 +243,15 @@ public class WeightedBalanceTest {
 		return vestedBalance / (0d + vestedBalance + unvestedBalance);
 	}
 
-	private static WeightedBalance prepareVestedForSending(long amount) {
-		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.ZERO.createReceive(BlockHeight.ONE, Amount.fromMicroNem(amount));
-
-		// Act:
-		return advanceDays(weightedBalance, 30);
-	}
 	//endregion
 
+	//region compare / copy
+
 	@Test
-	public void vestedBalanceCanBeCompared() {
+	public void balanceCanBeCompared() {
 		// Arrange:
-		final WeightedBalance weightedBalance1 = WeightedBalance.ZERO.
-				createReceive(new BlockHeight(10), Amount.fromMicroNem(1000));
-		final WeightedBalance weightedBalance2 = WeightedBalance.ZERO.createReceive(new BlockHeight(20), Amount.fromMicroNem(1000));
+		final WeightedBalance weightedBalance1 = WeightedBalance.createUnvested(new BlockHeight(10), Amount.fromMicroNem(1000));
+		final WeightedBalance weightedBalance2 = WeightedBalance.createUnvested(new BlockHeight(20), Amount.fromMicroNem(1000));
 
 		// Assert:
 		Assert.assertThat(weightedBalance1.compareTo(weightedBalance1), IsEqual.equalTo(0));
@@ -167,21 +260,23 @@ public class WeightedBalanceTest {
 	}
 
 	@Test
-	public void multipleReceiveTest() {
+	public void balanceCanBeCopied() {
 		// Arrange:
-		final WeightedBalance balance = WeightedBalance.ZERO.createReceive(new BlockHeight(1440), Amount.fromNem(123));
+		final WeightedBalance originalBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(1000)).next();
 
-		// Act / Assert:
-		final WeightedBalance result1 = balance.next();
-		assertWeightedBalance(result1, 1441, Amount.fromMicroNem(2_460_000L), Amount.fromMicroNem(120_540_000L));
+		// Act
+		final WeightedBalance copyBalance = originalBalance.copy();
 
-		final WeightedBalance result2 = result1.next();
-		assertWeightedBalance(result2, 2881, Amount.fromMicroNem(4_870_800L), Amount.fromMicroNem(118_129_200L));
-
-		// Assert: receive does not change vested balance
-		final WeightedBalance result3 = result2.createReceive(result2.getBlockHeight(), Amount.fromNem(345));
-		assertWeightedBalance(result3, 2881, Amount.fromMicroNem(4_870_800L), Amount.fromMicroNem(463_129_200));
+		// Assert:
+		assertWeightedBalance(
+				copyBalance,
+				1441,
+				Amount.fromMicroNem(20),
+				Amount.fromMicroNem(980));
+		Assert.assertThat(copyBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
+
+	//endregion
 
 	private static WeightedBalance advanceDays(final WeightedBalance weightedBalance, int numDays) {
 		WeightedBalance result = weightedBalance;
