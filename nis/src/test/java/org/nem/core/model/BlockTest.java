@@ -363,10 +363,11 @@ public class BlockTest {
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
 		// Act:
+		context.block.execute();
 		context.block.undo();
 
 		// Assert:
-		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 	}
 
 	@Test
@@ -375,10 +376,11 @@ public class BlockTest {
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
 		// Act:
+		context.block.execute();
 		context.block.undo();
 
 		// Assert:
-		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(72)));
+		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(100)));
 	}
 
 	@Test
@@ -387,6 +389,7 @@ public class BlockTest {
 		final UndoExecuteTestContext context = new UndoExecuteTestContext();
 
 		// Act:
+		context.block.execute();
 		context.block.undo();
 
 		// Assert:
@@ -563,9 +566,10 @@ public class BlockTest {
 
 		final BlockHeight height = new BlockHeight(11);
 		final Block block = createBlockWithTransaction(height, Amount.fromNem(7), transaction);
-		registerObservers.accept(block);
+		block.execute();
 
 		// Act:
+		registerObservers.accept(block);
 		block.undo();
 
 		// Assert:
@@ -651,6 +655,7 @@ public class BlockTest {
 		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
 
 		// Act:
+		block.execute();
 		block.undo();
 
 		// Assert:
@@ -685,6 +690,7 @@ public class BlockTest {
 		final Block block = createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
 
 		// Act:
+		block.execute();
 		block.undo();
 
 		// Assert:
