@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -54,9 +55,10 @@ public class NisMain {
 			System.exit(-1);
 		}
 
+		Block parentBlock=null;
 		final Account genesisAccount = this.accountAnalyzer.addAccountToCache(GenesisBlock.ADDRESS);
 		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
-		genesisAccount.getWeightedBalances().addReceive(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
+		genesisAccount.getWeightedBalances().addFullyVested(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
 		genesisAccount.setHeight(BlockHeight.ONE);
 
 		// This is tricky:
@@ -65,9 +67,24 @@ public class NisMain {
 		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
+
+			if (parentBlock != null) {
+				this.blockChain.updateScore(parentBlock, block);
+			}
 			block.subscribe(observer);
 			block.execute();
 			block.unsubscribe(observer);
+			if (parentBlock == null) {
+				for (final Iterator<Account> accountIterator= this.accountAnalyzer.iterator(); accountIterator.hasNext(); ) {
+					final Account account = accountIterator.next();
+					if (account.equals(genesisAccount)) {
+						continue;
+					}
+
+					account.getWeightedBalances().convertToFullyVested();
+				}
+			}
+			parentBlock = block;
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
@@ -93,9 +110,12 @@ public class NisMain {
 
 		this.populateDb();
 
-		final CompletableFuture analyzeBlocksFuture = CompletableFuture.runAsync(this::analyzeBlocks);
+		// TODO: this is a temporary hack to run analyzeBlocks before syncing starts ...
+		// TODO: really, loading the blocks from the db should be done in parallel with network discovery
+		this.analyzeBlocks();
+
 		final CompletableFuture networkHostBootFuture = this.networkHost.boot();
-		final CompletableFuture allFutures = CompletableFuture.allOf(analyzeBlocksFuture, networkHostBootFuture);
+		final CompletableFuture allFutures = CompletableFuture.allOf(networkHostBootFuture);
 		allFutures.join();
 	}
 

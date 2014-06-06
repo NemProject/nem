@@ -14,6 +14,7 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	private final ReadOnlyBlockDao blockDao;
 	private final AccountLookup accountLookup;
 	private final Block lastBlock;
+	private final BlockChainScore chainScore;
 	private final int maxHashesToReturn;
 
 	/**
@@ -22,22 +23,30 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	 * @param blockDao The block database.
 	 * @param accountLookup The account lookup to use.
 	 * @param lastBlock The last block.
+	 * @param chainScore The chain score.
 	 * @param maxHashesToReturn The maximum number of hashes to return.
 	 */
 	public LocalBlockLookupAdapter(
 			final ReadOnlyBlockDao blockDao,
 			final AccountLookup accountLookup,
 			final org.nem.nis.dbmodel.Block lastBlock,
+			final BlockChainScore chainScore,
 			final int maxHashesToReturn) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
 		this.lastBlock = BlockMapper.toModel(lastBlock, this.accountLookup);
+		this.chainScore = chainScore;
 		this.maxHashesToReturn = maxHashesToReturn;
 	}
 
 	@Override
 	public Block getLastBlock() {
 		return this.lastBlock;
+	}
+
+	@Override
+	public BlockChainScore getChainScore() {
+		return this.chainScore;
 	}
 
 	@Override

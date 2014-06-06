@@ -31,6 +31,11 @@ public enum NodeApiId {
 	 */
 	REST_CHAIN_LAST_BLOCK,
 
+	/**
+	 * The chain/score API.
+	 */
+	REST_CHAIN_SCORE,
+
 	//endregion
 
 	//region node/*

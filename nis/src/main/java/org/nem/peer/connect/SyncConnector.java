@@ -47,4 +47,13 @@ public interface SyncConnector {
 	 * @return All blocks in the chain after the specified height.
 	 */
 	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height);
+
+	/**
+	 * Requests information about the cumulative score of the remote chain
+	 * from the specified node.
+	 *
+	 * @param endpoint The remote endpoint.
+	 * @return The cumulative score for the endpoint's chain.
+	 */
+	public BlockChainScore getChainScore(final NodeEndpoint endpoint);
 }

@@ -1,6 +1,8 @@
 package org.nem.core.async;
 
 import java.io.Closeable;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -125,6 +127,9 @@ public class AsyncTimer implements Closeable {
 		return this.recurringFutureSupplier.get()
 				.exceptionally(e -> {
 					LOGGER.warning(String.format("Timer %s raised exception: %s", this.getName(), e.getMessage()));
+					StringWriter sw = new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					LOGGER.warning("STACKTRACE FOLLOWS: " + sw.toString());
 					return null;
 				})
 				.thenCompose(v -> {

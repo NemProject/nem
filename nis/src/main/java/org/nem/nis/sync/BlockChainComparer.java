@@ -63,7 +63,14 @@ public class BlockChainComparer {
 		}
 
 		public ComparisonResult compare() {
-			int code = this.compareLastBlock();
+			// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
+			//     which changes the peer chain's score. He will get punished because the promised score is not
+			//     equal to the actual peer chain score.
+			int code = this.compareChainScores();
+
+			if (ComparisonResult.Code.UNKNOWN == code)
+				code = this.compareLastBlock();
+
 			if (ComparisonResult.Code.UNKNOWN == code)
 				code = this.compareHashes();
 
@@ -90,6 +97,12 @@ public class BlockChainComparer {
 			return heightDifference > this.context.getMaxNumBlocksToRewrite();
 		}
 
+		private int compareChainScores() {
+			return this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore()) <= 0
+					? ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE
+					: ComparisonResult.Code.UNKNOWN;
+		}
+
 		private int compareHashes() {
 			final BlockHeight startingBlockHeight = new BlockHeight(Math.max(
 					1,
@@ -110,6 +123,11 @@ public class BlockChainComparer {
 			}
 
 			if (remoteHashes.size() == firstDifferenceIndex) {
+				if (remoteHashes.size() < localHashes.size()) {
+					// The remote node lied
+					return ComparisonResult.Code.REMOTE_IS_EVIL;
+				}
+
 				// nothing to do, we have all of peers blocks
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 			}

@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
 import java.util.function.BiPredicate;
 
 /**
@@ -139,7 +140,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The observer to use.
 	 */
 	public final void undo(final TransferObserver observer) {
-		this.transfer(new ReverseTransferObserver(observer));
+		final ReverseTransferObserver reverseObserver = new ReverseTransferObserver(observer);
+		this.transfer(reverseObserver);
+		reverseObserver.commit();
 	}
 
 	/**
@@ -200,6 +203,47 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	private static class ReverseTransferObserver implements TransferObserver {
 
 		private final TransferObserver observer;
+		private final List<PendingTransfer> pendingTransfers = new ArrayList<>();
+
+		private enum PendingTransferType {
+			TRANSFER,
+			CREDIT,
+			DEBIT
+		}
+
+		private static class PendingTransfer {
+			private final PendingTransferType type;
+			private final Account sender;
+			private final Account recipient;
+			private final Amount amount;
+
+			public PendingTransfer(
+					final PendingTransferType type,
+					final Account sender,
+					final Account recipient,
+					final Amount amount) {
+				this.type = type;
+				this.sender = sender;
+				this.recipient = recipient;
+				this.amount = amount;
+			}
+
+			public void commit(final TransferObserver observer) {
+				switch (this.type) {
+					case TRANSFER:
+						observer.notifyTransfer(this.sender, this.recipient, this.amount);
+						break;
+
+					case CREDIT:
+						observer.notifyCredit(this.sender, this.amount);
+						break;
+
+					case DEBIT:
+						observer.notifyDebit(this.sender, this.amount);
+						break;
+				}
+			}
+		}
 
 		public ReverseTransferObserver(final TransferObserver observer) {
 			this.observer = observer;
@@ -207,17 +251,23 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.observer.notifyTransfer(recipient, sender, amount);
+			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.TRANSFER, recipient, sender, amount));
 		}
 
 		@Override
 		public void notifyCredit(final Account account, final Amount amount) {
-			this.observer.notifyDebit(account, amount);
+			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.DEBIT, account, null, amount));
 		}
 
 		@Override
 		public void notifyDebit(final Account account, final Amount amount) {
-			this.observer.notifyCredit(account, amount);
+			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.CREDIT, account, null, amount));
+		}
+
+		public void commit() {
+			// apply the transfers in reverse order because order might be important for some observers
+			for (int i = this.pendingTransfers.size() - 1; i >= 0; --i)
+				this.pendingTransfers.get(i).commit(this.observer);
 		}
 	}
 

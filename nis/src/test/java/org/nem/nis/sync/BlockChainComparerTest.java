@@ -10,6 +10,49 @@ import org.nem.nis.test.MockBlockLookup;
 
 public class BlockChainComparerTest {
 
+	//region chain score is compared
+
+	@Test
+	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsLessThanLocalChainScore() {
+		// Assert:
+		Assert.assertThat(
+				compareDifferentChainScores(10, 9),
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
+	}
+
+	@Test
+	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsEqualToLocalChainScore() {
+		// Assert:
+		Assert.assertThat(
+				compareDifferentChainScores(10, 10),
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
+	}
+
+	@Test
+	public void chainScoreCheckPassesIfChainScoresAreTheSame() {
+		// Assert:
+		Assert.assertThat(compareDifferentChainScores(10, 10), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+	}
+
+	@Test
+	public void chainScoreCheckPassesIfRemoteChainScoreIsGreaterThanLocalChainScore() {
+		// Assert:
+		Assert.assertThat(compareDifferentChainScores(10, 11), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+	}
+
+	private static int compareDifferentChainScores(final int localChainScore, final int remoteChainScore) {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final BlockChainComparer comparer = createBlockChainComparer();
+
+		// Act:
+		return comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(account, 7), new BlockChainScore(localChainScore)),
+				new MockBlockLookup(null, new BlockChainScore(remoteChainScore))).getCode();
+	}
+
+	//endregion
+
 	//region last block comparison
 
 	@Test(expected = IllegalArgumentException.class)

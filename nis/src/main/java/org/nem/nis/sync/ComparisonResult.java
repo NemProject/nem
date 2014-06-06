@@ -44,6 +44,11 @@ public class ComparisonResult {
 		public static final int REMOTE_IS_NOT_SYNCED = 4;
 
 		/**
+		 * The remote node is reported a lower chain score than the local node.
+		 */
+		public static final int REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE = 5;
+
+		/**
 		 * The remote node has returned a non-verifiable block.
 		 */
 		public static final int REMOTE_HAS_NON_VERIFIABLE_BLOCK = REMOTE_IS_EVIL | 1;

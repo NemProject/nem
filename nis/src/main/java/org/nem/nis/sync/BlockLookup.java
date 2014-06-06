@@ -16,6 +16,13 @@ public interface BlockLookup {
 	public Block getLastBlock();
 
 	/**
+	 * Requests the complete chain score.
+	 *
+	 * @return The complete chain score.
+	 */
+	public BlockChainScore getChainScore();
+
+	/**
 	 * Requests information about the block at the specified height.
 	 *
 	 * @param height The block height.

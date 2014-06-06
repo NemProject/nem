@@ -216,6 +216,11 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
+	public BlockChainScore getChainScore(final NodeEndpoint endpoint) {
+		return null;
+	}
+	
+	@Override
 	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
 		this.numGetInfoCalls.incrementAndGet();
 
