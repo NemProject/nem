@@ -16,7 +16,7 @@ public class WeakNodeIdentity extends NodeIdentity {
 	 * @param name The name.
 	 */
 	public WeakNodeIdentity(final String name) {
-		super(new KeyPair());
+		super(new KeyPair(), name);
 		this.name = name;
 	}
 

@@ -94,7 +94,7 @@ public class PeerNetwork {
 		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
 		config.getPreTrustedNodes().getNodes().stream()
 				.map(node ->
-						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint(), configLocalNode.getEndpoint())
+						services.getPeerConnector().getLocalNodeInfo(node, configLocalNode.getEndpoint())
 								.exceptionally(e -> null)
 								.thenAccept(endpoint -> {
 									if (null == endpoint && 0 != numOutstandingRequests.decrementAndGet())
@@ -122,10 +122,9 @@ public class PeerNetwork {
 			return configLocalNode;
 
 		return new Node(
+				configLocalNode.getIdentity(),
 				reportedEndpoint,
-				configLocalNode.getPlatform(),
-				configLocalNode.getApplication(),
-				configLocalNode.getVersion());
+				configLocalNode.getMetaData());
 	}
 
 	/**
@@ -210,7 +209,7 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
-				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
+				.map(node -> this.peerConnector.announce(node, broadcastId, entity))
 				.collect(Collectors.toList());
 
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
@@ -307,7 +306,7 @@ public class PeerNetwork {
 				return CompletableFuture.completedFuture(null);
 			}
 
-			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
+			CompletableFuture<NodeStatus> future = this.connector.getInfo(node)
 					.thenApply(n -> {
 						// if the node returned inconsistent information, drop it for this round
 						if (!areCompatible(node, n))
@@ -318,7 +317,7 @@ public class PeerNetwork {
 
 			if (isDirectContact) {
 				future = future
-						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
+						.thenCompose(v -> this.connector.getKnownPeers(node))
 						.thenCompose(nodes -> {
 							final List<CompletableFuture> futures = nodes.asCollection().stream()
 									.map(n -> this.getNodeInfo(n, false))

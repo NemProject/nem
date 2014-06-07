@@ -62,14 +62,19 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		FATAL,
 
 		/*
+		 * Returns a node with a different identity.
+		 */
+		CHANGE_IDENTITY,
+
+		/*
 		 * Returns a node with a different address.
 		 */
 		CHANGE_ADDRESS,
 
 		/*
-		 * Returns a node with a different identity.
+		 * Returns a node with different meta data.
 		 */
-		CHANGE_IDENTITY,
+		CHANGE_METADATA,
 
 		/**
 		 * Sleeps the thread for a small period of time and then throws an InactivePeerException.
@@ -230,25 +235,29 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		this.numGetInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
-			final NodeEndpoint endpoint = node.getEndpoint();
-			NodeEndpoint endpointAfterChange = endpoint;
-			NodeIdentity identityAfterChange = node.getIdentity();
+			NodeEndpoint endpoint = node.getEndpoint();
+			NodeIdentity identity = node.getIdentity();
+			NodeMetaData metaData = node.getMetaData();
 			final TriggerAction action = this.getInfoTriggers.get(endpoint.getBaseUrl().getHost());
 			if (null != action) {
 				triggerGeneralAction(action);
 				switch (action) {
 					case CHANGE_IDENTITY:
-						identityAfterChange = new NodeIdentity(new KeyPair());
+						identity = new NodeIdentity(new KeyPair());
 						break;
 
 					case CHANGE_ADDRESS:
 						final URL url = endpoint.getBaseUrl();
-						endpointAfterChange = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() + 1);
+						endpoint = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() * 100);
+						break;
+
+					case CHANGE_METADATA:
+						metaData = new NodeMetaData("c-plat", "c-app", "c-ver");
 						break;
 				}
 			}
 
-			return new Node(identityAfterChange, endpointAfterChange);
+			return new Node(identity, endpoint, metaData);
 		});
 	}
 

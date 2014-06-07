@@ -9,9 +9,8 @@ import org.nem.core.test.*;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.node.*;
-import org.nem.peer.test.Utils;
 import org.nem.peer.test.*;
-import org.nem.peer.trust.TrustProvider;
+import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
 
-	private static final String DEFAULT_LOCAL_NODE_HOST = ConfigFactory.DEFAULT_LOCAL_NODE_HOST;
+	private static final String DEFAULT_LOCAL_NODE_HOST = "10.0.0.8";
 
 	//region constructor
 
@@ -53,9 +52,10 @@ public class PeerNetworkTest {
 		// Assert:
 		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(3));
 		for (final Node node : nodes.getInactiveNodes()) {
-			Assert.assertThat(node.getVersion(), IsNull.nullValue());
-			Assert.assertThat(node.getPlatform(), IsNull.nullValue());
-			Assert.assertThat(node.getApplication(), IsNull.nullValue());
+			final NodeMetaData metaData = node.getMetaData();
+			Assert.assertThat(metaData.getPlatform(), IsNull.nullValue());
+			Assert.assertThat(metaData.getApplication(), IsNull.nullValue());
+			Assert.assertThat(metaData.getApplication(), IsNull.nullValue());
 		}
 	}
 
@@ -85,7 +85,7 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		updateAllNodes(network, NodeStatus.INACTIVE);
-		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.INACTIVE);
+		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.INACTIVE);
 
 		// Act:
 		network.refresh().join();
@@ -100,7 +100,7 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
 		updateAllNodes(network, NodeStatus.ACTIVE);
-		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.ACTIVE);
+		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
 
 		// Act:
 		network.refresh().join();
@@ -114,7 +114,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		network.getNodes().update(Node.fromHost("10.0.0.25"), NodeStatus.FAILURE);
+		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.FAILURE);
 
 		// Act:
 		network.refresh().join();
@@ -189,7 +189,22 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void refreshNodeChangeAddressRemovesNodesFromBothLists() {
+	public void refreshGetInfoChangeIdentityRemovesNodesFromBothLists() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_IDENTITY);
+
+		// Act:
+		network.refresh().join();
+		final NodeCollection nodes = network.getNodes();
+
+		// Assert:
+		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { });
+	}
+
+	@Test
+	public void refreshGetInfoChangeAddressUpdatesNodeEndpoint() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
@@ -200,7 +215,28 @@ public class PeerNetworkTest {
 		final NodeCollection nodes = network.getNodes();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { });
+		NodeCollectionAssert.areHostsEquivalent(
+				nodes,
+				new String[] { "10.0.0.1", "10.0.0.200", "10.0.0.3" },
+				new String[] { });
+	}
+
+	@Test
+	public void refreshGetInfoChangeMetaDataUpdatesNodeMetaData() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_METADATA);
+
+		// Act:
+		network.refresh().join();
+		final Node node = network.getNodes().findNodeByIdentity(new WeakNodeIdentity("10.0.0.2"));
+		final NodeMetaData metaData = node.getMetaData();
+
+		// Assert:
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("c-app"));
+		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("c-plat"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("c-ver"));
 	}
 
 	//endregion
@@ -212,6 +248,20 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+
+		// Act:
+		network.refresh().join();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void refreshCallsGetKnownPeersForChangeAddressNodes() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
 		network.refresh().join();
@@ -249,11 +299,11 @@ public class PeerNetworkTest {
 	}
 
 	@Test
-	public void refreshDoesNotCallGetKnownPeersForChangeAddressNodes() {
+	public void refreshDoesNotCallGetKnownPeersForChangeIdentityNodes() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
+		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_IDENTITY);
 
 		// Act:
 		network.refresh().join();
@@ -305,10 +355,10 @@ public class PeerNetworkTest {
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
 		// but the local node can only communicate with 10.0.0.5
 		final List<Node> knownPeers = Arrays.asList(
-				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.2", 12)),
-                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.4", 12)),
-                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.5", 12)),
-                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
+				PeerUtils.createNodeWithHost("10.0.0.2"),
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.5"),
+				PeerUtils.createNodeWithHost("10.0.0.6"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -334,10 +384,10 @@ public class PeerNetworkTest {
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-6 are active
 		// but the local node can only communicate with 10.0.0.5
 		final List<Node> knownPeers = Arrays.asList(
-				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.2", 12)),
-				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.4", 12)),
-				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.5", 12)),
-				Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
+				PeerUtils.createNodeWithHost("10.0.0.2"),
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.5"),
+				PeerUtils.createNodeWithHost("10.0.0.6"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -355,8 +405,8 @@ public class PeerNetworkTest {
 		final PeerNetwork network = createTestNetwork(connector);
 
 		final List<Node> knownPeers = Arrays.asList(
-                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.15", 12)),
-                Node.fromEndpoint(new NodeEndpoint("ftp", "10.0.0.6", 12)));
+				PeerUtils.createNodeWithHost("10.0.0.15"),
+				PeerUtils.createNodeWithHost("10.0.0.6"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -567,7 +617,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.FATAL);
 
 		final PeerNetwork network =  new PeerNetwork(
-				ConfigFactory.createDefaultTestConfig(),
+				createTestConfig(),
 				new PeerNetworkServices(
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
@@ -648,7 +698,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 		final PeerNetwork network = createTestNetwork(nodeExperiences);
-		final Node remoteNode = Node.fromHost(host);
+		final Node remoteNode = PeerUtils.createNodeWithHost(host);
 
 		// Act:
 		network.updateExperience(remoteNode, result);
@@ -727,8 +777,8 @@ public class PeerNetworkTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final PeerNetwork network = createTestNetwork(experiences);
 		final Node localNode = network.getLocalNode();
-		final Node otherNode1 = Utils.createNodeWithPort(91);
-		final Node otherNode2 = Utils.createNodeWithPort(97);
+		final Node otherNode1 = PeerUtils.createNodeWithPort(91);
+		final Node otherNode2 = PeerUtils.createNodeWithPort(97);
 
 		experiences.getNodeExperience(localNode, otherNode1).successfulCalls().set(14);
 		experiences.getNodeExperience(localNode, otherNode2).successfulCalls().set(7);
@@ -757,8 +807,8 @@ public class PeerNetworkTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final PeerNetwork network = createTestNetwork(experiences);
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
-		pairs.add(new NodeExperiencePair(Utils.createNodeWithPort(81), Utils.createNodeExperience(14)));
-		pairs.add(new NodeExperiencePair(Utils.createNodeWithPort(83), Utils.createNodeExperience(44)));
+		pairs.add(new NodeExperiencePair(PeerUtils.createNodeWithPort(81), PeerUtils.createNodeExperience(14)));
+		pairs.add(new NodeExperiencePair(PeerUtils.createNodeWithPort(83), PeerUtils.createNodeExperience(44)));
 
 		// Act:
 		network.setRemoteNodeExperiences(new NodeExperiencesPair(network.getLocalNode(), pairs));
@@ -770,13 +820,13 @@ public class PeerNetworkTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final PeerNetwork network = createTestNetwork(experiences);
 
-		final Node remoteNode = Utils.createNodeWithPort(1);
-		final Node otherNode1 = Utils.createNodeWithPort(81);
-		final Node otherNode2 = Utils.createNodeWithPort(83);
+		final Node remoteNode = PeerUtils.createNodeWithPort(1);
+		final Node otherNode1 = PeerUtils.createNodeWithPort(81);
+		final Node otherNode2 = PeerUtils.createNodeWithPort(83);
 
 		final List<NodeExperiencePair> pairs = Arrays.asList(
-				new NodeExperiencePair(otherNode1, Utils.createNodeExperience(14)),
-				new NodeExperiencePair(otherNode2, Utils.createNodeExperience(44)));
+				new NodeExperiencePair(otherNode1, PeerUtils.createNodeExperience(14)),
+				new NodeExperiencePair(otherNode2, PeerUtils.createNodeExperience(44)));
 
 		// Act:
 		network.setRemoteNodeExperiences(new NodeExperiencesPair(remoteNode, pairs));
@@ -857,10 +907,11 @@ public class PeerNetworkTest {
 
 		// Assert:
 		final Node localNode = network.getLocalNode();
+		final NodeMetaData localNodeMetaData = localNode.getMetaData();
 		Assert.assertThat(localNode.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.25", 8990)));
-		Assert.assertThat(localNode.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(localNode.getVersion(), IsEqual.equalTo("2.0"));
-		Assert.assertThat(localNode.getApplication(), IsEqual.equalTo("FooBar"));
+		Assert.assertThat(localNodeMetaData.getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(localNodeMetaData.getVersion(), IsEqual.equalTo("2.0"));
+		Assert.assertThat(localNodeMetaData.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
 	@Test
@@ -884,14 +935,14 @@ public class PeerNetworkTest {
 	private void assertNodeIsConfigLocalNode(final Node node) {
 		// Assert:
 		assertNodeEndpointIsConfigLocalNodeEndpoint(node.getEndpoint());
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("Mac"));
+		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("FooBar"));
+		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo("2.0"));
 	}
 
 	public static CompletableFuture<PeerNetwork> createPeerNetworkWithVerificationOfLocalNode(final PeerConnector connector) {
 		return PeerNetwork.createWithVerificationOfLocalNode(
-				ConfigFactory.createDefaultTestConfig(),
+				createTestConfig(),
 				new PeerNetworkServices(
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
@@ -914,23 +965,23 @@ public class PeerNetworkTest {
 	}
 
 	private static PeerNetwork createTestNetwork(
-			final MockConnector connector,
+			final PeerConnector connector,
 			final MockBlockSynchronizer synchronizer) {
 		return new PeerNetwork(
-				ConfigFactory.createDefaultTestConfig(),
+				createTestConfig(),
 				new PeerNetworkServices(
 						connector,
 						Mockito.mock(SyncConnectorPool.class),
 						synchronizer));
 	}
 
-	private static PeerNetwork createTestNetwork(final MockConnector connector) {
+	private static PeerNetwork createTestNetwork(final PeerConnector connector) {
 		return createTestNetwork(connector, new MockBlockSynchronizer());
 	}
 
 	private static PeerNetwork createTestNetwork(final NodeExperiences nodeExperiences) {
 		return new PeerNetwork(
-				ConfigFactory.createDefaultTestConfig(),
+				createTestConfig(),
 				createMockPeerNetworkServices(),
 				nodeExperiences,
 				new NodeCollection());
@@ -938,7 +989,7 @@ public class PeerNetworkTest {
 
 	private static PeerNetwork createTestNetwork(final NodeCollection nodes) {
 		return new PeerNetwork(
-				ConfigFactory.createDefaultTestConfig(),
+				createTestConfig(),
 				createMockPeerNetworkServices(),
 				new NodeExperiences(),
 				nodes);
@@ -946,7 +997,7 @@ public class PeerNetworkTest {
 
 	private static PeerNetwork createTestNetwork(final TrustProvider provider) {
 		return new PeerNetwork(
-				ConfigFactory.createConfig(provider),
+				createTestConfig(provider),
 				createMockPeerNetworkServices());
 	}
 
@@ -955,7 +1006,26 @@ public class PeerNetworkTest {
 	}
 
 	private static Config createTestConfig() {
-		return ConfigFactory.createDefaultTestConfig();
+		return createTestConfig(new EigenTrustPlusPlus());
+	}
+
+	private static Config createTestConfig(final TrustProvider provider) {
+		final Node localNode = new Node(
+				new WeakNodeIdentity(DEFAULT_LOCAL_NODE_HOST),
+				NodeEndpoint.fromHost(DEFAULT_LOCAL_NODE_HOST),
+				new NodeMetaData("Mac", "FooBar", "2.0"));
+
+		final List<Node> wellKnownPeers = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.1"),
+				PeerUtils.createNodeWithHost("10.0.0.3"),
+				PeerUtils.createNodeWithHost("10.0.0.2"));
+
+		final Config config = Mockito.mock(Config.class);
+		Mockito.when(config.getTrustProvider()).thenReturn(provider);
+		Mockito.when(config.getLocalNode()).thenReturn(localNode);
+		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>(wellKnownPeers)));
+		Mockito.when(config.getTrustParameters()).thenReturn(new TrustParameters());
+		return config;
 	}
 
 	//endregion
