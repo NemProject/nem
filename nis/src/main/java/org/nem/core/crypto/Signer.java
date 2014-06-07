@@ -30,10 +30,13 @@ public class Signer {
 	 * @return The generated signature.
 	 */
 	public Signature sign(final byte[] data) {
-		ECDSASigner signer = createECDSASigner();
+		if (!this.keyPair.hasPrivateKey())
+			throw new CryptoException("cannot sign without private key");
+
+		final ECDSASigner signer = createECDSASigner();
 		signer.init(true, this.keyPair.getPrivateKeyParameters());
 		final byte[] hash = Hashes.sha3(data);
-		BigInteger[] components = signer.generateSignature(hash);
+		final BigInteger[] components = signer.generateSignature(hash);
 		final Signature signature = new Signature(components[0], components[1]);
 		signature.makeCanonical();
 		return signature;
