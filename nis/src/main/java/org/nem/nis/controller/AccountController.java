@@ -47,6 +47,18 @@ public class AccountController {
 	}
 
 	/**
+	 * Locks an account from foraging.
+	 *
+	 * @param privateKey The private key of the account to lock.
+	 */
+	@RequestMapping(value = "/account/lock", method = RequestMethod.POST)
+	@ClientApi
+	public void accountLock(@RequestBody final PrivateKey privateKey) {
+		final Account account = new Account(new KeyPair(privateKey));
+		this.foraging.removeUnlockedAccount(account);
+	}
+
+	/**
 	 * Gets transaction information for the specified account starting at the specified time.
 	 *
 	 * @param builder The page builder.
