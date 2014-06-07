@@ -2,138 +2,122 @@ package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
+import org.nem.peer.test.WeakNodeIdentity;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class NodeTest {
 
+	private final static NodeIdentity DEFAULT_IDENTITY = new WeakNodeIdentity("bob");
 	private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
+	private final static NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null, null);
 
 	@Test
-	public void ctorCanCreateNewNode() {
+	public void canCreateNewNodeWithoutMetaData() {
+		// Arrange:
+		final NodeIdentity identity = new WeakNodeIdentity("alice");
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+
 		// Act:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app", "ver");
+		final Node node = new Node(identity, endpoint);
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(DEFAULT_ENDPOINT));
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("ver"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
+		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
+		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getVersion(), IsNull.nullValue());
 	}
 
 	@Test
-	public void nodeCanBeCreatedFromHost() {
+	public void canCreateNewNodeWithMetaData() {
+		// Arrange:
+		final NodeIdentity identity = new WeakNodeIdentity("alice");
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+
 		// Act:
-		final Node node = Node.fromHost("10.7.6.5");
+		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.7.6.5")));
-		Assert.assertThat(node.getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getVersion(), IsNull.nullValue());
-		Assert.assertThat(node.getApplication(), IsNull.nullValue());
-	}
-
-	@Test
-	public void nodeCanBeCreatedFromEndpoint() {
-		// Act:
-		final Node node = Node.fromEndpoint(new NodeEndpoint("ftp", "10.7.6.5", 12));
-
-		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("ftp", "10.7.6.5", 12)));
-		Assert.assertThat(node.getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getVersion(), IsNull.nullValue());
-		Assert.assertThat(node.getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
+		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+		Assert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test
 	public void nodeCanBeRoundTripped() {
 		// Arrange:
-		final Node originalNode = new Node(DEFAULT_ENDPOINT, "plat", "app", "ver");
+		final NodeIdentity identity = new WeakNodeIdentity("alice");
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final Node originalNode = new Node(identity, endpoint, metaData);
 
 		// Act:
 		final Node node = new Node(Utils.roundtripSerializableEntity(originalNode, null));
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(DEFAULT_ENDPOINT));
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("ver"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app"));
+		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
+		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("p"));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
+	public void identityCannotBeNull() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> new Node(null, DEFAULT_ENDPOINT), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> new Node(null, DEFAULT_ENDPOINT, DEFAULT_META_DATA),
+				IllegalArgumentException.class);
+	}
+
+	@Test
 	public void endpointCannotBeNull() {
 		// Act:
-		new Node(null, "plat", "app", "ver");
-	}
-
-	@Test
-	public void versionIsOptional() {
-		// Arrange:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app", null);
-
-		// Assert:
-		Assert.assertThat(node.getVersion(), IsNull.nullValue());
-	}
-
-	@Test
-	public void platformIsOptional() {
-		// Act:
-		final Node node = new Node(DEFAULT_ENDPOINT, null, "app", "ver");
-
-		// Assert:
-		Assert.assertThat(node.getPlatform(), IsNull.nullValue());
-	}
-
-	@Test
-	public void applicationIsOptional() {
-		// Act:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", null, "ver");
-
-		// Assert:
-		Assert.assertThat(node.getApplication(), IsNull.nullValue());
+		ExceptionAssert.assertThrows(v -> new Node(DEFAULT_IDENTITY, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> new Node(DEFAULT_IDENTITY, null, DEFAULT_META_DATA),
+				IllegalArgumentException.class);
 	}
 
 	//region equals / hashCode
 
 	private static final Map<String, Node> DESC_TO_NODE_MAP = new HashMap<String, Node>() {
 		{
-			put("default", new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app", "ver"));
-			put("diff-endpoint", new Node(new NodeEndpoint("ftp", "10.8.8.2", 13), "plat", "app", "ver"));
-			put("diff-plat", new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat2", "app", "ver"));
-			put("diff-app", new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app2", "ver"));
-			put("diff-ver", new Node(new NodeEndpoint("ftp", "10.8.8.2", 12), "plat", "app", "ver2"));
+			put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));
+			put("diff-identity", new Node(new WeakNodeIdentity("alice"), DEFAULT_ENDPOINT, DEFAULT_META_DATA));
+			put("diff-endpoint", new Node(DEFAULT_IDENTITY, new NodeEndpoint("http", "localhost", 8080), DEFAULT_META_DATA));
+			put("diff-meta-data", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, new NodeMetaData("p", "a", "v")));
 		}
 	};
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app", "ver");
+		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA);
 
 		// Assert:
 		Assert.assertThat(DESC_TO_NODE_MAP.get("default"), IsEqual.equalTo(node));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint"), IsNot.not(IsEqual.equalTo(node)));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-plat"), IsEqual.equalTo(node));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-app"), IsEqual.equalTo(node));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-ver"), IsEqual.equalTo(node));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-identity"), IsNot.not(IsEqual.equalTo(node)));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint"), IsEqual.equalTo(node));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data"), IsEqual.equalTo(node));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(node)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)node)));
+		Assert.assertThat(DEFAULT_IDENTITY, IsNot.not(IsEqual.equalTo((Object)node)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app", "ver");
+		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA);
 		final int hashCode = node.hashCode();
 
 		// Assert:
 		Assert.assertThat(DESC_TO_NODE_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-plat").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-app").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-ver").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
@@ -141,12 +125,15 @@ public class NodeTest {
 	//toString
 
 	@Test
-	public void toStringIncludesHost() {
-		// Act:
-		final Node node = new Node(DEFAULT_ENDPOINT, "plat", "app", "ver");
+	public void toStringReturnsAppropriateRepresentation() {
+		// Arrange:
+		final NodeIdentity identity = new WeakNodeIdentity("alice");
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:
-		Assert.assertThat(node.toString(), IsEqual.equalTo("Node 10.8.8.2"));
+		Assert.assertThat(node.toString(), IsEqual.equalTo("Node [(Weak Id) alice] @ [127.0.0.1]"));
 	}
 
 	//endregion
