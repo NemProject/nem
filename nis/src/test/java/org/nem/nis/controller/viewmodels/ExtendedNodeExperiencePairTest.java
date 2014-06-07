@@ -3,7 +3,7 @@ package org.nem.nis.controller.viewmodels;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.node.Node;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.score.*;
 
 public class ExtendedNodeExperiencePairTest {
@@ -13,7 +13,7 @@ public class ExtendedNodeExperiencePairTest {
 	@Test
 	public void pairCanBeCreated() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final Node node = PeerUtils.createNodeWithPort(81);
 		final NodeExperience experience = new NodeExperience();
 
 		// Act:
@@ -28,7 +28,7 @@ public class ExtendedNodeExperiencePairTest {
 	@Test
 	public void pairCanBeRoundTripped() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final Node node = PeerUtils.createNodeWithPort(81);
 		final NodeExperience experience = new NodeExperience();
 		experience.successfulCalls().set(17);
 		final ExtendedNodeExperiencePair originalPair = new ExtendedNodeExperiencePair(node, experience, 89);
@@ -83,10 +83,12 @@ public class ExtendedNodeExperiencePairTest {
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
 		// Arrange:
-		final ExtendedNodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1, 9);
+		final ExtendedNodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", "bob", 5, 1, 9);
 
 		// Assert:
-		Assert.assertThat(pair.toString(), IsEqual.equalTo("[success: 5, failure: 1] @ [Node 10.0.0.1]"));
+		Assert.assertThat(
+				pair.toString(),
+				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) bob] @ [10.0.0.1]]"));
 	}
 
 	//endregion
@@ -96,8 +98,17 @@ public class ExtendedNodeExperiencePairTest {
 			final int numSuccess,
 			final int numFailures,
 			final int numSyncAttempts) {
+		return createNodeExperiencePair(host, host, numSuccess, numFailures, numSyncAttempts);
+	}
+
+	private static ExtendedNodeExperiencePair createNodeExperiencePair(
+			final String host,
+			final String name,
+			final int numSuccess,
+			final int numFailures,
+			final int numSyncAttempts) {
 		return new ExtendedNodeExperiencePair(
-				Node.fromHost(host),
+				PeerUtils.createNodeWithHost(host, name),
 				new NodeExperience(numSuccess, numFailures),
 				numSyncAttempts);
 	}

@@ -196,7 +196,7 @@ public class ScoresTest {
 
 			this.nodes = new Node[numNodes];
 			for (int i = 0; i < numNodes; ++i)
-				this.nodes[i] = Utils.createNodeWithPort(80 + i);
+				this.nodes[i] = PeerUtils.createNodeWithName(String.format("bob #%d", i));
 		}
 	}
 }

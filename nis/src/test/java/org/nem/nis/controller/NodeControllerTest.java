@@ -72,22 +72,22 @@ public class NodeControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final PeerNetwork network = context.network;
-		network.updateExperience(Node.fromHost("10.0.0.2"), NodeInteractionResult.FAILURE);
-		network.updateExperience(Node.fromHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
-		network.updateExperience(Node.fromHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.2"), NodeInteractionResult.FAILURE);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
 
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.2"))).thenReturn(7);
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.7"))).thenReturn(0);
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.4"))).thenReturn(2);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.2"))).thenReturn(7);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.7"))).thenReturn(0);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.4"))).thenReturn(2);
 
 		// Act:
 		final Collection<ExtendedNodeExperiencePair> pairs = context.controller.getExperiences().asCollection();
 
 		// Assert:
 		final List<ExtendedNodeExperiencePair> expectedPairs = Arrays.asList(
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.2"), new NodeExperience(0, 1), 7),
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.7"), new NodeExperience(1, 0), 0),
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.4"), new NodeExperience(1, 0), 2));
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.2"), new NodeExperience(0, 1), 7),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.7"), new NodeExperience(1, 0), 0),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.4"), new NodeExperience(1, 0), 2));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
@@ -96,18 +96,18 @@ public class NodeControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final NodeCollection nodeCollection = context.network.getNodes();
-		nodeCollection.update(Node.fromHost("10.0.0.2"), NodeStatus.INACTIVE);
-		nodeCollection.update(Node.fromHost("10.0.0.4"), NodeStatus.ACTIVE);
-		nodeCollection.update(Node.fromHost("10.0.0.3"), NodeStatus.FAILURE);
-		nodeCollection.update(Node.fromHost("10.0.0.7"), NodeStatus.ACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.3"), NodeStatus.FAILURE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.7"), NodeStatus.ACTIVE);
 
 		// Act:
 		final SerializableList<Node> nodes = context.controller.getActivePeerList();
 
 		// Assert:
 		final List<Node> expectedNodes = Arrays.asList(
-				Node.fromHost("10.0.0.4"),
-				Node.fromHost("10.0.0.7"));
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
 		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
@@ -117,7 +117,7 @@ public class NodeControllerTest {
 		final TestContext context = new TestContext();
 		final NodeCollection nodes = context.network.getNodes();
 
-		final Node sourceNode = Utils.createNodeWithPort(111);
+		final Node sourceNode = PeerUtils.createNodeWithName("alice");
 		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
 
 		// Arrange: sanity
@@ -135,8 +135,8 @@ public class NodeControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		final Node sourceNode = Utils.createNodeWithPort(111);
-		final Node partnerNode = Utils.createNodeWithPort(222);
+		final Node sourceNode = PeerUtils.createNodeWithName("alice");
+		final Node partnerNode = PeerUtils.createNodeWithName("bob");
 		final List<NodeExperiencePair> experiences = new ArrayList<>();
 		experiences.add(new NodeExperiencePair(partnerNode, createNodeExperience(12, 34)));
 		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, experiences);
