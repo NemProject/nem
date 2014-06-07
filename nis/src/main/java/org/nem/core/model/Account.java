@@ -11,8 +11,8 @@ import java.util.*;
  */
 public class Account implements SerializableEntity {
 
-	private final KeyPair keyPair;
-	private final Address address;
+	private KeyPair keyPair;
+	private Address address;
 	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
@@ -51,6 +51,20 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
+	 * This method is public, but it should be used very carefully
+	 *
+	 * @param address
+	 */
+	public void _setPublicKey(final Address address) {
+		if (! Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
+			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
+		}
+
+		this.keyPair = new KeyPair(address.getPublicKey());
+		this.address = Address.fromPublicKey(address.getPublicKey());
+	}
+
+	/**
 	 * Creates an account around a key pair and address.
 	 *
 	 * @param keyPair The key pair.
@@ -80,20 +94,6 @@ public class Account implements SerializableEntity {
 		this.height = rhs.getHeight();
 	}
 
-	private Account(final Account rhs, final KeyPair keyPair) {
-		this.keyPair = keyPair;
-		this.address = getAddressFromKeyPair(keyPair);
-
-		this.balance = rhs.getBalance();
-		this.label = rhs.getLabel();
-		this.foragedBlocks = rhs.getForagedBlocks();
-
-		this.messages = rhs.getMessages();
-		this.weightedBalances = rhs.weightedBalances;
-		this.importance = rhs.importance;
-
-		this.height = rhs.getHeight();
-	}
 
 	/**
 	 * Creates an unlinked copy of this account.
@@ -102,26 +102,6 @@ public class Account implements SerializableEntity {
 	 */
 	public Account copy() {
 		return new Account(this);
-	}
-
-	/**
-	 * Creates a shallow copy of this account with the specified address.
-	 *
-	 * @param address The desired address of the new account.
-	 * @return The shallow copy.
-	 */
-	public Account shallowCopyWithAddress(final Address address) {
-		return this.shallowCopyWithKeyPair(getKeyPairFromAddress(address));
-	}
-
-	/**
-	 * Creates a shallow copy of this account the the specified key pair.
-	 *
-	 * @param keyPair The desired key pair of the new account.
-	 * @return The shallow copy.
-	 */
-	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
-		return new Account(this, keyPair);
 	}
 
 	/**
