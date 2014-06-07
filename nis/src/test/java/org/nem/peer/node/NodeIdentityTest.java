@@ -1,8 +1,10 @@
 package org.nem.peer.node;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 
 public class NodeIdentityTest {
@@ -145,6 +147,60 @@ public class NodeIdentityTest {
 
 		// Assert:
 		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region serialization
+
+	@Test
+	public void identityWithPublicKeyCanBeRoundTripped() {
+		// Arrange:
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+
+		// ActL
+		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(new KeyPair(publicKey)));
+
+		// Assert:
+		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void identityWithPrivateKeyCanBeRoundTrippedWithoutPrivateKey() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+
+		// ActL
+		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(keyPair));
+
+		// Assert:
+		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void serializerPayloadDoesNotContainPrivateKey() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final NodeIdentity identity = new NodeIdentity(keyPair);
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		identity.serialize(serializer);
+		final JSONObject jsonObject = serializer.getObject();
+
+		// Assert:
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
+		Assert.assertThat(jsonObject.containsKey("public-key"), IsEqual.equalTo(true));
+	}
+
+	private static NodeIdentity createRoundTrippedIdentity(final NodeIdentity originalIdentity) {
+		return new NodeIdentity(Utils.roundtripSerializableEntity(originalIdentity, null));
 	}
 
 	//endregion

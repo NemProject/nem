@@ -2,13 +2,13 @@ package org.nem.peer.node;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.ArrayUtils;
-import org.nem.core.utils.ByteUtils;
 
 /**
  * Represents a node identity that uniquely identifies a node.
  */
-public class NodeIdentity {
+public class NodeIdentity implements SerializableEntity {
 
 	private final KeyPair keyPair;
 	private final Address address;
@@ -21,6 +21,17 @@ public class NodeIdentity {
 	public NodeIdentity(final KeyPair keyPair) {
 		this.keyPair = keyPair;
 		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
+	}
+
+	/**
+	 * Deserializes a node identity.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public NodeIdentity(final Deserializer deserializer) {
+		final PublicKey publicKey = new PublicKey(deserializer.readBytes("public-key"));
+		this.keyPair = new KeyPair(publicKey);
+		this.address = Address.fromPublicKey(publicKey);
 	}
 
 	/**
@@ -94,5 +105,10 @@ public class NodeIdentity {
 	@Override
 	public String toString() {
 		return this.address.toString();
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeBytes("public-key", this.keyPair.getPublicKey().getRaw());
 	}
 }
