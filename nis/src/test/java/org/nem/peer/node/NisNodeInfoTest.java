@@ -7,14 +7,14 @@ import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 
 public class NisNodeInfoTest {
 
 	@Test
 	public void nodeInfoExposesAllConstructorParameters() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(7);
+		final Node node = PeerUtils.createNodeWithName("a");
 		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
@@ -28,7 +28,7 @@ public class NisNodeInfoTest {
 	@Test
 	public void canRoundtripNodeInfoMetaData() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(17);
+		final Node node = PeerUtils.createNodeWithName("b");
 		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
