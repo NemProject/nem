@@ -188,7 +188,7 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region verify peer's chain
-		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		final List<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		return updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 	}
 

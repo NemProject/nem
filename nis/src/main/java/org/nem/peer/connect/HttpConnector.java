@@ -38,32 +38,32 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	//region PeerConnector
 
 	@Override
-	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_INFO);
+	public CompletableFuture<Node> getInfo(final Node node) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_INFO);
 		return this.getAsync(url).getFuture().thenApply(Node::new);
 	}
 
 	@Override
-	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
+	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
 		return this.getAsync(url).getFuture()
 				.thenApply(deserializer -> new SerializableList<>(deserializer, Node::new));
 	}
 
 	@Override
 	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(
-			final NodeEndpoint endpoint,
+			final Node node,
 			final NodeEndpoint localEndpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
 		return this.post(url, localEndpoint).getFuture().thenApply(NodeEndpoint::new);
 	}
 
 	@Override
 	public CompletableFuture announce(
-			final NodeEndpoint endpoint,
+			final Node node,
 			final NodeApiId announceId,
 			final SerializableEntity entity) {
-		final URL url = endpoint.getApiUrl(announceId);
+		final URL url = node.getEndpoint().getApiUrl(announceId);
 		return this.postVoidAsync(url, entity).getFuture();
 	}
 
@@ -72,33 +72,33 @@ public class HttpConnector implements PeerConnector, SyncConnector {
     // region SyncConnector
 
 	@Override
-	public Block getLastBlock(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
+	public Block getLastBlock(final Node node) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
 		return BlockFactory.VERIFIABLE.deserialize(this.get(url));
 	}
 
 	@Override
-	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_BLOCK_AT);
+	public Block getBlockAt(final Node node, final BlockHeight height) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_BLOCK_AT);
 		return BlockFactory.VERIFIABLE.deserialize(this.post(url, height).get());
 	}
 
 	@Override
-	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
+	public List<Block> getChainAfter(final Node node, final BlockHeight height) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
 		final Deserializer deserializer = this.post(url, height).get();
 		return deserializer.readObjectArray("data", BlockFactory.VERIFIABLE);
 	}
 
 	@Override
-	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
+	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
 		return new HashChain(this.post(url, height).get());
 	}
 
 	@Override
-	public BlockChainScore getChainScore(final NodeEndpoint endpoint) {
-		final URL url = endpoint.getApiUrl(NodeApiId.REST_CHAIN_SCORE);
+	public BlockChainScore getChainScore(final Node node) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_SCORE);
 		return new BlockChainScore(this.get(url));
 	}
 
