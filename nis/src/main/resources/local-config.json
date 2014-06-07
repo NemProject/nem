@@ -1,0 +1,7 @@
+{
+	"_info": "this file contains information about the local node and should not be shared",
+
+    "endpoint": { "protocol": "http", "host": "localhost", "port" : 7890 },
+    "identity": { "name": "evil bob", private-key": "AJfgb+c/Ee9EROjVDgd5wbGHj/OR8yZuJMjUj+/98U0y" },
+    "metaData": { "application": "NIS" }
+}

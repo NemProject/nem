@@ -19,7 +19,7 @@ public class Node implements SerializableEntity {
 	 * @param endpoint    The endpoint.
 	 */
 	public Node(final NodeIdentity identity, final NodeEndpoint endpoint) {
-		this(identity, endpoint, new NodeMetaData(null, null, null));
+		this(identity, endpoint, null);
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class Node implements SerializableEntity {
 			final NodeMetaData metaData) {
 		this.identity = identity;
 		this.endpoint = endpoint;
-		this.metaData = metaData;
+		this.metaData = getMetaData(metaData);
 		this.ensureValidity();
 	}
 
@@ -47,8 +47,12 @@ public class Node implements SerializableEntity {
 	public Node(final Deserializer deserializer) {
 		this.identity = deserializer.readObject("identity", NodeIdentity::new);
 		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint::new);
-		this.metaData = deserializer.readObject("metaData", NodeMetaData::new);
+		this.metaData = getMetaData(deserializer.readObject("metaData", NodeMetaData::new));
 		this.ensureValidity();
+	}
+
+	private static NodeMetaData getMetaData(final NodeMetaData metaData) {
+		return null != metaData ? metaData : new NodeMetaData(null, null, null);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 public class NodeIdentityTest {
@@ -23,6 +23,7 @@ public class NodeIdentityTest {
 		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		Assert.assertThat(identity.getName(), IsNull.nullValue());
 	}
 
 	@Test
@@ -37,11 +38,27 @@ public class NodeIdentityTest {
 		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		Assert.assertThat(identity.getName(), IsNull.nullValue());
+	}
+
+	@Test
+	public void identityCanBeCreatedWithFriendlyName() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+
+		// Act:
+		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
+
+		// Assert:
+		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
+		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
 	}
 
 	//endregion
 
-	//region
+	//region sign
 
 	@Test
 	public void equalIdentitiesProduceSameSignatures() {
@@ -158,14 +175,15 @@ public class NodeIdentityTest {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
 
-		// ActL
-		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(new KeyPair(publicKey)));
+		// Act:
+		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(new KeyPair(publicKey), "alice"));
 
 		// Assert:
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("alice"));
 	}
 
 	@Test
@@ -174,13 +192,14 @@ public class NodeIdentityTest {
 		final KeyPair keyPair = new KeyPair();
 
 		// ActL
-		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(keyPair));
+		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(keyPair, "bob"));
 
 		// Assert:
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(null));
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
 	}
 
 	@Test
@@ -195,8 +214,29 @@ public class NodeIdentityTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
 		Assert.assertThat(jsonObject.containsKey("public-key"), IsEqual.equalTo(true));
+		Assert.assertThat(jsonObject.containsKey("name"), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void jsonContainingPrivateKeyCanBeDeserialized() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final JsonSerializer serializer = new JsonSerializer(true);
+		serializer.writeBigInteger("private-key", keyPair.getPrivateKey().getRaw());
+		serializer.writeString("name", "trudy");
+
+		// Act:
+		final Deserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
+		final NodeIdentity identity = NodeIdentity.deserializeWithPrivateKey(deserializer);
+
+		// Assert:
+		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("trudy"));
 	}
 
 	private static NodeIdentity createRoundTrippedIdentity(final NodeIdentity originalIdentity) {

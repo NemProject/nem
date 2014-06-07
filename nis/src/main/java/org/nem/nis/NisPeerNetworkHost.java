@@ -1,5 +1,7 @@
 package org.nem.nis;
 
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
@@ -10,6 +12,7 @@ import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeApiId;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -53,7 +56,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * Boots the network.
 	 */
 	public CompletableFuture boot() {
-		final Config config = Config.fromFile("peers-config.json", CommonStarter.META_DATA.getVersion());
+		final Config config = new Config(
+				loadJsonObject("local-config.json"),
+				loadJsonObject("peers-config.json"),
+				CommonStarter.META_DATA.getVersion());
 		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
 				.thenAccept(network -> {
 					this.host = new PeerNetworkHost(network);
@@ -68,6 +74,19 @@ public class NisPeerNetworkHost implements AutoCloseable {
 							new UniformDelayStrategy(FORAGING_INTERVAL));
 					this.foragingTimer.setName("FORAGING");
 				});
+	}
+
+	private static JSONObject loadJsonObject(final String configFileName) {
+		try {
+			try (final InputStream fin = NisPeerNetworkHost.class.getClassLoader().getResourceAsStream(configFileName)) {
+				if (null == fin)
+					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
+
+				return (JSONObject)JSONValue.parse(fin);
+			}
+		} catch (Exception e) {
+			throw new FatalConfigException("Exception encountered while loading config", e);
+		}
 	}
 
 	/**

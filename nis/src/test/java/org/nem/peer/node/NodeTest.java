@@ -2,6 +2,7 @@ package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.peer.test.WeakNodeIdentity;
 
@@ -62,6 +63,30 @@ public class NodeTest {
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
 		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("p"));
+	}
+
+	@Test
+	public void nodeCanBeDeserializedWithoutMetaData() {
+		// Arrange:
+		final NodeIdentity identity = new WeakNodeIdentity("alice");
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final Node originalNode = new Node(identity, endpoint, metaData);
+
+		final JsonSerializer serializer = new JsonSerializer(true);
+		originalNode.serialize(serializer);
+		serializer.getObject().remove("metaData");
+
+		// Act:
+		final Node node = new Node(new JsonDeserializer(serializer.getObject(), null));
+
+		// Assert:
+		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
+		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
+		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getVersion(), IsNull.nullValue());
 	}
 
 	@Test

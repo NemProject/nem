@@ -12,6 +12,7 @@ public class NodeIdentity implements SerializableEntity {
 
 	private final KeyPair keyPair;
 	private final Address address;
+	private final String name;
 
 	/**
 	 * Creates a new node identity.
@@ -19,8 +20,19 @@ public class NodeIdentity implements SerializableEntity {
 	 * @param keyPair The keyPair that identifies the node.
 	 */
 	public NodeIdentity(final KeyPair keyPair) {
+		this(keyPair, null);
+	}
+
+	/**
+	 * Creates a new node identity with an optional friendly-name.
+	 *
+	 * @param keyPair The keyPair that identifies the node.
+	 * @param name The friendly name.
+	 */
+	public NodeIdentity(final KeyPair keyPair, final String name) {
 		this.keyPair = keyPair;
 		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
+		this.name = name;
 	}
 
 	/**
@@ -29,9 +41,30 @@ public class NodeIdentity implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeIdentity(final Deserializer deserializer) {
-		final PublicKey publicKey = new PublicKey(deserializer.readBytes("public-key"));
-		this.keyPair = new KeyPair(publicKey);
-		this.address = Address.fromPublicKey(publicKey);
+		this(deserializer, false);
+	}
+
+	private NodeIdentity(final Deserializer deserializer, boolean containsPrivateKey) {
+		this.keyPair = deserializeKeyPair(deserializer, containsPrivateKey);
+		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
+		this.name = deserializer.readString("name");
+	}
+
+	private static KeyPair deserializeKeyPair(final Deserializer deserializer, boolean containsPrivateKey) {
+		if (containsPrivateKey)
+			return new KeyPair(new PrivateKey(deserializer.readBigInteger("private-key")));
+
+		return new KeyPair(new PublicKey(deserializer.readBytes("public-key")));
+	}
+
+	/**
+	 * Deserializes a node identity with a private key.
+	 *
+	 * @param deserializer The deserializer.
+	 * @return The node identity.
+	 */
+	public static NodeIdentity deserializeWithPrivateKey(final Deserializer deserializer) {
+		return new NodeIdentity(deserializer, true);
 	}
 
 	/**
@@ -50,6 +83,15 @@ public class NodeIdentity implements SerializableEntity {
 	 */
 	public Address getAddress() {
 		return this.address;
+	}
+
+	/**
+	 * Gets the friendly name associated with this identity.
+	 *
+	 * @return The friendly name associated with this identity.
+	 */
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -89,13 +131,19 @@ public class NodeIdentity implements SerializableEntity {
 	}
 
 	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeBytes("public-key", this.keyPair.getPublicKey().getRaw());
+		serializer.writeString("name", this.name);
+	}
+
+	@Override
 	public int hashCode() {
 		return this.address.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof NodeIdentity))
+		if (!(obj instanceof NodeIdentity))
 			return false;
 
 		final NodeIdentity rhs = (NodeIdentity)obj;
@@ -105,10 +153,5 @@ public class NodeIdentity implements SerializableEntity {
 	@Override
 	public String toString() {
 		return this.address.toString();
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeBytes("public-key", this.keyPair.getPublicKey().getRaw());
 	}
 }

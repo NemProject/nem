@@ -3,12 +3,14 @@ package org.nem.peer;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.IsEquivalent;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConfigTest {
 
@@ -24,7 +26,7 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void localNodeIsInitializedCorrectly() throws Exception {
+	public void localNodeIsInitializedCorrectly() {
 		// Arrange:
 		final Config config = createTestConfig();
 
@@ -32,18 +34,16 @@ public class ConfigTest {
 		final Node node = config.getLocalNode();
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("Mac"));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
+		assertLocalNodeProperties(node, "Mac");
 	}
 
 	@Test
-	public void localNodeIsGivenDefaultPlatformIfOmitted() throws Exception {
+	public void localNodeIsGivenDefaultPlatformIfOmitted() {
 		// Arrange:
-		final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
-		jsonConfig.remove("platform");
-		final Config config = new Config(jsonConfig, "2.0");
+		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
+		((JSONObject)localConfig.get("metaData")).remove("platform");
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
+		final Config config = new Config(localConfig, peersConfig, "2.0");
 
 		// Act:
 		final Node node = config.getLocalNode();
@@ -54,36 +54,46 @@ public class ConfigTest {
 				System.getProperty("java.vendor"),
 				System.getProperty("java.version"),
 				System.getProperty("os.name"));
-		Assert.assertThat(node.getEndpoint().getBaseUrl(), IsEqual.equalTo(getDefaultLocalNodeUrl()));
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo(expectedPlatform));
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("2.0"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("FooBar"));
+		assertLocalNodeProperties(node, expectedPlatform);
+	}
+
+	private static void assertLocalNodeProperties(final Node node, final String expectedPlatform) {
+		final NodeMetaData metaData = node.getMetaData();
+		Assert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("local larry"));
+		Assert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
+		Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo(DEFAULT_LOCAL_NODE_HOST));
+		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("2.0"));
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
 	@Test
 	public void wellKnownPeersAreInitializedCorrectly() {
 		// Arrange:
-		final String[] knownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
-		final Config config = new Config(ConfigFactory.createTestJsonConfig(knownHosts), "2.0");
+		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
+		final String[] expectedWellKnownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig(expectedWellKnownHosts);
+		final Config config = new Config(localConfig, peersConfig, "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
-		final Set<Node> wellKnownPeers = preTrustedNodes.getNodes();
+		final List<String> wellKnownPeers = preTrustedNodes.getNodes().stream()
+				.map(node -> node.getEndpoint().getBaseUrl().getHost())
+				.collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
 		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(3));
-		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.5")), IsEqual.equalTo(true));
-		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.12")), IsEqual.equalTo(true));
-		Assert.assertThat(wellKnownPeers.contains(createConfigNode("10.0.0.3")), IsEqual.equalTo(true));
+		Assert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
 	}
 
 	@Test
 	public void wellKnownPeersAreEmptyIfNotSpecified() {
 		// Arrange:
-		final JSONObject jsonConfig = ConfigFactory.createTestJsonConfig();
-		jsonConfig.remove("knownPeers");
-		final Config config = new Config(jsonConfig, "2.0");
+		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
+		peersConfig.remove("knownPeers");
+		final Config config = new Config(localConfig, peersConfig, "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -121,10 +131,6 @@ public class ConfigTest {
 	}
 
 	//region Factories
-
-	private static Node createConfigNode(final String host) {
-		return new Node(new NodeEndpoint("ftp", host, 12), "plat", "app", "ver");
-	}
 
 	private static Config createTestConfig() {
 		return ConfigFactory.createDefaultTestConfig();
