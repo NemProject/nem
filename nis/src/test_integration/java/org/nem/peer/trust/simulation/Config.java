@@ -4,6 +4,7 @@ import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeCollection;
 import org.nem.peer.node.NodeEndpoint;
 import org.nem.peer.node.NodeStatus;
+import org.nem.peer.test.PeerUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -122,7 +123,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			this.node = Node.fromHost(address);
+			this.node = PeerUtils.createNodeWithHost(address);
 		}
 
 		public Entry(final String line) {
@@ -144,7 +145,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			this.node = Node.fromHost(nodeAttributes[0]);
+			this.node = PeerUtils.createNodeWithHost(nodeAttributes[0]);
 		}
 
 		public boolean isPreTrusted() {
