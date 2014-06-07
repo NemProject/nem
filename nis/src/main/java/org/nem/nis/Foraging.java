@@ -56,6 +56,11 @@ public class Foraging  {
 		unlockedAccounts.add(account);
 	}
 
+
+	public void removeUnlockedAccount(final Account account) {
+		unlockedAccounts.remove(account);
+	}
+
 	/**
 	 * Gets the number of unconfirmed transactions.
 	 *
