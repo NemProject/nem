@@ -3,7 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.peer.node.Node;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ public class TrustContextTest {
 	@Test
 	public void trustContextExposesAllConstructorParameters() {
 		// Arrange:
-		final Node localNode = Utils.createNodeWithPort(80);
+		final Node localNode = PeerUtils.createNodeWithName("bob");
 		final Node[] nodes = new Node[] { localNode };
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());

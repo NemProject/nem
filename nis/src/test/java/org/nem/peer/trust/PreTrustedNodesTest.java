@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.node.Node;
 
 import java.util.*;
@@ -29,9 +29,9 @@ public class PreTrustedNodesTest {
 
 		// Assert:
 		final Node[] expectedPreTrustedNodes = new Node[] {
-				Utils.createNodeWithPort(81),
-				Utils.createNodeWithPort(83),
-				Utils.createNodeWithPort(84)
+				PeerUtils.createNodeWithName("n"),
+				PeerUtils.createNodeWithName("e"),
+				PeerUtils.createNodeWithName("m")
 		};
 		Assert.assertThat(preTrustedNodes.getNodes(), IsEquivalent.equivalentTo(expectedPreTrustedNodes));
 	}
@@ -42,9 +42,9 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(81)), IsEqual.equalTo(true));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(83)), IsEqual.equalTo(true));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(84)), IsEqual.equalTo(true));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("n")), IsEqual.equalTo(true));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("e")), IsEqual.equalTo(true));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("m")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -53,9 +53,9 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(80)), IsEqual.equalTo(false));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(82)), IsEqual.equalTo(false));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(Utils.createNodeWithPort(85)), IsEqual.equalTo(false));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("a")), IsEqual.equalTo(false));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("p")), IsEqual.equalTo(false));
+		Assert.assertThat(preTrustedNodes.isPreTrusted(PeerUtils.createNodeWithName("z")), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -67,10 +67,10 @@ public class PreTrustedNodesTest {
 		// Arrange:
 		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());
 		final Node[] nodes = new Node[] {
-				Utils.createNodeWithPort(80),
-				Utils.createNodeWithPort(83),
-				Utils.createNodeWithPort(84),
-				Utils.createNodeWithPort(85)
+				PeerUtils.createNodeWithName("a"),
+				PeerUtils.createNodeWithName("e"),
+				PeerUtils.createNodeWithName("m"),
+				PeerUtils.createNodeWithName("z")
 		};
 
 		// Act:
@@ -89,10 +89,10 @@ public class PreTrustedNodesTest {
 		// Arrange:
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 		final Node[] nodes = new Node[] {
-				Utils.createNodeWithPort(80),
-				Utils.createNodeWithPort(83),
-				Utils.createNodeWithPort(84),
-				Utils.createNodeWithPort(85)
+				PeerUtils.createNodeWithName("a"),
+				PeerUtils.createNodeWithName("e"),
+				PeerUtils.createNodeWithName("m"),
+				PeerUtils.createNodeWithName("z")
 		};
 
 		// Act:
@@ -111,9 +111,9 @@ public class PreTrustedNodesTest {
 	public static PreTrustedNodes createTestPreTrustedNodes() {
 		// Arrange:
 		Set<Node> nodeSet = new HashSet<>();
-		nodeSet.add(Utils.createNodeWithPort(81));
-		nodeSet.add(Utils.createNodeWithPort(83));
-		nodeSet.add(Utils.createNodeWithPort(84));
+		nodeSet.add(PeerUtils.createNodeWithName("n"));
+		nodeSet.add(PeerUtils.createNodeWithName("e"));
+		nodeSet.add(PeerUtils.createNodeWithName("m"));
 		return new PreTrustedNodes(nodeSet);
 	}
 }

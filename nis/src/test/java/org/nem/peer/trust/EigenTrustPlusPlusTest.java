@@ -3,7 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.node.Node;
 import org.nem.peer.test.ScoreProviderTestContext;
 import org.nem.peer.test.TestTrustContext;
@@ -48,7 +48,7 @@ public class EigenTrustPlusPlusTest {
 	@Test
 	public void nodeIsCompletelyCredibleToItself() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 		final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
@@ -64,7 +64,7 @@ public class EigenTrustPlusPlusTest {
 	@Test
 	public void nodesWithoutSharedPartnersHaveNoCredibility() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 		final EigenTrustPlusPlus trust = new EigenTrustPlusPlus();
 
@@ -81,7 +81,7 @@ public class EigenTrustPlusPlusTest {
 	@Test
 	public void nodesWithSharedPartnersHaveCredibilityCorrelatedWithProviderScore() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(4);
+		final Node[] nodes = PeerUtils.createNodeArray(4);
 		final NodeExperiences experiences = new NodeExperiences();
 		final EigenTrustPlusPlus trust = new EigenTrustPlusPlus(new MockScoreProvider(experiences));
 
