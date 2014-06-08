@@ -72,7 +72,7 @@ public class AccountsHeightObserverTest {
 	//region notifyReceiveUndo
 
 	@Test
-	public void notifyReceiveUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void notifyReceiveUndoRemovesAccountNonZeroHeightAndZeroReferenceCounterFromAccountAnalyzer() {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(12);
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
