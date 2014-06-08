@@ -50,6 +50,20 @@ public class NodeController {
 	}
 
 	/**
+	 * Gets information about the running node.
+	 *
+	 * @param challenge The challenge.
+	 * @return Information about the running node.
+	 */
+	@RequestMapping(value = "/node/info", method = RequestMethod.POST)
+	@P2PApi
+	@PublicApi
+	public AuthenticatedResponse<Node> getInfo(final NodeChallenge challenge) {
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return new AuthenticatedResponse<>(localNode, localNode.getIdentity(), challenge);
+	}
+
+	/**
 	 * Gets extended information about the running node.
 	 *
 	 * @return Extended information about the running node.
@@ -85,6 +99,21 @@ public class NodeController {
 	@PublicApi
 	public SerializableList<Node> getActivePeerList() {
 		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
+	}
+
+	/**
+	 * Gets a list of the active nodes currently known by the running node.
+	 *
+	 * @param challenge The challenge.
+	 * @return A list of the active nodes currently known by the running node.
+	 */
+	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.POST)
+	@P2PApi
+	@PublicApi
+	public AuthenticatedResponse<SerializableList<Node>> getActivePeerList(final NodeChallenge challenge) {
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		final SerializableList<Node> activeNodes = new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
+		return new AuthenticatedResponse<>(activeNodes, localNode.getIdentity(), challenge);
 	}
 
 	/**

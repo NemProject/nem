@@ -4,7 +4,7 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.peer.node.Node;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Interface that is used to sync blocks across peers.
@@ -46,7 +46,7 @@ public interface SyncConnector {
 	 * @param height The block height.
 	 * @return All blocks in the chain after the specified height.
 	 */
-	public List<Block> getChainAfter(final Node node, final BlockHeight height);
+	public Collection<Block> getChainAfter(final Node node, final BlockHeight height);
 
 	/**
 	 * Requests information about the cumulative score of the remote chain
