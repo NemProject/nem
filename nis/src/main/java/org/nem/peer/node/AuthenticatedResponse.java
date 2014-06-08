@@ -18,11 +18,11 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 *
 	 * @param entity The entity.
 	 * @param identity The identity.
-	 * @param data The challenge data.
+	 * @param challenge The challenge data.
 	 */
-	public AuthenticatedResponse(final T entity, final NodeIdentity identity, final byte[] data) {
+	public AuthenticatedResponse(final T entity, final NodeIdentity identity, final NodeChallenge challenge) {
 		this.entity = entity;
-		this.signature = identity.sign(data);
+		this.signature = identity.sign(challenge.getRaw());
 	}
 
 	/**
@@ -39,11 +39,11 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 * Gets the entity.
 	 *
 	 * @param identity The identity of the responding node.
-	 * @param data The challenge data.
+	 * @param challenge The challenge data.
 	 * @return The entity.
 	 */
-	public T getEntity(final NodeIdentity identity, final byte[] data) {
-		if (!identity.verify(data, this.signature))
+	public T getEntity(final NodeIdentity identity, final NodeChallenge challenge) {
+		if (!identity.verify(challenge.getRaw(), this.signature))
 			throw new ImpersonatingPeerException("entity source cannot be verified");
 
 		return this.entity;

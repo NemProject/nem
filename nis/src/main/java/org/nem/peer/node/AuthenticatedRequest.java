@@ -10,17 +10,17 @@ import org.nem.core.serialization.*;
 public class AuthenticatedRequest<T extends SerializableEntity> implements SerializableEntity {
 
 	private final T entity;
-	private final byte[] data;
+	private final NodeChallenge challenge;
 
 	/**
 	 * Creates an authenticated request.
 	 *
 	 * @param entity The entity.
-	 * @param data The challenge data.
+	 * @param challenge The challenge data.
 	 */
-	public AuthenticatedRequest(final T entity, final byte[] data) {
+	public AuthenticatedRequest(final T entity, final NodeChallenge challenge) {
 		this.entity = entity;
-		this.data = data;
+		this.challenge = challenge;
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class AuthenticatedRequest<T extends SerializableEntity> implements Seria
 	 */
 	public AuthenticatedRequest(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
-		this.data = deserializer.readBytes("data");
+		this.challenge = deserializer.readObject("challenge", NodeChallenge::new);
 	}
 
 	/**
@@ -44,17 +44,17 @@ public class AuthenticatedRequest<T extends SerializableEntity> implements Seria
 	}
 
 	/**
-	 * Gets the data.
+	 * Gets the challenge.
 	 *
-	 * @return The data.
+	 * @return The challenge.
 	 */
-	public byte[] getData() {
-		return this.data;
+	public NodeChallenge getChallenge() {
+		return this.challenge;
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("entity", this.entity);
-		serializer.writeBytes("data", this.data);
+		serializer.writeObject("challenge", this.challenge);
 	}
 }

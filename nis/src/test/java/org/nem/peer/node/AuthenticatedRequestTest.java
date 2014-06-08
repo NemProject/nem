@@ -10,31 +10,31 @@ public class AuthenticatedRequestTest {
 	@Test
 	public void requestCanBeCreated() {
 		// Arrange:
-		final byte[] data = Utils.generateRandomBytes();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 
 		// Act:
-		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, data);
+		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(data));
+		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		Assert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
 	}
 
 	@Test
 	public void requestCanBeRoundTripped() {
 		// Arrange:
-		final byte[] data = Utils.generateRandomBytes();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedRequest<>(entity, data),
+				new AuthenticatedRequest<>(entity, challenge),
 				null);
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(data));
+		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		Assert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
 	}
 }

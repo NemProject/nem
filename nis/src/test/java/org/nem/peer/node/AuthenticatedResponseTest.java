@@ -11,48 +11,48 @@ public class AuthenticatedResponseTest {
 	@Test
 	public void responseCanBeCreated() {
 		// Arrange:
-		final byte[] data = Utils.generateRandomBytes();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 
 		// Act:
-		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity, data);
+		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity, challenge);
 
 		// Assert:
-		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(data)));
-		Assert.assertThat(response.getEntity(identity, data), IsEqual.equalTo(entity));
+		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
+		Assert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
 	}
 
 	@Test
 	public void responseCanBeRoundTripped() {
 		// Arrange:
-		final byte[] data = Utils.generateRandomBytes();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedResponse<>(entity, identity, data),
+				new AuthenticatedResponse<>(entity, identity, challenge),
 				null);
 		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(data)));
-		Assert.assertThat(response.getEntity(identity, data), IsEqual.equalTo(entity));
+		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
+		Assert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
 	}
 
 	@Test(expected = ImpersonatingPeerException.class)
 	public void responseGetEntityFailsIfPeerIsImpersonating() {
 		// Arrange:
-		final byte[] data = Utils.generateRandomBytes();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 		final NodeIdentity identity1 = new NodeIdentity(new KeyPair());
 		final NodeIdentity identity2 = new NodeIdentity(new KeyPair());
 
 		// Act:
-		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity1, data);
+		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity1, challenge);
 
 		// Assert:
-		Assert.assertThat(response.getEntity(identity2, data), IsEqual.equalTo(entity));
+		Assert.assertThat(response.getEntity(identity2, challenge), IsEqual.equalTo(entity));
 	}
 }
