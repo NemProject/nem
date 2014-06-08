@@ -93,6 +93,7 @@ public class Account implements SerializableEntity {
 		this.importance = rhs.importance.copy();
 
 		this.height = rhs.getHeight();
+		this.refCount = rhs.getReferenceCounter();
 	}
 
 

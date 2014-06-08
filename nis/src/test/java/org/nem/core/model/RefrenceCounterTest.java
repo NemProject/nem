@@ -34,7 +34,7 @@ public class RefrenceCounterTest {
 
 	//endregion
 
-	//region add/subtract
+	//region increment/decrement
 
 	@Test
 	public void referenceCounterCanBeIncremented() {

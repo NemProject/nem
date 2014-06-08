@@ -50,7 +50,8 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 		if (null == found || null == found.getHeight())
 			throw new IllegalArgumentException("problem during undo, account not present in AA or account height is null");
 
-		if (found.decrementReferenceCounter().getRaw() == 0)
+		if (found.decrementReferenceCounter().getRaw() == 0) {
 			this.accountAnalyzer.removeAccountFromCache(address);
+		}
 	}
 }
