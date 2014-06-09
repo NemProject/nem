@@ -229,7 +229,7 @@ public class PeerNetwork {
 		final Node partnerNode = partnerNodePair.getNode();
 		LOGGER.info("synchronizing with: " + partnerNode);
 		final NodeInteractionResult result = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
-		LOGGER.info("synchron with       " + partnerNode + " finished.");
+		LOGGER.info("synchronize with    " + partnerNode + " finished.");
 		this.updateExperience(partnerNodePair.getNode(), result);
 	}
 
