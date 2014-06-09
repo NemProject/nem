@@ -37,13 +37,14 @@ public class NodeController {
 		this.host = host;
 	}
 
+	//region getInfo / getExtendedInfo
+
 	/**
 	 * Gets information about the running node.
 	 *
 	 * @return Information about the running node.
 	 */
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
-	@P2PApi
 	@PublicApi
 	public Node getInfo() {
 		return this.host.getNetwork().getLocalNode();
@@ -57,8 +58,8 @@ public class NodeController {
 	 */
 	@RequestMapping(value = "/node/info", method = RequestMethod.POST)
 	@P2PApi
-	@PublicApi
-	public AuthenticatedResponse<Node> getInfo(final NodeChallenge challenge) {
+	@AuthenticatedApi
+	public AuthenticatedResponse<Node> getInfo(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(localNode, localNode.getIdentity(), challenge);
 	}
@@ -69,11 +70,15 @@ public class NodeController {
 	 * @return Extended information about the running node.
 	 */
 	@RequestMapping(value = "/node/extended-info", method = RequestMethod.GET)
-	@P2PApi
+	@ClientApi
 	@PublicApi
 	public NisNodeInfo getExtendedInfo() {
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
+
+	//endregion
+
+	//region getPeerList / getActivePeerList
 
 	/**
 	 * Gets a list of the active and inactive nodes currently known by the
@@ -83,7 +88,6 @@ public class NodeController {
 	 *         running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/all", method = RequestMethod.GET)
-	@P2PApi
 	@PublicApi
 	public NodeCollection getPeerList() {
 		return this.host.getNetwork().getNodes();
@@ -95,7 +99,6 @@ public class NodeController {
 	 * @return A list of the active nodes currently known by the running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
-	@P2PApi
 	@PublicApi
 	public SerializableList<Node> getActivePeerList() {
 		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
@@ -112,9 +115,10 @@ public class NodeController {
 	@PublicApi
 	public AuthenticatedResponse<SerializableList<Node>> getActivePeerList(final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		final SerializableList<Node> activeNodes = new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
-		return new AuthenticatedResponse<>(activeNodes, localNode.getIdentity(), challenge);
+		return new AuthenticatedResponse<>(this.getActivePeerList(), localNode.getIdentity(), challenge);
 	}
+
+	//endregion
 
 	/**
 	 * Gets the local node's experiences.
