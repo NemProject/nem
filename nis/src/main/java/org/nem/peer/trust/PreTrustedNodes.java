@@ -65,8 +65,10 @@ public class PreTrustedNodes {
 			return preTrustVector;
 		}
 
-		for (int i = 0; i < nodes.length; i++)
+		for (int i = 0; i < nodes.length; i++) {
 			preTrustVector.setAt(i, this.isPreTrusted(nodes[i]) ? 1.0 / numPreTrustedNodes : 0.0);
+		}
+		preTrustVector.normalize();
 
 		return preTrustVector;
 	}
