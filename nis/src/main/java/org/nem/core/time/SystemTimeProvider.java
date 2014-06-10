@@ -14,8 +14,8 @@ public class SystemTimeProvider implements TimeProvider {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, GregorianCalendar.AD);
 		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, Calendar.JUNE);
-		calendar.set(Calendar.DAY_OF_MONTH, 9);
+		calendar.set(Calendar.MONTH, Calendar.MAY);
+		calendar.set(Calendar.DAY_OF_MONTH, 25);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
