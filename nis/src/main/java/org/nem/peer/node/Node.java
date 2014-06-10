@@ -62,7 +62,6 @@ public class Node implements SerializableEntity {
 		this.platform = deserializer.readString("platform");
 		this.version = deserializer.readString("version");
 		this.application = deserializer.readString("application");
-		System.out.println(this.toString());
 		this.ensureValidity();
 	}
 
