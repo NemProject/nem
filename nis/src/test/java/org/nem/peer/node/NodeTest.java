@@ -14,6 +14,8 @@ public class NodeTest {
 	private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
 	private final static NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null, null);
 
+	//region construction
+
 	@Test
 	public void canCreateNewNodeWithoutMetaData() {
 		// Arrange:
@@ -107,6 +109,50 @@ public class NodeTest {
 				IllegalArgumentException.class);
 	}
 
+	//endregion
+
+	//region setters
+
+	@Test
+	public void canChangeEndpoint() {
+		// Arrange:
+		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT);
+		final NodeEndpoint endpoint = NodeEndpoint.fromHost("10.0.0.2");
+
+		// Act:
+		node.setEndpoint(endpoint);
+
+		// Assert:
+		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void cannotChangeEndpointToNull() {
+		// Act:
+		new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT).setEndpoint(null);
+	}
+
+	@Test
+	public void canChangeMetaData() {
+		// Arrange:
+		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT);
+		final NodeMetaData metaData = new NodeMetaData("aaa", "ppp", "vvv");
+
+		// Act:
+		node.setMetaData(metaData);
+
+		// Assert:
+		Assert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void cannotChangeMetaDataToNull() {
+		// Act:
+		new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT).setMetaData(null);
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	private static final Map<String, Node> DESC_TO_NODE_MAP = new HashMap<String, Node>() {
@@ -147,7 +193,7 @@ public class NodeTest {
 
 	//endregion
 
-	//toString
+	//region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {

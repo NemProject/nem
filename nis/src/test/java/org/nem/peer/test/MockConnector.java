@@ -248,7 +248,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 
 					case CHANGE_ADDRESS:
 						final URL url = endpoint.getBaseUrl();
-						endpoint = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() * 100);
+						endpoint = new NodeEndpoint(url.getProtocol(), url.getHost() + "0", url.getPort());
 						break;
 
 					case CHANGE_METADATA:

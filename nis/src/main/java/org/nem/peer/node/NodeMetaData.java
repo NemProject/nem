@@ -2,6 +2,8 @@ package org.nem.peer.node;
 
 import org.nem.core.serialization.*;
 
+import java.util.Arrays;
+
 /**
  * Meta data about a node.
  */
@@ -70,5 +72,27 @@ public class NodeMetaData implements SerializableEntity {
 		serializer.writeString("platform", this.platform);
 		serializer.writeString("application", this.application);
 		serializer.writeString("version", this.version);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(this.getParts());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof NodeMetaData))
+			return false;
+
+		final NodeMetaData rhs = (NodeMetaData)obj;
+		return Arrays.equals(this.getParts(), rhs.getParts());
+	}
+
+	private String[] getParts() {
+		return new String[] {
+			this.platform,
+			this.application,
+			this.version
+		};
 	}
 }

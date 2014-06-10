@@ -279,8 +279,13 @@ public class PeerNetwork {
 		}
 
 		public CompletableFuture<Void> refresh() {
-			final List<CompletableFuture> futures = this.getRefreshNodes()
-					.map(this::refreshNodeAsync)
+			// all refresh nodes are directly communicated with;
+			// ensure that only direct communication is trusted for these nodes
+			final Set<Node> refreshNodes = this.getRefreshNodes();
+			this.connectedNodes.addAll(refreshNodes);
+
+			final List<CompletableFuture> futures = refreshNodes.stream()
+					.map(n -> this.getNodeInfo(n, true))
 					.collect(Collectors.toList());
 
             return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
@@ -290,19 +295,16 @@ public class PeerNetwork {
 					});
 		}
 
-		private Stream<Node> getRefreshNodes() {
+		private Set<Node> getRefreshNodes() {
 			// always include pre-trusted nodes even if they previously resulted in a failure
 			final Set<Node> refreshNodes = new HashSet<>(this.nodes.getAllNodes());
 			refreshNodes.addAll(this.preTrustedNodes.getNodes().stream().collect(Collectors.toList()));
-			return refreshNodes.stream();
-		}
-
-		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
-			return this.getNodeInfo(node, true);
+			return refreshNodes;
 		}
 
 		private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
-			if (!this.connectedNodes.add(node)) {
+			// never sync with the local node or an indirect node that has already been communicated with
+			if (this.localNode.equals(node) || (!isDirectContact && !this.connectedNodes.add(node))) {
 				return CompletableFuture.completedFuture(null);
 			}
 
@@ -312,6 +314,8 @@ public class PeerNetwork {
 						if (!areCompatible(node, n))
 							throw new FatalPeerException("node response is not compatible with node identity");
 
+						node.setEndpoint(n.getEndpoint());
+						node.setMetaData(n.getMetaData());
 						return NodeStatus.ACTIVE;
 					});
 

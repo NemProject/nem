@@ -79,6 +79,8 @@ public class PeerNetworkTest {
 
 	//region getInfo
 
+	//region call counts
+
 	@Test
 	public void refreshCallsGetInfoForEveryInactiveNode() {
 		// Arrange:
@@ -143,6 +145,10 @@ public class PeerNetworkTest {
 		nodes.getAllNodes().stream().forEach(node -> nodes.update(node, status));
 	}
 
+	//endregion
+
+	//region transitions
+
 	@Test
 	public void refreshSuccessMovesNodesToActive() {
 		// Arrange:
@@ -193,6 +199,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_IDENTITY);
 
 		// Act:
@@ -208,6 +215,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
 
 		// Act:
@@ -217,7 +225,7 @@ public class PeerNetworkTest {
 		// Assert:
 		NodeCollectionAssert.areHostsEquivalent(
 				nodes,
-				new String[] { "10.0.0.1", "10.0.0.200", "10.0.0.3" },
+				new String[] { "10.0.0.1", "10.0.0.20", "10.0.0.3" },
 				new String[] { });
 	}
 
@@ -226,6 +234,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
 		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_METADATA);
 
 		// Act:
@@ -238,6 +247,8 @@ public class PeerNetworkTest {
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("c-plat"));
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("c-ver"));
 	}
+
+	//endregion
 
 	//endregion
 
@@ -350,7 +361,7 @@ public class PeerNetworkTest {
 		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
 		connector.setGetInfoError("10.0.0.4", MockConnector.TriggerAction.FATAL);
 		connector.setGetInfoError("10.0.0.6", MockConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.7", MockConnector.TriggerAction.CHANGE_ADDRESS);
+		connector.setGetInfoError("10.0.0.7", MockConnector.TriggerAction.CHANGE_IDENTITY);
 
 		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
 		// but the local node can only communicate with 10.0.0.5
@@ -358,7 +369,8 @@ public class PeerNetworkTest {
 				PeerUtils.createNodeWithHost("10.0.0.2"),
 				PeerUtils.createNodeWithHost("10.0.0.4"),
 				PeerUtils.createNodeWithHost("10.0.0.5"),
-				PeerUtils.createNodeWithHost("10.0.0.6"));
+				PeerUtils.createNodeWithHost("10.0.0.6"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
 		connector.setKnownPeers(knownPeers);
 
 		// Act:
@@ -370,6 +382,48 @@ public class PeerNetworkTest {
 				nodes,
 				new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.5" },
 				new String[] { "10.0.0.2", "10.0.0.6" });
+	}
+
+	@Test
+	public void refreshPreventsEvilNodeFromGettingGoodNodesDropped() {
+		// this is similar to refreshGivesPrecedenceToFirstHandExperience
+		// but is important to show the following attack is prevented:
+		// evil node propagating mismatched identities for good nodes does not remove the good nodes
+
+		// Arrange: set up 4 active nodes (3 pre-trusted)
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
+		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
+		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.SLEEP_INACTIVE);
+
+		// when the mock connector sees hosts 100-3, it will trigger an identity change
+		connector.setGetInfoError("10.0.0.100", MockConnector.TriggerAction.CHANGE_IDENTITY);
+		connector.setGetInfoError("10.0.0.101", MockConnector.TriggerAction.CHANGE_IDENTITY);
+		connector.setGetInfoError("10.0.0.102", MockConnector.TriggerAction.CHANGE_IDENTITY);
+		connector.setGetInfoError("10.0.0.103", MockConnector.TriggerAction.CHANGE_IDENTITY);
+
+		// Arrange: set up a node peers list that indicates good peers (1, 3, 25, 26) are untrustworthy
+		// (2 is the evil node in this scenario)
+		final List<Node> knownPeers = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.100", "10.0.0.1"),
+				PeerUtils.createNodeWithHost("10.0.0.101", "10.0.0.3"),
+				PeerUtils.createNodeWithHost("10.0.0.102", "10.0.0.25"),
+				PeerUtils.createNodeWithHost("10.0.0.103", "10.0.0.26"));
+		connector.setKnownPeers(knownPeers);
+
+		// Act:
+		network.refresh().join();
+		final NodeCollection nodes = network.getNodes();
+
+		// Assert:
+		// - all good peers (1, 3, 25) that were directly communicated with are active
+		// - the evil node (2) is active because the reverse is possible (i.e. 2 is the only good node)
+		// - the good node that hasn't been communicated with (26) has been dropped
+		NodeCollectionAssert.areHostsEquivalent(
+				nodes,
+				new String[] { "10.0.0.1", "10.0.0.25", "10.0.0.2" },
+				new String[] { "10.0.0.3" });
 	}
 
 	@Test

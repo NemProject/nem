@@ -9,8 +9,8 @@ import org.nem.core.serialization.*;
 public class Node implements SerializableEntity {
 
 	private final NodeIdentity identity;
-	private final NodeEndpoint endpoint;
-	private final NodeMetaData metaData;
+	private NodeEndpoint endpoint;
+	private NodeMetaData metaData;
 
 	/**
 	 * Creates a new node without meta data.
@@ -34,8 +34,8 @@ public class Node implements SerializableEntity {
 			final NodeEndpoint endpoint,
 			final NodeMetaData metaData) {
 		this.identity = identity;
-		this.endpoint = endpoint;
-		this.metaData = getMetaData(metaData);
+		this.setEndpoint(endpoint);
+		this.setMetaData(getMetaData(metaData));
 		this.ensureValidity();
 	}
 
@@ -46,8 +46,8 @@ public class Node implements SerializableEntity {
 	 */
 	public Node(final Deserializer deserializer) {
 		this.identity = deserializer.readObject("identity", NodeIdentity::new);
-		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint::new);
-		this.metaData = getMetaData(deserializer.readObject("metaData", NodeMetaData::new));
+		this.setEndpoint(deserializer.readObject("endpoint", NodeEndpoint::new));
+		this.setMetaData(getMetaData(deserializer.readObject("metaData", NodeMetaData::new)));
 		this.ensureValidity();
 	}
 
@@ -91,14 +91,35 @@ public class Node implements SerializableEntity {
 		return this.metaData;
 	}
 
+	/**
+	 * Sets the endpoint.
+	 *
+	 * @param endpoint The endpoint.
+	 */
+	public void setEndpoint(final NodeEndpoint endpoint) {
+		if (null == endpoint)
+			throw new IllegalArgumentException("endpoint must be non-null");
+
+		this.endpoint = endpoint;
+	}
+
+	/**
+	 * Sets the meta data.
+	 *
+	 * @param metaData The meta data.
+	 */
+	public void setMetaData(final NodeMetaData metaData) {
+		if (null == metaData)
+			throw new IllegalArgumentException("metaData must be non-null");
+
+		this.metaData = metaData;
+	}
+
 	//endregion
 
 	private void ensureValidity() {
 		if (null == this.identity)
 			throw new IllegalArgumentException("identity must be non-null");
-
-		if (null == this.endpoint)
-			throw new IllegalArgumentException("endpoint must be non-null");
 	}
 
 	@Override
