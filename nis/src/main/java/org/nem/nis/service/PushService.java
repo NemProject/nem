@@ -89,15 +89,18 @@ public class PushService {
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
 		logAdditionalInfo.accept(entity);
 
+		// TODO: broadcast entities need to be changed so that they are signed by the pusher
 		final PeerNetwork network = this.host.getNetwork();
 		Node remoteNode = network.getNodes().findNodeByEndpoint(NodeEndpoint.fromHost(request.getRemoteAddr()));
-		if (null == remoteNode)
-			remoteNode = Node.fromHost(request.getRemoteAddr());
+		final Consumer<NodeInteractionResult> updateStatus = status -> {
+			if (null != remoteNode)
+				network.updateExperience(remoteNode, status);
+		};
 
 		final NodeInteractionResult isValidStatus = isValid.apply(entity);
 		if (isValidStatus == NodeInteractionResult.FAILURE) {
 			// Bad experience with the remote node.
-			network.updateExperience(remoteNode, isValidStatus);
+			updateStatus.accept(isValidStatus);
 			return false;
 		}
 
@@ -105,7 +108,7 @@ public class PushService {
 		final NodeInteractionResult status = isAccepted.apply(entity);
 		if (NodeInteractionResult.NEUTRAL != status) {
 			// Good experience with the remote node.
-			network.updateExperience(remoteNode, status);
+			updateStatus.accept(status);
 		}
 
 		if (status == NodeInteractionResult.SUCCESS) {
