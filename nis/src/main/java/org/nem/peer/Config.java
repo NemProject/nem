@@ -17,7 +17,7 @@ public class Config {
 	private static final String DEFAULT_PLATFORM = "Unknown";
 	private static final String DEFAULT_APPLICATION = "Unknown";
 
-	private final Node localNode;
+	private Node localNode;
 	private final PreTrustedNodes preTrustedNodes;
 	private final TrustParameters trustParameters;
 	private final TrustProvider trustProvider;
@@ -85,6 +85,14 @@ public class Config {
 		return this.localNode;
 	}
 
+	/**
+	 * Replaces the local node's endpoint with a new endpoint.
+	 * 
+	 * @param endpoint The new endpoint.
+	 */
+	public void updateLocalNodeEndpoint(NodeEndpoint endpoint) {
+		this.localNode.setEndpoint(endpoint);
+	}
 	/**
 	 * Gets all pre-trusted nodes.
 	 *

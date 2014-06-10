@@ -271,7 +271,12 @@ public class PeerNetwork {
 		}
 		this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode().getEndpoint(), configLocalNode.getEndpoint())
 						  .exceptionally(e -> null)
-						  .thenAccept(endpoint -> { this.localNode = getLocalNode(configLocalNode, endpoint); });
+						  .thenAccept(endpoint -> { LOGGER.info(String.format(
+																"local node configured as <%s> seen as <%s>",
+																configLocalNode.getEndpoint(),
+																endpoint));
+						  							this.localNode.setEndpoint(endpoint); 
+						  							config.updateLocalNodeEndpoint(endpoint); });
 	}
 
 	private static class NodeRefresher {
