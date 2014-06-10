@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.ArrayUtils;
 
 public class NodeIdentityTest {
 
@@ -164,6 +165,27 @@ public class NodeIdentityTest {
 
 		// Assert:
 		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void signatureCannotBeVerifiedWithoutChallengePrefix() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final NodeIdentity identity = new NodeIdentity(keyPair);
+
+		final byte[] payload = "alice is bad".getBytes();
+		final byte[] challengePrefix = "nem trust challenge:".getBytes();
+		final byte[] publicKey = keyPair.getPublicKey().getRaw();
+		final byte[] payloadWithPrefix = ArrayUtils.concat(challengePrefix, publicKey, payload);
+
+		final Signer signer = new Signer(keyPair);
+		final Signature signedDataWithPrefix = signer.sign(payloadWithPrefix);
+		final Signature signedDataWithoutPrefix = signer.sign(payload);
+
+		// Assert:
+		final NodeChallenge challenge = new NodeChallenge(payload);
+		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithPrefix), IsEqual.equalTo(true));
+		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithoutPrefix), IsEqual.equalTo(false));
 	}
 
 	//endregion

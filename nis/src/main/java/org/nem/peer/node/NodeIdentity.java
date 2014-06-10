@@ -3,13 +3,14 @@ package org.nem.peer.node;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
-import org.nem.core.utils.ArrayUtils;
+import org.nem.core.utils.*;
 
 /**
  * Represents a node identity that uniquely identifies a node.
  */
 public class NodeIdentity implements SerializableEntity {
 
+	private static final byte[] CHALLENGE_PREFIX = StringEncoder.getBytes("nem trust challenge:");
 	private final KeyPair keyPair;
 	private final Address address;
 	private final String name;
@@ -127,7 +128,10 @@ public class NodeIdentity implements SerializableEntity {
 	}
 
 	private byte[] getPayload(final byte[] salt) {
-		return ArrayUtils.concat(this.address.getPublicKey().getRaw(), salt);
+		return ArrayUtils.concat(
+				CHALLENGE_PREFIX,
+				this.address.getPublicKey().getRaw(),
+				salt);
 	}
 
 	@Override
