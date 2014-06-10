@@ -22,6 +22,7 @@ public class Account implements SerializableEntity {
 	private final AccountImportance importance;
 
 	private BlockHeight height;
+	private ReferenceCounter refCount = ReferenceCounter.ZERO;
 
 	/**
 	 * Creates an account around a key pair.
@@ -92,6 +93,7 @@ public class Account implements SerializableEntity {
 		this.importance = rhs.importance.copy();
 
 		this.height = rhs.getHeight();
+		this.refCount = rhs.getReferenceCounter();
 	}
 
 	private Account(final Account rhs, final KeyPair keyPair) {
@@ -303,6 +305,35 @@ public class Account implements SerializableEntity {
 			this.height = height;
 	}
 
+	/**
+	 * Returns the reference counter.
+	 * 
+	 * @return The  reference counter.
+	 */
+	public ReferenceCounter getReferenceCounter() {
+		return this.refCount;
+	}
+	
+	/**
+	 * Increments the reference counter.
+	 * 
+	 * @return The new value of the reference counter.
+	 */
+	public ReferenceCounter incrementReferenceCounter() {
+		this.refCount = this.refCount.increment();
+		return this.refCount;
+	}
+	
+	/**
+	 * Decrements the reference counter.
+	 * 
+	 * @return The new value of the reference counter.
+	 */
+	public ReferenceCounter decrementReferenceCounter() {
+		this.refCount = this.refCount.decrement();
+		return this.refCount;
+	}
+	
 	/**
 	 * Gets the weighted balances associated with this account.
 	 *

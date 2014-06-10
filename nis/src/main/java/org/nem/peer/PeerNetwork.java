@@ -23,7 +23,7 @@ public class PeerNetwork {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private final Config config;
-	private final Node localNode;
+	private Node localNode;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
@@ -229,6 +229,7 @@ public class PeerNetwork {
 		final Node partnerNode = partnerNodePair.getNode();
 		LOGGER.info("synchronizing with: " + partnerNode);
 		final NodeInteractionResult result = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
+		LOGGER.info("synchronize with    " + partnerNode + " finished.");
 		this.updateExperience(partnerNodePair.getNode(), result);
 	}
 
@@ -256,6 +257,26 @@ public class PeerNetwork {
 		this.nodes.pruneInactiveNodes();
 		final int numNodesPruned = numInitialInactiveNodes - this.nodes.getInactiveNodes().size();
 		LOGGER.info(String.format("%d inactive node(s) were pruned", numNodesPruned));
+	}
+
+	/**
+	 * Update the endpoint of the local node as seen by other nodes.
+	 */
+	public void updateLocalNodeEndpoint() {
+		LOGGER.info("updating local node.");
+		final Node configLocalNode = config.getLocalNode();
+		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
+		if (partnerNodePair == null) {
+			LOGGER.warning("no suitable peers found to update local node.");
+		}
+		this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode().getEndpoint(), configLocalNode.getEndpoint())
+						  .exceptionally(e -> null)
+						  .thenAccept(endpoint -> { LOGGER.info(String.format(
+																"local node configured as <%s> seen as <%s>",
+																configLocalNode.getEndpoint(),
+																endpoint));
+						  							this.localNode.setEndpoint(endpoint); 
+						  							config.updateLocalNodeEndpoint(endpoint); });
 	}
 
 	private static class NodeRefresher {

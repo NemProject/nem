@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
  */
 public class Node implements SerializableEntity {
 
-	private final NodeEndpoint endpoint;
+	private NodeEndpoint endpoint;
 	private final String platform;
 	private final String version;
 	private final String application;
@@ -62,6 +62,7 @@ public class Node implements SerializableEntity {
 		this.platform = deserializer.readString("platform");
 		this.version = deserializer.readString("version");
 		this.application = deserializer.readString("application");
+		System.out.println(this.toString());
 		this.ensureValidity();
 	}
 
@@ -82,6 +83,18 @@ public class Node implements SerializableEntity {
 	 */
 	public NodeEndpoint getEndpoint() {
 		return this.endpoint;
+	}
+
+	/**
+	 * Sets the endpoint.
+	 *
+	 * @param endpoint The endpoint.
+	 */
+	public void setEndpoint(final NodeEndpoint endpoint) {
+		if (null == endpoint)
+			throw new IllegalArgumentException("endpoint must be non-null");
+	
+		this.endpoint = endpoint;
 	}
 
 	/**

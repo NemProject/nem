@@ -36,6 +36,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
 
+	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
+
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
 	private final CountingBlockSynchronizer synchronizer;
@@ -133,7 +135,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					this.createSecondaryAsyncTimer(
 							() -> CompletableFuture.runAsync(this.network::pruneInactiveNodes),
 							PRUNE_INACTIVE_NODES_DELAY,
-							"PRUNING INACTIVE NODES"));
+							"PRUNING INACTIVE NODES"),
+					this.createSecondaryAsyncTimer(
+							() -> CompletableFuture.runAsync(this.network::updateLocalNodeEndpoint),
+							UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
+							"UPDATING LOCAL NODE ENDPOINT"));
 		}
 
 		private static AbstractDelayStrategy getRefreshDelayStrategy() {

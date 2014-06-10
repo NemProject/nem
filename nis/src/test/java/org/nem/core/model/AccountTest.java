@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -168,6 +169,55 @@ public class AccountTest {
 
 	//endregion
 
+	//region refCount
+
+	@Test
+	public void referenceCountIsZeroForNewAccount() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		
+		// Assert:
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+	}
+
+	@Test
+	public void referenceCounterCanBeIncremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		
+		// Act:
+		final ReferenceCounter result = account.incrementReferenceCounter();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(1)));
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
+	}
+
+	@Test
+	public void referenceCounterCanBeDecrementedIfPositive() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		account.incrementReferenceCounter();
+		
+		// Act:
+		final ReferenceCounter result = account.decrementReferenceCounter();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(0)));
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void referenceCounterCannotBeDecrementedIfZero() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		
+		// Act:
+		account.decrementReferenceCounter();
+	}
+
+	//endregion
+	
 	//region foraged blocks
 
 	@Test
