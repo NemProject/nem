@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = "org.nem.nis", excludeFilters = {
+@ComponentScan(basePackages = {"org.nem.nis", "org.nem.b"}, excludeFilters = {
 		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
 })
 @EnableTransactionManagement
