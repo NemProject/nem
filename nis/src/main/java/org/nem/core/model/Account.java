@@ -33,8 +33,8 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Creates an account around an address. This constructor should only
-	 * be used if the account's public key is not known.
+	 * Creates an account around an address. This constructor should only be
+	 * used if the account's public key is not known.
 	 *
 	 * @param address The address.
 	 */
@@ -56,7 +56,7 @@ public class Account implements SerializableEntity {
 	 * @param address
 	 */
 	public void _setPublicKey(final Address address) {
-		if (! Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
+		if (!Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
 			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
 		}
 
@@ -94,6 +94,18 @@ public class Account implements SerializableEntity {
 		this.height = rhs.getHeight();
 	}
 
+	private Account(final Account rhs, final KeyPair keyPair) {
+		this.keyPair = keyPair;
+		this.address = getAddressFromKeyPair(keyPair);
+		this.balance = rhs.getBalance();
+		this.label = rhs.getLabel();
+		this.foragedBlocks = rhs.getForagedBlocks();
+
+		this.messages = rhs.getMessages();
+		this.weightedBalances = rhs.weightedBalances;
+		this.importance = rhs.importance;
+		this.height = rhs.getHeight();
+	}
 
 	/**
 	 * Creates an unlinked copy of this account.
@@ -105,8 +117,19 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes an account.
-	 * Currently this deserializer is used ONLY by NCC
+	 * 
+	 * Creates a shallow copy of this account the the specified key pair.
+	 * 
+	 * @param keyPair The desired key pair of the new account.
+	 * @return The shallow copy.
+	 */
+
+	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
+		return new Account(this, keyPair);
+	}
+
+	/**
+	 * Deserializes an account. Currently this deserializer is used ONLY by NCC
 	 *
 	 * @param deserializer The deserializer.
 	 */
@@ -139,7 +162,7 @@ public class Account implements SerializableEntity {
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
 
-        serializer.writeObject("importance", this.getImportanceInfo());
+		serializer.writeObject("importance", this.getImportanceInfo());
 		serializer.writeObjectArray("messages", this.getMessages());
 	}
 
@@ -277,7 +300,7 @@ public class Account implements SerializableEntity {
 	 */
 	public void setHeight(final BlockHeight height) {
 		if (null == this.height)
-		    this.height = height;
+			this.height = height;
 	}
 
 	/**
@@ -308,18 +331,18 @@ public class Account implements SerializableEntity {
 		if (obj == null || !(obj instanceof Account))
 			return false;
 
-		Account rhs = (Account)obj;
+		Account rhs = (Account) obj;
 		return this.address.equals(rhs.address);
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes an account object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param account    The object.
+	 * @param label The optional label.
+	 * @param account The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Account account) {
 		writeTo(serializer, label, account, AccountEncoding.ADDRESS);
@@ -329,25 +352,21 @@ public class Account implements SerializableEntity {
 	 * Writes an account object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param account    The object.
-	 * @param encoding   The account encoding mode.
+	 * @param label The optional label.
+	 * @param account The object.
+	 * @param encoding The account encoding mode.
 	 */
-	public static void writeTo(
-			final Serializer serializer,
-			final String label,
-			final Account account,
-			final AccountEncoding encoding) {
+	public static void writeTo(final Serializer serializer, final String label, final Account account, final AccountEncoding encoding) {
 		switch (encoding) {
-			case PUBLIC_KEY:
-				final KeyPair keyPair = account.getKeyPair();
-				serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
-				break;
+		case PUBLIC_KEY:
+			final KeyPair keyPair = account.getKeyPair();
+			serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
+			break;
 
-			case ADDRESS:
-			default:
-				Address.writeTo(serializer, label, account.getAddress());
-				break;
+		case ADDRESS:
+		default:
+			Address.writeTo(serializer, label, account.getAddress());
+			break;
 		}
 	}
 
@@ -355,7 +374,7 @@ public class Account implements SerializableEntity {
 	 * Reads an account object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
+	 * @param label The optional label.
 	 *
 	 * @return The read object.
 	 */
@@ -367,33 +386,27 @@ public class Account implements SerializableEntity {
 	 * Reads an account object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param encoding     The account encoding.
-	 * @param label        The optional label.
+	 * @param encoding The account encoding.
+	 * @param label The optional label.
 	 *
 	 * @return The read object.
 	 */
-	public static Account readFrom(
-			final Deserializer deserializer,
-			final String label,
-			final AccountEncoding encoding) {
+	public static Account readFrom(final Deserializer deserializer, final String label, final AccountEncoding encoding) {
 		final Address address = readAddress(deserializer, label, encoding);
 		return deserializer.getContext().findAccountByAddress(address);
 	}
 
-	private static Address readAddress(
-			final Deserializer deserializer,
-			final String label,
-			final AccountEncoding encoding) {
+	private static Address readAddress(final Deserializer deserializer, final String label, final AccountEncoding encoding) {
 		switch (encoding) {
-			case PUBLIC_KEY:
-				final byte[] publicKeyBytes = deserializer.readBytes(label);
-				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
+		case PUBLIC_KEY:
+			final byte[] publicKeyBytes = deserializer.readBytes(label);
+			return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
 
-			case ADDRESS:
-			default:
-				return Address.readFrom(deserializer, label);
+		case ADDRESS:
+		default:
+			return Address.readFrom(deserializer, label);
 		}
 	}
 
-	//endregion
+	// endregion
 }
