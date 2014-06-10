@@ -52,11 +52,21 @@ public class Foraging  {
 		this.unconfirmedTransactions = new UnconfirmedTransactions();
 	}
 
-	public void addUnlockedAccount(Account account) {
+	/**
+	 * Unlocks the specified account for foraging.
+	 *
+	 * @param account The account.
+	 */
+	public void addUnlockedAccount(final Account account) {
 		unlockedAccounts.add(account);
 	}
 
 
+	/**
+	 * Removes the specified account from the list of active foraging accounts.
+	 *
+	 * @param account The account.
+	 */
 	public void removeUnlockedAccount(final Account account) {
 		unlockedAccounts.remove(account);
 	}
