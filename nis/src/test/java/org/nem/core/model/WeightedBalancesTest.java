@@ -225,25 +225,30 @@ public class WeightedBalancesTest {
 		final WeightedBalances copiedBalances = originalBalances.copy();
 
 		// Assert:
-		assertUnvested(copiedBalances, 1, originalBalances.getUnvested(BlockHeight.ONE));
-		assertVested(copiedBalances, 1, originalBalances.getVested(BlockHeight.ONE));
-		assertUnvested(copiedBalances, 1441, originalBalances.getUnvested(height1));
-		assertVested(copiedBalances, 1441, originalBalances.getVested(height1));
-		assertUnvested(copiedBalances, 1500, originalBalances.getUnvested(height2));
-		assertVested(copiedBalances, 1500, originalBalances.getVested(height2));
+		assertEqualAtHeight(copiedBalances, originalBalances, BlockHeight.ONE);
+		assertEqualAtHeight(copiedBalances, originalBalances, height1);
+		assertEqualAtHeight(copiedBalances, originalBalances, height2);
 	}
 
 	//endregion
 
-	private void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
-	private void assertVested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertVested(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getVested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
-	private void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertEqualAtHeight(
+			final WeightedBalances actualBalances,
+			final WeightedBalances expectedBalances,
+			final BlockHeight height) {
+		assertUnvested(actualBalances, height.getRaw(), expectedBalances.getUnvested(height));
+		assertVested(actualBalances, height.getRaw(), expectedBalances.getVested(height));
+	}
+
+	private static void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		final BlockHeight blockHeight = new BlockHeight(height);
 		final Amount actualSum = weightedBalances.getUnvested(blockHeight).add(weightedBalances.getVested(blockHeight));
 		Assert.assertThat(actualSum, IsEqual.equalTo(amount));

@@ -10,7 +10,12 @@ public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter> {
 	 */
 	public static final ReferenceCounter ZERO = new ReferenceCounter(0);
 
-	protected ReferenceCounter(final long refCount) {
+	/**
+	 * Creates a new reference counter.
+	 *
+	 * @param refCount The original reference count.
+	 */
+	public ReferenceCounter(final long refCount) {
 		super(refCount, ReferenceCounter.class);
 		
 		if (this.getRaw() < 0)
@@ -43,5 +48,4 @@ public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter> {
 	public ReferenceCounter decrement() {
 		return new ReferenceCounter(this.getRaw() - 1);
 	}
-	
 }

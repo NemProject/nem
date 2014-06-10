@@ -27,6 +27,7 @@ public class OutlinkObserver implements TransferObserver {
 		if (sender.getAddress().equals(recipient.getAddress())) {
 			return;
 		}
+
 		final Amount linkWeight = calculateLinkWeight(this.isExecute ? sender : recipient, amount);
 
 		if (this.isExecute) {

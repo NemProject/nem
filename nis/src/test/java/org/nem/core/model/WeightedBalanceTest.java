@@ -12,7 +12,7 @@ public class WeightedBalanceTest {
 		// Arrange:
 		final WeightedBalance weightedBalance = WeightedBalance.createUnvested(new BlockHeight(120), Amount.fromNem(1_000_000));
 
-		// Assert
+		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.ZERO, Amount.fromNem(1_000_000));
 		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
@@ -22,7 +22,7 @@ public class WeightedBalanceTest {
 		// Arrange:
 		final WeightedBalance weightedBalance = WeightedBalance.createVested(new BlockHeight(120), Amount.fromNem(1_000_000));
 
-		// Assert
+		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.ZERO);
 		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
@@ -95,7 +95,7 @@ public class WeightedBalanceTest {
 		// Arrange:
 		final WeightedBalance initialBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(1000));
 
-		// Act
+		// Act:
 		final WeightedBalance weightedBalance = initialBalance.next();
 
 		// Assert:
@@ -107,11 +107,11 @@ public class WeightedBalanceTest {
 		// Arrange:
 		final WeightedBalance initialBalance = WeightedBalance.createUnvested(new BlockHeight(770), Amount.fromMicroNem(1000));
 
-		// Act
+		// Act:
 		final WeightedBalance weightedBalance = initialBalance.next();
 
 		// Assert:
-		assertWeightedBalance( weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
+		assertWeightedBalance(weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class WeightedBalanceTest {
 		// Arrange:
 		final WeightedBalance weightedBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(1000000));
 
-		// Act
+		// Act:
 		final WeightedBalance result = advanceDays(weightedBalance, 50);
 
 		// Assert:
@@ -131,7 +131,7 @@ public class WeightedBalanceTest {
 		// Arrange:
 		WeightedBalance balance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromMicroNem(75));
 		for (int i = 1; i < 75; ++i) {
-			// Act
+			// Act:
 			balance = balance.next();
 
 			// Assert:

@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
-
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -194,7 +193,7 @@ public class AccountTest {
 	}
 
 	@Test
-	public void referenceCounterCanBeDecrementedIfPositive() {
+	public void referenceCounterCanBeDecremented() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		account.incrementReferenceCounter();
@@ -205,15 +204,6 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(0)));
 		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void referenceCounterCannotBeDecrementedIfZero() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		
-		// Act:
-		account.decrementReferenceCounter();
 	}
 
 	//endregion
@@ -828,6 +818,7 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
+		Assert.assertThat(copyAccount.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(2)));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
@@ -843,6 +834,8 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.setLabel("Alpha Sigma");
+		account.incrementReferenceCounter();
+		account.incrementReferenceCounter();
 		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
 		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 	}
@@ -863,4 +856,37 @@ public class AccountTest {
 
 	//endregion
 
+	//region shallow copy
+
+	@Test
+	public void canCreateShallowCopyWithNewKeyPair() {
+		// Arrange:
+		final Account original = new Account(Utils.generateRandomAddress());
+		setAccountValuesForCopyTests(original);
+		final KeyPair keyPair = new KeyPair();
+
+		// Act:
+		final Account copy = original.shallowCopyWithKeyPair(keyPair);
+
+		// Assert:
+		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
+		assertShallowCopy(original, copy);
+
+	}
+
+	private static void assertShallowCopy(final Account original, final Account copy) {
+		// Assert:
+		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
+		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
+		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
+		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
+		Assert.assertThat(copy.getReferenceCounter(), IsEqual.equalTo(copy.getReferenceCounter()));
+
+		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
+		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
+		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));
+	}
+
+	//endregion
 }

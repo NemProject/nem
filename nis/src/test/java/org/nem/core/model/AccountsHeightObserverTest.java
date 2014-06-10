@@ -56,34 +56,41 @@ public class AccountsHeightObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 		accountAnalyzer.addAccountToCache(account1.getAddress());
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
-		final ReferenceCounter original = account1.getReferenceCounter();
 
 		// Act:
 		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
 
 		// Assert:
-		Assert.assertThat(original, IsEqual.equalTo(new ReferenceCounter(0)));
 		final Account result = accountAnalyzer.findByAddress(account1.getAddress());
 		Assert.assertThat(result.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
 	}
 
 	//endregion
-	
+
 	//region notifyReceiveUndo
 
 	@Test
-	public void notifyReceiveUndoRemovesAccountNonZeroHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void notifyReceiveUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+		// Assert:
+		assertReceiveUndoRemovesAccount(12, 12);
+	}
+
+	@Test
+	public void notifyReceiveUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+		// Assert: (the height doesn't have to match)
+		assertReceiveUndoRemovesAccount(12, 15);
+	}
+
+	private static void assertReceiveUndoRemovesAccount(final int accountHeight, final int undoHeight) {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
+		final Account account1 = createAccountWithHeight(accountHeight);
+		account1.incrementReferenceCounter();
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		accountAnalyzer.addAccountToCache(account1.getAddress());
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		observer.notifyReceive(new BlockHeight(14), account1, Amount.fromNem(4));
-		observer.notifyReceiveUndo(new BlockHeight(14), account1, Amount.fromNem(4));
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+		observer.notifyReceiveUndo(new BlockHeight(undoHeight), account1, Amount.fromNem(2));
 
 		// Assert:
 		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(0));
@@ -93,14 +100,13 @@ public class AccountsHeightObserverTest {
 	public void notifyReceiveUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
-		accountAnalyzer.addAccountToCache(account1.getAddress());
+		account1.incrementReferenceCounter();
+		account1.incrementReferenceCounter();
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		observer.notifyReceive(new BlockHeight(14), account1, Amount.fromNem(4));
-		observer.notifyReceiveUndo(new BlockHeight(14), account1, Amount.fromNem(4));
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
 
 		// Assert:
 		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
@@ -110,8 +116,7 @@ public class AccountsHeightObserverTest {
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
-		accountAnalyzer.addAccountToCache(account1.getAddress());
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
@@ -176,7 +181,12 @@ public class AccountsHeightObserverTest {
 	private static AccountAnalyzer createAccountAnalyzerWithAccount(final Account account) {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		accountAnalyzer.addAccountToCache(account.getAddress());
-		accountAnalyzer.findByAddress(account.getAddress()).setHeight(account.getHeight());
+
+		final Account cachedAccount = accountAnalyzer.findByAddress(account.getAddress());
+		cachedAccount.setHeight(account.getHeight());
+		for (int i = 0; i < account.getReferenceCounter().getRaw(); ++i)
+			cachedAccount.incrementReferenceCounter();
+
 		return accountAnalyzer;
 	}
 
