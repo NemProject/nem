@@ -23,6 +23,11 @@ public class OutlinkObserver implements TransferObserver {
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+		// Trying to gain importance by sending nem to yourself?
+		if (sender.getAddress().equals(recipient.getAddress())) {
+			return;
+		}
+
 		final Amount linkWeight = calculateLinkWeight(this.isExecute ? sender : recipient, amount);
 
 		if (this.isExecute) {

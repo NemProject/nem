@@ -4,8 +4,8 @@ package org.nem.core.model;
  * Calculates vested and unvested balances at a specified block height.
  */
 public class WeightedBalance implements Comparable<WeightedBalance> {
-	public static final long DECAY_NUMERATOR = 98;
-	public static final long DECAY_DENOMINATOR = 100;
+	public static final long DECAY_NUMERATOR = 9;
+	public static final long DECAY_DENOMINATOR = 10;
 	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
 
 	private final BlockHeight blockHeight;

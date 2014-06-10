@@ -40,6 +40,20 @@ public class OutlinkObserverTest {
 		verifyCallCounts(context.importance2, 0, 0);
 	}
 
+	@Test
+	public void notifyTransferDoesNotAddSelfOutlink() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), true);
+
+		// Act:
+		observer.notifyTransfer(context.account1, context.account1, new Amount(752));
+
+		// Assert:
+		verifyCallCounts(context.importance1, 0, 0);
+		verifyCallCounts(context.importance2, 0, 0);
+	}
+
 	//endregion
 
 	//region notifyCredit

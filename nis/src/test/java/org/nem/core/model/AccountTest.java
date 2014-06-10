@@ -168,6 +168,46 @@ public class AccountTest {
 
 	//endregion
 
+	//region refCount
+
+	@Test
+	public void referenceCountIsZeroForNewAccount() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		
+		// Assert:
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+	}
+
+	@Test
+	public void referenceCounterCanBeIncremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		
+		// Act:
+		final ReferenceCounter result = account.incrementReferenceCounter();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(1)));
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
+	}
+
+	@Test
+	public void referenceCounterCanBeDecremented() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		account.incrementReferenceCounter();
+		
+		// Act:
+		final ReferenceCounter result = account.decrementReferenceCounter();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(0)));
+		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+	}
+
+	//endregion
+	
 	//region foraged blocks
 
 	@Test
@@ -778,6 +818,7 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
+		Assert.assertThat(copyAccount.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(2)));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
@@ -793,6 +834,8 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.setLabel("Alpha Sigma");
+		account.incrementReferenceCounter();
+		account.incrementReferenceCounter();
 		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
 		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 	}
@@ -814,22 +857,6 @@ public class AccountTest {
 	//endregion
 
 	//region shallow copy
-
-	@Test
-	public void canCreateShallowCopyWithNewAddress() {
-		// Arrange:
-		final Account original = new Account(Utils.generateRandomAddress());
-		setAccountValuesForCopyTests(original);
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-
-		// Act:
-		final Account copy = original.shallowCopyWithAddress(address);
-
-		// Assert:
-		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(address));
-		assertKeyPairsAreEquivalent(copy.getKeyPair(), new KeyPair(address.getPublicKey()));
-		assertShallowCopy(original, copy);
-	}
 
 	@Test
 	public void canCreateShallowCopyWithNewKeyPair() {
@@ -854,6 +881,7 @@ public class AccountTest {
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
 		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
+		Assert.assertThat(copy.getReferenceCounter(), IsEqual.equalTo(copy.getReferenceCounter()));
 
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));

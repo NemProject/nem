@@ -708,6 +708,7 @@ public class BlockTest {
 			this.importance = Mockito.mock(AccountImportance.class);
 			this.balances = Mockito.mock(WeightedBalances.class);
 
+			Mockito.when(this.account.getAddress()).thenReturn(Utils.generateRandomAddress());
 			Mockito.when(this.account.getImportanceInfo()).thenReturn(this.importance);
 			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
 		}

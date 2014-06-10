@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.core</groupId>
 	<artifactId>nem-core</artifactId>
-	<version>0.0.36-ALPHA</version>
+	<version>0.0.37-ALPHA</version>
 	<name>NEM Core</name>
 
 	<properties>
@@ -79,12 +79,6 @@
 			<artifactId>httpasyncclient</artifactId>
 			<version>4.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-resources-plugin</artifactId>
-			<version>2.4.3</version>
-        </dependency>
     </dependencies>
 
     <build>

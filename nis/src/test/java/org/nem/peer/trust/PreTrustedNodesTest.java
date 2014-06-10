@@ -98,11 +98,11 @@ public class PreTrustedNodesTest {
 		// Act:
 		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
-		// Assert:
+		// Assert: (the vector should be normalized)
 		Assert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
 		Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.00));
-		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(1.0 / 3.0));
-		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(1.0 / 3.0));
+		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.50));
+		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.50));
 		Assert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.00));
 	}
 

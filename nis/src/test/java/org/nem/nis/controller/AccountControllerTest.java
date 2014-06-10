@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.*;
@@ -29,6 +30,21 @@ public class AccountControllerTest {
 		Assert.assertThat(context.foraging.getUnlockedAccounts().size(), IsEqual.equalTo(1));
 		Assert.assertThat(context.foraging.getUnlockedAccounts().get(0), IsEqual.equalTo(account));
 		Assert.assertThat(context.foraging.getUnlockedAccounts().get(0), IsNot.not(IsSame.sameInstance(account)));
+	}
+
+	@Test
+	public void lockRemovesAccountFromForaging() {
+		// Arrange:
+		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final PrivateKey privateKey = new PrivateKey(account.getKeyPair().getPrivateKey().getRaw());
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
+		context.controller.accountLock(privateKey);
+
+		// Assert:
+		Assert.assertThat(context.foraging.getUnlockedAccounts().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -169,6 +185,11 @@ public class AccountControllerTest {
 		@Override
 		public void addUnlockedAccount(final Account account) {
 			this.unlockedAccounts.add(account);
+		}
+
+		@Override
+		public void removeUnlockedAccount(final Account account) {
+			this.unlockedAccounts.remove(account);
 		}
 
 		public List<Account> getUnlockedAccounts() { return this.unlockedAccounts; }

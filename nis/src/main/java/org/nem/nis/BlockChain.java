@@ -447,7 +447,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			this.peerChain = peerChain;
 			this.ourScore = ourScore;
-			this.peerScore = null;
+			this.peerScore = BlockChainScore.ZERO;
 			this.hasOwnChain = hasOwnChain;
 		}
 

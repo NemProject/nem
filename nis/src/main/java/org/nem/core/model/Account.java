@@ -11,8 +11,8 @@ import java.util.*;
  */
 public class Account implements SerializableEntity {
 
-	private final KeyPair keyPair;
-	private final Address address;
+	private KeyPair keyPair;
+	private Address address;
 	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
@@ -22,6 +22,7 @@ public class Account implements SerializableEntity {
 	private final AccountImportance importance;
 
 	private BlockHeight height;
+	private ReferenceCounter refCount = ReferenceCounter.ZERO;
 
 	/**
 	 * Creates an account around a key pair.
@@ -33,8 +34,8 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Creates an account around an address. This constructor should only
-	 * be used if the account's public key is not known.
+	 * Creates an account around an address. This constructor should only be
+	 * used if the account's public key is not known.
 	 *
 	 * @param address The address.
 	 */
@@ -48,6 +49,20 @@ public class Account implements SerializableEntity {
 
 	private static Address getAddressFromKeyPair(final KeyPair keyPair) {
 		return Address.fromPublicKey(keyPair.getPublicKey());
+	}
+
+	/**
+	 * This method is public, but it should be used very carefully
+	 *
+	 * @param address
+	 */
+	public void _setPublicKey(final Address address) {
+		if (!Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
+			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
+		}
+
+		this.keyPair = new KeyPair(address.getPublicKey());
+		this.address = Address.fromPublicKey(address.getPublicKey());
 	}
 
 	/**
@@ -78,12 +93,12 @@ public class Account implements SerializableEntity {
 		this.importance = rhs.importance.copy();
 
 		this.height = rhs.getHeight();
+		this.refCount = rhs.getReferenceCounter();
 	}
 
 	private Account(final Account rhs, final KeyPair keyPair) {
 		this.keyPair = keyPair;
 		this.address = getAddressFromKeyPair(keyPair);
-
 		this.balance = rhs.getBalance();
 		this.label = rhs.getLabel();
 		this.foragedBlocks = rhs.getForagedBlocks();
@@ -91,7 +106,6 @@ public class Account implements SerializableEntity {
 		this.messages = rhs.getMessages();
 		this.weightedBalances = rhs.weightedBalances;
 		this.importance = rhs.importance;
-
 		this.height = rhs.getHeight();
 	}
 
@@ -105,18 +119,9 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Creates a shallow copy of this account with the specified address.
-	 *
-	 * @param address The desired address of the new account.
-	 * @return The shallow copy.
-	 */
-	public Account shallowCopyWithAddress(final Address address) {
-		return this.shallowCopyWithKeyPair(getKeyPairFromAddress(address));
-	}
-
-	/**
+	 * 
 	 * Creates a shallow copy of this account the the specified key pair.
-	 *
+	 * 
 	 * @param keyPair The desired key pair of the new account.
 	 * @return The shallow copy.
 	 */
@@ -125,8 +130,7 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes an account.
-	 * Currently this deserializer is used ONLY by NCC
+	 * Deserializes an account. Currently this deserializer is used ONLY by NCC
 	 *
 	 * @param deserializer The deserializer.
 	 */
@@ -159,7 +163,7 @@ public class Account implements SerializableEntity {
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
 
-        serializer.writeObject("importance", this.getImportanceInfo());
+		serializer.writeObject("importance", this.getImportanceInfo());
 		serializer.writeObjectArray("messages", this.getMessages());
 	}
 
@@ -297,9 +301,38 @@ public class Account implements SerializableEntity {
 	 */
 	public void setHeight(final BlockHeight height) {
 		if (null == this.height)
-		    this.height = height;
+			this.height = height;
 	}
 
+	/**
+	 * Returns the reference counter.
+	 * 
+	 * @return The reference counter.
+	 */
+	public ReferenceCounter getReferenceCounter() {
+		return this.refCount;
+	}
+	
+	/**
+	 * Increments the reference counter.
+	 *
+	 * @return The new value of the reference counter.
+	 */
+	public ReferenceCounter incrementReferenceCounter() {
+		this.refCount = this.refCount.increment();
+		return this.refCount;
+	}
+	
+	/**
+	 * Decrements the reference counter.
+	 *
+	 * @return The new value of the reference counter.
+	 */
+	public ReferenceCounter decrementReferenceCounter() {
+		this.refCount = this.refCount.decrement();
+		return this.refCount;
+	}
+	
 	/**
 	 * Gets the weighted balances associated with this account.
 	 *
@@ -325,10 +358,10 @@ public class Account implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Account))
+		if (!(obj instanceof Account))
 			return false;
 
-		Account rhs = (Account)obj;
+		final Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
 	}
 
@@ -338,8 +371,8 @@ public class Account implements SerializableEntity {
 	 * Writes an account object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param account    The object.
+	 * @param label The optional label.
+	 * @param account The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Account account) {
 		writeTo(serializer, label, account, AccountEncoding.ADDRESS);
@@ -349,9 +382,9 @@ public class Account implements SerializableEntity {
 	 * Writes an account object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param account    The object.
-	 * @param encoding   The account encoding mode.
+	 * @param label The optional label.
+	 * @param account The object.
+	 * @param encoding The account encoding mode.
 	 */
 	public static void writeTo(
 			final Serializer serializer,
@@ -359,15 +392,15 @@ public class Account implements SerializableEntity {
 			final Account account,
 			final AccountEncoding encoding) {
 		switch (encoding) {
-			case PUBLIC_KEY:
-				final KeyPair keyPair = account.getKeyPair();
-				serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
-				break;
+            case PUBLIC_KEY:
+                final KeyPair keyPair = account.getKeyPair();
+                serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
+                break;
 
-			case ADDRESS:
-			default:
-				Address.writeTo(serializer, label, account.getAddress());
-				break;
+            case ADDRESS:
+            default:
+                Address.writeTo(serializer, label, account.getAddress());
+                break;
 		}
 	}
 
@@ -375,7 +408,7 @@ public class Account implements SerializableEntity {
 	 * Reads an account object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
+	 * @param label The optional label.
 	 *
 	 * @return The read object.
 	 */
@@ -387,15 +420,14 @@ public class Account implements SerializableEntity {
 	 * Reads an account object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param encoding     The account encoding.
-	 * @param label        The optional label.
+	 * @param encoding The account encoding.
+	 * @param label The optional label.
 	 *
 	 * @return The read object.
 	 */
 	public static Account readFrom(
 			final Deserializer deserializer,
-			final String label,
-			final AccountEncoding encoding) {
+			final String label, final AccountEncoding encoding) {
 		final Address address = readAddress(deserializer, label, encoding);
 		return deserializer.getContext().findAccountByAddress(address);
 	}
@@ -405,13 +437,13 @@ public class Account implements SerializableEntity {
 			final String label,
 			final AccountEncoding encoding) {
 		switch (encoding) {
-			case PUBLIC_KEY:
-				final byte[] publicKeyBytes = deserializer.readBytes(label);
-				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
+		case PUBLIC_KEY:
+			final byte[] publicKeyBytes = deserializer.readBytes(label);
+			return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
 
-			case ADDRESS:
-			default:
-				return Address.readFrom(deserializer, label);
+		case ADDRESS:
+		default:
+			return Address.readFrom(deserializer, label);
 		}
 	}
 

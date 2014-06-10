@@ -8,6 +8,8 @@ import org.nem.nis.AccountAnalyzer;
 
 public class AccountsHeightObserverTest {
 
+	//region notifyReceive
+
 	@Test
 	public void notifyReceiveDelegatesToAccountAnalyzer() {
 		// Arrange:
@@ -47,36 +49,93 @@ public class AccountsHeightObserverTest {
 		Assert.assertThat(result.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
+	@Test
+	public void notifyReceiveIncrementsReferenceCounter() {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
+		final Account account1 = Utils.generateRandomAccount();
+		accountAnalyzer.addAccountToCache(account1.getAddress());
+		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+
+		// Act:
+		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+
+		// Assert:
+		final Account result = accountAnalyzer.findByAddress(account1.getAddress());
+		Assert.assertThat(result.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
+	}
+
 	//endregion
 
 	//region notifyReceiveUndo
 
 	@Test
-	public void notifyReceiveUndoRemovesAccountWithMatchingHeightFromAccountAnalyzer() {
+	public void notifyReceiveUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+		// Assert:
+		assertReceiveUndoRemovesAccount(12, 12);
+	}
+
+	@Test
+	public void notifyReceiveUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+		// Assert: (the height doesn't have to match)
+		assertReceiveUndoRemovesAccount(12, 15);
+	}
+
+	private static void assertReceiveUndoRemovesAccount(final int accountHeight, final int undoHeight) {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
+		final Account account1 = createAccountWithHeight(accountHeight);
+		account1.incrementReferenceCounter();
 		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
+		accountAnalyzer.addAccountToCache(account1.getAddress());
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+		observer.notifyReceiveUndo(new BlockHeight(undoHeight), account1, Amount.fromNem(2));
 
 		// Assert:
 		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void notifyReceiveUndoDoesNotRemoveAccountWithNonMatchingHeightFromAccountAnalyzer() {
+	public void notifyReceiveUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
+		// Arrange:
+		final Account account1 = createAccountWithHeight(12);
+		account1.incrementReferenceCounter();
+		account1.incrementReferenceCounter();
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
+		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+
+		// Act:
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
+
+		// Assert:
+		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(12);
 		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
+		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(4));
+		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(6));
+		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(7));
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(7));
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(6));
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
 
 		// Assert:
 		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
+
+		// Act:
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+
+		// Assert:
+		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -102,6 +161,17 @@ public class AccountsHeightObserverTest {
 		observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void notifyReceiveUndoFailsIfReferenceCounterUnderflows() {
+		// Arrange:
+		final Account account1 = createAccountWithHeight(12);
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
+		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+
+		// Act:
+		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+	}
+
 	private static Account createAccountWithHeight(final int height) {
 		final Account account = Utils.generateRandomAccount();
 		account.setHeight(new BlockHeight(height));
@@ -111,7 +181,12 @@ public class AccountsHeightObserverTest {
 	private static AccountAnalyzer createAccountAnalyzerWithAccount(final Account account) {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
 		accountAnalyzer.addAccountToCache(account.getAddress());
-		accountAnalyzer.findByAddress(account.getAddress()).setHeight(account.getHeight());
+
+		final Account cachedAccount = accountAnalyzer.findByAddress(account.getAddress());
+		cachedAccount.setHeight(account.getHeight());
+		for (int i = 0; i < account.getReferenceCounter().getRaw(); ++i)
+			cachedAccount.incrementReferenceCounter();
+
 		return accountAnalyzer;
 	}
 

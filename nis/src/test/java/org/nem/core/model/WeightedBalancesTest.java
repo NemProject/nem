@@ -49,17 +49,17 @@ public class WeightedBalancesTest {
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
 		weightedBalances.addReceive(new BlockHeight(2881), Amount.fromNem(345));
 
-		referenceBalance = referenceBalance.next(); // UV[1] = 123 * .98
-		referenceBalance = referenceBalance.next(); // UV[2] = UV[1] *.98
+		referenceBalance = referenceBalance.next(); // UV[1] = 123 * .9
+		referenceBalance = referenceBalance.next(); // UV[2] = UV[1] *.9
 		// UV[3] = UV[2] + 345
 		referenceBalance = referenceBalance.createReceive(referenceBalance.getBlockHeight(), Amount.fromNem(345));
 
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 2881, referenceBalance.getUnvestedBalance());
-		// UV[4] = UV[3] * .98
+		// UV[4] = UV[3] * .9
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.next().getUnvestedBalance());
-		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(453_866_616L));
+		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(400_167_000L));
 	}
 	//endregion
 
@@ -84,7 +84,7 @@ public class WeightedBalancesTest {
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		// use previous test as a reference to obtain proper value here
-		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(453_866_616L)));
+		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(400_167_000L)));
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.getUnvestedBalance());
 	}
 	//endregion
@@ -169,7 +169,7 @@ public class WeightedBalancesTest {
 
 		// Assert:
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
-		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem((long)(123_000_000 * .98)));
+		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem((long)(123_000_000 * .9)));
 	}
 
 	@Test
@@ -214,16 +214,41 @@ public class WeightedBalancesTest {
 
 	@Test
 	public void canCopyWeightedBalances() {
-		Assert.fail("needs to be implemented");
+		// Arrange:
+		final BlockHeight height1 = new BlockHeight(1441);
+		final BlockHeight height2 = new BlockHeight(1500);
+		final WeightedBalances originalBalances = new WeightedBalances();
+		originalBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
+		originalBalances.addReceive(height2, Amount.fromNem(345));
+
+		// Act
+		final WeightedBalances copiedBalances = originalBalances.copy();
+
+		// Assert:
+		assertEqualAtHeight(copiedBalances, originalBalances, BlockHeight.ONE);
+		assertEqualAtHeight(copiedBalances, originalBalances, height1);
+		assertEqualAtHeight(copiedBalances, originalBalances, height2);
 	}
 
 	//endregion
 
-	private void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
-	private void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertVested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+		Assert.assertThat(weightedBalances.getVested(new BlockHeight(height)), IsEqual.equalTo(amount));
+	}
+
+	private static void assertEqualAtHeight(
+			final WeightedBalances actualBalances,
+			final WeightedBalances expectedBalances,
+			final BlockHeight height) {
+		assertUnvested(actualBalances, height.getRaw(), expectedBalances.getUnvested(height));
+		assertVested(actualBalances, height.getRaw(), expectedBalances.getVested(height));
+	}
+
+	private static void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
 		final BlockHeight blockHeight = new BlockHeight(height);
 		final Amount actualSum = weightedBalances.getUnvested(blockHeight).add(weightedBalances.getVested(blockHeight));
 		Assert.assertThat(actualSum, IsEqual.equalTo(amount));
