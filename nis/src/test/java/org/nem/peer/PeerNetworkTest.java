@@ -570,9 +570,8 @@ public class PeerNetworkTest {
 		final MockConnector connector = new MockConnector();
 		final MockBlockSynchronizer synchronizer = new MockBlockSynchronizer();
 		final PeerNetwork network = createTestNetwork(connector, synchronizer);
-		connector.setGetInfoError("10.0.0.1", MockConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.INACTIVE);
+		for (final String host : new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" })
+			connector.setGetInfoError(host, MockConnector.TriggerAction.INACTIVE);
 		network.refresh().join();
 
 		// Act:
@@ -687,6 +686,119 @@ public class PeerNetworkTest {
 		result.node = synchronizer.getLastNode();
 		result.experience = nodeExperiences.getNodeExperience(network.getLocalNode(), result.node);
 		return result;
+	}
+
+	//endregion
+
+	//region updateLocalNodeEndpoint
+
+	@Test
+	public void updateLocalNodeEndpointDoesNotCallGetLocalNodeInfoForAnyInactiveNode() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		for (final String host : new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" })
+			connector.setGetInfoError(host, MockConnector.TriggerAction.INACTIVE);
+		network.refresh().join();
+
+		// Act:
+		network.updateLocalNodeEndpoint().join();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetLocalNodeInfoCalls(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointCallsGetLocalNodeInfoForSingleCommunicationPartner() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		network.refresh().join();
+
+		// Act:
+		network.updateLocalNodeEndpoint().join();
+
+		// Assert:
+		Assert.assertThat(connector.getNumGetLocalNodeInfoCalls(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointForwardsValidParametersToGetLocalNodeInfo() {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		network.refresh().join();
+
+		// Act:
+		network.updateLocalNodeEndpoint().join();
+
+		// Assert:
+		Assert.assertThat(
+				connector.getLastGetLocalNodeInfoLocalEndpoint(),
+				IsEqual.equalTo(network.getLocalNode().getEndpoint()));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointUpdatesLocalNodeEndpointWhenChanged() {
+		// Assert:
+		assertLocalNodeEndpointAfterUpdate(NodeEndpoint.fromHost("10.0.0.123"), NodeEndpoint.fromHost("10.0.0.123"));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointDoesNotUpdateLocalNodeEndpointWhenUnchanged() {
+		// Assert:
+		assertLocalNodeEndpointAfterUpdate(
+				NodeEndpoint.fromHost(DEFAULT_LOCAL_NODE_HOST),
+				NodeEndpoint.fromHost(DEFAULT_LOCAL_NODE_HOST));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointDoesNotUpdateLocalNodeEndpointWhenRemoteReturnsNull() {
+		// Assert:
+		assertLocalNodeEndpointAfterUpdate(null, NodeEndpoint.fromHost(DEFAULT_LOCAL_NODE_HOST));
+	}
+
+	private static void assertLocalNodeEndpointAfterUpdate(
+			final NodeEndpoint endpointReturnedFromRemote,
+			final NodeEndpoint expectedEndpoint) {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		connector.setGetLocalNodeInfoEndpoint(endpointReturnedFromRemote);
+
+		final PeerNetwork network = createTestNetwork(connector);
+		network.refresh().join();
+
+		// Act:
+		network.updateLocalNodeEndpoint().join();
+
+		// Assert:
+		Assert.assertThat(network.getLocalNode().getEndpoint(), IsEqual.equalTo(expectedEndpoint));
+	}
+
+	@Test
+	public void updateLocalNodeEndpointDoesNotUpdateLocalNodeEndpointWhenRemoteFails() {
+		// Assert:
+		assertLocalNodeEndpointIsUnchangedOnFailure(MockConnector.TriggerAction.INACTIVE);
+		assertLocalNodeEndpointIsUnchangedOnFailure(MockConnector.TriggerAction.FATAL);
+	}
+
+	private static void assertLocalNodeEndpointIsUnchangedOnFailure(final MockConnector.TriggerAction action) {
+		// Arrange:
+		final MockConnector connector = new MockConnector();
+		connector.setGetLocalNodeInfoEndpoint(NodeEndpoint.fromHost("10.0.0.123"));
+		for (final String host : new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" })
+			connector.setGetLocalNodeInfoError(host, action);
+
+		final PeerNetwork network = createTestNetwork(connector);
+		network.refresh().join();
+
+		// Act:
+		network.updateLocalNodeEndpoint().join();
+
+		// Assert:
+		Assert.assertThat(
+				network.getLocalNode().getEndpoint(),
+				IsEqual.equalTo(NodeEndpoint.fromHost(DEFAULT_LOCAL_NODE_HOST)));
 	}
 
 	//endregion

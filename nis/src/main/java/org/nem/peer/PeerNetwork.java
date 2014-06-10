@@ -258,6 +258,30 @@ public class PeerNetwork {
 		LOGGER.info(String.format("%d inactive node(s) were pruned", numNodesPruned));
 	}
 
+	/**
+	 * Updates the endpoint of the local node as seen by other nodes.
+	 */
+	public CompletableFuture updateLocalNodeEndpoint() {
+		LOGGER.info("updating local node endpoint");
+		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
+		if (null == partnerNodePair) {
+			LOGGER.warning("no suitable peers found to update local node");
+			return CompletableFuture.completedFuture(null);
+		}
+
+		return this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode(), this.localNode.getEndpoint())
+				.handle((endpoint, e) -> {
+					if (null == endpoint || this.localNode.getEndpoint().equals(endpoint))
+						return null;
+
+					LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
+							this.localNode.getEndpoint(),
+							endpoint));
+					this.localNode.setEndpoint(endpoint);
+					return null;
+				});
+	}
+
 	private static class NodeRefresher {
 		final Node localNode;
 		final PreTrustedNodes preTrustedNodes;
