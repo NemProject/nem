@@ -1,9 +1,15 @@
 package org.nem.nis.controller.viewmodels;
 
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 
 /**
@@ -12,10 +18,12 @@ import org.nem.core.time.TimeInstant;
 public class BlockDebugInfo implements SerializableEntity {
 
 	private final BlockHeight height;
-	private final Address foragerAddress;
-	private final TimeInstant timestamp;
+	private final Address forager;
+	private TimeInstant timestamp;
 	private final BlockDifficulty difficulty;
 	private final BigInteger hit;
+	private final BigInteger target;
+	private final List<TransactionDebugInfo> transactionDebugInfos;
 
 	/**
 	 * Creates a new block debug info.
@@ -25,31 +33,44 @@ public class BlockDebugInfo implements SerializableEntity {
 	 * @param timestamp The block timestamp.
 	 * @param difficulty The block difficulty.
 	 * @param hit The block hit.
+	 * @param target The block target.
 	 */
 	public BlockDebugInfo(
 			final BlockHeight blockHeight,
-			final Address foragerAddress,
 			final TimeInstant timestamp,
+			final Address forager,
 			final BlockDifficulty difficulty,
-			final BigInteger hit) {
+			final BigInteger hit,
+			final BigInteger target) {
 		this.height = blockHeight;
-		this.foragerAddress = foragerAddress;
+		this.forager = forager;
 		this.timestamp = timestamp;
 		this.difficulty = difficulty;
 		this.hit = hit;
+		this.target = target;
+		this.transactionDebugInfos = new ArrayList<>();
 	}
 	
 	/**
 	 * Deserializes a block debug info object.
 	 *
 	 * @param deserializer The deserializer.
+	 * @throws ParseException 
 	 */
-	public BlockDebugInfo(final Deserializer deserializer) {
+	public BlockDebugInfo(final Deserializer deserializer) throws ParseException {
 		this.height = BlockHeight.readFrom(deserializer, "height");
-		this.foragerAddress = Address.readFrom(deserializer, "foragerAddress");
-		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");
+		try {
+			Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(deserializer.readString("timestamp"));
+			this.timestamp = new TimeInstant(SystemTimeProvider.getTime(date.getTime()));
+		}
+		catch (ParseException e) {
+			this.timestamp = new TimeInstant(0);
+		}
+		this.forager = Address.readFrom(deserializer, "forager");
 		this.difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
 		this.hit = new BigInteger(deserializer.readString("hit"));
+		this.target = new BigInteger(deserializer.readString("target"));
+		this.transactionDebugInfos = deserializer.readObjectArray("transactions", TransactionDebugInfo::new);
 	}
 
 	/**
@@ -66,8 +87,8 @@ public class BlockDebugInfo implements SerializableEntity {
 	 *
 	 * @return The address.
 	 */
-	public Address getForagerAddress() {
-		return this.foragerAddress;
+	public Address getForager() {
+		return this.forager;
 	}
 	
 	/**
@@ -75,7 +96,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	 *
 	 * @return The timestamp.
 	 */
-	public TimeInstant getTimeInstant() {
+	public TimeInstant getTimestamp() {
 		return this.timestamp;
 	}
 	
@@ -97,12 +118,43 @@ public class BlockDebugInfo implements SerializableEntity {
 		return this.hit;
 	}
 	
+	/**
+	 * Returns The foragers target for the block
+	 *
+	 * @return The target.
+	 */
+	public BigInteger getTarget() {
+		return this.target;
+	}
+	
+	/**
+	 * Gets the transaction debug infos associated with this block debug info.
+	 *
+	 * @return The transaction debug infos associated with this block.
+	 */
+	public List<TransactionDebugInfo> getTransactionDebugInfos() {
+		return this.transactionDebugInfos;
+	}
+
+	/**
+	 * Adds a new transaction debug info to this block debug info.
+	 *
+	 * @param transactionDebugInfo The transaction debug info to add.
+	 */
+	public void addTransactionDebugInfo(final TransactionDebugInfo transactionDebugInfo) {
+		this.transactionDebugInfos.add(transactionDebugInfo);
+	}
+
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
-		Address.writeTo(serializer, "foragerAddress", foragerAddress);
-		TimeInstant.writeTo(serializer, "timestamp", this.timestamp);
+		Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + this.timestamp.getRawTime() * 1000);
+		String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+		serializer.writeString("timestamp", dateString);
+		Address.writeTo(serializer, "forager", forager);
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());
+		serializer.writeString("target", this.target.toString());
+		serializer.writeObjectArray("transactions", this.transactionDebugInfos);
 	}
 }

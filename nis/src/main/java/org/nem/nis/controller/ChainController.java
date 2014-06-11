@@ -1,12 +1,18 @@
 package org.nem.nis.controller;
 
+import java.math.BigInteger;
+
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.BlockChain;
+import org.nem.nis.BlockScorer;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.viewmodels.BlockDebugInfo;
+import org.nem.nis.controller.viewmodels.TransactionDebugInfo;
 import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +75,48 @@ public class ChainController {
 	@PublicApi
 	public BlockChainScore chainScore() {
 		return this.blockChain.getScore();
+	}
+
+	/**
+	 * Gets debug information about the block with the specified height.
+	 *
+	 * @param height The height.
+	 * @return The matching block debug information
+	 */
+	@RequestMapping(value = "/chain/block-debug-info/get", method = RequestMethod.GET)
+	@PublicApi
+	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
+		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
+		final AccountAnalyzer accountAnalyzer = this.blockChain.getAccountAnalyzerCopy();
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+		final Block block = BlockMapper.toModel(dbBlock, accountAnalyzer);
+		final org.nem.nis.dbmodel.Block dbParent = blockHeight.getRaw() == 1? null : this.blockDao.findByHeight(blockHeight.prev());
+		final Block parent = blockHeight.getRaw() == 1? null : BlockMapper.toModel(dbParent, accountAnalyzer);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		scorer.forceImportanceCalculation();
+		final BigInteger hit = scorer.calculateHit(block);
+		final BigInteger target = blockHeight.getRaw() == 1? BigInteger.ZERO : scorer.calculateTarget(parent, block);
+		final BlockDebugInfo blockDebugInfo =  new BlockDebugInfo(
+				block.getHeight(),
+				block.getTimeStamp(),
+				block.getSigner().getAddress(),
+				block.getDifficulty(),
+				hit,
+				target);
+		
+		for (Transaction transaction : block.getTransactions()) {
+			Address recipient = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getRecipient().getAddress() : Address.fromEncoded("N/A");
+			Amount amount = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getAmount() : Amount.fromMicroNem(0);
+			TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(
+					transaction.getTimeStamp(),
+					transaction.getDeadline(),
+					transaction.getSigner().getAddress(),
+					recipient,
+					amount,
+					transaction.getFee());
+			blockDebugInfo.addTransactionDebugInfo(transactionDebugInfo);
+		}
+		
+		return blockDebugInfo;
 	}
 }

@@ -55,6 +55,10 @@ public class BlockChain implements BlockSynchronizer {
 	public BlockChainScore getScore() {
 		return this.score;
 	}
+	
+	public AccountAnalyzer getAccountAnalyzerCopy() {
+		return this.accountAnalyzer.copy();
+	}
 
 	/**
 	 * Updates the score of this chain by adding the score derived from the specified block and parent block.

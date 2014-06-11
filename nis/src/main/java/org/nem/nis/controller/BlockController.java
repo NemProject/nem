@@ -1,6 +1,5 @@
 package org.nem.nis.controller;
 
-import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.crypto.Hash;
 import org.nem.nis.BlockScorer;
@@ -17,12 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class BlockController {
 
 	private final BlockIo blockIo;
-	private final BlockScorer scorer;
 
 	@Autowired(required = true)
 	BlockController(final BlockIo blockIo, final BlockScorer scorer) {
 		this.blockIo = blockIo;
-		this.scorer = scorer;
 	}
 
 	/**
@@ -49,24 +46,5 @@ public class BlockController {
 	@P2PApi
 	public Block blockAt(@RequestBody final BlockHeight height) {
 		return this.blockIo.getBlockAt(height);
-	}
-
-	/**
-	 * Gets debug information about the block with the specified height.
-	 *
-	 * @param height The height.
-	 * @return The matching block debug information
-	 */
-	@RequestMapping(value = "/block/debug-info/get", method = RequestMethod.GET)
-	@PublicApi
-	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
-		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
-		final Block block = this.blockIo.getBlockAt(blockHeight);
-		return new BlockDebugInfo(
-				block.getHeight(),
-				block.getSigner().getAddress(),
-				block.getTimeStamp(),
-				block.getDifficulty(),
-				this.scorer.calculateHit(block));
 	}
 }
