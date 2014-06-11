@@ -1,8 +1,10 @@
 package org.nem.nis.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 import org.nem.core.crypto.HashChain;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
@@ -107,13 +109,23 @@ public class ChainController {
 		for (Transaction transaction : block.getTransactions()) {
 			Address recipient = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getRecipient().getAddress() : Address.fromEncoded("N/A");
 			Amount amount = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getAmount() : Amount.fromMicroNem(0);
+			String message = "";
+			if (transaction.getType() == TransactionTypes.TRANSFER) {
+				if (((TransferTransaction)transaction).getMessage().canDecode()) {
+					try {
+						message = new String(((TransferTransaction)transaction).getMessage().getDecodedPayload(), "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+					}
+				}
+			}
 			TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(
 					transaction.getTimeStamp(),
 					transaction.getDeadline(),
 					transaction.getSigner().getAddress(),
 					recipient,
 					amount,
-					transaction.getFee());
+					transaction.getFee(),
+					message);
 			blockDebugInfo.addTransactionDebugInfo(transactionDebugInfo);
 		}
 		

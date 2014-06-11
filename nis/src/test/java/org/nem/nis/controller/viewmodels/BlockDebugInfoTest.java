@@ -1,10 +1,12 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.text.ParseException;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
@@ -57,7 +59,8 @@ public class BlockDebugInfoTest {
 		final Address recipient = Utils.generateRandomAddress();
 		final Amount amount = Amount.fromNem(100);
 		final Amount fee = Amount.fromNem(10);
-		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timestamp2, deadline, sender, recipient, amount, fee);
+		final String message = "Test message";
+		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timestamp2, deadline, sender, recipient, amount, fee, message);
 		originalBlockDebugInfo.addTransactionDebugInfo(originalTransactionDebugInfo);
 		
 		// Act:
