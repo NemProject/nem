@@ -43,10 +43,10 @@ public class TransferController {
 
 	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
 	@ClientApi
-	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce, final HttpServletRequest request) throws Exception {
+	public void transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
-		this.pushService.pushTransaction(transfer, request);
+		this.pushService.pushTransaction(transfer, null);
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {

@@ -69,8 +69,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					this.foragingTimer = new AsyncTimer(
 							() -> CompletableFuture.runAsync(() -> {
 								final Block block = this.blockChain.forageBlock();
-								if (null != block)
-									this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, block);
+								if (null == block)
+									return;
+
+								final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
+										block,
+										this.host.getNetwork().getLocalNode().getIdentity());
+								this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
 							}),
 							FORAGING_INITIAL_DELAY,
 							new UniformDelayStrategy(FORAGING_INTERVAL));
