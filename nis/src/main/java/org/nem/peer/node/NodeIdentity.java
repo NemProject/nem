@@ -156,6 +156,9 @@ public class NodeIdentity implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		return this.address.toString();
+		if (null == this.name)
+			return String.format("<%s>", this.address);
+
+		return String.format("%s <%s>", this.name, this.address);
 	}
 }
