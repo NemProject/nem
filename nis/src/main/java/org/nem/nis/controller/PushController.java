@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.nis.service.PushService;
+import org.nem.peer.SecureSerializableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,15 +31,27 @@ public class PushController {
 		this.pushService = pushService;
 	}
 
+	/**
+	 * Pushes a transaction to other nodes.
+	 *
+	 * @param deserializer The deserializer that should create a SecureSerializableEntity Transaction.
+	 */
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
-	public void pushTransaction(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
-		this.pushService.pushTransaction(TransactionFactory.VERIFIABLE.deserialize(deserializer), request);
+	public void pushTransaction(@RequestBody final Deserializer deserializer) {
+		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
+		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
 	}
 
+	/**
+	 * Pushes a block to other nodes.
+	 *
+	 * @param deserializer The deserializer that should create a SecureSerializableEntity Block.
+	 */
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
-	public void pushBlock(@RequestBody final Deserializer deserializer, final HttpServletRequest request) {
-		this.pushService.pushBlock(BlockFactory.VERIFIABLE.deserialize(deserializer), request);
+	public void pushBlock(@RequestBody final Deserializer deserializer) {
+		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
+		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
 	}
 }
