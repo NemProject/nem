@@ -2,6 +2,7 @@ package org.nem.peer.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.KeyPair;
 import org.nem.peer.test.*;
 
 import java.util.Iterator;
@@ -200,19 +201,21 @@ public class NodeCollectionTest {
 	@Test
 	public void updateSelectsNodeMetaDataFromUpdatedNode() {
 		// Arrange:
-		final Node node1 = new Node(NodeEndpoint.fromHost("10.0.0.0"), "plat", "app", "ver");
-		final Node node2 = new Node(NodeEndpoint.fromHost("10.0.0.0"), "plat2", "app2", "ver2");
+		final NodeIdentity identity = new NodeIdentity(new KeyPair());
+		final Node node1 = new Node(identity, NodeEndpoint.fromHost("10.0.0.1"), new NodeMetaData("plat", "app", "ver"));
+		final Node node2 = new Node(identity, NodeEndpoint.fromHost("10.0.0.3"), new NodeMetaData("plat2", "app2", "ver2"));
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
 		nodes.update(node1, NodeStatus.ACTIVE);
 		nodes.update(node2, NodeStatus.ACTIVE);
-		final Node node = nodes.findNodeByEndpoint(NodeEndpoint.fromHost("10.0.0.0"));
+		final Node node = nodes.findNodeByIdentity(identity);
+		final NodeMetaData metaData = node.getMetaData();
 
 		// Assert:
-		Assert.assertThat(node.getVersion(), IsEqual.equalTo("ver2"));
-		Assert.assertThat(node.getApplication(), IsEqual.equalTo("app2"));
-		Assert.assertThat(node.getPlatform(), IsEqual.equalTo("plat2"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("ver2"));
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app2"));
+		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat2"));
 	}
 
 	//endregion
@@ -263,16 +266,16 @@ public class NodeCollectionTest {
 
 	//endregion
 
-	//region findNodeByEndpoint
+	//region findNodeByEndpoint / findNodeByIdentity
 
 	@Test
 	public void findNodeByEndpointReturnsActiveNodeMatchingEndpoint() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
 
-		// Act: 
+		// Act:
 		final Node node = nodes.findNodeByEndpoint(new NodeEndpoint("http", "37.123.25.5", 7890));
-		
+
 		// Assert:
 		Assert.assertThat(node, IsEqual.equalTo(createNode("A", "37.123.25.5", 7890)));
 	}
@@ -296,6 +299,42 @@ public class NodeCollectionTest {
 
 		// Act:
 		final Node node = nodes.findNodeByEndpoint(new NodeEndpoint("http", "37.121.27.7", 7891));
+
+		// Assert:
+		Assert.assertThat(node, IsNull.nullValue());
+	}
+
+	@Test
+	public void findNodeByIdentityReturnsActiveNodeMatchingEndpoint() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
+
+		// Act:
+		final Node node = nodes.findNodeByIdentity(new WeakNodeIdentity("37.123.25.5-7890"));
+
+		// Assert:
+		Assert.assertThat(node, IsEqual.equalTo(createNode("A", "37.123.25.5", 7890)));
+	}
+
+	@Test
+	public void findNodeByIdentityReturnsInactiveNodeMatchingEndpoint() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
+
+		// Act:
+		final Node node = nodes.findNodeByIdentity(new WeakNodeIdentity("38.183.85.5-7890"));
+
+		// Assert:
+		Assert.assertThat(node, IsEqual.equalTo(createNode("A", "38.183.85.5", 7890)));
+	}
+
+	@Test
+	public void findNodeByIdentityReturnsNullIfNoNodeMatchesEndpoint() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
+
+		// Act:
+		final Node node = nodes.findNodeByIdentity(new WeakNodeIdentity("37.121.27.7-7891"));
 
 		// Assert:
 		Assert.assertThat(node, IsNull.nullValue());
@@ -418,12 +457,15 @@ public class NodeCollectionTest {
 
 	private static Node createNode(final String platform, final char port) {
 		// Arrange:
-		return new Node(new NodeEndpoint("http", "localhost", port), platform, "FooBar", "1.0");
+		return createNode(platform, "localhost", port);
 	}
 
 	private static Node createNode(final String platform, final String host, final int port) {
 		// Arrange:
-		return new Node(new NodeEndpoint("http", host, port), platform, "FooBar", "1.0");
+		return new Node(
+				new WeakNodeIdentity(String.format("%s-%d", host, port)),
+				new NodeEndpoint("http", host, port),
+				new NodeMetaData(platform, "FooBar", "1.0"));
 	}
 
 	private static NodeCollection createNodeCollectionWithMultipleNodes() {

@@ -2,7 +2,7 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.peer.test.Utils;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.node.Node;
 import org.nem.core.math.Matrix;
 
@@ -15,7 +15,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void previouslyUnknownNodeExperienceCanBeRetrieved() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(2);
+		final Node[] nodes = PeerUtils.createNodeArray(2);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		// Act:
@@ -28,7 +28,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void sameExperienceIsReturnedForSameSourceAndPeerNode() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(2);
+		final Node[] nodes = PeerUtils.createNodeArray(2);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		// Act:
@@ -42,7 +42,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void experienceIsDirectional() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(2);
+		final Node[] nodes = PeerUtils.createNodeArray(2);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		// Act:
@@ -100,7 +100,7 @@ public class NodeExperiencesTest {
 
 	private static Matrix createTotalSharedExperienceMatrix() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		for (final Node nodeI : nodes)
@@ -114,7 +114,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void sharedExperiencesMatrixHasZeroForLocalOnlyInteraction() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		for (final Node nodeI : nodes)
@@ -132,7 +132,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void sharedExperiencesMatrixHasZeroForExternalOnlyInteraction() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		experiences.getNodeExperience(nodes[0], nodes[2]).successfulCalls().set(7);
@@ -150,7 +150,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void sharedExperiencesMatrixHasOneForLocalAndExternalInteraction() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(3);
+		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		experiences.getNodeExperience(nodes[0], nodes[2]).successfulCalls().set(2);
@@ -173,7 +173,7 @@ public class NodeExperiencesTest {
 	@Test
 	public void getExperiencesReturnsAllNodeExperiences() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(4);
+		final Node[] nodes = PeerUtils.createNodeArray(4);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().set(2);
@@ -203,14 +203,14 @@ public class NodeExperiencesTest {
 	@Test
 	public void setExperiencesUpdatesAllNodeExperiences() {
 		// Arrange:
-		final Node[] nodes = Utils.createNodeArray(4);
+		final Node[] nodes = PeerUtils.createNodeArray(4);
 		final NodeExperiences experiences = new NodeExperiences();
 
 		experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().set(6);
 
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
-		pairs.add(new NodeExperiencePair(nodes[3], Utils.createNodeExperience(2)));
-		pairs.add(new NodeExperiencePair(nodes[1], Utils.createNodeExperience(11)));
+		pairs.add(new NodeExperiencePair(nodes[3], PeerUtils.createNodeExperience(2)));
+		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
 
 		// Act:
 		experiences.setNodeExperiences(nodes[0], pairs);

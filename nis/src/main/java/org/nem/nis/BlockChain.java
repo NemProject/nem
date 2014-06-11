@@ -188,7 +188,7 @@ public class BlockChain implements BlockSynchronizer {
 		//endregion
 
 		//region verify peer's chain
-		final List<Block> peerChain = connector.getChainAfter(node.getEndpoint(), commonBlockHeight);
+		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		return updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 	}
 
@@ -287,7 +287,7 @@ public class BlockChain implements BlockSynchronizer {
 	private NodeInteractionResult updateOurChain(
 			final BlockChainSyncContext context,
 			final org.nem.nis.dbmodel.Block dbParentBlock,
-			final List<Block> peerChain,
+			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore) {
@@ -372,7 +372,7 @@ public class BlockChain implements BlockSynchronizer {
 		public UpdateChainResult updateOurChain(
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
-				final List<Block> peerChain,
+				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
@@ -418,7 +418,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockDao blockDao;
 		private final Foraging foraging;
 		private final Block parentBlock;
-		private final List<Block> peerChain;
+		private final Collection<Block> peerChain;
 		private final BlockChainScore ourScore;
 		private BlockChainScore peerScore;
 		private final boolean hasOwnChain;
@@ -431,7 +431,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockDao blockDao,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
-				final List<Block> peerChain,
+				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 

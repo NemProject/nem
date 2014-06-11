@@ -74,11 +74,27 @@ public class NodeCollection implements SerializableEntity {
 	/**
 	 * Finds a node with a given endpoint.
 	 *
+	 * @param endpoint The endpoint.
 	 * @return The matching node or null if not found.
 	 */
 	public Node findNodeByEndpoint(final NodeEndpoint endpoint) {
 		for (final Node node : this.getAllNodes()) {
 			if (node.getEndpoint().equals(endpoint))
+				return node;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Finds a node with a given identity.
+	 *
+	 * @param identity The identity.
+	 * @return The matching node or null if not found.
+	 */
+	public Node findNodeByIdentity(final NodeIdentity identity) {
+		for (final Node node : this.getAllNodes()) {
+			if (node.getIdentity().equals(identity))
 				return node;
 		}
 

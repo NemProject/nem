@@ -1,8 +1,10 @@
 package org.nem.peer.test;
 
 import net.minidev.json.*;
+import org.nem.core.crypto.PublicKey;
+import org.nem.core.test.Utils;
+import org.nem.core.utils.Base64Encoder;
 import org.nem.peer.Config;
-import org.nem.peer.trust.TrustProvider;
 
 /**
  * Static class containing utility functions for creating Config objects.
@@ -14,55 +16,74 @@ public class ConfigFactory {
 	 */
 	public static final String DEFAULT_LOCAL_NODE_HOST = "10.0.0.8";
 
-	/**
-	 * Creates a JSONObject that represents an endpoint.
-	 *
-	 * @param protocol The protocol.
-	 * @param host     The host.
-	 * @param port     The port.
-	 *
-	 * @return A JSONObject that represents an endpoint.
-	 */
-	public static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {
-		JSONObject jsonEndpoint = new JSONObject();
+	private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {
+		final JSONObject jsonEndpoint = new JSONObject();
 		jsonEndpoint.put("protocol", protocol);
 		jsonEndpoint.put("host", host);
 		jsonEndpoint.put("port", port);
 		return jsonEndpoint;
 	}
 
+	private static JSONObject createIdentityJsonObject(final String publicKey) {
+		final JSONObject jsonIdentity = new JSONObject();
+		jsonIdentity.put("public-key", publicKey);
+		return jsonIdentity;
+	}
+
+	private static JSONObject createIdentityJsonObjectWithPrivateKey(final String privateKey) {
+		final JSONObject jsonIdentity = new JSONObject();
+		jsonIdentity.put("private-key", privateKey);
+		jsonIdentity.put("name", "local larry");
+		return jsonIdentity;
+	}
+
 	/**
-	 * Creates a JSONObject that represents a network configuration.
+	 * Creates default local node configuration.
 	 *
-	 * @param hosts The hosts that should be used as well known peers.
-	 *
-	 * @return A JSONObject that represents a network configuration.
+	 * @return The configuration.
 	 */
-	public static JSONObject createTestJsonConfig(final String[] hosts) {
-		JSONObject jsonConfig = new JSONObject();
+	public static JSONObject createDefaultLocalConfig() {
+		final JSONObject jsonConfig = new JSONObject();
 
 		jsonConfig.put("endpoint", createEndpointJsonObject("http", DEFAULT_LOCAL_NODE_HOST, 7890));
+		jsonConfig.put("identity", createIdentityJsonObjectWithPrivateKey("Dnumq0AdMXpLbaE1F1VYMLbDw6wG3wHvj67uWLrpy5A="));
 
-		jsonConfig.put("version", "1.0"); // note that the Config constructor parameter should take precedence
-		jsonConfig.put("platform", "Mac");
-		jsonConfig.put("application", "FooBar");
+		final JSONObject jsonMetaData = new JSONObject();
+		jsonMetaData.put("version", "1.0"); // note that the Config constructor parameter should take precedence
+		jsonMetaData.put("platform", "Mac");
+		jsonMetaData.put("application", "FooBar");
+		jsonConfig.put("metaData", jsonMetaData);
+		return jsonConfig;
+	}
 
-		JSONArray jsonWellKnownPeers = new JSONArray();
-		for (final String hostName : hosts)
-			jsonWellKnownPeers.add(createEndpointJsonObject("ftp", hostName, 12));
+	/**
+	 * Creates default peers configuration.
+	 *
+	 * @param hosts The peer hosts.
+	 * @return The configuration.
+	 */
+	public static JSONObject createDefaultPeersConfig(final String[] hosts) {
+		final JSONObject jsonConfig = new JSONObject();
+		final JSONArray jsonWellKnownPeers = new JSONArray();
+		for (final String hostName : hosts) {
+			final PublicKey publicKey = Utils.generateRandomPublicKey();
+			final JSONObject jsonWellKnownPeer = new JSONObject();
+			jsonWellKnownPeer.put("endpoint", createEndpointJsonObject("ftp", hostName, 12));
+			jsonWellKnownPeer.put("identity", createIdentityJsonObject(Base64Encoder.getString(publicKey.getRaw())));
+			jsonWellKnownPeers.add(jsonWellKnownPeer);
+		}
 
 		jsonConfig.put("knownPeers", jsonWellKnownPeers);
 		return jsonConfig;
 	}
 
 	/**
-	 * Creates a JSONObject that represents a network configuration and has three
-	 * well-known hosts.
+	 * Creates default peers configuration with three hosts.
 	 *
-	 * @return A JSONObject that represents a network configuration.
+	 * @return The configuration.
 	 */
-	public static JSONObject createTestJsonConfig() {
-		return createTestJsonConfig(new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.2" });
+	public static JSONObject createDefaultPeersConfig() {
+		return createDefaultPeersConfig(new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.2" });
 	}
 
 	/**
@@ -71,29 +92,9 @@ public class ConfigFactory {
 	 * @return A default Config object.
 	 */
 	public static Config createDefaultTestConfig() {
-		return new Config(createTestJsonConfig(), "2.0");
-	}
-
-
-	/**
-	 * Creates a Config object with the specified trust provider.
-	 *
-	 * @param trustProvider The trust provider.
-	 * @return A Config object.
-	 */
-	public static Config createConfig(final TrustProvider trustProvider) {
-
-		class MockConfig extends Config {
-			public MockConfig() {
-				super(createTestJsonConfig(), "2.0");
-			}
-
-			@Override
-			public TrustProvider getTrustProvider() {
-				return trustProvider;
-			}
-		}
-
-		return new MockConfig();
+		return new Config(
+				createDefaultLocalConfig(),
+				createDefaultPeersConfig(),
+				"2.0");
 	}
 }

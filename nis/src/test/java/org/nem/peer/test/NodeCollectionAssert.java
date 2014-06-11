@@ -101,6 +101,6 @@ public class NodeCollectionAssert {
 	}
 
 	private static List<String> getPlatforms(final Collection<Node> nodes) {
-		return nodes.stream().map(Node::getPlatform).collect(Collectors.toList());
+		return nodes.stream().map(n -> n.getMetaData().getPlatform()).collect(Collectors.toList());
 	}
 }

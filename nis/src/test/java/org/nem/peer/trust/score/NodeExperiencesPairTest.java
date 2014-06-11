@@ -2,8 +2,9 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.peer.test.Utils;
-import org.nem.peer.node.Node;
+import org.nem.core.crypto.KeyPair;
+import org.nem.peer.node.*;
+import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class NodeExperiencesPairTest {
 	@Test
 	public void pairCanBeCreated() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final Node node = PeerUtils.createNodeWithName("bob");
 		final List<NodeExperiencePair> experiences = new ArrayList<>();
 
 		// Act:
@@ -26,17 +27,18 @@ public class NodeExperiencesPairTest {
 	@Test
 	public void pairCanBeRoundTripped() throws Exception {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final NodeIdentity identity = new NodeIdentity(new KeyPair());
+		final Node node = new Node(identity, NodeEndpoint.fromHost("localhost"));
 		final List<NodeExperiencePair> experiences = new ArrayList<>();
-		experiences.add(new NodeExperiencePair(Utils.createNodeWithPort(87), new NodeExperience()));
-		experiences.add(new NodeExperiencePair(Utils.createNodeWithPort(90), new NodeExperience()));
+		experiences.add(new NodeExperiencePair(PeerUtils.createNodeWithName("a"), new NodeExperience()));
+		experiences.add(new NodeExperiencePair(PeerUtils.createNodeWithName("b"), new NodeExperience()));
 		final NodeExperiencesPair originalPair = new NodeExperiencesPair(node, experiences);
 
 		// Act:
 		final NodeExperiencesPair pair = new NodeExperiencesPair(org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
-		Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getPort(), IsEqual.equalTo(81));
+		Assert.assertThat(pair.getNode(), IsEqual.equalTo(node));
 		Assert.assertThat(pair.getExperiences().size(), IsEqual.equalTo(2));
 	}
 }

@@ -1,18 +1,14 @@
 {
-	"_info": "commented fields are proceeded with '_'",
-
-	"endpoint": {
-	    "protocol": "http",
-	    "host": "nemcoin.info",
-	    "port" : 7890
-	},
-
-    "application": "NIS",
+	"_info": "this file contains a list of all trusted peers and can be shared",
 
 	"knownPeers": [
-        { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
-        { "protocol": "http", "host": "trudy.nem.ninja", "port" : 7890 }
+	    {
+	        endpoint: { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
+	        identity: { "name": "bob", "public-key": "AgZoPC/IXqn6TFsdMzl740UH6hUkO3/ErWgiHJruK3WR" }
+	    },
+        {
+            endpoint: { "protocol": "http", "host": "trudy.nem.ninja", "port" : 7890 },
+            identity: { "name": "trudy", "public-key": "A+Bhs2AwM5xaEL5irWCBsMRSla0AkjgUGLcpXshEYC3U" }
+        }
     ],
-
-	"_end": "end"
 }

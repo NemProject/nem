@@ -5,7 +5,6 @@ import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,57 +13,37 @@ import java.util.stream.Collectors;
  */
 public class Config {
 
-	private static final String DEFAULT_PLATFORM = "Unknown";
-	private static final String DEFAULT_APPLICATION = "Unknown";
-
-	private Node localNode;
+	private final Node localNode;
 	private final PreTrustedNodes preTrustedNodes;
 	private final TrustParameters trustParameters;
 	private final TrustProvider trustProvider;
 
 	/**
-	 * Creates a new configuration object from a JSON configuration object.
+	 * Creates a new configuration object.
 	 *
-	 * @param jsonConfig A JSON configuration object.
+	 * @param localConfig A JSON object containing local-node settings.
+	 * @param peersConfig A JSON object containing peer settings.
 	 * @param applicationVersion The application version.
 	 */
-	public Config(final JSONObject jsonConfig, final String applicationVersion) {
-		jsonConfig.put("version", applicationVersion);
-		if (!jsonConfig.containsKey("platform")) {
-			final String defaultPlatform = String.format(
-					"%s (%s) on %s",
-					System.getProperty("java.vendor"),
-					System.getProperty("java.version"),
-					System.getProperty("os.name"));
-			jsonConfig.put("platform", defaultPlatform);
-		}
-
-		final JsonDeserializer deserializer = new JsonDeserializer(jsonConfig, new DeserializationContext(null));
-		this.localNode = parseLocalNode(deserializer);
-		this.preTrustedNodes = parseWellKnownPeers(deserializer);
+	public Config(final JSONObject localConfig, final JSONObject peersConfig, final String applicationVersion) {
+		updateLocalConfigMetaData((JSONObject)localConfig.get("metaData"), applicationVersion);
+		this.localNode = parseLocalNode(new JsonDeserializer(localConfig, null));
+		this.preTrustedNodes = parseWellKnownPeers(new JsonDeserializer(peersConfig, null));
 		this.trustParameters = getDefaultTrustParameters();
 		this.trustProvider = getDefaultTrustProvider();
 	}
 
-	/**
-	 * Loads configuration from a file.
-	 *
-	 * @param configFileName The configuration file name.
-	 * @param applicationVersion The application version.
-	 *
-	 * @return The configuration.
-	 */
-	public static Config fromFile(final String configFileName, final String applicationVersion) {
-		try {
-			try (final InputStream fin = Config.class.getClassLoader().getResourceAsStream(configFileName)) {
-				if (null == fin)
-					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
+	private void updateLocalConfigMetaData(final JSONObject localMetaData, final String applicationVersion) {
+		localMetaData.put("version", applicationVersion);
+		if (localMetaData.containsKey("platform"))
+			return;
 
-				return new Config((JSONObject)JSONValue.parse(fin), applicationVersion);
-			}
-		} catch (Exception e) {
-			throw new FatalConfigException("Exception encountered while loading config", e);
-		}
+        final String defaultPlatform = String.format(
+                "%s (%s) on %s",
+                System.getProperty("java.vendor"),
+                System.getProperty("java.version"),
+                System.getProperty("os.name"));
+        localMetaData.put("platform", defaultPlatform);
 	}
 
 	/**
@@ -85,14 +64,6 @@ public class Config {
 		return this.localNode;
 	}
 
-	/**
-	 * Replaces the local node's endpoint with a new endpoint.
-	 * 
-	 * @param endpoint The new endpoint.
-	 */
-	public void updateLocalNodeEndpoint(NodeEndpoint endpoint) {
-		this.localNode.setEndpoint(endpoint);
-	}
 	/**
 	 * Gets all pre-trusted nodes.
 	 *
@@ -121,17 +92,12 @@ public class Config {
 	}
 
 	private static Node parseLocalNode(final Deserializer deserializer) {
-		return new Node(deserializer);
+		return new LocalNodeDeserializer().deserialize(deserializer);
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<NodeEndpoint> wellKnownEndpoints = deserializer.readObjectArray("knownPeers", NodeEndpoint.DESERIALIZER);
-
-		final Set<Node> wellKnownNodes = wellKnownEndpoints.stream()
-				.map(Node::fromEndpoint)
-				.collect(Collectors.toSet());
-
-		return new PreTrustedNodes(wellKnownNodes);
+		final List<Node> wellKnownNodes = deserializer.readObjectArray("knownPeers", Node::new);
+		return new PreTrustedNodes(wellKnownNodes.stream().collect(Collectors.toSet()));
 	}
 
 	private static TrustParameters getDefaultTrustParameters() {
@@ -145,29 +111,5 @@ public class Config {
 	private static TrustProvider getDefaultTrustProvider() {
 		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
 		return new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT);
-	}
-
-	/**
-	 * A fatal configuration exception.
-	 */
-	private static class FatalConfigException extends RuntimeException {
-		/**
-		 * Creates a new config exception.
-		 *
-		 * @param message The exception message.
-		 */
-		public FatalConfigException(final String message) {
-			super(message);
-		}
-
-		/**
-		 * Creates a new config exception.
-		 *
-		 * @param message The exception message.
-		 * @param cause   The original exception.
-		 */
-		public FatalConfigException(final String message, Throwable cause) {
-			super(message, cause);
-		}
 	}
 }

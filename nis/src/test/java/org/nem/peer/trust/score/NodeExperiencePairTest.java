@@ -2,8 +2,9 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.peer.test.Utils;
-import org.nem.peer.node.Node;
+import org.nem.core.crypto.KeyPair;
+import org.nem.peer.node.*;
+import org.nem.peer.test.PeerUtils;
 
 public class NodeExperiencePairTest {
 
@@ -12,7 +13,7 @@ public class NodeExperiencePairTest {
 	@Test
 	public void pairCanBeCreated() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final Node node = PeerUtils.createNodeWithName("bob");
 		final NodeExperience experience = new NodeExperience();
 
 		// Act:
@@ -26,7 +27,8 @@ public class NodeExperiencePairTest {
 	@Test
 	public void pairCanBeRoundTripped() {
 		// Arrange:
-		final Node node = Utils.createNodeWithPort(81);
+		final NodeIdentity identity = new NodeIdentity(new KeyPair());
+		final Node node = new Node(identity, NodeEndpoint.fromHost("localhost"));
 		final NodeExperience experience = new NodeExperience();
 		experience.successfulCalls().set(17);
 		final NodeExperiencePair originalPair = new NodeExperiencePair(node, experience);
@@ -35,7 +37,7 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = new NodeExperiencePair(org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
-		Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getPort(), IsEqual.equalTo(81));
+		Assert.assertThat(pair.getNode(), IsEqual.equalTo(node));
 		Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
 	}
 
@@ -80,7 +82,9 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1);
 
 		// Assert:
-		Assert.assertThat(pair.toString(), IsEqual.equalTo("[success: 5, failure: 1] @ [Node 10.0.0.1]"));
+		Assert.assertThat(
+				pair.toString(),
+				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) 10.0.0.1] @ [10.0.0.1]]"));
 	}
 
 	//endregion
@@ -89,6 +93,6 @@ public class NodeExperiencePairTest {
 			final String host,
 			final int numSuccess,
 			final int numFailures) {
-		return new NodeExperiencePair(Node.fromHost(host), new NodeExperience(numSuccess, numFailures));
+		return new NodeExperiencePair(PeerUtils.createNodeWithHost(host), new NodeExperience(numSuccess, numFailures));
 	}
 }

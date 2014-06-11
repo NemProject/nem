@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class AsyncTimerTest {
 
-	private static int TimeUnit = 25;
+	private static int TimeUnit = 40;
 	private static int TimeHalfUnit = TimeUnit / 2;
 
 	//region get/setName

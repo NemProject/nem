@@ -1,13 +1,13 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.function.*;
 import java.util.logging.Logger;
 
@@ -38,16 +38,16 @@ public class PushService {
 	 * Pushes a transaction.
 	 *
 	 * @param entity The transaction.
-	 * @param request The servlet request.
+	 * @param identity The identity of the pushing node.
 	 */
-	public void pushTransaction(final Transaction entity, final HttpServletRequest request) {
+	public void pushTransaction(final Transaction entity, final NodeIdentity identity) {
 		boolean result = this.pushEntity(
 				entity,
 				PushService::checkTransaction,
 				this.foraging::processTransaction,
 				transaction -> { },
 				NodeApiId.REST_PUSH_TRANSACTION,
-				request);
+				identity);
 
 		if (!result)
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
@@ -62,54 +62,57 @@ public class PushService {
 	 * Pushes a block.
 	 *
 	 * @param entity The block.
-	 * @param request The servlet request.
+	 * @param identity The identity of the pushing node.
 	 */
-	public void pushBlock(final Block entity, final HttpServletRequest request) {
+	public void pushBlock(final Block entity, final NodeIdentity identity) {
 		boolean result = this.pushEntity(
 				entity,
 				this.blockChain::checkPushedBlock,
 				this.blockChain::processBlock,
 				block -> LOGGER.info("   block height: " + entity.getHeight()),
 				NodeApiId.REST_PUSH_BLOCK,
-				request);
+				identity);
 
 		if (!result)
 			throw new IllegalArgumentException("block must be verifiable");
 	}
 
-	private <T extends VerifiableEntity> boolean pushEntity(
+	private <T extends VerifiableEntity & SerializableEntity> boolean pushEntity(
 			final T entity,
 			final Function<T, NodeInteractionResult> isValid,
 			final Function<T, NodeInteractionResult> isAccepted,
 			final Consumer<T> logAdditionalInfo,
 			final NodeApiId broadcastId,
-			final HttpServletRequest request) {
-		LOGGER.info(String.format("   received: %s from %s", entity.getType(), request.getRemoteAddr()));
+			final NodeIdentity identity) {
+		LOGGER.info(String.format("   received: %s from %s", entity.getType(), identity));
 		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
 		logAdditionalInfo.accept(entity);
 
 		final PeerNetwork network = this.host.getNetwork();
-		Node remoteNode = network.getNodes().findNodeByEndpoint(NodeEndpoint.fromHost(request.getRemoteAddr()));
-		if (null == remoteNode)
-			remoteNode = Node.fromHost(request.getRemoteAddr());
+		final Node remoteNode = null == identity ? null : network.getNodes().findNodeByIdentity(identity);
+		final Consumer<NodeInteractionResult> updateStatus = status -> {
+			if (null != remoteNode)
+				network.updateExperience(remoteNode, status);
+		};
 
 		final NodeInteractionResult isValidStatus = isValid.apply(entity);
 		if (isValidStatus == NodeInteractionResult.FAILURE) {
 			// Bad experience with the remote node.
-			network.updateExperience(remoteNode, isValidStatus);
+			updateStatus.accept(isValidStatus);
 			return false;
 		}
 
 		// validate block and broadcast (async)
 		final NodeInteractionResult status = isAccepted.apply(entity);
-		if (NodeInteractionResult.NEUTRAL != status) {
-			// Good experience with the remote node.
-			network.updateExperience(remoteNode, status);
-		}
+		// Good or bad experience with the remote node.
+		updateStatus.accept(status);
 
 		if (status == NodeInteractionResult.SUCCESS) {
-			network.broadcast(broadcastId, entity);
+			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
+					entity,
+					this.host.getNetwork().getLocalNode().getIdentity());
+			network.broadcast(broadcastId, secureEntity);
 		}
 
 		return true;

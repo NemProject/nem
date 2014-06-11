@@ -20,17 +20,24 @@ public class ArrayUtils {
 	}
 
 	/**
-	 * Concatenates two arrays and returns the result.
+	 * Concatenates byte arrays and returns the result.
 	 *
-	 * @param lhs The first array.
-	 * @param rhs The second array.
+	 * @param arrays The arrays.
 	 *
-	 * @return An array that contains all the elements in lhs concatenated with all the elements in rhs.
+	 * @return A single array containing all elements in all arrays.
 	 */
-	public static byte[] concat(final byte[] lhs, final byte[] rhs) {
-		final byte[] result = new byte[lhs.length + rhs.length];
-		System.arraycopy(lhs, 0, result, 0, lhs.length);
-		System.arraycopy(rhs, 0, result, lhs.length, rhs.length);
+	public static byte[] concat(final byte[]... arrays) {
+		int totalSize = 0;
+		for (final byte[] array : arrays)
+			totalSize += array.length;
+
+		int startIndex = 0;
+		final byte[] result = new byte[totalSize];
+		for (final byte[] array : arrays) {
+			System.arraycopy(array, 0, result, startIndex, array.length);
+			startIndex += array.length;
+		}
+
 		return result;
 	}
 

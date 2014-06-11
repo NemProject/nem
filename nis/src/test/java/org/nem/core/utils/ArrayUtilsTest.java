@@ -42,8 +42,9 @@ public class ArrayUtilsTest {
 		byte[] src = null;
 
 		// Act:
-		byte[] result = ArrayUtils.duplicate(src);
+		ArrayUtils.duplicate(src);
 	}
+
 	//endregion duplicate
 
 	//region concat
@@ -98,6 +99,15 @@ public class ArrayUtilsTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6 }));
+	}
+
+	@Test
+	public void concatCanCombineMoreThanTwoArrays() {
+		// Act:
+		byte[] result = ArrayUtils.concat(new byte[] { 7, 13 }, new byte[] { 12, 4, 6 }, new byte[] { 11, 9 });
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6, 11, 9 }));
 	}
 
 	//endregion

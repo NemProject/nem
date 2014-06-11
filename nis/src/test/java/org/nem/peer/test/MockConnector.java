@@ -1,7 +1,7 @@
 package org.nem.peer.test;
 
 import org.nem.core.connect.*;
-import org.nem.core.crypto.HashChain;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.SerializableList;
@@ -62,9 +62,19 @@ public class MockConnector implements PeerConnector, SyncConnector {
 		FATAL,
 
 		/*
+		 * Returns a node with a different identity.
+		 */
+		CHANGE_IDENTITY,
+
+		/*
 		 * Returns a node with a different address.
 		 */
 		CHANGE_ADDRESS,
+
+		/*
+		 * Returns a node with different meta data.
+		 */
+		CHANGE_METADATA,
 
 		/**
 		 * Sleeps the thread for a small period of time and then throws an InactivePeerException.
@@ -196,57 +206,67 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public Block getLastBlock(final NodeEndpoint endpoint) {
+	public Block getLastBlock(final Node node) {
 		return null;
 	}
 
 	@Override
-	public Block getBlockAt(final NodeEndpoint endpoint, final BlockHeight height) {
+	public Block getBlockAt(final Node node, final BlockHeight height) {
 		return null;
 	}
 
 	@Override
-	public List<Block> getChainAfter(final NodeEndpoint endpoint, final BlockHeight height) {
+	public List<Block> getChainAfter(final Node node, final BlockHeight height) {
 		return null;
 	}
 
 	@Override
-	public HashChain getHashesFrom(final NodeEndpoint endpoint, final BlockHeight height) {
+	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
 		return null;
 	}
 
 	@Override
-	public BlockChainScore getChainScore(final NodeEndpoint endpoint) {
+	public BlockChainScore getChainScore(final Node node) {
 		return null;
 	}
 	
 	@Override
-	public CompletableFuture<Node> getInfo(final NodeEndpoint endpoint) {
+	public CompletableFuture<Node> getInfo(final Node node) {
 		this.numGetInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
-			NodeEndpoint endpointAfterChange = endpoint;
+			NodeEndpoint endpoint = node.getEndpoint();
+			NodeIdentity identity = node.getIdentity();
+			NodeMetaData metaData = node.getMetaData();
 			final TriggerAction action = this.getInfoTriggers.get(endpoint.getBaseUrl().getHost());
 			if (null != action) {
 				triggerGeneralAction(action);
 				switch (action) {
+					case CHANGE_IDENTITY:
+						identity = new NodeIdentity(new KeyPair());
+						break;
+
 					case CHANGE_ADDRESS:
-						URL url = endpoint.getBaseUrl();
-						endpointAfterChange = new NodeEndpoint(url.getProtocol(), url.getHost(), url.getPort() + 1);
+						final URL url = endpoint.getBaseUrl();
+						endpoint = new NodeEndpoint(url.getProtocol(), url.getHost() + "0", url.getPort());
+						break;
+
+					case CHANGE_METADATA:
+						metaData = new NodeMetaData("c-plat", "c-app", "c-ver");
 						break;
 				}
 			}
 
-			return new Node(endpointAfterChange, "P", "A", "V");
+			return new Node(identity, endpoint, metaData);
 		});
 	}
 
 	@Override
-	public CompletableFuture<SerializableList<Node>> getKnownPeers(final NodeEndpoint endpoint) {
+	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
 		this.numGetKnownPeerCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
-			if (shouldTriggerAction(endpoint, this.getKnownPeersErrorTrigger))
+			if (shouldTriggerAction(node.getEndpoint(), this.getKnownPeersErrorTrigger))
 				triggerGeneralAction(this.getKnownPeersErrorTriggerAction);
 
 			return new SerializableList<>(this.knownPeers);
@@ -254,11 +274,11 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final NodeEndpoint endpoint, final NodeEndpoint localEndpoint) {
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final Node node, final NodeEndpoint localEndpoint) {
 		this.numGetLocalNodeInfoCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {
-			final TriggerAction action = this.getLocalNodeInfoTriggers.get(endpoint.getBaseUrl().getHost());
+			final TriggerAction action = this.getLocalNodeInfoTriggers.get(node.getEndpoint().getBaseUrl().getHost());
 			if (null != action)
 				triggerGeneralAction(action);
 
@@ -268,7 +288,7 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	}
 
 	@Override
-	public CompletableFuture announce(final NodeEndpoint endpoint, final NodeApiId announceId, final SerializableEntity entity) {
+	public CompletableFuture announce(final Node node, final NodeApiId announceId, final SerializableEntity entity) {
 		this.numAnnounceCalls.incrementAndGet();
 
 		return CompletableFuture.supplyAsync(() -> {

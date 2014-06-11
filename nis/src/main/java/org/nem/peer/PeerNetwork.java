@@ -23,7 +23,7 @@ public class PeerNetwork {
 	private static final Logger LOGGER = Logger.getLogger(PeerNetwork.class.getName());
 
 	private final Config config;
-	private Node localNode;
+	private final Node localNode;
 	private NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
@@ -94,7 +94,7 @@ public class PeerNetwork {
 		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
 		config.getPreTrustedNodes().getNodes().stream()
 				.map(node ->
-						services.getPeerConnector().getLocalNodeInfo(node.getEndpoint(), configLocalNode.getEndpoint())
+						services.getPeerConnector().getLocalNodeInfo(node, configLocalNode.getEndpoint())
 								.exceptionally(e -> null)
 								.thenAccept(endpoint -> {
 									if (null == endpoint && 0 != numOutstandingRequests.decrementAndGet())
@@ -122,10 +122,9 @@ public class PeerNetwork {
 			return configLocalNode;
 
 		return new Node(
+				configLocalNode.getIdentity(),
 				reportedEndpoint,
-				configLocalNode.getPlatform(),
-				configLocalNode.getApplication(),
-				configLocalNode.getVersion());
+				configLocalNode.getMetaData());
 	}
 
 	/**
@@ -210,7 +209,7 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		final List<CompletableFuture> futures = this.nodes.getActiveNodes().stream()
-				.map(node -> this.peerConnector.announce(node.getEndpoint(), broadcastId, entity))
+				.map(node -> this.peerConnector.announce(node, broadcastId, entity))
 				.collect(Collectors.toList());
 
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
@@ -227,9 +226,9 @@ public class PeerNetwork {
 		}
 
 		final Node partnerNode = partnerNodePair.getNode();
-		LOGGER.info("synchronizing with: " + partnerNode);
+		LOGGER.info(String.format("synchronizing with %s", partnerNode));
 		final NodeInteractionResult result = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
-		LOGGER.info("synchronize with    " + partnerNode + " finished.");
+		LOGGER.info(String.format("synchronizing with %s finished", partnerNode));
 		this.updateExperience(partnerNodePair.getNode(), result);
 	}
 
@@ -260,23 +259,27 @@ public class PeerNetwork {
 	}
 
 	/**
-	 * Update the endpoint of the local node as seen by other nodes.
+	 * Updates the endpoint of the local node as seen by other nodes.
 	 */
-	public void updateLocalNodeEndpoint() {
-		LOGGER.info("updating local node.");
-		final Node configLocalNode = config.getLocalNode();
+	public CompletableFuture updateLocalNodeEndpoint() {
+		LOGGER.info("updating local node endpoint");
 		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
-		if (partnerNodePair == null) {
-			LOGGER.warning("no suitable peers found to update local node.");
+		if (null == partnerNodePair) {
+			LOGGER.warning("no suitable peers found to update local node");
+			return CompletableFuture.completedFuture(null);
 		}
-		this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode().getEndpoint(), configLocalNode.getEndpoint())
-						  .exceptionally(e -> null)
-						  .thenAccept(endpoint -> { LOGGER.info(String.format(
-																"local node configured as <%s> seen as <%s>",
-																configLocalNode.getEndpoint(),
-																endpoint));
-						  							this.localNode.setEndpoint(endpoint); 
-						  							config.updateLocalNodeEndpoint(endpoint); });
+
+		return this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode(), this.localNode.getEndpoint())
+				.handle((endpoint, e) -> {
+					if (null == endpoint || this.localNode.getEndpoint().equals(endpoint))
+						return null;
+
+					LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
+							this.localNode.getEndpoint(),
+							endpoint));
+					this.localNode.setEndpoint(endpoint);
+					return null;
+				});
 	}
 
 	private static class NodeRefresher {
@@ -301,8 +304,13 @@ public class PeerNetwork {
 		}
 
 		public CompletableFuture<Void> refresh() {
-			final List<CompletableFuture> futures = this.getRefreshNodes()
-					.map(this::refreshNodeAsync)
+			// all refresh nodes are directly communicated with;
+			// ensure that only direct communication is trusted for these nodes
+			final Set<Node> refreshNodes = this.getRefreshNodes();
+			this.connectedNodes.addAll(refreshNodes);
+
+			final List<CompletableFuture> futures = refreshNodes.stream()
+					.map(n -> this.getNodeInfo(n, true))
 					.collect(Collectors.toList());
 
             return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
@@ -312,34 +320,33 @@ public class PeerNetwork {
 					});
 		}
 
-		private Stream<Node> getRefreshNodes() {
+		private Set<Node> getRefreshNodes() {
 			// always include pre-trusted nodes even if they previously resulted in a failure
 			final Set<Node> refreshNodes = new HashSet<>(this.nodes.getAllNodes());
 			refreshNodes.addAll(this.preTrustedNodes.getNodes().stream().collect(Collectors.toList()));
-			return refreshNodes.stream();
-		}
-
-		private CompletableFuture<Void> refreshNodeAsync(final Node node) {
-			return this.getNodeInfo(node, true);
+			return refreshNodes;
 		}
 
 		private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
-			if (!this.connectedNodes.add(node)) {
+			// never sync with the local node or an indirect node that has already been communicated with
+			if (this.localNode.equals(node) || (!isDirectContact && !this.connectedNodes.add(node))) {
 				return CompletableFuture.completedFuture(null);
 			}
 
-			CompletableFuture<NodeStatus> future = this.connector.getInfo(node.getEndpoint())
+			CompletableFuture<NodeStatus> future = this.connector.getInfo(node)
 					.thenApply(n -> {
 						// if the node returned inconsistent information, drop it for this round
 						if (!areCompatible(node, n))
 							throw new FatalPeerException("node response is not compatible with node identity");
 
+						node.setEndpoint(n.getEndpoint());
+						node.setMetaData(n.getMetaData());
 						return NodeStatus.ACTIVE;
 					});
 
 			if (isDirectContact) {
 				future = future
-						.thenCompose(v -> this.connector.getKnownPeers(node.getEndpoint()))
+						.thenCompose(v -> this.connector.getKnownPeers(node))
 						.thenCompose(nodes -> {
 							final List<CompletableFuture> futures = nodes.asCollection().stream()
 									.map(n -> this.getNodeInfo(n, false))

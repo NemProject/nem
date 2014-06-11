@@ -67,9 +67,9 @@ public class ScoreProviderTestContext {
 			final double localTrust2,
 			final double localTrustSum2) {
 		// Arrange:
-		final Node node1 = Utils.createNodeWithPort(81);
-		final Node node2 = Utils.createNodeWithPort(82);
-		final Node node3 = Utils.createNodeWithPort(83);
+		final Node node1 = PeerUtils.createNodeWithName("a");
+		final Node node2 = PeerUtils.createNodeWithName("b");
+		final Node node3 = PeerUtils.createNodeWithName("c");
 
 		this.trustScores.getScore(node1, node3).score().set(localTrust1);
 		this.trustScores.getScoreWeight(node1).set(localTrustSum1);

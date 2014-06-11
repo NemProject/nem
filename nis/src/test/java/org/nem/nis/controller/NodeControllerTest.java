@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
@@ -16,19 +16,47 @@ import org.nem.peer.trust.score.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.function.Function;
 
 public class NodeControllerTest {
+
+	//region getInfo / getExtendedInfo
 
 	@Test
 	public void getInfoReturnsNetworkLocalNode() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		final Node node = context.controller.getExtendedInfo().getNode();
+		// Assert:
+		runInfoTest(context, c -> c.controller.getInfo(), n -> n);
+	}
+
+	@Test
+	public void getInfoAuthenticatedReturnsNetworkLocalNode() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		Assert.assertThat(node, IsSame.sameInstance(context.network.getLocalNode()));
+		final AuthenticatedResponse<?> response = runInfoTest(
+				context,
+				c -> c.controller.getInfo(challenge),
+				r -> r.getEntity(localNode.getIdentity(), challenge));
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	private static <T> T runInfoTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, Node> getNode) {
+		// Act:
+		final T response = action.apply(context);
+		final Node node = getNode.apply(response);
+
+		// Assert:
+		Assert.assertThat(node, IsEqual.equalTo(context.network.getLocalNode()));
+		return response;
 	}
 
 	@Test
@@ -55,6 +83,10 @@ public class NodeControllerTest {
 		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
 	}
 
+	//endregion
+
+	//region getPeerList / getActivePeerList
+
 	@Test
 	public void getPeerListReturnsNetworkNodes() {
 		// Arrange:
@@ -68,47 +100,76 @@ public class NodeControllerTest {
 	}
 
 	@Test
+	public void getActivePeerListReturnsActiveNetworkNodes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		runActivePeerListTest(context, c -> c.controller.getActivePeerList(), l -> l);
+	}
+
+	@Test
+	public void getActivePeerListAuthenticatedReturnsActiveNetworkNodes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		// Assert:
+		final AuthenticatedResponse<?> response = runActivePeerListTest(
+				context,
+				c -> c.controller.getActivePeerList(challenge),
+				r -> r.getEntity(localNode.getIdentity(), challenge));
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	private static <T> T runActivePeerListTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, SerializableList<Node>> getActivePeerList) {
+		// Arrange:
+		final NodeCollection nodeCollection = context.network.getNodes();
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.3"), NodeStatus.FAILURE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.7"), NodeStatus.ACTIVE);
+
+		// Act:
+		final T response = action.apply(context);
+		final SerializableList<Node> nodes = getActivePeerList.apply(response);
+
+		// Assert:
+		final List<Node> expectedNodes = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
+		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
+		return response;
+	}
+
+	//endregion
+
+	@Test
 	public void getExperiencesReturnsExtendedLocalNodeExperiences() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final PeerNetwork network = context.network;
-		network.updateExperience(Node.fromHost("10.0.0.2"), NodeInteractionResult.FAILURE);
-		network.updateExperience(Node.fromHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
-		network.updateExperience(Node.fromHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.2"), NodeInteractionResult.FAILURE);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
+		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
 
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.2"))).thenReturn(7);
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.7"))).thenReturn(0);
-		Mockito.when(context.host.getSyncAttempts(Node.fromHost("10.0.0.4"))).thenReturn(2);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.2"))).thenReturn(7);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.7"))).thenReturn(0);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.4"))).thenReturn(2);
 
 		// Act:
 		final Collection<ExtendedNodeExperiencePair> pairs = context.controller.getExperiences().asCollection();
 
 		// Assert:
 		final List<ExtendedNodeExperiencePair> expectedPairs = Arrays.asList(
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.2"), new NodeExperience(0, 1), 7),
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.7"), new NodeExperience(1, 0), 0),
-				new ExtendedNodeExperiencePair(Node.fromHost("10.0.0.4"), new NodeExperience(1, 0), 2));
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.2"), new NodeExperience(0, 1), 7),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.7"), new NodeExperience(1, 0), 0),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.4"), new NodeExperience(1, 0), 2));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
-	}
-
-	@Test
-	public void getActivePeerListReturnsActiveNetworkNodes() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NodeCollection nodeCollection = context.network.getNodes();
-		nodeCollection.update(Node.fromHost("10.0.0.2"), NodeStatus.INACTIVE);
-		nodeCollection.update(Node.fromHost("10.0.0.4"), NodeStatus.ACTIVE);
-		nodeCollection.update(Node.fromHost("10.0.0.3"), NodeStatus.FAILURE);
-		nodeCollection.update(Node.fromHost("10.0.0.7"), NodeStatus.ACTIVE);
-
-		// Act:
-		final SerializableList<Node> nodes = context.controller.getActivePeerList();
-
-		// Assert:
-		final List<Node> expectedNodes = Arrays.asList(
-				Node.fromHost("10.0.0.4"),
-				Node.fromHost("10.0.0.7"));
-		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
 	@Test
@@ -117,7 +178,7 @@ public class NodeControllerTest {
 		final TestContext context = new TestContext();
 		final NodeCollection nodes = context.network.getNodes();
 
-		final Node sourceNode = Utils.createNodeWithPort(111);
+		final Node sourceNode = PeerUtils.createNodeWithName("alice");
 		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
 
 		// Arrange: sanity
@@ -135,8 +196,8 @@ public class NodeControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		final Node sourceNode = Utils.createNodeWithPort(111);
-		final Node partnerNode = Utils.createNodeWithPort(222);
+		final Node sourceNode = PeerUtils.createNodeWithName("alice");
+		final Node partnerNode = PeerUtils.createNodeWithName("bob");
 		final List<NodeExperiencePair> experiences = new ArrayList<>();
 		experiences.add(new NodeExperiencePair(partnerNode, createNodeExperience(12, 34)));
 		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, experiences);

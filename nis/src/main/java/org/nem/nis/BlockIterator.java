@@ -5,7 +5,7 @@ import org.nem.core.model.BlockHeight;
 import org.nem.nis.sync.BlockLookup;
 import org.nem.nis.visitors.BlockVisitor;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Static class that provides functions for iterating over a chain of blocks.
@@ -42,7 +42,7 @@ public class BlockIterator {
 	/**
 	 * Calls the visitor for all blocks.
 	 */
-	public static void all(Block parentBlock, final List<Block> blocks, final BlockVisitor visitor) {
+	public static void all(Block parentBlock, final Collection<Block> blocks, final BlockVisitor visitor) {
 		for (final Block block : blocks) {
 			visitor.visit(parentBlock, block);
 			parentBlock = block;

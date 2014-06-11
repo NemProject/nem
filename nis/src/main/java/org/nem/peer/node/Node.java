@@ -8,48 +8,35 @@ import org.nem.core.serialization.*;
  */
 public class Node implements SerializableEntity {
 
+	private final NodeIdentity identity;
 	private NodeEndpoint endpoint;
-	private final String platform;
-	private final String version;
-	private final String application;
+	private NodeMetaData metaData;
 
 	/**
-	 * Creates a new node.
+	 * Creates a new node without meta data.
 	 *
+	 * @param identity    The identity.
 	 * @param endpoint    The endpoint.
-	 * @param platform    The platform.
-	 * @param application The application.
+	 */
+	public Node(final NodeIdentity identity, final NodeEndpoint endpoint) {
+		this(identity, endpoint, null);
+	}
+
+	/**
+	 * Creates a new node with meta data.
+	 *
+	 * @param identity    The identity.
+	 * @param endpoint    The endpoint.
+	 * @param metaData    The meta data.
 	 */
 	public Node(
+			final NodeIdentity identity,
 			final NodeEndpoint endpoint,
-			final String platform,
-			final String application,
-			final String version) {
-		this.endpoint = endpoint;
-		this.platform = platform;
-		this.application = application;
-		this.version = version;
+			final NodeMetaData metaData) {
+		this.identity = identity;
+		this.setEndpoint(endpoint);
+		this.setMetaData(getMetaData(metaData));
 		this.ensureValidity();
-	}
-
-	/**
-	 * Creates a new node given a host name.
-	 *
-	 * @param host The host.
-	 * @return The node.
-	 */
-	public static Node fromHost(final String host) {
-		return fromEndpoint(NodeEndpoint.fromHost(host));
-	}
-
-	/**
-	 * Creates a new node given an endpoint.
-	 *
-	 * @param endpoint The endpoint.
-	 * @return The node.
-	 */
-	public static Node fromEndpoint(final NodeEndpoint endpoint) {
-		return new Node(endpoint, null, null, null);
 	}
 
 	/**
@@ -58,22 +45,33 @@ public class Node implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public Node(final Deserializer deserializer) {
-		this.endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
-		this.platform = deserializer.readString("platform");
-		this.version = deserializer.readString("version");
-		this.application = deserializer.readString("application");
+		this.identity = deserializer.readObject("identity", NodeIdentity::new);
+		this.setEndpoint(deserializer.readObject("endpoint", NodeEndpoint::new));
+		this.setMetaData(getMetaData(deserializer.readObject("metaData", NodeMetaData::new)));
 		this.ensureValidity();
+	}
+
+	private static NodeMetaData getMetaData(final NodeMetaData metaData) {
+		return null != metaData ? metaData : new NodeMetaData(null, null, null);
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
+		serializer.writeObject("identity", this.identity);
 		serializer.writeObject("endpoint", this.endpoint);
-		serializer.writeString("platform", this.platform);
-		serializer.writeString("version", this.version);
-		serializer.writeString("application", this.application);
+		serializer.writeObject("metaData", this.metaData);
 	}
 
 	//region Getters and Setters
+
+	/**
+	 * Gets the identity.
+	 *
+	 * @return The identity.
+	 */
+	public NodeIdentity getIdentity() {
+		return this.identity;
+	}
 
 	/**
 	 * Gets the endpoint.
@@ -85,6 +83,15 @@ public class Node implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the meta data.
+	 *
+	 * @return The meta data.
+	 */
+	public NodeMetaData getMetaData() {
+		return this.metaData;
+	}
+
+	/**
 	 * Sets the endpoint.
 	 *
 	 * @param endpoint The endpoint.
@@ -92,60 +99,45 @@ public class Node implements SerializableEntity {
 	public void setEndpoint(final NodeEndpoint endpoint) {
 		if (null == endpoint)
 			throw new IllegalArgumentException("endpoint must be non-null");
-	
+
 		this.endpoint = endpoint;
 	}
 
 	/**
-	 * Gets the platform.
+	 * Sets the meta data.
 	 *
-	 * @return The platform.
+	 * @param metaData The meta data.
 	 */
-	public String getPlatform() {
-		return this.platform;
-	}
+	public void setMetaData(final NodeMetaData metaData) {
+		if (null == metaData)
+			throw new IllegalArgumentException("metaData must be non-null");
 
-	/**
-	 * Gets the version.
-	 *
-	 * @return The version.
-	 */
-	public String getVersion() {
-		return this.version;
-	}
-
-	/**
-	 * Gets the application.
-	 *
-	 * @return The application.
-	 */
-	public String getApplication() {
-		return this.application;
+		this.metaData = metaData;
 	}
 
 	//endregion
 
 	private void ensureValidity() {
-		if (null == this.endpoint)
-			throw new IllegalArgumentException("endpoint must be non-null");
+		if (null == this.identity)
+			throw new IllegalArgumentException("identity must be non-null");
 	}
 
 	@Override
 	public int hashCode() {
-		return this.endpoint.hashCode();
+		return this.identity.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Node))
+		if (!(obj instanceof Node))
 			return false;
 
-		Node rhs = (Node)obj;
-		return this.endpoint.equals(rhs.endpoint);
+		final Node rhs = (Node)obj;
+		return this.identity.equals(rhs.identity);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Node %s", this.endpoint.getBaseUrl().getHost());
+		return String.format("Node [%s] @ [%s]", this.identity, this.endpoint.getBaseUrl().getHost());
 	}
 }

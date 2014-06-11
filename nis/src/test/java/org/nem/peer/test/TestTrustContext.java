@@ -21,12 +21,12 @@ public class TestTrustContext {
 	 * Creates a new test trust context.
 	 */
 	public TestTrustContext() {
-		this.localNode = Utils.createNodeWithPort(80);
+		this.localNode = PeerUtils.createNodeWithName("local");
 		this.nodes = new Node[] {
-				Utils.createNodeWithPort(81),
-				Utils.createNodeWithPort(87),
-				Utils.createNodeWithPort(86),
-				Utils.createNodeWithPort(89),
+				PeerUtils.createNodeWithName("bob"),
+				PeerUtils.createNodeWithName("alice"),
+				PeerUtils.createNodeWithName("trudy"),
+				PeerUtils.createNodeWithName("peggy"),
 				localNode
 		};
 

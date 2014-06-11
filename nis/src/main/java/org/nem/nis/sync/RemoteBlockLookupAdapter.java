@@ -11,7 +11,7 @@ import org.nem.peer.node.*;
 public class RemoteBlockLookupAdapter implements BlockLookup {
 
 	private final SyncConnector connector;
-	private final NodeEndpoint remoteEndpoint;
+	private final Node remoteNode;
 
 	/**
 	 * Creates a new remote block lookup adapter.
@@ -21,26 +21,26 @@ public class RemoteBlockLookupAdapter implements BlockLookup {
 	 */
 	public RemoteBlockLookupAdapter(final SyncConnector connector, final Node node) {
 		this.connector = connector;
-		this.remoteEndpoint = node.getEndpoint();
+		this.remoteNode = node;
 	}
 
 	@Override
 	public BlockChainScore getChainScore() {
-		return this.connector.getChainScore(this.remoteEndpoint);
+		return this.connector.getChainScore(this.remoteNode);
 	}
 
 	@Override
 	public Block getLastBlock() {
-		return this.connector.getLastBlock(this.remoteEndpoint);
+		return this.connector.getLastBlock(this.remoteNode);
 	}
 
 	@Override
 	public Block getBlockAt(final BlockHeight height) {
-		return this.connector.getBlockAt(this.remoteEndpoint, height);
+		return this.connector.getBlockAt(this.remoteNode, height);
 	}
 
 	@Override
 	public HashChain getHashesFrom(final BlockHeight height) {
-		return this.connector.getHashesFrom(this.remoteEndpoint, height);
+		return this.connector.getHashesFrom(this.remoteNode, height);
 	}
 }

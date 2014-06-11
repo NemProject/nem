@@ -24,7 +24,7 @@ public class ExceptionAssert {
 			if (ex.getClass() == exceptionClass)
 				return;
 
-			Assert.fail(String.format("unexpected exception of type %s was thrown", exceptionClass));
+			Assert.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
 		}
 
 		Assert.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
