@@ -142,6 +142,7 @@ public class ChainControllerTest {
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));

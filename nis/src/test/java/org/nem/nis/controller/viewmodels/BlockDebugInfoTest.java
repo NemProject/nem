@@ -25,9 +25,10 @@ public class BlockDebugInfoTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
 		final BigInteger hit = BigInteger.valueOf(1234);
 		final BigInteger target = BigInteger.valueOf(4321);
+		final int interBlockTime = 45;
 		
 		// Act:
-		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(height, timestamp, address, difficulty, hit, target);
+		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(height, timestamp, address, difficulty, hit, target, interBlockTime);
 		
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
@@ -36,6 +37,7 @@ public class BlockDebugInfoTest {
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
 	}
 	
 	//endregion
@@ -51,7 +53,8 @@ public class BlockDebugInfoTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
 		final BigInteger hit = BigInteger.valueOf(1234);
 		final BigInteger target = BigInteger.valueOf(4321);
-		final BlockDebugInfo originalBlockDebugInfo = new BlockDebugInfo(height, timestamp, address, difficulty, hit, target);
+		final int interBlockTime = 45;
+		final BlockDebugInfo originalBlockDebugInfo = new BlockDebugInfo(height, timestamp, address, difficulty, hit, target, interBlockTime);
 
 		final TimeInstant timestamp2 = new TimeInstant(1000);
 		final TimeInstant deadline = new TimeInstant(1720);
@@ -74,6 +77,7 @@ public class BlockDebugInfoTest {
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
 		
 		TransactionDebugInfo transactionDebugInfo = blockDebugInfo.getTransactionDebugInfos().get(0);
 		Assert.assertThat(transactionDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp2));

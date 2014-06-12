@@ -97,23 +97,26 @@ public class ChainController {
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		scorer.forceImportanceCalculation();
 		final BigInteger hit = scorer.calculateHit(block);
-		final BigInteger target = blockHeight.getRaw() == 1? BigInteger.ZERO : scorer.calculateTarget(parent, block);
+		final BigInteger target = parent == null? BigInteger.ZERO : scorer.calculateTarget(parent, block);
+		final int interBlockTime = parent == null? 0 : block.getTimeStamp().subtract(parent.getTimeStamp());
 		final BlockDebugInfo blockDebugInfo =  new BlockDebugInfo(
 				block.getHeight(),
 				block.getTimeStamp(),
 				block.getSigner().getAddress(),
 				block.getDifficulty(),
 				hit,
-				target);
+				target,
+				interBlockTime);
 		
 		for (Transaction transaction : block.getTransactions()) {
 			Address recipient = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getRecipient().getAddress() : Address.fromEncoded("N/A");
 			Amount amount = transaction instanceof TransferTransaction? ((TransferTransaction)transaction).getAmount() : Amount.fromMicroNem(0);
-			String message = "";
+			String messageText = "";
 			if (transaction.getType() == TransactionTypes.TRANSFER) {
-				if (((TransferTransaction)transaction).getMessage().canDecode()) {
+				Message message = ((TransferTransaction)transaction).getMessage();
+				if (message != null && message.canDecode()) {
 					try {
-						message = new String(((TransferTransaction)transaction).getMessage().getDecodedPayload(), "UTF-8");
+						messageText = new String(message.getDecodedPayload(), "UTF-8");
 					} catch (UnsupportedEncodingException e) {
 					}
 				}
@@ -125,7 +128,7 @@ public class ChainController {
 					recipient,
 					amount,
 					transaction.getFee(),
-					message);
+					messageText);
 			blockDebugInfo.addTransactionDebugInfo(transactionDebugInfo);
 		}
 		

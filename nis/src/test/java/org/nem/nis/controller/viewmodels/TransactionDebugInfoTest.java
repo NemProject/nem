@@ -1,12 +1,10 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.Address;
 import org.nem.core.model.Amount;
 import org.nem.core.serialization.Deserializer;

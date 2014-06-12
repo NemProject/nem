@@ -1,14 +1,11 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.Address;
 import org.nem.core.model.Amount;
-import org.nem.core.model.Message;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
@@ -26,7 +23,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	private final Address recipient;
 	private final Amount amount;
 	private final Amount fee;
-	private String message;
+	private final String message;
 	
 
 	/**
@@ -38,6 +35,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
 	 * @param fee The transaction fee.
+	 * @param message The transaction message.
 	 */
 	public TransactionDebugInfo(
 			final TimeInstant timestamp,
@@ -77,7 +75,6 @@ public class TransactionDebugInfo implements SerializableEntity {
 		this.recipient = Address.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
 		this.fee = Amount.readFrom(deserializer, "fee");
-		this.message = "N/A";
 		this.message = deserializer.readString("message");
 	}
 	
@@ -152,10 +149,10 @@ public class TransactionDebugInfo implements SerializableEntity {
 		date = new Date(SystemTimeProvider.getEpochTimeMillis() + this.deadline.getRawTime() * 1000);
 		dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 		serializer.writeString("deadline", dateString);
-		Address.writeTo(serializer, "sender", sender);
-		Address.writeTo(serializer, "recipient", recipient);
-		Amount.writeTo(serializer, "amount", amount);
-		Amount.writeTo(serializer, "fee", fee);
+		Address.writeTo(serializer, "sender", this.sender);
+		Address.writeTo(serializer, "recipient", this.recipient);
+		Amount.writeTo(serializer, "amount", this.amount);
+		Amount.writeTo(serializer, "fee", this.fee);
 		serializer.writeString("message", this.message);
 	}
 

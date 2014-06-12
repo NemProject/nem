@@ -23,17 +23,19 @@ public class BlockDebugInfo implements SerializableEntity {
 	private final BlockDifficulty difficulty;
 	private final BigInteger hit;
 	private final BigInteger target;
+	private final int interBlockTime;
 	private final List<TransactionDebugInfo> transactionDebugInfos;
 
 	/**
 	 * Creates a new block debug info.
 	 *
 	 * @param blockHeight The block height.
-	 * @param foragerAddress The address of the forager of the block.
 	 * @param timestamp The block timestamp.
+	 * @param foragerAddress The address of the forager of the block.
 	 * @param difficulty The block difficulty.
 	 * @param hit The block hit.
 	 * @param target The block target.
+	 * @param interBlockTime The block time - parent block time.
 	 */
 	public BlockDebugInfo(
 			final BlockHeight blockHeight,
@@ -41,13 +43,15 @@ public class BlockDebugInfo implements SerializableEntity {
 			final Address forager,
 			final BlockDifficulty difficulty,
 			final BigInteger hit,
-			final BigInteger target) {
+			final BigInteger target,
+			final int interBlockTime) {
 		this.height = blockHeight;
 		this.forager = forager;
 		this.timestamp = timestamp;
 		this.difficulty = difficulty;
 		this.hit = hit;
 		this.target = target;
+		this.interBlockTime = interBlockTime;
 		this.transactionDebugInfos = new ArrayList<>();
 	}
 	
@@ -70,6 +74,7 @@ public class BlockDebugInfo implements SerializableEntity {
 		this.difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
 		this.hit = new BigInteger(deserializer.readString("hit"));
 		this.target = new BigInteger(deserializer.readString("target"));
+		this.interBlockTime = deserializer.readInt("interBlockTime");
 		this.transactionDebugInfos = deserializer.readObjectArray("transactions", TransactionDebugInfo::new);
 	}
 
@@ -119,12 +124,21 @@ public class BlockDebugInfo implements SerializableEntity {
 	}
 	
 	/**
-	 * Returns The foragers target for the block
+	 * Returns The forager's target for the block
 	 *
 	 * @return The target.
 	 */
 	public BigInteger getTarget() {
 		return this.target;
+	}
+	
+	/**
+	 * Returns the time span between the block and its parent block.
+	 *
+	 * @return The message.
+	 */
+	public int getInterBlockTime() {
+		return this.interBlockTime;
 	}
 	
 	/**
@@ -155,6 +169,7 @@ public class BlockDebugInfo implements SerializableEntity {
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());
 		serializer.writeString("target", this.target.toString());
+		serializer.writeInt("interBlockTime", this.interBlockTime);
 		serializer.writeObjectArray("transactions", this.transactionDebugInfos);
 	}
 }
