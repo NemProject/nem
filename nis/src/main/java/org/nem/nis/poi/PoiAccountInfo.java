@@ -1,9 +1,8 @@
 package org.nem.nis.poi;
 
-import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Account information used by poi.
@@ -16,7 +15,9 @@ public class PoiAccountInfo {
 	private final int index;
 	private final Account account;
 	private final BlockHeight height;
-	private final ColumnVector outlinkWeightsVector;
+
+	private final Map<Address, Double> netOutlinks = new HashMap<>();
+	private final List<WeightedLink> outlinks = new ArrayList<>();
 
 	/**
 	 * Creates a new POI account info.
@@ -30,14 +31,8 @@ public class PoiAccountInfo {
 		this.account = account;
 		this.height = height;
 
-		if (!this.hasOutlinks()) {
-			this.outlinkWeightsVector = null;
-			return;
-		}
-
 		final AccountImportance importanceInfo = this.account.getImportanceInfo();
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
-		this.outlinkWeightsVector = new ColumnVector(importanceInfo.getOutlinksSize(height));
 
 		// weight = out-link amount * DECAY_BASE^(age in days)
 		int i = 0;
@@ -46,9 +41,15 @@ public class PoiAccountInfo {
 			final long heightDifference = height.subtract(outlink.getHeight());
 			long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 			double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
-			this.outlinkWeightsVector.setAt(i, weight);
+
+			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
+			this.increment(outlink.getOtherAccountAddress(), weight);
 			++i;
 		}
+	}
+
+	private void increment(final Address address, double amount) {
+		this.netOutlinks.put(address, this.netOutlinks.getOrDefault(address, 0.0) + amount);
 	}
 
 	/**
@@ -76,33 +77,48 @@ public class PoiAccountInfo {
 	}
 
 	/**
-	 * Determines if the account has any out-links.
+	 * Adds an inlink to this account info.
 	 *
-	 * @return true if the account has any out-links.
+	 * @param inlink The inlink to add.
 	 */
-	public boolean hasOutlinks() {
-		return 0 != this.account.getImportanceInfo().getOutlinksSize(this.height);
+	public void addInlink(final WeightedLink inlink) {
+		this.increment(inlink.getOtherAccountAddress(), -inlink.getWeight());
 	}
 
 	/**
-	 * Gets the out-links weights vector.
+	 * Gets the weighted outlinks associated with this account.
 	 *
-	 * @return The out-links weight vector.
+	 * @return The weighted outlinks.
 	 */
-	public ColumnVector getOutlinkWeights() {
-		return this.outlinkWeightsVector;
+	public List<WeightedLink> getOutlinks() {
+		return this.outlinks;
 	}
 
 	/**
-	 * Calculates the out-link score.
+	 * Gets the weighted net outlinks associated with this account.
 	 *
-	 * @return The out-link score.
+	 * @return The weighted net outlinks.
 	 */
-	public double getOutlinkScore() {
-		if (!this.hasOutlinks())
-			return 0;
+	public List<WeightedLink> getNetOutlinks() {
+		final List<WeightedLink> links = new ArrayList<>();
+		for (final Map.Entry<Address, Double> entry : this.netOutlinks.entrySet()) {
+			if (entry.getValue() <= 0)
+				continue;
 
-		final double weightsMedian = this.outlinkWeightsVector.median();
-		return weightsMedian * this.outlinkWeightsVector.size();
+			links.add(new WeightedLink(entry.getKey(), entry.getValue()));
+		}
+
+		return links;
+	}
+
+	/**
+	 * Calculates the net out-link score.
+	 *
+	 * @return The net out-link score.
+	 */
+	public double getNetOutlinkScore() {
+		return this.getNetOutlinks().stream()
+				.map(WeightedLink::getWeight)
+				.reduce(0.0, Double::sum);
 	}
 }

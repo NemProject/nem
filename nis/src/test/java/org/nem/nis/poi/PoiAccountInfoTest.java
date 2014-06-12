@@ -2,9 +2,9 @@ package org.nem.nis.poi;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.math.ColumnVector;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
@@ -51,55 +51,40 @@ public class PoiAccountInfoTest {
 		return new PoiAccountInfo(11, account, height).canForage();
 	}
 
-	@Test
-	public void hasOutlinksIsOnlyTrueWhenAccountHasAtLeastOneOutlink() {
-		// Assert:
-		Assert.assertThat(createAccountInfoWithNullOutlinks().hasOutlinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutlinks().hasOutlinks(), IsEqual.equalTo(false));
-		Assert.assertThat(createAccountInfoWithOutlinks(1).hasOutlinks(), IsEqual.equalTo(true));
-		Assert.assertThat(createAccountInfoWithOutlinks(2, 4).hasOutlinks(), IsEqual.equalTo(true));
-	}
+	//region getOutlinks
 
 	@Test
-	public void outlinkWeightsAreNullWhenAccountHasNoOutlinks() {
+	public void outlinksAreEmptyWhenAccountHasNoOutlinks() {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
 
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
 		// Assert:
-		Assert.assertThat(info.getOutlinkWeights(), IsNull.nullValue());
+		Assert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
 	}
 
 	@Test
-	public void outlinkScoreIsZeroWhenAccountHasNoOutlinks() {
-		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
-
-		// Assert:
-		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(0.0));
-	}
-
-	@Test
-	public void outlinkWeightsAreOrderedWhenAccountHasOutlinks() {
+	public void outlinksAreCorrectWhenAccountHasOutlinks() {
 		// Arrange:
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
 
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
 		// Assert:
-		Assert.assertThat(
-				info.getOutlinkWeights(),
-				IsEqual.equalTo(new ColumnVector(2.0e06, 3.0e06, 1.0e06, 5.0e06, 9.0e06)));
+		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06),
+				new WeightedLink(Address.fromEncoded("acc 1"), 3.0e06),
+				new WeightedLink(Address.fromEncoded("acc 2"), 1.0e06),
+				new WeightedLink(Address.fromEncoded("acc 3"), 5.0e06),
+				new WeightedLink(Address.fromEncoded("acc 4"), 9.0e06));
+		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
 
 	@Test
-	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinks() {
-		// Arrange:
-		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
-
-		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(15.0e06));
-	}
-
-	@Test
-	public void outlinkWeightsAreOrderedWhenAccountHasOutlinksWithVariableHeights() {
+	public void outlinksAreCorrectWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
 		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
 		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
@@ -111,32 +96,132 @@ public class PoiAccountInfoTest {
 				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
 				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
 
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
 		// Assert:
-		final ColumnVector expectedWeights = new ColumnVector(
-				2.0e06 * threeDayDecay,
-				6.0e06 * twoDayDecay,
-				3.0e06 * twoDayDecay,
-				1.0e06 * oneDayDecay,
-				5.0e06 * oneDayDecay,
-				8.0e06,
-				9.0e06);
-		Assert.assertThat(info.getOutlinkWeights(), IsEqual.equalTo(expectedWeights));
+		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06 * threeDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 1"), 6.0e06 * twoDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 2"), 3.0e06 * twoDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 3"), 1.0e06 * oneDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 4"), 5.0e06 * oneDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 5"), 8.0e06),
+				new WeightedLink(Address.fromEncoded("acc 6"), 9.0e06));
+		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+	}
+
+	//endregion
+
+	//region getNetOutlinks
+
+	@Test
+	public void netOutlinksAreEmptyWhenAccountHasNoOutlinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
+
+		// Act:
+		final List<WeightedLink> actualLinks = info.getNetOutlinks();
+
+		// Assert:
+		Assert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
 	}
 
 	@Test
-	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinksWithVariableHeights() {
+	public void netOutlinksAreCorrectWhenAccountHasOutlinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 2"), 2.0e06));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
+
+		// Act:
+		final List<WeightedLink> actualLinks = info.getNetOutlinks();
+
+		// Assert:
+		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 1"), 3.0e06),
+				new WeightedLink(Address.fromEncoded("acc 3"), 5.0e06),
+				new WeightedLink(Address.fromEncoded("acc 4"), 7.0e06));
+		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+	}
+
+	@Test
+	public void netOutlinksAreCorrectWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
 		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
+		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
 
 		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(
 				4322,
 				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
 				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06 * threeDayDecay));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 2"), 8.0e06 * twoDayDecay));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 5"), 2.5e06));
 
-		// Assert: (median * num out-links)
-		Assert.assertThat(info.getOutlinkScore(), IsEqual.equalTo(5.0e06 * oneDayDecay * 7));
+		// Act:
+		final List<WeightedLink> actualLinks = info.getNetOutlinks();
+
+		// Assert:
+		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 1"), 6.0e06 * twoDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 3"), 1.0e06 * oneDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 4"), 5.0e06 * oneDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 5"), 5.5e06),
+				new WeightedLink(Address.fromEncoded("acc 6"), 9.0e06));
+		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
+
+	//endregion
+
+	//region getNetOutlinkScore
+
+	@Test
+	public void outlinkScoreIsZeroWhenAccountHasNoOutlinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
+
+		// Assert:
+		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(0.0));
+	}
+
+	@Test
+	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinks() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(2, 3, 1, 5, 9);
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 2"), 2.0e06));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
+
+		// Assert: sum(net out-links)
+		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(1.5e07));
+	}
+
+	@Test
+	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinksWithVariableHeights() {
+		// Arrange:
+		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
+		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+
+		// block heights must be in order so that account links have increasing block heights
+		final PoiAccountInfo info = createAccountInfoWithOutlinks(
+				4322,
+				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
+				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06 * threeDayDecay));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 2"), 8.0e06 * twoDayDecay));
+		info.addInlink(new WeightedLink(Address.fromEncoded("acc 5"), 2.5e06));
+
+		// Assert: sum(net out-links)
+		final double expectedScore = 6.0e06 * twoDayDecay + (1.0e06 + 5.0e06) * oneDayDecay + 5.50e06 + 9.0e06;
+		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(expectedScore));
+	}
+
+	//endregion
 
 	private static PoiAccountInfo createAccountInfoWithNullOutlinks() {
 		return createAccountInfoWithOutlinks((List<AccountLink>)null);
@@ -168,10 +253,13 @@ public class PoiAccountInfoTest {
 
 		final List<AccountLink> outlinks = new ArrayList<>();
 		for (int i = 0; i < amounts.length; ++i) {
+			final Account otherAccount = Mockito.mock(Account.class);
+			Mockito.when(otherAccount.getAddress()).thenReturn(Address.fromEncoded(String.format("acc %d", i)));
+
 			final AccountLink link = new AccountLink(
 					new BlockHeight(heights[i]),
 					Amount.fromNem(amounts[i]),
-					account.getAddress());
+					otherAccount.getAddress());
 			outlinks.add(link);
 		}
 
