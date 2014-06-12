@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
@@ -7,22 +9,34 @@ import org.nem.core.serialization.Serializer;
 /**
  * Represents a score for an entire block chain.
  */
-public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implements SerializableEntity {
+public class BlockChainScore extends AdvancedAbstractPrimitive<BlockChainScore, BigInteger> implements SerializableEntity {
 
 	/**
 	 * Value representing initial score.
 	 */
-	public static final BlockChainScore ZERO = new BlockChainScore(0);
+	public static final BlockChainScore ZERO = new BlockChainScore(BigInteger.ZERO);
 
 	/**
 	 * Creates a block chain score.
 	 *
 	 * @param score The block chain score.
 	 */
-	public BlockChainScore(final long score) {
+	public BlockChainScore(final BigInteger score) {
 		super(score, BlockChainScore.class);
 
-		if (this.getRaw() < 0)
+		if (this.getRaw().compareTo(BigInteger.ZERO) < 0)
+			throw new IllegalArgumentException("block chain score can't be negative");
+	}
+
+	/**
+	 * Creates a block chain score from a given long value.
+	 *
+	 * @param score The block chain score.
+	 */
+	public BlockChainScore(final long score) {
+		super(BigInteger.valueOf(score), BlockChainScore.class);
+
+		if (this.getRaw().compareTo(BigInteger.ZERO) < 0)
 			throw new IllegalArgumentException("block chain score can't be negative");
 	}
 
@@ -32,7 +46,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 * @param deserializer The deserializer.
 	 */
 	public BlockChainScore(final Deserializer deserializer) {
-		this(deserializer.readLong("score"));
+		this(deserializer.readBigInteger("score"));
 	}
 
 	/**
@@ -40,7 +54,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 *
 	 * @return The underlying score.
 	 */
-	public long getRaw() { 
+	public BigInteger getRaw() { 
 		return this.getValue(); 
 	}
 	
@@ -51,7 +65,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 * @return The new score.
 	 */
 	public BlockChainScore add(final BlockChainScore score) {
-		return new BlockChainScore(this.getRaw() + score.getRaw());
+		return new BlockChainScore(this.getRaw().add(score.getRaw()));
 	}
 	
 	/**
@@ -61,11 +75,11 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore> implemen
 	 * @return The new score.
 	 */
 	public BlockChainScore subtract(final BlockChainScore score) {
-		return new BlockChainScore(this.getRaw() - score.getRaw());
+		return new BlockChainScore(this.getRaw().subtract(score.getRaw()));
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeLong("score", this.getRaw());
+		serializer.writeBigInteger("score", this.getRaw());
 	}
 }

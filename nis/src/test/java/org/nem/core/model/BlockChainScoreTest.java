@@ -1,11 +1,16 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+
 import net.minidev.json.JSONObject;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.*;
-import org.nem.core.serialization.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.Base64Encoder;
 
 public class BlockChainScoreTest {
 
@@ -14,25 +19,25 @@ public class BlockChainScoreTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeScore() {
 		// Act:
-		new BlockChainScore(-1);
+		new BlockChainScore(BigInteger.valueOf(-1));
 	}
 
 	@Test
 	public void canBeCreatedAroundZeroScore() {
 		// Act:
-		final BlockChainScore score = new BlockChainScore(0);
+		final BlockChainScore score = new BlockChainScore(BigInteger.ZERO);
 
 		// Assert:
-		Assert.assertThat(score.getRaw(), IsEqual.equalTo(0L));
+		Assert.assertThat(score.getRaw(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
 	public void canBeCreatedAroundPositiveScore() {
 		// Act:
-		final BlockChainScore score = new BlockChainScore(1);
+		final BlockChainScore score = new BlockChainScore(BigInteger.ONE);
 
 		// Assert:
-		Assert.assertThat(score.getRaw(), IsEqual.equalTo(1L));
+		Assert.assertThat(score.getRaw(), IsEqual.equalTo(BigInteger.ONE));
 	}
 
 	//endregion
@@ -42,34 +47,34 @@ public class BlockChainScoreTest {
 	@Test
 	public void scoresCanBeAdded() {
 		// Arrange:
-		final BlockChainScore score1 = new BlockChainScore(17);
-		final BlockChainScore score2 = new BlockChainScore(3);
+		final BlockChainScore score1 = new BlockChainScore(BigInteger.valueOf(17));
+		final BlockChainScore score2 = new BlockChainScore(BigInteger.valueOf(3));
 
 		// Act:
 		final BlockChainScore result = score1.add(score2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(20)));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(20))));
 	}
 
 	@Test
 	public void scoresCanBeSubtracted() {
 		// Arrange:
-		final BlockChainScore score1 = new BlockChainScore(17);
-		final BlockChainScore score2 = new BlockChainScore(3);
+		final BlockChainScore score1 = new BlockChainScore(BigInteger.valueOf(17));
+		final BlockChainScore score2 = new BlockChainScore(BigInteger.valueOf(3));
 
 		// Act:
 		final BlockChainScore result = score1.subtract(score2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(14)));
+		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(14))));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSubtractLargerScoreFromSmallerScore() {
 		// Arrange:
-		final BlockChainScore score1 = new BlockChainScore(17);
-		final BlockChainScore score2 = new BlockChainScore(3);
+		final BlockChainScore score1 = new BlockChainScore(BigInteger.valueOf(17));
+		final BlockChainScore score2 = new BlockChainScore(BigInteger.valueOf(3));
 
 		// Act:
 		score2.subtract(score1);
@@ -83,7 +88,7 @@ public class BlockChainScoreTest {
 	public void scoreCanBeSerialized() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final BlockChainScore score = new BlockChainScore(142);
+		final BlockChainScore score = new BlockChainScore(BigInteger.valueOf(142));
 
 		// Act:
 		score.serialize(serializer);
@@ -91,16 +96,16 @@ public class BlockChainScoreTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
-		Assert.assertThat(jsonObject.get("score"), IsEqual.equalTo(142L));
+		Assert.assertThat(jsonObject.get("score"), IsEqual.equalTo(Base64Encoder.getString(BigInteger.valueOf(142).toByteArray())));
 	}
 
 	@Test
 	public void scoreCanBeRoundTripped() {
 		// Act:
-		final BlockChainScore score = createRoundTrippedScore(new BlockChainScore(142));
+		final BlockChainScore score = createRoundTrippedScore(new BlockChainScore(BigInteger.valueOf(142)));
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(142)));
+		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(142))));
 	}
 
 	private static BlockChainScore createRoundTrippedScore(final BlockChainScore originalScore) {
