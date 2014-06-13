@@ -38,6 +38,20 @@ public class PoiContextTest {
 	}
 
 	@Test
+	public void outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithAccountLinks();
+
+		// Assert:
+		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
+		// (2) calculation delegates to PoiAccountInfo
+		// (3) net outflows are used instead of total outflows
+		Assert.assertThat(
+				context.getOutlinkScoreVector().roundTo(5),
+				IsEqual.equalTo(new ColumnVector(10e06, 6e06, 0, 8e06)));
+	}
+
+	@Test
 	public void importanceVectorIsInitializedCorrectly() {
 		// Act:
 		// (0, 1, 8), (0, 2, 4)
