@@ -46,6 +46,18 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
+		return add(transaction, exists, true);
+	}
+
+	/**
+	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
+	 *
+	 * @param transaction The transaction.
+	 * @param exists Predicate that determines the existence of the transaction given its hash.
+	 * @param execute detemines if the transaction should be executed if valid.
+	 * @return true if the transaction was added.
+	 */
+	boolean add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (exists.test(transactionHash)) {
 			return false;
@@ -60,13 +72,15 @@ public class UnconfirmedTransactions {
 		if (!isValid(transaction)) {
 			return false;
 		}
-
-		transaction.execute(this.transferObserver);
+		
+		if (execute) {
+			transaction.execute(this.transferObserver);
+		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction;
+		return null == previousTransaction;		
 	}
-
+	
 	private boolean isValid(final Transaction transaction) {
 		return ValidationResult.SUCCESS == transaction.checkValidity(
 				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
@@ -118,10 +132,10 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Gets all transactions before the specified time.
+	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
 	 * @param time The specified time.
-	 * @return All transactions before the specified time.
+	 * @return The sorted list of all transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		final List<Transaction> transactions =  this.transactions.values().stream()
@@ -142,7 +156,14 @@ public class UnconfirmedTransactions {
 		return sortTransactions(transactions);
 	}
 
-
+	/**
+	 * Executes all transactions.
+	 */
+	public void executeAll() {
+		this.getAll().stream()
+					 .forEach(tx -> tx.execute(this.transferObserver));		
+	}
+	
 	/**
 	 * There might be conflicting transactions on the list of unconfirmed transactions.
 	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.
@@ -156,8 +177,9 @@ public class UnconfirmedTransactions {
 
 		// TODO: should we remove those that .add() failed?
 		unconfirmedTransactions.stream()
-				.forEach(filteredTxes::add);
+				.forEach(tx -> filteredTxes.add(tx, hash -> false, false));
 
+		filteredTxes.executeAll();
 		return filteredTxes.getAll();
 	}
 
