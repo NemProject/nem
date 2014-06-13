@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.*;
 import java.util.List;
 
 @Configuration
-@ComponentScan(basePackages={"org.nem.b.b"})
+@ComponentScan(basePackages={"org.nem.nis.controller", "org.nem.nis.a"})
 //@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
 public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Autowired
