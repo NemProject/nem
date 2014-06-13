@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.Amount;
+
 /**
  * An observer that notifies listeners when transfers are made.
  */

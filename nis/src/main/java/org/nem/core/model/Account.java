@@ -2,6 +2,10 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.*;
 import org.nem.core.messages.MessageFactory;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockAmount;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.ReferenceCounter;
 import org.nem.core.serialization.*;
 
 import java.util.*;

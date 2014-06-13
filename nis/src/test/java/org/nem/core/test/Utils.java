@@ -1,11 +1,14 @@
 package org.nem.core.test;
 
 import net.minidev.json.JSONObject;
+
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 

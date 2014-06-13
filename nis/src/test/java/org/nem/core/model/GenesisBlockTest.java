@@ -1,9 +1,13 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 
 import java.io.*;

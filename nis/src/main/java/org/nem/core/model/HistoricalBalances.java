@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 // NOTE: historical balances are currently unused, but we could leave it, to have
 // api to get "confirmed balance" X blocks ago
 public class HistoricalBalances {

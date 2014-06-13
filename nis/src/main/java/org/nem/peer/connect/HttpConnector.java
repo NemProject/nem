@@ -3,6 +3,8 @@ package org.nem.peer.connect;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 

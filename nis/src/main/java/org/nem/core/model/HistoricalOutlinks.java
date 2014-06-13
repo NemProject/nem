@@ -3,6 +3,9 @@ package org.nem.core.model;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * A collection of historical out-links.
  */

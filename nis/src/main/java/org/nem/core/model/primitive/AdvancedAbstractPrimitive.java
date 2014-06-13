@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 public abstract class AdvancedAbstractPrimitive<TDerived extends AdvancedAbstractPrimitive, TValue extends Number & Comparable<TValue>> implements Comparable<TDerived> {
 

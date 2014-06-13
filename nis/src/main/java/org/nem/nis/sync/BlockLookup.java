@@ -2,6 +2,8 @@ package org.nem.nis.sync;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * An interface for looking up blocks.

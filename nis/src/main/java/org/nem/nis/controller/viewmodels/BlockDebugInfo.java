@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;

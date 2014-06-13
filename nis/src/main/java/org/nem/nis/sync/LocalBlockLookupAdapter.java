@@ -2,6 +2,8 @@ package org.nem.nis.sync;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;

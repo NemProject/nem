@@ -5,6 +5,8 @@ import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsSame;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.security.InvalidParameterException;
 

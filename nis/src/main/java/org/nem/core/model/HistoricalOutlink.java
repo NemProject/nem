@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import java.util.LinkedList;
 
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * Represents a historical out-link
  */

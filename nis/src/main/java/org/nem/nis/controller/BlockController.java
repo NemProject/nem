@@ -1,11 +1,11 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.BlockHeight;
 import org.nem.core.crypto.Hash;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.BlockIo;
 import org.nem.core.model.Block;
+import org.nem.core.model.primitive.BlockHeight;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

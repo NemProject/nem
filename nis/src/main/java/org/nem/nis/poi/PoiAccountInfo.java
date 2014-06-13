@@ -2,6 +2,8 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Iterator;
 

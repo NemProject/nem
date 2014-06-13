@@ -2,6 +2,7 @@ package org.nem.nis.sync;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Helper class for comparing two block chains.

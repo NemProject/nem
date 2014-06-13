@@ -12,6 +12,8 @@ import org.hibernate.criterion.Restrictions;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;

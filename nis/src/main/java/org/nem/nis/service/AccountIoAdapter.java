@@ -5,6 +5,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.ncc.TransactionMetaData;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dbmodel.*;

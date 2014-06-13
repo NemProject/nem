@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;

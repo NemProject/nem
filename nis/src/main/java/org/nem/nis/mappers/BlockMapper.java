@@ -4,6 +4,8 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 

@@ -5,6 +5,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -114,7 +115,7 @@ public class Foraging  {
 	 *
 	 * @param transaction - transaction that isValid() and verify()-ed
 	 *
-	 * @return false if given transaction has already been seen, true if it has been added
+	 * @return NEUTRAL if given transaction has already been seen or isn't within the time window, SUCCESS if it has been added
 	 */
 	public NodeInteractionResult processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();

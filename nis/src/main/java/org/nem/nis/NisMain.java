@@ -10,10 +10,10 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.KeyPair;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
-
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;

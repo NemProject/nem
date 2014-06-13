@@ -2,6 +2,8 @@ package org.nem.nis.test;
 
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.poi.PoiImportanceGenerator;
 

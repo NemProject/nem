@@ -7,6 +7,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;

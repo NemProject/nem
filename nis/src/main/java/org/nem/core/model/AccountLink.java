@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * A link between a source account and another account.
  */

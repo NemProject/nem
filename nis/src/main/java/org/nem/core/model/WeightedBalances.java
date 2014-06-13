@@ -3,6 +3,9 @@ package org.nem.core.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 // TODO: needs more comprehensive tests around edge cases
 
 /**

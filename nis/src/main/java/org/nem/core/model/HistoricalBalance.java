@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * Represents a balance of an account at a certain block height.
  */

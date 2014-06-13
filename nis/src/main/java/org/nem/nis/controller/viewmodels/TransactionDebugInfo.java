@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.Amount;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;

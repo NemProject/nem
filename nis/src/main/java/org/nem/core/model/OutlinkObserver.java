@@ -2,6 +2,9 @@ package org.nem.core.model;
 
 import java.math.BigInteger;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * A transfer observer that updates outlink information.
  */

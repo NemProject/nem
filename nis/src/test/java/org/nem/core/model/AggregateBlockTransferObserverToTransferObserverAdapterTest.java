@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 import java.util.*;

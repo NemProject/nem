@@ -5,10 +5,12 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.MockBlockScorerAnalyzer;
 import org.nem.nis.test.*;
 
 import java.lang.reflect.Field;

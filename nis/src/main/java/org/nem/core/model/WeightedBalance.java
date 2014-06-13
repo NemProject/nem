@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * Calculates vested and unvested balances at a specified block height.
  */

@@ -5,7 +5,7 @@ import org.nem.core.math.SparseMatrix;
 import org.nem.core.model.Account;
 import org.nem.core.model.AccountLink;
 import org.nem.core.model.Address;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 

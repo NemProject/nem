@@ -1,8 +1,9 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.model.primitive.ReferenceCounter;
 
 public class RefrenceCounterTest {
 

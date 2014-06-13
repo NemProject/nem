@@ -1,7 +1,7 @@
 package org.nem.nis.visitors;
 
 import org.nem.core.model.Block;
-import org.nem.core.model.BlockChainScore;
+import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.BlockScorer;
 
 /**

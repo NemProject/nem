@@ -6,6 +6,8 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.math.DenseMatrix;
 import org.nem.core.math.Matrix;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.MockAccount;
 

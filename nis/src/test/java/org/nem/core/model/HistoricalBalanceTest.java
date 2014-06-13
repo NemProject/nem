@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 
 public class HistoricalBalanceTest {
 

@@ -3,6 +3,8 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;

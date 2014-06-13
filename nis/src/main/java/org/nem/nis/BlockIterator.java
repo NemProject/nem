@@ -1,7 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.Block;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.sync.BlockLookup;
 import org.nem.nis.visitors.BlockVisitor;
 

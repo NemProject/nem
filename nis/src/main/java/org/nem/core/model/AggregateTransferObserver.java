@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import java.util.List;
 
+import org.nem.core.model.primitive.Amount;
+
 /**
  * An aggregate transfer observer.
  */

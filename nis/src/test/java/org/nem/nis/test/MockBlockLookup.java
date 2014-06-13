@@ -2,6 +2,8 @@ package org.nem.nis.test;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.sync.BlockLookup;
 

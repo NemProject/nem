@@ -1,9 +1,10 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 import java.math.BigInteger;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.model.primitive.AdvancedAbstractPrimitive;
 
 public class AdvancedAbstractPrimitiveTest {
 

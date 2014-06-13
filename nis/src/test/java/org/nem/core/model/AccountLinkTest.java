@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 public class AccountLinkTest {

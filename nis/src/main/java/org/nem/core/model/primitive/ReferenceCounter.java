@@ -1,4 +1,5 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
+
 
 /**
  * Represents a referencer counter.
@@ -10,7 +11,7 @@ public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter> {
 	 */
 	public static final ReferenceCounter ZERO = new ReferenceCounter(0);
 
-	protected ReferenceCounter(final long refCount) {
+	public ReferenceCounter(final long refCount) {
 		super(refCount, ReferenceCounter.class);
 		
 		if (this.getRaw() < 0)

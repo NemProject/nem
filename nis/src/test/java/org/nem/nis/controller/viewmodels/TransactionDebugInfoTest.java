@@ -6,7 +6,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.Address;
-import org.nem.core.model.Amount;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;

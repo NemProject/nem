@@ -2,7 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Collection;
 import java.util.logging.Logger;

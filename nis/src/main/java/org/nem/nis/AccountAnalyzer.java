@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.nem.core.crypto.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.poi.*;
 

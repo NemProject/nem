@@ -2,6 +2,9 @@ package org.nem.core.model;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
