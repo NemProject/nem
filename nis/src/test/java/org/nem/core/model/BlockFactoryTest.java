@@ -1,4 +1,4 @@
-package org.nem.core.model.primitive;
+package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
 
