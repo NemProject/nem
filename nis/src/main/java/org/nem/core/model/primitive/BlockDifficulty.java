@@ -7,7 +7,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a NEM block difficulty.
  */
-public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty> {
+public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 
 	/**
 	 * The initial block difficulty.

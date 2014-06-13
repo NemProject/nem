@@ -4,7 +4,7 @@ package org.nem.core.model.primitive;
 /**
  * Represents a referencer counter.
  */
-public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter> {
+public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter, Long> {
 
 	/**
 	 * Value representing initial referenceCount.

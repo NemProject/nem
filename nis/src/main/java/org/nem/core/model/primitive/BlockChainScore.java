@@ -9,7 +9,7 @@ import org.nem.core.serialization.Serializer;
 /**
  * Represents a score for an entire block chain.
  */
-public class BlockChainScore extends AdvancedAbstractPrimitive<BlockChainScore, BigInteger> implements SerializableEntity {
+public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteger> implements SerializableEntity {
 
 	/**
 	 * Value representing initial score.

@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents an amount of NEM.
  */
-public class Amount extends AbstractPrimitive<Amount> {
+public class Amount extends AbstractPrimitive<Amount, Long> {
 
 	public static final int MICRONEMS_IN_NEM = 1000000;
 
