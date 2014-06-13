@@ -2,10 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.math.SparseMatrix;
-import org.nem.core.model.Account;
-import org.nem.core.model.AccountLink;
-import org.nem.core.model.Address;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.*;
 
 import java.util.*;
 
@@ -136,6 +133,7 @@ public class PoiContext {
 		private SparseMatrix outlinkMatrix;
 
 		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
+		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
 		public AccountProcessor(final int numAccounts) {
@@ -162,20 +160,17 @@ public class PoiContext {
 				//	 if (!accountInfo.canForage())
 				//	 continue;
 
+				this.addressToAccountInfoMap.put(account.getAddress(), accountInfo);
 				this.addressToIndexMap.put(account.getAddress(), i);
 
 				this.accountInfos.add(accountInfo);
 				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(height).getNumMicroNem());
-				this.outlinkScoreVector.setAt(i, accountInfo.getOutlinkScore());
-
-				if (!accountInfo.hasOutlinks())
-					this.dangleIndexes.add(i);
 
 				++i;
 			}
 
 			this.outlinkMatrix = new SparseMatrix(i, i, numOutlinks < i ? 1 : numOutlinks / i);
-			this.createOutlinkMatrix(height);
+			this.createOutlinkMatrix();
 
 			// Initially set importance to the row sum vector of the outlink matrix
 			// TODO: Is there a better way to estimate the eigenvector
@@ -191,25 +186,39 @@ public class PoiContext {
 			this.importanceVector.normalize();			
 		}
 
-		private void createOutlinkMatrix(BlockHeight height) {
+		private void createOutlinkMatrix() {
+			// TODO: this is O(2n) right now, if it is a bottleneck we can store inlinks with accounts (sacrificing memory)
+
+			// TODO: need to add tests to ensure that the context is using net outlinks (did makoto add those already?)
+
+			// (1) add reverse links to allow net calculation
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+				for (final WeightedLink link : accountInfo.getOutlinks()) {
+					final PoiAccountInfo otherAccountInfo = this.addressToAccountInfoMap.get(link.getOtherAccountAddress());
+					if (null == otherAccountInfo)
+						continue;
 
-				if (!accountInfo.hasOutlinks())
-					continue;
-
-				final ColumnVector outlinkWeights = accountInfo.getOutlinkWeights();
-				final Iterator<AccountLink> accountLinkIterator = accountInfo.getAccount()
-						.getImportanceInfo()
-						.getOutlinksIterator(height);
-				for (int i = 0; i < outlinkWeights.size(); ++i) {
-					final AccountLink outlink = accountLinkIterator.next();
-					int rowIndex = this.addressToIndexMap.get(outlink.getOtherAccountAddress());
-
-					// calculate net inflows and outflows
-					double weight = outlinkWeights.getAt(i);
-					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), weight);
-					this.outlinkMatrix.incrementAt(accountInfo.getIndex(), rowIndex, -weight);
+					otherAccountInfo.addInlink(new WeightedLink(accountInfo.getAccount().getAddress(), link.getWeight()));
 				}
+			}
+
+			// (2) update the matrix with all net outflows
+			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+				for (final WeightedLink link : accountInfo.getNetOutlinks()) {
+					final Integer rowIndex = this.addressToIndexMap.get(link.getOtherAccountAddress());
+					if (null == rowIndex)
+						continue;
+
+					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), link.getWeight());
+				}
+
+				// update the outlink score
+				int rowIndex = accountInfo.getIndex();
+				final double outlinkScore = accountInfo.getNetOutlinkScore();
+				if (0.0 == outlinkScore)
+					this.dangleIndexes.add(rowIndex);
+				else
+					this.outlinkScoreVector.setAt(rowIndex, outlinkScore);
 			}
 
 			this.outlinkMatrix.removeNegatives();

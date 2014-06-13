@@ -2,11 +2,9 @@ package org.nem.nis.poi;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.math.ColumnVector;
-import org.nem.core.math.DenseMatrix;
-import org.nem.core.math.Matrix;
+import org.nem.core.math.*;
 import org.nem.core.model.*;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
@@ -36,7 +34,21 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(1e06, 0, 6e06, 0, 5e06, 10e06)));
+				IsEqual.equalTo(new ColumnVector(1e06, 0, 3e06, 0, 10e06, 7e06)));
+	}
+
+	@Test
+	public void outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithAccountLinks();
+
+		// Assert:
+		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
+		// (2) calculation delegates to PoiAccountInfo
+		// (3) net outflows are used instead of total outflows
+		Assert.assertThat(
+				context.getOutlinkScoreVector().roundTo(5),
+				IsEqual.equalTo(new ColumnVector(10e06, 6e06, 0, 8e06)));
 	}
 
 	@Test
@@ -145,7 +157,7 @@ public class PoiContextTest {
 			account.setVestedBalanceAt(Amount.fromMicroNem(info.vestedBalance), height);
 
 			for (final int amount : info.amounts) {
-				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), account.getAddress());
+				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), Utils.generateRandomAddress());
 				account.getImportanceInfo().addOutlink(link);
 			}
 
@@ -158,12 +170,12 @@ public class PoiContextTest {
 	private static PoiContext createTestPoiContext() {
 		final int umInNem = Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		new int[] { 1 }), // 1 * 1
+				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		new int[] { 1 }), // 1
 				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		null),
-				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2, 7 }), // 2 * 3
+				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2 }), // 3
 				new TestAccountInfo(umInNem,			3 * umInNem - 1,	null),
-				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // 1 * 5
-				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7, 3 })); // 5 * 2
+				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // 10
+				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7 })); // 7
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
