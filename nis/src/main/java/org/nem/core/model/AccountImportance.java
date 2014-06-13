@@ -4,7 +4,9 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
+import org.nem.core.utils.FormatUtils;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 
 /**
@@ -157,6 +159,7 @@ public class AccountImportance implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		return String.format("(%s : %f)", this.getHeight(), this.importance);
+		DecimalFormat formatter = FormatUtils.getDecimalFormat(6);
+		return String.format("(%s : %s)", this.getHeight(), formatter.format(this.importance));
 	}
 }
