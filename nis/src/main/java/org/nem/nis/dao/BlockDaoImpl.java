@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -119,7 +120,12 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
 		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit);
-		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
+		final List<BlockDifficulty> result = new ArrayList<>(rawDifficulties.size());
+		for (final Long elem : rawDifficulties) {
+			result.add(new BlockDifficulty(elem));
+		}
+		return result;
+		//return rawDifficulties.stream().map(diff -> new BlockDifficulty(diff)).collect(Collectors.toList());
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -98,9 +99,14 @@ public class NodeController {
 	public SerializableList<ExtendedNodeExperiencePair> getExperiences() {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
 
-		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = pair.getExperiences().stream()
-				.map(this::extend)
-				.collect(Collectors.toList());
+		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
+		for (final NodeExperiencePair nexp : pair.getExperiences())
+		{
+			extend(nexp);
+		}
+//		pair.getExperiences().stream()
+//				.map(this::extend)
+//				.collect(Collectors.toList());
 
 		return new SerializableList<>(nodeExperiencePairs);
 	}
