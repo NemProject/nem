@@ -1,4 +1,4 @@
-package org.nem.nis.controller.utils;
+package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
@@ -59,7 +59,7 @@ public class ErrorResponseTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo((Integer)0)));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo(0)));
 		Assert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
 		Assert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));

@@ -6,7 +6,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.nis.controller.utils.ErrorResponse;
+import org.nem.core.connect.ErrorResponse;
 
 import javax.servlet.*;
 import javax.servlet.http.*;

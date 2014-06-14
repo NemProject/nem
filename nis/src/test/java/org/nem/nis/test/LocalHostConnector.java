@@ -7,7 +7,7 @@ import org.nem.core.connect.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.controller.utils.ErrorResponse;
+import org.nem.core.connect.ErrorResponse;
 
 import java.net.URL;
 

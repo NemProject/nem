@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.nis.controller.utils.ErrorResponse;
+import org.nem.core.connect.ErrorResponse;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 

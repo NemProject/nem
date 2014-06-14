@@ -5,7 +5,7 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
 import org.nem.core.serialization.JsonSerializer;
-import org.nem.nis.controller.utils.ErrorResponse;
+import org.nem.core.connect.ErrorResponse;
 
 import javax.servlet.http.*;
 import java.io.IOException;

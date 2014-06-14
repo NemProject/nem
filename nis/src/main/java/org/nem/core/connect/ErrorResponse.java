@@ -1,4 +1,4 @@
-package org.nem.nis.controller.utils;
+package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
 import org.nem.core.time.SystemTimeProvider;
