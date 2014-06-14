@@ -132,7 +132,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector multiplyElementWise(final ColumnVector vector) {
-		return this.transform(() -> this.matrix.multiplyElementWise(vector.matrix));
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.multiplyElementWise(vector.matrix);
+			}
+		});
 	}
 
 	/**
@@ -143,7 +148,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector add(final ColumnVector vector) {
-		return this.transform(() -> this.matrix.addElementWise(vector.matrix));
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.addElementWise(vector.matrix);
+			}
+		});
 	}
 
 	//endregion
@@ -179,7 +189,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector roundTo(final int numPlaces) {
-		return this.transform(() -> this.matrix.roundTo(numPlaces));
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.roundTo(numPlaces);
+			}
+		});
 	}
 
 	/**
@@ -189,7 +204,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector multiply(final double scalar) {
-		return this.transform(() -> this.matrix.multiply(scalar));
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.multiply(scalar);
+			}
+		});
 	}
 
 	/**
@@ -198,7 +218,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector sqrt() {
-		return this.transform(this.matrix::sqrt);
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.sqrt();
+			}
+		});
 	}
 
 	/**
@@ -207,7 +232,12 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector abs() {
-		return this.transform(this.matrix::abs);
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return matrix.abs();
+			}
+		});
 	}
 
 	private ColumnVector transform(final Supplier<Matrix> supplier) {
