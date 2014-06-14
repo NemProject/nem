@@ -8,12 +8,7 @@ import java.util.logging.Logger;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
-<<<<<<< HEAD
 import org.nem.core.model.primitive.*;
-=======
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
->>>>>>> refs/heads/feature/BigInteger-BllockChainScore
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.test.MockAccount;

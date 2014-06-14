@@ -157,7 +157,7 @@ public class AccountImportance implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		DecimalFormat formatter = FormatUtils.getDecimalFormat(6);
+		final DecimalFormat formatter = FormatUtils.getDecimalFormat(6);
 		return String.format("(%s : %s)", this.getHeight(), formatter.format(this.importance));
 	}
 }

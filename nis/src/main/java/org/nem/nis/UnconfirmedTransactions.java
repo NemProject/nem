@@ -54,10 +54,10 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param transaction The transaction.
 	 * @param exists Predicate that determines the existence of the transaction given its hash.
-	 * @param execute detemines if the transaction should be executed if valid.
+	 * @param execute determines if the transaction should be executed if valid.
 	 * @return true if the transaction was added.
 	 */
-	boolean add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
+	private boolean add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (exists.test(transactionHash)) {
 			return false;
@@ -78,9 +78,9 @@ public class UnconfirmedTransactions {
 		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction;		
+		return null == previousTransaction;
 	}
-	
+
 	private boolean isValid(final Transaction transaction) {
 		return ValidationResult.SUCCESS == transaction.checkValidity(
 				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
@@ -159,7 +159,7 @@ public class UnconfirmedTransactions {
 	/**
 	 * Executes all transactions.
 	 */
-	public void executeAll() {
+	private void executeAll() {
 		this.getAll().stream()
 					 .forEach(tx -> tx.execute(this.transferObserver));		
 	}
