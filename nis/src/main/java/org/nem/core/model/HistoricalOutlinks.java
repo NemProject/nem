@@ -1,7 +1,8 @@
 package org.nem.core.model;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import org.nem.core.model.primitive.*;
+
+import java.util.*;
 
 /**
  * A collection of historical out-links.

@@ -3,9 +3,8 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.MockTransaction;
-import org.nem.core.test.Utils;
+import org.nem.core.model.primitive.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 public class TransactionMetaDataPairTest {

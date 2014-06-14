@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 import java.util.*;

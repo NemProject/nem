@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 import java.util.*;

@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 
 import java.util.*;
 

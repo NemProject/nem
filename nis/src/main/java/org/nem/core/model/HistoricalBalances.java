@@ -1,9 +1,9 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.*;
+
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 // NOTE: historical balances are currently unused, but we could leave it, to have
 // api to get "confirmed balance" X blocks ago

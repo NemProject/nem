@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 /**
  * Abstract base class for strongly typed primitives.

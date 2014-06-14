@@ -2,8 +2,8 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.serialization.*;
 import org.nem.nis.BlockChain;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;

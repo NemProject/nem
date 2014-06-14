@@ -1,8 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.*;
 
 import java.util.Iterator;
 

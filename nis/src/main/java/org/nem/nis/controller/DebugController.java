@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.PublicApi;

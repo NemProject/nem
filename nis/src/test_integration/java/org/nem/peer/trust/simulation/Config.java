@@ -1,18 +1,10 @@
 package org.nem.peer.trust.simulation;
 
-import org.nem.peer.node.Node;
-import org.nem.peer.node.NodeCollection;
-import org.nem.peer.node.NodeEndpoint;
-import org.nem.peer.node.NodeStatus;
+import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 

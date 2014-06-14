@@ -2,14 +2,12 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.KeyPair;
-import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dao.BlockDao;
+import org.nem.core.crypto.*;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.dao.*;
 
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;

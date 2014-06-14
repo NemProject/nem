@@ -3,6 +3,7 @@ package org.nem.nis.visitors;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.NisUtils;

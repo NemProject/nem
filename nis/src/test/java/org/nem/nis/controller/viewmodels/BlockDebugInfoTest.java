@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;

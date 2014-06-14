@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.*;
 import org.nem.core.messages.MessageFactory;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 import java.util.*;

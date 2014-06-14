@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.*;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;

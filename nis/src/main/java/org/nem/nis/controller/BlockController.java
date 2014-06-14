@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.crypto.Hash;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.BlockIo;

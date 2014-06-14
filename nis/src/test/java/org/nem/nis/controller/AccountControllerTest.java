@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.test.Utils;

@@ -2,6 +2,7 @@ package org.nem.peer.connect;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.peer.node.Node;
 
 import java.util.Collection;

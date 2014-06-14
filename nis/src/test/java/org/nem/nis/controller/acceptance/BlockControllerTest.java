@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.LocalHostConnector;
 
 import java.net.MalformedURLException;

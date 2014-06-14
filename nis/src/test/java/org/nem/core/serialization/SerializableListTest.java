@@ -4,7 +4,6 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
-import org.nem.core.test.Utils;
 
 import java.util.*;
 

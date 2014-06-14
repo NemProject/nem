@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.*;
+
 /**
  * A link between a source account and another account.
  */

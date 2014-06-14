@@ -1,10 +1,8 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.core.model.primitive.*;
 
 import java.security.InvalidParameterException;
 

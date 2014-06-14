@@ -1,8 +1,8 @@
 package org.nem.nis.service;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.HashChain;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.BlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

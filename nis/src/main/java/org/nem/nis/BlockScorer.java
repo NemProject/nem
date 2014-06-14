@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;

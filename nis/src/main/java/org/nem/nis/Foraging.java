@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;

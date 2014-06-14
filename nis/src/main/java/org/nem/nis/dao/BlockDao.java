@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 

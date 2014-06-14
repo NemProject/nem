@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.*;
+
 /**
  * An observer that updates weighted balance information.
  */

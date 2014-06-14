@@ -9,7 +9,6 @@ import org.nem.nis.service.PushService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 // TODO: add tests

@@ -8,8 +8,6 @@ import org.nem.peer.SecureSerializableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * This controller will handle data propagation:
  * * /push/transaction - for what is now model.Transaction

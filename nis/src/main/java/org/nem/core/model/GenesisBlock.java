@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import net.minidev.json.*;
 import org.nem.core.crypto.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.nis.AccountAnalyzer;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Represents the genesis block.

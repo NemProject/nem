@@ -6,7 +6,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;

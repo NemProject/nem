@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.PublicKey;
+import org.nem.core.model.primitive.Amount;
 import org.nem.nis.dbmodel.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;

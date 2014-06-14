@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Possible comparison results.

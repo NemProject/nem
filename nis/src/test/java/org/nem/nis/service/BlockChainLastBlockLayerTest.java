@@ -1,19 +1,15 @@
 package org.nem.nis.service;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Account;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.test.MockAccountDao;
-import org.nem.nis.test.MockBlockDao;
+import org.nem.nis.mappers.*;
+import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
 	@Test

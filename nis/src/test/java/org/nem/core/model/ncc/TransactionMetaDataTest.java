@@ -2,7 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 

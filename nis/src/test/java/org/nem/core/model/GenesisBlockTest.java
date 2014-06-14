@@ -4,6 +4,7 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
 import java.io.*;

@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.MockBlockLookup;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.visitors.BlockVisitor;

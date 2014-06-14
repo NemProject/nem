@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 import java.util.Iterator;

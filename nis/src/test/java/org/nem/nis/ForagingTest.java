@@ -1,20 +1,16 @@
 package org.nem.nis;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsNull;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.MockForaging;
 import org.nem.core.test.Utils;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.peer.NodeInteractionResult;
 
 import java.lang.reflect.Field;

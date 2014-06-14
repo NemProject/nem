@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.service.RequiredBlockDaoAdapter;

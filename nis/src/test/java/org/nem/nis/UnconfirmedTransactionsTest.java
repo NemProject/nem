@@ -3,9 +3,9 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;

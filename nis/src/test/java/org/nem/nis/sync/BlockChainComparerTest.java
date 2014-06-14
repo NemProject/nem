@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockLookup;

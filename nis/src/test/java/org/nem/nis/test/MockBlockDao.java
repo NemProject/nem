@@ -1,8 +1,8 @@
 package org.nem.nis.test;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.HashChain;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.Block;

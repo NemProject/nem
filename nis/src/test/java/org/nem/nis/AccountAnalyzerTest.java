@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.poi.PoiImportanceGenerator;
 

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;

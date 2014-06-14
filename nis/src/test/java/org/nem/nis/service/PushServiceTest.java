@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;

@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 import org.hamcrest.core.*;
 import org.junit.*;

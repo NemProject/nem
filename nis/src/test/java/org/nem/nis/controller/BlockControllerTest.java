@@ -5,9 +5,9 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockScorer;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.BlockIo;
@@ -15,7 +15,6 @@ import org.nem.nis.test.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.MockPeerNetwork;
 
-import java.math.BigInteger;
 import java.util.function.*;
 
 public class BlockControllerTest {

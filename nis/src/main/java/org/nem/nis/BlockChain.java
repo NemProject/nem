@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Block;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.dao.AccountDao;

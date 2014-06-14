@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 
-import javax.security.auth.x500.X500Principal;
 import java.security.cert.X509Certificate;
 
 public class ApplicationMetaDataTest {

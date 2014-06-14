@@ -1,15 +1,13 @@
 package org.nem.nis.dao;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

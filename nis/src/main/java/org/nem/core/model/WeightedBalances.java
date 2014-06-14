@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.*;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

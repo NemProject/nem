@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 
 public class ComparisonResultTest {
 

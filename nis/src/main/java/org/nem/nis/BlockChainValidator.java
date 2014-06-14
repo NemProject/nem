@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.math.BigInteger;
 import java.util.Collection;

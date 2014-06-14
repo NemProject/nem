@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.model.primitive.*;
 import org.nem.nis.AccountAnalyzer;
 
 /**

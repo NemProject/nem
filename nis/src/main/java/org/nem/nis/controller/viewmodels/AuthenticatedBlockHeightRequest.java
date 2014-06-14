@@ -1,6 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
-import org.nem.core.model.BlockHeight;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.peer.node.*;
 

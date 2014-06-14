@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
