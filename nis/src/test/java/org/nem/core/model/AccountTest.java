@@ -13,6 +13,7 @@ import org.nem.core.utils.Base64Encoder;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 public class AccountTest {
 
@@ -406,7 +407,8 @@ public class AccountTest {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Assert:
-		assertAccountSerialization(address, address.getPublicKey().getRaw());
+		assertAccountSerialization(address, address.getPublicKey().getRaw(), true);
+		assertAccountSerialization(address, address.getPublicKey().getRaw(), false);
 	}
 
 	@Test
@@ -415,7 +417,8 @@ public class AccountTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Assert:
-		assertAccountSerialization(address, null);
+		assertAccountSerialization(address, null, true);
+		assertAccountSerialization(address, null, false);
 	}
 
 	@Test
@@ -434,6 +437,17 @@ public class AccountTest {
 
 		// Assert:
 		assertAccountRoundTrip(address, null);
+	}
+
+	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
+		// Arrange:
+		final Account.DeserializationOptions allOption = Account.DeserializationOptions.ALL;
+		final Account.DeserializationOptions summaryOption = Account.DeserializationOptions.SUMMARY;
+
+		// Assert:
+		assertAccountRoundTrip(address, Account::new, expectedPublicKey, true);
+		assertAccountRoundTrip(address, d -> new Account(d, allOption), expectedPublicKey, false);
+		assertAccountRoundTrip(address, d -> new Account(d, summaryOption), expectedPublicKey, true);
 	}
 
 	@Test
@@ -467,7 +481,9 @@ public class AccountTest {
 		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
 
 		// Act:
-		final Account roundTrippedRecipient = new Account(Utils.roundtripSerializableEntity(recipient, accountLookup));
+		final Account roundTrippedRecipient = new Account(
+				Utils.roundtripSerializableEntity(recipient, accountLookup),
+				Account.DeserializationOptions.ALL);
 
 		// Assert:
 		final List<Message> messages = roundTrippedRecipient.getMessages();
@@ -497,7 +513,9 @@ public class AccountTest {
 		accountLookup.setMockAccount(senders.get(1));
 
 		// Act:
-		final Account roundTrippedRecipient = new Account(Utils.roundtripSerializableEntity(recipient, accountLookup));
+		final Account roundTrippedRecipient = new Account(
+				Utils.roundtripSerializableEntity(recipient, accountLookup),
+				Account.DeserializationOptions.ALL);
 
 		// Assert:
 		final List<Message> messages = roundTrippedRecipient.getMessages();
@@ -507,12 +525,17 @@ public class AccountTest {
 		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(null));
 	}
 
-	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
+	private static void assertAccountRoundTrip(
+			final Address address,
+			final Function<Deserializer, Account> accountDeserializer,
+			final PublicKey expectedPublicKey,
+			final boolean isSummary) {
 		// Arrange:
 		final Account originalAccount = createAccountForSerializationTests(address);
+		final SerializableEntity entity = isSummary ? originalAccount.asSummary() : originalAccount;
 
 		// Act:
-		final Account account = new Account(Utils.roundtripSerializableEntity(originalAccount, null));
+		final Account account = accountDeserializer.apply(Utils.roundtripSerializableEntity(entity, null));
 
 		// Assert:
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
@@ -530,20 +553,31 @@ public class AccountTest {
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo("alpha gamma"));
 
 		final List<Message> messages = account.getMessages();
-		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
-		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
-		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+		if (isSummary) {
+			// messages are not serialized in summary mode
+			Assert.assertThat(messages.size(), IsEqual.equalTo(0));
+		} else {
+			Assert.assertThat(messages.size(), IsEqual.equalTo(2));
+			Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
+			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+		}
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
-	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
+	private static void assertAccountSerialization(
+			final Address address,
+			final byte[] expectedPublicKey,
+			final boolean isSummary) {
 		// Arrange:
 		final Account originalAccount = createAccountForSerializationTests(address);
+		final SerializableEntity entity = isSummary ? originalAccount.asSummary() : originalAccount;
 
 		// Act:
-		final JsonDeserializer deserializer = serializeAccountAndCreateDeserializer(originalAccount);
+		final JsonSerializer serializer = new JsonSerializer(true);
+		entity.serialize(serializer);
+		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 
 		// Assert:
 		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
@@ -556,10 +590,19 @@ public class AccountTest {
 		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
 
-		final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
-		Assert.assertThat(messages.size(), IsEqual.equalTo(2));
-		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
-		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+		if (isSummary) {
+			// messages are not serialized in summary mode
+			Assert.assertThat(serializer.getObject().containsKey("messages"), IsEqual.equalTo(false));
+		} else {
+			final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
+			Assert.assertThat(messages.size(), IsEqual.equalTo(2));
+			Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
+			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
+		}
+
+		// 6-7 "real" properties and 1 "hidden" (ordering) property
+		final int expectedProperties = 6 + (isSummary ? 0 : 1) + 1 ;
+		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
 	private static Account createAccountForSerializationTests(final Address address) {
@@ -574,13 +617,6 @@ public class AccountTest {
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
-	}
-
-	private static JsonDeserializer serializeAccountAndCreateDeserializer(final Account account) {
-		// Act:
-		final JsonSerializer serializer = new JsonSerializer(true);
-		account.serialize(serializer);
-		return new JsonDeserializer(serializer.getObject(), null);
 	}
 
 	//endregion

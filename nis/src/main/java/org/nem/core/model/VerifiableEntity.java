@@ -136,12 +136,6 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.serialize(serializer, true);
 	}
 
-	/**
-	 * Serializes this object.
-	 *
-	 * @param serializer       The serializer to use.
-	 * @param includeSignature true if the serialization should include the signature.
-	 */
 	private void serialize(final Serializer serializer, boolean includeSignature) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
@@ -204,29 +198,6 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @return A non-verifiable serializer.
 	 */
 	public SerializableEntity asNonVerifiable() {
-		return new NonVerifiableSerializationAdapter(this);
-	}
-
-	/**
-	 * A serialization adapter for VerifiableEntity that serializes the entity
-	 * without a signature.
-	 */
-	public static class NonVerifiableSerializationAdapter implements SerializableEntity {
-
-		private final VerifiableEntity entity;
-
-		/**
-		 * Creates a non-verifiable serialization adapter for entity.
-		 *
-		 * @param entity The entity.
-		 */
-		public NonVerifiableSerializationAdapter(final VerifiableEntity entity) {
-			this.entity = entity;
-		}
-
-		@Override
-		public void serialize(Serializer serializer) {
-			entity.serialize(serializer, false);
-		}
+		return serializer -> this.serialize(serializer, false);
 	}
 }

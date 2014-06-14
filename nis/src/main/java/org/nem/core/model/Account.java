@@ -12,6 +12,21 @@ import java.util.*;
  */
 public class Account implements SerializableEntity {
 
+	/**
+	 * Enumeration of deserialization options.
+	 */
+	public enum DeserializationOptions {
+		/**
+		 * The serialized data only includes summary account information.
+		 */
+		SUMMARY,
+
+		/**
+		 * The serialized data includes all account information.
+		 */
+		ALL
+	}
+
 	private KeyPair keyPair;
 	private Address address;
 	private final List<Message> messages;
@@ -131,11 +146,21 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes an account. Currently this deserializer is used ONLY by NCC
+	 * Deserializes an account. Currently this deserializer is used ONLY by NCC.
 	 *
 	 * @param deserializer The deserializer.
 	 */
 	public Account(final Deserializer deserializer) {
+		this(deserializer, DeserializationOptions.SUMMARY);
+	}
+
+	/**
+	 * Deserializes an account. Currently this deserializer is used ONLY by NCC.
+	 *
+	 * @param deserializer The deserializer.
+	 * @param options The deserialization options.
+	 */
+	public Account(final Deserializer deserializer, final DeserializationOptions options) {
 		this(deserializeAddress(deserializer));
 
 		this.balance = Amount.readFrom(deserializer, "balance");
@@ -146,7 +171,8 @@ public class Account implements SerializableEntity {
 		if (importance.isSet())
 			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
 
-		this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
+		if (DeserializationOptions.ALL == options)
+			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
@@ -157,6 +183,10 @@ public class Account implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
+		this.serialize(serializer, false);
+	}
+
+	private void serialize(final Serializer serializer, final boolean isSummary) {
 		writeTo(serializer, "address", this, AccountEncoding.ADDRESS);
 		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
 
@@ -165,7 +195,18 @@ public class Account implements SerializableEntity {
 		serializer.writeString("label", this.getLabel());
 
 		serializer.writeObject("importance", this.getImportanceInfo());
-		serializer.writeObjectArray("messages", this.getMessages());
+
+		if (!isSummary)
+			serializer.writeObjectArray("messages", this.getMessages());
+	}
+
+	/**
+	 * Returns a summary serializable entity for the current entity.
+	 *
+	 * @return A summary serializable entity.
+	 */
+	public SerializableEntity asSummary() {
+		return serializer -> this.serialize(serializer, true);
 	}
 
 	/**
