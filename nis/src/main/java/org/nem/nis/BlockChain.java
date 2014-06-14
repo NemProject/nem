@@ -553,7 +553,7 @@ public class BlockChain implements BlockSynchronizer {
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 				this.peerChain.stream()
-						.filter(this.blockChainLastBlockLayer::addBlockToDb)
+						.filter(tr -> this.blockChainLastBlockLayer.addBlockToDb(tr))
 						.forEach(tr -> this.foraging.removeFromUnconfirmedTransactions(tr));
 			}
 		}
