@@ -2,14 +2,8 @@ package org.nem.nis.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.Signature;
-import org.nem.core.crypto.Signer;
-import org.nem.core.model.GenesisBlock;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.utils.*;
 import org.nem.deploy.CommonStarter;
-import org.nem.nis.NisMain;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
@@ -20,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -28,9 +21,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class NodeController {
-	private static final Logger LOGGER = Logger.getLogger(NodeController.class.getName());
-
-	private NisPeerNetworkHost host;
+	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	NodeController(final NisPeerNetworkHost host) {
@@ -136,25 +127,6 @@ public class NodeController {
 				.collect(Collectors.toList());
 
 		return new SerializableList<>(nodeExperiencePairs);
-	}
-
-	// TODO: is this temporary?
-	@RequestMapping(value = "/node/fixer", method = RequestMethod.GET)
-	public String nodeFixer(@RequestParam(value = "data") final String sig) {
-		final byte[] data = ArrayUtils.concat(
-				StringEncoder.getBytes(host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
-				ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60)
-		);
-		final Signer signer = new Signer(new KeyPair(GenesisBlock.ADDRESS.getPublicKey()));
-		final byte[] signed = Base32Encoder.getBytes(sig);
-		LOGGER.info(String.format("%d %s",
-				NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
-				host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
-		if (signer.verify(data, new Signature(signed))) {
-			LOGGER.info("forced shut down");
-			System.exit(-1);
-		}
-		return "ok";
 	}
 
 	private ExtendedNodeExperiencePair extend(final NodeExperiencePair pair) {

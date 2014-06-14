@@ -2,10 +2,8 @@ package org.nem.nis.controller;
 
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
-import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.core.model.BlockHeight;
 import org.nem.core.crypto.Hash;
-import org.nem.nis.BlockScorer;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.BlockIo;
 import org.nem.core.model.Block;
@@ -19,18 +17,14 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class BlockController {
-
 	private final BlockIo blockIo;
-	private final BlockScorer scorer;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	BlockController(
 			final BlockIo blockIo,
-			final BlockScorer scorer,
 			final NisPeerNetworkHost host) {
 		this.blockIo = blockIo;
-		this.scorer = scorer;
 		this.host = host;
 	}
 
@@ -74,24 +68,5 @@ public class BlockController {
 				this.blockAt(request.getEntity()),
 				localNode.getIdentity(),
 				request.getChallenge());
-	}
-
-	/**
-	 * Gets debug information about the block with the specified height.
-	 *
-	 * @param height The height.
-	 * @return The matching block debug information
-	 */
-	@RequestMapping(value = "/block/debug-info/get", method = RequestMethod.GET)
-	@PublicApi
-	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
-		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
-		final Block block = this.blockIo.getBlockAt(blockHeight);
-		return new BlockDebugInfo(
-				block.getHeight(),
-				block.getSigner().getAddress(),
-				block.getTimeStamp(),
-				block.getDifficulty(),
-				this.scorer.calculateHit(block));
 	}
 }
