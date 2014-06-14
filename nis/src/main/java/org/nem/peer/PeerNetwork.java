@@ -268,6 +268,7 @@ public class PeerNetwork {
 		final NodeExperiencePair partnerNodePair = this.selector.selectNode();
 		if (partnerNodePair == null) {
 			LOGGER.warning("no suitable peers found to update local node.");
+			return;
 		}
 		this.peerConnector.getLocalNodeInfo(partnerNodePair.getNode().getEndpoint(), configLocalNode.getEndpoint())
 						  .exceptionally(e -> null)
