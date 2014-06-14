@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.*;
-
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;

@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a NEM block height.
  */
-public class BlockHeight extends AbstractPrimitive<BlockHeight> implements SerializableEntity {
+public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements SerializableEntity {
 
 	/**
 	 * Value representing initial height.

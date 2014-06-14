@@ -4,6 +4,9 @@ import org.nem.core.model.primitive.*;
 
 import java.util.List;
 
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+
 /**
  * An adapter from an aggregate BlockTransferObserver to a TransferObserver.
  */

@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;

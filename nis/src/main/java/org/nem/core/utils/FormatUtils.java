@@ -20,4 +20,30 @@ public class FormatUtils {
 		format.setGroupingUsed(false);
 		return format;
 	}
+
+	/**
+	 * Gets a decimal format that with the desired number of decimal places.
+	 *
+	 * @return The desired decimal format.
+	 */
+	public static DecimalFormat getDecimalFormat(final int decimalPlaces) {
+		if (decimalPlaces < 0) {
+			return getDefaultDecimalFormat();
+		}
+		final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+		decimalFormatSymbols.setDecimalSeparator('.');
+		final StringBuilder builder = new StringBuilder();
+		builder.append("#0");
+		for (int i = 0; i < decimalPlaces; ++i) {
+			// jaguar trap :)
+			if (i == 0) {
+				builder.append(".");
+			}
+			builder.append("0");
+		}
+
+		final DecimalFormat format = new DecimalFormat(builder.toString(), decimalFormatSymbols);
+		format.setGroupingUsed(false);
+		return format;
+	}
 }

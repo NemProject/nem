@@ -3,18 +3,13 @@ package org.nem.core.model.primitive;
 /**
  * Represents a referencer counter.
  */
-public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter> {
+public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter, Long> {
 
 	/**
 	 * Value representing initial referenceCount.
 	 */
 	public static final ReferenceCounter ZERO = new ReferenceCounter(0);
 
-	/**
-	 * Creates a new reference counter.
-	 *
-	 * @param refCount The original reference count.
-	 */
 	public ReferenceCounter(final long refCount) {
 		super(refCount, ReferenceCounter.class);
 		

@@ -1,9 +1,10 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.primitive.*;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 

@@ -1,7 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
 import java.math.BigInteger;
-import java.text.ParseException;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

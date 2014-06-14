@@ -8,17 +8,17 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.BlockMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.logging.Logger;
 
 /**
  * Controller that exposes debug endpoints.
  */
+@RestController
 public class DebugController {
 	private static final Logger LOGGER = Logger.getLogger(DebugController.class.getName());
 
@@ -33,6 +33,7 @@ public class DebugController {
 	 * @param blockChain The block chain.
 	 * @param blockDao The block dao.
 	 */
+	@Autowired(required = true)
 	public DebugController(
 			final NisPeerNetworkHost host,
 			final BlockChain blockChain,

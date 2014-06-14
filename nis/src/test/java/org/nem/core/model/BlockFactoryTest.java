@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;

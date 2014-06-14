@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a non-negative amount of blocks.
  */
-public class BlockAmount extends AbstractPrimitive<BlockAmount> {
+public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 
 	/**
 	 * Value representing initial height.

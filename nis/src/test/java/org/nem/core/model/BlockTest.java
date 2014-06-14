@@ -703,15 +703,18 @@ public class BlockTest {
 		private final Account account;
 		private final AccountImportance importance;
 		private final WeightedBalances balances;
+		private final Address address;
 
 		public MockAccountContext() {
 			this.account = Mockito.mock(Account.class);
 			this.importance = Mockito.mock(AccountImportance.class);
 			this.balances = Mockito.mock(WeightedBalances.class);
+			this.address = Mockito.mock(Address.class);
 
 			Mockito.when(this.account.getAddress()).thenReturn(Utils.generateRandomAddress());
 			Mockito.when(this.account.getImportanceInfo()).thenReturn(this.importance);
 			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
+			Mockito.when(this.account.getAddress()).thenReturn(this.address);
 		}
 	}
 
