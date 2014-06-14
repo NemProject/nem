@@ -46,6 +46,12 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	}
 
 	/**
+	 * Forces the account analyzer to do a poi calculation the next time recalculateImportances() is called.
+	 */
+	public void resetLastPoiRecalc() {
+		this.lastPoiRecalc = null;
+	}
+	/**
 	 * Returns an AccountLookup that automatically caches unknown accounts.
 	 *
 	 * @return An AccountLookup that automatically caches unknown accounts.
@@ -151,7 +157,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		return this.addressToAccountMap.values().iterator();
 	}
 
-	private Collection<Account> getAccounts(final BlockHeight blockHeight) {
+	public Collection<Account> getAccounts(final BlockHeight blockHeight) {
 		return this.addressToAccountMap.values().stream()
 				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
 				.collect(Collectors.toList());

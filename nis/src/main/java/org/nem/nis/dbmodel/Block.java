@@ -121,8 +121,8 @@ public class Block {
 		return new Hash(this.generationHash);
 	}
 
-	public void setGenerationHash(byte[] blockHash) {
-		this.blockHash = blockHash;
+	public void setGenerationHash(byte[] generationHash) {
+		this.generationHash = generationHash;
 	}
 
 	public Integer getTimestamp() {
