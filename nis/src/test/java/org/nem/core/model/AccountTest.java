@@ -177,34 +177,34 @@ public class AccountTest {
 		final Account account = Utils.generateRandomAccount();
 		
 		// Assert:
-		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
 
 	@Test
-	public void referenceCounterCanBeIncremented() {
+	public void referenceCountCanBeIncremented() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		
 		// Act:
-		final ReferenceCounter result = account.incrementReferenceCounter();
+		final ReferenceCount result = account.incrementReferenceCount();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(1)));
-		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(1)));
+		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
 	}
 
 	@Test
-	public void referenceCounterCanBeDecremented() {
+	public void referenceCountCanBeDecremented() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		account.incrementReferenceCounter();
+		account.incrementReferenceCount();
 		
 		// Act:
-		final ReferenceCounter result = account.decrementReferenceCounter();
+		final ReferenceCount result = account.decrementReferenceCount();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCounter(0)));
-		Assert.assertThat(account.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(0)));
+		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(0)));
+		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
 
 	//endregion
@@ -819,7 +819,7 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
-		Assert.assertThat(copyAccount.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(2)));
+		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
@@ -835,8 +835,8 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.setLabel("Alpha Sigma");
-		account.incrementReferenceCounter();
-		account.incrementReferenceCounter();
+		account.incrementReferenceCount();
+		account.incrementReferenceCount();
 		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
 		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 	}
@@ -882,7 +882,7 @@ public class AccountTest {
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
 		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
-		Assert.assertThat(copy.getReferenceCounter(), IsEqual.equalTo(copy.getReferenceCounter()));
+		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(copy.getReferenceCount()));
 
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));

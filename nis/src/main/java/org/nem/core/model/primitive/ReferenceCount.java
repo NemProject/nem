@@ -3,15 +3,20 @@ package org.nem.core.model.primitive;
 /**
  * Represents a referencer counter.
  */
-public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter, Long> {
+public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {
 
 	/**
 	 * Value representing initial referenceCount.
 	 */
-	public static final ReferenceCounter ZERO = new ReferenceCounter(0);
+	public static final ReferenceCount ZERO = new ReferenceCount(0);
 
-	public ReferenceCounter(final long refCount) {
-		super(refCount, ReferenceCounter.class);
+	/**
+	 * Creates a new reference counter.
+	 *
+	 * @param refCount The original reference count.
+	 */
+	public ReferenceCount(final long refCount) {
+		super(refCount, ReferenceCount.class);
 		
 		if (this.getRaw() < 0)
 			throw new IllegalArgumentException("reference counter can't be negative");
@@ -31,8 +36,8 @@ public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter, Long> 
 	 * 
 	 * @return The incremented reference counter
 	 */
-	public ReferenceCounter increment() {
-		return new ReferenceCounter(this.getRaw() + 1);
+	public ReferenceCount increment() {
+		return new ReferenceCount(this.getRaw() + 1);
 	}
 	
 	/**
@@ -40,7 +45,7 @@ public class ReferenceCounter extends AbstractPrimitive<ReferenceCounter, Long> 
 	 * 
 	 * @return The decremented reference counter
 	 */
-	public ReferenceCounter decrement() {
-		return new ReferenceCounter(this.getRaw() - 1);
+	public ReferenceCount decrement() {
+		return new ReferenceCount(this.getRaw() - 1);
 	}
 }

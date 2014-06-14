@@ -23,7 +23,7 @@ public class Account implements SerializableEntity {
 	private final AccountImportance importance;
 
 	private BlockHeight height;
-	private ReferenceCounter refCount = ReferenceCounter.ZERO;
+	private ReferenceCount refCount = ReferenceCount.ZERO;
 
 	/**
 	 * Creates an account around a key pair.
@@ -94,7 +94,7 @@ public class Account implements SerializableEntity {
 		this.importance = rhs.importance.copy();
 
 		this.height = rhs.getHeight();
-		this.refCount = rhs.getReferenceCounter();
+		this.refCount = rhs.getReferenceCount();
 	}
 
 	private Account(final Account rhs, final KeyPair keyPair) {
@@ -306,30 +306,30 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * Returns the reference counter.
+	 * Returns the reference count.
 	 * 
-	 * @return The reference counter.
+	 * @return The reference count.
 	 */
-	public ReferenceCounter getReferenceCounter() {
+	public ReferenceCount getReferenceCount() {
 		return this.refCount;
 	}
 	
 	/**
-	 * Increments the reference counter.
+	 * Increments the reference count.
 	 *
-	 * @return The new value of the reference counter.
+	 * @return The new value of the reference count.
 	 */
-	public ReferenceCounter incrementReferenceCounter() {
+	public ReferenceCount incrementReferenceCount() {
 		this.refCount = this.refCount.increment();
 		return this.refCount;
 	}
 	
 	/**
-	 * Decrements the reference counter.
+	 * Decrements the reference count.
 	 *
-	 * @return The new value of the reference counter.
+	 * @return The new value of the reference count.
 	 */
-	public ReferenceCounter decrementReferenceCounter() {
+	public ReferenceCount decrementReferenceCount() {
 		this.refCount = this.refCount.decrement();
 		return this.refCount;
 	}
