@@ -102,7 +102,7 @@ public class NodeController {
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
 		for (final NodeExperiencePair nexp : pair.getExperiences())
 		{
-			extend(nexp);
+			nodeExperiencePairs.add(extend(nexp));
 		}
 //		pair.getExperiences().stream()
 //				.map(this::extend)
