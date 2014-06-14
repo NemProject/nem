@@ -63,7 +63,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		final Account result = accountAnalyzer.findByAddress(account1.getAddress());
-		Assert.assertThat(result.getReferenceCounter(), IsEqual.equalTo(new ReferenceCounter(1)));
+		Assert.assertThat(result.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
 	}
 
 	//endregion
@@ -85,7 +85,7 @@ public class AccountsHeightObserverTest {
 	private static void assertReceiveUndoRemovesAccount(final int accountHeight, final int undoHeight) {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(accountHeight);
-		account1.incrementReferenceCounter();
+		account1.incrementReferenceCount();
 		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		accountAnalyzer.addAccountToCache(account1.getAddress());
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
@@ -101,8 +101,8 @@ public class AccountsHeightObserverTest {
 	public void notifyReceiveUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
 		// Arrange:
 		final Account account1 = createAccountWithHeight(12);
-		account1.incrementReferenceCounter();
-		account1.incrementReferenceCounter();
+		account1.incrementReferenceCount();
+		account1.incrementReferenceCount();
 		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
@@ -185,8 +185,8 @@ public class AccountsHeightObserverTest {
 
 		final Account cachedAccount = accountAnalyzer.findByAddress(account.getAddress());
 		cachedAccount.setHeight(account.getHeight());
-		for (int i = 0; i < account.getReferenceCounter().getRaw(); ++i)
-			cachedAccount.incrementReferenceCounter();
+		for (int i = 0; i < account.getReferenceCount().getRaw(); ++i)
+			cachedAccount.incrementReferenceCount();
 
 		return accountAnalyzer;
 	}

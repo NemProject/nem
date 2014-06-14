@@ -41,7 +41,7 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 	private void addToAccountAnalyzer(final BlockHeight height, final Account account) {
 		final Account found = this.accountAnalyzer.findByAddress(account.getAddress());
 		found.setHeight(height);
-		found.incrementReferenceCounter();
+		found.incrementReferenceCount();
 	}
 
 	private void tryRemoveFromAccountAnalyzer(final BlockHeight height, final Account account) {
@@ -51,7 +51,7 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 		if (null == found || null == found.getHeight())
 			throw new IllegalArgumentException("problem during undo, account not present in AA or account height is null");
 
-		if (ReferenceCounter.ZERO.equals(found.decrementReferenceCounter())) {
+		if (ReferenceCount.ZERO.equals(found.decrementReferenceCount())) {
 			this.accountAnalyzer.removeAccountFromCache(address);
 		}
 	}
