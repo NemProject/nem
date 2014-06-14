@@ -35,7 +35,7 @@ public class WeightedBalances {
 	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
-				balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()),
+				balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()),
 				this.historicalBalances.copy());
 	}
 

@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 /**
  * A collection of historical out-links.
@@ -53,7 +54,7 @@ public class HistoricalOutlinks {
 	public int outlinksSize(final BlockHeight blockHeight) {
 		return this.outlinks.stream()
 				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
-				.map(HistoricalOutlink::size)
+				.map(hl -> hl.size())
 				.reduce(0, Integer::sum);
 	}
 
@@ -77,7 +78,7 @@ public class HistoricalOutlinks {
 	 */
 	public int outlinkSize() {
 		return this.outlinks.stream()
-				.map(HistoricalOutlink::size)
+				.map(hl -> hl.size())
 				.reduce(0, Integer::sum);
 	}
 
@@ -95,7 +96,11 @@ public class HistoricalOutlinks {
 	 */
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();
-		this.outlinks.stream().map(HistoricalOutlink::copy).forEach(copy.outlinks::add);
+		// looks ugly, but obfuscation does not like forEach :/
+		for (final HistoricalOutlink temp : this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList()) )
+		{
+			copy.outlinks.add(temp);
+		}
 		return copy;
 	}
 }

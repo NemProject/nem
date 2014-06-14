@@ -11,7 +11,12 @@ public class MessageFactory {
 	/**
 	 * An object deserializer that wraps this factory.
 	 */
-	public static final ObjectDeserializer<Message> DESERIALIZER = MessageFactory::deserialize;
+	public static final ObjectDeserializer<Message> DESERIALIZER = new ObjectDeserializer<Message>() {
+		@Override
+		public Message deserialize(Deserializer deserializer) {
+			return MessageFactory.deserialize(deserializer);
+		}
+	};
 
 	private static Message deserialize(final Deserializer deserializer) {
 		int type = deserializer.readInt("type");

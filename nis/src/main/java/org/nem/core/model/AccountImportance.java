@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.ObjectDeserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
 
@@ -16,6 +17,12 @@ public class AccountImportance implements SerializableEntity {
 	private BlockHeight importanceHeight;
 	private double importance;
 
+	public static final ObjectDeserializer<AccountImportance> DESERIALIZER = new ObjectDeserializer<AccountImportance>() {
+		@Override
+		public AccountImportance deserialize(Deserializer deserializer) {
+			return new AccountImportance(deserializer);
+		}
+	};
 	/**
 	 * Creates a new importance instance.
 	 */
