@@ -42,7 +42,7 @@ public class BlockScorer {
 	public BlockScorer(final AccountAnalyzer accountAnalyzer) {
 		this.accountAnalyzer = accountAnalyzer;
 	}
-	
+
 	/**
 	 * Forces a recalculation of the importances the next time calculateForgerBalance() is called.
 	 */

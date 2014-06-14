@@ -55,8 +55,13 @@ public class BlockChain implements BlockSynchronizer {
 	public BlockChainScore getScore() {
 		return this.score;
 	}
-	
-	public AccountAnalyzer getAccountAnalyzerCopy() {
+
+	/**
+	 * Creates a copy of the current account analyzer.
+	 *
+	 * @return A copy of the account analyzer.
+	 */
+	public AccountAnalyzer copyAccountAnalyzer() {
 		return this.accountAnalyzer.copy();
 	}
 

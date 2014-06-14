@@ -1,14 +1,11 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.Date;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.Amount;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.serialization.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 
@@ -17,20 +14,19 @@ import org.nem.core.time.TimeInstant;
  */
 public class TransactionDebugInfo implements SerializableEntity {
 
-	private TimeInstant timestamp;
-	private TimeInstant deadline;
+	private final TimeInstant timestamp;
+	private final TimeInstant deadline;
 	private final Address sender;
 	private final Address recipient;
 	private final Amount amount;
 	private final Amount fee;
 	private final String message;
-	
 
 	/**
 	 * Creates a new transaction debug info.
 	 *
 	 * @param timestamp The transaction timestamp.
-	 * @param timestamp The transaction deadline.
+	 * @param deadline The transaction deadline.
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
@@ -58,19 +54,10 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 * Deserializes a transaction debug info object.
 	 *
 	 * @param deserializer The deserializer.
-	 * @throws ParseException 
 	 */
-	public TransactionDebugInfo(final Deserializer deserializer){
-		try {
-			Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(deserializer.readString("timestamp"));
-			this.timestamp = new TimeInstant(SystemTimeProvider.getTime(date.getTime()));
-			date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(deserializer.readString("deadline"));
-			this.deadline = new TimeInstant(SystemTimeProvider.getTime(date.getTime()));
-		}
-		catch (ParseException e) {
-			this.timestamp = new TimeInstant(0);
-			this.deadline = new TimeInstant(0);
-		}
+	public TransactionDebugInfo(final Deserializer deserializer) {
+		this.timestamp = readTimeStringAsTimeInstant(deserializer, "timestamp");
+		this.deadline = readTimeStringAsTimeInstant(deserializer, "deadline");
 		this.sender = Address.readFrom(deserializer, "sender");
 		this.recipient = Address.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
@@ -143,12 +130,8 @@ public class TransactionDebugInfo implements SerializableEntity {
 	
 	@Override
 	public void serialize(final Serializer serializer) {
-		Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + this.timestamp.getRawTime() * 1000);
-		String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-		serializer.writeString("timestamp", dateString);
-		date = new Date(SystemTimeProvider.getEpochTimeMillis() + this.deadline.getRawTime() * 1000);
-		dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-		serializer.writeString("deadline", dateString);
+		writeTimeInstantAsTimeString(serializer, "timestamp", this.timestamp);
+		writeTimeInstantAsTimeString(serializer, "deadline", this.deadline);
 		Address.writeTo(serializer, "sender", this.sender);
 		Address.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
@@ -156,4 +139,24 @@ public class TransactionDebugInfo implements SerializableEntity {
 		serializer.writeString("message", this.message);
 	}
 
+	// TODO: refactor this
+
+	private static TimeInstant readTimeStringAsTimeInstant(final Deserializer deserializer, final String name) {
+		try {
+			final Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(deserializer.readString(name));
+			return new TimeInstant(SystemTimeProvider.getTime(date.getTime()));
+		}
+		catch (ParseException e) {
+			return TimeInstant.ZERO;
+		}
+	}
+
+	private static void writeTimeInstantAsTimeString(
+			final Serializer serializer,
+			final String label,
+			final TimeInstant timeInstant) {
+		final Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + timeInstant.getRawTime() * 1000);
+		final String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+		serializer.writeString(label, dateString);
+	}
 }

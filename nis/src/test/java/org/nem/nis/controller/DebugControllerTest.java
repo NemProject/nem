@@ -9,53 +9,97 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
-import org.nem.nis.service.BlockIo;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
+import org.nem.nis.test.NisUtils;
 import org.nem.peer.test.MockPeerNetwork;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class DebugControllerTest {
 
+	// TODO: refactor the creation of Block and dbBlock
+
 	@Test
-	public void blockDebugInfoDelegatesToBlockIoAndBlockScorer() {
+	public void blockDebugInfoDelegatesToBlockDaoAndBlockScorer() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final BlockHeight height = new BlockHeight(10);
-		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final TimeInstant timestamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
-		final BigInteger hit = BigInteger.valueOf(1234);
-		final Block blockIoBlock = new Block(
-				new Account(address),
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
+		final Account signer1 = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
+		final Account signer2 = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
+
+		final Block blockDaoBlock = new Block(
+				signer1,
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				timestamp.addSeconds(60),
+				height);
+		blockDaoBlock.setDifficulty(difficulty);
+		blockDaoBlock.getSigner().setHeight(BlockHeight.ONE);
+
+		final Block blockDaoParent = new Block(
+				signer2,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				timestamp,
-				height);
-		blockIoBlock.setDifficulty(difficulty);
+				height.prev());
+		blockDaoParent.setDifficulty(difficulty);
+		blockDaoParent.getSigner().setHeight(BlockHeight.ONE);
 
-		Mockito.when(context.blockIo.getBlockAt(new BlockHeight(43))).thenReturn(blockIoBlock);
-		Mockito.when(context.blockScorer.calculateHit(blockIoBlock)).thenReturn(hit);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		scorer.forceImportanceCalculation();
+		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
+		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
+
+		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		dbBlock.setPrevBlockHash(blockDaoBlock.getPreviousBlockHash().getRaw());
+		dbBlock.setGenerationHash(blockDaoBlock.getGenerationHash().getRaw());
+		dbBlock.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
+		dbBlock.setDifficulty(blockDaoBlock.getDifficulty().getRaw());
+		dbBlock.setHeight(blockDaoBlock.getHeight().getRaw());
+		dbBlock.setTimestamp(blockDaoBlock.getTimeStamp().getRawTime());
+		dbBlock.setForgerProof(new byte[64]);
+		dbBlock.setBlockTransfers(new ArrayList<>());
+
+		final org.nem.nis.dbmodel.Block dbParent = NisUtils.createDbBlockWithTimeStamp(383);
+		dbParent.setPrevBlockHash(blockDaoParent.getPreviousBlockHash().getRaw());
+		dbParent.setGenerationHash(blockDaoParent.getGenerationHash().getRaw());
+		dbParent.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
+		dbParent.setDifficulty(blockDaoParent.getDifficulty().getRaw());
+		dbParent.setHeight(blockDaoParent.getHeight().getRaw());
+		dbParent.setTimestamp(blockDaoParent.getTimeStamp().getRawTime());
+		dbParent.setForgerProof(new byte[64]);
+		dbParent.setBlockTransfers(new ArrayList<>());
+		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
+		Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
+
+		Mockito.when(context.blockChain.copyAccountAnalyzer()).thenReturn(accountAnalyzer);
 
 		// Act:
-		final BlockDebugInfo blockDebugInfo = context.controller.blockDebugInfo("43");
+		final BlockDebugInfo blockDebugInfo = context.controller.blockDebugInfo("10");
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(blockDebugInfo.getTimeInstant(), IsEqual.equalTo(timestamp));
+		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(signer1.getAddress()));
+		Assert.assertThat(blockDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp.addSeconds(60)));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
+		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
-		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(new BlockHeight(43));
-		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(Mockito.any());
-
-		Mockito.verify(context.blockScorer, Mockito.times(1)).calculateHit(blockIoBlock);
-		Mockito.verify(context.blockScorer, Mockito.times(1)).calculateHit(Mockito.any());
+		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
+		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));
+		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
 	}
 
+
 	private static class TestContext {
-		private final BlockIo blockIo = Mockito.mock(BlockIo.class);
-		private final BlockScorer blockScorer = Mockito.mock(BlockScorer.class);
+		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
+		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final MockPeerNetwork network = new MockPeerNetwork();
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
@@ -64,7 +108,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockScorer, this.blockIo);
+			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
 		}
 	}
 }

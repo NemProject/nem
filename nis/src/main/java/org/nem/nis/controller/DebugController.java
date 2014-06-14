@@ -2,14 +2,18 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.PublicApi;
-import org.nem.nis.controller.viewmodels.BlockDebugInfo;
-import org.nem.nis.service.BlockIo;
+import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.mappers.BlockMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.logging.Logger;
 
 /**
@@ -19,23 +23,23 @@ public class DebugController {
 	private static final Logger LOGGER = Logger.getLogger(DebugController.class.getName());
 
 	private final NisPeerNetworkHost host;
-	private final BlockScorer scorer;
-	private final BlockIo blockIo;
+	private final BlockChain blockChain;
+	private final BlockDao blockDao;
 
 	/**
 	 * Creates a new debug controller.
 	 *
 	 * @param host The host.
-	 * @param scorer The scorer.
-	 * @param blockIo The block i/o.
+	 * @param blockChain The block chain.
+	 * @param blockDao The block dao.
 	 */
 	public DebugController(
 			final NisPeerNetworkHost host,
-			final BlockScorer scorer,
-			final BlockIo blockIo) {
+			final BlockChain blockChain,
+			final BlockDao blockDao) {
 		this.host = host;
-		this.scorer = scorer;
-		this.blockIo = blockIo;
+		this.blockChain = blockChain;
+		this.blockDao = blockDao;
 	}
 
 	/**
@@ -68,18 +72,63 @@ public class DebugController {
 	 * Gets debug information about the block with the specified height.
 	 *
 	 * @param height The height.
-	 * @return The matching block debug information.
+	 * @return The matching block debug information
 	 */
 	@RequestMapping(value = "/debug/block-info/get", method = RequestMethod.GET)
 	@PublicApi
 	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
 		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
-		final Block block = this.blockIo.getBlockAt(blockHeight);
-		return new BlockDebugInfo(
+		final AccountAnalyzer accountAnalyzer = this.blockChain.copyAccountAnalyzer();
+
+		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+		final Block block = BlockMapper.toModel(dbBlock, accountAnalyzer);
+
+		final org.nem.nis.dbmodel.Block dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
+		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountAnalyzer);
+
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here?
+
+		final BigInteger hit = scorer.calculateHit(block);
+		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);
+		final int interBlockTime = null == parent ? 0 : block.getTimeStamp().subtract(parent.getTimeStamp());
+		final BlockDebugInfo blockDebugInfo =  new BlockDebugInfo(
 				block.getHeight(),
-				block.getSigner().getAddress(),
 				block.getTimeStamp(),
+				block.getSigner().getAddress(),
 				block.getDifficulty(),
-				this.scorer.calculateHit(block));
+				hit,
+				target,
+				interBlockTime);
+
+		for (final Transaction transaction : block.getTransactions())
+			blockDebugInfo.addTransactionDebugInfo(mapToDebugInfo(transaction));
+
+		return blockDebugInfo;
+	}
+
+	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {
+		Address recipient = Address.fromEncoded("N/A");
+		Amount amount = Amount.ZERO;
+		String messageText = "";
+
+		if (transaction instanceof TransferTransaction) {
+			final TransferTransaction transfer = ((TransferTransaction)transaction);
+			recipient = transfer.getRecipient().getAddress();
+			amount = transfer.getAmount();
+
+			final Message message = transfer.getMessage();
+			if (null != message && message.canDecode())
+				messageText = StringEncoder.getString(message.getDecodedPayload());
+		}
+
+		return new TransactionDebugInfo(
+				transaction.getTimeStamp(),
+				transaction.getDeadline(),
+				transaction.getSigner().getAddress(),
+				recipient,
+				amount,
+				transaction.getFee(),
+				messageText);
 	}
 }

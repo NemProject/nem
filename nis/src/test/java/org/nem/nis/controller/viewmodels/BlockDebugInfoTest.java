@@ -1,12 +1,10 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.text.ParseException;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
@@ -33,7 +31,7 @@ public class BlockDebugInfoTest {
 		
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForager(), IsEqual.equalTo(address));
+		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(blockDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
@@ -46,7 +44,7 @@ public class BlockDebugInfoTest {
 	//region serialization
 
 	@Test
-	public void canRoundtripBlockDebugInfo() throws ParseException {
+	public void canRoundtripBlockDebugInfo() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(10);
 		final Address address = Utils.generateRandomAddress();
@@ -73,14 +71,16 @@ public class BlockDebugInfoTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForager(), IsEqual.equalTo(address));
+		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(blockDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
-		
-		TransactionDebugInfo transactionDebugInfo = blockDebugInfo.getTransactionDebugInfos().get(0);
+
+		Assert.assertThat(blockDebugInfo.getTransactionDebugInfos().size(), IsEqual.equalTo(1));
+
+		final TransactionDebugInfo transactionDebugInfo = blockDebugInfo.getTransactionDebugInfos().get(0);
 		Assert.assertThat(transactionDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp2));
 		Assert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
 		Assert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
