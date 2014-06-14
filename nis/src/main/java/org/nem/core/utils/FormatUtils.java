@@ -1,7 +1,7 @@
 package org.nem.core.utils;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.*;
+import java.util.Arrays;
 
 /**
  * Static class containing helper functions for formatting.
@@ -27,19 +27,19 @@ public class FormatUtils {
 	 * @return The desired decimal format.
 	 */
 	public static DecimalFormat getDecimalFormat(final int decimalPlaces) {
-		if (decimalPlaces < 0) {
-			return getDefaultDecimalFormat();
-		}
+		if (decimalPlaces < 0)
+			throw new IllegalArgumentException("decimalPlaces must be non-negative");
+
 		final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
 		decimalFormatSymbols.setDecimalSeparator('.');
 		final StringBuilder builder = new StringBuilder();
 		builder.append("#0");
-		for (int i = 0; i < decimalPlaces; ++i) {
-			// jaguar trap :)
-			if (i == 0) {
-				builder.append(".");
-			}
-			builder.append("0");
+
+		if (decimalPlaces > 0) {
+			builder.append('.');
+			final char[] zeros = new char[decimalPlaces];
+			Arrays.fill(zeros, '0');
+			builder.append(zeros);
 		}
 
 		final DecimalFormat format = new DecimalFormat(builder.toString(), decimalFormatSymbols);
