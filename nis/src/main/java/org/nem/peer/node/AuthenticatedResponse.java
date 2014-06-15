@@ -33,7 +33,7 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 *
 	 * @param deserializer The deserializer.
 	 */
-		public AuthenticatedResponse(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
+	public AuthenticatedResponse(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
 		this.signature = Signature.readFrom(deserializer, "signature");
 	}
@@ -46,9 +46,8 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 * @return The entity.
 	 */
 	public T getEntity(final NodeIdentity identity, final NodeChallenge challenge) {
-		if (!identity.verify(challenge.getRaw(), this.signature))
-		{
-			LOGGER.info("couldn't verify node's response");
+		if (!identity.verify(challenge.getRaw(), this.signature)) {
+			LOGGER.info(String.format("couldn't verify response from node '%s'", identity));
 			throw new ImpersonatingPeerException("entity source cannot be verified");
 		}
 
