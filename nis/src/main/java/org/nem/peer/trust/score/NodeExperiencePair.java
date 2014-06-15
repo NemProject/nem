@@ -7,6 +7,12 @@ import org.nem.peer.node.Node;
  * A Node and NodeExperience pair.
  */
 public class NodeExperiencePair implements SerializableEntity {
+	public static final ObjectDeserializer<NodeExperiencePair> DESERIALIZER = new ObjectDeserializer<NodeExperiencePair>() {
+		@Override
+		public NodeExperiencePair deserialize(Deserializer deserializer) {
+			return new NodeExperiencePair(deserializer);
+		}
+	};
 
 	private final Node node;
 	private final NodeExperience experience;
@@ -29,7 +35,7 @@ public class NodeExperiencePair implements SerializableEntity {
 	 */
 	public NodeExperiencePair(final Deserializer deserializer) {
 		this.node = deserializer.readObject("node", Node::new);
-		this.experience = deserializer.readObject("experience", NodeExperience::new);
+		this.experience = deserializer.readObject("experience", NodeExperience.DESERIALIZER);
 	}
 
 	/**

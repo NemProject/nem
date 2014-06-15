@@ -9,6 +9,13 @@ import org.nem.core.time.*;
  * Meta data information about the application.
  */
 public class ApplicationMetaData implements SerializableEntity {
+	public static final ObjectDeserializer<ApplicationMetaData> DESERIALIZER = new ObjectDeserializer<ApplicationMetaData>() {
+		@Override
+		public ApplicationMetaData deserialize(Deserializer deserializer) {
+			return new ApplicationMetaData(deserializer);
+		}
+	};
+
 	private final String appName;
 	private final String version;
 	private final String certificateSigner;

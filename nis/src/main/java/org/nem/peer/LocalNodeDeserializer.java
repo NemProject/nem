@@ -11,8 +11,8 @@ public class LocalNodeDeserializer implements ObjectDeserializer<Node> {
 	@Override
 	public Node deserialize(final Deserializer deserializer) {
 		final NodeIdentity identity = deserializer.readObject("identity", NodeIdentity::deserializeWithPrivateKey);
-		final NodeEndpoint endpoint = deserializer.readObject("endpoint", NodeEndpoint::new);
-		final NodeMetaData metaData = deserializer.readObject("metaData", NodeMetaData::new);
+		final NodeEndpoint endpoint = deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER);
+		final NodeMetaData metaData = deserializer.readObject("metaData", NodeMetaData.DESERIALIZER);
 		return new Node(identity, endpoint, metaData);
 	}
 }
