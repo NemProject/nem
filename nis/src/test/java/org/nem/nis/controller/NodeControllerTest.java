@@ -2,9 +2,10 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
@@ -16,6 +17,7 @@ import org.nem.peer.trust.score.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class NodeControllerTest {
@@ -234,6 +236,40 @@ public class NodeControllerTest {
 		// (1) scheme and address come from the servlet request
 		// (2) port comes from the original local node endpoint
 		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 123)));
+	}
+
+	@Test
+	public void bootDelegatesToPeerNetworkHost() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ArgumentCaptor<Node> nodeArgument = ArgumentCaptor.forClass(Node.class);
+		Mockito.when(context.host.boot(nodeArgument.capture())).thenReturn(CompletableFuture.completedFuture(null));
+
+		final NodeIdentity identity = new NodeIdentity(new KeyPair());
+		final Deserializer deserializer = createLocalNodeDeserializer(identity);
+
+		// Act:
+		context.controller.boot(deserializer);
+
+		// Assert:
+		Mockito.verify(context.host, Mockito.times(1)).boot(Mockito.any());
+		Assert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
+	}
+
+	private static JsonDeserializer createLocalNodeDeserializer(final NodeIdentity identity) {
+		// Arrange:
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
+		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+
+		final JsonSerializer serializer = new JsonSerializer(true);
+		serializer.writeObject("identity", childSerializer -> {
+			childSerializer.writeBigInteger("private-key", identity.getKeyPair().getPrivateKey().getRaw());
+			childSerializer.writeString("name", "trudy");
+		});
+		serializer.writeObject("endpoint", endpoint);
+		serializer.writeObject("metaData", metaData);
+
+		return new JsonDeserializer(serializer.getObject(), null);
 	}
 
 	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {

@@ -2,12 +2,12 @@ package org.nem.nis.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,5 +176,17 @@ public class NodeController {
 				request.getScheme(),
 				request.getRemoteAddr(),
 				localEndpoint.getBaseUrl().getPort());
+	}
+
+	/**
+	 * Boots the network.
+	 *
+	 * @param deserializer Information about the primary node including the private key.
+	 */
+	@RequestMapping(value = "/node/boot", method = RequestMethod.POST)
+	@P2PApi
+	public void boot(@RequestBody final Deserializer deserializer) {
+		final Node localNode = new LocalNodeDeserializer().deserialize(deserializer);
+		this.host.boot(localNode);
 	}
 }

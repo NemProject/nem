@@ -21,29 +21,33 @@ public class Config {
 	/**
 	 * Creates a new configuration object.
 	 *
-	 * @param localConfig A JSON object containing local-node settings.
+	 * @param localNode The local node.
 	 * @param peersConfig A JSON object containing peer settings.
 	 * @param applicationVersion The application version.
 	 */
-	public Config(final JSONObject localConfig, final JSONObject peersConfig, final String applicationVersion) {
-		updateLocalConfigMetaData((JSONObject)localConfig.get("metaData"), applicationVersion);
-		this.localNode = parseLocalNode(new JsonDeserializer(localConfig, null));
+	public Config(final Node localNode, final JSONObject peersConfig, final String applicationVersion) {
+		updateLocalNodeMetaData(localNode, applicationVersion);
+		this.localNode = localNode;
 		this.preTrustedNodes = parseWellKnownPeers(new JsonDeserializer(peersConfig, null));
 		this.trustParameters = getDefaultTrustParameters();
 		this.trustProvider = getDefaultTrustProvider();
 	}
 
-	private void updateLocalConfigMetaData(final JSONObject localMetaData, final String applicationVersion) {
-		localMetaData.put("version", applicationVersion);
-		if (localMetaData.containsKey("platform"))
-			return;
+	private void updateLocalNodeMetaData(final Node localNode, final String applicationVersion) {
+		String platform = localNode.getMetaData().getPlatform();
+		if (null == platform) {
+			platform = String.format(
+					"%s (%s) on %s",
+					System.getProperty("java.vendor"),
+					System.getProperty("java.version"),
+					System.getProperty("os.name"));
+		}
 
-        final String defaultPlatform = String.format(
-                "%s (%s) on %s",
-                System.getProperty("java.vendor"),
-                System.getProperty("java.version"),
-                System.getProperty("os.name"));
-        localMetaData.put("platform", defaultPlatform);
+		final NodeMetaData metaData = new NodeMetaData(
+				platform,
+				localNode.getMetaData().getApplication(),
+				applicationVersion);
+		localNode.setMetaData(metaData);
 	}
 
 	/**

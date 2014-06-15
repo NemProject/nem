@@ -1,10 +1,13 @@
 package org.nem.peer.test;
 
 import net.minidev.json.*;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.peer.Config;
+import org.nem.peer.node.*;
+
+import java.math.BigInteger;
 
 /**
  * Static class containing utility functions for creating Config objects.
@@ -30,30 +33,20 @@ public class ConfigFactory {
 		return jsonIdentity;
 	}
 
-	private static JSONObject createIdentityJsonObjectWithPrivateKey(final String privateKey) {
-		final JSONObject jsonIdentity = new JSONObject();
-		jsonIdentity.put("private-key", privateKey);
-		jsonIdentity.put("name", "local larry");
-		return jsonIdentity;
-	}
-
 	/**
 	 * Creates default local node configuration.
 	 *
 	 * @return The configuration.
 	 */
-	public static JSONObject createDefaultLocalConfig() {
-		final JSONObject jsonConfig = new JSONObject();
+	public static Node createDefaultLocalNode() {
+		final byte[] privateKeyBytes = Base64Encoder.getBytes("Dnumq0AdMXpLbaE1F1VYMLbDw6wG3wHvj67uWLrpy5A=");
+		final PrivateKey privateKey = new PrivateKey(new BigInteger(privateKeyBytes));
 
-		jsonConfig.put("endpoint", createEndpointJsonObject("http", DEFAULT_LOCAL_NODE_HOST, 7890));
-		jsonConfig.put("identity", createIdentityJsonObjectWithPrivateKey("Dnumq0AdMXpLbaE1F1VYMLbDw6wG3wHvj67uWLrpy5A="));
-
-		final JSONObject jsonMetaData = new JSONObject();
-		jsonMetaData.put("version", "1.0"); // note that the Config constructor parameter should take precedence
-		jsonMetaData.put("platform", "Mac");
-		jsonMetaData.put("application", "FooBar");
-		jsonConfig.put("metaData", jsonMetaData);
-		return jsonConfig;
+		// note that the Config constructor parameter should take precedence over the meta data version
+		return new Node(
+				new NodeIdentity(new KeyPair(privateKey), "local larry"),
+				new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890),
+				new NodeMetaData("Mac", "FooBar", "1.0"));
 	}
 
 	/**
@@ -93,7 +86,7 @@ public class ConfigFactory {
 	 */
 	public static Config createDefaultTestConfig() {
 		return new Config(
-				createDefaultLocalConfig(),
+				createDefaultLocalNode(),
 				createDefaultPeersConfig(),
 				"2.0");
 	}

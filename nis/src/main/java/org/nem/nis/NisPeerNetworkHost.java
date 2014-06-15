@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /**
@@ -46,6 +47,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final CountingBlockSynchronizer synchronizer;
 	private AsyncTimer foragingTimer;
 	private PeerNetworkHost host;
+	private final AtomicBoolean isBootAttempted = new AtomicBoolean(false);
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
@@ -56,10 +58,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	/**
 	 * Boots the network.
+	 *
+	 * @param localNode The local node.
 	 */
-	public CompletableFuture boot() {
+	public CompletableFuture boot(final Node localNode) {
+		if (!this.isBootAttempted.compareAndSet(false, true))
+			throw new IllegalStateException("network boot was already attempted");
+
 		final Config config = new Config(
-				loadJsonObject("local-config.json"),
+				localNode,
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion());
 		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
@@ -102,6 +109,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return The hosted network.
 	 */
 	public PeerNetwork getNetwork() {
+		if (null == this.host)
+			throw new IllegalStateException("network has not been booted yet");
+
 		return this.host.getNetwork();
 	}
 
