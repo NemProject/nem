@@ -76,13 +76,13 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public Block getLastBlock(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
-		return postAuthenticated(url, node.getIdentity(), BlockFactory.VERIFIABLE::deserialize).join();
+		return postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj)).join();
 	}
 
 	@Override
 	public Block getBlockAt(final Node node, final BlockHeight height) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_BLOCK_AT);
-		return postAuthenticated(url, node.getIdentity(), BlockFactory.VERIFIABLE::deserialize, height).join();
+		return postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj), height).join();
 	}
 
 	@Override

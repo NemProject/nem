@@ -358,7 +358,7 @@ public class PeerNetwork {
 			}
 
 			return future
-					.exceptionally(this::getNodeStatusFromException)
+					.exceptionally(obj -> this.getNodeStatusFromException(obj))
 					.thenAccept(ns -> this.update(node, ns));
 		}
 

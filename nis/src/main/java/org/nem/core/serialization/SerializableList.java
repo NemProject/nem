@@ -25,7 +25,7 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 */
 	public SerializableList(final Collection<T> collection) {
 		this(collection.size());
-		collection.forEach(this::add);
+		collection.forEach(obj -> this.add(obj));
 	}
 
 	/**

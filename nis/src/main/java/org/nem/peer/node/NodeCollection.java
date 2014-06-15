@@ -157,7 +157,7 @@ public class NodeCollection implements SerializableEntity {
 	 */
 	public void pruneInactiveNodes() {
 		this.getInactiveNodes().stream()
-				.filter(this.inactiveNodesSnapshot::contains)
+				.filter(obj -> this.inactiveNodesSnapshot.contains(obj))
 				.forEach(node -> this.update(node, NodeStatus.FAILURE));
 
 		this.inactiveNodesSnapshot = createSet();

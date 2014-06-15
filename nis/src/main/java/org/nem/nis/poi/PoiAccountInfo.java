@@ -119,7 +119,7 @@ public class PoiAccountInfo {
 	 */
 	public double getNetOutlinkScore() {
 		return this.getNetOutlinks().stream()
-				.map(WeightedLink::getWeight)
+				.map(obj -> obj.getWeight())
 				.reduce(0.0, Double::sum);
 	}
 }

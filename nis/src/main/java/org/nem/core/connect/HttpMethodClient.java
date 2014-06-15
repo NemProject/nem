@@ -124,7 +124,7 @@ public class HttpMethodClient<T> {
 	}
 
 	public void close() {
-		ExceptionUtils.propagateVoid(this.httpClient::close);
+		ExceptionUtils.propagateVoid(() -> this.httpClient.close());
 	}
 
 	/**

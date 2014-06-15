@@ -66,7 +66,7 @@ public class AccountIoAdapter implements AccountIo {
 						TransferMapper.toModel((Transfer)tr[0], this.accountAnalyzer),
 						new TransactionMetaData(new BlockHeight((long)tr[1]))
 				))
-				.forEach(transactionList::add);
+				.forEach(obj -> transactionList.add(obj));
 		return transactionList;
 	}
 
@@ -82,7 +82,7 @@ public class AccountIoAdapter implements AccountIo {
 
 		blocks.stream()
 				.map(bl -> BlockMapper.toModel(bl, this.accountAnalyzer))
-				.forEach(blockList::add);
+				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}
 

@@ -191,7 +191,7 @@ public class UnconfirmedTransactions {
 	public void dropExpiredTransactions(TimeInstant time) {
 		this.transactions.values().stream()
 				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
-				.forEach(this::remove);
+				.forEach(obj -> this.remove(obj));
 	}
 
 	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {

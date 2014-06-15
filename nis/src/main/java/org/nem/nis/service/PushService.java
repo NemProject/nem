@@ -43,8 +43,8 @@ public class PushService {
 	public void pushTransaction(final Transaction entity, final NodeIdentity identity) {
 		boolean result = this.pushEntity(
 				entity,
-				PushService::checkTransaction,
-				this.foraging::processTransaction,
+				obj -> PushService.checkTransaction(obj),
+				obj -> this.foraging.processTransaction(obj),
 				transaction -> { },
 				NodeApiId.REST_PUSH_TRANSACTION,
 				identity);
@@ -67,8 +67,8 @@ public class PushService {
 	public void pushBlock(final Block entity, final NodeIdentity identity) {
 		boolean result = this.pushEntity(
 				entity,
-				this.blockChain::checkPushedBlock,
-				this.blockChain::processBlock,
+				obj -> this.blockChain.checkPushedBlock(obj),
+				obj -> this.blockChain.processBlock(obj),
 				block -> LOGGER.info("   block height: " + entity.getHeight()),
 				NodeApiId.REST_PUSH_BLOCK,
 				identity);

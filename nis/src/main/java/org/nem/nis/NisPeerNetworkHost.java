@@ -142,7 +142,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.network = network;
 
 			this.refreshTimer = new AsyncTimer(
-					this.network::refresh,
+					() -> this.network.updateLocalNodeEndpoint(),
 					REFRESH_INITIAL_DELAY,
 					getRefreshDelayStrategy());
 			this.refreshTimer.setName("REFRESH");
@@ -153,15 +153,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 							BROADCAST_INTERVAL,
 							"BROADCAST"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(this.network::synchronize),
+							() -> CompletableFuture.runAsync(() -> this.network.updateLocalNodeEndpoint()),
 							SYNC_INTERVAL,
 							"SYNC"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(this.network::pruneInactiveNodes),
+							() -> CompletableFuture.runAsync(() -> this.network.updateLocalNodeEndpoint()),
 							PRUNE_INACTIVE_NODES_DELAY,
 							"PRUNING INACTIVE NODES"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(this.network::updateLocalNodeEndpoint),
+							() -> CompletableFuture.runAsync(() -> this.network.updateLocalNodeEndpoint()),
 							UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
 							"UPDATING LOCAL NODE ENDPOINT"));
 		}
@@ -203,7 +203,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		@Override
 		public void close() {
 			this.refreshTimer.close();
-			this.secondaryTimers.forEach(AsyncTimer::close);
+			this.secondaryTimers.forEach(obj -> obj.close());
 		}
 	}
 }
