@@ -427,6 +427,35 @@ public class PeerNetworkTest {
 	}
 
 	@Test
+	public void refreshResultForDirectNodeIgnoresChildNodeGetInfoResults() {
+		// Arrange: set up 4 active nodes (3 pre-trusted)
+		final MockConnector connector = new MockConnector();
+		final PeerNetwork network = createTestNetwork(connector);
+		updateAllNodes(network, NodeStatus.ACTIVE);
+		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
+
+		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.SLEEP_INACTIVE);
+		connector.setGetInfoError("10.0.0.100", MockConnector.TriggerAction.INACTIVE);
+
+		// Arrange: set up a node peers list that contains an unseen inactive node
+		final List<Node> knownPeers = Arrays.asList(PeerUtils.createNodeWithHost("10.0.0.100"));
+		connector.setKnownPeers(knownPeers);
+
+		// Act:
+		network.refresh().join();
+		final NodeCollection nodes = network.getNodes();
+
+		// Assert:
+		// - all peers (1, 2, 25) that were directly communicated (successfully) are active
+		// - the inactive peer (3) is inactive
+		// - the unseen inactive peer (100) is inactive
+		NodeCollectionAssert.areHostsEquivalent(
+				nodes,
+				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.25" },
+				new String[] { "10.0.0.3", "10.0.0.100" });
+	}
+
+	@Test
 	public void refreshCallsGetInfoOnceForEachUniqueEndpoint() {
 		// Arrange:
 		final MockConnector connector = new MockConnector();
