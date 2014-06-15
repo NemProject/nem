@@ -4,11 +4,11 @@
 	"knownPeers": [
 	    {
 	        endpoint: { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
-	        identity: { "name": "bob", "public-key": "AgZoPC/IXqn6TFsdMzl740UH6hUkO3/ErWgiHJruK3WR" }
+	        identity: { "name": "bob", "public-key": "A1D5T4w6BKT0c1a6dJt0QYpVUR2IpW0YCZgTDYwmsov9" }
 	    },
         {
             endpoint: { "protocol": "http", "host": "trudy.nem.ninja", "port" : 7890 },
-            identity: { "name": "trudy", "public-key": "A+Bhs2AwM5xaEL5irWCBsMRSla0AkjgUGLcpXshEYC3U" }
+            identity: { "name": "trudy", "public-key": "A8Vb0lDlbCku1MiYsIg2djEygyUdIbapCZu5iduZ1zbS" }
         }
     ],
 }
