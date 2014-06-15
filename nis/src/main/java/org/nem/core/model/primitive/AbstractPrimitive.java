@@ -7,7 +7,7 @@ package org.nem.core.model.primitive;
  * @param <TValue> The value type.
  */
 public abstract class AbstractPrimitive<
-		TDerived extends AbstractPrimitive,
+		TDerived extends AbstractPrimitive<?, TValue>,
 		TValue extends Number & Comparable<TValue>>
 		implements Comparable<TDerived> {
 
@@ -32,7 +32,7 @@ public abstract class AbstractPrimitive<
 	 */
 	@Override
 	public int compareTo(final TDerived rhs) {
-		return this.value.compareTo((TValue)rhs.getValue());
+		return this.value.compareTo(rhs.getValue());
 	}
 
 	/**
@@ -54,7 +54,7 @@ public abstract class AbstractPrimitive<
 			return false;
 
 		final TDerived rhs = this.derivedClass.cast(obj);
-		return 0 == this.value.compareTo((TValue)rhs.getValue());
+		return 0 == this.compareTo(rhs);
 	}
 
 	@Override
