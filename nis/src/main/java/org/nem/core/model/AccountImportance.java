@@ -17,6 +17,12 @@ public class AccountImportance implements SerializableEntity {
 	private BlockHeight importanceHeight;
 	private double importance;
 
+	public static final ObjectDeserializer<AccountImportance> DESERIALIZER = new ObjectDeserializer<AccountImportance>() {
+		@Override
+		public AccountImportance deserialize(Deserializer deserializer) {
+			return new AccountImportance(deserializer);
+		}
+	};
 	/**
 	 * Creates a new importance instance.
 	 */

@@ -203,7 +203,7 @@ public class Block extends VerifiableEntity {
 	 * @param transactions The transactions to add.
 	 */
 	public void addTransactions(final Collection<Transaction> transactions) {
-		transactions.forEach(this::addTransaction);
+		transactions.forEach(tx -> addTransaction(tx));
 	}
 
 	/**

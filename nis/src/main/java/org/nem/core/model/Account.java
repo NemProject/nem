@@ -167,7 +167,7 @@ public class Account implements SerializableEntity {
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
 
-		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
+		final AccountImportance importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 		if (importance.isSet())
 			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
 

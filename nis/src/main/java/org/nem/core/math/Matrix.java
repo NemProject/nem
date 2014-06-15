@@ -128,12 +128,15 @@ public abstract class Matrix {
 	 */
 	public void normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
-		this.forEach((r, c, v, u) -> {
-			final double sum = columnSums[c];
-			if (0 == sum)
-				return;
+		this.forEach(new ElementVisitorFunction() {
+			@Override
+			public void visit(int row, int col, double value, DoubleConsumer setter) {
+				final double sum = columnSums[col];
+				if (0 == sum)
+					return;
 
-			u.accept(v / sum);
+				setter.accept(value / sum);
+			}
 		});
 	}
 
@@ -141,9 +144,12 @@ public abstract class Matrix {
 	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
-		this.forEach((r, c, v, u) -> {
-			if (v < 0)
-				u.accept(0.0);
+		this.forEach(new ElementVisitorFunction() {
+			@Override
+			public void visit(int row, int col, double value, DoubleConsumer setter) {
+				if (value < 0)
+					setter.accept(0.0);
+			}
 		});
 	}
 
@@ -153,7 +159,12 @@ public abstract class Matrix {
 	 * @param scale The scale factor.
 	 */
 	public final void scale(final double scale) {
-		this.forEach((r, c, v, u) -> u.accept(v / scale));
+		this.forEach(new ElementVisitorFunction() {
+			@Override
+			public void visit(int row, int col, double value, DoubleConsumer setter) {
+				setter.accept(value / scale);
+			}
+		});
 	}
 
 	//endregion
@@ -368,7 +379,12 @@ public abstract class Matrix {
 	 * @param func The function.
 	 */
 	protected void forEach(final ReadOnlyElementVisitorFunction func) {
-		this.forEach((r, c, v, u) -> func.visit(r, c, v));
+		this.forEach(new ElementVisitorFunction() {
+			@Override
+			public void visit(int row, int col, double value, DoubleConsumer setter) {
+				func.visit(row, col, value);
+			}
+		});
 	}
 
 	/**

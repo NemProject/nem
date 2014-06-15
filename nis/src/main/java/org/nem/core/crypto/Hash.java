@@ -20,7 +20,12 @@ public class Hash implements SerializableEntity {
 	/**
 	 * An object deserializer that can be used to deserialize hashes.
 	 */
-	public static final ObjectDeserializer<Hash> DESERIALIZER = Hash::new;
+	public static final ObjectDeserializer<Hash> DESERIALIZER = new ObjectDeserializer<Hash>() {
+		@Override
+		public Hash deserialize(Deserializer deserializer) {
+			return new Hash(deserializer);
+		}
+	};
 
 	private final byte[] data;
 

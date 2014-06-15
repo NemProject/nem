@@ -3,6 +3,7 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.function.DoubleConsumer;
 
 /**
  * Represents a dense matrix.
@@ -67,13 +68,27 @@ public final class DenseMatrix extends Matrix {
 		this.values[row * this.numCols + col] = val;
 	}
 
+	class SetWrapper implements DoubleConsumer {
+		final int i;
+		final int j;
+		SetWrapper(int i, int j) {
+			this.i = i;
+			this.j = j;
+		}
+		@Override
+		public void accept(double value) {
+			setAtUnchecked(i, j, value);
+		}
+	}
+
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
 		for (int i = 0; i < this.getRowCount(); ++i) {
 			for (int j = 0; j < this.getColumnCount(); ++j) {
 				final int iCopy = i;
 				final int jCopy = j;
-				func.visit(i, j, this.getAtUnchecked(i, j), v -> this.setAtUnchecked(iCopy, jCopy, v));
+				final SetWrapper setWrapper = new SetWrapper(iCopy, jCopy);
+				func.visit(i, j, this.getAtUnchecked(i, j), setWrapper);
 			}
 		}
 	}

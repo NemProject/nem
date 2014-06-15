@@ -22,16 +22,22 @@ public class AggregateTransferObserver implements TransferObserver {
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-		transferObservers.stream().forEach(o -> o.notifyTransfer(sender, recipient, amount));
+		for (final TransferObserver o : this.transferObservers) {
+			o.notifyTransfer(sender, recipient, amount);
+		}
 	}
 
 	@Override
 	public void notifyCredit(final Account account, final Amount amount) {
-		transferObservers.stream().forEach(o -> o.notifyCredit(account, amount));
+		for (final TransferObserver o : this.transferObservers) {
+			o.notifyCredit(account, amount);
+		}
 	}
 
 	@Override
 	public void notifyDebit(final Account account, final Amount amount) {
-		transferObservers.stream().forEach(o -> o.notifyDebit(account, amount));
+		for (final TransferObserver o : this.transferObservers) {
+			o.notifyDebit(account, amount);
+		}
 	}
 }

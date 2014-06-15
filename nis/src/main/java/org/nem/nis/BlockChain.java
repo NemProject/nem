@@ -551,7 +551,7 @@ public class BlockChain implements BlockSynchronizer {
 					// mind that we're using "new" (replaced) accountAnalyzer
 					final Set<Hash> transactionHashes = this.peerChain.stream()
 							.flatMap(bl -> bl.getTransactions().stream())
-							.map(HashUtils::calculateHash)
+							.map(bl -> HashUtils.calculateHash(bl))
 							.collect(Collectors.toSet());
 					this.addRevertedTransactionsAsUnconfirmed(
 							transactionHashes,
@@ -562,8 +562,8 @@ public class BlockChain implements BlockSynchronizer {
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 				this.peerChain.stream()
-						.filter(this.blockChainLastBlockLayer::addBlockToDb)
-						.forEach(this.foraging::removeFromUnconfirmedTransactions);
+						.filter(tr -> this.blockChainLastBlockLayer.addBlockToDb(tr))
+						.forEach(tr -> this.foraging.removeFromUnconfirmedTransactions(tr));
 			}
 		}
 
@@ -589,7 +589,7 @@ public class BlockChain implements BlockSynchronizer {
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer))
-						.forEach(this.foraging::addUnconfirmedTransactionWithoutDbCheck);
+						.forEach(tr -> this.foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
 				currentHeight--;
 			}
 		}
