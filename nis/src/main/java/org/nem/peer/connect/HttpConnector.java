@@ -98,13 +98,13 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		return postAuthenticated(url, node.getIdentity(), HashChain::new, height).join();
+		return postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
 	}
 
 	@Override
 	public BlockChainScore getChainScore(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_SCORE);
-		return postAuthenticated(url, node.getIdentity(), BlockChainScore::new).join();
+		return postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
 	}
 
 	//endregion
