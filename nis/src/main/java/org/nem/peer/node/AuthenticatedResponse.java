@@ -3,12 +3,15 @@ package org.nem.peer.node;
 import org.nem.core.crypto.Signature;
 import org.nem.core.serialization.*;
 
+import java.util.logging.Logger;
+
 /**
  * Authenticated NIS response that can be used to authenticate the local node.
  *
  * @param <T> The type of entity.
  */
 public class AuthenticatedResponse<T extends SerializableEntity> implements SerializableEntity {
+	private static final Logger LOGGER = Logger.getLogger(AuthenticatedResponse.class.getName());
 
 	private final T entity;
 	private final Signature signature;
@@ -30,7 +33,7 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public AuthenticatedResponse(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
+		public AuthenticatedResponse(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
 		this.signature = Signature.readFrom(deserializer, "signature");
 	}
@@ -44,7 +47,10 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 */
 	public T getEntity(final NodeIdentity identity, final NodeChallenge challenge) {
 		if (!identity.verify(challenge.getRaw(), this.signature))
+		{
+			LOGGER.info("couldn't verify node's response");
 			throw new ImpersonatingPeerException("entity source cannot be verified");
+		}
 
 		return this.entity;
 	}

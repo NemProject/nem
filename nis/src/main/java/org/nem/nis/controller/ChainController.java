@@ -49,7 +49,7 @@ public class ChainController {
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<Block> blockLast(final NodeChallenge challenge) {
+	public AuthenticatedResponse<Block> blockLast(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(this.blockLast(), localNode.getIdentity(), challenge);
 	}
@@ -103,7 +103,8 @@ public class ChainController {
 	@RequestMapping(value = "/chain/score", method = RequestMethod.POST)
 	@P2PApi
 	@PublicApi
-	public AuthenticatedResponse<BlockChainScore> chainScore(final NodeChallenge challenge) {
+	@AuthenticatedApi
+	public AuthenticatedResponse<BlockChainScore> chainScore(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(this.chainScore(), localNode.getIdentity(), challenge);
 	}

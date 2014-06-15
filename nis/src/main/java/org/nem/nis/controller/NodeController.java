@@ -104,7 +104,8 @@ public class NodeController {
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.POST)
 	@P2PApi
 	@PublicApi
-	public AuthenticatedResponse<SerializableList<Node>> getActivePeerList(final NodeChallenge challenge) {
+	@AuthenticatedApi
+	public AuthenticatedResponse<SerializableList<Node>> getActivePeerList(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(this.getActivePeerList(), localNode.getIdentity(), challenge);
 	}
