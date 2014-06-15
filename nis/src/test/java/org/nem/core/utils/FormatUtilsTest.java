@@ -21,4 +21,40 @@ public class FormatUtilsTest {
 		Assert.assertThat(format.format(1), IsEqual.equalTo("1.000"));
 		Assert.assertThat(format.format(8.0), IsEqual.equalTo("8.000"));
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void decimalFormatCannotBeSpecifiedWithNegativeDecimalPlaces() {
+		// Assert:
+		FormatUtils.getDecimalFormat(-1);
+	}
+
+	@Test
+	public void decimalFormatWithZeroDecimalPlacesFormatsValuesCorrectly() {
+		// Arrange:
+		final DecimalFormat format = FormatUtils.getDecimalFormat(0);
+
+		// Assert:
+		Assert.assertThat(format.format(2.1234), IsEqual.equalTo("2"));
+		Assert.assertThat(format.format(3.2345), IsEqual.equalTo("3"));
+		Assert.assertThat(format.format(5012.0123), IsEqual.equalTo("5012"));
+		Assert.assertThat(format.format(5.0126), IsEqual.equalTo("5"));
+		Assert.assertThat(format.format(11.1234), IsEqual.equalTo("11"));
+		Assert.assertThat(format.format(1), IsEqual.equalTo("1"));
+		Assert.assertThat(format.format(8.0), IsEqual.equalTo("8"));
+	}
+
+	@Test
+	public void decimalFormatWithCustomDecimalPlacesFormatsValuesCorrectly() {
+		// Arrange:
+		final DecimalFormat format = FormatUtils.getDecimalFormat(5);
+
+		// Assert:
+		Assert.assertThat(format.format(2.1234), IsEqual.equalTo("2.12340"));
+		Assert.assertThat(format.format(3.2345), IsEqual.equalTo("3.23450"));
+		Assert.assertThat(format.format(5012.0123), IsEqual.equalTo("5012.01230"));
+		Assert.assertThat(format.format(5.0126), IsEqual.equalTo("5.01260"));
+		Assert.assertThat(format.format(11.1234), IsEqual.equalTo("11.12340"));
+		Assert.assertThat(format.format(1), IsEqual.equalTo("1.00000"));
+		Assert.assertThat(format.format(8.0), IsEqual.equalTo("8.00000"));
+	}
 }

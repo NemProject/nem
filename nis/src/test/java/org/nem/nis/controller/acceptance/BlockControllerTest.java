@@ -1,7 +1,6 @@
 package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
-
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;

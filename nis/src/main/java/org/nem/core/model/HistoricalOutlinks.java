@@ -4,9 +4,6 @@ import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
-
 /**
  * A collection of historical out-links.
  */

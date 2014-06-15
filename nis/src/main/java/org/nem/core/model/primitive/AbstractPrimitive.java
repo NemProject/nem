@@ -1,17 +1,25 @@
 package org.nem.core.model.primitive;
 
-public abstract class AbstractPrimitive<TDerived extends AbstractPrimitive, TValue extends Number & Comparable<TValue>> implements Comparable<TDerived> {
+/**
+ * Abstract base class for strongly typed primitives.
+ *
+ * @param <TDerived> The derived class type.
+ * @param <TValue> The value type.
+ */
+public abstract class AbstractPrimitive<
+		TDerived extends AbstractPrimitive<?, TValue>,
+		TValue extends Number & Comparable<TValue>>
+		implements Comparable<TDerived> {
 
 	private final TValue value;
 	private final Class<TDerived> derivedClass;
-
 
 	/**
 	 * Creates a new primitive.
 	 *
 	 * @param value The primitive value.
 	 */
-	protected AbstractPrimitive(TValue value, final Class<TDerived> derivedClass) {
+	protected AbstractPrimitive(final TValue value, final Class<TDerived> derivedClass) {
 		this.value = value;
 		this.derivedClass = derivedClass;
 	}
@@ -24,7 +32,7 @@ public abstract class AbstractPrimitive<TDerived extends AbstractPrimitive, TVal
 	 */
 	@Override
 	public int compareTo(final TDerived rhs) {
-		return this.value.compareTo((TValue)rhs.getValue());
+		return this.value.compareTo(rhs.getValue());
 	}
 
 	/**
@@ -36,7 +44,8 @@ public abstract class AbstractPrimitive<TDerived extends AbstractPrimitive, TVal
 
 	@Override
 	public int hashCode() {
-		return (int)(this.value.longValue() ^ (this.value.longValue() >>> 32));
+		final long longValue = this.value.longValue();
+		return (int)(longValue ^ (longValue >> 32));
 	}
 
 	@Override
@@ -45,7 +54,7 @@ public abstract class AbstractPrimitive<TDerived extends AbstractPrimitive, TVal
 			return false;
 
 		final TDerived rhs = this.derivedClass.cast(obj);
-		return this.value.compareTo((TValue)rhs.getValue()) == 0;
+		return 0 == this.compareTo(rhs);
 	}
 
 	@Override

@@ -5,40 +5,34 @@ import java.math.BigInteger;
 import net.minidev.json.JSONObject;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-import org.nem.core.model.primitive.BlockChainScore;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.test.Utils;
+import org.junit.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 import org.nem.core.utils.Base64Encoder;
 
 public class BlockChainScoreTest {
 
 	//region constructor
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void cannotBeCreatedAroundNegativeScore() {
 		// Act:
-		new BlockChainScore(BigInteger.valueOf(-1));
+		ExceptionAssert.assertThrows(v -> new BlockChainScore(BigInteger.valueOf(-1)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new BlockChainScore(-1), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void canBeCreatedAroundZeroScore() {
-		// Act:
-		final BlockChainScore score = new BlockChainScore(BigInteger.ZERO);
-
 		// Assert:
-		Assert.assertThat(score.getRaw(), IsEqual.equalTo(BigInteger.ZERO));
+		Assert.assertThat(new BlockChainScore(0).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
+		Assert.assertThat(new BlockChainScore(BigInteger.ZERO).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
 	public void canBeCreatedAroundPositiveScore() {
-		// Act:
-		final BlockChainScore score = new BlockChainScore(BigInteger.ONE);
-
 		// Assert:
-		Assert.assertThat(score.getRaw(), IsEqual.equalTo(BigInteger.ONE));
+		Assert.assertThat(new BlockChainScore(1).getRaw(), IsEqual.equalTo(BigInteger.ONE));
+		Assert.assertThat(new BlockChainScore(BigInteger.ONE).getRaw(), IsEqual.equalTo(BigInteger.ONE));
 	}
 
 	//endregion
@@ -97,7 +91,9 @@ public class BlockChainScoreTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
-		Assert.assertThat(jsonObject.get("score"), IsEqual.equalTo(Base64Encoder.getString(BigInteger.valueOf(142).toByteArray())));
+		Assert.assertThat(
+				jsonObject.get("score"),
+				IsEqual.equalTo(Base64Encoder.getString(BigInteger.valueOf(142).toByteArray())));
 	}
 
 	@Test
@@ -114,5 +110,4 @@ public class BlockChainScoreTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalScore, null);
 		return new BlockChainScore(deserializer);
 	}
-
 }

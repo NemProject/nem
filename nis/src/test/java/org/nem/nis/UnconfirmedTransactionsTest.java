@@ -221,10 +221,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
-		boolean success = transactions.add(first);
+		transactions.add(first);
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));
 		second.setFee(Amount.fromNem(1));
-		success = transactions.add(second);
+		transactions.add(second);
 
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));

@@ -2,9 +2,7 @@ package org.nem.core.model.primitive;
 
 import java.math.BigInteger;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a score for an entire block chain.
@@ -34,10 +32,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteg
 	 * @param score The block chain score.
 	 */
 	public BlockChainScore(final long score) {
-		super(BigInteger.valueOf(score), BlockChainScore.class);
-
-		if (this.getRaw().compareTo(BigInteger.ZERO) < 0)
-			throw new IllegalArgumentException("block chain score can't be negative");
+		this(BigInteger.valueOf(score));
 	}
 
 	/**
