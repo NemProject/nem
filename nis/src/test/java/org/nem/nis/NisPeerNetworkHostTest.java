@@ -54,6 +54,16 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
+	@Test(expected = IllegalStateException.class)
+	public void networkCannotBeBootedMoreThanOnce() {
+		// Arrange:
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+			// Act:
+			host.boot(createLocalNode());
+			host.boot(createLocalNode());
+		}
+	}
+
 	private static Node createLocalNode() {
 		return new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("10.0.0.1"));
 	}
