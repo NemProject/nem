@@ -55,7 +55,7 @@ public class HttpMethodClient<T> {
 	 * @return The response from the server.
 	 */
 	public AsyncToken<T> get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, HttpGet::new, responseStrategy);
+		return sendRequest(url, obj -> new HttpGet(obj), responseStrategy);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class HttpMethodClient<T> {
 		 * @return The result value.
 		 */
 		public T get()  {
-			return ExceptionUtils.propagate(() -> this.getFuture().get(), FatalPeerException::new);
+			return ExceptionUtils.propagate(() -> this.getFuture().get(), obj -> new FatalPeerException(obj));
 		}
 
 		/**

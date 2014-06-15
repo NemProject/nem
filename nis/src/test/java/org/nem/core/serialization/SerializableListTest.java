@@ -237,7 +237,7 @@ public class SerializableListTest {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
 		final SerializableList<MockSerializableEntity> list =
-				new SerializableList<>(deserializer, MockSerializableEntity::new);
+				new SerializableList<>(deserializer, obj -> new MockSerializableEntity(obj));
 
 		// Assert:
 		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));

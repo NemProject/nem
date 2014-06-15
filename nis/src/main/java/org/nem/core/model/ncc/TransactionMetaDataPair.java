@@ -30,7 +30,7 @@ public class TransactionMetaDataPair implements SerializableEntity {
 	public TransactionMetaDataPair(final Deserializer deserializer) {
 		this(
 				deserializer.readObject("transaction", TransactionFactory.VERIFIABLE),
-				deserializer.readObject("meta", TransactionMetaData::new));
+				deserializer.readObject("meta", obj -> new TransactionMetaData(obj)));
 	}
 
 	@Override

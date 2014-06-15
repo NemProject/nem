@@ -29,7 +29,7 @@ public class NisNodeInfo implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NisNodeInfo(final Deserializer deserializer) {
-		this.node = deserializer.readObject("node", Node::new);
+		this.node = deserializer.readObject("node", obj -> new Node(obj));
 		this.appMetaData = deserializer.readObject("nisInfo", ApplicationMetaData.DESERIALIZER);
 	}
 

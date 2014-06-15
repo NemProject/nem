@@ -131,7 +131,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
 		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
-		return rawTimestamps.stream().map(TimeInstant::new).collect(Collectors.toList());
+		return rawTimestamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class ExceptionUtils {
 	 * @param runnable The checked runnable.
 	 */
 	public static void propagateVoid(final CheckedRunnable runnable) {
-		propagateVoid(runnable, RuntimeException::new);
+		propagateVoid(runnable, obj -> new RuntimeException(obj));
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ExceptionUtils {
 	 * @return The function result.
 	 */
 	public static <T> T propagate(final Callable<T> callable) {
-		return propagate(callable, RuntimeException::new);
+		return propagate(callable, obj -> new RuntimeException(obj));
 	}
 
 	/**

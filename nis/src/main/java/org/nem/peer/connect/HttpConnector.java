@@ -43,13 +43,13 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_INFO);
-		return postAuthenticated(url, node.getIdentity(), Node::new);
+		return postAuthenticated(url, node.getIdentity(), obj -> new Node(obj));
 	}
 
 	@Override
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
-		return postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, Node::new));
+		return postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, obj -> new Node(obj)));
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 			final Node node,
 			final NodeEndpoint localEndpoint) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
-		return this.post(url, localEndpoint).getFuture().thenApply(NodeEndpoint::new);
+		return this.post(url, localEndpoint).getFuture().thenApply(obj -> new NodeEndpoint(obj));
 	}
 
 	@Override

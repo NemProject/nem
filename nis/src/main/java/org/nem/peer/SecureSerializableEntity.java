@@ -37,7 +37,7 @@ public class SecureSerializableEntity<T extends SerializableEntity> implements S
 	public SecureSerializableEntity(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
 		this.signature = Signature.readFrom(deserializer, "signature");
-		this.identity = deserializer.readObject("identity", NodeIdentity::new);
+		this.identity = deserializer.readObject("identity", obj -> new NodeIdentity(obj));
 	}
 
 	/**

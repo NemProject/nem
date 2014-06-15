@@ -29,6 +29,6 @@ public class HttpErrorResponseDeserializerUnionStrategy implements HttpResponseS
 				response.getStatusLine().getStatusCode(),
 				JSONValue.parse(response.getEntity().getContent()),
 				this.context),
-			FatalPeerException::new);
+			obj -> new FatalPeerException(obj));
 	}
 }

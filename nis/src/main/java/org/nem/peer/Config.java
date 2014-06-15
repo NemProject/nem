@@ -96,7 +96,7 @@ public class Config {
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<Node> wellKnownNodes = deserializer.readObjectArray("knownPeers", Node::new);
+		final List<Node> wellKnownNodes = deserializer.readObjectArray("knownPeers", obj -> new Node(obj));
 		return new PreTrustedNodes(wellKnownNodes.stream().collect(Collectors.toSet()));
 	}
 

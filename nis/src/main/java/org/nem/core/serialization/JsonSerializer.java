@@ -83,7 +83,7 @@ public class JsonSerializer implements Serializer {
 
 		final JSONArray jsonObjects = objects.stream()
 				.map(JsonSerializer::serializeObject)
-				.collect(Collectors.toCollection(JSONArray::new));
+				.collect(Collectors.toCollection(obj -> new JSONArray(obj)));
 
 		this.object.put(label, jsonObjects);
 	}

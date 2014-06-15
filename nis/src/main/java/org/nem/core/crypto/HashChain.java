@@ -43,6 +43,6 @@ public class HashChain extends SerializableList<Hash> {
 	 * @param rawHashList The list of raw hashes.
 	 */
 	public static HashChain fromRawHashes(final List<byte[]> rawHashList) {
-		return new HashChain(rawHashList.stream().map(Hash::new).collect(Collectors.toList()));
+		return new HashChain(rawHashList.stream().map(obj -> new Hash(obj)).collect(Collectors.toList()));
 	}
 }

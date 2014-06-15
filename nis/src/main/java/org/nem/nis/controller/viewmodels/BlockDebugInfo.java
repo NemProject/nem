@@ -65,7 +65,7 @@ public class BlockDebugInfo implements SerializableEntity {
 		this.hit = new BigInteger(deserializer.readString("hit"));
 		this.target = new BigInteger(deserializer.readString("target"));
 		this.interBlockTime = deserializer.readInt("interBlockTime");
-		this.transactionDebugInfos = deserializer.readObjectArray("transactions", TransactionDebugInfo::new);
+		this.transactionDebugInfos = deserializer.readObjectArray("transactions", obj -> new TransactionDebugInfo(obj));
 	}
 
 	/**

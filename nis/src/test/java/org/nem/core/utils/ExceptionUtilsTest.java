@@ -37,7 +37,7 @@ public class ExceptionUtilsTest {
 		// Act:
 		ExceptionUtils.propagate(
 				() -> { throw new IOException(); },
-				EncodingException::new);
+				obj -> new EncodingException(obj));
 	}
 
 	@Test(expected = EncodingException.class)
@@ -57,7 +57,7 @@ public class ExceptionUtilsTest {
 		// Act:
 		ExceptionUtils.propagate(
 				() -> { throw new MockExecutionException(new IOException()); },
-				EncodingException::new);
+				obj -> new EncodingException(obj));
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class ExceptionUtilsTest {
 		// Act:
 		ExceptionUtils.propagateVoid(
 				() -> { throw new IOException(); },
-				EncodingException::new);
+				obj -> new EncodingException(obj));
 	}
 
 	@Test(expected = EncodingException.class)
@@ -143,7 +143,7 @@ public class ExceptionUtilsTest {
 		// Act:
 		ExceptionUtils.propagateVoid(
 				() -> { throw new MockExecutionException(new IOException()); },
-				EncodingException::new);
+				obj -> new EncodingException(obj));
 	}
 
 	@Test

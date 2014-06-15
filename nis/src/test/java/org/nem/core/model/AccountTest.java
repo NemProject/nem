@@ -445,7 +445,7 @@ public class AccountTest {
 		final Account.DeserializationOptions summaryOption = Account.DeserializationOptions.SUMMARY;
 
 		// Assert:
-		assertAccountRoundTrip(address, Account::new, expectedPublicKey, true);
+		assertAccountRoundTrip(address, obj -> new Account(obj), expectedPublicKey, true);
 		assertAccountRoundTrip(address, d -> new Account(d, allOption), expectedPublicKey, false);
 		assertAccountRoundTrip(address, d -> new Account(d, summaryOption), expectedPublicKey, true);
 	}
@@ -586,7 +586,7 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 
-		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
+		final AccountImportance importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
 		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
 
