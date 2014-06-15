@@ -14,7 +14,7 @@ public class BlockChainScoreTest {
 
 	//region constructor
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void cannotBeCreatedAroundNegativeScore() {
 		// Act:
 		ExceptionAssert.assertThrows(v -> new BlockChainScore(BigInteger.valueOf(-1)), IllegalArgumentException.class);
