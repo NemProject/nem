@@ -17,7 +17,7 @@ public class ConnectUtils {
 	 * Creates a deserializer using the specified strategy around the specified bytes.
 	 *
 	 * @param serializedBytes The bytes.
-	 * @param strategy The strategy
+	 * @param strategy The strategy.
 	 * @return The deserializer.
 	 * @throws IOException On an IO error.
 	 */
@@ -48,5 +48,24 @@ public class ConnectUtils {
 		final StatusLine statusLine = Mockito.mock(StatusLine.class);
 		Mockito.when(response.getStatusLine()).thenReturn(statusLine);
 		Mockito.when(statusLine.getStatusCode()).thenReturn(statusCode);
+	}
+
+	/**
+	 * Attempts to coerce a stream that throws an IOException.
+	 *
+	 * @param strategy The strategy.
+	 * @throws IOException On an IO error.
+	 */
+	public static void coerceStreamWithIoError(final HttpResponseStrategy<?> strategy) throws IOException {
+		// Arrange:
+		final HttpResponse response = Mockito.mock(HttpResponse.class);
+		mockStatusCode(response, 200);
+
+		final HttpEntity entity = Mockito.mock(HttpEntity.class);
+		Mockito.when(response.getEntity()).thenReturn(entity);
+		Mockito.when(entity.getContent()).thenThrow(new IOException());
+
+		// Act:
+		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
 	}
 }
