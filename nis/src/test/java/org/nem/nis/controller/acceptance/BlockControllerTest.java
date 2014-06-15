@@ -3,6 +3,7 @@ package org.nem.nis.controller.acceptance;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.LocalHostConnector;
@@ -22,8 +23,8 @@ public class BlockControllerTest {
 		input.put("height", 1);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
-		final Block block = BlockFactory.VERIFIABLE.deserialize(result.getBodyAsDeserializer());
+		final ErrorResponseDeserializerUnion result = connector.post(BLOCK_AT_PATH, input);
+		final Block block = BlockFactory.VERIFIABLE.deserialize(result.getDeserializer());
 
 		// Assert:
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(1)));
@@ -48,7 +49,7 @@ public class BlockControllerTest {
 		input.put("height", height);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
+		final ErrorResponseDeserializerUnion result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(expectedStatus));
@@ -61,7 +62,7 @@ public class BlockControllerTest {
 		final JSONObject input = new JSONObject();
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(BLOCK_AT_PATH, input);
+		final ErrorResponseDeserializerUnion result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(500));
@@ -74,7 +75,7 @@ public class BlockControllerTest {
 		final JSONObject input = new JSONObject();
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(INVALID_PATH, input);
+		final ErrorResponseDeserializerUnion result = connector.post(INVALID_PATH, input);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));

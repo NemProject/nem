@@ -3,6 +3,7 @@ package org.nem.nis.controller.acceptance;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.model.*;
 import org.nem.nis.test.LocalHostConnector;
 import org.nem.core.utils.*;
@@ -36,7 +37,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
@@ -63,7 +64,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
@@ -90,7 +91,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
@@ -117,7 +118,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
@@ -144,7 +145,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
@@ -171,7 +172,7 @@ public class TransferControllerTest {
 		obj.put("message", message);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
@@ -184,7 +185,7 @@ public class TransferControllerTest {
 		final JSONObject obj = createValidTransaction();
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
@@ -198,11 +199,11 @@ public class TransferControllerTest {
 		obj.put("timestamp", 100);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(TRANSFER_PREPARE_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(result.getBodyAsErrorResponse().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
 	}
 
 	private static JSONObject createValidTransaction() {

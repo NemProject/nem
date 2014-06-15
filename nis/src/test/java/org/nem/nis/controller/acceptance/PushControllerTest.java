@@ -3,6 +3,7 @@ package org.nem.nis.controller.acceptance;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.nis.test.LocalHostConnector;
 
 public class PushControllerTest {
@@ -18,7 +19,7 @@ public class PushControllerTest {
 		obj.put("type", 123456);
 
 		// Act:
-		final LocalHostConnector.Result result = connector.post(PUSH_TRANSACTION_PATH, obj);
+		final ErrorResponseDeserializerUnion result = connector.post(PUSH_TRANSACTION_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
