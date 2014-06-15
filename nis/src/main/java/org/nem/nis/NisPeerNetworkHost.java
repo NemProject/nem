@@ -56,10 +56,12 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	/**
 	 * Boots the network.
+	 *
+	 * @param localNode The local node.
 	 */
-	public CompletableFuture boot() {
+	public CompletableFuture boot(final Node localNode) {
 		final Config config = new Config(
-				loadJsonObject("local-config.json"),
+				localNode,
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion());
 		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
@@ -102,6 +104,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return The hosted network.
 	 */
 	public PeerNetwork getNetwork() {
+		if (null == this.host)
+			throw new IllegalStateException("network has not been booted yet");
+
 		return this.host.getNetwork();
 	}
 

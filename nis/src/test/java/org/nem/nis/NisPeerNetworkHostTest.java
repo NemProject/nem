@@ -1,7 +1,9 @@
 package org.nem.nis;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.KeyPair;
+import org.nem.peer.node.*;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -12,7 +14,7 @@ public class NisPeerNetworkHostTest {
 		// Arrange:
 		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
 			// Act:
-			host.boot().join();
+			host.boot(createLocalNode()).join();
 		}
 	}
 
@@ -21,7 +23,7 @@ public class NisPeerNetworkHostTest {
 		// Arrange:
 		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
 			// Act:
-			final CompletableFuture future = host.boot();
+			final CompletableFuture future = host.boot(createLocalNode());
 
 			// Assert:
 			Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
@@ -29,5 +31,30 @@ public class NisPeerNetworkHostTest {
 			// Cleanup:
 			future.join();
 		}
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void getNetworkThrowsIfNetworkIsNotBooted() {
+		// Arrange:
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+			// Act:
+			host.getNetwork();
+		}
+	}
+
+	@Test
+	public void getNetworkDoesNotThrowIfNetworkIsBooted() {
+		// Arrange:
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+			// Act:
+			host.boot(createLocalNode()).join();
+
+			// Assert:
+			Assert.assertThat(host.getNetwork(), IsNull.notNullValue());
+		}
+	}
+
+	private static Node createLocalNode() {
+		return new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("10.0.0.1"));
 	}
 }

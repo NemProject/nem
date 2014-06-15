@@ -24,7 +24,7 @@ public class PeerNetwork {
 
 	private final Config config;
 	private final Node localNode;
-	private NodeCollection nodes;
+	private final NodeCollection nodes;
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
 	private final BlockSynchronizer blockSynchronizer;

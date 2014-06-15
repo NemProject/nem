@@ -8,7 +8,6 @@ import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 
-import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,10 +39,12 @@ public class ConfigTest {
 	@Test
 	public void localNodeIsGivenDefaultPlatformIfOmitted() {
 		// Arrange:
-		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
-		((JSONObject)localConfig.get("metaData")).remove("platform");
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		final NodeMetaData localNodeMetaData = localNode.getMetaData();
+		localNode.setMetaData(new NodeMetaData(null, localNodeMetaData.getApplication(), localNodeMetaData.getVersion()));
+
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
-		final Config config = new Config(localConfig, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0");
 
 		// Act:
 		final Node node = config.getLocalNode();
@@ -70,10 +71,10 @@ public class ConfigTest {
 	@Test
 	public void wellKnownPeersAreInitializedCorrectly() {
 		// Arrange:
-		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final String[] expectedWellKnownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig(expectedWellKnownHosts);
-		final Config config = new Config(localConfig, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -90,10 +91,10 @@ public class ConfigTest {
 	@Test
 	public void wellKnownPeersAreEmptyIfNotSpecified() {
 		// Arrange:
-		final JSONObject localConfig = ConfigFactory.createDefaultLocalConfig();
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
 		peersConfig.remove("knownPeers");
-		final Config config = new Config(localConfig, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -134,10 +135,6 @@ public class ConfigTest {
 
 	private static Config createTestConfig() {
 		return ConfigFactory.createDefaultTestConfig();
-	}
-
-	private static URL getDefaultLocalNodeUrl() throws MalformedURLException {
-		return new URL("http", DEFAULT_LOCAL_NODE_HOST, 7890, "/");
 	}
 
 	//endregion
