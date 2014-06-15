@@ -22,7 +22,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	@Autowired
 	AccountDao accountDao;
 
-	public static String GENESIS_ADDRESS = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
+	public static String NEMESIS_ADDRESS = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
 
 	@Test
 	public void canSaveAccount() {

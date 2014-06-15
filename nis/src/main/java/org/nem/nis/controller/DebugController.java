@@ -55,7 +55,7 @@ public class DebugController {
 				StringEncoder.getBytes(host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
 				ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
 
-		final Signer signer = new Signer(new KeyPair(GenesisBlock.ADDRESS.getPublicKey()));
+		final Signer signer = new Signer(new KeyPair(NemesisBlock.ADDRESS.getPublicKey()));
 		final byte[] signed = Base32Encoder.getBytes(signature);
 		LOGGER.info(String.format("%d %s",
 				NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,

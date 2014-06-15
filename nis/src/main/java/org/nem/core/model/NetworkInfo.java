@@ -10,8 +10,8 @@ public class NetworkInfo {
 
 	private byte version;
 	private char addressStartChar;
-	private String genesisAccountId;
-	private String[] genesisRecipientAccountIds;
+	private String nemesisAccountId;
+	private String[] nemesisRecipientAccountIds;
 
 	/**
 	 * Gets the network version.
@@ -32,21 +32,21 @@ public class NetworkInfo {
 	}
 
 	/**
-	 * Gets the network genesis account.
+	 * Gets the network nemesis account.
 	 *
-	 * @return The network genesis account.
+	 * @return The network nemesis account.
 	 */
-	public String getGenesisAccountId() {
-		return this.genesisAccountId;
+	public String getNemesisAccountId() {
+		return this.nemesisAccountId;
 	}
 
 	/**
-	 * Gets the network genesis recipient account ids.
+	 * Gets the network nemesis recipient account ids.
 	 *
-	 * @return The network genesis recipient account ids.
+	 * @return The network nemesis recipient account ids.
 	 */
-	public String[] getGenesisRecipientAccountIds() {
-		return this.genesisRecipientAccountIds;
+	public String[] getNemesisRecipientAccountIds() {
+		return this.nemesisRecipientAccountIds;
 	}
 
 	/**
@@ -81,8 +81,8 @@ public class NetworkInfo {
 		info.version = 0x68;
 		info.addressStartChar = 'N';
 		// TODO: change to real addresses before changing to main-net
-		info.genesisAccountId = "Not-a-real-address-0";//"NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
-		info.genesisRecipientAccountIds = new String[] {
+		info.nemesisAccountId = "Not-a-real-address-0";//"NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW";
+		info.nemesisRecipientAccountIds = new String[] {
 				"Not-a-real-address-1", // "NBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI",
 				"Not-a-real-address-2", // "NCBWD3TSIMFRHV67PQUQPRL5SZ5CEE6MUL2ANOON",
 				"Not-a-real-address-3", // "NBI5SUNZOYBHM3D6Q7BOHP6K327EIJ6EETIIRTS2",
@@ -100,8 +100,8 @@ public class NetworkInfo {
 		final NetworkInfo info = new NetworkInfo();
 		info.version = (byte)0x98;
 		info.addressStartChar = 'T';
-		info.genesisAccountId = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
-		info.genesisRecipientAccountIds = new String[] {
+		info.nemesisAccountId = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
+		info.nemesisRecipientAccountIds = new String[] {
 				"TbloodZW6W4DUVL4NGAQXHZXFQJLNHPDXHULLHZW",
 				"TAthiesMY6QO6XKPCBZFEVVVFVL2UT3ESDHAVGL7",
 				"TDmakotEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT",

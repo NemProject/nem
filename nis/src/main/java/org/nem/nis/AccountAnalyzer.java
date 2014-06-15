@@ -174,7 +174,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	private static boolean shouldIncludeInImportanceCalculation(final Account account, final BlockHeight blockHeight) {
 		return null != account.getHeight()
 				&& account.getHeight().compareTo(blockHeight) <= 0
-				&& !account.getAddress().equals(GenesisBlock.ADDRESS);
+				&& !account.getAddress().equals(NemesisBlock.ADDRESS);
 	}
 
 	/**

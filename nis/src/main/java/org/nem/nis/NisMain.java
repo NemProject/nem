@@ -20,8 +20,8 @@ public class NisMain {
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
-	private static Block GENESIS_BLOCK = GenesisBlock.fromResource();
-	private static Hash GENESIS_BLOCK_HASH = HashUtils.calculateHash(GENESIS_BLOCK);
+	private static Block NEMESIS_BLOCK = NemesisBlock.fromResource();
+	private static Hash NEMESIS_BLOCK_HASH = HashUtils.calculateHash(NEMESIS_BLOCK);
 
 	@Autowired
 	private AccountDao accountDao;
@@ -45,18 +45,18 @@ public class NisMain {
 		Long curBlockId;
 		LOGGER.info("starting analysis...");
 
-		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(GENESIS_BLOCK_HASH);
+		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(NEMESIS_BLOCK_HASH);
 		LOGGER.info(String.format("hex: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
-			LOGGER.severe("couldn't find genesis block, you're probably using developer's build, drop the db and rerun");
+			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}
 
 		Block parentBlock = null;
-		final Account genesisAccount = this.accountAnalyzer.addAccountToCache(GenesisBlock.ADDRESS);
-		genesisAccount.incrementBalance(GenesisBlock.AMOUNT);
-		genesisAccount.getWeightedBalances().addFullyVested(GENESIS_BLOCK.getHeight(), GenesisBlock.AMOUNT);
-		genesisAccount.setHeight(BlockHeight.ONE);
+		final Account nemesisAccount = this.accountAnalyzer.addAccountToCache(NemesisBlock.ADDRESS);
+		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
+		nemesisAccount.getWeightedBalances().addFullyVested(NEMESIS_BLOCK.getHeight(), NemesisBlock.AMOUNT);
+		nemesisAccount.setHeight(BlockHeight.ONE);
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
@@ -73,10 +73,10 @@ public class NisMain {
 			block.execute();
 			block.unsubscribe(observer);
 
-			// fully vest all transactions coming out of the genesis block
+			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
 				for (final Account account : this.accountAnalyzer) {
-					if (account.equals(genesisAccount)) {
+					if (account.equals(nemesisAccount)) {
 						continue;
 					}
 
@@ -106,7 +106,7 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-		logGenesisInformation();
+		logNemesisInformation();
 
 		this.populateDb();
 
@@ -119,28 +119,28 @@ public class NisMain {
 		allFutures.join();
 	}
 
-	private static void logGenesisInformation() {
-		LOGGER.info("genesis block hash:" + GENESIS_BLOCK_HASH);
+	private static void logNemesisInformation() {
+		LOGGER.info("nemesis block hash:" + NEMESIS_BLOCK_HASH);
 
-		final KeyPair genesisKeyPair = GENESIS_BLOCK.getSigner().getKeyPair();
-		final Address genesisAddress = GENESIS_BLOCK.getSigner().getAddress();
-		LOGGER.info("genesis account private key          : " + genesisKeyPair.getPrivateKey());
-		LOGGER.info("genesis account            public key: " + genesisKeyPair.getPublicKey());
-		LOGGER.info("genesis account compressed public key: " + genesisAddress.getEncoded());
-		LOGGER.info("genesis account generetion hash      : " + GENESIS_BLOCK.getGenerationHash());
+		final KeyPair nemesisKeyPair = NEMESIS_BLOCK.getSigner().getKeyPair();
+		final Address nemesisAddress = NEMESIS_BLOCK.getSigner().getAddress();
+		LOGGER.info("nemesis account private key          : " + nemesisKeyPair.getPrivateKey());
+		LOGGER.info("nemesis account            public key: " + nemesisKeyPair.getPublicKey());
+		LOGGER.info("nemesis account compressed public key: " + nemesisAddress.getEncoded());
+		LOGGER.info("nemesis account generetion hash      : " + NEMESIS_BLOCK.getGenerationHash());
 	}
 
 	private void populateDb() {
 		if (0 != this.blockDao.count())
 			return;
 
-		this.saveBlock(GENESIS_BLOCK);
+		this.saveBlock(NEMESIS_BLOCK);
 	}
 
 	private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
 		org.nem.nis.dbmodel.Block dbBlock;
 
-		dbBlock = this.blockDao.findByHash(GENESIS_BLOCK_HASH);
+		dbBlock = this.blockDao.findByHash(NEMESIS_BLOCK_HASH);
 		if (null != dbBlock) {
 			return dbBlock;
 		}

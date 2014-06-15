@@ -123,18 +123,18 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void feeIsWaivedForGenesisAccount() {
+	public void feeIsWaivedForNemesisAccount() {
 		// Arrange:
-		final Account genesisAccount = new Account(GenesisBlock.ADDRESS);
+		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
 
 		// Assert:
-		Assert.assertThat(calculateFee(genesisAccount, 0, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 12000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 12001, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 13000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 12000, 1), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 12000, 199), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(calculateFee(genesisAccount, 13000, 200), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 0, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 12000, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 12001, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 13000, 0), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 12000, 1), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 12000, 199), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(calculateFee(nemesisAccount, 13000, 200), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test

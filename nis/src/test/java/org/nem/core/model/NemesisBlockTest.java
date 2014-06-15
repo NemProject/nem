@@ -9,18 +9,18 @@ import org.nem.core.time.TimeInstant;
 
 import java.io.*;
 
-public class GenesisBlockTest {
+public class NemesisBlockTest {
 
-	private final GenesisBlock GENESIS_BLOCK = GenesisBlock.fromResource();
-	private final static String GENESIS_ACCOUNT = NetworkInfo.getDefault().getGenesisAccountId();
+	private final NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource();
+	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
 
 	@Test
-	public void genesisBlockCanBeCreated() {
+	public void nemesisBlockCanBeCreated() {
 		// Act:
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
-		Assert.assertThat(block.getSigner().getAddress().getEncoded(), IsEqual.equalTo(GENESIS_ACCOUNT));
+		Assert.assertThat(block.getSigner().getAddress().getEncoded(), IsEqual.equalTo(NEMESIS_ACCOUNT));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
@@ -35,18 +35,18 @@ public class GenesisBlockTest {
 	}
 
 	@Test
-	public void genesisBlockIsVerifiable() {
+	public void nemesisBlockIsVerifiable() {
 		// Arrange:
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void genesisTransactionsAreVerifiable() {
+	public void nemesisTransactionsAreVerifiable() {
 		// Arrange:
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
 		for (final Transaction transaction : block.getTransactions())
@@ -54,9 +54,9 @@ public class GenesisBlockTest {
 	}
 
 	@Test
-	public void genesisTransactionsDoNotHaveFees() {
+	public void nemesisTransactionsDoNotHaveFees() {
 		// Arrange:
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
 		for (final Transaction transaction : block.getTransactions())
@@ -66,24 +66,24 @@ public class GenesisBlockTest {
 	//region constants
 
 	@Test
-	public void amountConstantIsConsistentWithGenesisBlock() {
+	public void amountConstantIsConsistentWithNemesisBlock() {
 		// Act:
 		Amount totalAmount = Amount.ZERO;
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 		for (final Transaction transaction : block.getTransactions())
 			totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
 
 		// Assert:
-		Assert.assertThat(totalAmount, IsEqual.equalTo(GenesisBlock.AMOUNT));
+		Assert.assertThat(totalAmount, IsEqual.equalTo(NemesisBlock.AMOUNT));
 	}
 
 	@Test
-	public void accountConstantIsConsistentWithGenesisBlock() {
+	public void accountConstantIsConsistentWithNemesisBlock() {
 		// Arrange:
-		final Block block = GENESIS_BLOCK;
+		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
-		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(GenesisBlock.ADDRESS));
+		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NemesisBlock.ADDRESS));
 	}
 
 	//endregion
@@ -91,32 +91,32 @@ public class GenesisBlockTest {
 	//region failed construction
 
 	@Test(expected = IllegalArgumentException.class)
-	public void genesisBlockCannotBeLoadedWithIncorrectType() {
+	public void nemesisBlockCannotBeLoadedWithIncorrectType() {
 		// Arrange:
-		final JSONObject genesisBlockJson = loadGenesisBlockJsonObject();
-		genesisBlockJson.put("type", 1);
+		final JSONObject nemesisBlockJson = loadNemesisBlockJsonObject();
+		nemesisBlockJson.put("type", 1);
 
 		// Act:
-		GenesisBlock.fromJsonObject(genesisBlockJson);
+		NemesisBlock.fromJsonObject(nemesisBlockJson);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void genesisBlockCannotBeLoadedFromInvalidJson() throws IOException {
+	public void nemesisBlockCannotBeLoadedFromInvalidJson() throws IOException {
 		// Arrange:
-		final JSONObject genesisBlockJson = loadGenesisBlockJsonObject();
-		final String badJson = "<bad>" + genesisBlockJson.toJSONString();
+		final JSONObject nemesisBlockJson = loadNemesisBlockJsonObject();
+		final String badJson = "<bad>" + nemesisBlockJson.toJSONString();
 		try (final ByteArrayInputStream inputStream = new ByteArrayInputStream(badJson.getBytes())) {
 			// Act:
-			GenesisBlock.fromStream(inputStream);
+			NemesisBlock.fromStream(inputStream);
 		}
 	}
 
-	private static JSONObject loadGenesisBlockJsonObject() {
-		try (final InputStream fin = GenesisBlock.class.getClassLoader().getResourceAsStream("genesis-block.json")) {
+	private static JSONObject loadNemesisBlockJsonObject() {
+		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.json")) {
 			return (JSONObject)JSONValue.parseStrict(fin);
 		}
 		catch (IOException|net.minidev.json.parser.ParseException e) {
-			Assert.fail("unexpected exception was thrown when parsing genesis block resource");
+			Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
 			return null;
 		}
 	}

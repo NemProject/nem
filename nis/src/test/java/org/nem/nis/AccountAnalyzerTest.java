@@ -483,7 +483,7 @@ public class AccountAnalyzerTest {
 	}
 
 	@Test
-	public void recalculateImportancesIgnoresGenesisAccount() {
+	public void recalculateImportancesIgnoresNemesisAccount() {
 		// Arrange:
 		final int height = 70;
 		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
@@ -495,12 +495,12 @@ public class AccountAnalyzerTest {
 
 		final AccountAnalyzer analyzer = new AccountAnalyzer(importanceGenerator);
 		final List<Account> accounts = createAccountsForRecalculateTests(finalImportanceVector.size(), analyzer);
-		accounts.add(analyzer.addAccountToCache(GenesisBlock.ADDRESS));
+		accounts.add(analyzer.addAccountToCache(NemesisBlock.ADDRESS));
 
 		// Act:
 		analyzer.recalculateImportances(new BlockHeight(height));
 
-		// Assert: the generator was called once and passed a collection with three accounts (but not the genesis account)
+		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		Mockito.verify(importanceGenerator, Mockito.times(1)).getAccountImportances(Mockito.any(), Mockito.any());
 		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(new Long[]{ 10L, 20L, 30L }));
 

@@ -225,6 +225,6 @@ public class TransferControllerTest {
 	}
 
 	private static String getRecipientAccountId() {
-		return NetworkInfo.getDefault().getGenesisRecipientAccountIds()[2];
+		return NetworkInfo.getDefault().getNemesisRecipientAccountIds()[2];
 	}
 }

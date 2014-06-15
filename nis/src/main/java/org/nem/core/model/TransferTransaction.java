@@ -94,7 +94,7 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		if (GenesisBlock.ADDRESS.equals(this.getSigner().getAddress()))
+		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress()))
 			return Amount.ZERO;
 
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
