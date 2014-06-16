@@ -6,7 +6,7 @@ import org.nem.peer.node.*;
 /**
  * A deserializer for local node data.
  */
-public class 	LocalNodeDeserializer implements ObjectDeserializer<Node> {
+public class LocalNodeDeserializer implements ObjectDeserializer<Node> {
 
 	@Override
 	public Node deserialize(final Deserializer deserializer) {
