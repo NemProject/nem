@@ -39,6 +39,8 @@ public class Account implements SerializableEntity {
 
 	private BlockHeight height;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
+	
+	private AccountStatus status = AccountStatus.LOCKED;
 
 	/**
 	 * Creates an account around a key pair.
@@ -171,6 +173,8 @@ public class Account implements SerializableEntity {
 		if (importance.isSet())
 			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
 
+		this.status = AccountStatus.readFrom(deserializer, "status");
+		
 		if (DeserializationOptions.ALL == options)
 			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
@@ -195,6 +199,8 @@ public class Account implements SerializableEntity {
 		serializer.writeString("label", this.getLabel());
 
 		serializer.writeObject("importance", this.getImportanceInfo());
+
+		AccountStatus.writeTo(serializer, "status", this.getStatus());
 
 		if (!isSummary)
 			serializer.writeObjectArray("messages", this.getMessages());
@@ -382,6 +388,24 @@ public class Account implements SerializableEntity {
 	 */
 	public WeightedBalances getWeightedBalances() {
 		return this.weightedBalances;
+	}
+
+	/**
+	 * Returns status of an account.
+	 *
+	 * @return The status of the account.
+	 */
+	public AccountStatus getStatus() {
+		return this.status;
+	}
+
+	/**
+	 * Sets the status of an account.
+	 *
+	 * @param status The new status.
+	 */
+	public void setStatus(final AccountStatus status) {
+		this.status = status;
 	}
 
 	/**

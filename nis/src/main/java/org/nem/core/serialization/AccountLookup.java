@@ -16,4 +16,14 @@ public interface AccountLookup {
 	 * @return The account with the specified id.
 	 */
 	public Account findByAddress(final Address id);
+
+	/**
+	 * Checks if an account is known.
+	 *
+	 * @param id The account id.
+	 *
+	 * @return True if the account is known, false if unknown.
+	 */
+	public boolean isKnownAddress(final Address id);
+
 }

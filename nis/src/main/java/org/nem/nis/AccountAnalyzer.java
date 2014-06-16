@@ -139,6 +139,18 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	}
 
 	/**
+	 * Checks if an account is known.
+	 *
+	 * @param id The account id.
+	 *
+	 * @return True if the account is known, false if unknown.
+	 */	
+	@Override
+	public boolean isKnownAddress(final Address address) {
+		return this.addressToAccountMap.get(address) != null;
+	}
+	
+	/**
 	 * Creates a copy of this analyzer.
 	 *
 	 * @return A copy of this analyzer.
@@ -207,6 +219,11 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		@Override
 		public Account findByAddress(final Address id) {
 			return this.accountAnalyzer.addAccountToCache(id);
+		}
+
+		@Override
+		public boolean isKnownAddress(final Address address) {
+			return this.accountAnalyzer.isKnownAddress(address);
 		}
 	}
 }
