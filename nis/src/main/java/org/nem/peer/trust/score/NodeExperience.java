@@ -6,13 +6,6 @@ import org.nem.core.serialization.*;
  * Represents experience one node has with another node.
  */
 public class NodeExperience implements SerializableEntity {
-	public static final ObjectDeserializer<NodeExperience> DESERIALIZER = new ObjectDeserializer<NodeExperience>() {
-		@Override
-		public NodeExperience deserialize(Deserializer deserializer) {
-			return new NodeExperience(deserializer);
-		}
-	};
-
 	private final PositiveLong successfulCalls = new PositiveLong(0);
 	private final PositiveLong failedCalls = new PositiveLong(0);
 

@@ -9,13 +9,6 @@ import org.nem.core.utils.*;
  * Represents a node identity that uniquely identifies a node.
  */
 public class NodeIdentity implements SerializableEntity {
-	public static final ObjectDeserializer<NodeIdentity> DESERIALIZER = new ObjectDeserializer<NodeIdentity>() {
-		@Override
-		public NodeIdentity deserialize(Deserializer deserializer) {
-			return new NodeIdentity(deserializer);
-		}
-	};
-
 	private static final byte[] CHALLENGE_PREFIX = StringEncoder.getBytes("nem trust challenge:");
 	private final KeyPair keyPair;
 	private final Address address;

@@ -10,14 +10,6 @@ import java.util.logging.Logger;
  * The endpoint of a node in the NEM network.
  */
 public class NodeEndpoint implements SerializableEntity {
-	private static final Logger LOGGER = Logger.getLogger(NodeEndpoint.class.getName());
-	public static final ObjectDeserializer<NodeEndpoint> DESERIALIZER = new ObjectDeserializer<NodeEndpoint>() {
-		@Override
-		public NodeEndpoint deserialize(Deserializer deserializer) {
-			return new NodeEndpoint(deserializer);
-		}
-	};
-
 	private final String protocol;
 	private final String host;
 	private final int port;

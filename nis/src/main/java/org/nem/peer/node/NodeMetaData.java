@@ -8,13 +8,6 @@ import java.util.Arrays;
  * Meta data about a node.
  */
 public class NodeMetaData implements SerializableEntity {
-	public static final ObjectDeserializer<NodeMetaData> DESERIALIZER = new ObjectDeserializer<NodeMetaData>() {
-		@Override
-		public NodeMetaData deserialize(Deserializer deserializer) {
-			return new NodeMetaData(deserializer);
-		}
-	};
-
 	private final String platform;
 	private final String application;
 	private final String version;

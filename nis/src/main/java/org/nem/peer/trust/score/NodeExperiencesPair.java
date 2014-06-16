@@ -31,7 +31,7 @@ public class NodeExperiencesPair implements SerializableEntity {
 	 */
 	public NodeExperiencesPair(final Deserializer deserializer) {
 		this.node = deserializer.readObject("node", obj -> new Node(obj));
-		this.experiences = deserializer.readObjectArray("experiences", NodeExperiencePair.DESERIALIZER);
+		this.experiences = deserializer.readObjectArray("experiences", obj -> new NodeExperiencePair(obj));
 	}
 
 	/**

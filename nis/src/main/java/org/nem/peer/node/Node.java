@@ -7,7 +7,6 @@ import org.nem.core.serialization.*;
  * Each Node is uniquely identified by its endpoint.
  */
 public class Node implements SerializableEntity {
-
 	private final NodeIdentity identity;
 	private NodeEndpoint endpoint;
 	private NodeMetaData metaData;
@@ -45,9 +44,9 @@ public class Node implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public Node(final Deserializer deserializer) {
-		this.identity = deserializer.readObject("identity", NodeIdentity.DESERIALIZER);
-		this.setEndpoint(deserializer.readObject("endpoint", NodeEndpoint.DESERIALIZER));
-		this.setMetaData(getMetaData(deserializer.readObject("metaData", NodeMetaData.DESERIALIZER)));
+		this.identity = deserializer.readObject("identity", obj -> new NodeIdentity(obj));
+		this.setEndpoint(deserializer.readObject("endpoint", obj -> new NodeEndpoint(obj)));
+		this.setMetaData(getMetaData(deserializer.readObject("metaData", obj -> new NodeMetaData(obj))));
 		this.ensureValidity();
 	}
 
