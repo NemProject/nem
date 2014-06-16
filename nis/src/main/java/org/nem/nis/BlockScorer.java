@@ -93,7 +93,7 @@ public class BlockScorer {
 		final long grouped = (backInTime / BlockChainConstants.POI_GROUPING) * BlockChainConstants.POI_GROUPING;
 		final BlockHeight blockHeight = new BlockHeight(grouped + 1);
 		this.accountAnalyzer.recalculateImportances(blockHeight);
-		final long multiplier = 1_000_000_000L * 10; // TODO: remove 10 before open alpha
+		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 	}
 
