@@ -25,20 +25,31 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void foragingRequiresMinimumBalanceAndMinimumVestedBalance() {
-		// Assert: balance must be at least one nem
+	public void cannotForageWhenEitherBalanceOrVestedBalanceIsLessThanMinimumBalance() {
+		// Arrange:
+		final Amount minBalance = Amount.fromNem(1000);
+		final Amount minBalanceMinusOne = Amount.fromMicroNem(999999999);
+
+		// Assert:
+		Assert.assertThat(canForage(Amount.ZERO, minBalance), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(minBalanceMinusOne, minBalance), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(minBalance, Amount.ZERO), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(minBalance, minBalanceMinusOne), IsEqual.equalTo(false));
 		Assert.assertThat(canForage(Amount.ZERO, Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(Amount.ZERO, Amount.fromNem(1)), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(Amount.fromMicroNem(999999), Amount.fromNem(1)), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(minBalanceMinusOne, minBalanceMinusOne), IsEqual.equalTo(false));
+	}
 
-		// Assert: vested balance must be at least one nem
-		Assert.assertThat(canForage(Amount.fromNem(1), Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(Amount.fromNem(1), Amount.fromMicroNem(999999)), IsEqual.equalTo(false));
+	@Test
+	public void canForageWhenBothBalanceAndVestedBalanceAreAtLeastMinimumBalance() {
+		// Arrange:
+		final Amount minBalance = Amount.fromNem(1000);
+		final Amount twiceMinBalance = Amount.fromNem(2000);
 
-		// Assert: balance and vested balance must be at least one nem
-		Assert.assertThat(canForage(Amount.fromNem(1), Amount.fromNem(1)), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(Amount.fromNem(1), Amount.fromNem(2)), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(Amount.fromNem(2), Amount.fromNem(1)), IsEqual.equalTo(true));
+		// Assert:
+		Assert.assertThat(canForage(minBalance, minBalance), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(minBalance, twiceMinBalance), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(twiceMinBalance, minBalance), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(twiceMinBalance, twiceMinBalance), IsEqual.equalTo(true));
 	}
 
 	private static boolean canForage(final Amount balance, final Amount vestedBalance) {

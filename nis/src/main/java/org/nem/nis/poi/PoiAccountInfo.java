@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class PoiAccountInfo {
 
-	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1);
+	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1000);
 	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR/(double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
@@ -36,7 +36,6 @@ public class PoiAccountInfo {
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
 
 		// weight = out-link amount * DECAY_BASE^(age in days)
-		int i = 0;
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
@@ -45,7 +44,6 @@ public class PoiAccountInfo {
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
 			this.increment(outlink.getOtherAccountAddress(), weight);
-			++i;
 		}
 	}
 
