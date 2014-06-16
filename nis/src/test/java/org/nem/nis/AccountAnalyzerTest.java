@@ -231,6 +231,39 @@ public class AccountAnalyzerTest {
 
 	//endregion
 
+	//region isKnownAddress
+
+	@Test
+	public void isKnownAddressReturnsTrueIfAddressIsKnown() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
+		
+		// Act:
+		analyzer.addAccountToCache(address);
+
+		// Assert:
+		Assert.assertThat(analyzer.isKnownAddress(address), IsEqual.equalTo(true));
+		
+	}
+
+	@Test
+	public void isKnownAddressReturnsfalseIfAddressIsUnknown() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final Address address = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		
+		// Act:
+		analyzer.addAccountToCache(address);
+
+		// Assert:
+		Assert.assertThat(analyzer.isKnownAddress(address2), IsEqual.equalTo(false));
+		
+	}
+
+	//endregion
+
 	//region asAutoCache
 
 	@Test

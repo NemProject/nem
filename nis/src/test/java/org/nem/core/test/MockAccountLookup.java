@@ -70,6 +70,11 @@ public class MockAccountLookup implements AccountLookup {
 		}
 	}
 
+	@Override
+	public boolean isKnownAddress(Address id) {
+		return this.accountMap.get(id) != null;
+	}
+
 	/**
 	 * Returns the number of times findByAddress was called.
 	 *

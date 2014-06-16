@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 
 public class ForagingTest {
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 
 	static void setFinalStatic(Field field, Object newValue) throws Exception {
 		field.setAccessible(true);
@@ -40,6 +41,55 @@ public class ForagingTest {
 		setFinalStatic(NisMain.class.getField("TIME_PROVIDER"), new SystemTimeProvider());
 	}
 
+	// region add/remove unlocked account
+	
+	@Test
+	public void canAddUnlockedAccount() {
+		// Arrange:
+		final Foraging foraging = createMockForaging();
+		
+		// Assert:
+		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		
+		// Act:
+		foraging.addUnlockedAccount(RECIPIENT1);
+		
+		// Assert:
+		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));		
+	}
+	
+	@Test
+	public void canotAddUnknownAccount() {
+		// Arrange:
+		final Foraging foraging = createMockForaging();
+		
+		// Act:
+		foraging.addUnlockedAccount(RECIPIENT2);
+		
+		// Assert:
+		Assert.assertThat(RECIPIENT2.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));		
+	}
+	
+	@Test
+	public void canRemoveUnlockedAccount() {
+		// Arrange:
+		final Foraging foraging = createMockForaging();
+		
+		// Act:
+		foraging.addUnlockedAccount(RECIPIENT1);
+		
+		// Assert:
+		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));		
+
+		// Act:
+		foraging.removeUnlockedAccount(RECIPIENT1);
+		
+		// Assert:
+		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));		
+	}
+	
+	// endregion
+	
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
 		// Arrange:
@@ -278,6 +328,12 @@ public class ForagingTest {
 
 	private Foraging createMockForaging() {
 		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		return new MockForaging(null, lastBlockLayer);
+		final AccountAnalyzer accountAnalyzer = createAccountAnalyzer();
+		accountAnalyzer.addAccountToCache(RECIPIENT1.getAddress());
+		return new MockForaging(accountAnalyzer, lastBlockLayer);
+	}
+
+	private static AccountAnalyzer createAccountAnalyzer() {
+		return new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 	}
 }

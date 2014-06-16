@@ -59,7 +59,10 @@ public class Foraging  {
 	 * @param account The account.
 	 */
 	public void addUnlockedAccount(final Account account) {
-		unlockedAccounts.add(account);
+		if (accountLookup.isKnownAddress(account.getAddress())) {
+			unlockedAccounts.add(account);
+			account.setStatus(AccountStatus.UNLOCKED);
+		}
 	}
 
 
@@ -69,7 +72,10 @@ public class Foraging  {
 	 * @param account The account.
 	 */
 	public void removeUnlockedAccount(final Account account) {
-		unlockedAccounts.remove(account);
+		if (accountLookup.isKnownAddress(account.getAddress())) {
+			unlockedAccounts.remove(account);
+			account.setStatus(AccountStatus.LOCKED);
+		}
 	}
 
 	/**
