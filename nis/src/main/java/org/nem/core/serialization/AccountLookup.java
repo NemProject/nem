@@ -22,7 +22,7 @@ public interface AccountLookup {
 	 *
 	 * @param id The account id.
 	 *
-	 * @return True if the account is known, false if unknown.
+	 * @return true if the account is known, false if unknown.
 	 */
 	public boolean isKnownAddress(final Address id);
 

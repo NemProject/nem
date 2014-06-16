@@ -269,19 +269,18 @@ public class AccountTest {
 		final Account account = Utils.generateRandomAccount();
 
 		// Act:
-		account.setStatus(AccountStatus.LOCKED);
+		account.setStatus(AccountStatus.UNLOCKED);
 
 		// Assert:
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 	}
 
 	@Test
-	public void accountStatusCanBeRead() {
+	public void accountStatusIsInitiallyLocked() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 
 		// Act:
-		account.setStatus(AccountStatus.LOCKED);
 		AccountStatus status = account.getStatus();
 
 		// Assert:
@@ -634,7 +633,7 @@ public class AccountTest {
 			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
 		}
 
-		// 6-7 "real" properties and 1 "hidden" (ordering) property
+		// 7-8 "real" properties and 1 "hidden" (ordering) property
 		final int expectedProperties = 7 + (isSummary ? 0 : 1) + 1 ;
 		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
@@ -863,8 +862,8 @@ public class AccountTest {
 		copyAccount.setStatus(AccountStatus.LOCKED);
 
 		// Assert:
-		Assert.assertThat(copyAccount.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(copyAccount.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	@Test

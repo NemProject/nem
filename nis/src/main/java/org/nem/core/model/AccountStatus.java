@@ -18,7 +18,7 @@ public enum AccountStatus{
 	
 	private final String status;
 
-	private AccountStatus(String status) {  
+	private AccountStatus(final String status) {
 		this.status = status;  
 	}
 
@@ -31,10 +31,6 @@ public enum AccountStatus{
 			}  
 		}
 		throw new IllegalArgumentException("Invalid account status: " + status);
-	}
-
-	public String toString() {  
-		return status;  
 	}
 
 	//region inline serialization

@@ -138,16 +138,9 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 				: new Account(Address.fromEncoded(encodedAddress));
 	}
 
-	/**
-	 * Checks if an account is known.
-	 *
-	 * @param id The account id.
-	 *
-	 * @return True if the account is known, false if unknown.
-	 */	
 	@Override
 	public boolean isKnownAddress(final Address address) {
-		return this.addressToAccountMap.get(address) != null;
+		return this.addressToAccountMap.containsKey(address);
 	}
 	
 	/**

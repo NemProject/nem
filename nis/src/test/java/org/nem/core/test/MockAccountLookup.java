@@ -72,7 +72,7 @@ public class MockAccountLookup implements AccountLookup {
 
 	@Override
 	public boolean isKnownAddress(Address id) {
-		return this.accountMap.get(id) != null;
+		return this.accountMap.containsKey(id);
 	}
 
 	/**
@@ -91,5 +91,19 @@ public class MockAccountLookup implements AccountLookup {
 	 */
 	public void setMockAccount(final Account account) {
 		this.accountMap.put(account.getAddress(), account);
+	}
+
+	/**
+	 * Creates a new MockAccountLookup around the specified accounts.
+	 *
+	 * @param accounts The accounts.
+	 * @return The account lookup.
+	 */
+	public static MockAccountLookup createWithAccounts(final Account... accounts) {
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		for (final Account account : accounts)
+			accountLookup.setMockAccount(account);
+
+		return accountLookup;
 	}
 }

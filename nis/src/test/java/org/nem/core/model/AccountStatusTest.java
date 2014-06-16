@@ -12,6 +12,7 @@ import org.nem.core.test.Utils;
 public class AccountStatusTest {
 
 	//region construction
+
 	@Test
 	public void accountStatusCanBeCreatedFromCorrectStatusString() {
 		// Arrange:
@@ -52,16 +53,16 @@ public class AccountStatusTest {
 	public void canRoundtripAccountStatus() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final AccountStatus originalStatust = AccountStatus.fromString("UNLOCKED");
+		final AccountStatus originalStatus = AccountStatus.fromString("UNLOCKED");
 
 		// Act:
-		AccountStatus.writeTo(serializer, "status", originalStatust);
+		AccountStatus.writeTo(serializer, "status", originalStatus);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
 		final AccountStatus status = AccountStatus.readFrom(deserializer, "status");
 
 		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(originalStatust));
+		Assert.assertThat(status, IsEqual.equalTo(originalStatus));
 	}
 
 	//endregion

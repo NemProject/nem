@@ -44,7 +44,7 @@ public class ForagingTest {
 	// region add/remove unlocked account
 	
 	@Test
-	public void canAddUnlockedAccount() {
+	public void canUnlockKnownAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
 		
@@ -59,7 +59,7 @@ public class ForagingTest {
 	}
 	
 	@Test
-	public void canotAddUnknownAccount() {
+	public void cannotUnlockUnknownAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
 		
@@ -71,7 +71,7 @@ public class ForagingTest {
 	}
 	
 	@Test
-	public void canRemoveUnlockedAccount() {
+	public void canLockKnownAccountAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
 		

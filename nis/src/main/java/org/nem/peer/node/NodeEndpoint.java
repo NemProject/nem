@@ -4,7 +4,6 @@ import org.nem.core.serialization.*;
 
 import java.net.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * The endpoint of a node in the NEM network.

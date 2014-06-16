@@ -248,7 +248,7 @@ public class AccountAnalyzerTest {
 	}
 
 	@Test
-	public void isKnownAddressReturnsfalseIfAddressIsUnknown() {
+	public void isKnownAddressReturnsFalseIfAddressIsUnknown() {
 		// Arrange:
 		final AccountAnalyzer analyzer = createAccountAnalyzer();
 		final Address address = Utils.generateRandomAddress();

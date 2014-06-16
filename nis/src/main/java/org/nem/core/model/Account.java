@@ -39,7 +39,7 @@ public class Account implements SerializableEntity {
 
 	private BlockHeight height;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
-	
+
 	private AccountStatus status = AccountStatus.LOCKED;
 
 	/**
@@ -176,7 +176,7 @@ public class Account implements SerializableEntity {
 		final AccountImportance importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 		if (importance.isSet())
 			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
-		
+
 		if (DeserializationOptions.ALL == options)
 			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
 	}
