@@ -22,7 +22,7 @@ public class PoiContextTest {
 		// (2) vested balances are not normalized
 		Assert.assertThat(
 				context.getVestedBalanceVector(),
-				IsEqual.equalTo(new ColumnVector(3000001, 2999999, 5, 1000000, 999999, 4000000)));
+				IsEqual.equalTo(new ColumnVector(2999999999L, 5000000000L, 1000000000L, 1000000000L)));
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(1e06, 0, 3e06, 0, 10e06, 7e06)));
+				IsEqual.equalTo(new ColumnVector(0, 3e06, 0, 10e06)));
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class PoiContextTest {
 		// (3) net outflows are used instead of total outflows
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(10e06, 6e06, 0, 8e06)));
+				IsEqual.equalTo(new ColumnVector(12e06, 6e06, 0, 8e06)));
 	}
 
 	@Test
@@ -75,7 +75,7 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) a uniform vector of 0.850
-		final ColumnVector expectedVector = new ColumnVector(6);
+		final ColumnVector expectedVector = new ColumnVector(4);
 		expectedVector.setAll(0.850);
 		Assert.assertThat(context.getTeleportationVector(), IsEqual.equalTo(expectedVector));
 	}
@@ -86,9 +86,9 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext();
 
 		// Assert:
-		// (1) a uniform vector of 0.0250
-		final ColumnVector expectedVector = new ColumnVector(6);
-		expectedVector.setAll(0.0250);
+		// (1) a uniform vector summing to 0.15
+		final ColumnVector expectedVector = new ColumnVector(4);
+		expectedVector.setAll(0.15 / 4);
 		Assert.assertThat(context.getInverseTeleportationVector().roundTo(5), IsEqual.equalTo(expectedVector));
 	}
 
@@ -101,7 +101,7 @@ public class PoiContextTest {
 		// (1) accounts without out-links are dangling
 		Assert.assertThat(
 				context.getDangleIndexes(),
-				IsEquivalent.equivalentTo(new Integer[] { 1, 3 }));
+				IsEquivalent.equivalentTo(new Integer[] { 0, 2 }));
 	}
 
 	@Test
@@ -113,7 +113,7 @@ public class PoiContextTest {
 		// (1) dangle vector is the 1-vector
 		Assert.assertThat(
 				context.getDangleVector(),
-				IsEqual.equalTo(new ColumnVector(1, 1, 1, 1, 1, 1)));
+				IsEqual.equalTo(new ColumnVector(1, 1, 1, 1)));
 	}
 
 	@Test
@@ -169,28 +169,29 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createTestPoiContext() {
-		final int umInNem = Amount.MICRONEMS_IN_NEM;
+		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * umInNem + 1,	umInNem - 1,		new int[] { 1 }), // 1
-				new TestAccountInfo(3 * umInNem - 1,	4 * umInNem,		null),
-				new TestAccountInfo(5, 					umInNem,			new int[] { 1, 2 }), // 3
-				new TestAccountInfo(umInNem,			3 * umInNem - 1,	null),
-				new TestAccountInfo(umInNem - 1,		3 * umInNem + 1,	new int[] { 1, 1, 4, 3, 1 }), // 10
-				new TestAccountInfo(4 * umInNem,		5,					new int[] { 7 })); // 7
+				new TestAccountInfo(3 * multiplier - 1,	4 * multiplier,		null),
+				new TestAccountInfo(3 * multiplier + 1,	multiplier - 1,		new int[] { 1 }), // 1 (insufficient balance)
+				new TestAccountInfo(5 * multiplier, 	multiplier,			new int[] { 1, 2 }), // 3
+				new TestAccountInfo(multiplier,			3 * multiplier - 1,	null),
+				new TestAccountInfo(multiplier,			3 * multiplier + 1,	new int[] { 1, 1, 4, 3, 1 }), // 10
+				new TestAccountInfo(multiplier - 1,		5 * multiplier,		new int[] { 7 })); // 7 (insufficient vested balance)
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
-		return new PoiContext(accounts, accounts.size(), height);
+		return new PoiContext(accounts, height);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
 		// Arrange: create 4 accounts
-		final int umInNem = Amount.MICRONEMS_IN_NEM;
+		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(umInNem, umInNem, null),
-				new TestAccountInfo(umInNem, umInNem, null),
-				new TestAccountInfo(umInNem, umInNem, null),
-				new TestAccountInfo(umInNem, umInNem, null));
+				new TestAccountInfo(multiplier, multiplier, null),
+				new TestAccountInfo(multiplier, multiplier, null),
+				new TestAccountInfo(multiplier, multiplier, null),
+				new TestAccountInfo(multiplier, multiplier, null),
+				new TestAccountInfo(multiplier - 1, multiplier - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
@@ -202,18 +203,20 @@ public class PoiContextTest {
 		addAccountLink(height, accounts.get(1), accounts.get(2), 6);
 		addAccountLink(height, accounts.get(3), accounts.get(0), 3);
 		addAccountLink(height, accounts.get(3), accounts.get(2), 5);
+		addAccountLink(height, accounts.get(4), accounts.get(2), 5); // from non-foraging account (ignored)
+		addAccountLink(height, accounts.get(0), accounts.get(4), 2); // to non-foraging account (included in scores)
 
 		// Act:
-		return new PoiContext(accounts, accounts.size(), height);
+		return new PoiContext(accounts, height);
 	}
 
 	private static class TestAccountInfo {
 
-		public final int vestedBalance;
-		public final int balance;
+		public final long vestedBalance;
+		public final long balance;
 		public final int[] amounts;
 
-		public TestAccountInfo(int vestedBalance, int balance, int[] amounts) {
+		public TestAccountInfo(long vestedBalance, long balance, int[] amounts) {
 			this.vestedBalance = vestedBalance;
 			this.balance = balance;
 			this.amounts = null == amounts ? new int[] { } : amounts;

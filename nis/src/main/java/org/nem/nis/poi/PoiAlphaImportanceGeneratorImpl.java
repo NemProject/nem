@@ -38,7 +38,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 			final PoiScorer.ScoringAlg scoringAlg) {
 
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accounts, accounts.size(), blockHeight);
+		final PoiContext context = new PoiContext(accounts, blockHeight);
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm

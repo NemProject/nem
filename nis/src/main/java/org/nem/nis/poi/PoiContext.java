@@ -28,13 +28,13 @@ public class PoiContext {
 	 * Creates a new context.
 	 *
 	 * @param accounts The accounts.
-	 * @param numAccounts The number of accounts.
 	 * @param height The current block height.
 	 */
-	public PoiContext(final Iterable<Account> accounts, final int numAccounts, final BlockHeight height) {
+	public PoiContext(final Iterable<Account> accounts, final BlockHeight height) {
 		// (1) build the account vectors and matrices
-		final AccountProcessor ap = new AccountProcessor(numAccounts);
-		ap.process(accounts, height);
+		final AccountProcessor ap = new AccountProcessor(accounts, height);
+		ap.process();
+
 		this.dangleIndexes = ap.dangleIndexes;
 		this.dangleVector = ap.dangleVector;
 		this.vestedBalanceVector = ap.vestedBalanceVector;
@@ -126,6 +126,7 @@ public class PoiContext {
 
 	private static class AccountProcessor {
 
+		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
 		private final ColumnVector vestedBalanceVector;
@@ -137,36 +138,39 @@ public class PoiContext {
 		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
-		public AccountProcessor(final int numAccounts) {
+		public AccountProcessor(final Iterable<Account> accounts, final BlockHeight height) {
+			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
 
-			this.dangleVector = new ColumnVector(numAccounts);
-			this.dangleVector.setAll(1);
-
-			this.vestedBalanceVector = new ColumnVector(numAccounts);
-			this.importanceVector = new ColumnVector(numAccounts);
-			this.outlinkScoreVector = new ColumnVector(numAccounts);
-		}
-
-		public void process(final Iterable<Account> accounts, final BlockHeight height) {
-			// (1) go through all accounts and initialize all vectors
 			int i = 0;
-			int numOutlinks = 0;
 			for (final Account account : accounts) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
-				numOutlinks += account.getImportanceInfo().getOutlinksSize(height);
-				// TODO: to simplify the calculation, should we exclude accounts that can't forage?
-				// TODO: (this should shrink the matrix size)
-				// TODO: I would recommend playing around with this after we get POI working initially
-				//	 if (!accountInfo.canForage())
-				//	 continue;
+				if (!accountInfo.canForage())
+					continue;
 
 				this.addressToAccountInfoMap.put(account.getAddress(), accountInfo);
 				this.addressToIndexMap.put(account.getAddress(), i);
 
 				this.accountInfos.add(accountInfo);
-				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(height).getNumMicroNem());
+				++i;
+			}
 
+			this.dangleVector = new ColumnVector(i);
+			this.dangleVector.setAll(1);
+
+			this.vestedBalanceVector = new ColumnVector(i);
+			this.importanceVector = new ColumnVector(i);
+			this.outlinkScoreVector = new ColumnVector(i);
+		}
+
+		public void process() {
+			// (1) go through all accounts and set the vested balances
+			int i = 0;
+			int numOutlinks = 0;
+			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+				final Account account = accountInfo.getAccount();
+				numOutlinks += account.getImportanceInfo().getOutlinksSize(this.height);
+				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(this.height).getNumMicroNem());
 				++i;
 			}
 
@@ -188,10 +192,6 @@ public class PoiContext {
 		}
 
 		private void createOutlinkMatrix() {
-			// TODO: this is O(2n) right now, if it is a bottleneck we can store inlinks with accounts (sacrificing memory)
-
-			// TODO: need to add tests to ensure that the context is using net outlinks (did makoto add those already?)
-
 			// (1) add reverse links to allow net calculation
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 				for (final WeightedLink link : accountInfo.getOutlinks()) {
