@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Possible account statuses.
  */
-public enum AccountStatus  implements SerializableEntity {
+public enum AccountStatus{
 	/**
 	 * The account is locked.
 	 */
@@ -35,11 +35,6 @@ public enum AccountStatus  implements SerializableEntity {
 
 	public String toString() {  
 		return status;  
-	}
-
-	@Override
-	public void serialize(Serializer serializer) {
-		serializer.writeString("status", this.status);
 	}
 
 	//region inline serialization

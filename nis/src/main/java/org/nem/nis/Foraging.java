@@ -61,7 +61,7 @@ public class Foraging  {
 	public void addUnlockedAccount(final Account account) {
 		if (accountLookup.isKnownAddress(account.getAddress())) {
 			unlockedAccounts.add(account);
-			accountLookup.findByAddress(account.getAddress()).setStatus(AccountStatus.UNLOCKED);
+			account.setStatus(AccountStatus.UNLOCKED);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class Foraging  {
 	public void removeUnlockedAccount(final Account account) {
 		if (accountLookup.isKnownAddress(account.getAddress())) {
 			unlockedAccounts.remove(account);
-			accountLookup.findByAddress(account.getAddress()).setStatus(AccountStatus.LOCKED);
+			account.setStatus(AccountStatus.LOCKED);
 		}
 	}
 

@@ -109,6 +109,7 @@ public class Account implements SerializableEntity {
 		this.messages.addAll(rhs.getMessages());
 		this.weightedBalances = rhs.weightedBalances.copy();
 		this.importance = rhs.importance.copy();
+		this.status = rhs.getStatus();
 
 		this.height = rhs.getHeight();
 		this.refCount = rhs.getReferenceCount();
@@ -125,6 +126,8 @@ public class Account implements SerializableEntity {
 		this.weightedBalances = rhs.weightedBalances;
 		this.importance = rhs.importance;
 		this.height = rhs.getHeight();
+		this.refCount = rhs.getReferenceCount();
+		this.status = rhs.getStatus();
 	}
 
 	/**
@@ -168,12 +171,11 @@ public class Account implements SerializableEntity {
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
+		this.status = AccountStatus.readFrom(deserializer, "status");
 
 		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
 		if (importance.isSet())
 			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
-
-		this.status = AccountStatus.readFrom(deserializer, "status");
 		
 		if (DeserializationOptions.ALL == options)
 			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
@@ -197,10 +199,9 @@ public class Account implements SerializableEntity {
 		Amount.writeTo(serializer, "balance", this.getBalance());
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
+		AccountStatus.writeTo(serializer, "status", this.getStatus());
 
 		serializer.writeObject("importance", this.getImportanceInfo());
-
-		AccountStatus.writeTo(serializer, "status", this.getStatus());
 
 		if (!isSummary)
 			serializer.writeObjectArray("messages", this.getMessages());
