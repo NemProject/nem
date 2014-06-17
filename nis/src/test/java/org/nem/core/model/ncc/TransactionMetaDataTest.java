@@ -19,7 +19,7 @@ public class TransactionMetaDataTest {
 	@Test
 	public void canRoundTripTransactionMetaData() {
 		// Arrange:
-		final TransactionMetaData metaData = createRoundMetaDataPair(7546);
+		final TransactionMetaData metaData = createRoundTrippedTransactionMetaData(7546);
 
 		// Assert:
 		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
@@ -29,7 +29,7 @@ public class TransactionMetaDataTest {
 		return new TransactionMetaData(new BlockHeight(height));
 	}
 
-	private static TransactionMetaData createRoundMetaDataPair(long height) {
+	private static TransactionMetaData createRoundTrippedTransactionMetaData(long height) {
 		// Arrange:
 		final TransactionMetaData metaData = createTransactionMetaData(height);
 

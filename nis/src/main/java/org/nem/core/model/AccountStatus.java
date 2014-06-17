@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Possible account statuses.
  */
-public enum AccountStatus{
+public enum AccountStatus {
 	/**
 	 * The account is locked.
 	 */
