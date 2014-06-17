@@ -66,7 +66,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		private final PoiScorer scorer;
 
 		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int numAccounts) {
-			super(context.getImportanceVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
+			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.scorer = scorer;
 		}

@@ -31,7 +31,7 @@ public class PoiContext {
 		this.accountProcessor.process();
 
 		// (2) build the teleportation vectors
-		final TeleportationBuilder tb = new TeleportationBuilder(this.getImportanceVector());
+		final TeleportationBuilder tb = new TeleportationBuilder(this.getPoiStartVector());
 		this.teleportationVector = tb.teleportationVector;
 		this.inverseTeleportationVector = tb.inverseTeleportationVector;
 	}
@@ -57,12 +57,12 @@ public class PoiContext {
 	}
 
 	/**
-	 * Gets the importance vector.
+	 * Gets the poi start vector.
 	 *
-	 * @return The importance vector.
+	 * @return The poi start vector.
 	 */
-	public ColumnVector getImportanceVector() {
-		return this.accountProcessor.importanceVector;
+	public ColumnVector getPoiStartVector() {
+		return this.accountProcessor.poiStartVector;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class PoiContext {
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
 		private final ColumnVector vestedBalanceVector;
-		private final ColumnVector importanceVector;
+		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
 		private SparseMatrix outlinkMatrix;
 
@@ -159,7 +159,7 @@ public class PoiContext {
 			this.dangleVector.setAll(1);
 
 			this.vestedBalanceVector = new ColumnVector(i);
-			this.importanceVector = new ColumnVector(i);
+			this.poiStartVector = new ColumnVector(i);
 			this.outlinkScoreVector = new ColumnVector(i);
 		}
 
@@ -177,10 +177,8 @@ public class PoiContext {
 			this.outlinkMatrix = new SparseMatrix(i, i, numOutlinks < i ? 1 : numOutlinks / i);
 			this.createOutlinkMatrix();
 
-			// Initially set importance to the row sum vector of the outlink matrix
-			// TODO: Is there a better way to estimate the eigenvector
-			// TODO: maybe save from previous block
-			this.createImportanceVector();
+			// (2) create the start vector
+			this.createStartVector();
 		}
 
 		public void updateImportances(
@@ -201,20 +199,20 @@ public class PoiContext {
 			}
 		}
 
-		private void createImportanceVector() {
-			// (1) Assign the initial importance vector to the last page rank
+		private void createStartVector() {
+			// (1) Assign the start vector to the last page rank
 			int i = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
-				this.importanceVector.setAt(i, importance.getLastPageRank());
+				this.poiStartVector.setAt(i, importance.getLastPageRank());
 				++i;
 			}
 
-			// (2) normalize the importance vector
-			if (this.importanceVector.isZeroVector())
-				this.importanceVector.setAll(1.0);
+			// (2) normalize the start vector
+			if (this.poiStartVector.isZeroVector())
+				this.poiStartVector.setAll(1.0);
 
-			this.importanceVector.normalize();			
+			this.poiStartVector.normalize();
 		}
 
 		private void createOutlinkMatrix() {

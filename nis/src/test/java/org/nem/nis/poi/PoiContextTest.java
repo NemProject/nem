@@ -56,20 +56,20 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void importanceVectorIsInitializedToNormalizedUniformVectorForFirstIteration() {
+	public void poiStartVectorIsInitializedToNormalizedUniformVectorForFirstIteration() {
 		// Act:
 		final PoiContext context = createTestPoiContextWithAccountLinks();
 
 		// Assert:
-		// (1) importance vector is uniform
-		// (2) importance vector is normalized
+		// (1) start vector is uniform
+		// (2) start vector is normalized
 		Assert.assertThat(
-				context.getImportanceVector(),
+				context.getPoiStartVector(),
 				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
 
 	@Test
-	public void importanceVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
+	public void poiStartVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<Account> accounts = createTestPoiAccounts(height);
@@ -82,10 +82,10 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accounts);
 
 		// Assert:
-		// (1) importance vector is derived from previous page rank
-		// (2) importance vector is normalized
+		// (1) start vector is derived from previous page rank
+		// (2) start vector is normalized
 		Assert.assertThat(
-				context.getImportanceVector(),
+				context.getPoiStartVector(),
 				IsEqual.equalTo(new ColumnVector(3.0 / 9, 4.0 / 9, 0.0, 2.0 / 9)));
 	}
 
