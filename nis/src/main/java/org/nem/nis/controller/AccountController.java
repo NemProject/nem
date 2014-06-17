@@ -2,6 +2,8 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.AccountMetaData;
+import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.Foraging;
@@ -30,8 +32,10 @@ public class AccountController {
 
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
-	public Account accountGet(@RequestParam(value = "address") final String nemAddress) {
-		return this.accountIo.findByAddress(getAddress(nemAddress));
+	public AccountMetaDataPair accountGet(@RequestParam(value = "address") final String nemAddress) {
+		Account account = this.accountIo.findByAddress(getAddress(nemAddress));
+		AccountMetaData metaDta = new AccountMetaData(foraging.isAccountUnlocked(account)? AccountStatus.UNLOCKED : AccountStatus.LOCKED);
+		return new AccountMetaDataPair(account, metaDta);
 	}
 
 	/**

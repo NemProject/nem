@@ -48,14 +48,11 @@ public class ForagingTest {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
 		
-		// Assert:
-		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
-		
 		// Act:
 		foraging.addUnlockedAccount(RECIPIENT1);
 		
 		// Assert:
-		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));		
+		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(true));		
 	}
 	
 	@Test
@@ -67,7 +64,7 @@ public class ForagingTest {
 		foraging.addUnlockedAccount(RECIPIENT2);
 		
 		// Assert:
-		Assert.assertThat(RECIPIENT2.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));		
+		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT2), IsEqual.equalTo(false));		
 	}
 	
 	@Test
@@ -79,13 +76,13 @@ public class ForagingTest {
 		foraging.addUnlockedAccount(RECIPIENT1);
 		
 		// Assert:
-		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));		
+		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(true));		
 
 		// Act:
 		foraging.removeUnlockedAccount(RECIPIENT1);
 		
 		// Assert:
-		Assert.assertThat(RECIPIENT1.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));		
+		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(false));		
 	}
 	
 	// endregion

@@ -61,7 +61,6 @@ public class Foraging  {
 	public void addUnlockedAccount(final Account account) {
 		if (this.accountLookup.isKnownAddress(account.getAddress())) {
 			this.unlockedAccounts.add(account);
-			account.setStatus(AccountStatus.UNLOCKED);
 		}
 	}
 
@@ -74,8 +73,16 @@ public class Foraging  {
 	public void removeUnlockedAccount(final Account account) {
 		if (this.accountLookup.isKnownAddress(account.getAddress())) {
 			this.unlockedAccounts.remove(account);
-			account.setStatus(AccountStatus.LOCKED);
 		}
+	}
+
+	/**
+	 * Determines if a given account is unlocked.
+	 *
+	 * @param account true if the account is unlocked, false otherwise.
+	 */
+	public boolean isAccountUnlocked(final Account account) {
+		return this.unlockedAccounts.contains(account);
 	}
 
 	/**

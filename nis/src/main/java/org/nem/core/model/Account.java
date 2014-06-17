@@ -43,8 +43,6 @@ public class Account implements SerializableEntity {
 	private BlockHeight height;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
 
-	private AccountStatus status = AccountStatus.LOCKED;
-
 	/**
 	 * Creates an account around a key pair.
 	 *
@@ -113,7 +111,6 @@ public class Account implements SerializableEntity {
 		this.messages.addAll(rhs.getMessages());
 		this.weightedBalances = rhs.weightedBalances.copy();
 		this.importance = rhs.importance.copy();
-		this.status = rhs.getStatus();
 
 		this.height = rhs.getHeight();
 		this.refCount = rhs.getReferenceCount();
@@ -131,7 +128,6 @@ public class Account implements SerializableEntity {
 		this.importance = rhs.importance;
 		this.height = rhs.getHeight();
 		this.refCount = rhs.getReferenceCount();
-		this.status = rhs.getStatus();
 	}
 
 	/**
@@ -175,7 +171,6 @@ public class Account implements SerializableEntity {
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
-		this.status = AccountStatus.readFrom(deserializer, "status");
 		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 
 		if (DeserializationOptions.ALL == options)
@@ -200,7 +195,6 @@ public class Account implements SerializableEntity {
 		Amount.writeTo(serializer, "balance", this.getBalance());
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
 		serializer.writeString("label", this.getLabel());
-		AccountStatus.writeTo(serializer, "status", this.getStatus());
 
 		serializer.writeObject("importance", this.getImportanceInfo());
 
@@ -390,24 +384,6 @@ public class Account implements SerializableEntity {
 	 */
 	public WeightedBalances getWeightedBalances() {
 		return this.weightedBalances;
-	}
-
-	/**
-	 * Returns status of an account.
-	 *
-	 * @return The status of the account.
-	 */
-	public AccountStatus getStatus() {
-		return this.status;
-	}
-
-	/**
-	 * Sets the status of an account.
-	 *
-	 * @param status The new status.
-	 */
-	public void setStatus(final AccountStatus status) {
-		this.status = status;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
@@ -57,10 +58,10 @@ public class AccountControllerTest {
 		final TestContext context = new TestContext(accountIoAdapter);
 
 		// Act:
-		final Account resultAccount = context.controller.accountGet(account.getAddress().getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(account.getAddress().getEncoded());
 
 		// Assert:
-		Assert.assertThat(resultAccount, IsSame.sameInstance(account));
+		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(account));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -34,7 +34,6 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 		Assert.assertThat(account.getHeight(), IsNull.nullValue());
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
@@ -54,7 +53,6 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
         Assert.assertThat(account.getHeight(), IsNull.nullValue());
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
@@ -76,7 +74,6 @@ public class AccountTest {
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
         Assert.assertThat(account.getHeight(), IsNull.nullValue());
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 
 		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
 		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
@@ -257,34 +254,6 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	//endregion
-
-	//region account status
-
-	@Test
-	public void accountStatusCanBeSet() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setStatus(AccountStatus.UNLOCKED);
-
-		// Assert:
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
-	}
-
-	@Test
-	public void accountStatusIsInitiallyLocked() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		AccountStatus status = account.getStatus();
-
-		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	//endregion
@@ -582,7 +551,6 @@ public class AccountTest {
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(747L)));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 
 		final List<Message> messages = account.getMessages();
 		if (isSummary) {
@@ -646,7 +614,6 @@ public class AccountTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
-		account.setStatus(AccountStatus.UNLOCKED);
 		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
@@ -851,22 +818,6 @@ public class AccountTest {
 	}
 
 	@Test
-	public void copyCreatesUnlinkedCopyOfStatus() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		account.setStatus(AccountStatus.UNLOCKED);
-
-		// Act:
-		final Account copyAccount = account.copy();
-		Assert.assertThat(copyAccount.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
-		copyAccount.setStatus(AccountStatus.LOCKED);
-
-		// Assert:
-		Assert.assertThat(account.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
-		Assert.assertThat(copyAccount.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
-	}
-
-	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
@@ -906,7 +857,6 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
-		Assert.assertThat(copyAccount.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
@@ -924,7 +874,6 @@ public class AccountTest {
 		account.setLabel("Alpha Sigma");
 		account.incrementReferenceCount();
 		account.incrementReferenceCount();
-		account.setStatus(AccountStatus.UNLOCKED);
 		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
 		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 	}
@@ -971,7 +920,6 @@ public class AccountTest {
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
 		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
 		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
-		Assert.assertThat(copy.getStatus(), IsEqual.equalTo(original.getStatus()));
 
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
