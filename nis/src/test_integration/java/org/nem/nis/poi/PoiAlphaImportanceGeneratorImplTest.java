@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
@@ -528,6 +529,15 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			final BlockHeight blockHeight,
 			final Collection<Account> accounts) {
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
-		return poi.getAccountImportances(blockHeight, accounts);
+		poi.updateAccountImportances(blockHeight, accounts);
+		final List<Double> importances = accounts.stream()
+				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
+				.collect(Collectors.toList());
+
+		final ColumnVector importancesVector = new ColumnVector(importances.size());
+		for (int i = 0; i < importances.size(); ++i)
+			importancesVector.setAt(i, importances.get(i));
+
+		return importancesVector;
 	}
 }

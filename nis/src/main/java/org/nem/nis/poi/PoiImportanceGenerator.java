@@ -12,27 +12,25 @@ import org.nem.core.model.primitive.BlockHeight;
 public interface PoiImportanceGenerator {
 
 	/**
-	 * Generates the importance scores for the specified accounts.
+	 * Updates the importance scores for the specified accounts.
 	 *
 	 * @param blockHeight The block height.
 	 * @param accounts The accounts.
-	 * @return The importance scores.
 	 */
-	public default ColumnVector getAccountImportances(
+	public default void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<Account> accounts) {
-		return this.getAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.MAKOTO);
+		this.updateAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.MAKOTO);
 	}
 
 	/**
-	 * Generates the importance scores for the specified accounts.
+	 * Updates the importance scores for the specified accounts.
 	 *
 	 * @param blockHeight The block height.
 	 * @param accounts The accounts.
 	 * @param scoringAlg The scoring algorithm.
-	 * @return The importance scores.
 	 */
-	public ColumnVector getAccountImportances(
+	public void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<Account> accounts,
 			final PoiScorer.ScoringAlg scoringAlg);

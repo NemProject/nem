@@ -23,20 +23,15 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
-	public static final int DEFAULT_MAX_ITERS = 200;
+	public static final int DEFAULT_MAX_ITERATIONS = 200;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	@Override
-	public ColumnVector getAccountImportances(final BlockHeight blockHeight, Collection<Account> accounts, PoiScorer.ScoringAlg scoringAlg) {
-		return calculateImportancesImpl(blockHeight, accounts, scoringAlg);
-	}
-
-	// This is the draft implementation for calculating proof-of-importance
-	private ColumnVector calculateImportancesImpl(
+	public void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<Account> accounts,
 			final PoiScorer.ScoringAlg scoringAlg) {
-
+		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
 		final PoiContext context = new PoiContext(accounts, blockHeight);
 		final PoiScorer scorer = new PoiScorer();
@@ -50,16 +45,19 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		LOGGER.info("POI iterator needed " + (stop - start) + "ms.");
 
 		if (!iterator.hasConverged()) {
-			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERS);
+			final String message = String.format(
+					"POI: power iteration failed to converge in %s iterations",
+					DEFAULT_MAX_ITERATIONS);
 			throw new IllegalStateException(message);
 		}
 
 		// (3) merge all sub-scores
-		return scorer.calculateFinalScore(
+		final ColumnVector importanceVector =  scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector(),
 				scoringAlg);
+		context.updateImportances(importanceVector);
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {
@@ -68,7 +66,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		private final PoiScorer scorer;
 
 		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int numAccounts) {
-			super(context.getImportanceVector(), DEFAULT_MAX_ITERS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
+			super(context.getImportanceVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.scorer = scorer;
 		}

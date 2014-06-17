@@ -124,9 +124,7 @@ public class BlockChainTest {
 	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer((blockHeight, accounts, scoringAlg) -> {
-			ColumnVector importances = new ColumnVector(accounts.size());
-			importances.setAll(1.0 / accounts.size());
-			return importances;
+			accounts.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accounts.size()));
 		});
 
 		final List<Account> accounts = prepareSigners(accountAnalyzer);

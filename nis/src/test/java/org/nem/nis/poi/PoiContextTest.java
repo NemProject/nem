@@ -9,9 +9,12 @@ import org.nem.core.test.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PoiContextTest {
-	
+
+	//region process
+
 	@Test
 	public void vestedBalanceVectorIsInitializedCorrectly() {
 		// Act:
@@ -138,6 +141,48 @@ public class PoiContextTest {
 				IsEqual.equalTo(expectedAccountLinks));
 	}
 
+	//endregion
+
+	//region updateImportances
+
+	@Test
+	public void canUpdateFilteredAccountsWithCompatibleImportanceVector() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		final PoiContext context = createTestPoiContext(height, accounts);
+
+		// Act:
+		context.updateImportances(new ColumnVector(5, 2, 7, 3));
+
+		// Assert:
+		final List<Double> importances = accounts.stream()
+				.map(a -> {
+					final AccountImportance ai = a.getImportanceInfo();
+					return ai.isSet() ?  ai.getImportance(height) : 0.0;
+				})
+				.collect(Collectors.toList());
+		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+	}
+
+	@Test
+	public void cannotUpdateFilteredAccountsWithIncompatibleImportanceVector() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		final PoiContext context = createTestPoiContext(height, accounts);
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> context.updateImportances(new ColumnVector(5, 2, 7, 3, 4, 8)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> context.updateImportances(new ColumnVector(5, 2, 3)),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
+
 	private static void addAccountLink(
 			final BlockHeight height,
 			final Account sender,
@@ -168,7 +213,7 @@ public class PoiContextTest {
 		return accounts;
 	}
 
-	private static PoiContext createTestPoiContext() {
+	private static List<Account> createTestPoiAccounts(final BlockHeight height) {
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * multiplier - 1,	4 * multiplier,		null),
@@ -178,8 +223,16 @@ public class PoiContextTest {
 				new TestAccountInfo(multiplier,			3 * multiplier + 1,	new int[] { 1, 1, 4, 3, 1 }), // 10
 				new TestAccountInfo(multiplier - 1,		5 * multiplier,		new int[] { 7 })); // 7 (insufficient vested balance)
 
+		return createTestPoiAccounts(accountInfos, height);
+	}
+
+	private static PoiContext createTestPoiContext() {
 		final BlockHeight height = new BlockHeight(21);
-		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		return createTestPoiContext(height, accounts);
+	}
+
+	private static PoiContext createTestPoiContext(final BlockHeight height, final List<Account> accounts) {
 		return new PoiContext(accounts, height);
 	}
 

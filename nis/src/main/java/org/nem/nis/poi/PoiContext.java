@@ -14,12 +14,7 @@ public class PoiContext {
 
 	private static final double TELEPORTATION_PROB = .85;
 
-	private final List<Integer> dangleIndexes;
-	private final ColumnVector dangleVector;
-	private final ColumnVector vestedBalanceVector;
-	private final ColumnVector importanceVector;
-	private final ColumnVector outlinkScoreVector;
-	private final SparseMatrix outlinkMatrix;
+	private final AccountProcessor accountProcessor;
 
 	private final ColumnVector teleportationVector;
 	private final ColumnVector inverseTeleportationVector;
@@ -32,18 +27,11 @@ public class PoiContext {
 	 */
 	public PoiContext(final Iterable<Account> accounts, final BlockHeight height) {
 		// (1) build the account vectors and matrices
-		final AccountProcessor ap = new AccountProcessor(accounts, height);
-		ap.process();
-
-		this.dangleIndexes = ap.dangleIndexes;
-		this.dangleVector = ap.dangleVector;
-		this.vestedBalanceVector = ap.vestedBalanceVector;
-		this.outlinkScoreVector = ap.outlinkScoreVector;
-		this.importanceVector = ap.importanceVector;
-		this.outlinkMatrix = ap.outlinkMatrix;
+		this.accountProcessor = new AccountProcessor(accounts, height);
+		this.accountProcessor.process();
 
 		// (2) build the teleportation vectors
-		final TeleportationBuilder tb = new TeleportationBuilder(this.importanceVector);
+		final TeleportationBuilder tb = new TeleportationBuilder(this.getImportanceVector());
 		this.teleportationVector = tb.teleportationVector;
 		this.inverseTeleportationVector = tb.inverseTeleportationVector;
 	}
@@ -56,7 +44,7 @@ public class PoiContext {
 	 * @return The vested balance vector.
 	 */
 	public ColumnVector getVestedBalanceVector() {
-		return this.vestedBalanceVector;
+		return this.accountProcessor.vestedBalanceVector;
 	}
 
 	/**
@@ -65,7 +53,7 @@ public class PoiContext {
 	 * @return The out-link vector.
 	 */
 	public ColumnVector getOutlinkScoreVector() {
-		return this.outlinkScoreVector;
+		return this.accountProcessor.outlinkScoreVector;
 	}
 
 	/**
@@ -74,7 +62,7 @@ public class PoiContext {
 	 * @return The importance vector.
 	 */
 	public ColumnVector getImportanceVector() {
-		return this.importanceVector;
+		return this.accountProcessor.importanceVector;
 	}
 
 	/**
@@ -101,7 +89,7 @@ public class PoiContext {
 	 * @return The dangle indexes.
 	 */
 	public List<Integer> getDangleIndexes() {
-		return this.dangleIndexes;
+		return this.accountProcessor.dangleIndexes;
 	}
 
 	/**
@@ -110,7 +98,7 @@ public class PoiContext {
 	 * @return The dangle vector.
 	 */
 	public ColumnVector getDangleVector() {
-		return this.dangleVector;
+		return this.accountProcessor.dangleVector;
 	}
 
 	/**
@@ -119,10 +107,19 @@ public class PoiContext {
 	 * @return The out-link matrix.
 	 */
 	public SparseMatrix getOutlinkMatrix() {
-		return this.outlinkMatrix;
+		return this.accountProcessor.outlinkMatrix;
 	}
 
 	//endregion
+
+	/**
+	 * Updates the importance information for all foraging-eligible accounts.
+	 *
+	 * @param importanceVector The calculated importances.
+	 */
+	public void updateImportances(final ColumnVector importanceVector) {
+		this.accountProcessor.updateImportances(importanceVector);
+	}
 
 	private static class AccountProcessor {
 
@@ -182,7 +179,19 @@ public class PoiContext {
 			// TODO: maybe save from previous block
 			this.createImportanceVector();
 		}
-		
+
+		public void updateImportances(final ColumnVector importanceVector) {
+			if (importanceVector.size() != this.accountInfos.size())
+				throw new IllegalArgumentException("importance vector is an unexpected dimension");
+
+			int i = 0;
+			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+				importance.setImportance(this.height, importanceVector.getAt(i));
+				++i;
+			}
+		}
+
 		private void createImportanceVector() {
 			// (1) Assign the row sum of the outlinkMatrix to the components
 			this.importanceVector = this.outlinkMatrix.getRowSumVector();

@@ -192,12 +192,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 			return;
 
 		final Collection<Account> accounts = this.getAccounts(blockHeight);
-		final ColumnVector poiVector = this.importanceGenerator.getAccountImportances(blockHeight, accounts);
-
-		int i = 0;
-		for (final Account account : accounts)
-			account.getImportanceInfo().setImportance(blockHeight, poiVector.getAt(i++));
-
+		this.importanceGenerator.updateAccountImportances(blockHeight, accounts);
 		this.lastPoiRecalc = blockHeight;
 	}
 
