@@ -16,13 +16,11 @@ public class AccountImportance implements SerializableEntity {
 
 	private BlockHeight importanceHeight;
 	private double importance;
+	private double lastPageRank; // TODO: not sure if this is the right place for this
 
-	public static final ObjectDeserializer<AccountImportance> DESERIALIZER = new ObjectDeserializer<AccountImportance>() {
-		@Override
-		public AccountImportance deserialize(Deserializer deserializer) {
-			return new AccountImportance(deserializer);
-		}
-	};
+	public static final ObjectDeserializer<AccountImportance> DESERIALIZER =
+			deserializer -> new AccountImportance(deserializer);
+
 	/**
 	 * Creates a new importance instance.
 	 */
@@ -41,6 +39,7 @@ public class AccountImportance implements SerializableEntity {
 		boolean isSet = 0 != deserializer.readInt("isSet");
 		if (isSet) {
 			this.importance = deserializer.readDouble("score");
+			this.lastPageRank = deserializer.readDouble("page-rank");
 			this.importanceHeight = BlockHeight.readFrom(deserializer, "height");
 		}
 	}
@@ -110,7 +109,25 @@ public class AccountImportance implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the importance at the specified block height.
+	 * Gets the last page rank.
+	 *
+	 * @return The last page rank.
+	 */
+	public double getLastPageRank() {
+		return this.lastPageRank;
+	}
+
+	/**
+	 * Sets the last page rank.
+	 *
+	 * @param lastPageRank The last page rank.
+	 */
+	public void setLastPageRank(final double lastPageRank) {
+		this.lastPageRank = lastPageRank;
+	}
+
+	/**
+	 * Gets the page rank at the specified block height.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The importance.
@@ -149,6 +166,7 @@ public class AccountImportance implements SerializableEntity {
 		final AccountImportance copy = new AccountImportance(this.historicalOutlinks.copy());
 		copy.importance = this.importance;
 		copy.importanceHeight = this.importanceHeight;
+		copy.lastPageRank = this.lastPageRank;
 		return copy;
 	}
 
@@ -157,6 +175,7 @@ public class AccountImportance implements SerializableEntity {
 		serializer.writeInt("isSet", this.isSet() ? 1 : 0);
 		if (this.isSet()) {
 			serializer.writeDouble("score", this.importance);
+			serializer.writeDouble("page-rank", this.lastPageRank);
 			BlockHeight.writeTo(serializer, "height", this.importanceHeight);
 		}
 	}

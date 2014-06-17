@@ -43,6 +43,7 @@ public class AccountImportanceTest {
 		// Arrange:
 		final AccountImportance original = new AccountImportance();
 		original.setImportance(new BlockHeight(5), 17);
+		original.setLastPageRank(12);
 
 		// Act:
 		final AccountImportance ai = roundtripImportance(original);
@@ -52,6 +53,7 @@ public class AccountImportanceTest {
 		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(17.0));
 		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
 	private static AccountImportance roundtripImportance(final AccountImportance original) {
@@ -196,6 +198,31 @@ public class AccountImportanceTest {
 
 	//endregion
 
+	//region {get|set}LastPageRank
+
+	@Test
+	public void pageRankIsInitiallyZero() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+
+		// Assert:
+		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.0));
+	}
+
+	@Test
+	public void pageRankCanBeSet() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+
+		// Act:
+		ai.setLastPageRank(12);
+
+		// Assert:
+		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
+	}
+
+	//endregion
+
 	//region copy
 
 	@Test
@@ -203,15 +230,17 @@ public class AccountImportanceTest {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
 		ai.setImportance(new BlockHeight(5), 17);
+		ai.setLastPageRank(12.0);
 
 			// Act:
 		final AccountImportance copy = ai.copy();
 		final double importance = copy.getImportance(new BlockHeight(5));
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		Assert.assertThat(copy.isSet(), IsEqual.equalTo(true));
 		Assert.assertThat(importance, IsEqual.equalTo(17.0));
 		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		Assert.assertThat(copy.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
 	@Test

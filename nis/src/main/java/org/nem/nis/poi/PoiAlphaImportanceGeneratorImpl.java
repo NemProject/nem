@@ -57,7 +57,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector(),
 				scoringAlg);
-		context.updateImportances(importanceVector);
+		context.updateImportances(iterator.getResult(), importanceVector);
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {

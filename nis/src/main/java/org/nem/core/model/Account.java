@@ -35,7 +35,10 @@ public class Account implements SerializableEntity {
 	private BlockAmount foragedBlocks = BlockAmount.ZERO;
 
 	private final WeightedBalances weightedBalances;
-	private final AccountImportance importance;
+
+	// importance is not final because it could get set twice: once in Account(KeyPair, Address)
+	// and again in Account(Deserializer)
+	private AccountImportance importance;
 
 	private BlockHeight height;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
@@ -70,7 +73,8 @@ public class Account implements SerializableEntity {
 	}
 
 	/**
-	 * This method is public, but it should be used very carefully
+	 * This method is public, but it should be used very carefully.
+	 * TODO: revisit
 	 *
 	 * @param address
 	 */
@@ -172,10 +176,7 @@ public class Account implements SerializableEntity {
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readString("label");
 		this.status = AccountStatus.readFrom(deserializer, "status");
-
-		final AccountImportance importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
-		if (importance.isSet())
-			this.importance.setImportance(importance.getHeight(), importance.getImportance(importance.getHeight()));
+		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 
 		if (DeserializationOptions.ALL == options)
 			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));

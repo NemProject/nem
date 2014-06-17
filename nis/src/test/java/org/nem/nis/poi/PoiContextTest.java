@@ -56,19 +56,37 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void importanceVectorIsInitializedCorrectly() {
+	public void importanceVectorIsInitializedToNormalizedUniformVectorForFirstIteration() {
 		// Act:
-		// (0, 1, 8), (0, 2, 4)
-		// (1, 0, 2), (1, 2, 6)
-		// (3, 0, 3), (3, 2, 5)
 		final PoiContext context = createTestPoiContextWithAccountLinks();
 
 		// Assert:
-		// (1) importance vector is initially set to row sum vector of the out-link matrix
+		// (1) importance vector is uniform
 		// (2) importance vector is normalized
 		Assert.assertThat(
 				context.getImportanceVector(),
-				IsEqual.equalTo(new ColumnVector(0.375 / 3, 0.6 / 3, 2.025 / 3, 0)));
+				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
+	}
+
+	@Test
+	public void importanceVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		accounts.get(0).getImportanceInfo().setLastPageRank(3);
+		accounts.get(1).getImportanceInfo().setLastPageRank(7);
+		accounts.get(2).getImportanceInfo().setLastPageRank(4);
+		accounts.get(4).getImportanceInfo().setLastPageRank(2);
+
+		// Act:
+		final PoiContext context = createTestPoiContext(height, accounts);
+
+		// Assert:
+		// (1) importance vector is derived from previous page rank
+		// (2) importance vector is normalized
+		Assert.assertThat(
+				context.getImportanceVector(),
+				IsEqual.equalTo(new ColumnVector(3.0 / 9, 4.0 / 9, 0.0, 2.0 / 9)));
 	}
 
 	@Test
@@ -146,6 +164,23 @@ public class PoiContextTest {
 	//region updateImportances
 
 	@Test
+	public void canUpdateFilteredAccountsWithCompatiblePageRankVector() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		final PoiContext context = createTestPoiContext(height, accounts);
+
+		// Act:
+		context.updateImportances(new ColumnVector(5, 2, 7, 3), new ColumnVector(4));
+
+		// Assert:
+		final List<Double> importances = accounts.stream()
+				.map(a -> a.getImportanceInfo().getLastPageRank())
+				.collect(Collectors.toList());
+		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+	}
+
+	@Test
 	public void canUpdateFilteredAccountsWithCompatibleImportanceVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
@@ -153,16 +188,32 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accounts);
 
 		// Act:
-		context.updateImportances(new ColumnVector(5, 2, 7, 3));
+		context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3));
 
 		// Assert:
 		final List<Double> importances = accounts.stream()
 				.map(a -> {
 					final AccountImportance ai = a.getImportanceInfo();
-					return ai.isSet() ?  ai.getImportance(height) : 0.0;
+					return ai.isSet() ? ai.getImportance(height) : 0.0;
 				})
 				.collect(Collectors.toList());
 		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+	}
+
+	@Test
+	public void cannotUpdateFilteredAccountsWithIncompatiblePageRankVector() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<Account> accounts = createTestPoiAccounts(height);
+		final PoiContext context = createTestPoiContext(height, accounts);
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> context.updateImportances(new ColumnVector(5, 2, 7, 3, 4, 8), new ColumnVector(4)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> context.updateImportances(new ColumnVector(5, 2, 3), new ColumnVector(4)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -174,10 +225,10 @@ public class PoiContextTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(5, 2, 7, 3, 4, 8)),
+				v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3, 4, 8)),
 				IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(5, 2, 3)),
+				v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 3)),
 				IllegalArgumentException.class);
 	}
 

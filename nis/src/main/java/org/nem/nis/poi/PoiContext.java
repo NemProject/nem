@@ -115,10 +115,13 @@ public class PoiContext {
 	/**
 	 * Updates the importance information for all foraging-eligible accounts.
 	 *
+	 * @param pageRankVector The calculated page ranks.
 	 * @param importanceVector The calculated importances.
 	 */
-	public void updateImportances(final ColumnVector importanceVector) {
-		this.accountProcessor.updateImportances(importanceVector);
+	public void updateImportances(
+			final ColumnVector pageRankVector,
+			final ColumnVector importanceVector) {
+		this.accountProcessor.updateImportances(pageRankVector, importanceVector);
 	}
 
 	private static class AccountProcessor {
@@ -127,7 +130,7 @@ public class PoiContext {
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
 		private final ColumnVector vestedBalanceVector;
-		private ColumnVector importanceVector;
+		private final ColumnVector importanceVector;
 		private final ColumnVector outlinkScoreVector;
 		private SparseMatrix outlinkMatrix;
 
@@ -180,23 +183,37 @@ public class PoiContext {
 			this.createImportanceVector();
 		}
 
-		public void updateImportances(final ColumnVector importanceVector) {
+		public void updateImportances(
+				final ColumnVector pageRankVector,
+				final ColumnVector importanceVector) {
+			if (pageRankVector.size() != this.accountInfos.size())
+				throw new IllegalArgumentException("page rank vector is an unexpected dimension");
+
 			if (importanceVector.size() != this.accountInfos.size())
 				throw new IllegalArgumentException("importance vector is an unexpected dimension");
 
 			int i = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+				importance.setLastPageRank(pageRankVector.getAt(i));
 				importance.setImportance(this.height, importanceVector.getAt(i));
 				++i;
 			}
 		}
 
 		private void createImportanceVector() {
-			// (1) Assign the row sum of the outlinkMatrix to the components
-			this.importanceVector = this.outlinkMatrix.getRowSumVector();
+			// (1) Assign the initial importance vector to the last page rank
+			int i = 0;
+			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+				this.importanceVector.setAt(i, importance.getLastPageRank());
+				++i;
+			}
 
 			// (2) normalize the importance vector
+			if (this.importanceVector.isZeroVector())
+				this.importanceVector.setAll(1.0);
+
 			this.importanceVector.normalize();			
 		}
 
