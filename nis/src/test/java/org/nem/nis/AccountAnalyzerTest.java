@@ -87,7 +87,8 @@ public class AccountAnalyzerTest {
 		// Assert:
 		Assert.assertThat(analyzer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
-		Assert.assertThat(cachedAccount2, IsNot.not(IsSame.sameInstance(cachedAccount1)));
+		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
+		Assert.assertThat(cachedAccount2.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -225,7 +226,8 @@ public class AccountAnalyzerTest {
 
 		// Assert:
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
-		Assert.assertThat(foundAccount, IsNot.not(IsSame.sameInstance(cachedAccount1)));
+		Assert.assertThat(foundAccount, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
+		Assert.assertThat(foundAccount.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
 	}
 
 	//endregion
