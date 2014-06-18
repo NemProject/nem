@@ -3,6 +3,9 @@ package org.nem.core.model.ncc;
 import org.nem.core.model.Account;
 import org.nem.core.serialization.*;
 
+/**
+ * A pair containing both an account and account meta data.
+ */
 public class AccountMetaDataPair implements SerializableEntity {
 
 	private Account account;

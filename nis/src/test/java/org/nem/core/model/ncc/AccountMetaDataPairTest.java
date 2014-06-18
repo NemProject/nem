@@ -25,11 +25,11 @@ public class AccountMetaDataPairTest {
 		final Account account = Utils.generateRandomAccount();
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(account, AccountStatus.UNLOCKED);
+		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(account, AccountStatus.LOCKED);
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getAccount(), IsEqual.equalTo(account));
-		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	private static AccountMetaDataPair createRoundTrippedPair(

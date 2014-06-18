@@ -33,9 +33,13 @@ public class AccountController {
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaDataPair accountGet(@RequestParam(value = "address") final String nemAddress) {
-		Account account = this.accountIo.findByAddress(getAddress(nemAddress));
-		AccountMetaData metaDta = new AccountMetaData(foraging.isAccountUnlocked(account)? AccountStatus.UNLOCKED : AccountStatus.LOCKED);
-		return new AccountMetaDataPair(account, metaDta);
+		final Account account = this.accountIo.findByAddress(this.getAddress(nemAddress));
+		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(account));
+		return new AccountMetaDataPair(account, metaData);
+	}
+
+	private AccountStatus getAccountStatus(final Account account) {
+		return this.foraging.isAccountUnlocked(account)? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
 	/**

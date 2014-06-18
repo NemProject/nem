@@ -20,17 +20,17 @@ public class AccountMetaDataTest {
 	@Test
 	public void canRoundTripAccountMetaData() {
 		// Arrange:
-		final AccountMetaData metaData = createRoundTrippedAccountMetaData(AccountStatus.UNLOCKED);
+		final AccountMetaData metaData = createRoundTrippedAccountMetaData(AccountStatus.LOCKED);
 
 		// Assert:
-		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	private static AccountMetaData createAccountMetaData(AccountStatus status) {
 		return new AccountMetaData(status);
 	}
 
-	private static AccountMetaData createRoundTrippedAccountMetaData(AccountStatus status) {
+	private static AccountMetaData createRoundTrippedAccountMetaData(final AccountStatus status) {
 		// Arrange:
 		final AccountMetaData metaData = createAccountMetaData(status);
 

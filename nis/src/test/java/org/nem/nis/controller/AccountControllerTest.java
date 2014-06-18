@@ -62,6 +62,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(account));
+		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -180,7 +181,7 @@ public class AccountControllerTest {
 	private static class MockForaging extends Foraging {
 		private final List<Account> unlockedAccounts = new ArrayList<>();
 
-		MockForaging() {
+		public MockForaging() {
 			super(null, null, null, null);
 		}
 
