@@ -585,7 +585,6 @@ public class AccountTest {
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(deserializer.readString("status"), IsEqual.equalTo("UNLOCKED"));
 
 		final AccountImportance importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
 		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
@@ -601,8 +600,8 @@ public class AccountTest {
 			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
 		}
 
-		// 7-8 "real" properties and 1 "hidden" (ordering) property
-		final int expectedProperties = 7 + (isSummary ? 0 : 1) + 1 ;
+		// 6-7 "real" properties and 1 "hidden" (ordering) property
+		final int expectedProperties = 6 + (isSummary ? 0 : 1) + 1 ;
 		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
