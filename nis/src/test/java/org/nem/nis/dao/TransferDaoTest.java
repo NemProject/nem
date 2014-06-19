@@ -2,11 +2,15 @@ package org.nem.nis.dao;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public class TransferDaoTest {
 	@Autowired
 	TransferDao transferDao;
+
+	@Autowired
+	BlockDao blockDao;
 
 	@Test
 	public void savingTransferSavesAccounts() {
@@ -73,10 +80,15 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10);
-		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+
+		// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
+		final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, transferTransaction.getTimeStamp(), BlockHeight.ONE);
+		dummyBlock.addTransaction(transferTransaction);
+		dummyBlock.sign();
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
-		transferDao.save(dbTransfer);
+		blockDao.save(dbBlock);
 		final Collection<Object[]> entities1 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime(), 25);
 		final Collection<Object[]> entities2 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime()-1, 25);
 
