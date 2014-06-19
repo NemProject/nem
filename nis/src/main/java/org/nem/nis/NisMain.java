@@ -2,11 +2,11 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
@@ -20,8 +20,8 @@ public class NisMain {
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
-	private static Block NEMESIS_BLOCK = NemesisBlock.fromResource();
-	private static Hash NEMESIS_BLOCK_HASH = HashUtils.calculateHash(NEMESIS_BLOCK);
+	private Block nemesisBlock;
+	private Hash nemesisBlockHash;
 
 	@Autowired
 	private AccountDao accountDao;
@@ -45,7 +45,7 @@ public class NisMain {
 		Long curBlockId;
 		LOGGER.info("starting analysis...");
 
-		org.nem.nis.dbmodel.Block dbBlock = blockDao.findByHash(NEMESIS_BLOCK_HASH);
+		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
 		LOGGER.info(String.format("hex: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
@@ -53,10 +53,6 @@ public class NisMain {
 		}
 
 		Block parentBlock = null;
-		final Account nemesisAccount = this.accountAnalyzer.addAccountToCache(NemesisBlock.ADDRESS);
-		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
-		nemesisAccount.getWeightedBalances().addFullyVested(NEMESIS_BLOCK.getHeight(), NemesisBlock.AMOUNT);
-		nemesisAccount.setHeight(BlockHeight.ONE);
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
@@ -76,7 +72,7 @@ public class NisMain {
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
 				for (final Account account : this.accountAnalyzer) {
-					if (account.equals(nemesisAccount)) {
+					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
 						continue;
 					}
 
@@ -106,35 +102,49 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-		logNemesisInformation();
+		// load the nemesis block information
+		this.nemesisBlock = this.loadNemesisBlock();
+		this.nemesisBlockHash = HashUtils.calculateHash(this.nemesisBlock);
+		this.logNemesisInformation();
 
 		this.populateDb();
 
 		this.analyzeBlocks();
 	}
 
-	private static void logNemesisInformation() {
-		LOGGER.info("nemesis block hash:" + NEMESIS_BLOCK_HASH);
+	private NemesisBlock loadNemesisBlock() {
+		// set up the nemesis block amounts
+		final Account nemesisAccount = this.accountAnalyzer.addAccountToCache(NemesisBlock.ADDRESS);
+		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
+		nemesisAccount.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
+		nemesisAccount.setHeight(BlockHeight.ONE);
 
-		final KeyPair nemesisKeyPair = NEMESIS_BLOCK.getSigner().getKeyPair();
-		final Address nemesisAddress = NEMESIS_BLOCK.getSigner().getAddress();
+		// load the nemesis block
+		return NemesisBlock.fromResource(new DeserializationContext(this.accountAnalyzer.asAutoCache()));
+	}
+
+	private void logNemesisInformation() {
+		LOGGER.info("nemesis block hash:" + this.nemesisBlockHash);
+
+		final KeyPair nemesisKeyPair = this.nemesisBlock.getSigner().getKeyPair();
+		final Address nemesisAddress = this.nemesisBlock.getSigner().getAddress();
 		LOGGER.info("nemesis account private key          : " + nemesisKeyPair.getPrivateKey());
 		LOGGER.info("nemesis account            public key: " + nemesisKeyPair.getPublicKey());
 		LOGGER.info("nemesis account compressed public key: " + nemesisAddress.getEncoded());
-		LOGGER.info("nemesis account generetion hash      : " + NEMESIS_BLOCK.getGenerationHash());
+		LOGGER.info("nemesis account generation hash      : " + this.nemesisBlock.getGenerationHash());
 	}
 
 	private void populateDb() {
 		if (0 != this.blockDao.count())
 			return;
 
-		this.saveBlock(NEMESIS_BLOCK);
+		this.saveBlock(this.nemesisBlock);
 	}
 
 	private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
 		org.nem.nis.dbmodel.Block dbBlock;
 
-		dbBlock = this.blockDao.findByHash(NEMESIS_BLOCK_HASH);
+		dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
 		if (null != dbBlock) {
 			return dbBlock;
 		}

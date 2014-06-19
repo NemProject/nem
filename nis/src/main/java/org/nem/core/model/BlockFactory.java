@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.ObjectDeserializer;
+import org.nem.core.serialization.*;
 
 /**
  * similar to transaction factory, but for the blocks
@@ -27,8 +26,11 @@ public class BlockFactory {
 		int type = deserializer.readInt("type");
 
 		switch (type) {
-			case 1:
-				return new Block(1, options, deserializer);
+			case BlockTypes.NEMESIS:
+				return NemesisBlock.fromResource(deserializer.getContext());
+
+			case BlockTypes.REGULAR:
+				return new Block(BlockTypes.REGULAR, options, deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown block type: " + type);

@@ -5,14 +5,19 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.DeserializationContext;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.core.time.TimeInstant;
 
 import java.io.*;
 
 public class NemesisBlockTest {
 
-	private final NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource();
+	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
+	private final static NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource(new DeserializationContext(MOCK_ACCOUNT_LOOKUP));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
+
+	//region basic
 
 	@Test
 	public void nemesisBlockCanBeCreated() {
@@ -63,6 +68,14 @@ public class NemesisBlockTest {
 			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
 	}
 
+	@Test
+	public void nemesisDeserializationUsesAccountLookupParameter() {
+		// Assert: (1 signer, 9 senders, 9 recipients)
+		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(19));
+	}
+
+	//endregion
+
 	//region constants
 
 	@Test
@@ -97,7 +110,7 @@ public class NemesisBlockTest {
 		nemesisBlockJson.put("type", 1);
 
 		// Act:
-		NemesisBlock.fromJsonObject(nemesisBlockJson);
+		NemesisBlock.fromJsonObject(nemesisBlockJson, new DeserializationContext(new MockAccountLookup()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -107,7 +120,7 @@ public class NemesisBlockTest {
 		final String badJson = "<bad>" + nemesisBlockJson.toJSONString();
 		try (final ByteArrayInputStream inputStream = new ByteArrayInputStream(badJson.getBytes())) {
 			// Act:
-			NemesisBlock.fromStream(inputStream);
+			NemesisBlock.fromStream(inputStream, new DeserializationContext(new MockAccountLookup()));
 		}
 	}
 
