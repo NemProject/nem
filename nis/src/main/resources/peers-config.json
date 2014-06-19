@@ -6,9 +6,26 @@
 	        endpoint: { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
 	        identity: { "name": "bob", "public-key": "A1D5T4w6BKT0c1a6dJt0QYpVUR2IpW0YCZgTDYwmsov9" }
 	    },
-        {
-            endpoint: { "protocol": "http", "host": "trudy.nem.ninja", "port" : 7890 },
-            identity: { "name": "trudy", "public-key": "A8Vb0lDlbCku1MiYsIg2djEygyUdIbapCZu5iduZ1zbS" }
+
+	    {
+            endpoint: { "protocol": "http", "host": "san.nem.ninja", "port" : 7890 },
+            identity: { "name": "san", "public-key": "AySca5ctL3m23Y9zgWQzlKrW0gPnhfvqh4Yf2HfxxbPW" }
+        },
+	    {
+            endpoint: { "protocol": "http", "host": "go.nem.ninja", "port" : 7890 },
+            identity: { "name": "go", "public-key": "AvG2dqlMATdjrXbRX1rou0pyrKsRU3WtXYGV9CsyMFzW" }
+        },
+	    {
+            endpoint: { "protocol": "http", "host": "hachi.nem.ninja", "port" : 7890 },
+            identity: { "name": "hachi", "public-key": "AzHfTPOeJihlItBu9p4um3UFh26OdJj81Xa5KFPnOlka" }
+        },
+	    {
+            endpoint: { "protocol": "http", "host": "jusan.nem.ninja", "port" : 7890 },
+            identity: { "name": "jusan", "public-key": "Ahxv4ZW2XuaXW3giJ63nVTOa6YI1xbdjWQ1LtX1vCMfC" }
+        },
+	    {
+            endpoint: { "protocol": "http", "host": "nijuichi.nem.ninja", "port" : 7890 },
+            identity: { "name": "nijuichi", "public-key": "AjyQSXWl08579r2RrZ6c2mSCrgnyD025pVId0HjNSRj+" }
         }
     ],
 }
