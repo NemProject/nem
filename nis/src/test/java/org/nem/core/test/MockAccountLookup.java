@@ -75,6 +75,11 @@ public class MockAccountLookup implements AccountLookup {
 		return this.accountMap.containsKey(id);
 	}
 
+	@Override
+	public void removeAccountFromCache(Address id) {
+
+	}
+
 	/**
 	 * Returns the number of times findByAddress was called.
 	 *

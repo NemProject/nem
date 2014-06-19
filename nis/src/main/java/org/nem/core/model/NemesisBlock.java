@@ -4,7 +4,6 @@ import net.minidev.json.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
-import org.nem.nis.AccountAnalyzer;
 
 import java.io.*;
 
@@ -51,10 +50,11 @@ public class NemesisBlock extends Block {
 
 	/**
 	 * Loads the nemesis block from the default project resource.
+	 * @param accountLookup
 	 */
-	public static NemesisBlock fromResource() {
+	public static NemesisBlock fromResource(final AccountLookup accountLookup) {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_FILE)) {
-			return fromStream(fin);
+			return fromStream(fin, accountLookup);
 		}
 		catch (IOException e) {
 			throw new IllegalStateException("unable to parse nemesis block stream");
@@ -65,10 +65,11 @@ public class NemesisBlock extends Block {
 	 * Loads the nemesis block from an input stream.
 	 *
 	 * @param fin The input stream.
+	 * @param accountLookup
 	 */
-	public static NemesisBlock fromStream(final InputStream fin) {
+	public static NemesisBlock fromStream(final InputStream fin, final AccountLookup accountLookup) {
 		try {
-			return fromJsonObject((JSONObject)JSONValue.parseStrict(fin));
+			return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), accountLookup);
 		}
 		catch (IOException|net.minidev.json.parser.ParseException e) {
 			throw new IllegalArgumentException("unable to parse nemesis block stream");
@@ -79,9 +80,10 @@ public class NemesisBlock extends Block {
 	 * Loads the nemesis block from a json object.
 	 *
 	 * @param jsonObject The json object.
+	 * @param accountLookup
 	 */
-	public static NemesisBlock fromJsonObject(final JSONObject jsonObject) {
-		final DeserializationContext context = new DeserializationContext((new AccountAnalyzer(null)).asAutoCache());
+	public static NemesisBlock fromJsonObject(final JSONObject jsonObject, final AccountLookup accountLookup) {
+		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, context);
 		if (NEMESIS_BLOCK_TYPE != deserializer.readInt("type"))
 			throw new IllegalArgumentException("json object does not have correct type set");

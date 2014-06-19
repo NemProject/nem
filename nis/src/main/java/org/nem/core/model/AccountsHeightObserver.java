@@ -1,20 +1,20 @@
 package org.nem.core.model;
 
 import org.nem.core.model.primitive.*;
-import org.nem.nis.AccountAnalyzer;
+import org.nem.core.serialization.AccountLookup;
 
 /**
  * A BlockTransferObserver implementation that updates account heights.
  */
 public class AccountsHeightObserver implements BlockTransferObserver {
-	final AccountAnalyzer accountAnalyzer;
+	final AccountLookup accountAnalyzer;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param accountAnalyzer The account analyzer to use.
 	 */
-	public AccountsHeightObserver(final AccountAnalyzer accountAnalyzer) {
+	public AccountsHeightObserver(final AccountLookup accountAnalyzer) {
 		this.accountAnalyzer = accountAnalyzer;
 	}
 

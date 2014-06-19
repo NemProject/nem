@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.*;
@@ -20,7 +19,7 @@ public class NisMain {
 
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
-	private static Block NEMESIS_BLOCK = NemesisBlock.fromResource();
+	private static Block NEMESIS_BLOCK = NemesisBlock.fromResource((new AccountAnalyzer(null)).asAutoCache());
 	private static Hash NEMESIS_BLOCK_HASH = HashUtils.calculateHash(NEMESIS_BLOCK);
 
 	@Autowired
