@@ -9,7 +9,8 @@ import org.nem.core.serialization.*;
  */
 public class HttpConnectorPool implements SyncConnectorPool {
 
-	private static final int DEFAULT_TIMEOUT = 30000;
+	private static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
+	private static final int DEFAULT_SOCKET_TIMEOUT = 10000;
 
 	private final HttpMethodClient<Deserializer> httpMethodClient;
 
@@ -17,7 +18,9 @@ public class HttpConnectorPool implements SyncConnectorPool {
 	 * Creates a new HTTP connector pool.
 	 */
 	public HttpConnectorPool() {
-		this.httpMethodClient = new HttpMethodClient<>(DEFAULT_TIMEOUT);
+		this.httpMethodClient = new HttpMethodClient<>(
+				DEFAULT_CONNECTION_TIMEOUT,
+				DEFAULT_SOCKET_TIMEOUT);
 	}
 
 	@Override

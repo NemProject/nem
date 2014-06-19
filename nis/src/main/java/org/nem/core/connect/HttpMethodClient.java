@@ -32,12 +32,14 @@ public class HttpMethodClient<T> {
 	/**
 	 * Creates a new HTTP method client.
 	 *
-	 * @param timeout The timeout (in seconds) that should be used.
+	 * @param connectionTimeout The connection timeout (in milliseconds) that should be used.
+	 * @param socketTimeout The socket timeout (in milliseconds) that should be used.
 	 */
-	public HttpMethodClient(final int timeout) {
+	public HttpMethodClient(final int connectionTimeout, final int socketTimeout) {
 		final RequestConfig config = RequestConfig.custom()
-				.setSocketTimeout(timeout)
-				.setConnectTimeout(timeout)
+				.setConnectTimeout(connectionTimeout)
+				.setConnectionRequestTimeout(connectionTimeout)
+				.setSocketTimeout(socketTimeout)
 				.setRedirectsEnabled(false)
 				.build();
 

@@ -122,7 +122,7 @@ public class HttpMethodClientTest {
 	//endregion
 
 	private static HttpMethodClient<Deserializer> createClient(int timeout) {
-		return new HttpMethodClient<>(timeout);
+		return new HttpMethodClient<>(timeout, timeout);
 	}
 
 	private static class TestRunner {
@@ -167,7 +167,7 @@ public class HttpMethodClientTest {
 		public void sendDelegatesToStrategyOnSuccess() {
 			// Arrange:
 			final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
-			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT);
+			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 			// Act:
 			this.strategy.send(client, stringToUrl(GOOD_URL), strategy).get();
@@ -180,7 +180,7 @@ public class HttpMethodClientTest {
 		public void sendSetsRequestHeadersCorrectly() {
 			// Arrange:
 			final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
-			final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT);
+			final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT, GOOD_TIMEOUT);
 
 			// Act:
 			this.strategy.send(client, stringToUrl(GOOD_URL), strategy).get();
