@@ -29,8 +29,8 @@ public class DebugControllerTest {
 		final TimeInstant timestamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
-		final Account signer1 = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
-		final Account signer2 = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
+		final Account signer1 = addRandomAccountWithBalance(accountAnalyzer);
+		final Account signer2 = addRandomAccountWithBalance(accountAnalyzer);
 
 		final Block blockDaoBlock = new Block(
 				signer1,
@@ -96,6 +96,12 @@ public class DebugControllerTest {
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
 	}
 
+	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
+		final Account account = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
+		account.incrementBalance(Amount.fromNem(10000));
+		account.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
+		return account;
+	}
 
 	private static class TestContext {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);

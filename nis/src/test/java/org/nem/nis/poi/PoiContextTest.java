@@ -13,6 +13,37 @@ import java.util.stream.Collectors;
 
 public class PoiContextTest {
 
+	//region construction
+
+	@Test(expected = IllegalArgumentException.class)
+	public void cannotCreateContextAroundZeroAccounts() {
+		// Arrange:
+		final List<TestAccountInfo> accountInfos = Arrays.asList();
+
+		final BlockHeight height = new BlockHeight(21);
+		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+
+		// Act:
+		createTestPoiContext(height, accounts);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void cannotCreateContextAroundZeroForagingEligibleAccounts() {
+		// Arrange:
+		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
+		final List<TestAccountInfo> accountInfos = Arrays.asList(
+				new TestAccountInfo(multiplier - 1, multiplier - 1, null), // non-foraging account
+				new TestAccountInfo(multiplier - 1, multiplier - 1, null)); // non-foraging account
+
+		final BlockHeight height = new BlockHeight(21);
+		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+
+		// Act:
+		createTestPoiContext(height, accounts);
+	}
+
+	//endregion
+
 	//region process
 
 	@Test

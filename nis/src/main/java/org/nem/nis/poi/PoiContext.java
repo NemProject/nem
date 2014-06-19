@@ -125,7 +125,6 @@ public class PoiContext {
 	}
 
 	private static class AccountProcessor {
-
 		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
 		private final ColumnVector dangleVector;
@@ -154,6 +153,9 @@ public class PoiContext {
 				this.accountInfos.add(accountInfo);
 				++i;
 			}
+
+			if (0 == i)
+				throw new IllegalArgumentException("there aren't any foraging eligible accounts");
 
 			this.dangleVector = new ColumnVector(i);
 			this.dangleVector.setAll(1);
