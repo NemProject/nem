@@ -20,11 +20,4 @@ public class BlockChainConstants {
 	 * Number of blocks send and compared during synchronization
 	 */
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
-
-	/**
-	 * Number of blocks that should be treated as a group for POI purposes.
-	 * In other words, POI importances will only be calculated at blocks that
-	 * are a multiple of this grouping number.
-	 */
-	public static final int POI_GROUPING = 31;
 }

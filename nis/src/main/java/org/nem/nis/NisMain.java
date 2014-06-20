@@ -101,10 +101,15 @@ public class NisMain {
 			}
 		} while (dbBlock != null);
 
+		this.initializePoi(parentBlock.getHeight());
+	}
+
+	private void initializePoi(final BlockHeight height) {
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
-		LOGGER.info("initializing PoI");
+		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.size()));
 		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer);
-		blockScorer.recalculateImportanceWithGrouping(parentBlock);
+		final BlockHeight blockHeight = blockScorer.getGroupedHeight(height);
+		this.accountAnalyzer.recalculateImportances(blockHeight);
 		LOGGER.info("PoI initialized");
 	}
 

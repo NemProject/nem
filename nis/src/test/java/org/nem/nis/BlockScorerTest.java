@@ -13,6 +13,7 @@ import org.nem.nis.test.*;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.*;
 
 public class BlockScorerTest {
 
@@ -147,6 +148,41 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
+	//region getGroupedHeight
+
+	private static final Map<Integer, Integer> HEIGHT_TO_GROUPED_HEIGHT_MAP = new HashMap<Integer, Integer>() {
+		{
+			put(1, 1);
+			put(30, 1);
+			put(31, 1);
+			put(32, 32);
+			put(33, 32);
+			put(90, 63);
+			put(111, 94);
+		}
+	};
+
+	@Test
+	public void getGroupedHeightReturnsGroupedBlockHeight() {
+		// Assert:
+		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet())
+			assertGroupedHeight(pair.getKey(), pair.getValue());
+	}
+
+	private static void assertGroupedHeight(final long height, final long expectedGroupedHeight) {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+
+		// Act:
+		final BlockHeight groupedHeight = scorer.getGroupedHeight(new BlockHeight(height));
+
+		// Assert:
+		Assert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
+	}
+
+	//endregion
+
 	//region calculateForgerBalance
 
 	@Test
@@ -166,14 +202,9 @@ public class BlockScorerTest {
 
 	@Test
 	public void calculateForgerBalanceCallsRecalculateImportancesForGroupedBlock() {
-		// Arrange:
-		assertRecalculateImportancesCalledForHeight(1, 1);
-		assertRecalculateImportancesCalledForHeight(30, 1);
-		assertRecalculateImportancesCalledForHeight(31, 1);
-		assertRecalculateImportancesCalledForHeight(32, 32);
-		assertRecalculateImportancesCalledForHeight(33, 32);
-		assertRecalculateImportancesCalledForHeight(90, 63);
-		assertRecalculateImportancesCalledForHeight(111, 94);
+		// Assert:
+		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet())
+			assertRecalculateImportancesCalledForHeight(pair.getKey(), pair.getValue());
 	}
 
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {

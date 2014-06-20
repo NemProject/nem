@@ -37,6 +37,13 @@ public class BlockScorer {
      */
     private static final double TWO_TO_THE_POWER_OF_256 = Math.pow(2.0, 256.0);
 
+	/**
+	 * Number of blocks that should be treated as a group for POI purposes.
+	 * In other words, POI importances will only be calculated at blocks that
+	 * are a multiple of this grouping number.
+	 */
+	private static final int POI_GROUPING = 31;
+
 	public final AccountAnalyzer accountAnalyzer;
 
 	public BlockScorer(final AccountAnalyzer accountAnalyzer) {
@@ -82,23 +89,28 @@ public class BlockScorer {
 				 .divide(block.getDifficulty().asBigInteger());
 	}
 
-
-	public BlockHeight recalculateImportanceWithGrouping(Block block) {
-		final long backInTime = block.getHeight().getRaw() - 1;
-		final long grouped = (backInTime / BlockChainConstants.POI_GROUPING) * BlockChainConstants.POI_GROUPING;
-		final BlockHeight blockHeight = new BlockHeight(grouped + 1);
-		this.accountAnalyzer.recalculateImportances(blockHeight);
-		return blockHeight;
+	/**
+	 * Gets the grouped height for the specified un-grouped height.
+	 *
+	 * @param height The un-grouped height.
+	 * @return The grouped height.
+	 */
+	public BlockHeight getGroupedHeight(final BlockHeight height) {
+		final long backInTime = height.getRaw() - 1;
+		final long grouped = (backInTime / POI_GROUPING) * POI_GROUPING;
+		return new BlockHeight(grouped + 1);
 	}
 
 	/**
 	 * Calculates forager balance for block.
+	 * This has the side-effect of recalculating importances.
 	 *
 	 * @param block The signed, "hit" block.
 	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
-		final BlockHeight blockHeight = recalculateImportanceWithGrouping(block);
+		final BlockHeight blockHeight = this.getGroupedHeight(block.getHeight());
+		this.accountAnalyzer.recalculateImportances(blockHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 	}
