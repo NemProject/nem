@@ -100,10 +100,6 @@ public class NisAppConfig {
 		return new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
 	}
 
-	@Bean BlockScorer blockScorer() {
-		return new BlockScorer(this.accountAnalyzer());
-	}
-
 	@Bean
 	public HibernateTransactionManager transactionManager() throws IOException {
 		return new HibernateTransactionManager(this.sessionFactory());
