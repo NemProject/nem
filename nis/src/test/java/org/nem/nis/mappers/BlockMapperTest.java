@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.dbmodel.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
@@ -98,6 +99,24 @@ public class BlockMapperTest {
 
 		// Assert:
 		Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(0)));
+	}
+
+	@Test
+	public void dbModelWithNemesisTypeCanBeMappedToNemesisModel() {
+		// Arrange:
+		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
+		final TestContext context = new TestContext();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		dbModel.setHeight(1L);
+
+		// Act:
+		final Block model = context.toModel(dbModel);
+
+		// Assert:
+		Assert.assertThat(model, IsInstanceOf.instanceOf(NemesisBlock.class));
+		Assert.assertThat(
+				HashUtils.calculateHash(model),
+				IsEqual.equalTo(HashUtils.calculateHash(NemesisBlock.fromResource(deserializationContext))));
 	}
 
 	private class TestContext {

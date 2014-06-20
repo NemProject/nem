@@ -16,7 +16,6 @@ import java.util.*;
  */
 public class Block extends VerifiableEntity {
 
-	private final static int BLOCK_TYPE = 1;
 	private final static int BLOCK_VERSION = 1;
 
 	private final BlockHeight height;
@@ -45,7 +44,7 @@ public class Block extends VerifiableEntity {
 			final Hash generationHash,
 			final TimeInstant timestamp,
 			final BlockHeight height) {
-		super(BLOCK_TYPE, BLOCK_VERSION, timestamp, forger);
+		super(BlockTypes.REGULAR, BLOCK_VERSION, timestamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.generationHash = generationHash;

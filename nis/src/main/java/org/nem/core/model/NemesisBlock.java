@@ -12,8 +12,6 @@ import java.io.*;
  */
 public class NemesisBlock extends Block {
 
-	private final static int NEMESIS_BLOCK_TYPE = 1;
-
 	/**
 	 * The nemesis account address.
 	 */
@@ -44,17 +42,19 @@ public class NemesisBlock extends Block {
 	}
 
 	private NemesisBlock(final Deserializer deserializer) {
-		super(NEMESIS_BLOCK_TYPE, DeserializationOptions.VERIFIABLE, deserializer);
+		super(BlockTypes.NEMESIS, DeserializationOptions.VERIFIABLE, deserializer);
 		this.setGenerationHash(NEMESIS_GENERATION_HASH);
 	}
 
 	/**
 	 * Loads the nemesis block from the default project resource.
-	 * @param accountLookup
+	 *
+	 * @param context The deserialization context to use.
+	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromResource(final AccountLookup accountLookup) {
+	public static NemesisBlock fromResource(final DeserializationContext context) {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_FILE)) {
-			return fromStream(fin, accountLookup);
+			return fromStream(fin, context);
 		}
 		catch (IOException e) {
 			throw new IllegalStateException("unable to parse nemesis block stream");
@@ -65,11 +65,12 @@ public class NemesisBlock extends Block {
 	 * Loads the nemesis block from an input stream.
 	 *
 	 * @param fin The input stream.
-	 * @param accountLookup
+	 * @param context The deserialization context to use.
+	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromStream(final InputStream fin, final AccountLookup accountLookup) {
+	public static NemesisBlock fromStream(final InputStream fin, final DeserializationContext context) {
 		try {
-			return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), accountLookup);
+			return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), context);
 		}
 		catch (IOException|net.minidev.json.parser.ParseException e) {
 			throw new IllegalArgumentException("unable to parse nemesis block stream");
@@ -80,15 +81,14 @@ public class NemesisBlock extends Block {
 	 * Loads the nemesis block from a json object.
 	 *
 	 * @param jsonObject The json object.
-	 * @param accountLookup
+	 * @param context The deserialization context to use.
+	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromJsonObject(final JSONObject jsonObject, final AccountLookup accountLookup) {
-		final DeserializationContext context = new DeserializationContext(accountLookup);
+	public static NemesisBlock fromJsonObject(final JSONObject jsonObject, final DeserializationContext context) {
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, context);
-		if (NEMESIS_BLOCK_TYPE != deserializer.readInt("type"))
+		if (BlockTypes.NEMESIS != deserializer.readInt("type"))
 			throw new IllegalArgumentException("json object does not have correct type set");
 
 		return new NemesisBlock(deserializer);
-
 	}
 }

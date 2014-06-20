@@ -2,9 +2,9 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 
 import java.util.ArrayList;
@@ -62,6 +62,9 @@ public class BlockMapper {
 	 * @return The Block model.
 	 */
 	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
+		if (1 == dbBlock.getHeight())
+			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
+
 		final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
 
