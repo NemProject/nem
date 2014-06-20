@@ -82,6 +82,15 @@ public class BlockScorer {
 				 .divide(block.getDifficulty().asBigInteger());
 	}
 
+
+	public BlockHeight recalculateImportanceWithGrouping(Block block) {
+		final long backInTime = block.getHeight().getRaw() - 1;
+		final long grouped = (backInTime / BlockChainConstants.POI_GROUPING) * BlockChainConstants.POI_GROUPING;
+		final BlockHeight blockHeight = new BlockHeight(grouped + 1);
+		this.accountAnalyzer.recalculateImportances(blockHeight);
+		return blockHeight;
+	}
+
 	/**
 	 * Calculates forager balance for block.
 	 *
@@ -89,10 +98,7 @@ public class BlockScorer {
 	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
-		final long backInTime = block.getHeight().getRaw() - 1;
-		final long grouped = (backInTime / BlockChainConstants.POI_GROUPING) * BlockChainConstants.POI_GROUPING;
-		final BlockHeight blockHeight = new BlockHeight(grouped + 1);
-		this.accountAnalyzer.recalculateImportances(blockHeight);
+		final BlockHeight blockHeight = recalculateImportanceWithGrouping(block);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
 	}

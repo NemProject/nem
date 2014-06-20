@@ -61,6 +61,10 @@ public class NisMain {
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 
+			if ((block.getHeight().getRaw() % 1000) == 0) {
+				System.out.print(String.format("\r%d", block.getHeight().getRaw()));
+			}
+
 			if (null != parentBlock) {
 				this.blockChain.updateScore(parentBlock, block);
 			}
@@ -84,6 +88,8 @@ public class NisMain {
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
+				System.out.println();
+				System.out.flush();
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
@@ -96,6 +102,10 @@ public class NisMain {
 		} while (dbBlock != null);
 
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
+		LOGGER.info("initializing PoI");
+		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer);
+		blockScorer.recalculateImportanceWithGrouping(parentBlock);
+		LOGGER.info("PoI initialized");
 	}
 
 	@PostConstruct
