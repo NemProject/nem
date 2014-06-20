@@ -112,4 +112,21 @@ public class SignerTest {
 		// Act:
 		signer.sign(input);
 	}
+
+	@Test
+	public void replacingRWithGroupOrderMinusRInSignatureRuinsSignature() {
+		// Arrange:
+		final KeyPair kp = new KeyPair();
+		final Signer signer = new Signer(kp);
+		final byte[] input = Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = signer.sign(input);
+		final Signature signature2 = new Signature(
+				Curves.secp256k1().getParams().getN().subtract(signature.getR()),
+				signature.getS());
+
+		// Assert:
+		Assert.assertThat(signer.verify(input, signature2), IsEqual.equalTo(false));
+	}
 }
