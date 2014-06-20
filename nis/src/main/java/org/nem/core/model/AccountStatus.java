@@ -7,6 +7,11 @@ import org.nem.core.serialization.*;
  */
 public enum AccountStatus {
 	/**
+	 * The account status is unknown (needed for ncc).
+	 */
+	UNKNOWN("UNKNOWN"),
+
+	/**
 	 * The account is locked.
 	 */
 	LOCKED("LOCKED"),
