@@ -232,8 +232,7 @@ public class BlockChainTest {
 		BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
 				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				//.divide(BigInteger.valueOf(forger.getBalance().getNumNem()))
-				.divide(BigInteger.valueOf(800000000L))  // this is value of calculateForgerBalance() for current forager
+				.divide(BigInteger.valueOf(800000000L)) // this is value of calculateForgerBalance() for current forager
 				.intValue();
 		seconds += 1;
 

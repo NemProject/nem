@@ -1,21 +1,18 @@
-package org.nem.nis;
+package org.nem.core.model;
 
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.AccountAnalyzer;
 
 import java.io.*;
 
-// Test temporarily moved from org.nem.core to org.nem.nis, due to usagen of AA
-
 public class NemesisBlockTest {
 
-	private final NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource((new AccountAnalyzer(null)).asAutoCache());
+	private final NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource((new MockAccountLookup()));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
 
 	@Test
@@ -101,7 +98,7 @@ public class NemesisBlockTest {
 		nemesisBlockJson.put("type", 1);
 
 		// Act:
-		NemesisBlock.fromJsonObject(nemesisBlockJson, (new AccountAnalyzer(null)).asAutoCache());
+		NemesisBlock.fromJsonObject(nemesisBlockJson, (new MockAccountLookup()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -111,7 +108,7 @@ public class NemesisBlockTest {
 		final String badJson = "<bad>" + nemesisBlockJson.toJSONString();
 		try (final ByteArrayInputStream inputStream = new ByteArrayInputStream(badJson.getBytes())) {
 			// Act:
-			NemesisBlock.fromStream(inputStream, (new AccountAnalyzer(null)).asAutoCache());
+			NemesisBlock.fromStream(inputStream, (new MockAccountLookup()));
 		}
 	}
 

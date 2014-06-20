@@ -25,13 +25,4 @@ public interface AccountLookup {
 	 * @return true if the account is known, false if unknown.
 	 */
 	public boolean isKnownAddress(final Address id);
-
-	/**
-	 * Removes an account from the cache if it is in the cache.
-	 *TODO: this should't be here, but I needed to add it to break core/nis dependency
-	 *
-	 * @param Address address The account id
-	 *
-	 */
-	public void removeAccountFromCache(final Address id);
 }

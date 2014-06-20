@@ -86,7 +86,11 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		});
 	}
 
-	@Override
+	/**
+	 * Removes an account from the cache if it is in the cache.
+	 *
+	 * @param address The address of the account to remove.
+	 */
 	public void removeAccountFromCache(final Address address) {
 		this.addressToAccountMap.remove(address);
 	}
@@ -209,11 +213,5 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		public boolean isKnownAddress(final Address address) {
 			return this.accountAnalyzer.isKnownAddress(address);
 		}
-
-		@Override
-		public void removeAccountFromCache(final Address address) {
-			this.accountAnalyzer.removeAccountFromCache(address);
-		}
-
 	}
 }

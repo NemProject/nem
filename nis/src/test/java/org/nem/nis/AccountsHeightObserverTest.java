@@ -4,11 +4,8 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
-import org.nem.core.model.AccountsHeightObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-// Test temporarily moved from org.nem.core to org.nem.nis, due to usagen of AA
 
 public class AccountsHeightObserverTest {
 

@@ -6,8 +6,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
@@ -88,9 +87,9 @@ public class TransferDaoTest {
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
-		blockDao.save(dbBlock);
-		final Collection<Object[]> entities1 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime(), 25);
-		final Collection<Object[]> entities2 = transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime()-1, 25);
+		this.blockDao.save(dbBlock);
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime(), 25);
+		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccount(sender, transferTransaction.getTimeStamp().getRawTime()-1, 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(1));
