@@ -2,10 +2,8 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.logging.*;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -126,11 +124,9 @@ public class NisMain {
 		}
 		catch (final IOException e)
 		{
-			LOGGER.severe("Could not load default logging.properties file");
+			LOGGER.severe("Could not load default logging properties file");
 			LOGGER.severe(e.getMessage());
 		}
-
-		LOGGER.info("hello world");
 
 		// load the nemesis block information
 		this.nemesisBlock = this.loadNemesisBlock();
