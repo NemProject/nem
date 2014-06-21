@@ -1,13 +1,15 @@
 package org.nem.deploy;
 
+import java.io.*;
 import java.util.EnumSet;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -30,6 +32,15 @@ import org.springframework.web.servlet.DispatcherServlet;
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
+
+	static {
+		// initialize logging before anything is logged; otherwise not all settings will take effect
+		initializeLogging();
+	}
+
+	/**
+	 * The application meta data.
+	 */
 	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(
 			CommonStarter.class,
 			new SystemTimeProvider());
@@ -128,5 +139,16 @@ public class CommonStarter implements ServletContextListener {
 		//Zipping following MimeTypes
 		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	}
+
+	private static void initializeLogging() {
+		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
+			LogManager.getLogManager().readConfiguration(inputStream);
+		}
+		catch (final IOException e)
+		{
+			LOGGER.severe("Could not load default logging properties file");
+			LOGGER.severe(e.getMessage());
+		}
 	}
 }

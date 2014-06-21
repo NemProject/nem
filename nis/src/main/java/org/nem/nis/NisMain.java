@@ -119,15 +119,6 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-		try (final InputStream inputStream = NisMain.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
-			LogManager.getLogManager().readConfiguration(inputStream);
-		}
-		catch (final IOException e)
-		{
-			LOGGER.severe("Could not load default logging properties file");
-			LOGGER.severe(e.getMessage());
-		}
-
 		// load the nemesis block information
 		this.nemesisBlock = this.loadNemesisBlock();
 		this.nemesisBlockHash = HashUtils.calculateHash(this.nemesisBlock);
