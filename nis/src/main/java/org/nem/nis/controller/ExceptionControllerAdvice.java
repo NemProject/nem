@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.connect.ErrorResponse;
+import org.nem.nis.controller.interceptors.UnauthorizedAccessException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,17 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final Exception e) {
 		return createResponse(e, HttpStatus.BAD_REQUEST);
+	}
+
+	/**
+	 * Handler for unauthorized-access exceptions.
+	 *
+	 * @param e The exception.
+	 * @return The appropriate JSON indicating an error.
+	 */
+	@ExceptionHandler(UnauthorizedAccessException.class)
+	public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(final Exception e) {
+		return createResponse(e, HttpStatus.UNAUTHORIZED);
 	}
 
 	/**

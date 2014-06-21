@@ -13,6 +13,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -125,6 +126,8 @@ public class NisMain {
 		this.populateDb();
 
 		this.analyzeBlocks();
+
+		this.networkHost.boot(new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1")));
 	}
 
 	private NemesisBlock loadNemesisBlock() {

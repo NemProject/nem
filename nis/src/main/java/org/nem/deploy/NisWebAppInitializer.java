@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.nem.nis.controller.interceptors.LocalHostInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +24,11 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 		converters.add(this.deserializerHttpMessageConverter);
 		converters.add(this.serializableEntityHttpMessageConverter);
 		this.addDefaultHttpMessageConverters(converters);
+	}
+
+	@Override
+	protected void addInterceptors(final InterceptorRegistry registry) {
+		registry.addInterceptor(new LocalHostInterceptor());
+		super.addInterceptors(registry);
 	}
 }

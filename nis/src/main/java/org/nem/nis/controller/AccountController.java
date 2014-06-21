@@ -7,7 +7,7 @@ import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.Foraging;
-import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +107,7 @@ public class AccountController {
 	 * @return Account importance information.
 	 */
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
+	@PublicApi
 	@ClientApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
 		final List<AccountImportanceViewModel> accounts = StreamSupport.stream(this.accountIo.spliterator(), false)
