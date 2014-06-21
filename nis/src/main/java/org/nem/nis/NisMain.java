@@ -2,6 +2,9 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.nem.core.crypto.*;
@@ -117,6 +120,17 @@ public class NisMain {
 	@PostConstruct
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
+
+		try (final InputStream inputStream = NisMain.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
+			LogManager.getLogManager().readConfiguration(inputStream);
+		}
+		catch (final IOException e)
+		{
+			LOGGER.severe("Could not load default logging.properties file");
+			LOGGER.severe(e.getMessage());
+		}
+
+		LOGGER.info("hello world");
 
 		// load the nemesis block information
 		this.nemesisBlock = this.loadNemesisBlock();
