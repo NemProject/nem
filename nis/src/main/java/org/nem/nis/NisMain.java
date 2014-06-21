@@ -136,8 +136,6 @@ public class NisMain {
 		this.populateDb();
 
 		this.analyzeBlocks();
-
-		this.networkHost.boot(new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1")));
 	}
 
 	private NemesisBlock loadNemesisBlock() {
