@@ -3,7 +3,7 @@ package org.nem.deploy;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.*;
@@ -16,25 +16,27 @@ public class DeserializerHttpMessageConverterTest {
 	// region supports / canRead / canWrite
 
 	@Test
-	public void converterSupportsApplicationJsonMediaType() {
+	public void converterSupportsPolicyMediaType() {
 		// Arrange:
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final MediaType mediaType = new MediaType("application");
+		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
+		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
+		final DeserializerHttpMessageConverter mc = createMessageConverter(policy);
 
 		// Act:
 		final List<MediaType> mediaTypes = mc.getSupportedMediaTypes();
 
 		// Assert:
 		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mediaTypes.get(0).getType(), IsEqual.equalTo("application"));
-		Assert.assertThat(mediaTypes.get(0).getSubtype(), IsEqual.equalTo("json"));
-		Assert.assertThat(mediaTypes.get(0).getCharSet(), IsNull.nullValue());
+		Assert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
+		Mockito.verify(policy, Mockito.times(1)).getMediaType();
 	}
 
 	@Test
 	public void cannotWriteCompatibleTypes() {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
 		Assert.assertThat(mc.canWrite(JsonDeserializer.class, supportedType), IsEqual.equalTo(false));
@@ -45,7 +47,7 @@ public class DeserializerHttpMessageConverterTest {
 	public void canReadCompatibleTypes() {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
 		Assert.assertThat(mc.canRead(JsonDeserializer.class, supportedType), IsEqual.equalTo(true));
@@ -56,7 +58,7 @@ public class DeserializerHttpMessageConverterTest {
 	public void cannotReadIncompatibleTypes() {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
 		Assert.assertThat(mc.canRead(MediaType.class, supportedType), IsEqual.equalTo(false));
@@ -71,7 +73,7 @@ public class DeserializerHttpMessageConverterTest {
 	public void writeIsUnsupported() throws Exception {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
 		final JsonDeserializer deserializer = new JsonDeserializer(new JSONObject(), new DeserializationContext(null));
 
 		// Act:
@@ -82,7 +84,7 @@ public class DeserializerHttpMessageConverterTest {
 	public void readDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
 		// Arrange:
 		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
 
 		// Act:
 		final Deserializer deserializer = mc.read(
@@ -95,31 +97,31 @@ public class DeserializerHttpMessageConverterTest {
 	}
 
 	@Test
-	public void readDeserializerIsAssociatedWithAccountLookup() throws Exception {
+	public void readDelegatesToPolicy() throws Exception {
 		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
+		final MediaType mediaType = new MediaType("application", "json");
+		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
+		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
+
+		// Arrange:
 		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(accountLookup);
+		final DeserializerHttpMessageConverter mc = createMessageConverter(policy);
 
 		// Act:
-		final Deserializer deserializer = mc.read(
-				JsonDeserializer.class,
-				new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity)));
-
-		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
+		final MockHttpInputMessage message = new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity));
+		mc.read(JsonDeserializer.class, message);
 
 		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void readFailsIfInputStringIsNotJsonObject() throws Exception {
-		// Arrange:
-		final DeserializerHttpMessageConverter mc = new DeserializerHttpMessageConverter(null);
-
-		// Act:
-		mc.read(JsonDeserializer.class, new MockHttpInputMessage("7"));
+		Mockito.verify(policy, Mockito.times(1)).fromStream(message.getBody());
 	}
 
 	//endregion
+
+	private static DeserializerHttpMessageConverter createMessageConverter() {
+		return new DeserializerHttpMessageConverter(new JsonSerializationPolicy(null));
+	}
+
+	private static DeserializerHttpMessageConverter createMessageConverter(final SerializationPolicy policy) {
+		return new DeserializerHttpMessageConverter(policy);
+	}
 }

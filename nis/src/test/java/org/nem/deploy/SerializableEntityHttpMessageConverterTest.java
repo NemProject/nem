@@ -3,6 +3,7 @@ package org.nem.deploy;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.*;
@@ -16,18 +17,20 @@ public class SerializableEntityHttpMessageConverterTest {
 	// region supports / canRead / canWrite
 
 	@Test
-	public void converterSupportsApplicationJsonMediaType() {
+	public void converterSupportsPolicyMediaType() {
 		// Arrange:
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
+		final MediaType mediaType = new MediaType("application");
+		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
+		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter(policy);
 
 		// Act:
 		final List<MediaType> mediaTypes = mc.getSupportedMediaTypes();
 
 		// Assert:
 		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mediaTypes.get(0).getType(), IsEqual.equalTo("application"));
-		Assert.assertThat(mediaTypes.get(0).getSubtype(), IsEqual.equalTo("json"));
-		Assert.assertThat(mediaTypes.get(0).getCharSet(), IsNull.nullValue());
+		Assert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
+		Mockito.verify(policy, Mockito.times(2)).getMediaType();
 	}
 
 	@Test
@@ -98,7 +101,7 @@ public class SerializableEntityHttpMessageConverterTest {
 
 	//endregion
 
-	//region read / write
+	//region read
 
 	@Test
 	public void readIsSupportedForCompatibleTypeWithDeserializerConstructor() throws Exception {
@@ -113,6 +116,26 @@ public class SerializableEntityHttpMessageConverterTest {
 
 		// Assert:
 		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+	}
+
+	@Test
+	public void readDelegatesToPolicy() throws Exception {
+		// Arrange:
+		final MediaType mediaType = new MediaType("application", "json");
+		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
+		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
+		Mockito.when(policy.fromStream(Mockito.any())).thenReturn(Mockito.mock(Deserializer.class));
+
+		// Arrange:
+		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter(policy);
+
+		// Act:
+		final MockHttpInputMessage message = new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity));
+		mc.read(MockSerializableEntity.class, message);
+
+		// Assert:
+		Mockito.verify(policy, Mockito.times(1)).fromStream(message.getBody());
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -148,6 +171,11 @@ public class SerializableEntityHttpMessageConverterTest {
 				new MockHttpInputMessage(new JSONObject()));
 	}
 
+	//endregion
+
+	//region write
+
+
 	@Test
 	public void writeCreatesJsonStringWithTerminatingNewline() throws Exception {
 		// Arrange:
@@ -162,12 +190,6 @@ public class SerializableEntityHttpMessageConverterTest {
 
 		// Assert:
 		Assert.assertThat(jsonString.endsWith("\r\n"), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void writeCreatesJsonStringThatCanBeRoundTripped() throws Exception {
-		// Arrange:
-		assertWriteCanRoundTripEntityWithString("foo");
 	}
 
 	@Test
@@ -193,11 +215,35 @@ public class SerializableEntityHttpMessageConverterTest {
 		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
+	@Test
+	public void writeDelegatesToPolicy() throws Exception {
+		// Arrange:
+		final MediaType mediaType = new MediaType("application", "json");
+		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
+		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
+		Mockito.when(policy.toBytes(Mockito.any())).thenReturn(new byte[0]);
+
+		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter(policy);
+		final MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+
+		// Act:
+		mc.write(originalEntity, mediaType, outputMessage);
+
+		// Assert:
+		Mockito.verify(policy, Mockito.times(1)).toBytes(originalEntity);
+	}
+
 	//endregion
 
 	private static SerializableEntityHttpMessageConverter createMessageConverter() {
+		return createMessageConverter(new JsonSerializationPolicy(null));
+	}
+
+	private static SerializableEntityHttpMessageConverter createMessageConverter(final SerializationPolicy policy) {
 		return new SerializableEntityHttpMessageConverter(
-				new DeserializerHttpMessageConverter(new MockAccountLookup()));
+				new DeserializerHttpMessageConverter(policy),
+				policy);
 	}
 
 	private static class SerializableEntityWithoutDeserializerConstructor extends MockSerializableEntity {

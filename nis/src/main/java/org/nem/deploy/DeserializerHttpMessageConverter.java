@@ -1,6 +1,5 @@
 package org.nem.deploy;
 
-import net.minidev.json.*;
 import org.nem.core.serialization.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -13,17 +12,17 @@ import java.io.IOException;
  */
 public class DeserializerHttpMessageConverter extends AbstractHttpMessageConverter<Deserializer> {
 
-	private final AccountLookup accountLookup;
+	private final SerializationPolicy policy;
 
 	/**
 	 * Creates a new http message converter.
 	 *
-	 * @param accountLookup The account lookup to use.
+	 * @param policy The serialization policy to use.
 	 */
 	@Autowired(required = true)
-	public DeserializerHttpMessageConverter(final AccountLookup accountLookup) {
-		super(new MediaType("application", "json"));
-		this.accountLookup = accountLookup;
+	public DeserializerHttpMessageConverter(final SerializationPolicy policy) {
+		super(policy.getMediaType());
+		this.policy = policy;
 	}
 
 	@Override
@@ -37,15 +36,11 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 	}
 
 	@Override
-	protected JsonDeserializer readInternal(
+	protected Deserializer readInternal(
 			final Class<? extends Deserializer> aClass,
 			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
 
-		final Object result = JSONValue.parse(httpInputMessage.getBody());
-		if (result instanceof JSONObject)
-			return new JsonDeserializer((JSONObject)result, new DeserializationContext(this.accountLookup));
-
-		throw new IllegalArgumentException("JSON Object was expected");
+		return this.policy.fromStream(httpInputMessage.getBody());
 	}
 
 	@Override

@@ -117,11 +117,14 @@ public class NisAppConfig {
 
 	@Bean
 	public DeserializerHttpMessageConverter deserializerHttpMessageConverter() {
-		return new DeserializerHttpMessageConverter(this.accountAnalyzer());
+		return new DeserializerHttpMessageConverter(
+				new JsonSerializationPolicy(this.accountAnalyzer()));
 	}
 
 	@Bean
 	public SerializableEntityHttpMessageConverter serializableEntityHttpMessageConverter() {
-		return new SerializableEntityHttpMessageConverter(this.deserializerHttpMessageConverter());
+		return new SerializableEntityHttpMessageConverter(
+				this.deserializerHttpMessageConverter(),
+				new JsonSerializationPolicy(this.accountAnalyzer()));
 	}
 }

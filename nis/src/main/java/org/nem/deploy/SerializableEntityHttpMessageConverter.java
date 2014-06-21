@@ -16,14 +16,21 @@ import java.lang.reflect.InvocationTargetException;
 public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<SerializableEntity> {
 
 	private final DeserializerHttpMessageConverter deserializerMessageConverter;
+	private final SerializationPolicy policy;
 
 	/**
 	 * Creates a new http message converter.
+	 *
+	 * @param deserializerMessageConverter A deserializer message converter.
+	 * @param policy The serialization policy.
 	 */
 	@Autowired(required = true)
-	public SerializableEntityHttpMessageConverter(final DeserializerHttpMessageConverter deserializerMessageConverter) {
-		super(new MediaType("application", "json"));
+	public SerializableEntityHttpMessageConverter(
+			final DeserializerHttpMessageConverter deserializerMessageConverter,
+			final SerializationPolicy policy) {
+		super(policy.getMediaType());
 		this.deserializerMessageConverter = deserializerMessageConverter;
+		this.policy = policy;
 	}
 
 	@Override
@@ -53,11 +60,7 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 			final SerializableEntity serializableEntity,
 			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
 
-		final JsonSerializer serializer = new JsonSerializer();
-		serializableEntity.serialize(serializer);
-
-		final String rawJson = serializer.getObject().toJSONString() + "\r\n";
-		httpOutputMessage.getBody().write(StringEncoder.getBytes(rawJson));
+		httpOutputMessage.getBody().write(this.policy.toBytes(serializableEntity));
 	}
 
 	private <T> Constructor<T> getConstructor(final Class<T> aClass) {
