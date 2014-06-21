@@ -177,6 +177,21 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
+	public void canRoundtripNullString() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeString("String", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final String s = deserializer.readString("String");
+
+		// Assert:
+		Assert.assertThat(s, IsNull.nullValue());
+	}
+
+	@Test
 	public void canRoundtripObject() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();

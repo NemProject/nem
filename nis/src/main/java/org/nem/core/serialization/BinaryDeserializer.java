@@ -62,7 +62,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	@Override
 	public String readString(final String label) {
 		byte[] bytes = this.readBytes(null);
-		return StringEncoder.getString(bytes);
+		return null == bytes ? null : StringEncoder.getString(bytes);
 	}
 
 	@Override

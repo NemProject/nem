@@ -66,7 +66,7 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
 	@Override
 	public void writeString(final String label, final String s) {
-		this.writeBytes(null, StringEncoder.getBytes(s));
+		this.writeBytes(null, null == s ? null : StringEncoder.getBytes(s));
 	}
 
 	@Override
