@@ -1,7 +1,6 @@
 package org.nem.deploy;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.StringEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
@@ -21,15 +20,12 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 	/**
 	 * Creates a new http message converter.
 	 *
-	 * @param deserializerMessageConverter A deserializer message converter.
 	 * @param policy The serialization policy.
 	 */
 	@Autowired(required = true)
-	public SerializableEntityHttpMessageConverter(
-			final DeserializerHttpMessageConverter deserializerMessageConverter,
-			final SerializationPolicy policy) {
+	public SerializableEntityHttpMessageConverter(final SerializationPolicy policy) {
 		super(policy.getMediaType());
-		this.deserializerMessageConverter = deserializerMessageConverter;
+		this.deserializerMessageConverter = new DeserializerHttpMessageConverter(policy);
 		this.policy = policy;
 	}
 

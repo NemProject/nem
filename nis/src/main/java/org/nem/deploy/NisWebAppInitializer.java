@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.interceptors.LocalHostInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,16 +15,20 @@ import java.util.List;
 //@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
 public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Autowired
-	DeserializerHttpMessageConverter deserializerHttpMessageConverter;
-
-	@Autowired
-	SerializableEntityHttpMessageConverter serializableEntityHttpMessageConverter;
+	private AccountLookup accountLookup;
 
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
-		converters.add(this.deserializerHttpMessageConverter);
-		converters.add(this.serializableEntityHttpMessageConverter);
+		addConvertersForPolicy(converters, new JsonSerializationPolicy(this.accountLookup));
+		addConvertersForPolicy(converters, new BinarySerializationPolicy(this.accountLookup));
 		this.addDefaultHttpMessageConverters(converters);
+	}
+
+	private static void addConvertersForPolicy(
+			final List<HttpMessageConverter<?>> converters,
+			final SerializationPolicy policy) {
+		converters.add(new DeserializerHttpMessageConverter(policy));
+		converters.add(new SerializableEntityHttpMessageConverter(policy));
 	}
 
 	@Override

@@ -114,17 +114,4 @@ public class NisAppConfig {
 	public NisPeerNetworkHost nisPeerNetworkHost() {
 		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
 	}
-
-	@Bean
-	public DeserializerHttpMessageConverter deserializerHttpMessageConverter() {
-		return new DeserializerHttpMessageConverter(
-				new JsonSerializationPolicy(this.accountAnalyzer()));
-	}
-
-	@Bean
-	public SerializableEntityHttpMessageConverter serializableEntityHttpMessageConverter() {
-		return new SerializableEntityHttpMessageConverter(
-				this.deserializerHttpMessageConverter(),
-				new JsonSerializationPolicy(this.accountAnalyzer()));
-	}
 }

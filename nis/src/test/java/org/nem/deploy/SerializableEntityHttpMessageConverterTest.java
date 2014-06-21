@@ -241,9 +241,7 @@ public class SerializableEntityHttpMessageConverterTest {
 	}
 
 	private static SerializableEntityHttpMessageConverter createMessageConverter(final SerializationPolicy policy) {
-		return new SerializableEntityHttpMessageConverter(
-				new DeserializerHttpMessageConverter(policy),
-				policy);
+		return new SerializableEntityHttpMessageConverter(policy);
 	}
 
 	private static class SerializableEntityWithoutDeserializerConstructor extends MockSerializableEntity {
