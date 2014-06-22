@@ -25,7 +25,8 @@ public class NemesisBlock extends Block {
 	// this will be removed later, only public key will be present in the code
 	// all signatures will be pre-generated and placed in-code
 	private final static PrivateKey CREATOR_PRIVATE_KEY = PrivateKey.fromHexString(
-			"aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
+			"0000000000000000000000000000000000000000000000000000000000000000");
+		//"aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
 
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
 			"03d671c0029ba81781be05702df62d05d7111be2223657c5b883794cb784e3c03c");
@@ -37,7 +38,7 @@ public class NemesisBlock extends Block {
 	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.json";
 
 	static {
-		final KeyPair nemesisKeyPair = new KeyPair(CREATOR_PRIVATE_KEY);
+		final KeyPair nemesisKeyPair = new KeyPair(CREATOR_PUBLIC_KEY);
 		ADDRESS = Address.fromPublicKey(nemesisKeyPair.getPublicKey());
 	}
 
