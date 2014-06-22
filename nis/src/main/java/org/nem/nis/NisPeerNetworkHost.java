@@ -85,8 +85,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 								this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
 							}),
 							FORAGING_INITIAL_DELAY,
-							new UniformDelayStrategy(FORAGING_INTERVAL));
-					this.foragingTimer.setName("FORAGING");
+							new UniformDelayStrategy(FORAGING_INTERVAL),
+							null);
 				});
 	}
 
@@ -155,8 +155,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.refreshTimer = new AsyncTimer(
 					() -> this.network.refresh(),
 					REFRESH_INITIAL_DELAY,
-					getRefreshDelayStrategy());
-			this.refreshTimer.setName("REFRESH");
+					getRefreshDelayStrategy(),
+					null);
 
 			this.secondaryTimers = Arrays.asList(
 					this.createSecondaryAsyncTimer(
@@ -197,8 +197,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final AsyncTimer timer = AsyncTimer.After(
 					this.refreshTimer,
 					recurringFutureSupplier,
-					new UniformDelayStrategy(delay));
-			timer.setName(name);
+					new UniformDelayStrategy(delay),
+					null);
 			return timer;
 		}
 

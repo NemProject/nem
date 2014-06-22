@@ -16,13 +16,11 @@ public class AsyncTimer implements Closeable {
 	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final AbstractDelayStrategy delay;
 	private final CompletableFuture<?> future;
+	private final AsyncTimerVisitor visitor;
 
 	private final AtomicBoolean isStopped = new AtomicBoolean();
 	private final CompletableFuture<?> firstRecurrenceFuture = new CompletableFuture<>();
 	private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
-
-	private int numExecutions;
-	private String name;
 
 	/**
 	 * Creates a new async timer.
@@ -30,29 +28,34 @@ public class AsyncTimer implements Closeable {
 	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param initialDelay The time (in milliseconds) to delay the first execution.
 	 * @param delay The delay strategy.
+	 * @param visitor The visitor.
 	 */
 	public AsyncTimer(
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int initialDelay,
-			final AbstractDelayStrategy delay) {
+			final AbstractDelayStrategy delay,
+			final AsyncTimerVisitor visitor) {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
-		this.future = this.refresh(initialDelay);
+		this.visitor = getVisitorOrDefault(visitor);
+		this.future = this.chain(initialDelay);
 	}
 
 	private AsyncTimer(
 			final CompletableFuture<?> trigger,
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final AbstractDelayStrategy delay) {
+			final AbstractDelayStrategy delay,
+			final AsyncTimerVisitor visitor) {
 
 		this.recurringFutureSupplier = recurringFutureSupplier;
 		this.delay = delay;
-		this.future = this.createFuture(trigger);
+		this.visitor = getVisitorOrDefault(visitor);
+		this.future = trigger.thenCompose(v -> this.getNextChainLink());
 	}
 
-	private CompletableFuture<?> createFuture(final CompletableFuture<?> trigger) {
-		return trigger.thenCompose(v -> this.getNextChainLink());
+	private static AsyncTimerVisitor getVisitorOrDefault(final AsyncTimerVisitor visitor) {
+		return null == visitor ? new DefaultAsyncTimerVisitor() : visitor;
 	}
 
 	/**
@@ -61,35 +64,16 @@ public class AsyncTimer implements Closeable {
 	 * @param triggerTimer The timer that will trigger the first execution when it has completed a single recurrence.
 	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
 	 * @param delay The delay strategy.
+	 * @param visitor The visitor.
 	 */
 	public static AsyncTimer After(
 			final AsyncTimer triggerTimer,
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final AbstractDelayStrategy delay) {
+			final AbstractDelayStrategy delay,
+			final AsyncTimerVisitor visitor) {
 
-		return new AsyncTimer(triggerTimer.firstRecurrenceFuture, recurringFutureSupplier, delay);
+		return new AsyncTimer(triggerTimer.firstRecurrenceFuture, recurringFutureSupplier, delay, visitor);
 	}
-
-	/**
-	 * Gets the number of times the user function has been executed.
-	 *
-	 * @return The number of times the user function has been executed.
-	 */
-	public int getNumExecutions() { return this.numExecutions; }
-
-	/**
-	 * Gets the name of the timer.
-	 *
-	 * @return The name of the timer.
-	 */
-	public String getName() { return this.name; }
-
-	/**
-	 * Sets the name of the timer.
-	 *
-	 * @param name The name of the timer.
-	 */
-	public void setName(final String name) { this.name = name; }
 
 	/**
 	 * Determines if this timer is stopped.
@@ -100,8 +84,8 @@ public class AsyncTimer implements Closeable {
 		return this.future.isDone();
 	}
 
-	private CompletableFuture<?> refresh(int delay) {
-		this.log("sleeping for " + delay + "ms");
+	private CompletableFuture<?> chain(int delay) {
+		this.visitor.notifyDelay(delay);
 		final SleepRunnable sleepRunnable = new SleepRunnable();
 		this.scheduler.schedule(sleepRunnable, delay, TimeUnit.MILLISECONDS);
 		return sleepRunnable.getFuture().thenCompose(v -> this.getNextChainLink());
@@ -114,35 +98,23 @@ public class AsyncTimer implements Closeable {
 
 	private CompletableFuture<?> getNextChainLink() {
 		if (this.isStopped.get() || this.delay.shouldStop()) {
-			this.log("stopped");
+			this.visitor.notifyStop();
 			final CompletableFuture<Void> terminatingFuture = new CompletableFuture<>();
 			terminatingFuture.complete(null);
 			return terminatingFuture;
 		}
 
-		this.log("executing");
-		++this.numExecutions;
+		this.visitor.notifyOperationStart();
 		return this.recurringFutureSupplier.get()
+				.thenAccept(v -> this.visitor.notifyOperationComplete())
 				.exceptionally(e -> {
-					LOGGER.log(
-                            Level.WARNING,
-							String.format("Timer %s raised exception: %s", this.getName(), e.getMessage()),
-							e);
+					this.visitor.notifyOperationCompleteExceptionally(e);
 					return null;
 				})
 				.thenCompose(v -> {
 					this.firstRecurrenceFuture.complete(null);
-					return this.refresh(this.delay.next());
+					return this.chain(this.delay.next());
 				});
-	}
-
-	private void log(final String message) {
-		LOGGER.fine(String.format(
-				"[%d] Timer %s: %s (%d)",
-				Thread.currentThread().getId(),
-				this.getName(),
-				message,
-				this.numExecutions));
 	}
 
 	private static class SleepRunnable implements Runnable {
@@ -159,6 +131,45 @@ public class AsyncTimer implements Closeable {
 
 		public CompletableFuture<Void> getFuture() {
 			return this.future;
+		}
+	}
+
+	private static class DefaultAsyncTimerVisitor implements AsyncTimerVisitor {
+
+		@Override
+		public void notifyOperationStart() {
+			this.log("executing");
+		}
+
+		@Override
+		public void notifyOperationComplete() {
+		}
+
+		@Override
+		public void notifyOperationCompleteExceptionally(final Throwable e) {
+			LOGGER.log(
+					Level.WARNING,
+					String.format("Timer %s raised exception: %s", "<name>", e.getMessage()),
+					e);
+		}
+
+		@Override
+		public void notifyDelay(final int delay) {
+			this.log("sleeping for " + delay + "ms");
+		}
+
+		@Override
+		public void notifyStop() {
+			this.log("stopping");
+		}
+
+		private void log(final String message) {
+			LOGGER.fine(String.format(
+					"[%d] Timer %s: %s (%d)",
+					Thread.currentThread().getId(),
+					"<name>",
+					message,
+					0));
 		}
 	}
 }
