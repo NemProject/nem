@@ -1,5 +1,5 @@
 {
-	"signature":"MPn2c01LkvQv6dHO5Ct46nx1vFP\/govWsxwTmwhfkQRgxloyY8Ld2wBqbKTvRVAkajFzUHir+xktNLZpOAtwOQ==",
+	"signature":"xjtbAmPYhhLP3BWMHx\/v5n91APucQaRDoo48d6NviJ9GQkRyQ1nzRQ7Lv7f4RGRwBUw4GDX9dQLXy15\/pL4lWw==",
 		"prevBlockHash":{
 			"data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 		},
@@ -230,9 +230,9 @@
 		},
 		{
 			"amount":160000000000000,
-			"signature":"Yd9HFEeIVjWPELXXc1i3sUzkQq0uPT7gUHtWplWIV\/1t8HNPBFhb1AFdZ7m2jE0DN93IU0YRMQSFfM63aHIZBQ==",
+			"signature":"Vu2xm1L5YES8q9bTK3yZoLhrqhKyrFV4lfKfFS03hpzc215BOtp1GDitO9HFnECLqrsIttUa\/R0GJH+B4nQIOg==",
 			"fee":0,
-			"recipient":"TDUIUAJ7J7IIEP5DSKMG75GKJM7WNEN6HMQWYUJD",
+			"recipient":"TCUDNGOWU4S6H6CNMEYQB3HJCE5VEAE6FVXDUETM",
 			"type":257,
 			"deadline":0,
 			"message":{
@@ -244,9 +244,9 @@
 		},
 		{
 			"amount":160000000000000,
-			"signature":"REit7ybkxluSlzaesUskfczi\/ESvL3rlPCh3qIVRzc0A43jYPT46GtLW0IwwT90VztK27GzYLrkM0mQnyBMscg==",
+			"signature":"3hSOxQQHGOiJP232imyIY9eFmJR3+Svo1NeypcGqRUauUDY8zsGCeW6pgn4qicvGWmsLBYkBFrNPlogUSDpbVg==",
 			"fee":0,
-			"recipient":"TAPGSQOZKZFJ6K7EYR6ASJJPNGN5FEV4KMWJ54R3",
+			"recipient":"TCPVPTY7M4IBC2MKEALDQ7JX6MYDZZMCW4E6F34B",
 			"type":257,
 			"deadline":0,
 			"message":{
