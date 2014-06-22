@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * NIS PeerNetworkHost
@@ -74,7 +74,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					this.host = new PeerNetworkHost(network);
 
 					this.foragingTimer = new AsyncTimer(
-							() -> CompletableFuture.runAsync(() -> {
+							this.host.runnableToFutureSupplier(() -> {
 								final Block block = this.blockChain.forageBlock();
 								if (null == block)
 									return;
@@ -142,6 +142,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		private final PeerNetwork network;
 		private final AsyncTimer refreshTimer;
 		private final List<AsyncTimer> secondaryTimers;
+		private final Executor executor = Executors.newCachedThreadPool();
 
 		/**
 		 * Creates a host that hosts the specified network.
@@ -163,15 +164,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 							BROADCAST_INTERVAL,
 							"BROADCAST"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(() -> this.network.synchronize()),
+							this.runnableToFutureSupplier(() -> this.network.synchronize()),
 							SYNC_INTERVAL,
 							"SYNC"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(() -> this.network.pruneInactiveNodes()),
+							this.runnableToFutureSupplier(() -> this.network.pruneInactiveNodes()),
 							PRUNE_INACTIVE_NODES_DELAY,
 							"PRUNING INACTIVE NODES"),
 					this.createSecondaryAsyncTimer(
-							() -> CompletableFuture.runAsync(() -> this.network.updateLocalNodeEndpoint()),
+							this.runnableToFutureSupplier(() -> this.network.updateLocalNodeEndpoint()),
 							UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
 							"UPDATING LOCAL NODE ENDPOINT"));
 		}
@@ -214,6 +215,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		public void close() {
 			this.refreshTimer.close();
 			this.secondaryTimers.forEach(obj -> obj.close());
+		}
+
+		private Supplier<CompletableFuture<?>> runnableToFutureSupplier(final Runnable runnable) {
+			return () -> CompletableFuture.runAsync(runnable, this.executor);
 		}
 	}
 }
