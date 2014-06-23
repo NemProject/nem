@@ -6,11 +6,13 @@ import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 /**
  * Encapsulates management of an account's importance.
  */
 public class AccountImportance implements SerializableEntity {
+	private static final Logger LOGGER = Logger.getLogger(AccountImportance.class.getName());
 
 	private final HistoricalOutlinks historicalOutlinks;
 
@@ -133,8 +135,13 @@ public class AccountImportance implements SerializableEntity {
 	 * @return The importance.
 	 */
 	public double getImportance(final BlockHeight blockHeight) {
-		if (this.importanceHeight == null || 0 != this.importanceHeight.compareTo(blockHeight))
+		if (this.importanceHeight == null) {
+			LOGGER.warning("your balance haven't vested yet, foraging does not make sense");
+			return 0.0;
+		}
+		if (0 != this.importanceHeight.compareTo(blockHeight)) {
 			throw new IllegalArgumentException("importance not set at wanted height");
+		}
 
 		return this.importance;
 	}

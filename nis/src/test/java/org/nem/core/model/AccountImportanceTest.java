@@ -130,13 +130,13 @@ public class AccountImportanceTest {
 
 	//region {get|set}Importance
 
-	@Test(expected = IllegalArgumentException.class)
-	public void cannotGetImportanceWhenItIsUnset() {
+	@Test
+	public void getImportanceReturnsZeroWhenUnset() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
 
 		// Act:
-		ai.getImportance(new BlockHeight(7));
+		Assert.assertThat(ai.getImportance(new BlockHeight(7)), IsEqual.equalTo(0.0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
