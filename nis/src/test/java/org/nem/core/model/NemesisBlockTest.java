@@ -16,6 +16,7 @@ public class NemesisBlockTest {
 	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
 	private final static NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource(new DeserializationContext(MOCK_ACCOUNT_LOOKUP));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
+	private final static int NUM_NEMESIS_TRANSACTIONS = 19;
 
 	//region basic
 
@@ -33,7 +34,7 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(9));
+		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
 
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 		Assert.assertThat(block.getGenerationHash(), IsNull.notNullValue());
@@ -70,8 +71,8 @@ public class NemesisBlockTest {
 
 	@Test
 	public void nemesisDeserializationUsesAccountLookupParameter() {
-		// Assert: (1 signer, 9 senders, 9 recipients)
-		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(19));
+		// Assert: (1 signer, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
+		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(1 + 2 * NUM_NEMESIS_TRANSACTIONS));
 	}
 
 	//endregion
