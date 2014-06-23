@@ -108,7 +108,7 @@ public class AccountImportanceViewModelTest {
 		final AccountImportanceViewModel viewModel = createViewModel("foo", 5, 1);
 
 		// Assert:
-		Assert.assertThat(viewModel.toString(), IsEqual.equalTo("foo -> (5 : 1.000000)"));
+		Assert.assertThat(viewModel.toString(), IsEqual.equalTo("FOO -> (5 : 1.000000)"));
 	}
 
 	//endregion
