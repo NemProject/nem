@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.peer.node.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class NisPeerNetworkHostTest {
@@ -61,6 +62,19 @@ public class NisPeerNetworkHostTest {
 			// Act:
 			host.boot(createLocalNode());
 			host.boot(createLocalNode());
+		}
+	}
+
+	@Test
+	public void getVisitorsReturnsSixTimerVisitors() {
+		// Arrange:
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+			// Act:
+			host.boot(createLocalNode()).join();
+			final List<NisAsyncTimerVisitor> visitors = host.getVisitors();
+
+			// Assert:
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(6));
 		}
 	}
 

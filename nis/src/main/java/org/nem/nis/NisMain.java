@@ -2,25 +2,27 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.io.*;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
-	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+	/**
+	 * The time provider.
+	 */
+	public static final TimeProvider TIME_PROVIDER = CommonStarter.TIME_PROVIDER;
 
 	private Block nemesisBlock;
 	private Hash nemesisBlockHash;

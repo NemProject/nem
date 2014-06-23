@@ -1,13 +1,15 @@
 package org.nem.nis.controller;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
@@ -15,7 +17,8 @@ import org.nem.nis.test.NisUtils;
 import org.nem.peer.test.MockPeerNetwork;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DebugControllerTest {
 
@@ -96,6 +99,37 @@ public class DebugControllerTest {
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
 	}
 
+	@Test
+	public void timersInfoDelegatesToHost() {
+		// Arrange:
+		final List<NisAsyncTimerVisitor> originalVisitors = Arrays.asList(
+				new NisAsyncTimerVisitor("foo", null),
+				new NisAsyncTimerVisitor("bar", null));
+		final TestContext context = new TestContext();
+		Mockito.when(context.host.getVisitors()).thenReturn(originalVisitors);
+
+		// Act:
+		final SerializableList<NisAsyncTimerVisitor> visitors = context.controller.timersInfo();
+
+		// Assert:
+		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
+		Assert.assertThat(
+				visitors.asCollection().stream().map(v -> v.getTimerName()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(new String[] { "foo", "bar" }));
+	}
+
+	@Test
+	public void incomingConnectionsInfoDelegatesToConstructorParameter() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final AuditCollection auditCollection = context.controller.incomingConnectionsInfo();
+
+		// Assert:
+		Assert.assertThat(auditCollection, IsSame.sameInstance(context.auditCollection));
+	}
+
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
 		final Account account = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
 		account.incrementBalance(Amount.fromNem(10000));
@@ -107,6 +141,7 @@ public class DebugControllerTest {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final MockPeerNetwork network = new MockPeerNetwork();
+		private final AuditCollection auditCollection = Mockito.mock(AuditCollection.class);
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
 
@@ -114,7 +149,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
+			this.controller = new DebugController(this.host, this.blockChain, this.blockDao, this.auditCollection);
 		}
 	}
 }

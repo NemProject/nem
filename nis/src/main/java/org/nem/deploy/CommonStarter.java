@@ -15,7 +15,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.nem.core.metadata.*;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -39,11 +39,16 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	/**
+	 * The time provider.
+	 */
+	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+
+	/**
 	 * The application meta data.
 	 */
 	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(
 			CommonStarter.class,
-			new SystemTimeProvider());
+			TIME_PROVIDER);
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");

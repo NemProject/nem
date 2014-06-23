@@ -3,8 +3,10 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
+import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.BlockDao;
@@ -25,6 +27,7 @@ public class DebugController {
 	private final NisPeerNetworkHost host;
 	private final BlockChain blockChain;
 	private final BlockDao blockDao;
+	private final AuditCollection auditCollection;
 
 	/**
 	 * Creates a new debug controller.
@@ -37,10 +40,12 @@ public class DebugController {
 	public DebugController(
 			final NisPeerNetworkHost host,
 			final BlockChain blockChain,
-			final BlockDao blockDao) {
+			final BlockDao blockDao,
+			final AuditCollection auditCollection) {
 		this.host = host;
 		this.blockChain = blockChain;
 		this.blockDao = blockDao;
+		this.auditCollection = auditCollection;
 	}
 
 	/**
@@ -107,6 +112,29 @@ public class DebugController {
 
 		return blockDebugInfo;
 	}
+
+	/**
+	 * Gets debug information about all running timers.
+	 *
+	 * @return Debug information about all running timers.
+	 */
+	@RequestMapping(value = "/debug/timers", method = RequestMethod.GET)
+	@PublicApi
+	public SerializableList<NisAsyncTimerVisitor> timersInfo() {
+		return new SerializableList<>(this.host.getVisitors());
+	}
+
+	/**
+	 * Gets debug information about incoming connections.
+	 *
+	 * @return Debug information about incoming connections.
+	 */
+	@RequestMapping(value = "/debug/connections/incoming", method = RequestMethod.GET)
+	@PublicApi
+	public AuditCollection incomingConnectionsInfo() {
+		return this.auditCollection;
+	}
+
 
 	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {
 		Address recipient = Address.fromEncoded("N/A");

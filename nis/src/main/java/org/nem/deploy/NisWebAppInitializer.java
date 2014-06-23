@@ -1,7 +1,8 @@
 package org.nem.deploy;
 
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.controller.interceptors.LocalHostInterceptor;
+import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.controller.interceptors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,9 @@ import java.util.List;
 public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Autowired
 	private AccountLookup accountLookup;
+
+	@Autowired
+	private AuditCollection auditCollection;
 
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
@@ -34,6 +38,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(new LocalHostInterceptor());
+		registry.addInterceptor(new AuditInterceptor(this.auditCollection));
 		super.addInterceptors(registry);
 	}
 }
