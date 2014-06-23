@@ -4,15 +4,11 @@ import java.io.Closeable;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import java.util.logging.*;
 
 /**
  * Timer that executes a future given on an interval.
  */
 public class AsyncTimer implements Closeable {
-
-	private static final Logger LOGGER = Logger.getLogger(AsyncTimer.class.getName());
-
 	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final AbstractDelayStrategy delay;
 	private final CompletableFuture<?> future;
@@ -135,10 +131,8 @@ public class AsyncTimer implements Closeable {
 	}
 
 	private static class DefaultAsyncTimerVisitor implements AsyncTimerVisitor {
-
 		@Override
 		public void notifyOperationStart() {
-			this.log("executing");
 		}
 
 		@Override
@@ -147,29 +141,14 @@ public class AsyncTimer implements Closeable {
 
 		@Override
 		public void notifyOperationCompleteExceptionally(final Throwable e) {
-			LOGGER.log(
-					Level.WARNING,
-					String.format("Timer %s raised exception: %s", "<name>", e.getMessage()),
-					e);
 		}
 
 		@Override
 		public void notifyDelay(final int delay) {
-			this.log("sleeping for " + delay + "ms");
 		}
 
 		@Override
 		public void notifyStop() {
-			this.log("stopping");
-		}
-
-		private void log(final String message) {
-			LOGGER.fine(String.format(
-					"[%d] Timer %s: %s (%d)",
-					Thread.currentThread().getId(),
-					"<name>",
-					message,
-					0));
 		}
 	}
 }
