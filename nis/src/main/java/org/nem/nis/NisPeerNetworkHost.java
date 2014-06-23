@@ -48,6 +48,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private AsyncTimer foragingTimer;
 	private PeerNetworkHost host;
 	private final AtomicBoolean isBootAttempted = new AtomicBoolean(false);
+	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
@@ -72,6 +73,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
 				.thenAccept(network -> {
 					this.host = new PeerNetworkHost(network);
+					this.timerVisitors.addAll(this.host.getVisitors());
+
+					final NisAsyncTimerVisitor foragingTimerVisitor = this.host.createNamedVisitor("FORAGING");
+					this.timerVisitors.add(foragingTimerVisitor);
 
 					this.foragingTimer = new AsyncTimer(
 							this.host.runnableToFutureSupplier(() -> {
@@ -86,7 +91,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 							}),
 							FORAGING_INITIAL_DELAY,
 							new UniformDelayStrategy(FORAGING_INTERVAL),
-							null);
+							foragingTimerVisitor);
 				});
 	}
 
@@ -125,6 +130,17 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		return this.synchronizer.getSyncAttempts(node);
 	}
 
+	/**
+	 * Gets all timer visitors.
+	 *
+	 * @return All timer visitors.
+	 */
+	public List<NisAsyncTimerVisitor> getVisitors() {
+		final List<NisAsyncTimerVisitor> visitors = new ArrayList<>();
+		visitors.addAll(this.timerVisitors);
+		return visitors;
+	}
+
 	@Override
 	public void close() {
 		this.foragingTimer.close();
@@ -138,25 +154,22 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private static class PeerNetworkHost implements AutoCloseable {
-
 		private final PeerNetwork network;
 		private final AsyncTimer refreshTimer;
+		private final List<NisAsyncTimerVisitor> timerVisitors;
 		private final List<AsyncTimer> secondaryTimers;
 		private final Executor executor = Executors.newCachedThreadPool();
 
-		/**
-		 * Creates a host that hosts the specified network.
-		 *
-		 * @param network The network.
-		 */
 		public PeerNetworkHost(final PeerNetwork network) {
 			this.network = network;
+			this.timerVisitors = new ArrayList<>();
 
+			this.timerVisitors.add(this.createNamedVisitor("REFRESH"));
 			this.refreshTimer = new AsyncTimer(
 					() -> this.network.refresh(),
 					REFRESH_INITIAL_DELAY,
 					getRefreshDelayStrategy(),
-					null);
+					this.timerVisitors.get(0));
 
 			this.secondaryTimers = Arrays.asList(
 					this.createSecondaryAsyncTimer(
@@ -194,21 +207,22 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 				final int delay,
 				final String name) {
-			final AsyncTimer timer = AsyncTimer.After(
+			final NisAsyncTimerVisitor visitor = this.createNamedVisitor(name);
+			this.timerVisitors.add(visitor);
+
+			return AsyncTimer.After(
 					this.refreshTimer,
 					recurringFutureSupplier,
 					new UniformDelayStrategy(delay),
-					null);
-			return timer;
+					visitor);
 		}
 
-		/**
-		 * Gets the hosted network.
-		 *
-		 * @return The hosted network.
-		 */
 		public PeerNetwork getNetwork() {
 			return this.network;
+		}
+
+		public List<NisAsyncTimerVisitor> getVisitors() {
+			return this.timerVisitors;
 		}
 
 		@Override
@@ -217,8 +231,12 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.secondaryTimers.forEach(obj -> obj.close());
 		}
 
-		private Supplier<CompletableFuture<?>> runnableToFutureSupplier(final Runnable runnable) {
+		public Supplier<CompletableFuture<?>> runnableToFutureSupplier(final Runnable runnable) {
 			return () -> CompletableFuture.runAsync(runnable, this.executor);
+		}
+
+		public NisAsyncTimerVisitor createNamedVisitor(final String name) {
+			return new NisAsyncTimerVisitor(name, CommonStarter.TIME_PROVIDER);
 		}
 	}
 }
