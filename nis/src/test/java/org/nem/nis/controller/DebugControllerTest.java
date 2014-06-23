@@ -2,10 +2,11 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
@@ -15,7 +16,8 @@ import org.nem.nis.test.NisUtils;
 import org.nem.peer.test.MockPeerNetwork;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DebugControllerTest {
 
@@ -94,6 +96,25 @@ public class DebugControllerTest {
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
+	}
+
+	@Test
+	public void timersInfoDelegatesToHost() {
+		// Arrange:
+		final List<NisAsyncTimerVisitor> originalVisitors = Arrays.asList(
+				new NisAsyncTimerVisitor("foo", null),
+				new NisAsyncTimerVisitor("bar", null));
+		final TestContext context = new TestContext();
+		Mockito.when(context.host.getVisitors()).thenReturn(originalVisitors);
+
+		// Act:
+		final SerializableList<NisAsyncTimerVisitor> visitors = context.controller.timersInfo();
+
+		// Assert:
+		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
+		Assert.assertThat(
+				visitors.asCollection().stream().map(v -> v.getTimerName()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(new String[] { "foo", "bar" }));
 	}
 
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {

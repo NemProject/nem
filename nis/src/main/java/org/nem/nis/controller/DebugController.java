@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.PublicApi;
@@ -106,6 +107,17 @@ public class DebugController {
 			blockDebugInfo.addTransactionDebugInfo(mapToDebugInfo(transaction));
 
 		return blockDebugInfo;
+	}
+
+	/**
+	 * Gets debug information about all running timers.
+	 *
+	 * @return Timer debug information.
+	 */
+	@RequestMapping(value = "/debug/timers", method = RequestMethod.GET)
+	@PublicApi
+	public SerializableList<NisAsyncTimerVisitor> timersInfo() {
+		return new SerializableList<>(this.host.getVisitors());
 	}
 
 	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {
