@@ -47,9 +47,9 @@ public class AuditCollection implements SerializableEntity {
 	public void add(final AuditEntry entry) {
 		synchronized (this.mostRecentEntries) {
 			if (this.mostRecentEntries.size() >= this.maxEntries)
-				this.mostRecentEntries.removeFirst();
+				this.mostRecentEntries.removeLast();
 
-			this.mostRecentEntries.addLast(entry);
+			this.mostRecentEntries.addFirst(entry);
 		}
 
 		synchronized (this.outstandingEntries) {

@@ -26,7 +26,7 @@ public class AuditCollectionTest {
 
 		// Assert:
 		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1, 2, 3, 4)));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(2, 3, 4)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(4, 3, 2)));
 	}
 
 	//endregion
@@ -42,9 +42,8 @@ public class AuditCollectionTest {
 		collection.add(createEntry(1));
 
 		// Assert:
-		final List<AuditEntry> expectedEntries = createEntries(1);
-		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(expectedEntries));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(expectedEntries));
+		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(1)));
 	}
 
 	@Test
@@ -60,9 +59,8 @@ public class AuditCollectionTest {
 
 
 		// Assert:
-		final List<AuditEntry> expectedEntries = createEntries(1, 2, 1, 3);
-		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(expectedEntries));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(expectedEntries));
+		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1, 2, 1, 3)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(3, 1, 2, 1)));
 	}
 
 	//endregion
@@ -81,9 +79,8 @@ public class AuditCollectionTest {
 		collection.remove(createEntry(4));
 
 		// Assert:
-		final List<AuditEntry> expectedEntries = createEntries(1, 2, 3);
-		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(expectedEntries));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(expectedEntries));
+		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1, 2, 3)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(3, 2, 1)));
 	}
 
 	@Test
@@ -99,7 +96,7 @@ public class AuditCollectionTest {
 
 		// Assert:
 		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1, 3)));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(1, 2, 3)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(3, 2, 1)));
 	}
 
 	@Test
@@ -116,7 +113,7 @@ public class AuditCollectionTest {
 
 		// Assert:
 		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(2, 1, 3)));
-		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(1, 2, 1, 3)));
+		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(3, 1, 2, 1)));
 	}
 
 	//endregion
@@ -145,7 +142,7 @@ public class AuditCollectionTest {
 				IsEqual.equalTo(Arrays.asList(2, 1, 3)));
 		Assert.assertThat(
 				deserializer.readObjectArray("most-recent", d -> d.readInt("id")),
-				IsEqual.equalTo(Arrays.asList(1, 2, 1, 3)));
+				IsEqual.equalTo(Arrays.asList(3, 1, 2, 1)));
 	}
 
 	//endregion
