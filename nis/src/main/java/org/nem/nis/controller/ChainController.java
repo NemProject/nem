@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.nis.BlockChain;
 import org.nem.nis.NisPeerNetworkHost;
@@ -55,6 +56,25 @@ public class ChainController {
 	}
 
 	//endregion
+
+	@RequestMapping(value = "/chain/local-blocks-after", method = RequestMethod.POST)
+	@ClientApi
+	public SerializableList<Block> localBlocksAfter(@RequestBody final BlockHeight height) {
+		// TODO: add tests for this action
+		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
+		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
+		for (int i = 0; i < BlockChainConstants.BLOCKS_LIMIT; ++i) {
+			final Long curBlockId = dbBlock.getNextBlockId();
+			if (null == curBlockId) {
+				break;
+			}
+
+			dbBlock = this.blockDao.findById(curBlockId);
+			blockList.add(BlockMapper.toModel(dbBlock, this.accountLookup));
+		}
+
+		return blockList;
+	}
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
