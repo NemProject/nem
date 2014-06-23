@@ -1,31 +1,53 @@
 package org.nem.nis.audit;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.test.Utils;
+import org.mockito.Mockito;
+import org.nem.core.serialization.*;
+import org.nem.core.time.TimeProvider;
+import org.nem.nis.test.NisUtils;
 
 public class AuditEntryTest {
 
 	@Test
 	public void entryExposesConstructorParameters() {
 		// Act:
-		final AuditEntry entry = new AuditEntry("host", "path");
+		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", Mockito.mock(TimeProvider.class));
 
 		// Assert:
-		Assert.assertThat(entry.getHost(), IsEqual.equalTo("host"));
-		Assert.assertThat(entry.getPath(), IsEqual.equalTo("path"));
+		Assert.assertThat(entry.getId(), IsEqual.equalTo(7));
+		Assert.assertThat(entry.getHost(), IsEqual.equalTo("localhost"));
+		Assert.assertThat(entry.getPath(), IsEqual.equalTo("/chain/last-block"));
 	}
 
 	@Test
-	public void entryCanBeRoundTripped() {
+	public void getElapsedTimeReturnsCurrentElapsedTime() {
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(new AuditEntry("host", "path"), null);
-		final AuditEntry entry = new AuditEntry(deserializer);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final AuditEntry entry = new AuditEntry(7, "host", "path", timeProvider);
 
 		// Assert:
-		Assert.assertThat(entry.getHost(), IsEqual.equalTo("host"));
-		Assert.assertThat(entry.getPath(), IsEqual.equalTo("path"));
+		Assert.assertThat(entry.getElapsedTime(), IsEqual.equalTo(41));
+		Assert.assertThat(entry.getElapsedTime(), IsEqual.equalTo(48));
+	}
+
+	@Test
+	public void entryCanBeSerialized() {
+		// Arrange:
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", timeProvider);
+
+		// Act:
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(entry);
+		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, null);
+
+		// Assert:
+		Assert.assertThat(4, IsEqual.equalTo(jsonObject.size()));
+		Assert.assertThat(deserializer.readInt("id"), IsEqual.equalTo(7));
+		Assert.assertThat(deserializer.readString("host"), IsEqual.equalTo("localhost"));
+		Assert.assertThat(deserializer.readString("path"), IsEqual.equalTo("/chain/last-block"));
+		Assert.assertThat(deserializer.readInt("elapsed-time"), IsEqual.equalTo(41));
 	}
 
 	//region equals / hashCode
@@ -33,12 +55,15 @@ public class AuditEntryTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final AuditEntry entry = new AuditEntry("host", "path");
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		final AuditEntry entry = new AuditEntry(7, "host", "path", timeProvider);
 
 		// Assert:
-		Assert.assertThat(new AuditEntry("host", "path"), IsEqual.equalTo(entry));
-		Assert.assertThat(new AuditEntry("host2", "path"), IsNot.not(IsEqual.equalTo(entry)));
-		Assert.assertThat(new AuditEntry("host", "path2"), IsNot.not(IsEqual.equalTo(entry)));
+		Assert.assertThat(new AuditEntry(7, "host", "path", timeProvider), IsEqual.equalTo(entry));
+		Assert.assertThat(new AuditEntry(8, "host", "path", timeProvider), IsEqual.equalTo(entry));
+		Assert.assertThat(new AuditEntry(7, "host2", "path", timeProvider), IsNot.not(IsEqual.equalTo(entry)));
+		Assert.assertThat(new AuditEntry(7, "host", "path2", timeProvider), IsNot.not(IsEqual.equalTo(entry)));
+		Assert.assertThat(new AuditEntry(7, "host", "path", Mockito.mock(TimeProvider.class)), IsEqual.equalTo(entry));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(entry)));
 		Assert.assertThat("host", IsNot.not(IsEqual.equalTo((Object)entry)));
 	}
@@ -46,13 +71,16 @@ public class AuditEntryTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final AuditEntry entry = new AuditEntry("host", "path");
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		final AuditEntry entry = new AuditEntry(7, "host", "path", timeProvider);
 		final int hashCode = entry.hashCode();
 
 		// Assert:
-		Assert.assertThat(new AuditEntry("host", "path").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new AuditEntry("host2", "path").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new AuditEntry("host", "path2").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new AuditEntry(7, "host", "path", timeProvider).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new AuditEntry(8, "host", "path", timeProvider).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new AuditEntry(7, "host2", "path", timeProvider).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new AuditEntry(7, "host", "path2", timeProvider).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new AuditEntry(7, "host", "path", Mockito.mock(TimeProvider.class)).hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
@@ -62,10 +90,11 @@ public class AuditEntryTest {
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
 		// Arrange:
-		final AuditEntry entry = new AuditEntry("host", "path");
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", timeProvider);
 
 		// Assert:
-		Assert.assertThat(entry.toString(), IsEqual.equalTo("host -> path"));
+		Assert.assertThat(entry.toString(), IsEqual.equalTo("#7 (localhost -> /chain/last-block)"));
 	}
 
 	//endregion

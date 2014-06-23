@@ -1,10 +1,12 @@
 package org.nem.nis.controller.interceptors;
 
+import org.nem.core.time.TimeProvider;
 import org.nem.nis.audit.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Interceptor that audits requests.
@@ -12,12 +14,18 @@ import javax.servlet.http.*;
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 
 	private final AuditCollection auditCollection;
+	private final TimeProvider timeProvider;
+	private final AtomicInteger counter = new AtomicInteger(0);
 
 	/**
 	 * Creates a new audit interceptor.
+	 *
+	 * @param auditCollection The audit collection.
+	 * @param timeProvider The time provider.
 	 */
-	public AuditInterceptor(final AuditCollection auditCollection) {
+	public AuditInterceptor(final AuditCollection auditCollection, final TimeProvider timeProvider) {
 		this.auditCollection = auditCollection;
+		this.timeProvider = timeProvider;
 	}
 
 	@Override
@@ -25,20 +33,21 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler) throws Exception {
-		this.auditCollection.add(createAuditEntry(request));
+		this.auditCollection.add(this.createAuditEntry(this.counter.incrementAndGet(), request));
 		return true;
 	}
 
 	@Override
-	public void postHandle(
+	public void afterCompletion(
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler,
-			final ModelAndView modelAndView) throws Exception {
-		this.auditCollection.remove(createAuditEntry(request));
+			final Exception ex)
+			throws Exception {
+		this.auditCollection.remove(this.createAuditEntry(-1, request));
 	}
 
-	private static AuditEntry createAuditEntry(final HttpServletRequest request) {
-		return new AuditEntry(request.getRemoteAddr(), request.getServletPath());
+	private AuditEntry createAuditEntry(final int id, final HttpServletRequest request) {
+		return new AuditEntry(id, request.getRemoteAddr(), request.getServletPath(), this.timeProvider);
 	}
 }

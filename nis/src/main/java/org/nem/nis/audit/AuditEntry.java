@@ -1,33 +1,45 @@
 package org.nem.nis.audit;
 
 import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
 /**
  * An entry in an audit log.
  */
 public class AuditEntry implements SerializableEntity {
+	private final int id;
 	private final String host;
 	private final String path;
+	private final TimeProvider timeProvider;
+	private final TimeInstant startTime;
 
 	/**
 	 * Creates a new entry.
 	 *
+	 * @param id The id.
 	 * @param host The host.
 	 * @param path The path.
+	 * @param timeProvider The time provider.
 	 */
-	public AuditEntry(final String host, final String path) {
+	public AuditEntry(
+			final int id,
+			final String host,
+			final String path,
+			final TimeProvider timeProvider) {
+		this.id = id;
 		this.host = host;
 		this.path = path;
+		this.timeProvider = timeProvider;
+		this.startTime = timeProvider.getCurrentTime();
 	}
 
 	/**
-	 * Deserializes an entry.
+	 * Gets the id.
 	 *
-	 * @param deserializer The deserializer.
+	 * @return The id.
 	 */
-	public AuditEntry(final Deserializer deserializer) {
-		this.host = deserializer.readString("host");
-		this.path = deserializer.readString("path");
+	public int getId() {
+		return this.id;
 	}
 
 	/**
@@ -48,10 +60,21 @@ public class AuditEntry implements SerializableEntity {
 		return this.path;
 	}
 
+	/**
+	 * Gets the elapsed time.
+	 *
+	 * @return The elapsed time.
+	 */
+	public int getElapsedTime() {
+		return this.timeProvider.getCurrentTime().subtract(this.startTime);
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
+		serializer.writeInt("id", this.id);
 		serializer.writeString("host", this.host);
 		serializer.writeString("path", this.path);
+		serializer.writeInt("elapsed-time", this.getElapsedTime());
 	}
 
 	@Override
@@ -70,6 +93,6 @@ public class AuditEntry implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		return String.format("%s -> %s", this.host, this.path);
+		return String.format("#%d (%s -> %s)", this.id, this.host, this.path);
 	}
 }

@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.time.TimeProvider;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.interceptors.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Autowired
 	private AuditCollection auditCollection;
 
+	@Autowired
+	private TimeProvider timeProvider;
+
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
 		addConvertersForPolicy(converters, new JsonSerializationPolicy(this.accountLookup));
@@ -38,7 +42,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(new LocalHostInterceptor());
-		registry.addInterceptor(new AuditInterceptor(this.auditCollection));
+		registry.addInterceptor(new AuditInterceptor(this.auditCollection, this.timeProvider));
 		super.addInterceptors(registry);
 	}
 }
