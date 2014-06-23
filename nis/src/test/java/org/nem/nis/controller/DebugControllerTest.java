@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
@@ -117,6 +118,18 @@ public class DebugControllerTest {
 				IsEquivalent.equivalentTo(new String[] { "foo", "bar" }));
 	}
 
+	@Test
+	public void incomingConnectionsInfoDelegatesToConstructorParameter() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final AuditCollection auditCollection = context.controller.incomingConnectionsInfo();
+
+		// Assert:
+		Assert.assertThat(auditCollection, IsSame.sameInstance(context.auditCollection));
+	}
+
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
 		final Account account = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
 		account.incrementBalance(Amount.fromNem(10000));
@@ -128,6 +141,7 @@ public class DebugControllerTest {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final MockPeerNetwork network = new MockPeerNetwork();
+		private final AuditCollection auditCollection = Mockito.mock(AuditCollection.class);
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
 
@@ -135,7 +149,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
+			this.controller = new DebugController(this.host, this.blockChain, this.blockDao, this.auditCollection);
 		}
 	}
 }
