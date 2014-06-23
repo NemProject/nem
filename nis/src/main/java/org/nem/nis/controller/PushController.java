@@ -8,6 +8,8 @@ import org.nem.peer.SecureSerializableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 /**
  * This controller will handle data propagation:
  * * /push/transaction - for what is now model.Transaction
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 // TODO: add tests
 @RestController
 public class PushController {
+	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
+
 
 	private final PushService pushService;
 
@@ -37,8 +41,10 @@ public class PushController {
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer) {
+		LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
+		LOGGER.info("[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:"+secureEntity.getEntity().getSigner());
 	}
 
 	/**
@@ -49,7 +55,9 @@ public class PushController {
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
 	public void pushBlock(@RequestBody final Deserializer deserializer) {
+		LOGGER.info("[start] /push/block");
 		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
 		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
+		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:"+secureEntity.getEntity().getSigner());
 	}
 }

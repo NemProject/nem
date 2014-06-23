@@ -16,8 +16,11 @@ import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 @RestController
 public class ChainController {
+	private static final Logger LOGGER = Logger.getLogger(ChainController.class.getName());
 
 	private final AccountLookup accountLookup;
 	private final RequiredBlockDao blockDao;
@@ -44,7 +47,10 @@ public class ChainController {
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@PublicApi
 	public Block blockLast() {
-		return BlockMapper.toModel(this.blockChainLastBlockLayer.getLastDbBlock(), this.accountLookup);
+		LOGGER.info("[start] /chain/last-block");
+		final Block block = BlockMapper.toModel(this.blockChainLastBlockLayer.getLastDbBlock(), this.accountLookup);
+		LOGGER.info("[end] /chain/last-block height:" + block.getHeight() + " signer:" + block.getSigner());
+		return block;
 	}
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.POST)
