@@ -17,7 +17,7 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("Sigma Gamma");
 
 		// Assert:
-		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("Sigma Gamma"));
+		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
 	}
 
@@ -242,7 +242,7 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("Sigma Gamma");
 
 		// Assert:
-		Assert.assertThat(address.toString(), IsEqual.equalTo("Sigma Gamma"));
+		Assert.assertThat(address.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
 	//endregion

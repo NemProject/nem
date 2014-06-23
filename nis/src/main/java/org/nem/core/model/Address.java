@@ -34,7 +34,7 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromEncoded(final String encoded) {
-		return new Address(encoded);
+		return new Address(encoded.toUpperCase());
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class Address {
 		byte[] encodedBytes;
 
 		try {
-			encodedBytes = Base32Encoder.getBytes(this.encoded.toUpperCase());
+			encodedBytes = Base32Encoder.getBytes(this.encoded);
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
@@ -142,7 +142,7 @@ public class Address {
 			return false;
 
 		Address rhs = (Address)obj;
-		return this.encoded.equalsIgnoreCase(rhs.encoded);
+		return this.encoded.equals(rhs.encoded);
 	}
 
 	@Override
