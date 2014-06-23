@@ -5,7 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.time.*;
 import org.nem.nis.test.NisUtils;
 
 public class AuditEntryTest {
@@ -13,12 +13,14 @@ public class AuditEntryTest {
 	@Test
 	public void entryExposesConstructorParameters() {
 		// Act:
-		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", Mockito.mock(TimeProvider.class));
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", timeProvider);
 
 		// Assert:
 		Assert.assertThat(entry.getId(), IsEqual.equalTo(7));
 		Assert.assertThat(entry.getHost(), IsEqual.equalTo("localhost"));
 		Assert.assertThat(entry.getPath(), IsEqual.equalTo("/chain/last-block"));
+		Assert.assertThat(entry.getStartTime(), IsEqual.equalTo(new TimeInstant(12)));
 	}
 
 	@Test
@@ -43,10 +45,11 @@ public class AuditEntryTest {
 		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, null);
 
 		// Assert:
-		Assert.assertThat(4, IsEqual.equalTo(jsonObject.size()));
+		Assert.assertThat(5, IsEqual.equalTo(jsonObject.size()));
 		Assert.assertThat(deserializer.readInt("id"), IsEqual.equalTo(7));
 		Assert.assertThat(deserializer.readString("host"), IsEqual.equalTo("localhost"));
 		Assert.assertThat(deserializer.readString("path"), IsEqual.equalTo("/chain/last-block"));
+		Assert.assertThat(deserializer.readInt("start-time"), IsEqual.equalTo(12));
 		Assert.assertThat(deserializer.readInt("elapsed-time"), IsEqual.equalTo(41));
 	}
 

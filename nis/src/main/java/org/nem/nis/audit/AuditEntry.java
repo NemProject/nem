@@ -61,6 +61,15 @@ public class AuditEntry implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the start time.
+	 *
+	 * @return The start time.
+	 */
+	public TimeInstant getStartTime() {
+		return this.startTime;
+	}
+
+	/**
 	 * Gets the elapsed time.
 	 *
 	 * @return The elapsed time.
@@ -74,6 +83,7 @@ public class AuditEntry implements SerializableEntity {
 		serializer.writeInt("id", this.id);
 		serializer.writeString("host", this.host);
 		serializer.writeString("path", this.path);
+		TimeInstant.writeTo(serializer, "start-time", this.startTime);
 		serializer.writeInt("elapsed-time", this.getElapsedTime());
 	}
 
