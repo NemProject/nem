@@ -1,7 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
 import org.nem.nis.audit.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
@@ -15,6 +14,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 
 	/**
 	 * Creates a new audit interceptor.
+	 *
+	 * @param auditCollection The audit collection.
 	 */
 	public AuditInterceptor(final AuditCollection auditCollection) {
 		this.auditCollection = auditCollection;
@@ -25,20 +26,17 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler) throws Exception {
-		this.auditCollection.add(createAuditEntry(request));
+		this.auditCollection.add(request.getRemoteAddr(), request.getServletPath());
 		return true;
 	}
 
 	@Override
-	public void postHandle(
+	public void afterCompletion(
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler,
-			final ModelAndView modelAndView) throws Exception {
-		this.auditCollection.remove(createAuditEntry(request));
-	}
-
-	private static AuditEntry createAuditEntry(final HttpServletRequest request) {
-		return new AuditEntry(request.getRemoteAddr(), request.getServletPath());
+			final Exception ex)
+			throws Exception {
+		this.auditCollection.remove(request.getRemoteAddr(), request.getServletPath());
 	}
 }

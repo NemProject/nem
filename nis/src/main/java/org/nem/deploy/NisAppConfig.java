@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import com.googlecode.flyway.core.Flyway;
 import org.hibernate.SessionFactory;
+import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.AccountDao;
@@ -114,10 +115,5 @@ public class NisAppConfig {
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
 		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
-	}
-
-	@Bean
-	public AuditCollection auditCollection() {
-		return new AuditCollection(50);
 	}
 }

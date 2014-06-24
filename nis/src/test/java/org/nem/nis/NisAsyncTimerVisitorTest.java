@@ -6,6 +6,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.time.*;
+import org.nem.nis.test.NisUtils;
 
 public class NisAsyncTimerVisitorTest {
 
@@ -21,7 +22,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationStartUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = createMockTimeProvider(71, 101);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
 		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
@@ -42,7 +43,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationCompleteUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = createMockTimeProvider(71, 101);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
 		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
@@ -64,7 +65,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationCompleteExceptionallyUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = createMockTimeProvider(71, 101);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
 		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
@@ -86,7 +87,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void averageOperationTimeIsCalculatedCorrectlyWhenThereAreMultipleCompletions() {
 		// Arrange:
-		final TimeProvider timeProvider = createMockTimeProvider(71, 101, 101, 121, 121, 131);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101, 101, 121, 121, 131);
 		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
@@ -142,7 +143,7 @@ public class NisAsyncTimerVisitorTest {
 
 	private static void assertVisitorSerialization(final boolean isExecuting) {
 		// Arrange:
-		final TimeProvider timeProvider = createMockTimeProvider(71, 101, 101, 121, 121, 131, 142);
+		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101, 101, 121, 121, 131, 142);
 		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
 
 		visitor.notifyOperationStart();
@@ -186,15 +187,5 @@ public class NisAsyncTimerVisitorTest {
 		Assert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(expectedLastDelayTime));
 		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(0));
 		Assert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
-	}
-
-	private static TimeProvider createMockTimeProvider(final int... rawInstants) {
-		final TimeInstant[] instants = new TimeInstant[rawInstants.length - 1];
-		for (int i = 1; i < rawInstants.length; ++i)
-			instants[i - 1] = new TimeInstant(rawInstants[i]);
-
-		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);
-		return timeProvider;
 	}
 }
