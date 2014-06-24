@@ -119,7 +119,7 @@ public class NisAppConfig {
 
 	@Bean
 	public AuditCollection auditCollection() {
-		return new AuditCollection(50);
+		return new AuditCollection(50, this.timeProvider());
 	}
 
 	@Bean

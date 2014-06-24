@@ -42,7 +42,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(new LocalHostInterceptor());
-		registry.addInterceptor(new AuditInterceptor(this.auditCollection, this.timeProvider));
+		registry.addInterceptor(new AuditInterceptor(this.auditCollection));
 		super.addInterceptors(registry);
 	}
 }
