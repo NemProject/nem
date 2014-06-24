@@ -16,25 +16,16 @@ import java.util.concurrent.CompletableFuture;
  */
 public class HttpConnector implements PeerConnector, SyncConnector {
 
-	private final HttpMethodClient<Deserializer> httpMethodClient;
-	private final HttpResponseStrategy<Deserializer> responseStrategy;
-	private final HttpResponseStrategy<Deserializer> voidResponseStrategy;
+	private final Communicator communicator;
 	private final NodeChallengeFactory challengeFactory;
 
 	/**
 	 * Creates a new HTTP connector.
 	 *
-	 * @param httpMethodClient The HTTP client to use.
-	 * @param responseStrategy The response strategy to use for functions expected to return data.
-	 * @param voidResponseStrategy The response strategy to use for functions expected to not return data.
+	 * @param communicator The communicator to use.
 	 */
-	public HttpConnector(
-			final HttpMethodClient<Deserializer> httpMethodClient,
-			final HttpResponseStrategy<Deserializer> responseStrategy,
-			final HttpResponseStrategy<Deserializer> voidResponseStrategy) {
-		this.httpMethodClient = httpMethodClient;
-		this.responseStrategy = responseStrategy;
-		this.voidResponseStrategy = voidResponseStrategy;
+	public HttpConnector(final Communicator communicator) {
+		this.communicator = communicator;
 		this.challengeFactory = new NodeChallengeFactory();
 	}
 
@@ -43,13 +34,13 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_INFO);
-		return postAuthenticated(url, node.getIdentity(), obj -> new Node(obj));
+		return this.postAuthenticated(url, node.getIdentity(), obj -> new Node(obj));
 	}
 
 	@Override
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
-		return postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, obj -> new Node(obj)));
+		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, obj -> new Node(obj)));
 	}
 
 	@Override
@@ -57,7 +48,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 			final Node node,
 			final NodeEndpoint localEndpoint) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
-		return this.post(url, localEndpoint).getFuture().thenApply(obj -> new NodeEndpoint(obj));
+		return this.post(url, localEndpoint).thenApply(obj -> new NodeEndpoint(obj));
 	}
 
 	@Override
@@ -66,7 +57,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 			final NodeApiId announceId,
 			final SerializableEntity entity) {
 		final URL url = node.getEndpoint().getApiUrl(announceId);
-		return this.postVoidAsync(url, entity).getFuture();
+		return this.postVoidAsync(url, entity);
 	}
 
 	//endregion
@@ -76,19 +67,19 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public Block getLastBlock(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
-		return postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj)).join();
+		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj)).join();
 	}
 
 	@Override
 	public Block getBlockAt(final Node node, final BlockHeight height) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_BLOCK_AT);
-		return postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj), height).join();
+		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj), height).join();
 	}
 
 	@Override
 	public Collection<Block> getChainAfter(final Node node, final BlockHeight height) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
-		return postAuthenticated(
+		return this.postAuthenticated(
 				url,
 				node.getIdentity(),
 				d -> new SerializableList<>(d, BlockFactory.VERIFIABLE),
@@ -98,27 +89,23 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	@Override
 	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
-		return postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
+		return this.postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
 	}
 
 	@Override
 	public BlockChainScore getChainScore(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_SCORE);
-		return postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
+		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
 	}
 
 	//endregion
 
-	private HttpMethodClient.AsyncToken<Deserializer> getAsync(final URL url) {
-		return this.httpMethodClient.get(url, this.responseStrategy);
+	private CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity) {
+		return this.communicator.post(url, entity);
 	}
 
-	private HttpMethodClient.AsyncToken<Deserializer> post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy);
-	}
-
-	private HttpMethodClient.AsyncToken<Deserializer> postVoidAsync(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy);
+	private CompletableFuture<Deserializer> postVoidAsync(final URL url, final SerializableEntity entity) {
+		return this.communicator.post(url, entity);
 	}
 
 	private <T extends SerializableEntity> CompletableFuture<T> postAuthenticated(
@@ -126,8 +113,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 			final NodeIdentity remoteNodeIdentity,
 			final ObjectDeserializer<T> entityDeserializer) {
 		final NodeChallenge challenge = this.challengeFactory.next();
-		return unwrapAuthenticatedResponse(
-				this.post(url, challenge).getFuture(), challenge, remoteNodeIdentity, entityDeserializer);
+		return unwrapAuthenticatedResponse(this.post(url, challenge), challenge, remoteNodeIdentity, entityDeserializer);
 	}
 
 	private <TOut extends SerializableEntity> CompletableFuture<TOut> postAuthenticated(
@@ -137,8 +123,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 			final BlockHeight entity) {
 		final NodeChallenge challenge = this.challengeFactory.next();
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
-		return unwrapAuthenticatedResponse(
-				this.post(url, request).getFuture(), challenge, remoteNodeIdentity, entityDeserializer);
+		return unwrapAuthenticatedResponse(this.post(url, request), challenge, remoteNodeIdentity, entityDeserializer);
 	}
 
 	private static <T extends SerializableEntity> CompletableFuture<T> unwrapAuthenticatedResponse(
