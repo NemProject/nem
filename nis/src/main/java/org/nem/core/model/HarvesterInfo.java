@@ -7,6 +7,8 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.Serializer;
 
+// TODO: is this more of a view model
+// TODO: comment
 
 public class HarvesterInfo implements SerializableEntity {
 
