@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.AccountAnalyzer;
@@ -82,6 +83,20 @@ public class AccountIoAdapter implements AccountIo {
 
 		blocks.stream()
 				.map(bl -> BlockMapper.toModel(bl, this.accountAnalyzer))
+				.forEach(obj -> blockList.add(obj));
+		return blockList;
+	}
+
+	@Override
+	public SerializableList<HarvesterInfo> getAccountCrops(Address address, String timestamp) {
+		final Account account = this.accountAnalyzer.findByAddress(address);
+		final Integer intTimestamp = intOrMaxInt(timestamp);
+		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
+
+		final SerializableList<HarvesterInfo> blockList = new SerializableList<>(0);
+
+		blocks.stream()
+				.map(bl -> new HarvesterInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}

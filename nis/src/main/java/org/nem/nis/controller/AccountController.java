@@ -85,11 +85,26 @@ public class AccountController {
 	 * @param builder The page builder.
 	 * @return Information about the matching blocks.
 	 */
+	// TODO: remove after appropriate changes will be made in NCC
 	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
 		return this.accountIo.getAccountBlocks(page.getAddress(), page.getTimestamp());
+	}
+
+	/**
+	 * Gets information about harvested blocks.
+	 *
+	 * @param builder The page builder.
+	 *
+	 * @return information about harvested blocks
+	 */
+	@RequestMapping(value = "/account/crops", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<HarvesterInfo> accountCrops(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return this.accountIo.getAccountCrops(page.getAddress(), page.getTimestamp());
 	}
 
 	private Address getAddress(final String nemAddress) {
