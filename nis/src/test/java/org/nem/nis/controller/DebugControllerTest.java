@@ -119,15 +119,33 @@ public class DebugControllerTest {
 	}
 
 	@Test
-	public void incomingConnectionsInfoDelegatesToConstructorParameter() {
+	public void incomingConnectionsInfoDelegatesToHost() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final AuditCollection hostAuditCollection = Mockito.mock(AuditCollection.class);
+		Mockito.when(context.host.getIncomingAudits()).thenReturn(hostAuditCollection);
 
 		// Act:
 		final AuditCollection auditCollection = context.controller.incomingConnectionsInfo();
 
 		// Assert:
-		Assert.assertThat(auditCollection, IsSame.sameInstance(context.auditCollection));
+		Assert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
+		Mockito.verify(context.host, Mockito.times(1)).getIncomingAudits();
+	}
+
+	@Test
+	public void outgoingConnectionsInfoDelegatesToHost() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final AuditCollection hostAuditCollection = Mockito.mock(AuditCollection.class);
+		Mockito.when(context.host.getOutgoingAudits()).thenReturn(hostAuditCollection);
+
+		// Act:
+		final AuditCollection auditCollection = context.controller.outgoingConnectionsInfo();
+
+		// Assert:
+		Assert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
+		Mockito.verify(context.host, Mockito.times(1)).getOutgoingAudits();
 	}
 
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
@@ -141,7 +159,6 @@ public class DebugControllerTest {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final MockPeerNetwork network = new MockPeerNetwork();
-		private final AuditCollection auditCollection = Mockito.mock(AuditCollection.class);
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
 
@@ -149,7 +166,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockChain, this.blockDao, this.auditCollection);
+			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
 		}
 	}
 }

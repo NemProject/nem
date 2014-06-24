@@ -27,7 +27,6 @@ public class DebugController {
 	private final NisPeerNetworkHost host;
 	private final BlockChain blockChain;
 	private final BlockDao blockDao;
-	private final AuditCollection auditCollection;
 
 	/**
 	 * Creates a new debug controller.
@@ -40,12 +39,10 @@ public class DebugController {
 	public DebugController(
 			final NisPeerNetworkHost host,
 			final BlockChain blockChain,
-			final BlockDao blockDao,
-			final AuditCollection auditCollection) {
+			final BlockDao blockDao) {
 		this.host = host;
 		this.blockChain = blockChain;
 		this.blockDao = blockDao;
-		this.auditCollection = auditCollection;
 	}
 
 	/**
@@ -132,9 +129,19 @@ public class DebugController {
 	@RequestMapping(value = "/debug/connections/incoming", method = RequestMethod.GET)
 	@PublicApi
 	public AuditCollection incomingConnectionsInfo() {
-		return this.auditCollection;
+		return this.host.getIncomingAudits();
 	}
 
+	/**
+	 * Gets debug information about outgoing connections.
+	 *
+	 * @return Debug information about outgoing connections.
+	 */
+	@RequestMapping(value = "/debug/connections/outgoing", method = RequestMethod.GET)
+	@PublicApi
+	public AuditCollection outgoingConnectionsInfo() {
+		return this.host.getOutgoingAudits();
+	}
 
 	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {
 		Address recipient = Address.fromEncoded("N/A");

@@ -116,15 +116,4 @@ public class NisAppConfig {
 	public NisPeerNetworkHost nisPeerNetworkHost() {
 		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
 	}
-
-	@Bean
-	public AuditCollection auditCollection() {
-		return new AuditCollection(50, this.timeProvider());
-	}
-
-	@Bean
-	public TimeProvider timeProvider() {
-		// TODO: not sure if this can be injected into CommonStarter?
-		return CommonStarter.TIME_PROVIDER;
-	}
 }

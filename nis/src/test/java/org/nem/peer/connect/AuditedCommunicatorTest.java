@@ -8,7 +8,7 @@ import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
 
 import java.net.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 
 public class AuditedCommunicatorTest {
 
@@ -125,7 +125,7 @@ public class AuditedCommunicatorTest {
 			// Assert:
 			ExceptionAssert.assertThrows(
 					v -> this.post(this.communicator, url, this.entity).join(),
-					RuntimeException.class);
+					CompletionException.class);
 
 			// Assert:
 			Mockito.verify(this.collection, Mockito.times(1)).remove("localhost", "/my/path");

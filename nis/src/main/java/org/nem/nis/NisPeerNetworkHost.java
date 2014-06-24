@@ -6,6 +6,7 @@ import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.CommonStarter;
+import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.Node;
@@ -22,6 +23,9 @@ import java.util.function.*;
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
+
+	//region constants
+
 	private static final int ONE_SECOND = 1000;
 	private static final int ONE_MINUTE = 60 * ONE_SECOND;
 	private static final int ONE_HOUR = 60 * ONE_MINUTE;
@@ -42,6 +46,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
 
+	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
+
+	//endregion
+
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
 	private final CountingBlockSynchronizer synchronizer;
@@ -49,6 +57,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetworkHost host;
 	private final AtomicBoolean isBootAttempted = new AtomicBoolean(false);
 	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
+	private final AuditCollection outgoingAudits = createAuditCollection();
+	private final AuditCollection incomingAudits = createAuditCollection();
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
@@ -121,6 +131,24 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	/**
+	 * Gets outgoing audit information.
+	 *
+	 * @return The outgoing audit information.
+	 */
+	public AuditCollection getOutgoingAudits() {
+		return this.outgoingAudits;
+	}
+
+	/**
+	 * Gets incoming audit information.
+	 *
+	 * @return The incoming audit information.
+	 */
+	public AuditCollection getIncomingAudits() {
+		return this.incomingAudits;
+	}
+
+	/**
 	 * Gets the number of sync attempts with the specified node.
 	 *
 	 * @param node The node to sync with.
@@ -148,9 +176,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private PeerNetworkServices createNetworkServices() {
-		final HttpConnectorPool connectorPool = new HttpConnectorPool();
+		final HttpConnectorPool connectorPool = new HttpConnectorPool(this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
 		return new PeerNetworkServices(connector, connectorPool, this.synchronizer);
+	}
+
+	private static AuditCollection createAuditCollection() {
+		return new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER);
 	}
 
 	private static class PeerNetworkHost implements AutoCloseable {
@@ -235,7 +267,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			return () -> CompletableFuture.runAsync(runnable, this.executor);
 		}
 
-		public NisAsyncTimerVisitor createNamedVisitor(final String name) {
+		public static NisAsyncTimerVisitor createNamedVisitor(final String name) {
 			return new NisAsyncTimerVisitor(name, CommonStarter.TIME_PROVIDER);
 		}
 	}
