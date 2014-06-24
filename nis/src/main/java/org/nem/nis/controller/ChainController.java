@@ -47,9 +47,9 @@ public class ChainController {
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@PublicApi
 	public Block blockLast() {
-		LOGGER.info("[start] /chain/last-block");
+		LOGGER.info("[start] /chain/last-block (pub)");
 		final Block block = BlockMapper.toModel(this.blockChainLastBlockLayer.getLastDbBlock(), this.accountLookup);
-		LOGGER.info("[end] /chain/last-block height:" + block.getHeight() + " signer:" + block.getSigner());
+		LOGGER.info("[end] /chain/last-block (pub) height:" + block.getHeight() + " signer:" + block.getSigner());
 		return block;
 	}
 
@@ -57,8 +57,11 @@ public class ChainController {
 	@P2PApi
 	@AuthenticatedApi
 	public AuthenticatedResponse<Block> blockLast(@RequestBody final NodeChallenge challenge) {
+		LOGGER.info("[start] /chain/last-block (auth)");
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(this.blockLast(), localNode.getIdentity(), challenge);
+		AuthenticatedResponse<Block> response = new AuthenticatedResponse<>(this.blockLast(), localNode.getIdentity(), challenge);
+		LOGGER.info("[end] /chain/last-block (auth) ");
+		return response;
 	}
 
 	//endregion
