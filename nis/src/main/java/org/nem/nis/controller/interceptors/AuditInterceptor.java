@@ -2,7 +2,6 @@ package org.nem.nis.controller.interceptors;
 
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.audit.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
