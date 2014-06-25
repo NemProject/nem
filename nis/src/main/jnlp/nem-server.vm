@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="7.0+" codebase="http://nem.pucchiwerk.eu/nem" href="$outputFile" version="0.0.1">
+<jnlp spec="7.0+" codebase="http://bob.nem.ninja" href="$outputFile" version="0.0.1">
   <information>
     <title>NEM Server (NIS)</title>
     <vendor>NEM Community</vendor>
