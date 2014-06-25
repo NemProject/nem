@@ -134,22 +134,13 @@ public class HttpMethodClient<T> {
 			final HttpRequestBase request = requestFactory.apply(uri);
 			this.httpClient.execute(request, callback);
 
-			final CompletableFuture<Void> sleepFuture = SleepFuture.create(this.requestTimeout);
-			sleepFuture.thenAccept(v -> {
-				if (!sleepFuture.isCancelled() && !sleepFuture.isCompletedExceptionally()) {
-					LOGGER.warning(String.format("forcibly aborting request to %s", url));
-					request.abort();
-				 }
-			});
 			final CompletableFuture<T> responseFuture = callback.getFuture()
-			.thenApply(response -> {
-				sleepFuture.cancel(true);
-				return responseStrategy.coerce(request, response);
-			})
-			.exceptionally(e -> {
-				sleepFuture.cancel(true);
-				LOGGER.fine(String.format("finished with exception %s : %s", url, e.getMessage()));
-				return null;
+					.thenApply(response -> responseStrategy.coerce(request, response));
+
+			SleepFuture.create(this.requestTimeout).thenAccept(v -> {
+				request.abort();
+				if (request.isAborted())
+					LOGGER.warning(String.format("forcibly aborting request to %s", url));
 			});
 
 			return new AsyncToken<>(request, responseFuture);
