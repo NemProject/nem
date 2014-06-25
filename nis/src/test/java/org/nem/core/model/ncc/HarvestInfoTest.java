@@ -1,12 +1,9 @@
 package org.nem.core.model.ncc;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.ncc.HarvestInfo;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -15,10 +12,11 @@ public class HarvestInfoTest {
 	@Test
 	public void HarvestInfoCtorSetsProperFields() {
 		// Arrange + Act:
-		final HarvestInfo result = new HarvestInfo(Hash.fromHexString("aabbcc"), 
-													   new BlockHeight(123), 
-													   new TimeInstant(654), 
-													   Amount.fromMicroNem(45678));
+		final HarvestInfo result = new HarvestInfo(
+				Hash.fromHexString("aabbcc"),
+                new BlockHeight(123),
+                new TimeInstant(654),
+                Amount.fromMicroNem(45678));
 
 		// Assert:
 		Assert.assertThat(result.getHash(), IsEqual.equalTo(Hash.fromHexString("aabbcc")));
@@ -30,10 +28,11 @@ public class HarvestInfoTest {
 	@Test
 	public void canRoundTripHarvestInfo() {
 		// Arrange:
-		final HarvestInfo entity = new HarvestInfo(Hash.fromHexString("aabbcc"), 
-													   new BlockHeight(123), 
-													   new TimeInstant(654), 
-													   Amount.fromMicroNem(45678));
+		final HarvestInfo entity = new HarvestInfo(
+				Hash.fromHexString("aabbcc"),
+				new BlockHeight(123),
+				new TimeInstant(654),
+				Amount.fromMicroNem(45678));
 
 		// Assert:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, null);

@@ -6,7 +6,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-// TODO: is this more of a view model
 // TODO: comment
 
 public class HarvestInfo implements SerializableEntity {
