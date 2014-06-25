@@ -89,15 +89,15 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvesterInfo> getAccountCrops(Address address, String timestamp) {
+	public SerializableList<HarvestInfo> getAccountHarvests(Address address, String timestamp) {
 		final Account account = this.accountAnalyzer.findByAddress(address);
 		final Integer intTimestamp = intOrMaxInt(timestamp);
 		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
 
-		final SerializableList<HarvesterInfo> blockList = new SerializableList<>(0);
+		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvesterInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), new TimeInstant(bl.getTimestamp()), Amount.fromMicroNem(bl.getTotalFee())))
+				.map(bl -> new HarvestInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), new TimeInstant(bl.getTimestamp()), Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}

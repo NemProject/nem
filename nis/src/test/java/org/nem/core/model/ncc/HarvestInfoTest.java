@@ -4,18 +4,18 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.ncc.HarvesterInfo;
+import org.nem.core.model.ncc.HarvestInfo;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-public class HarvesterInfoTest {
+public class HarvestInfoTest {
 	@Test
-	public void harvesterInfoCtorSetsProperFields() {
+	public void HarvestInfoCtorSetsProperFields() {
 		// Arrange + Act:
-		final HarvesterInfo result = new HarvesterInfo(Hash.fromHexString("aabbcc"), 
+		final HarvestInfo result = new HarvestInfo(Hash.fromHexString("aabbcc"), 
 													   new BlockHeight(123), 
 													   new TimeInstant(654), 
 													   Amount.fromMicroNem(45678));
@@ -28,16 +28,16 @@ public class HarvesterInfoTest {
 	}
 
 	@Test
-	public void canRoundTripHarvesterInfo() {
+	public void canRoundTripHarvestInfo() {
 		// Arrange:
-		final HarvesterInfo entity = new HarvesterInfo(Hash.fromHexString("aabbcc"), 
+		final HarvestInfo entity = new HarvestInfo(Hash.fromHexString("aabbcc"), 
 													   new BlockHeight(123), 
 													   new TimeInstant(654), 
 													   Amount.fromMicroNem(45678));
 
 		// Assert:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, null);
-		final HarvesterInfo result = new HarvesterInfo(deserializer);
+		final HarvestInfo result = new HarvestInfo(deserializer);
 
 		// Assera:
 		Assert.assertThat(result.getHash(), IsEqual.equalTo(Hash.fromHexString("aabbcc")));

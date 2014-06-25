@@ -1,7 +1,7 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.HarvesterInfo;
+import org.nem.core.model.ncc.HarvestInfo;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 
@@ -43,5 +43,5 @@ public interface AccountIo extends Iterable<Account> {
 	 * @param timestamp The maximum timestamp of a block.
 	 * @return The information about harvested blocks.
 	 */
-	SerializableList<HarvesterInfo> getAccountCrops(final Address address, final String timestamp);
+	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timestamp);
 }

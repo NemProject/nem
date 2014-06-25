@@ -98,11 +98,11 @@ public class AccountController {
 	 *
 	 * @return information about harvested blocks
 	 */
-	@RequestMapping(value = "/account/crops", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvesterInfo> accountCrops(final AccountPageBuilder builder) {
+	public SerializableList<HarvestInfo> accountHarvests(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
-		return this.accountIo.getAccountCrops(page.getAddress(), page.getTimestamp());
+		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimestamp());
 	}
 
 	private Address getAddress(final String nemAddress) {

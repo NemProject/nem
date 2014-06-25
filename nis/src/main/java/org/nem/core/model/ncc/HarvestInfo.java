@@ -9,21 +9,21 @@ import org.nem.core.time.TimeInstant;
 // TODO: is this more of a view model
 // TODO: comment
 
-public class HarvesterInfo implements SerializableEntity {
+public class HarvestInfo implements SerializableEntity {
 
 	private final Hash blockHash;
 	private final BlockHeight height;
 	private final TimeInstant timestamp;
 	private final Amount totalFee;
 
-	public HarvesterInfo(final Deserializer deserializer) {
+	public HarvestInfo(final Deserializer deserializer) {
 		this.blockHash = deserializer.readObject("blockHash", Hash.DESERIALIZER);
 		this.height = BlockHeight.readFrom(deserializer, "height");
 		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");
 		this.totalFee = Amount.readFrom(deserializer, "totalFee");
 	}
 
-	public HarvesterInfo(final Hash blockHash, final BlockHeight height, final TimeInstant timestamp, final Amount totalFee) {
+	public HarvestInfo(final Hash blockHash, final BlockHeight height, final TimeInstant timestamp, final Amount totalFee) {
 		this.blockHash = blockHash;
 		this.height = height;
 		this.timestamp = timestamp;
