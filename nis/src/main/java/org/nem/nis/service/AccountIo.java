@@ -1,6 +1,7 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.HarvesterInfo;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 

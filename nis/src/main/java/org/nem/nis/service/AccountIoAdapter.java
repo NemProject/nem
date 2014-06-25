@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.nem.core.time.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
@@ -96,7 +97,7 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<HarvesterInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvesterInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), Amount.fromMicroNem(bl.getTotalFee())))
+				.map(bl -> new HarvesterInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), new TimeInstant(bl.getTimestamp()), Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}
