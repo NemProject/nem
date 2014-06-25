@@ -26,6 +26,8 @@ import java.util.function.Function;
 public class HttpMethodClient<T> {
 
 	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
+	private static final int MAX_CONNECTIONS = 100;
+	private static final int MAX_CONNECTIONS_PER_ROUTE = 20;
 
 	private final CloseableHttpAsyncClient httpClient;
 
@@ -45,6 +47,8 @@ public class HttpMethodClient<T> {
 
 		this.httpClient = HttpAsyncClients.custom()
 				.setDefaultRequestConfig(config)
+				.setMaxConnPerRoute(MAX_CONNECTIONS_PER_ROUTE)
+				.setMaxConnTotal(MAX_CONNECTIONS)
 				.build();
 		this.httpClient.start();
 	}
@@ -161,7 +165,7 @@ public class HttpMethodClient<T> {
 		 * @return The result value.
 		 */
 		public T get()  {
-			return ExceptionUtils.propagate(() -> this.getFuture().get(), obj -> new FatalPeerException(obj));
+			return this.getFuture().join();
 		}
 
 		/**

@@ -16,7 +16,6 @@ public class AsyncTimer implements Closeable {
 
 	private final AtomicBoolean isStopped = new AtomicBoolean();
 	private final CompletableFuture<?> firstRecurrenceFuture = new CompletableFuture<>();
-	private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
 	/**
 	 * Creates a new async timer.
@@ -82,9 +81,7 @@ public class AsyncTimer implements Closeable {
 
 	private CompletableFuture<?> chain(int delay) {
 		this.visitor.notifyDelay(delay);
-		final SleepRunnable sleepRunnable = new SleepRunnable();
-		this.scheduler.schedule(sleepRunnable, delay, TimeUnit.MILLISECONDS);
-		return sleepRunnable.getFuture().thenCompose(v -> this.getNextChainLink());
+		return SleepFuture.create(delay).thenCompose(v -> this.getNextChainLink());
 	}
 
 	@Override
@@ -111,23 +108,6 @@ public class AsyncTimer implements Closeable {
 					this.firstRecurrenceFuture.complete(null);
 					return this.chain(this.delay.next());
 				});
-	}
-
-	private static class SleepRunnable implements Runnable {
-		private final CompletableFuture<Void> future;
-
-		public SleepRunnable() {
-			this.future = new CompletableFuture<>();
-		}
-
-		@Override
-		public void run() {
-			this.future.complete(null);
-		}
-
-		public CompletableFuture<Void> getFuture() {
-			return this.future;
-		}
 	}
 
 	private static class DefaultAsyncTimerVisitor implements AsyncTimerVisitor {
