@@ -14,7 +14,7 @@ import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 
 public class PeerNetworkTest {
 
@@ -1120,6 +1120,20 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Assert.assertThat(networkCompletable.isDone(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void createWithVerificationOfLocalNodeFailsIfNoPreTrustedNodesAreProvided() {
+		// Arrange:
+		final Config config = Mockito.mock(Config.class);
+		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
+
+		// Act:
+		final CompletableFuture<PeerNetwork> networkCompletable =
+				PeerNetwork.createWithVerificationOfLocalNode(config, createMockPeerNetworkServices());
+
+		// Assert:
+		ExceptionAssert.assertThrowsCompletionException(v -> networkCompletable.join(), IllegalArgumentException.class);
 	}
 
 	private void assertNodeEndpointIsConfigLocalNodeEndpoint(final NodeEndpoint endpoint) {

@@ -1,7 +1,6 @@
 package org.nem.nis;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import net.minidev.json.*;
 import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
@@ -9,8 +8,7 @@ import org.nem.deploy.CommonStarter;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.Node;
-import org.nem.peer.node.NodeApiId;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
@@ -73,15 +71,30 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param localNode The local node.
 	 */
 	public CompletableFuture boot(final Node localNode) {
-		if (!this.isBootAttempted.compareAndSet(false, true))
-			throw new IllegalStateException("network boot was already attempted");
-
 		final Config config = new Config(
 				localNode,
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion());
+
+		return this.boot(config);
+	}
+
+	/**
+	 * Boots the network.
+	 *
+	 * @param config The network configuration.
+	 */
+	public CompletableFuture boot(final Config config) {
+		if (!this.isBootAttempted.compareAndSet(false, true))
+			throw new IllegalStateException("network boot was already attempted");
+
 		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
-				.thenAccept(network -> {
+				.handle((network, e) -> {
+					if (null != e) {
+						this.isBootAttempted.set(false);
+						throw new IllegalStateException("network boot failed", e);
+					}
+
 					this.host = new PeerNetworkHost(network);
 					this.timerVisitors.addAll(this.host.getVisitors());
 
@@ -102,6 +115,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 							FORAGING_INITIAL_DELAY,
 							new UniformDelayStrategy(FORAGING_INTERVAL),
 							foragingTimerVisitor);
+					return null;
 				});
 	}
 
@@ -171,8 +185,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	@Override
 	public void close() {
-		this.foragingTimer.close();
-		this.host.close();
+		if (null != foragingTimer)
+			this.foragingTimer.close();
+
+		if (null != this.host)
+			this.host.close();
 	}
 
 	private PeerNetworkServices createNetworkServices() {

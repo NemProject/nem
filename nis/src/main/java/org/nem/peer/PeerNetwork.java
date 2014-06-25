@@ -92,6 +92,11 @@ public class PeerNetwork {
 		final Node configLocalNode = config.getLocalNode();
 		final CompletableFuture<PeerNetwork> networkFuture = new CompletableFuture<>();
 		final AtomicInteger numOutstandingRequests = new AtomicInteger(config.getPreTrustedNodes().getSize());
+		if (0 == numOutstandingRequests.get()) {
+			networkFuture.completeExceptionally(new IllegalArgumentException("no pre-trusted nodes were specified"));
+			return networkFuture;
+		}
+
 		config.getPreTrustedNodes().getNodes().stream()
 				.map(node ->
 						services.getPeerConnector().getLocalNodeInfo(node, configLocalNode.getEndpoint())

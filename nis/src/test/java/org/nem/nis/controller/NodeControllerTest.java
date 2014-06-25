@@ -252,7 +252,7 @@ public class NodeControllerTest {
 		context.controller.boot(deserializer);
 
 		// Assert:
-		Mockito.verify(context.host, Mockito.times(1)).boot(Mockito.any());
+		Mockito.verify(context.host, Mockito.times(1)).boot(Mockito.any(Node.class));
 		Assert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
 	}
 
