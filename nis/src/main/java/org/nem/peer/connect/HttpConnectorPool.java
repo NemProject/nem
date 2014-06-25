@@ -9,10 +9,6 @@ import org.nem.nis.audit.AuditCollection;
  * (where HttpMethodClient is the shared resource).
  */
 public class HttpConnectorPool implements SyncConnectorPool {
-
-	private static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
-	private static final int DEFAULT_SOCKET_TIMEOUT = 10000;
-
 	private final HttpMethodClient<Deserializer> httpMethodClient;
 	private final AuditCollection auditCollection;
 
@@ -22,9 +18,7 @@ public class HttpConnectorPool implements SyncConnectorPool {
 	 * @param auditCollection The audit collection.
 	 */
 	public HttpConnectorPool(final AuditCollection auditCollection) {
-		this.httpMethodClient = new HttpMethodClient<>(
-				DEFAULT_CONNECTION_TIMEOUT,
-				DEFAULT_SOCKET_TIMEOUT);
+		this.httpMethodClient = new HttpMethodClient<>();
 		this.auditCollection = auditCollection;
 	}
 

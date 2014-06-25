@@ -10,6 +10,7 @@ import org.apache.http.impl.nio.client.*;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.eclipse.jetty.http.MimeTypes;
+import org.nem.core.async.SleepFuture;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 
@@ -17,6 +18,7 @@ import java.net.*;
 import java.nio.charset.Charset;
 import java.util.concurrent.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * Helper class that wraps an HttpClient.
@@ -24,20 +26,30 @@ import java.util.function.Function;
  * @param <T> The type of responses.
  */
 public class HttpMethodClient<T> {
+	private static final Logger LOGGER = Logger.getLogger(HttpMethodClient.class.getName());
 
 	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 	private static final int MAX_CONNECTIONS = 100;
 	private static final int MAX_CONNECTIONS_PER_ROUTE = 20;
 
 	private final CloseableHttpAsyncClient httpClient;
+	private final int requestTimeout;
+
+	/**
+	 * Creates a new HTTP method client with default timeouts.
+	 */
+	public HttpMethodClient() {
+		this(5000, 10000, 20000);
+	}
 
 	/**
 	 * Creates a new HTTP method client.
 	 *
 	 * @param connectionTimeout The connection timeout (in milliseconds) that should be used.
 	 * @param socketTimeout The socket timeout (in milliseconds) that should be used.
+	 * @param requestTimeout The request timeout (in milliseconds) that should be used.
 	 */
-	public HttpMethodClient(final int connectionTimeout, final int socketTimeout) {
+	public HttpMethodClient(final int connectionTimeout, final int socketTimeout, final int requestTimeout) {
 		final RequestConfig config = RequestConfig.custom()
 				.setConnectTimeout(connectionTimeout)
 				.setConnectionRequestTimeout(connectionTimeout)
@@ -51,6 +63,8 @@ public class HttpMethodClient<T> {
 				.setMaxConnTotal(MAX_CONNECTIONS)
 				.build();
 		this.httpClient.start();
+
+		this.requestTimeout = requestTimeout;
 	}
 
 	/**
@@ -120,9 +134,15 @@ public class HttpMethodClient<T> {
 			final HttpRequestBase request = requestFactory.apply(uri);
 			this.httpClient.execute(request, callback);
 
-			return new AsyncToken<>(
-					request,
-					callback.getFuture().thenApply(response -> responseStrategy.coerce(request, response)));
+			final CompletableFuture<T> responseFuture = callback.getFuture()
+					.thenApply(response -> responseStrategy.coerce(request, response));
+
+			SleepFuture.create(this.requestTimeout).thenAccept(v -> {
+				LOGGER.warning(String.format("forcibly aborting request to %s", url));
+				request.abort();
+			});
+
+			return new AsyncToken<>(request, responseFuture);
 
 		} catch (URISyntaxException e) {
 			throw new FatalPeerException(e);
@@ -165,7 +185,7 @@ public class HttpMethodClient<T> {
 		 * @return The result value.
 		 */
 		public T get()  {
-			return this.getFuture().join();
+			return ExceptionUtils.propagate(() -> this.getFuture().get());
 		}
 
 		/**

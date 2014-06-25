@@ -13,7 +13,7 @@ import java.net.URL;
  */
 public class LocalHostConnector {
 
-	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpMethodClient = new HttpMethodClient<>(5000, 10000);
+	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpMethodClient = new HttpMethodClient<>();
 
 	/**
 	 * Returns the result of a POST operation to the specified path on the local host.

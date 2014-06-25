@@ -14,8 +14,8 @@ public class SleepFuture {
 	 *
 	 * @param delay The delay (in milliseconds).
 	 */
-	public static CompletableFuture<Void> create(final int delay) {
-		final CompletableFuture<Void> future = new CompletableFuture<>();
+	public static <T> CompletableFuture<T> create(final int delay) {
+		final CompletableFuture<T> future = new CompletableFuture<>();
 		scheduler.schedule(() -> future.complete(null), delay, TimeUnit.MILLISECONDS);
 		return future;
 	}
