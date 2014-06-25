@@ -4,11 +4,13 @@ import org.nem.nis.audit.*;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
+import java.util.logging.Logger;
 
 /**
  * Interceptor that audits requests.
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
+	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
 
 	private final AuditCollection auditCollection;
 
@@ -26,6 +28,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler) throws Exception {
+		LOGGER.info(String.format("entering %s [%s]", request.getServletPath(), request.getRemoteAddr()));
 		this.auditCollection.add(request.getRemoteAddr(), request.getServletPath());
 		return true;
 	}
@@ -38,5 +41,6 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final Exception ex)
 			throws Exception {
 		this.auditCollection.remove(request.getRemoteAddr(), request.getServletPath());
+		LOGGER.info(String.format("exiting %s [%s]", request.getServletPath(), request.getRemoteAddr()));
 	}
 }

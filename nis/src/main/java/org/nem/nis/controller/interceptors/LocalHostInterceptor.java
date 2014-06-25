@@ -8,11 +8,13 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.*;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.util.logging.Logger;
 
 /**
  * Interceptor that rejects remote calls to client APIs.
  */
 public class LocalHostInterceptor extends HandlerInterceptorAdapter {
+	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
 
 	final InetAddress[] localAddresses;
 
@@ -45,6 +47,7 @@ public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 				return true;
 		}
 
+		LOGGER.warning(String.format("remote %s attempted to call local %s", request.getRemoteAddr(), request.getServletPath()));
 		throw new UnauthorizedAccessException("this api is only accessible from the local machine");
 	}
 
