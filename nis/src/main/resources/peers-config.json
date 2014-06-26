@@ -3,6 +3,10 @@
 
 	"knownPeers": [
 	    {
+	        endpoint: { "protocol": "http", "host": "alice.nem.ninja", "port" : 7890 },
+	        identity: { "name": "alice", "public-key": "AvJVOPf72w2+fTNjvmf57ayAM8d3zz\/BDt7a4amQxUWf" }
+        },
+	    {
 	        endpoint: { "protocol": "http", "host": "bob.nem.ninja", "port" : 7890 },
 	        identity: { "name": "bob", "public-key": "A1D5T4w6BKT0c1a6dJt0QYpVUR2IpW0YCZgTDYwmsov9" }
 	    },

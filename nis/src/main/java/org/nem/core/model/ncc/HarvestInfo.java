@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-// TODO: comment
+// TODO: probably can't be viewmodel as we need it in core for NCC to use
 
 public class HarvestInfo implements SerializableEntity {
 
