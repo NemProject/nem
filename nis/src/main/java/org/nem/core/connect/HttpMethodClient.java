@@ -138,8 +138,7 @@ public class HttpMethodClient<T> {
 					.thenApply(response -> responseStrategy.coerce(request, response));
 
 			SleepFuture.create(this.requestTimeout).thenAccept(v -> {
-				request.abort();
-				if (request.isAborted())
+				if (!responseFuture.isDone())
 					LOGGER.warning(String.format("forcibly aborting request to %s", url));
 			});
 
