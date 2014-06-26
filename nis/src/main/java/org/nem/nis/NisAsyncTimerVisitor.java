@@ -144,7 +144,7 @@ public class NisAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 	public void notifyOperationCompleteExceptionally(final Throwable ex) {
 		LOGGER.log(
 				Level.WARNING,
-				String.format("Timer %s raised exception: %s", "<name>", ex.getMessage()),
+				String.format("Timer %s raised exception: %s", this.getTimerName(), ex.getMessage()),
 				ex);
 
 		this.handleOperationCompletion();
