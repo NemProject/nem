@@ -1,15 +1,15 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.ObjectDeserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
+/**
+ * Metadata about a block.
+ */
 public class BlockMetaData implements SerializableEntity {
 	public static final ObjectDeserializer<BlockMetaData> DESERIALIZER = deserializer -> new BlockMetaData(deserializer);
 
-	private Hash hash;
+	private final Hash hash;
 
 	/**
 	 * Creates a new meta data.
