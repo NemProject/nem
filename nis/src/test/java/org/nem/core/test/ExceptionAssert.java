@@ -52,4 +52,19 @@ public class ExceptionAssert {
 
 		Assert.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
 	}
+
+	/**
+	 * Asserts that the execution of consumer throws an exception of the specific class.
+	 *
+	 * @param consumer The consumer.
+	 * @param exceptionClass The expected exception class.
+	 */
+	public static void assertDoesNotThrow(final Consumer<Void> consumer) {
+		try {
+			consumer.accept(null);
+		}
+		catch (Exception ex) {
+			Assert.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
+		}
+	}
 }

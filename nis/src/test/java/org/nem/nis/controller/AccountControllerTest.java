@@ -1,13 +1,14 @@
 package org.nem.nis.controller;
 
+import static org.mockito.Mockito.mock;
+
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.AccountMetaDataPair;
-import org.nem.core.model.ncc.TransactionMetaDataPair;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.*;
@@ -19,10 +20,31 @@ import java.util.*;
 public class AccountControllerTest {
 
 	@Test
+	public void unlockCopiesRelevantAccountData() {
+		// Arrange:
+		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		account.incrementBalance(Amount.fromNem(10000L));
+		account.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000L));
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		Mockito.when(accountAnalyzer.isKnownAddress(account.getAddress())).thenReturn(true);
+		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		Mockito.when(lastBlockLayer.getLastBlockHeight()).thenReturn(9L);
+		final TestContext context = new TestContext(new Foraging(accountAnalyzer, null, lastBlockLayer, null), accountIoAdapter);
+
+		// Act + Assert (Should not throw IllegalArgumentException):
+		ExceptionAssert.assertDoesNotThrow(v -> context.controller.accountUnlock(account.getKeyPair().getPrivateKey()));
+	}
+
+	@Test
 	public void unlockDelegatesToForaging() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		final TestContext context = new TestContext();
+		account.incrementBalance(new Amount(1000L));
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
+		final TestContext context = new TestContext(accountIoAdapter);
 		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
@@ -36,7 +58,9 @@ public class AccountControllerTest {
 	public void unlockFailureRaisesException() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		final TestContext context = new TestContext();
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
+		final TestContext context = new TestContext(accountIoAdapter);
 		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.FAILURE_UNKNOWN_ACCOUNT);
 
 		// Act:
@@ -49,8 +73,11 @@ public class AccountControllerTest {
 	public void lockDelegatesToForaging() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		account.incrementBalance(new Amount(1000L));
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
+		final TestContext context = new TestContext(accountIoAdapter);
 		final PrivateKey privateKey = new PrivateKey(account.getKeyPair().getPrivateKey().getRaw());
-		final TestContext context = new TestContext();
 		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
@@ -187,6 +214,10 @@ public class AccountControllerTest {
 
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
 			this.controller = new AccountController(this.foraging, accountIoAdapter);
+		}
+
+		public TestContext(final Foraging foraging, final AccountIoAdapter accountIoAdapter) {
+			this.controller = new AccountController(foraging, accountIoAdapter);
 		}
 	}
 }
