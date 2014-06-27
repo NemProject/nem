@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 //
 // Initial logic is as follows:
@@ -151,6 +153,19 @@ public class Foraging  {
 		}
 
 		return addUnconfirmedTransaction(transaction) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.NEUTRAL;
+	}
+
+	/**
+	 * This method is for GUI's usage.
+	 * Right now it returns only outgoing TXes, TODO: should it return incoming too?
+	 *
+	 * @param address - sender of transactions.
+	 * @return The list of transactions.
+	 */
+	public List<Transaction> getUnconfirmedTransactions(final Address address) {
+		return this.unconfirmedTransactions.getTransactionsBefore((new SystemTimeProvider()).getCurrentTime()).stream()
+				.filter(tx -> (tx.getSigner().getAddress().equals(address)))
+				.collect(Collectors.toList());
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
