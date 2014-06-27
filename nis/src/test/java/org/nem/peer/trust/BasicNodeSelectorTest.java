@@ -1,25 +1,18 @@
 package org.nem.peer.trust;
 
-import static org.junit.Assert.*;
-
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
-import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
-import org.nem.nis.BlockChain;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.score.*;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class BasicNodeSelectorTest {
-	private static final Logger LOGGER = Logger.getLogger(BasicNodeSelectorTest.class.getName());
 
 	//region recalculations
 
@@ -175,50 +168,6 @@ public class BasicNodeSelectorTest {
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
-	@Test
-	public void selectNodesDoesNotFavorAnyNodeIfAllNodesHaveEqualTrust() {
-		// I admit, it really belongs to integration tests.
-		// Arrange:
-		int numNodes = 101;
-		int numNodesSelected = 10;
-		final SecureRandom random = new SecureRandom(); 
-		final ColumnVector trustVector = new ColumnVector(numNodes);
-		trustVector.setAll(1.0/(double)numNodes);
-		final TestContext context = new TestContext(trustVector, random);
-
-		// Act:
-		int numTries = numNodes*1000;
-		
-		// Assuming a discrete uniform distribution
-		double expectedValue = (double)(numTries*numNodesSelected)/(double)numNodes;
-		double[] expected = new double[numNodes];
-		Arrays.fill(expected, expectedValue);
-		
-		long[] observed = new long[numNodes];
-		int i=0;
-		for (i=0; i<numTries; i++) {
-			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(numNodesSelected);
-			nodePairs.stream()
-					 .forEach(nodePair -> observed[context.findIndex(nodePair.getNode())]++);
-		}
-		double chiSquare = 0.0;
-		for (i=0; i<numNodes; i++) {
-			chiSquare += (observed[i]-expectedValue)*(observed[i]-expectedValue)/expectedValue;
-		}
-		LOGGER.info("chiSquare=" + chiSquare);
-		double[] chiSquareTable = {61.98, 67.33, 70.06, 77.93, 82.36, 90.13, 99.33, 109.14, 118.50, 124.34, 129.56, 135.81, 140.17, 149.45 };
-		double[] oneMinusAlpha = { 0.001, 0.005, 0.01, 0.05, 0.100, 0.250, 0.500, 0.750, 0.900, 0.950, 0.975, 0.990, 0.995, 0.999 };
-		for (i=chiSquareTable.length-1; i>=0; i--) {
-			if (chiSquare > chiSquareTable[i]) {
-				LOGGER.info("Hypothesis of randomness of node selection can be rejected with at least " + oneMinusAlpha[i]*100 + "% certainty.");
-				break;
-			}
-		}
-		if (i == -1) {
-			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0]*100) + "% certainty.");
-		}
-	}
-
 	private static class TestContext {
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
@@ -245,15 +194,6 @@ public class BasicNodeSelectorTest {
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
 			this.selector = new BasicNodeSelector(this.trustProvider, this.context, random);
-		}
-		
-		public int findIndex(Node node) {
-			for (int i=0; i<nodes.length; i++) {
-				if (nodes[i] == node) {
-					return i;
-				}
-			}
-			return -1;
 		}
 	}
 }
