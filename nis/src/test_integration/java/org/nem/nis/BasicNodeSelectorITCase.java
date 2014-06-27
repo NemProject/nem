@@ -16,37 +16,75 @@ import java.util.logging.Logger;
 public class BasicNodeSelectorITCase {
 	private static final Logger LOGGER = Logger.getLogger(BasicNodeSelectorITCase.class.getName());
 
+	private static final int NUM_NODES = 101;
+	private static final int NUM_NODES_SELECTED = 10;
+	private static final int NUM_TRIES = NUM_NODES * 1000;
+
 	@Test
 	public void selectNodesDoesNotFavorAnyNodeIfAllNodesHaveEqualTrust() {
 		// Arrange:
-		final int numNodes = 101;
-		final int numNodesSelected = 10;
-
-		LOGGER.info(String.format("Generating test context with %d nodes...", numNodes));
-		final ColumnVector trustVector = new ColumnVector(numNodes);
-		trustVector.setAll(1.0 / (double)numNodes);
+		LOGGER.info(String.format("Generating test context with %d nodes...", NUM_NODES));
+		final ColumnVector trustVector = new ColumnVector(NUM_NODES);
+		trustVector.setAll(1.0 / (double)NUM_NODES);
 		final TestContext context = new TestContext(trustVector);
 
 		// Act:
-		int numTries = numNodes * 1000;
-
-		LOGGER.info(String.format("Selecting nodes (%d) iterations...", numTries));
-		final long[] observed = new long[numNodes];
-		for (int i = 0; i < numTries; ++i) {
-			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(numNodesSelected);
-			nodePairs.stream().forEach(nodePair -> observed[context.findIndex(nodePair.getNode())]++);
+		LOGGER.info(String.format("Selecting nodes (%d iterations)...", NUM_TRIES));
+		final long[] observed = new long[NUM_NODES];
+		for (int i = 0; i < NUM_TRIES; ++i) {
+			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(NUM_NODES_SELECTED);
+			nodePairs.stream().forEach(nodePair -> ++observed[context.findIndex(nodePair.getNode())]);
 		}
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)(numTries * numNodesSelected)/(double)numNodes;
+		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED)/(double)NUM_NODES;
+		double chiSquare = calculateChiSquare(observed, expectedValue);
+
+		// Assert:
+		assertRandomness(chiSquare);
+	}
+
+	@Test
+	public void secureRandomIsRandom() {
+		// Arrange:
+		final SecureRandom random = new SecureRandom();
+
+		// Act:
+		LOGGER.info(String.format("Selecting (%d) random values ...", NUM_TRIES));
+		final long[] observed = new long[NUM_NODES];
+		for (int i = 0; i < NUM_TRIES; ++i) {
+			final int value = (int)(random.nextDouble() * NUM_NODES);
+			++observed[value];
+		}
+
+		// Assuming a discrete uniform distribution
+		LOGGER.info("Calculating chiSquare...");
+		final double expectedValue = (double)NUM_TRIES/(double)NUM_NODES;
+		double chiSquare = calculateChiSquare(observed, expectedValue);
+
+		// Assert:
+		assertRandomness(chiSquare);
+	}
+
+	private static double calculateChiSquare(final long[] observedValues, final double expectedValue) {
+		LOGGER.info("Calculating chiSquare...");
 		double chiSquare = 0.0;
-		for (int i = 0; i < numNodes; ++i) {
-			final double difference = observed[i] - expectedValue;
+		double min = expectedValue;
+		double max = expectedValue;
+		for (final long observedValue : observedValues) {
+			min = observedValue < min ? observedValue : min;
+			max = observedValue > max ? observedValue : max;
+
+			final double difference = observedValue - expectedValue;
 			chiSquare += (difference * difference) / expectedValue;
 		}
 
-		LOGGER.info(String.format("chiSquare=%f", chiSquare));
+		LOGGER.info(String.format("chiSquare=%f, min=%f, max=%f", chiSquare, min, max));
+		return chiSquare;
+	}
+
+	private static void assertRandomness(final double chiSquare) {
 		double probability = 0;
 		final double[] chiSquareTable = { 61.98, 67.33, 70.06, 77.93, 82.36, 90.13, 99.33, 109.14, 118.50, 124.34, 129.56, 135.81, 140.17, 149.45 };
 		final double[] oneMinusAlpha = { 0.001, 0.005, 0.01, 0.05, 0.100, 0.250, 0.500, 0.750, 0.900, 0.950, 0.975, 0.990, 0.995, 0.999 };
