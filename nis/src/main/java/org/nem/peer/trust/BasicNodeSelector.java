@@ -49,20 +49,24 @@ public class BasicNodeSelector implements NodeSelector {
 		final List<NodeExperiencePair> nodePairs = new ArrayList<>();
 
 		int numSelectedNodes;
+		double remainingTrust = 1.0;
 		do {
 			numSelectedNodes = nodePairs.size();
 
 			double sum = 0;
-			double rand = this.random.nextDouble();
+			double rand = this.random.nextDouble() * remainingTrust;
 			for (int i = 0; i < nodes.length; ++i) {
-				double trust = this.trustVector.getAt(i);
-				sum += trust;
-
 				// skip nodes with zero trust and those that have already been used
-				if (0 == trust || usedNodes[i] || sum < rand)
+				double trust = this.trustVector.getAt(i);
+				if (0 == trust || usedNodes[i])
+					continue;
+
+				sum += trust;
+				if (sum < rand)
 					continue;
 
 				usedNodes[i] = true;
+				remainingTrust -= trust;
 				final NodeExperience experience = this.context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
 				nodePairs.add(new NodeExperiencePair(nodes[i], experience));
 				break;
