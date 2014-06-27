@@ -176,9 +176,11 @@ public class BasicNodeSelectorTest {
 	}
 
 	@Test
-	public void selectOneNodeDoesNotFavorAnyNodeIfAllNodesHaveEqualTrust() {
+	public void selectNodesDoesNotFavorAnyNodeIfAllNodesHaveEqualTrust() {
+		// I admit, it really belongs to integration tests.
 		// Arrange:
 		int numNodes = 101;
+		int numNodesSelected = 10;
 		final SecureRandom random = new SecureRandom(); 
 		final ColumnVector trustVector = new ColumnVector(numNodes);
 		trustVector.setAll(1.0/(double)numNodes);
@@ -188,19 +190,20 @@ public class BasicNodeSelectorTest {
 		int numTries = numNodes*1000;
 		
 		// Assuming a discrete uniform distribution
+		double expectedValue = (double)(numTries*numNodesSelected)/(double)numNodes;
 		double[] expected = new double[numNodes];
-		Arrays.fill(expected, (double)numTries/(double)numNodes);
+		Arrays.fill(expected, expectedValue);
 		
 		long[] observed = new long[numNodes];
 		int i=0;
 		for (i=0; i<numTries; i++) {
-			//observed[random.nextInt(numNodes)]++; // Even this will result in failure
-			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(1);
-			observed[context.findIndex(nodePairs.get(0).getNode())]++;
+			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(numNodesSelected);
+			nodePairs.stream()
+					 .forEach(nodePair -> observed[context.findIndex(nodePair.getNode())]++);
 		}
 		double chiSquare = 0.0;
 		for (i=0; i<numNodes; i++) {
-			chiSquare += (observed[i]-numTries/numNodes)*(observed[i]-numTries/numNodes)*numNodes/numTries;
+			chiSquare += (observed[i]-expectedValue)*(observed[i]-expectedValue)/expectedValue;
 		}
 		LOGGER.info("chiSquare=" + chiSquare);
 		double[] chiSquareTable = {61.98, 67.33, 70.06, 77.93, 82.36, 90.13, 99.33, 109.14, 118.50, 124.34, 129.56, 135.81, 140.17, 149.45 };
@@ -214,13 +217,6 @@ public class BasicNodeSelectorTest {
 		if (i == -1) {
 			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0]*100) + "% certainty.");
 		}
-		
-		// Assert:
-		// TODO: test fails. not sure why and how to fix at the moment.
-//		ChiSquareTest test = new ChiSquareTest();
-//		double p = test.chiSquareTest(expected, observed);
-//		boolean success = test.chiSquareTest(expected, observed, 0.05);
-//		assertTrue(p > 0.95);
 	}
 
 	private static class TestContext {
