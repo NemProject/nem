@@ -163,7 +163,7 @@ public class Foraging  {
 	 * @return The list of transactions.
 	 */
 	public List<Transaction> getUnconfirmedTransactions(final Address address) {
-		return this.unconfirmedTransactions.getTransactionsBefore((new SystemTimeProvider()).getCurrentTime()).stream()
+		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
 				.filter(tx -> (tx.getSigner().getAddress().equals(address)))
 				.collect(Collectors.toList());
 	}

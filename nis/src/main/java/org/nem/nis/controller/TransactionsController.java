@@ -4,12 +4,9 @@ import org.nem.core.model.Transaction;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.Foraging;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.controller.viewmodels.AccountPage;
-import org.nem.nis.controller.viewmodels.AccountPageBuilder;
+import org.nem.nis.controller.viewmodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class TransactionsController {
@@ -25,7 +22,7 @@ public class TransactionsController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
-		return new SerializableList<>(foraging.getUnconfirmedTransactions(page.getAddress()));
+		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(page.getAddress()));
 	}
 
 }
