@@ -138,8 +138,11 @@ public class HttpMethodClient<T> {
 					.thenApply(response -> responseStrategy.coerce(request, response));
 
 			SleepFuture.create(this.requestTimeout).thenAccept(v -> {
-				if (!responseFuture.isDone())
-					LOGGER.warning(String.format("forcibly aborting request to %s", url));
+				if (responseFuture.isDone())
+					return;
+
+                LOGGER.warning(String.format("forcibly aborting request to %s", url));
+				request.abort();
 			});
 
 			return new AsyncToken<>(request, responseFuture);

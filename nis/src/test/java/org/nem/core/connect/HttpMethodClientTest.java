@@ -17,6 +17,7 @@ import java.util.concurrent.CancellationException;
 public class HttpMethodClientTest {
 
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpDeserializerResponseStrategy(null);
+	private static final int GOOD_TIMEOUT = 10000;
 
 	private final TestRunner getTestRunner = new TestRunner("GET", HttpMethodClient::get);
 
@@ -73,7 +74,7 @@ public class HttpMethodClientTest {
 		this.getTestRunner.sendThrowsFatalPeerExceptionOnClientProtocolError();
 	}
 
-	@Test(expected = CancellationException.class)
+	@Test(expected = CancellationException.class, timeout = GOOD_TIMEOUT)
 	public void getIsCancelledIfOperationTakesTooLong() {
 		// Assert:
 		this.getTestRunner.sendIsCancelledIfOperationTakesTooLong();
@@ -125,7 +126,7 @@ public class HttpMethodClientTest {
 		this.postTestRunner.sendThrowsFatalPeerExceptionOnClientProtocolError();
 	}
 
-	@Test(expected = CancellationException.class)
+	@Test(expected = CancellationException.class, timeout = GOOD_TIMEOUT)
 	public void postIsCancelledIfOperationTakesTooLong() {
 		// Assert:
 		this.postTestRunner.sendIsCancelledIfOperationTakesTooLong();
@@ -143,7 +144,6 @@ public class HttpMethodClientTest {
 		private final String TIMEOUT_URL = "http://127.0.0.100/";
 		private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private final String HOST_LESS_URI = "file:///~/calendar";
-		private final int GOOD_TIMEOUT = 10000;
 
 		public interface SendAsyncStrategy {
 
