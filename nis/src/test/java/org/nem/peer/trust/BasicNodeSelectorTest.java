@@ -1,5 +1,9 @@
 package org.nem.peer.trust;
 
+import static org.junit.Assert.*;
+
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
+import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -168,6 +172,34 @@ public class BasicNodeSelectorTest {
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
+	@Test
+	public void selectOneNodeDoesNotFavorAnyNodeIfAllNodesHaveEqualTrust() {
+		// Arrange:
+		final SecureRandom random = new SecureRandom(); 
+		final TestContext context = new TestContext(new ColumnVector(0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125), random);
+
+		// Act:
+		int numNodes = 8;
+		int numTries = numNodes*10000;
+		
+		// Assuming a discrete uniform distribution
+		double[] expected = new double[numNodes];
+		Arrays.fill(expected, (double)numTries/(double)numNodes);
+		
+		long[] observed = new long[numNodes];
+		for (int i=0; i<numTries; i++) {
+			//observed[random.nextInt(8)]++; // Even this will result in failure
+			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(1);
+			observed[context.findIndex(nodePairs.get(0).getNode())]++;
+		}
+
+		// Assert:
+		// TODO: test fails. not sure why and how to fix at the moment.
+		ChiSquareTest test = new ChiSquareTest();
+		double p = test.chiSquareTest(expected, observed);
+		assertTrue(p > 0.95);
+	}
+
 	private static class TestContext {
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
@@ -194,6 +226,15 @@ public class BasicNodeSelectorTest {
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
 			this.selector = new BasicNodeSelector(this.trustProvider, this.context, random);
+		}
+		
+		public int findIndex(Node node) {
+			for (int i=0; i<nodes.length; i++) {
+				if (nodes[i] == node) {
+					return i;
+				}
+			}
+			return -1;
 		}
 	}
 }
