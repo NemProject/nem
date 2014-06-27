@@ -48,8 +48,10 @@ public class AccountController {
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
-		final Account account = new Account(new KeyPair(privateKey));
-		final UnlockResult result = this.foraging.addUnlockedAccount(account);
+		KeyPair keyPair = new KeyPair(privateKey);
+		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
+		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
+		final UnlockResult result = this.foraging.addUnlockedAccount(copyOfAccount);
 
 		if (UnlockResult.SUCCESS != result)
 			throw new IllegalArgumentException(result.toString());
