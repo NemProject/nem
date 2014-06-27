@@ -8,6 +8,7 @@ import org.nem.nis.dao.TransferDao;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.poi.PoiAccountInfo;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 
@@ -58,12 +59,20 @@ public class Foraging  {
 	 *
 	 * @param account The account.
 	 */
-	public void addUnlockedAccount(final Account account) {
-		if (this.accountLookup.isKnownAddress(account.getAddress())) {
-			this.unlockedAccounts.add(account);
-		}
-	}
+	public UnlockResult addUnlockedAccount(final Account account) {
+		if (!this.accountLookup.isKnownAddress(account.getAddress()))
+			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 
+		final PoiAccountInfo accountInfo = new PoiAccountInfo(
+				-1,
+				account,
+				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
+		if (!accountInfo.canForage())
+			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
+
+		this.unlockedAccounts.add(account);
+		return UnlockResult.SUCCESS;
+	}
 
 	/**
 	 * Removes the specified account from the list of active foraging accounts.

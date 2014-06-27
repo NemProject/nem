@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.PoiImportanceGenerator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.MockForaging;
+import org.nem.nis.test.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.peer.NodeInteractionResult;
@@ -44,45 +44,71 @@ public class ForagingTest {
 	// region add/remove unlocked account
 	
 	@Test
-	public void canUnlockKnownAccount() {
+	public void canUnlockKnownForagingEligibleAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
+		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(10000));
 		
 		// Act:
-		foraging.addUnlockedAccount(RECIPIENT1);
+		final UnlockResult result = foraging.addUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(true));		
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
 	}
-	
+
+	@Test
+	public void cannotUnlockForagingIneligibleAccount() {
+		// Arrange:
+		final Foraging foraging = createMockForaging();
+		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(100));
+
+		// Act:
+		final UnlockResult result = foraging.addUnlockedAccount(account);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_FORAGING_INELIGIBLE));
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
+	}
+
 	@Test
 	public void cannotUnlockUnknownAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
+		final Account account = copyAccountWithBalance(RECIPIENT2, Amount.fromNem(10000));
 		
 		// Act:
-		foraging.addUnlockedAccount(RECIPIENT2);
+		final UnlockResult result = foraging.addUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT2), IsEqual.equalTo(false));		
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_UNKNOWN_ACCOUNT));
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
 	}
-	
+
+	private static Account copyAccountWithBalance(final Account original, final Amount amount) {
+		final Account copy = original.copy();
+		copy.getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
+		copy.incrementBalance(amount);
+		return copy;
+	}
+
 	@Test
-	public void canLockKnownAccountAccount() {
+	public void canLockUnlockedAccount() {
 		// Arrange:
 		final Foraging foraging = createMockForaging();
+		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(10000));
 		
 		// Act:
-		foraging.addUnlockedAccount(RECIPIENT1);
+		foraging.addUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(true));		
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
 
 		// Act:
-		foraging.removeUnlockedAccount(RECIPIENT1);
+		foraging.removeUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(RECIPIENT1), IsEqual.equalTo(false));		
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
 	}
 	
 	// endregion
@@ -325,6 +351,8 @@ public class ForagingTest {
 
 	private Foraging createMockForaging() {
 		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
+		Mockito.when(lastBlockLayer.getLastBlockHeight()).thenReturn(9L);
+
 		final AccountAnalyzer accountAnalyzer = createAccountAnalyzer();
 		accountAnalyzer.addAccountToCache(RECIPIENT1.getAddress());
 		return new MockForaging(accountAnalyzer, lastBlockLayer);

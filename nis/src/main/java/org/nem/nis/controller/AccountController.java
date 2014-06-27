@@ -4,7 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.Foraging;
+import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.AccountIo;
@@ -49,7 +49,10 @@ public class AccountController {
 	@ClientApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
-		this.foraging.addUnlockedAccount(account);
+		final UnlockResult result = this.foraging.addUnlockedAccount(account);
+
+		if (UnlockResult.SUCCESS != result)
+			throw new IllegalArgumentException(result.toString());
 	}
 
 	/**

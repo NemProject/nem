@@ -9,9 +9,8 @@ import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
-import org.nem.core.test.IsEquivalent;
-import org.nem.core.test.Utils;
-import org.nem.nis.Foraging;
+import org.nem.core.test.*;
+import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.*;
 
@@ -20,33 +19,46 @@ import java.util.*;
 public class AccountControllerTest {
 
 	@Test
-	public void unlockAddsAccountToForaging() {
+	public void unlockDelegatesToForaging() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		final TestContext context = new TestContext();
+		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
 		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
 
 		// Assert:
-		Assert.assertThat(context.foraging.getUnlockedAccounts().size(), IsEqual.equalTo(1));
-		Assert.assertThat(context.foraging.getUnlockedAccounts().get(0), IsEqual.equalTo(account));
-		Assert.assertThat(context.foraging.getUnlockedAccounts().get(0), IsNot.not(IsSame.sameInstance(account)));
+		Mockito.verify(context.foraging, Mockito.times(1)).addUnlockedAccount(Mockito.any());
 	}
 
 	@Test
-	public void lockRemovesAccountFromForaging() {
+	public void unlockFailureRaisesException() {
+		// Arrange:
+		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final TestContext context = new TestContext();
+		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.FAILURE_UNKNOWN_ACCOUNT);
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.accountUnlock(account.getKeyPair().getPrivateKey()),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void lockDelegatesToForaging() {
 		// Arrange:
 		final Account account = org.nem.core.test.Utils.generateRandomAccount();
 		final PrivateKey privateKey = new PrivateKey(account.getKeyPair().getPrivateKey().getRaw());
 		final TestContext context = new TestContext();
+		Mockito.when(context.foraging.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
 		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
 		context.controller.accountLock(privateKey);
 
 		// Assert:
-		Assert.assertThat(context.foraging.getUnlockedAccounts().size(), IsEqual.equalTo(0));
+		Mockito.verify(context.foraging, Mockito.times(1)).removeUnlockedAccount(Mockito.any());
 	}
 
 	@Test
@@ -166,7 +178,7 @@ public class AccountControllerTest {
 	}
 
 	private static class TestContext {
-		private final MockForaging foraging = new MockForaging();
+		private final Foraging foraging = Mockito.mock(Foraging.class);
 		private final AccountController controller;
 
 		public TestContext() {
@@ -176,25 +188,5 @@ public class AccountControllerTest {
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
 			this.controller = new AccountController(this.foraging, accountIoAdapter);
 		}
-	}
-
-	private static class MockForaging extends Foraging {
-		private final List<Account> unlockedAccounts = new ArrayList<>();
-
-		public MockForaging() {
-			super(null, null, null, null);
-		}
-
-		@Override
-		public void addUnlockedAccount(final Account account) {
-			this.unlockedAccounts.add(account);
-		}
-
-		@Override
-		public void removeUnlockedAccount(final Account account) {
-			this.unlockedAccounts.remove(account);
-		}
-
-		public List<Account> getUnlockedAccounts() { return this.unlockedAccounts; }
 	}
 }
