@@ -109,6 +109,7 @@ public class NisMain {
 	}
 
 	private void initializePoi(final BlockHeight height) {
+		LOGGER.info("Analyzed blocks: " + height);
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.size()));
 		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer);

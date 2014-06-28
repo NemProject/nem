@@ -98,7 +98,10 @@ public class BlockScorer {
 	public BlockHeight getGroupedHeight(final BlockHeight height) {
 		final long backInTime = height.getRaw() - 1;
 		final long grouped = (backInTime / POI_GROUPING) * POI_GROUPING;
-		return new BlockHeight(grouped + 1);
+		if (grouped == 0) {
+			return BlockHeight.ONE;
+		}
+		return new BlockHeight(grouped);
 	}
 
 	/**
