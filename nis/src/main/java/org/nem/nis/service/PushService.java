@@ -40,7 +40,7 @@ public class PushService {
 	 * @param entity The transaction.
 	 * @param identity The identity of the pushing node.
 	 */
-	public void pushTransaction(final Transaction entity, final NodeIdentity identity) {
+	public boolean pushTransaction(final Transaction entity, final NodeIdentity identity) {
 		boolean result = this.pushEntity(
 				entity,
 				obj -> PushService.checkTransaction(obj),
@@ -51,6 +51,8 @@ public class PushService {
 
 		if (!result)
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
+
+		return true;
 	}
 
 	private static NodeInteractionResult checkTransaction(final Transaction transaction) {
