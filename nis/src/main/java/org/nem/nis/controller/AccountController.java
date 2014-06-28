@@ -83,6 +83,19 @@ public class AccountController {
 	}
 
 	/**
+	 * Gets unconfirmed transaction information for the specified account
+	 *
+	 * @param builder The page builder.
+	 * @return Information about matching transactions
+	 */
+	@RequestMapping(value = "/account/unconfirmedTransactions", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Transaction> transactionsUnconfirmed(final AccountPageBuilder builder) {
+		final AccountPage page = builder.build();
+		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(page.getAddress()));
+	}
+
+	/**
 	 * Gets block information for the specified account starting at the specified time.
 	 *
 	 * @param builder The page builder.
