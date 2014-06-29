@@ -8,28 +8,31 @@ import org.nem.peer.trust.score.*;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.*;
 
 /**
  * Represents the NEM network (basically a facade on top of the trust and services packages).
  */
 public class PeerNetwork {
 	private final PeerNetworkState state;
-	private final PeerNetworkServicesFactory factory;
+	private final PeerNetworkServicesFactory servicesFactory;
+	private final NodeSelectorFactory selectorFactory;
 	private NodeSelector selector;
 
 	/**
 	 * Creates a new network.
 	 *
 	 * @param state The network state.
-	 * @param factory The network services factory.
+	 * @param servicesFactory The network services factory.
+	 * @param selectorFactory The node selector factory.
 	 */
 	public PeerNetwork(
 			final PeerNetworkState state,
-			final PeerNetworkServicesFactory factory) {
+			final PeerNetworkServicesFactory servicesFactory,
+			final NodeSelectorFactory selectorFactory) {
 		this.state = state;
-		this.factory = factory;
-		this.selector = this.factory.createNodeSelector();
+		this.servicesFactory = servicesFactory;
+		this.selectorFactory = selectorFactory;
+		this.selector = this.selectorFactory.createNodeSelector();
 	}
 
 	//region PeerNetworkState delegation
@@ -88,8 +91,8 @@ public class PeerNetwork {
 	 * Refreshes the network.
 	 */
 	public CompletableFuture<Void> refresh() {
-		return this.factory.createNodeRefresher().refresh(this.getPartnerNodes())
-				.whenComplete((v, e) -> this.selector = this.factory.createNodeSelector());
+		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
+				.whenComplete((v, e) -> this.selector = this.selectorFactory.createNodeSelector());
 	}
 
 	/**
@@ -99,28 +102,28 @@ public class PeerNetwork {
 	 * @param entity      The entity.
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
-		return this.factory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);
+		return this.servicesFactory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);
 	}
 
 	/**
 	 * Synchronizes this node with another node in the network.
 	 */
 	public void synchronize() {
-		this.factory.createNodeSynchronizer().synchronize(this.selector);
+		this.servicesFactory.createNodeSynchronizer().synchronize(this.selector);
 	}
 
 	/**
 	 * Prunes all nodes that have stayed inactive since the last time this function was called.
 	 */
 	public void pruneInactiveNodes() {
-		this.factory.createInactiveNodePruner().prune(this.state.getNodes());
+		this.servicesFactory.createInactiveNodePruner().prune(this.state.getNodes());
 	}
 
 	/**
 	 * Updates the endpoint of the local node as seen by other nodes.
 	 */
 	public CompletableFuture<Boolean> updateLocalNodeEndpoint() {
-		return this.factory.createLocalNodeEndpointUpdater().update(this.selector);
+		return this.servicesFactory.createLocalNodeEndpointUpdater().update(this.selector);
 	}
 
 	private List<Node> getPartnerNodes() {

@@ -90,15 +90,15 @@ public class PeerNetworkTest {
 
 	//endregion
 
-	//region PeerNetworkServicesFactory delegation
+	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation
 
 	@Test
-	public void constructorDelegatesToFactory() {
+	public void constructorCreatesNodeSelector() {
 		// Act:
 		final TestContext context = new TestContext();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createNodeSelector();
+		Mockito.verify(context.selectorFactory, Mockito.times(1)).createNodeSelector();
 	}
 
 	@Test
@@ -107,13 +107,13 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
 		Mockito.when(refresher.refresh(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
-		Mockito.when(context.factory.createNodeRefresher()).thenReturn(refresher);
+		Mockito.when(context.servicesFactory.createNodeRefresher()).thenReturn(refresher);
 
 		// Act:
 		context.network.refresh().join();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createNodeRefresher();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeRefresher();
 		Mockito.verify(refresher, Mockito.times(1)).refresh(Mockito.any());
 	}
 
@@ -123,13 +123,13 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
 		Mockito.when(refresher.refresh(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
-		Mockito.when(context.factory.createNodeRefresher()).thenReturn(refresher);
+		Mockito.when(context.servicesFactory.createNodeRefresher()).thenReturn(refresher);
 
 		// Act:
 		context.network.refresh().join();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(2)).createNodeSelector();
+		Mockito.verify(context.selectorFactory, Mockito.times(2)).createNodeSelector();
 	}
 
 	@Test
@@ -139,13 +139,13 @@ public class PeerNetworkTest {
 		final NodeBroadcaster broadcaster = Mockito.mock(NodeBroadcaster.class);
 		Mockito.when(broadcaster.broadcast(Mockito.any(), Mockito.any(), Mockito.any()))
 				.thenReturn(CompletableFuture.completedFuture(null));
-		Mockito.when(context.factory.createNodeBroadcaster()).thenReturn(broadcaster);
+		Mockito.when(context.servicesFactory.createNodeBroadcaster()).thenReturn(broadcaster);
 
 		// Act:
 		context.network.broadcast(NodeApiId.REST_PUSH_BLOCK, new MockSerializableEntity()).join();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createNodeBroadcaster();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeBroadcaster();
 		Mockito.verify(broadcaster, Mockito.times(1)).broadcast(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
@@ -154,13 +154,13 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final NodeSynchronizer synchronizer = Mockito.mock(NodeSynchronizer.class);
-		Mockito.when(context.factory.createNodeSynchronizer()).thenReturn(synchronizer);
+		Mockito.when(context.servicesFactory.createNodeSynchronizer()).thenReturn(synchronizer);
 
 		// Act:
 		context.network.synchronize();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createNodeSynchronizer();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeSynchronizer();
 		Mockito.verify(synchronizer, Mockito.times(1)).synchronize(Mockito.any());
 	}
 
@@ -169,13 +169,13 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final InactiveNodePruner pruner = Mockito.mock(InactiveNodePruner.class);
-		Mockito.when(context.factory.createInactiveNodePruner()).thenReturn(pruner);
+		Mockito.when(context.servicesFactory.createInactiveNodePruner()).thenReturn(pruner);
 
 		// Act:
 		context.network.pruneInactiveNodes();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createInactiveNodePruner();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createInactiveNodePruner();
 		Mockito.verify(pruner, Mockito.times(1)).prune(Mockito.any());
 	}
 
@@ -185,13 +185,13 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 		Mockito.when(updater.update(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
-		Mockito.when(context.factory.createLocalNodeEndpointUpdater()).thenReturn(updater);
+		Mockito.when(context.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(updater);
 
 		// Act:
 		context.network.updateLocalNodeEndpoint().join();
 
 		// Assert:
-		Mockito.verify(context.factory, Mockito.times(1)).createLocalNodeEndpointUpdater();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createLocalNodeEndpointUpdater();
 		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
 	}
 
@@ -199,16 +199,16 @@ public class PeerNetworkTest {
 
 	private static class TestContext {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
-		private final PeerNetworkServicesFactory factory = Mockito.mock(PeerNetworkServicesFactory.class);
+		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
+		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final PeerNetwork network;
 
 		public TestContext() {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
 			Mockito.when(selector.selectNodes()).thenReturn(new ArrayList<>());
+			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
 
-			Mockito.when(this.factory.createNodeSelector()).thenReturn(selector);
-
-		 	this.network = new PeerNetwork(this.state, this.factory);
+		 	this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory);
 		}
 	}
 }

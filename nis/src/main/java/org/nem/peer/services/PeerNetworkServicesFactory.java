@@ -77,18 +77,4 @@ public class PeerNetworkServicesFactory {
 	public NodeSynchronizer createNodeSynchronizer() {
 		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
 	}
-
-	/**
-	 * Creates a node selector.
-	 *
-	 * @return A node synchronizer.
-	 */
-	public NodeSelector createNodeSelector() {
-		// TODO: fix me!
-//		this.selector = new BasicNodeSelector(
-//				new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.nodes),
-//				context);
-		return null;
-////		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
-	}
 }
