@@ -14,311 +14,201 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class NodeRefresherTest {
-	//region getInfo
+	private static final int DEFAULT_SLEEP = 300;
 
-	//region call counts
-
-	@Test
-	public void refreshCallsGetInfoForEveryInactiveNode() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.INACTIVE);
-		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.INACTIVE);
-
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(4));
-	}
+	//region getInfo calls
 
 	@Test
-	public void refreshCallsGetInfoForEveryActiveNode() {
+	public void refreshCallsGetInfoForAllSpecifiedNodes() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
+		final TestContext context = new TestContext();
 
 		// Act:
-		network.refresh().join();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(4));
-	}
-
-	@Test
-	public void refreshDoesNotCallGetInfoForNonPreTrustedFailedNode() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.FAILURE);
-
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
-	}
-
-	@Test
-	public void refreshCallsGetInfoForPreTrustedFailedNode() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.FAILURE);
-
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(3));
-	}
-
-	private static void updateAllNodes(final PeerNetwork network, final NodeStatus status) {
-		// Arrange:
-		final NodeCollection nodes = network.getNodes();
-		nodes.getAllNodes().stream().forEach(node -> nodes.update(node, status));
+		for (final Node refreshNode : context.refreshNodes)
+			Mockito.verify(context.connector, Mockito.times(1)).getInfo(refreshNode);
 	}
 
 	//endregion
 
-	//region transitions
+	//region getInfo transitions / short-circuiting
 
 	@Test
 	public void refreshSuccessMovesNodesToActive() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.NONE);
+		final TestContext context = new TestContext();
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.2" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "b", "c" }, new String[]{ });
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	@Test
 	public void refreshGetInfoTransientFailureMovesNodesToInactive() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
+		final TestContext context = new TestContext();
+		context.setInactiveGetInfoForNode("b");
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { "10.0.0.2" });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ "b" });
+		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	@Test
 	public void refreshGetInfoFatalFailureRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
+		final TestContext context = new TestContext();
+		context.setFatalGetInfoForNode("b");
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ });
+		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	@Test
 	public void refreshGetInfoChangeIdentityRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_IDENTITY);
+		final TestContext context = new TestContext();
+		final Node changedNode = PeerUtils.createNodeWithName("p");
+		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
+				.thenReturn(CompletableFuture.completedFuture(changedNode));
+		final NodeRefresher refresher = new NodeRefresher(context.localNode, context.nodes, context.connector);
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ });
+		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
+		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(changedNode);
 	}
 
 	@Test
 	public void refreshGetInfoChangeAddressUpdatesNodeEndpoint() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
+		final TestContext context = new TestContext();
+		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
+				.thenReturn(CompletableFuture.completedFuture(PeerUtils.createNodeWithHost("10.0.0.125", "b")));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
+		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.20", "10.0.0.3" },
-				new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "b", "c" }, new String[]{ });
+		Assert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	@Test
 	public void refreshGetInfoChangeMetaDataUpdatesNodeMetaData() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_METADATA);
+		final TestContext context = new TestContext();
+		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
+				.thenReturn(CompletableFuture.completedFuture(new Node(
+						new WeakNodeIdentity("b"),
+						NodeEndpoint.fromHost("localhost"),
+						new NodeMetaData("c-plat", "c-app", "c-ver"))));
 
 		// Act:
-		network.refresh().join();
-		final Node node = network.getNodes().findNodeByIdentity(new WeakNodeIdentity("10.0.0.2"));
-		final NodeMetaData metaData = node.getMetaData();
+		context.refresher.refresh(context.refreshNodes).join();
+		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
+		final NodeMetaData metaData = updatedNode.getMetaData();
 
 		// Assert:
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("c-app"));
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("c-plat"));
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("c-app"));
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("c-ver"));
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	//endregion
 
-	//endregion
-
-	//region getKnownPeers
+	//region getKnownPeers calls
 
 	@Test
 	public void refreshCallsGetKnownPeersForActiveNodes() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
+		final TestContext context = new TestContext();
 
 		// Act:
-		network.refresh().join();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(3));
+		for (final Node refreshNode : context.refreshNodes)
+			Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(refreshNode);
 	}
 
-	@Test
-	public void refreshCallsGetKnownPeersForChangeAddressNodes() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_ADDRESS);
+	//endregion
 
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(3));
-	}
+	//region getKnownPeers transitions / short-circuiting
 
 	@Test
-	public void refreshDoesNotCallGetKnownPeersForInactiveNodes() {
+	public void refreshGetKnownPeersInfoTransientFailureMovesNodesToInactive() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
+		final TestContext context = new TestContext();
+		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1)))
+				.thenReturn(CompletableFuture.supplyAsync(() -> {
+					throw new InactivePeerException("inactive");
+				}));
 
 		// Act:
-		network.refresh().join();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
-	}
-
-	@Test
-	public void refreshDoesNotCallGetKnownPeersForFatalFailureNodes() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.FATAL);
-
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
-	}
-
-	@Test
-	public void refreshDoesNotCallGetKnownPeersForChangeIdentityNodes() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.CHANGE_IDENTITY);
-
-		// Act:
-		network.refresh().join();
-
-		// Assert:
-		Assert.assertThat(connector.getNumGetKnownPeerCalls(), IsEqual.equalTo(2));
-	}
-
-	@Test
-	public void refreshGetKnownPeersTransientFailureMovesNodesToInactive() {
-		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.INACTIVE);
-
-		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
-
-		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { "10.0.0.2" });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ "b" });
 	}
 
 	@Test
 	public void refreshGetKnownPeersFatalFailureRemovesNodesFromBothLists() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetKnownPeersError("10.0.0.2", MockConnector.TriggerAction.FATAL);
+		final TestContext context = new TestContext();
+		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1)))
+				.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(nodes, new String[] { "10.0.0.1", "10.0.0.3" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ });
 	}
+
+	//endregion
+
+	//region precedence / potential attacks
 
 	@Test
 	public void refreshGivesPrecedenceToFirstHandExperience() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
-		connector.setGetInfoError("10.0.0.4", MockConnector.TriggerAction.FATAL);
-		connector.setGetInfoError("10.0.0.6", MockConnector.TriggerAction.INACTIVE);
-		connector.setGetInfoError("10.0.0.7", MockConnector.TriggerAction.CHANGE_IDENTITY);
+		final TestContext context = new TestContext();
+		context.setInactiveGetInfoForNode("b", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("d");
+		context.setInactiveGetInfoForNode("f");
+		context.setFatalGetInfoForNode("g");
 
-		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-7 are active
-		// but the local node can only communicate with 10.0.0.5
-		final List<Node> knownPeers = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.2"),
-				PeerUtils.createNodeWithHost("10.0.0.4"),
-				PeerUtils.createNodeWithHost("10.0.0.5"),
-				PeerUtils.createNodeWithHost("10.0.0.6"),
-				PeerUtils.createNodeWithHost("10.0.0.7"));
-		connector.setKnownPeers(knownPeers);
+		// Arrange: set up a node peers list that indicates peers b, d-g are active
+		// but the local node can only communicate with e
+		context.setKnownPeers(createNodesWithNames("b", "d", "e", "f", "g"));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.5" },
-				new String[] { "10.0.0.2", "10.0.0.6" });
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[]{ "a", "c", "e" },
+				new String[]{ "b", "f" });
 	}
 
 	@Test
@@ -328,137 +218,168 @@ public class NodeRefresherTest {
 		// evil node propagating mismatched identities for good nodes does not remove the good nodes
 
 		// Arrange: set up 4 active nodes (3 pre-trusted)
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
-		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.SLEEP_INACTIVE);
+		final TestContext context = new TestContext();
+		context.refreshNodes.add(PeerUtils.createNodeWithName("d"));
+		context.setInactiveGetInfoForNode("c", DEFAULT_SLEEP);
 
-		// when the mock connector sees hosts 100-3, it will trigger an identity change
-		connector.setGetInfoError("10.0.0.100", MockConnector.TriggerAction.CHANGE_IDENTITY);
-		connector.setGetInfoError("10.0.0.101", MockConnector.TriggerAction.CHANGE_IDENTITY);
-		connector.setGetInfoError("10.0.0.102", MockConnector.TriggerAction.CHANGE_IDENTITY);
-		connector.setGetInfoError("10.0.0.103", MockConnector.TriggerAction.CHANGE_IDENTITY);
-
-		// Arrange: set up a node peers list that indicates good peers (1, 3, 25, 26) are untrustworthy
-		// (2 is the evil node in this scenario)
-		final List<Node> knownPeers = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.100", "10.0.0.1"),
-				PeerUtils.createNodeWithHost("10.0.0.101", "10.0.0.3"),
-				PeerUtils.createNodeWithHost("10.0.0.102", "10.0.0.25"),
-				PeerUtils.createNodeWithHost("10.0.0.103", "10.0.0.26"));
-		connector.setKnownPeers(knownPeers);
+		// Arrange: when the mock connector sees nodes w-x, it will trigger an identity change to a good node
+		final List<Node> evilNodes = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.100", "w"),
+				PeerUtils.createNodeWithHost("10.0.0.101", "x"),
+				PeerUtils.createNodeWithHost("10.0.0.102", "y"),
+				PeerUtils.createNodeWithHost("10.0.0.103", "z"));
+		context.setKnownPeers(evilNodes);
+		for (final Node evilNode : evilNodes) {
+			final StringBuilder newNameBuilder = new StringBuilder();
+			newNameBuilder.appendCodePoint(evilNode.getIdentity().getName().codePointAt(0) - 'w' + 'b');
+			Mockito.when(context.connector.getInfo(evilNode))
+					.thenReturn(CompletableFuture.completedFuture(
+							PeerUtils.createNodeWithName(newNameBuilder.toString())));
+		}
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		// - all good peers (1, 3, 25) that were directly communicated with are active
-		// - the evil node (2) is active because the reverse is possible (i.e. 2 is the only good node)
-		// - the good node that hasn't been communicated with (26) has been dropped
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.25", "10.0.0.2" },
-				new String[] { "10.0.0.3" });
+		// - all good peers (a, b, d) that were directly communicated with are active
+		// - the delayed inactive node (c) is inactive
+		// - the impersonating bad nodes are not added
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[] { "a", "b", "d" },
+				new String[] { "c" });
+
+		// Assert: the endpoints of good nodes were not changed
+		for (final Node node : context.nodes.getAllNodes())
+			Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
 	@Test
 	public void refreshResultForDirectNodeIgnoresChildNodeGetInfoResults() {
 		// Arrange: set up 4 active nodes (3 pre-trusted)
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		updateAllNodes(network, NodeStatus.ACTIVE);
-		network.getNodes().update(PeerUtils.createNodeWithHost("10.0.0.25"), NodeStatus.ACTIVE);
+		final TestContext context = new TestContext();
+		context.refreshNodes.add(PeerUtils.createNodeWithName("d"));
+		context.setInactiveGetInfoForNode("c", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("y");
+		context.setInactiveGetInfoForNode("z");
 
-		connector.setGetInfoError("10.0.0.3", MockConnector.TriggerAction.SLEEP_INACTIVE);
-		connector.setGetInfoError("10.0.0.100", MockConnector.TriggerAction.INACTIVE);
-
-		// Arrange: set up a node peers list that contains an unseen inactive node
-		final List<Node> knownPeers = Arrays.asList(PeerUtils.createNodeWithHost("10.0.0.100"));
-		connector.setKnownPeers(knownPeers);
+		// Arrange: set up a node peers list that contains an unseen inactive and failure node
+		context.setKnownPeers(createNodesWithNames("y", "z"));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		// - all peers (1, 2, 25) that were directly communicated (successfully) are active
-		// - the inactive peer (3) is inactive
-		// - the unseen inactive peer (100) is inactive
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.25" },
-				new String[] { "10.0.0.3", "10.0.0.100" });
+		// - all peers (a, b, d) that were directly communicated with successfully are active
+		// - the peer that was directly communicated with unsuccessfully (c) is inactive
+		// - the unseen inactive peer (z) is inactive
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[] { "a", "b", "d" },
+				new String[] { "c", "z" });
 	}
 
 	@Test
 	public void refreshCallsGetInfoOnceForEachUniqueEndpoint() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-		connector.setGetInfoError("10.0.0.2", MockConnector.TriggerAction.SLEEP_INACTIVE);
-		connector.setGetInfoError("10.0.0.4", MockConnector.TriggerAction.FATAL);
-		connector.setGetInfoError("10.0.0.6", MockConnector.TriggerAction.INACTIVE);
+		final TestContext context = new TestContext();
+		context.setInactiveGetInfoForNode("b", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("d");
+		context.setInactiveGetInfoForNode("f");
 
-		// Arrange: set up a node peers list that indicates peer 10.0.0.2, 10.0.0.4-6 are active
-		// but the local node can only communicate with 10.0.0.5
-		final List<Node> knownPeers = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.2"),
-				PeerUtils.createNodeWithHost("10.0.0.4"),
-				PeerUtils.createNodeWithHost("10.0.0.5"),
-				PeerUtils.createNodeWithHost("10.0.0.6"));
-		connector.setKnownPeers(knownPeers);
+		// Arrange: set up a node peers list that indicates peer b, d-f are active
+		// but the local node can only communicate with e
+		context.setKnownPeers(createNodesWithNames("b", "d", "e", "f"));
 
 		// Act:
-		network.refresh().join();
-		network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		Assert.assertThat(connector.getNumGetInfoCalls(), IsEqual.equalTo(6));
+		Mockito.verify(context.connector, Mockito.times(2)).getKnownPeers(Mockito.any());
+		Mockito.verify(context.connector, Mockito.times(6)).getInfo(Mockito.any());
 	}
+
+	//endregion
+
+	//region basic merging
 
 	@Test
 	public void refreshOnlyMergesInRelayedActivePeers() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-
-		final List<Node> knownPeers = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.15"),
-				PeerUtils.createNodeWithHost("10.0.0.6"));
-		connector.setKnownPeers(knownPeers);
+		final TestContext context = new TestContext();
+		final List<Node> knownPeers = createNodesWithNames("y", "z");
+		Mockito.when(context.connector.getKnownPeers(Mockito.any()))
+				.thenReturn(CompletableFuture.completedFuture(new SerializableList<>(knownPeers)));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.6", "10.0.0.15" },
-				new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c", "y", "z" }, new String[] { });
 	}
 
 	@Test
 	public void refreshDoesNotMergeInLocalNode() {
 		// Arrange:
-		final MockConnector connector = new MockConnector();
-		final PeerNetwork network = createTestNetwork(connector);
-
-		final List<Node> knownPeers = Arrays.asList(network.getLocalNode());
-		connector.setKnownPeers(knownPeers);
+		final TestContext context = new TestContext();
+		Mockito.when(context.connector.getKnownPeers(Mockito.any()))
+				.thenReturn(CompletableFuture.completedFuture(new SerializableList<>(Arrays.asList(context.localNode))));
 
 		// Act:
-		network.refresh().join();
-		final NodeCollection nodes = network.getNodes();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areHostsEquivalent(
-				nodes,
-				new String[] { "10.0.0.1", "10.0.0.2", "10.0.0.3" },
-				new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
 	}
 
 	//endregion
+
+	private static List<Node> createNodesWithNames(final String... names) {
+		final List<Node> nodes = new ArrayList<>();
+		for (final String name : names)
+			nodes.add(PeerUtils.createNodeWithName(name));
+
+		return nodes;
+	}
+
+	private static PeerConnector mockPeerConnector() {
+		final PeerConnector connector = Mockito.mock(PeerConnector.class);
+		Mockito.when(connector.getInfo(Mockito.any()))
+				.thenAnswer(i -> CompletableFuture.completedFuture((Node)i.getArguments()[0]));
+		Mockito.when(connector.getKnownPeers(Mockito.any()))
+				.thenAnswer(i -> CompletableFuture.completedFuture(new SerializableList<>(10)));
+		return connector;
+	}
+
+	private static class TestContext {
+		private final List<Node> refreshNodes = createNodesWithNames("a", "b", "c");
+		private final Node localNode = PeerUtils.createNodeWithName("l");
+		private final NodeCollection nodes = new NodeCollection();
+		private final PeerConnector connector = mockPeerConnector();
+		private final NodeRefresher refresher = new NodeRefresher(this.localNode, this.nodes, this.connector);
+
+		public void setInactiveGetInfoForNode(final String name) {
+			this.setInactiveGetInfoForNode(name, 0);
+		}
+
+		public void setInactiveGetInfoForNode(final String name, int sleep) {
+			final Node node = PeerUtils.createNodeWithName(name);
+			Mockito.when(this.connector.getInfo(node))
+					.thenReturn(CompletableFuture.supplyAsync(() -> {
+						ExceptionUtils.propagateVoid(() -> Thread.sleep(sleep));
+						throw new InactivePeerException("inactive");
+					}));
+		}
+
+		public void setFatalGetInfoForNode(final String name) {
+			final Node node = PeerUtils.createNodeWithName(name);
+			Mockito.when(this.connector.getInfo(node))
+					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
+		}
+
+		public void setKnownPeers(final List<Node> nodes) {
+			Mockito.when(this.connector.getKnownPeers(Mockito.any()))
+					.thenAnswer(i -> CompletableFuture.completedFuture(new SerializableList<>(nodes)));
+		}
+	}
 }

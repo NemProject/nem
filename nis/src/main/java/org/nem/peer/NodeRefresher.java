@@ -1,28 +1,48 @@
-private static class NodeRefresher {
-	final Node localNode;
-	final PreTrustedNodes preTrustedNodes;
-	final NodeCollection nodes;
-	final PeerConnector connector;
-	final Map<Node, NodeStatus> nodesToUpdate;
-	final ConcurrentHashSet<Node> connectedNodes;
+package org.nem.peer;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.connect.*;
+import org.nem.peer.connect.PeerConnector;
+import org.nem.peer.node.*;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+/**
+ * Helper class used to implement network refreshing logic.
+ */
+public class NodeRefresher {
+	private static final Logger LOGGER = Logger.getLogger(NodeRefresher.class.getName());
+
+	private final Node localNode;
+	private final NodeCollection nodes;
+	private final PeerConnector connector;
+	private final Map<Node, NodeStatus> nodesToUpdate;
+	private final ConcurrentHashSet<Node> connectedNodes;
+
+	/**
+	 * Creates a new refresher.
+	 *
+	 * @param localNode The local node.
+	 * @param nodes The network nodes.
+	 * @param connector The peer connector.
+	 */
 	public NodeRefresher(
 			final Node localNode,
-			final PreTrustedNodes preTrustedNodes,
 			final NodeCollection nodes,
 			final PeerConnector connector) {
 		this.localNode = localNode;
-		this.preTrustedNodes = preTrustedNodes;
 		this.nodes = nodes;
 		this.connector = connector;
 		this.nodesToUpdate = new ConcurrentHashMap<>();
 		this.connectedNodes = new ConcurrentHashSet<>();
 	}
 
-	public CompletableFuture<Void> refresh() {
+	public CompletableFuture<Void> refresh(final List<Node> refreshNodes) {
 		// all refresh nodes are directly communicated with;
 		// ensure that only direct communication is trusted for these nodes
-		final Set<Node> refreshNodes = this.getRefreshNodes();
 		this.connectedNodes.addAll(refreshNodes);
 
 		final List<CompletableFuture> futures = refreshNodes.stream()
@@ -34,13 +54,6 @@ private static class NodeRefresher {
 					for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
 						this.nodes.update(entry.getKey(), entry.getValue());
 				});
-	}
-
-	private Set<Node> getRefreshNodes() {
-		// always include pre-trusted nodes even if they previously resulted in a failure
-		final Set<Node> refreshNodes = new HashSet<>(this.nodes.getAllNodes());
-		refreshNodes.addAll(this.preTrustedNodes.getNodes().stream().collect(Collectors.toList()));
-		return refreshNodes;
 	}
 
 	private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
@@ -74,7 +87,7 @@ private static class NodeRefresher {
 		}
 
 		return future
-				.exceptionally(obj -> this.getNodeStatusFromException(obj))
+				.exceptionally(this::getNodeStatusFromException)
 				.thenAccept(ns -> this.update(node, ns));
 	}
 
