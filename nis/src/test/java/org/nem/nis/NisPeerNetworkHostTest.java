@@ -61,45 +61,6 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void networkCannotBeBootedMoreThanOnce() {
-		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
-			// Act:
-			host.boot(createLocalNode());
-			host.boot(createLocalNode());
-		}
-	}
-
-	@Test
-	public void bootCanBeRetriedIfInitialBootFails() {
-		// Arrange:
-		final Config config = createBootFailureConfig();
-
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
-			// Arrange: trigger a boot failure
-			ExceptionAssert.assertThrowsCompletionException(v -> host.boot(config).join(), IllegalStateException.class);
-
-			// Act:
-			host.boot(createLocalNode()).join();
-
-			// Assert:
-			Assert.assertThat(host.getNetwork(), IsNull.notNullValue());
-		}
-	}
-
-	private static Config createBootFailureConfig() {
-		// Arrange:
-		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
-		Mockito.when(trustProvider.computeTrust(Mockito.any())).thenReturn(new ColumnVector(1));
-
-		final Config config = Mockito.mock(Config.class);
-		Mockito.when(config.getTrustProvider()).thenReturn(trustProvider);
-		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
-		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
-		return config;
-	}
-
 	@Test
 	public void getVisitorsReturnsSixTimerVisitors() {
 		// Arrange:

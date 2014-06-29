@@ -15,13 +15,13 @@ public class PeerNetworkStateTest {
 	//region constructor
 
 	@Test
-	public void ctorAddsAllWellKnownPeersAsInactive() {
+	public void ctorAddsAllWellKnownPeersAsActive() {
 		// Act:
 		final Config config = createTestConfig();
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { }, new String[] { "a", "b", "c" });
+		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { "a", "b", "c" }, new String[] { });
 	}
 
 	//endregion

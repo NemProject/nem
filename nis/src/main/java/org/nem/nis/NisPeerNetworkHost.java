@@ -6,20 +6,18 @@ import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.NisNodeSelectorFactory;
+import org.nem.nis.boot.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
-import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 /**
@@ -58,10 +56,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final CountingBlockSynchronizer synchronizer;
 	private AsyncTimer foragingTimer;
 	private PeerNetworkHost host;
-	private final AtomicBoolean isBootAttempted = new AtomicBoolean(false);
 	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final AuditCollection outgoingAudits = createAuditCollection();
 	private final AuditCollection incomingAudits = createAuditCollection();
+	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
@@ -90,45 +88,29 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param config The network configuration.
 	 */
 	public CompletableFuture boot(final Config config) {
-		if (!this.isBootAttempted.compareAndSet(false, true))
-			throw new IllegalStateException("network boot was already attempted");
+		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
+		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
+			this.host = new PeerNetworkHost(network);
+			this.timerVisitors.addAll(this.host.getVisitors());
 
-		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(config, networkState);
-		final PeerNetwork network = new PeerNetwork(
-				networkState,
-				createNetworkServicesFactory(networkState),
-				selectorFactory);
-		return network.refresh()
-				.thenCompose(v -> network.updateLocalNodeEndpoint())
-				.handle((v, e) -> {
-					if (null != e) {
-						this.isBootAttempted.set(false);
-						throw new IllegalStateException("network boot failed", e);
-					}
+			final NisAsyncTimerVisitor foragingTimerVisitor = PeerNetworkHost.createNamedVisitor("FORAGING");
+			this.timerVisitors.add(foragingTimerVisitor);
 
-					this.host = new PeerNetworkHost(network);
-					this.timerVisitors.addAll(this.host.getVisitors());
+			this.foragingTimer = new AsyncTimer(
+					this.host.runnableToFutureSupplier(() -> {
+						final Block block = this.blockChain.forageBlock();
+						if (null == block)
+							return;
 
-					final NisAsyncTimerVisitor foragingTimerVisitor = PeerNetworkHost.createNamedVisitor("FORAGING");
-					this.timerVisitors.add(foragingTimerVisitor);
-
-					this.foragingTimer = new AsyncTimer(
-							this.host.runnableToFutureSupplier(() -> {
-								final Block block = this.blockChain.forageBlock();
-								if (null == block)
-									return;
-
-								final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-										block,
-										this.host.getNetwork().getLocalNode().getIdentity());
-								this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
-							}),
-							FORAGING_INITIAL_DELAY,
-							new UniformDelayStrategy(FORAGING_INTERVAL),
-							foragingTimerVisitor);
-					return null;
-				});
+						final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
+								block,
+								this.host.getNetwork().getLocalNode().getIdentity());
+						this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
+					}),
+					FORAGING_INITIAL_DELAY,
+					new UniformDelayStrategy(FORAGING_INTERVAL),
+					foragingTimerVisitor);
+		});
 	}
 
 	private static JSONObject loadJsonObject(final String configFileName) {
@@ -208,6 +190,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
 		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
+	}
+
+	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
+		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(config, networkState);
+		return new PeerNetworkBootstrapper(
+				networkState,
+				this.createNetworkServicesFactory(networkState),
+				selectorFactory);
 	}
 
 	private static AuditCollection createAuditCollection() {
