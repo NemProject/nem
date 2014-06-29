@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public class LocalNodeEndpointUpdaterTest {
 
 	@Test
-	public void updateLocalNodeEndpointDelegatesToNodeSelectorForNodeSelection() {
+	public void updateDelegatesToNodeSelectorForNodeSelection() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -27,7 +27,7 @@ public class LocalNodeEndpointUpdaterTest {
 	}
 
 	@Test
-	public void updateLocalNodeEndpointReturnsFalseWhenThereAreNoCommunicationPartners() {
+	public void updateReturnsFalseWhenThereAreNoCommunicationPartners() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -40,13 +40,13 @@ public class LocalNodeEndpointUpdaterTest {
 	}
 
 	@Test
-	public void updateLocalNodeEndpointDoesNotUpdateEndpointWhenGetLocalInfoFailsWithInactiveException() {
+	public void updateDoesNotUpdateEndpointWhenGetLocalInfoFailsWithInactiveException() {
 		// Assert:
 		assertEndpointIsNotUpdatedWhenGetLocalInfoFailsWithException(new InactivePeerException("inactive"));
 	}
 
 	@Test
-	public void updateLocalNodeEndpointDoesNotUpdateEndpointWhenGetLocalInfoFailsWithFatalException() {
+	public void updateDoesNotUpdateEndpointWhenGetLocalInfoFailsWithFatalException() {
 		// Assert:
 		assertEndpointIsNotUpdatedWhenGetLocalInfoFailsWithException(new FatalPeerException("fatal"));
 	}
@@ -68,13 +68,13 @@ public class LocalNodeEndpointUpdaterTest {
 	}
 
 	@Test
-	public void updateLocalNodeEndpointDoesNotUpdateEndpointWhenGetLocalInfoReturnsNull() {
+	public void updateDoesNotUpdateEndpointWhenGetLocalInfoReturnsNull() {
 		// Assert:
 		assertEndpointIsNotUpdatedByReturnedEndpoint(null);
 	}
 
 	@Test
-	public void updateLocalNodeEndpointDoesNotUpdateEndpointWhenEndpointIsUnchanged() {
+	public void updateDoesNotUpdateEndpointWhenEndpointIsUnchanged() {
 		// Assert:
 		assertEndpointIsNotUpdatedByReturnedEndpoint(NodeEndpoint.fromHost("127.0.0.1"));
 	}
@@ -96,7 +96,7 @@ public class LocalNodeEndpointUpdaterTest {
 	}
 
 	@Test
-	public void updateLocalNodeEndpointUpdatesEndpointWhenEndpointIsChanged() {
+	public void updateUpdatesEndpointWhenEndpointIsChanged() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getLocalNodeInfo(Mockito.any(), Mockito.eq(context.localNode.getEndpoint())))

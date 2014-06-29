@@ -334,6 +334,23 @@ public class NodeRefresherTest {
 
 	//endregion
 
+	//region async
+
+	@Test
+	public void refreshIsAsync() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setInactiveGetInfoForNode("b", DEFAULT_SLEEP);
+
+		// Act:
+		final CompletableFuture future = context.refresher.refresh(context.refreshNodes);
+
+		// Assert:
+		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
 	private static PeerConnector mockPeerConnector() {
 		final PeerConnector connector = Mockito.mock(PeerConnector.class);
 		Mockito.when(connector.getInfo(Mockito.any()))

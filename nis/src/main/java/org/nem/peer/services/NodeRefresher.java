@@ -40,6 +40,12 @@ public class NodeRefresher {
 		this.connectedNodes = new ConcurrentHashSet<>();
 	}
 
+	/**
+	 * Refreshes this node's list of active nodes.
+	 *
+	 * @param refreshNodes The nodes with which to directly communicate.
+	 * @return The future.
+	 */
 	public CompletableFuture<Void> refresh(final List<Node> refreshNodes) {
 		// all refresh nodes are directly communicated with;
 		// ensure that only direct communication is trusted for these nodes

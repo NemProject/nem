@@ -28,6 +28,12 @@ public class LocalNodeEndpointUpdater {
 		this.connector = connector;
 	}
 
+	/**
+	 * Updates the local node endpoint.
+	 *
+	 * @param selector The node selector.
+	 * @return The future.
+	 */
 	public CompletableFuture<Boolean> update(final NodeSelector selector) {
 		LOGGER.info("updating local node endpoint");
 		final NodeExperiencePair partnerNodePair = selector.selectNode();
