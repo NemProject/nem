@@ -8,7 +8,6 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.*;
 
 import java.util.concurrent.CompletableFuture;
 

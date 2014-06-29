@@ -32,6 +32,9 @@ public class PeerNetworkState {
 		this.localNode = config.getLocalNode();
 		this.nodeExperiences = nodeExperiences;
 		this.nodes = nodeCollection;
+
+		for (final Node node : this.config.getPreTrustedNodes().getNodes())
+			this.nodes.update(node, NodeStatus.INACTIVE);
 	}
 
 	/**

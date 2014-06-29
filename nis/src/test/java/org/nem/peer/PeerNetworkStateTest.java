@@ -12,6 +12,20 @@ import java.util.*;
 
 public class PeerNetworkStateTest {
 
+	//region constructor
+
+	@Test
+	public void ctorAddsAllWellKnownPeersAsInactive() {
+		// Act:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Assert:
+		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { }, new String[] { "a", "b", "c" });
+	}
+
+	//endregion
+
 	//region getters
 
 	@Test
