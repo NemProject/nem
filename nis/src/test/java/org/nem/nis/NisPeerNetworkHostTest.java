@@ -2,14 +2,8 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.math.ColumnVector;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.peer.Config;
 import org.nem.peer.node.*;
-import org.nem.peer.test.PeerUtils;
-import org.nem.peer.trust.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -58,6 +52,16 @@ public class NisPeerNetworkHostTest {
 
 			// Assert:
 			Assert.assertThat(host.getNetwork(), IsNull.notNullValue());
+		}
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void networkCannotBeBootedMoreThanOnce() {
+		// Arrange:
+		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+			// Act:
+			host.boot(createLocalNode());
+			host.boot(createLocalNode());
 		}
 	}
 
