@@ -29,7 +29,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 	}
 
 	@Override
-	public List<Node> selectNodes(int maxNodes) {
-		return this.selector.selectNodes(maxNodes);
+	public List<Node> selectNodes() {
+		return this.selector.selectNodes();
 	}
 }

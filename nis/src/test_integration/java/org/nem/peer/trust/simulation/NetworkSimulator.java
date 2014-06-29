@@ -216,6 +216,7 @@ public class NetworkSimulator {
 				this.trustContext.getParams());
 
 		final NodeSelector basicNodeSelector = new BasicNodeSelector(
+				10,
 				new ActiveNodeTrustProvider(
 						new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
 						nodeCollection),

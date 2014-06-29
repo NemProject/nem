@@ -204,7 +204,7 @@ public class PeerNetworkTest {
 
 		public TestContext() {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
-			Mockito.when(selector.selectNodes(Mockito.anyInt())).thenReturn(new ArrayList<>());
+			Mockito.when(selector.selectNodes()).thenReturn(new ArrayList<>());
 
 			Mockito.when(this.factory.createNodeSelector()).thenReturn(selector);
 

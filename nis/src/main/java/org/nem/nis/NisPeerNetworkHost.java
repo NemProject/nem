@@ -91,7 +91,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			throw new IllegalStateException("network boot was already attempted");
 
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final PeerNetwork network = new PeerNetwork(networkState, createNetworkServicesFactory(networkState));
+		final PeerNetwork network = new PeerNetwork(
+				networkState,
+				createNetworkServicesFactory(networkState));
 		return network.updateLocalNodeEndpoint()
 				.handle((v, e) -> {
 					if (null != e) {
@@ -217,7 +219,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.network = network;
 			this.timerVisitors = new ArrayList<>();
 
-			this.timerVisitors.add(this.createNamedVisitor("REFRESH"));
+			this.timerVisitors.add(PeerNetworkHost.createNamedVisitor("REFRESH"));
 			this.refreshTimer = new AsyncTimer(
 					() -> this.network.refresh(),
 					REFRESH_INITIAL_DELAY,

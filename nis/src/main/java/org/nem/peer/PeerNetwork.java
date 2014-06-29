@@ -124,8 +124,7 @@ public class PeerNetwork {
 	}
 
 	private List<Node> getPartnerNodes() {
-		return this.selector.selectNodes(10).stream()
-				.collect(Collectors.toList());
+		return this.selector.selectNodes();
 	}
 
 	//endregion

@@ -32,7 +32,7 @@ public class BasicNodeSelectorITCase {
 		LOGGER.info(String.format("Selecting nodes (%d iterations)...", NUM_TRIES));
 		final long[] observed = new long[NUM_NODES];
 		for (int i = 0; i < NUM_TRIES; ++i) {
-			final List<Node> nodes = context.selector.selectNodes(NUM_NODES_SELECTED);
+			final List<Node> nodes = context.selector.selectNodes();
 			nodes.stream().forEach(node -> ++observed[context.findIndex(node)]);
 		}
 
@@ -130,7 +130,7 @@ public class BasicNodeSelectorITCase {
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = new BasicNodeSelector(this.trustProvider, this.context, random);
+			this.selector = new BasicNodeSelector(NUM_NODES_SELECTED, this.trustProvider, this.context, random);
 		}
 
 		public int findIndex(final Node node) {

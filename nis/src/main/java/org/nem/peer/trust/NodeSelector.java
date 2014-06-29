@@ -10,20 +10,16 @@ import java.util.List;
 public interface NodeSelector {
 
 	/**
-	 * Selects a node.
+	 * Selects a single node.
 	 *
 	 * @return The node.
 	 */
-	public default Node selectNode() {
-		final List<Node> nodes = this.selectNodes(1);
-		return nodes.size() > 0 ? nodes.get(0) : null;
-	}
+	public Node selectNode();
 
 	/**
-	 * Selects at most the specified number of nodes.
+	 * Selects multiple nodes.
 	 *
-	 * @param maxNodes The maximum number of nodes to select.
 	 * @return The nodes.
 	 */
-	public List<Node> selectNodes(final int maxNodes);
+	public List<Node> selectNodes();
 }

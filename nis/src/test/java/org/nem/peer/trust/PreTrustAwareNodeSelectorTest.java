@@ -34,15 +34,15 @@ public class PreTrustAwareNodeSelectorTest {
 		// Arrange:
 		final NodeSelector wrappedSelector = Mockito.mock(NodeSelector.class);
 		final List<Node> nodes = new ArrayList<>();
-		Mockito.when(wrappedSelector.selectNodes(Mockito.anyInt())).thenReturn(nodes);
+		Mockito.when(wrappedSelector.selectNodes()).thenReturn(nodes);
 
 		final PreTrustAwareNodeSelector selector = new PreTrustAwareNodeSelector(wrappedSelector, null);
 
 		// Act:
-		final List<Node> selectedNodes = selector.selectNodes(10);
+		final List<Node> selectedNodes = selector.selectNodes();
 
 		// Assert:
-		Mockito.verify(wrappedSelector, Mockito.times(1)).selectNodes(10);
+		Mockito.verify(wrappedSelector, Mockito.times(1)).selectNodes();
 		Assert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
 }
