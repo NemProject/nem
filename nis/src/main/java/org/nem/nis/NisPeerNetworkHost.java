@@ -9,6 +9,8 @@ import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
+import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
@@ -88,8 +90,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		if (!this.isBootAttempted.compareAndSet(false, true))
 			throw new IllegalStateException("network boot was already attempted");
 
-		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
-				.handle((network, e) -> {
+		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+		final PeerNetwork network = new PeerNetwork(networkState, createNetworkServicesFactory(networkState));
+		return network.updateLocalNodeEndpoint()
+				.handle((v, e) -> {
 					if (null != e) {
 						this.isBootAttempted.set(false);
 						throw new IllegalStateException("network boot failed", e);
@@ -98,7 +102,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					this.host = new PeerNetworkHost(network);
 					this.timerVisitors.addAll(this.host.getVisitors());
 
-					final NisAsyncTimerVisitor foragingTimerVisitor = this.host.createNamedVisitor("FORAGING");
+					final NisAsyncTimerVisitor foragingTimerVisitor = PeerNetworkHost.createNamedVisitor("FORAGING");
 					this.timerVisitors.add(foragingTimerVisitor);
 
 					this.foragingTimer = new AsyncTimer(
@@ -192,10 +196,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.host.close();
 	}
 
-	private PeerNetworkServices createNetworkServices() {
+	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
-		return new PeerNetworkServices(connector, connectorPool, this.synchronizer);
+		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
 	}
 
 	private static AuditCollection createAuditCollection() {

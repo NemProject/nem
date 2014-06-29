@@ -266,15 +266,7 @@ public class NodeControllerTest {
 		return new JsonDeserializer(serializer.getObject(), null);
 	}
 
-	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {
-		final NodeExperience experience = new NodeExperience();
-		experience.successfulCalls().set(numSuccessfulCalls);
-		experience.failedCalls().set(numFailureCalls);
-		return experience;
-	}
-
 	private static class TestContext {
-		private final NodeExperiences nodeExperiences = new NodeExperiences();
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final NodeController controller;
