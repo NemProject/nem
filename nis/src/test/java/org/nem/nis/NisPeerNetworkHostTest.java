@@ -4,10 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.math.ColumnVector;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.peer.Config;
 import org.nem.peer.node.*;
-import org.nem.peer.trust.PreTrustedNodes;
+import org.nem.peer.test.PeerUtils;
+import org.nem.peer.trust.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -72,8 +74,7 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void bootCanBeRetriedIfInitialBootFails() {
 		// Arrange:
-		final Config config = Mockito.mock(Config.class);
-		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
+		final Config config = createBootFailureConfig();
 
 		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
 			// Arrange: trigger a boot failure
@@ -85,6 +86,18 @@ public class NisPeerNetworkHostTest {
 			// Assert:
 			Assert.assertThat(host.getNetwork(), IsNull.notNullValue());
 		}
+	}
+
+	private static Config createBootFailureConfig() {
+		// Arrange:
+		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
+		Mockito.when(trustProvider.computeTrust(Mockito.any())).thenReturn(new ColumnVector(1));
+
+		final Config config = Mockito.mock(Config.class);
+		Mockito.when(config.getTrustProvider()).thenReturn(trustProvider);
+		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
+		return config;
 	}
 
 	@Test

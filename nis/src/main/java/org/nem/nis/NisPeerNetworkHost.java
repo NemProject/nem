@@ -6,6 +6,7 @@ import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.NisNodeSelectorFactory;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
@@ -98,7 +99,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				networkState,
 				createNetworkServicesFactory(networkState),
 				selectorFactory);
-		return network.updateLocalNodeEndpoint()
+		return network.refresh()
+				.thenCompose(v -> network.updateLocalNodeEndpoint())
 				.handle((v, e) -> {
 					if (null != e) {
 						this.isBootAttempted.set(false);
@@ -296,31 +298,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 		public static NisAsyncTimerVisitor createNamedVisitor(final String name) {
 			return new NisAsyncTimerVisitor(name, CommonStarter.TIME_PROVIDER);
-		}
-	}
-
-	private static class NisNodeSelectorFactory implements NodeSelectorFactory {
-		private final Config config;
-		private final PeerNetworkState state;
-
-		public NisNodeSelectorFactory(final Config config, final PeerNetworkState state) {
-			this.config = config;
-			this.state = state;
-		}
-
-		@Override
-		public NodeSelector createNodeSelector() {
-			final TrustContext context = this.state.getTrustContext();
-			final SecureRandom random = new SecureRandom();
-			return new PreTrustAwareNodeSelector(
-					new BasicNodeSelector(
-							10, // TODO: read from configuration
-							new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.state.getNodes()),
-							context,
-							random),
-					this.state.getNodes(),
-					context,
-					random);
 		}
 	}
 }
