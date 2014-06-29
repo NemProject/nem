@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.peer.services;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

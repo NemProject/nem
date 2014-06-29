@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.peer.services;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;

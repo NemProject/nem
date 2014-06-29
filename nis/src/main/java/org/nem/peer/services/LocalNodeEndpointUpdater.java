@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.peer.services;
 
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.*;
