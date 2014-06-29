@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 import org.nem.core.math.ColumnVector;
+import org.nem.peer.PeerNetworkState;
 import org.nem.peer.node.Node;
 import org.nem.peer.node.NodeCollection;
 import org.nem.peer.node.NodeStatus;
@@ -74,12 +75,15 @@ public class NetworkSimulator {
 
 		this.config = config;
 		this.trustProvider = trustProvider;
-		this.trustContext = new TrustContext(
-				TrustUtils.toNodeArray(config.getNodes(), config.getLocalNode()),
+
+		final org.nem.peer.Config peerConfig = new org.nem.peer.Config(
 				config.getLocalNode(),
-				new NodeExperiences(),
 				new PreTrustedNodes(config.getPreTrustedNodes()),
-				new TrustParameters());
+				new TrustParameters(),
+				this.trustProvider,
+				"0.0");
+
+		this.trustContext = new PeerNetworkState(peerConfig, new NodeExperiences(), config.getNodes()).getTrustContext();
 	}
 
 	public double getFailedPercentage() {
