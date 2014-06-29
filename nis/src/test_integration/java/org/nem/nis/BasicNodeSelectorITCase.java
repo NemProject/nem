@@ -32,8 +32,8 @@ public class BasicNodeSelectorITCase {
 		LOGGER.info(String.format("Selecting nodes (%d iterations)...", NUM_TRIES));
 		final long[] observed = new long[NUM_NODES];
 		for (int i = 0; i < NUM_TRIES; ++i) {
-			final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(NUM_NODES_SELECTED);
-			nodePairs.stream().forEach(nodePair -> ++observed[context.findIndex(nodePair.getNode())]);
+			final List<Node> nodes = context.selector.selectNodes(NUM_NODES_SELECTED);
+			nodes.stream().forEach(node -> ++observed[context.findIndex(node)]);
 		}
 
 		// Assuming a discrete uniform distribution

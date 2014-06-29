@@ -119,10 +119,7 @@ public class LocalNodeEndpointUpdaterTest {
 		private final LocalNodeEndpointUpdater updater = new LocalNodeEndpointUpdater(this.localNode, this.connector);
 
 		public void makeSelectorReturnRemoteNode() {
-			final NodeExperiencePair pair = new NodeExperiencePair(
-					PeerUtils.createNodeWithName("p"),
-					new NodeExperience());
-			Mockito.when(this.selector.selectNode()).thenReturn(pair);
+			Mockito.when(this.selector.selectNode()).thenReturn(PeerUtils.createNodeWithName("p"));
 		}
 	}
 }

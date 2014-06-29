@@ -36,13 +36,13 @@ public class LocalNodeEndpointUpdater {
 	 */
 	public CompletableFuture<Boolean> update(final NodeSelector selector) {
 		LOGGER.info("updating local node endpoint");
-		final NodeExperiencePair partnerNodePair = selector.selectNode();
-		if (null == partnerNodePair) {
+		final Node partnerNode = selector.selectNode();
+		if (null == partnerNode) {
 			LOGGER.warning("no suitable peers found to update local node");
 			return CompletableFuture.completedFuture(false);
 		}
 
-		return this.connector.getLocalNodeInfo(partnerNodePair.getNode(), this.localNode.getEndpoint())
+		return this.connector.getLocalNodeInfo(partnerNode, this.localNode.getEndpoint())
 				.handle((endpoint, e) -> {
 					if (null == endpoint || this.localNode.getEndpoint().equals(endpoint))
 						return false;

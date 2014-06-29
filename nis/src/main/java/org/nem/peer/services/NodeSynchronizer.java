@@ -41,17 +41,16 @@ public class NodeSynchronizer {
 	 * @return The future.
 	 */
 	public boolean synchronize(final NodeSelector selector) {
-		final NodeExperiencePair partnerNodePair = selector.selectNode();
-		if (null == partnerNodePair) {
+		final Node partnerNode = selector.selectNode();
+		if (null == partnerNode) {
 			LOGGER.warning("no suitable peers found to sync with");
 			return false;
 		}
 
-		final Node partnerNode = partnerNodePair.getNode();
 		LOGGER.info(String.format("synchronizing with %s", partnerNode));
 		final NodeInteractionResult result = this.blockSynchronizer.synchronizeNode(this.syncConnectorPool, partnerNode);
 		LOGGER.info(String.format("synchronizing with %s finished", partnerNode));
-		this.state.updateExperience(partnerNodePair.getNode(), result);
+		this.state.updateExperience(partnerNode, result);
 		return true;
 	}
 }

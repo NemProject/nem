@@ -221,7 +221,7 @@ public class NetworkSimulator {
 						nodeCollection),
 				trustContext);
 
-		return basicNodeSelector.selectNode().getNode();
+		return basicNodeSelector.selectNode();
 	}
 
 	/**

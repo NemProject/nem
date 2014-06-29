@@ -2,8 +2,6 @@ package org.nem.peer.trust;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.peer.node.Node;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiencePair;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -42,16 +40,15 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	@Override
-	public List<NodeExperiencePair> selectNodes(final int maxNodes) {
-		final Node localNode = this.context.getLocalNode();
+	public List<Node> selectNodes(final int maxNodes) {
 		final Node[] nodes = this.context.getNodes();
 		final boolean[] usedNodes = new boolean[nodes.length];
-		final List<NodeExperiencePair> nodePairs = new ArrayList<>();
+		final List<Node> partnerNodes = new ArrayList<>();
 
 		int numSelectedNodes;
 		double remainingTrust = 1.0;
 		do {
-			numSelectedNodes = nodePairs.size();
+			numSelectedNodes = partnerNodes.size();
 
 			double sum = 0;
 			double rand = this.random.nextDouble() * remainingTrust;
@@ -67,14 +64,13 @@ public class BasicNodeSelector implements NodeSelector {
 
 				usedNodes[i] = true;
 				remainingTrust -= trust;
-				final NodeExperience experience = this.context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-				nodePairs.add(new NodeExperiencePair(nodes[i], experience));
+				partnerNodes.add(nodes[i]);
 				break;
 			}
 
 			// stop the loop if either maxNodes have been selected or the last iteration didn't select a node
-		} while (nodePairs.size() != maxNodes && nodePairs.size() != numSelectedNodes);
+		} while (partnerNodes.size() != maxNodes && partnerNodes.size() != numSelectedNodes);
 
-		return nodePairs;
+		return partnerNodes;
 	}
 }

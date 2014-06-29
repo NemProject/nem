@@ -8,7 +8,6 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.NodeSelector;
-import org.nem.peer.trust.score.*;
 
 public class NodeSynchronizerTest {
 
@@ -83,11 +82,9 @@ public class NodeSynchronizerTest {
 				this.state);
 
 		public Node makeSelectorReturnRemoteNode() {
-			final NodeExperiencePair pair = new NodeExperiencePair(
-					PeerUtils.createNodeWithName("p"),
-					new NodeExperience());
-			Mockito.when(this.selector.selectNode()).thenReturn(pair);
-			return pair.getNode();
+			final Node remoteNode = PeerUtils.createNodeWithName("p");
+			Mockito.when(this.selector.selectNode()).thenReturn(remoteNode);
+			return remoteNode;
 		}
 	}
 }

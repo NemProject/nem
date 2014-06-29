@@ -50,10 +50,10 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(0, 0, 0), random);
 
 		// Act:
-		final NodeExperiencePair nodePair = context.selector.selectNode();
+		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(nodePair, IsNull.nullValue());
+		Assert.assertThat(node, IsNull.nullValue());
 	}
 
 	@Test
@@ -64,10 +64,10 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(0, 1, 0), random);
 
 		// Act:
-		final NodeExperiencePair nodePair = context.selector.selectNode();
+		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(nodePair.getNode(), IsEqual.equalTo(context.nodes[1]));
+		Assert.assertThat(node, IsEqual.equalTo(context.nodes[1]));
 	}
 
 	//endregion
@@ -82,10 +82,10 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(0, 0, 0, 0), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes(10);
 
 		// Assert:
-		Assert.assertThat(nodePairs.size(), IsEqual.equalTo(0));
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -96,11 +96,11 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(0.1, 0.2, 0.3, 0.4), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes(2);
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -112,11 +112,11 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(20, 40, 60, 80), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes(2);
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -128,11 +128,11 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(1, 0, 1, 0), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes(10);
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -144,11 +144,11 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(10, 20, 30, 40), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes(2);
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -160,11 +160,11 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(10, 20, 30, 40), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes(10);
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
