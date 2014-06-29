@@ -3,7 +3,6 @@ package org.nem.peer.services;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.NodeSelector;
-import org.nem.peer.trust.score.NodeExperiencePair;
 
 import java.util.concurrent.*;
 import java.util.logging.Logger;
@@ -44,8 +43,11 @@ public class LocalNodeEndpointUpdater {
 
 		return this.connector.getLocalNodeInfo(partnerNode, this.localNode.getEndpoint())
 				.handle((endpoint, e) -> {
-					if (null == endpoint || this.localNode.getEndpoint().equals(endpoint))
+					if (null == endpoint)
 						return false;
+
+					if (this.localNode.getEndpoint().equals(endpoint))
+						return true;
 
 					LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
 							this.localNode.getEndpoint(),

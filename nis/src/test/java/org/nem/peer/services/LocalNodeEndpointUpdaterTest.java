@@ -69,16 +69,18 @@ public class LocalNodeEndpointUpdaterTest {
 	@Test
 	public void updateDoesNotUpdateEndpointWhenGetLocalInfoReturnsNull() {
 		// Assert:
-		assertEndpointIsNotUpdatedByReturnedEndpoint(null);
+		assertEndpointIsNotUpdatedByReturnedEndpoint(null, false);
 	}
 
 	@Test
 	public void updateDoesNotUpdateEndpointWhenEndpointIsUnchanged() {
 		// Assert:
-		assertEndpointIsNotUpdatedByReturnedEndpoint(NodeEndpoint.fromHost("127.0.0.1"));
+		assertEndpointIsNotUpdatedByReturnedEndpoint(NodeEndpoint.fromHost("127.0.0.1"), true);
 	}
 
-	private static void assertEndpointIsNotUpdatedByReturnedEndpoint(final NodeEndpoint endpoint) {
+	private static void assertEndpointIsNotUpdatedByReturnedEndpoint(
+			final NodeEndpoint endpoint,
+			final boolean expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getLocalNodeInfo(Mockito.any(), Mockito.eq(context.localNode.getEndpoint())))
@@ -90,7 +92,7 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(1)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
