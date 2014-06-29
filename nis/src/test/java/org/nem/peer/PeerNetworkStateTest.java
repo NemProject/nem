@@ -261,6 +261,8 @@ public class PeerNetworkStateTest {
 	private static Config createTestConfig() {
 		final Config config = Mockito.mock(Config.class);
 		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+		Mockito.when(config.getPreTrustedNodes()).
+				thenReturn(new PreTrustedNodes(new HashSet<>(PeerUtils.createNodesWithNames("a", "b", "c"))));
 		return config;
 	}
 

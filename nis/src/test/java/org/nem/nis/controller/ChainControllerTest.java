@@ -17,8 +17,9 @@ import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.service.*;
 import org.nem.nis.service.RequiredBlockDao;
 import org.nem.nis.test.*;
+import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.MockPeerNetwork;
+import org.nem.peer.test.PeerUtils;
 
 import java.util.function.Function;
 
@@ -144,11 +145,14 @@ public class ChainControllerTest {
 		private final AccountLookup accountLookup = new MockAccountLookup();
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
-		private final MockPeerNetwork network = new MockPeerNetwork();
+		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final ChainController controller;
 
 		private TestContext() {
+			this.network = Mockito.mock(PeerNetwork.class);
+			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 

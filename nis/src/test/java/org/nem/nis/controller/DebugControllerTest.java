@@ -14,7 +14,8 @@ import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
 import org.nem.nis.test.NisUtils;
-import org.nem.peer.test.MockPeerNetwork;
+import org.nem.peer.PeerNetwork;
+import org.nem.peer.test.PeerUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -158,11 +159,14 @@ public class DebugControllerTest {
 	private static class TestContext {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
-		private final MockPeerNetwork network = new MockPeerNetwork();
+		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
 
 		private TestContext() {
+			this.network = Mockito.mock(PeerNetwork.class);
+			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 

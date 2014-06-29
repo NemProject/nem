@@ -12,8 +12,9 @@ import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.BlockIo;
 import org.nem.nis.test.*;
+import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.MockPeerNetwork;
+import org.nem.peer.test.PeerUtils;
 
 import java.util.function.*;
 
@@ -94,11 +95,14 @@ public class BlockControllerTest {
 
 	private static class TestContext {
 		private final BlockIo blockIo = Mockito.mock(BlockIo.class);
-		private final MockPeerNetwork network = new MockPeerNetwork();
+		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final BlockController controller;
 
 		private TestContext() {
+			this.network = Mockito.mock(PeerNetwork.class);
+			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
