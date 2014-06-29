@@ -199,7 +199,7 @@ public class NodeRefresherTest {
 
 		// Arrange: set up a node peers list that indicates peers b, d-g are active
 		// but the local node can only communicate with e
-		context.setKnownPeers(createNodesWithNames("b", "d", "e", "f", "g"));
+		context.setKnownPeers(PeerUtils.createNodesWithNames("b", "d", "e", "f", "g"));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -264,7 +264,7 @@ public class NodeRefresherTest {
 		context.setInactiveGetInfoForNode("z");
 
 		// Arrange: set up a node peers list that contains an unseen inactive and failure node
-		context.setKnownPeers(createNodesWithNames("y", "z"));
+		context.setKnownPeers(PeerUtils.createNodesWithNames("y", "z"));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -289,7 +289,7 @@ public class NodeRefresherTest {
 
 		// Arrange: set up a node peers list that indicates peer b, d-f are active
 		// but the local node can only communicate with e
-		context.setKnownPeers(createNodesWithNames("b", "d", "e", "f"));
+		context.setKnownPeers(PeerUtils.createNodesWithNames("b", "d", "e", "f"));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -307,7 +307,7 @@ public class NodeRefresherTest {
 	public void refreshOnlyMergesInRelayedActivePeers() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Node> knownPeers = createNodesWithNames("y", "z");
+		final List<Node> knownPeers = PeerUtils.createNodesWithNames("y", "z");
 		Mockito.when(context.connector.getKnownPeers(Mockito.any()))
 				.thenReturn(CompletableFuture.completedFuture(new SerializableList<>(knownPeers)));
 
@@ -334,14 +334,6 @@ public class NodeRefresherTest {
 
 	//endregion
 
-	private static List<Node> createNodesWithNames(final String... names) {
-		final List<Node> nodes = new ArrayList<>();
-		for (final String name : names)
-			nodes.add(PeerUtils.createNodeWithName(name));
-
-		return nodes;
-	}
-
 	private static PeerConnector mockPeerConnector() {
 		final PeerConnector connector = Mockito.mock(PeerConnector.class);
 		Mockito.when(connector.getInfo(Mockito.any()))
@@ -352,7 +344,7 @@ public class NodeRefresherTest {
 	}
 
 	private static class TestContext {
-		private final List<Node> refreshNodes = createNodesWithNames("a", "b", "c");
+		private final List<Node> refreshNodes = PeerUtils.createNodesWithNames("a", "b", "c");
 		private final Node localNode = PeerUtils.createNodeWithName("l");
 		private final NodeCollection nodes = new NodeCollection();
 		private final PeerConnector connector = mockPeerConnector();

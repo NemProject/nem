@@ -3,6 +3,8 @@ package org.nem.peer.test;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.score.NodeExperience;
 
+import java.util.*;
+
 public class PeerUtils {
 
 	/**
@@ -75,5 +77,19 @@ public class PeerUtils {
 		final NodeExperience experience = new NodeExperience();
 		experience.successfulCalls().set(numSuccessfulCalls);
 		return experience;
+	}
+
+	/**
+	 * Creates a list of nodes with the specified names.
+	 *
+	 * @param names The desired names.
+	 * @return The nodes.
+	 */
+	public static List<Node> createNodesWithNames(final String... names) {
+		final List<Node> nodes = new ArrayList<>();
+		for (final String name : names)
+			nodes.add(PeerUtils.createNodeWithName(name));
+
+		return nodes;
 	}
 }
