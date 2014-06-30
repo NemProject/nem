@@ -10,10 +10,9 @@ import java.util.*;
 /**
  * A json deserializer that supports label-based lookup in addition to forward-only deserialization.
  */
-public class JsonDeserializer implements Deserializer {
+public class JsonDeserializer extends Deserializer {
 
 	private final JSONObject object;
-	private final DeserializationContext context;
 	private final JSONArray propertyOrderArray;
 	private int propertyOrderArrayIndex;
 
@@ -24,20 +23,20 @@ public class JsonDeserializer implements Deserializer {
 	 * @param context The deserialization context.
 	 */
 	public JsonDeserializer(final JSONObject object, final DeserializationContext context) {
+		super(context);
 		this.object = object;
-		this.context = context;
 		this.propertyOrderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 		this.propertyOrderArrayIndex = 0;
 	}
 
 	@Override
-	public Integer readInt(final String label) {
+	public Integer readOptionalInt(final String label) {
 		this.checkLabel(label);
 		return (Integer)this.object.get(label);
 	}
 
 	@Override
-	public Long readLong(final String label) {
+	public Long readOptionalLong(final String label) {
 		this.checkLabel(label);
 
 		// the alternative to this ugly piece, is setting up JSONParser.DEFAULT_PERMISSIVE_MODE
@@ -56,7 +55,7 @@ public class JsonDeserializer implements Deserializer {
 	}
 
 	@Override
-	public Double readDouble(final String label) {
+	public Double readOptionalDouble(final String label) {
 		this.checkLabel(label);
 
 		final Object object = this.object.get(label);
@@ -70,7 +69,7 @@ public class JsonDeserializer implements Deserializer {
 	}
 
 	@Override
-	public BigInteger readBigInteger(final String label) {
+	public BigInteger readOptionalBigInteger(final String label) {
 		final byte[] bytes = this.readBytes(label);
 		return null == bytes ? null : new BigInteger(bytes);
 	}
@@ -85,13 +84,13 @@ public class JsonDeserializer implements Deserializer {
 	}
 
 	@Override
-	public String readString(final String label) {
+	public String readOptionalString(final String label) {
 		this.checkLabel(label);
 		return (String)this.object.get(label);
 	}
 
 	@Override
-	public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
+	public <T> T readOptionalObject(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
 		final JSONObject childObject = (JSONObject)this.object.get(label);
 		if (null == childObject)
@@ -115,13 +114,8 @@ public class JsonDeserializer implements Deserializer {
 		return objects;
 	}
 
-	@Override
-	public DeserializationContext getContext() {
-		return this.context;
-	}
-
 	public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
-		final JsonDeserializer deserializer = new JsonDeserializer(object, this.context);
+		final JsonDeserializer deserializer = new JsonDeserializer(object, this.getContext());
 		return 0 == object.size() ? null : activator.deserialize(deserializer);
 	}
 

@@ -9,10 +9,9 @@ import java.util.*;
 /**
  * A binary deserializer that supports forward-only deserialization.
  */
-public class BinaryDeserializer implements AutoCloseable, Deserializer {
+public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	private final ByteArrayInputStream stream;
-	private final DeserializationContext context;
 
 	/**
 	 * Creates a new binary deserializer.
@@ -21,12 +20,12 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	 * @param context The deserialization context.
 	 */
 	public BinaryDeserializer(final byte[] bytes, final DeserializationContext context) {
+		super(context);
 		this.stream = new ByteArrayInputStream(bytes);
-		this.context = context;
 	}
 
 	@Override
-	public Integer readInt(final String label) {
+	public Integer readOptionalInt(final String label) {
 		byte[] bytes = this.readBytes(4);
 		return bytes[0] & 0x000000FF
 				| (bytes[1] << 8) & 0x0000FF00
@@ -35,7 +34,7 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	}
 
 	@Override
-	public Long readLong(final String label) {
+	public Long readOptionalLong(final String label) {
 		long lowPart = this.readInt(null);
 		long highPart = this.readInt(null);
 		return lowPart & 0x00000000FFFFFFFFL
@@ -43,12 +42,12 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	}
 
 	@Override
-	public Double readDouble(final String label) {
+	public Double readOptionalDouble(final String label) {
 		return Double.longBitsToDouble(this.readLong(label));
 	}
 
 	@Override
-	public BigInteger readBigInteger(final String label) {
+	public BigInteger readOptionalBigInteger(final String label) {
 		byte[] bytes = this.readBytes(null);
 		return new BigInteger(bytes);
 	}
@@ -60,13 +59,13 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 	}
 
 	@Override
-	public String readString(final String label) {
+	public String readOptionalString(final String label) {
 		byte[] bytes = this.readBytes(null);
 		return null == bytes ? null : StringEncoder.getString(bytes);
 	}
 
 	@Override
-	public <T> T readObject(final String label, final ObjectDeserializer<T> activator) {
+	public <T> T readOptionalObject(final String label, final ObjectDeserializer<T> activator) {
 		return this.deserializeObject(activator);
 	}
 
@@ -78,11 +77,6 @@ public class BinaryDeserializer implements AutoCloseable, Deserializer {
 			objects.add(deserializeObject(activator));
 
 		return objects;
-	}
-
-	@Override
-	public DeserializationContext getContext() {
-		return this.context;
 	}
 
 	@Override

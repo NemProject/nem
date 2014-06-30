@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * A json serializer that supports forward-only serialization.
  */
-public class JsonSerializer implements Serializer {
+public class JsonSerializer extends Serializer {
 
 	public static final String PROPERTY_ORDER_ARRAY_NAME = "_propertyOrderArray";
 

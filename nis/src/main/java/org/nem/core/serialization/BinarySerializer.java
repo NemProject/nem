@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * A binary serializer that supports forward-only serialization.
  */
-public class BinarySerializer implements AutoCloseable, Serializer {
+public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	/**
 	 * Sentinel value used to indicate that a serialized byte array should be deserialized as null.
