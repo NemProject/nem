@@ -482,7 +482,7 @@ public class Account implements SerializableEntity {
 			final AccountEncoding encoding) {
 		switch (encoding) {
 		case PUBLIC_KEY:
-			final byte[] publicKeyBytes = deserializer.readBytes(label);
+			final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
 			return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
 
 		case ADDRESS:

@@ -119,8 +119,12 @@ public class Config {
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<Node> wellKnownNodes = deserializer.readObjectArray("knownPeers", obj -> new Node(obj));
-		return new PreTrustedNodes(wellKnownNodes.stream().collect(Collectors.toSet()));
+		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", obj -> new Node(obj));
+		final Set<Node> preTrustedNodes = new HashSet<>();
+		if (null != wellKnownNodes)
+			preTrustedNodes.addAll(wellKnownNodes);
+
+		return new PreTrustedNodes(preTrustedNodes);
 	}
 
 	private static TrustParameters getDefaultTrustParameters() {
