@@ -29,9 +29,9 @@ public class NodeTest {
 		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
 		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getVersion(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo("?"));
 	}
 
 	@Test
@@ -86,9 +86,9 @@ public class NodeTest {
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getVersion(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo("?"));
 	}
 
 	@Test

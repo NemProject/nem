@@ -54,8 +54,8 @@ public class ErrorResponse implements SerializableEntity {
 	 */
 	public ErrorResponse(final Deserializer deserializer) {
 		this.status = deserializer.readInt("status");
-		this.error = deserializer.readString("error");
-		this.message = deserializer.readString("message");
+		this.error = deserializer.readOptionalString("error");
+		this.message = deserializer.readOptionalString("message");
 		this.timeStamp = deserializer.readInt("timeStamp");
 	}
 

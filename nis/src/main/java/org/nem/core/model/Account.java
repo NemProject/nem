@@ -170,7 +170,7 @@ public class Account implements SerializableEntity {
 
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
-		this.label = deserializer.readString("label");
+		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 
 		if (DeserializationOptions.ALL == options)

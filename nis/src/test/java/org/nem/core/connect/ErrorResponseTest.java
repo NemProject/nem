@@ -59,7 +59,7 @@ public class ErrorResponseTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo((Integer)0)));
 		Assert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
 		Assert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));
@@ -75,6 +75,18 @@ public class ErrorResponseTest {
 		Assert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(500));
+	}
+
+	@Test
+	public void responseWithoutDescriptionsCanBeRoundTripped() {
+		// Act:
+		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(null, 890));
+
+		// Assert:
+		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getError(), IsNull.nullValue());
+		Assert.assertThat(response.getMessage(), IsNull.nullValue());
+		Assert.assertThat(response.getStatus(), IsEqual.equalTo(890));
 	}
 
 	private static ErrorResponse createRoundTrippedResponse(final ErrorResponse originalResponse) {

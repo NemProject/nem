@@ -45,7 +45,7 @@ public class ApplicationMetaData implements SerializableEntity {
 	public ApplicationMetaData(Deserializer deserializer) {
 		this.appName = deserializer.readString("application");
 		this.version = deserializer.readString("version");
-		this.certificateSigner = deserializer.readString("signer");
+		this.certificateSigner = deserializer.readOptionalString("signer");
 		this.startTime = TimeInstant.readFrom(deserializer, "startTime");
 		this.currentTime = TimeInstant.readFrom(deserializer, "currentTime");
 		this.timeProvider = null;

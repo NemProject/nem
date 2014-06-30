@@ -38,7 +38,7 @@ public class MockSerializableEntity implements SerializableEntity {
 	 */
 	public MockSerializableEntity(final Deserializer deserializer) {
 		this.intValue = deserializer.readInt("int");
-		this.stringValue = deserializer.readString("s");
+		this.stringValue = deserializer.readOptionalString("s");
 		this.longValue = deserializer.readLong("long");
 	}
 
