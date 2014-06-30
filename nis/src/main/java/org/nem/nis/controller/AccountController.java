@@ -83,7 +83,8 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets unconfirmed transaction information for the specified account
+	 * Gets unconfirmed transaction information for the specified account.
+	 * TODO: not sure if we should have an AccountPageBuilder here since there isn't paging.
 	 *
 	 * @param builder The page builder.
 	 * @return Information about matching transactions

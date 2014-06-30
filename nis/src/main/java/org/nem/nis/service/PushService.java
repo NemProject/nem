@@ -52,6 +52,7 @@ public class PushService {
 		if (!result)
 			throw new IllegalArgumentException("transfer must be valid and verifiable");
 
+		// TODO: this function always returns true
 		return true;
 	}
 

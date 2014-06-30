@@ -9,7 +9,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
 import org.nem.nis.test.*;
 
 import java.lang.reflect.Field;
@@ -186,22 +185,20 @@ public class BlockScorerTest {
 
 	//region calculateForgerBalance
 
-// this test doesn't make much sense, and won't work
-//
-//	@Test
-//	public void calculateForgerBalanceDerivesBalanceFromImportance() {
-//		// Arrange:
-//		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
-//		final Block block = NisUtils.createRandomBlockWithHeight(94);
-//		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(94), 0.75);
-//		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
-//
-//		// Act:
-//		final long balance = scorer.calculateForgerBalance(block);
-//
-//		// Assert:
-//		Assert.assertThat(balance, IsEqual.equalTo(3_000_000_000L));
-//	}
+	@Test
+	public void calculateForgerBalanceDerivesBalanceFromImportance() {
+		// Arrange:
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final Block block = NisUtils.createRandomBlockWithHeight(100);
+		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(93), 0.75); // this is the grouped height
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+
+		// Act:
+		final long balance = scorer.calculateForgerBalance(block);
+
+		// Assert:
+		Assert.assertThat(balance, IsEqual.equalTo(3_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
+	}
 
 	@Test
 	public void calculateForgerBalanceCallsRecalculateImportancesForGroupedBlock() {
