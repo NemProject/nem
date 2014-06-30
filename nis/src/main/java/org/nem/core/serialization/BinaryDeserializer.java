@@ -48,19 +48,19 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public BigInteger readOptionalBigInteger(final String label) {
-		byte[] bytes = this.readBytes(null);
-		return new BigInteger(bytes);
+		byte[] bytes = this.readOptionalBytes(null);
+		return null == bytes ? null : new BigInteger(bytes);
 	}
 
 	@Override
-	public byte[] readBytes(final String label) {
+	public byte[] readOptionalBytes(final String label) {
 		int numBytes = this.readInt(null);
 		return BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numBytes ? null : this.readBytes(numBytes);
 	}
 
 	@Override
 	public String readOptionalString(final String label) {
-		byte[] bytes = this.readBytes(null);
+		byte[] bytes = this.readOptionalBytes(null);
 		return null == bytes ? null : StringEncoder.getString(bytes);
 	}
 
@@ -70,9 +70,12 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	}
 
 	@Override
-	public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
-		List<T> objects = new ArrayList<>();
+	public <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator) {
 		int numObjects = this.readInt(null);
+		if (BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numObjects)
+			return null;
+
+		List<T> objects = new ArrayList<>();
 		for (int i = 0; i < numObjects; ++i)
 			objects.add(deserializeObject(activator));
 

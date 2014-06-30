@@ -115,17 +115,27 @@ public abstract class Deserializer {
 
 	//endregion
 
-	//region readBytes
+	//region read[Optional]Bytes
 
 	/**
 	 * Reads a byte array value.
-	 * (Note that there is not an "or default" variant of this function because an empty array is always allowable).
 	 *
 	 * @param label The optional name of the value.
 	 *
 	 * @return The read value.
 	 */
-	public abstract byte[] readBytes(final String label);
+	public final byte[] readBytes(final String label) {
+		return this.requireNonNull(label, this.readOptionalBytes(label));
+	}
+
+	/**
+	 * Reads a byte array value (allowing null values).
+	 *
+	 * @param label The optional name of the value.
+	 *
+	 * @return The read value.
+	 */
+	public abstract byte[] readOptionalBytes(final String label);
 
 	//endregion
 
@@ -181,18 +191,29 @@ public abstract class Deserializer {
 
 	//endregion
 
-	//region readObjectArray
+	//region read[Optional]ObjectArray
 
 	/**
 	 * Reads an array of object values.
-	 * (Note that there is not an "or default" variant of this function because an empty array is always allowable).
 	 *
 	 * @param label     The optional name of the value.
 	 * @param activator The activator that should be used to create the SerializableEntity values.
 	 *
 	 * @return The read array.
 	 */
-	public abstract <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator);
+	public final <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
+		return this.requireNonNull(label, this.readOptionalObjectArray(label, activator));
+	}
+
+	/**
+	 * Reads an array of object values (allowing null values).
+	 *
+	 * @param label     The optional name of the value.
+	 * @param activator The activator that should be used to create the SerializableEntity values.
+	 *
+	 * @return The read array.
+	 */
+	public abstract <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator);
 
 	//endregion
 

@@ -70,13 +70,13 @@ public class JsonDeserializer extends Deserializer {
 
 	@Override
 	public BigInteger readOptionalBigInteger(final String label) {
-		final byte[] bytes = this.readBytes(label);
+		final byte[] bytes = this.readOptionalBytes(label);
 		return null == bytes ? null : new BigInteger(bytes);
 	}
 
 	@Override
-	public byte[] readBytes(final String label) {
-		final String s = this.readString(label);
+	public byte[] readOptionalBytes(final String label) {
+		final String s = this.readOptionalString(label);
 		if (null == s)
 			return null;
 
@@ -100,12 +100,12 @@ public class JsonDeserializer extends Deserializer {
 	}
 
 	@Override
-	public <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
+	public <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
 		final JSONArray jsonArray = (JSONArray)this.object.get(label);
 
 		if (null == jsonArray)
-			return new ArrayList<>();
+			return null;
 
 		final List<T> objects = new ArrayList<>();
 		for (Object jsonObject : jsonArray)

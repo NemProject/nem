@@ -54,7 +54,7 @@ public class JsonSerializer extends Serializer {
 
 	@Override
 	public void writeBigInteger(final String label, final BigInteger i) {
-		this.writeBytes(label, i.toByteArray());
+		this.writeBytes(label, null == i ? null : i.toByteArray());
 	}
 
 	@Override

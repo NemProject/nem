@@ -177,13 +177,13 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	//region Read
 
 	@Test
-	public void canReadNullInt() {
+	public void canReadOptionalNullInt() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Integer i = deserializer.readInt("int");
+		final Integer i = deserializer.readOptionalInt("int");
 
 		// Assert:
 		Assert.assertThat(i, IsNull.nullValue());
@@ -205,13 +205,13 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadNullLong() {
+	public void canReadOptionalNullLong() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Long l = deserializer.readLong("long");
+		final Long l = deserializer.readOptionalLong("long");
 
 		// Assert:
 		Assert.assertThat(l, IsNull.nullValue());
@@ -233,43 +233,16 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadNullDouble() {
+	public void canReadOptionalNullDouble() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Double d = deserializer.readDouble("double");
+		final Double d = deserializer.readOptionalDouble("double");
 
 		// Assert:
 		Assert.assertThat(d, IsNull.nullValue());
-	}
-
-	@Test
-	public void canReadNullBigInteger() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final BigInteger i = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(i, IsNull.nullValue());
-	}
-
-	@Test
-	public void canReadNullObject() {
-
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(object, IsNull.nullValue());
 	}
 
 	//endregion

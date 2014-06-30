@@ -50,7 +50,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	@Override
 	public void writeBigInteger(final String label, final BigInteger i) {
-		this.writeBytes(null, i.toByteArray());
+		this.writeBytes(null, null == i ? null : i.toByteArray());
 	}
 
 	@Override
@@ -77,12 +77,12 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	@Override
 	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects) {
 		if (null == objects) {
-			this.writeInt(null, 0);
+			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
 			return;
 		}
 
 		this.writeInt(null, objects.size());
-		for (SerializableEntity object : objects)
+		for (final SerializableEntity object : objects)
 			this.writeBytes(null, serializeObject(object));
 	}
 
