@@ -46,7 +46,7 @@ public class BlockChainComparer {
 		private final BlockLookup remoteLookup;
 
 		private final Block localLastBlock;
-		private final Block remoteLastBlock;
+		private Block remoteLastBlock;
 
 		private long commonBlockIndex;
 		private boolean areChainsConsistent;
@@ -59,14 +59,11 @@ public class BlockChainComparer {
 			this.localLastBlock = this.localLookup.getLastBlock();
 			if (null == this.localLastBlock)
 				throw new IllegalArgumentException("Local does not have any blocks");
-
-			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 		}
 
 		public ComparisonResult compare() {
-			// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
-			//     which changes the peer chain's score. He will get punished because the promised score is not
-			//     equal to the actual peer chain score.
+			// BR: Don't call getLastBlock in the constructor. The purpose of the chain score is to let the remote peer
+			//     only look up the last block if it is really needed.
 			int code = this.compareChainScores();
 
 			if (ComparisonResult.Code.UNKNOWN == code)
@@ -140,6 +137,7 @@ public class BlockChainComparer {
 		}
 
 		private int compareLastBlock() {
+			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 			if (null == this.remoteLastBlock)
 				return ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS;
 

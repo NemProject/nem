@@ -39,10 +39,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		boolean isAdded = transactions.add(transaction);
+		ValidationResult result = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -54,10 +54,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		boolean isAdded = transactions.add(transaction);
+		ValidationResult result = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
@@ -70,10 +70,10 @@ public class UnconfirmedTransactionsTest {
 		transactions.add(new MockTransaction(sender, 7));
 
 		final MockTransaction transaction = new MockTransaction(sender, 8);
-		boolean isAdded = transactions.add(transaction);
+		ValidationResult result = transactions.add(transaction);
 
 		// Assert:
-		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -84,10 +84,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		boolean isAdded = transactions.add(transaction, hash -> false);
+		ValidationResult result = transactions.add(transaction, hash -> false);
 
 		// Assert:
-		Assert.assertThat(isAdded, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -98,10 +98,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		boolean isAdded = transactions.add(transaction, hash -> true);
+		ValidationResult result = transactions.add(transaction, hash -> true);
 
 		// Assert:
-		Assert.assertThat(isAdded, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	//endregion

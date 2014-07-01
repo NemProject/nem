@@ -112,11 +112,11 @@ public class Foraging  {
 	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
-	public boolean addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
+	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction);
 	}
 
-	private boolean addUnconfirmedTransaction(Transaction transaction) {
+	private ValidationResult addUnconfirmedTransaction(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction, hash -> {
 			synchronized (blockChainLastBlockLayer) {
 				return null != transferDao.findByHash(hash.getRaw());
@@ -141,18 +141,18 @@ public class Foraging  {
 	 *
 	 * @return NEUTRAL if given transaction has already been seen or isn't within the time window, SUCCESS if it has been added
 	 */
-	public NodeInteractionResult processTransaction(Transaction transaction) {
+	public ValidationResult processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		//TODO: 30 seconds should probably be a constant instead of a magic number, below
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
-			return NodeInteractionResult.NEUTRAL;
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
-			return NodeInteractionResult.NEUTRAL;
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
-		return addUnconfirmedTransaction(transaction) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.NEUTRAL;
+		return addUnconfirmedTransaction(transaction);
 	}
 
 	/**

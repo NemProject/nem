@@ -3,8 +3,7 @@ package org.nem.nis;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.mappers.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
@@ -113,14 +112,14 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param block The block.
 	 * @return An appropriate interaction result.
 	 */
-	public NodeInteractionResult checkPushedBlock(final Block block) {
+	public ValidationResult checkPushedBlock(final Block block) {
 		if (!this.isLastBlockParent(block)) {
 			// if peer tried to send us block that we also generated, there is no sense to punish him
-			return this.isLastBlockSibling(block) ? NodeInteractionResult.NEUTRAL : NodeInteractionResult.FAILURE;
+			return this.isLastBlockSibling(block) ? ValidationResult.NEUTRAL : ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 
 		// the peer returned a block that can be added to our chain
-		return block.verify() ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE;
+		return block.verify() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 	}
 
 	public Block forageBlock() {
@@ -129,7 +128,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		// make a full-blown analysis
 		// TODO: we can call it thanks to the "hack" inside processBlock
-		if (block != null && this.processBlock(block) == NodeInteractionResult.SUCCESS) {
+		if (block != null && this.processBlock(block) == ValidationResult.SUCCESS) {
 			return block;
 		}
 
@@ -198,7 +197,8 @@ public class BlockChain implements BlockSynchronizer {
 
 		//region verify peer's chain
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
-		return updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+		ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+		return ValidationResultToNodeInteractionResultMapper.map(validationResult);
 	}
 
 	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
@@ -223,7 +223,7 @@ public class BlockChain implements BlockSynchronizer {
 	 *
 	 * @return Node experience code which indicates the status of the operation
 	 */
-	public synchronized NodeInteractionResult processBlock(Block receivedBlock) {
+	public synchronized ValidationResult processBlock(Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
@@ -234,14 +234,14 @@ public class BlockChain implements BlockSynchronizer {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
 			// This really should not happen
-			return NodeInteractionResult.FAILURE;
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
 
 		// receivedBlock already seen
 		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
 				// This will happen frequently and is ok
-				return NodeInteractionResult.NEUTRAL;
+				return ValidationResult.NEUTRAL;
 			}
 
 			// check if we know previous receivedBlock
@@ -251,7 +251,7 @@ public class BlockChain implements BlockSynchronizer {
 		// if we don't have parent, we can't do anything with this receivedBlock
 		if (dbParent == null) {
 			// We might be on a fork, don't punish remote node
-			return NodeInteractionResult.NEUTRAL;
+			return ValidationResult.NEUTRAL;
 		}
 
 		// TODO: we should have some time limit set
@@ -293,7 +293,7 @@ public class BlockChain implements BlockSynchronizer {
 				this.score);
 	}
 
-	private NodeInteractionResult updateOurChain(
+	private ValidationResult updateOurChain(
 			final BlockChainSyncContext context,
 			final org.nem.nis.dbmodel.Block dbParentBlock,
 			final Collection<Block> peerChain,
@@ -309,20 +309,20 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) <= 0) {
 			// if we got here, the peer lied about his score, so penalize him
-			return NodeInteractionResult.FAILURE;
+			return ValidationResult.FAILURE_CHAIN_SCORE_INFERIOR;
 		}
 
-		if (NodeInteractionResult.SUCCESS == updateResult.interactionResult) {
+		if (ValidationResult.SUCCESS == updateResult.validationResult) {
 			this.score = this.score.subtract(updateResult.ourScore).add(updateResult.peerScore);
 		}
 
-		return updateResult.interactionResult;
+		return updateResult.validationResult;
 	}
 
 	//region UpdateChainResult
 
 	private static class UpdateChainResult {
-		public NodeInteractionResult interactionResult;
+		public ValidationResult validationResult;
 		public BlockChainScore ourScore;
 		public BlockChainScore peerScore;
 	}
@@ -398,7 +398,7 @@ public class BlockChain implements BlockSynchronizer {
 					hasOwnChain);
 
 			final UpdateChainResult result = new UpdateChainResult();
-			result.interactionResult = updateContext.update();
+			result.validationResult = updateContext.update();
 			result.ourScore = updateContext.ourScore;
 			result.peerScore = updateContext.peerScore;
 			return result;
@@ -460,26 +460,24 @@ public class BlockChain implements BlockSynchronizer {
 			this.hasOwnChain = hasOwnChain;
 		}
 
-		public NodeInteractionResult update() {
-			// do not trust peer, take first block from our db and convert it
+		public ValidationResult update() {
 			if (!this.validatePeerChain()) {
-				return NodeInteractionResult.FAILURE;
+				return ValidationResult.FAILURE_CHAIN_INVALID;
 			}
 
 			this.peerScore = this.getPeerChainScore();
 
-			// warning: this changes number of foraged blocks
 			logScore(this.ourScore, this.peerScore);
 			if (BlockChainScore.ZERO.equals(this.peerScore)) {
-				return NodeInteractionResult.FAILURE;
+				return ValidationResult.FAILURE_CHAIN_INVALID;
 			}
 
 			if (this.peerScore.compareTo(this.ourScore) < 0) {
-				return NodeInteractionResult.NEUTRAL;
+				return ValidationResult.NEUTRAL;
 			}
 
 			this.updateOurChain();
-			return NodeInteractionResult.SUCCESS;
+			return ValidationResult.SUCCESS;
 		}
 
 		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
