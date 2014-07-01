@@ -2,18 +2,23 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.math.BigInteger;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.deploy.CommonStarter;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.peer.node.Node;
+import org.nem.peer.node.NodeEndpoint;
+import org.nem.peer.node.NodeIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -23,6 +28,7 @@ public class NisMain {
 	 * The time provider.
 	 */
 	public static final TimeProvider TIME_PROVIDER = CommonStarter.TIME_PROVIDER;
+	private static NisConfiguration nisConfiguration = new NisConfiguration();
 
 	private Block nemesisBlock;
 	private Hash nemesisBlockHash;
@@ -130,6 +136,15 @@ public class NisMain {
 		this.populateDb();
 
 		this.analyzeBlocks();
+
+		if (nisConfiguration.isAutoBoot()) {
+			LOGGER.warning("auto-booting ... ");
+			this.networkHost.boot(new Node(new NodeIdentity(new KeyPair(new PrivateKey(new BigInteger(nisConfiguration.getBootKey())))), NodeEndpoint.fromHost("127.0.0.1")));
+			nisConfiguration.flushKeyPass();
+			LOGGER.warning("auto-booted ...");
+		} else {
+			LOGGER.info("auto-boot is off");
+		}
 	}
 
 	private NemesisBlock loadNemesisBlock() {
