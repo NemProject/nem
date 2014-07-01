@@ -52,7 +52,7 @@ public class PushService {
 
 		if (ValidationResult.SUCCESS != result &&
 			ValidationResult.NEUTRAL != result)
-			LOGGER.info("transfer must be valid and verifiable");
+			LOGGER.info("Warning: ValidationResult=" + result.toString());
 
 		return result;
 	}
@@ -81,7 +81,7 @@ public class PushService {
 
 		if (ValidationResult.SUCCESS != result &&
 			ValidationResult.NEUTRAL != result)
-			LOGGER.info("block must be valid and verifiable");
+			LOGGER.info("Warning: ValidationResult=" + result.toString());
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(
