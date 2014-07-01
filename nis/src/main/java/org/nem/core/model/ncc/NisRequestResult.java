@@ -67,7 +67,7 @@ public class NisRequestResult implements SerializableEntity {
 	 * @return The type for the request result.
 	 */
 	public int getType() {
-		return this.code;
+		return this.type;
 	}
 	
 	/**
@@ -90,8 +90,8 @@ public class NisRequestResult implements SerializableEntity {
 	 * Indicating whether or not the the result represents an error
 	 */
 	public boolean isError() {
-		return CODE_NEUTRAL == this.code ||
-			   CODE_SUCCESS == this.code;
+		return CODE_NEUTRAL != this.code &&
+			   CODE_SUCCESS != this.code;
 	}
 	
 	@Override
