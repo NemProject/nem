@@ -155,6 +155,11 @@ public class Foraging  {
 		return addUnconfirmedTransaction(transaction);
 	}
 
+	private boolean matchAddress(final Transaction transaction, final Address address) {
+		return (transaction.getSigner().getAddress().equals(address) ||
+				(transaction.getType() == TransactionTypes.TRANSFER &&
+						((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
+	}
 	/**
 	 * This method is for GUI's usage.
 	 * Right now it returns only outgoing TXes, TODO: should it return incoming too?
@@ -164,7 +169,7 @@ public class Foraging  {
 	 */
 	public List<Transaction> getUnconfirmedTransactions(final Address address) {
 		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
-				.filter(tx -> (tx.getSigner().getAddress().equals(address)))
+				.filter(tx -> matchAddress(tx, address))
 				.collect(Collectors.toList());
 	}
 

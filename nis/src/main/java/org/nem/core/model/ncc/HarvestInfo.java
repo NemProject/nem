@@ -9,6 +9,9 @@ import org.nem.core.time.TimeInstant;
  * Contains information about a harvested block.
  */
 public class HarvestInfo implements SerializableEntity {
+	public static ObjectDeserializer<HarvestInfo> DESERIALIZER =
+			deserializer -> new HarvestInfo(deserializer);
+
 	private final Hash blockHash;
 	private final BlockHeight height;
 	private final TimeInstant timestamp;

@@ -35,18 +35,6 @@ public class NodeIdentity implements SerializableEntity {
 		this.name = name;
 	}
 
-	/**
-	 * Deserializes a node identity.
-	 *
-	 * @param deserializer The deserializer.
-	 *
-	 * TODO: since there is deserializeWithPrivateKey, maybe it would be more consistent
-	 * TODO: to drop this ctor and add deserializeWithPublicKey?
-	 */
-	public NodeIdentity(final Deserializer deserializer) {
-		this(deserializer, false);
-	}
-
 	private NodeIdentity(final Deserializer deserializer, boolean containsPrivateKey) {
 		this.keyPair = deserializeKeyPair(deserializer, containsPrivateKey);
 		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
@@ -68,6 +56,16 @@ public class NodeIdentity implements SerializableEntity {
 	 */
 	public static NodeIdentity deserializeWithPrivateKey(final Deserializer deserializer) {
 		return new NodeIdentity(deserializer, true);
+	}
+
+	/**
+	 * Deserializes a node identity with a public key.
+	 *
+	 * @param deserializer The deserializer.
+	 * @return The node identity.
+	 */
+	public static NodeIdentity deserializeWithPublicKey(final Deserializer deserializer) {
+		return new NodeIdentity(deserializer, false);
 	}
 
 	/**
