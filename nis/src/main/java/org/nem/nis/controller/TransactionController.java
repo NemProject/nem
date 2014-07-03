@@ -28,7 +28,7 @@ public class TransactionController {
 		this.pushService = pushService;
 	}
 
-	@RequestMapping(value = "/transfer/prepare", method = RequestMethod.POST)
+	@RequestMapping(value = "/transaction/prepare", method = RequestMethod.POST)
 	@ClientApi
 	public RequestPrepare transferPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
@@ -41,7 +41,7 @@ public class TransactionController {
 		return new RequestPrepare(transferData);
 	}
 
-	@RequestMapping(value = "/transfer/announce", method = RequestMethod.POST)
+	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NisRequestResult transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
