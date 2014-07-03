@@ -1,15 +1,11 @@
 package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HexEncoder;
-import org.nem.core.utils.StringEncoder;
 
 public class ExplorerTransferView implements SerializableEntity {
 	private int type;

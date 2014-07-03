@@ -2,16 +2,10 @@ package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
-import org.nem.core.model.Block;
-import org.nem.core.model.primitive.BlockDifficulty;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.serialization.*;
 import org.nem.core.serialization.Serializer;
-import org.nem.core.time.TimeInstant;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ExplorerBlockView implements SerializableEntity {
 	private final Long height;
@@ -27,7 +21,6 @@ public class ExplorerBlockView implements SerializableEntity {
 		this.blockHash = blockHash;
 		this.transactions = new ArrayList<>(txCount);
 	}
-
 
 	@Override
 	public void serialize(final Serializer serializer) {
