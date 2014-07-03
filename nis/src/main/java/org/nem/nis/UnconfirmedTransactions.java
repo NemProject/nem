@@ -8,12 +8,14 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
  */
 public class UnconfirmedTransactions {
+	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
@@ -70,7 +72,7 @@ public class UnconfirmedTransactions {
 		// not sure if adding to cache here is a good idea...
 		addToCache(transaction.getSigner());
 		if (!isValid(transaction)) {
-			System.out.println("Transaction from " + transaction.getSigner().getAddress().getEncoded() + " rejected. not enough NEM.");
+			LOGGER.warning(String.format("Transaction from %s rejected. not enough NEM.", transaction.getSigner().getAddress()));
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 		
