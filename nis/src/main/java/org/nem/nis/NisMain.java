@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.math.BigInteger;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
@@ -16,9 +15,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.node.Node;
-import org.nem.peer.node.NodeEndpoint;
-import org.nem.peer.node.NodeIdentity;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -72,7 +69,7 @@ public class NisMain {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 
 			if ((block.getHeight().getRaw() % 1000) == 0) {
-				System.out.print(String.format("\r%d", block.getHeight().getRaw()));
+				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
 			}
 
 			if (null != parentBlock) {
@@ -98,8 +95,6 @@ public class NisMain {
 
 			curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
-				System.out.println();
-				System.out.flush();
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
@@ -137,14 +132,16 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
-		if (nisConfiguration.isAutoBoot()) {
-			LOGGER.warning("auto-booting ... ");
-			this.networkHost.boot(new Node(new NodeIdentity(new KeyPair(new PrivateKey(new BigInteger(nisConfiguration.getBootKey())))), NodeEndpoint.fromHost("127.0.0.1")));
-			nisConfiguration.flushKeyPass();
-			LOGGER.warning("auto-booted ...");
-		} else {
+		final PrivateKey autoBootKey = nisConfiguration.getAutoBootKey();
+		if (null == autoBootKey) {
 			LOGGER.info("auto-boot is off");
+			return;
 		}
+
+		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(nisConfiguration.getAutoBootKey()));
+		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
+		this.networkHost.boot(new Node(autoBootNodeIdentity, NodeEndpoint.fromHost("127.0.0.1")));
+		LOGGER.warning("auto-booted!");
 	}
 
 	private NemesisBlock loadNemesisBlock() {
