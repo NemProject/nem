@@ -39,7 +39,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.add(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -54,7 +54,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.add(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -70,7 +70,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.add(new MockTransaction(sender, 7));
 
 		final MockTransaction transaction = new MockTransaction(sender, 8);
-		ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.add(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -84,7 +84,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		ValidationResult result = transactions.add(transaction, hash -> false);
+		final ValidationResult result = transactions.add(transaction, hash -> false);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -98,7 +98,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		ValidationResult result = transactions.add(transaction, hash -> true);
+		final ValidationResult result = transactions.add(transaction, hash -> true);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));

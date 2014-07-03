@@ -153,7 +153,7 @@ public class BlockChainTest {
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));
-		ValidationResult result = blockChain.processBlock(block);
+		final ValidationResult result = blockChain.processBlock(block);
 		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer);
 		TransferTransaction transaction;
 

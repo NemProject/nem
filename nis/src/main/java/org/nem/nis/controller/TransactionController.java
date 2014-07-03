@@ -46,7 +46,7 @@ public class TransactionController {
 	public NisRequestResult transferAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
-		ValidationResult result = this.pushService.pushTransaction(transfer, null);
+		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
 		return new NisRequestResult(NisRequestResult.TYPE_VALIDATION_RESULT, result.getValue(), result.toString());
 	}
 

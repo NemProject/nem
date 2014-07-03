@@ -197,7 +197,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		//region verify peer's chain
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
-		ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+		final ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return ValidationResultToNodeInteractionResultMapper.map(validationResult);
 	}
 

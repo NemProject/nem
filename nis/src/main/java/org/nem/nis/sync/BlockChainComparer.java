@@ -141,10 +141,10 @@ public class BlockChainComparer {
 			if (null == this.remoteLastBlock)
 				return ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS;
 
-			if (!remoteLastBlock.verify())
+			if (!this.remoteLastBlock.verify())
 				return ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 
-			if (areBlocksEqual(localLastBlock, remoteLastBlock))
+			if (areBlocksEqual(this.localLastBlock, this.remoteLastBlock))
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 
 			if (this.isRemoteTooFarBehind())
