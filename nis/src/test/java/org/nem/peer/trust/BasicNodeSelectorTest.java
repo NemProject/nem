@@ -47,13 +47,13 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(new ColumnVector(0, 0, 0), random);
+		final TestContext context = new TestContext(10, new ColumnVector(0, 0, 0), random);
 
 		// Act:
-		final NodeExperiencePair nodePair = context.selector.selectNode();
+		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(nodePair, IsNull.nullValue());
+		Assert.assertThat(node, IsNull.nullValue());
 	}
 
 	@Test
@@ -61,13 +61,13 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(new ColumnVector(0, 1, 0), random);
+		final TestContext context = new TestContext(10, new ColumnVector(0, 1, 0), random);
 
 		// Act:
-		final NodeExperiencePair nodePair = context.selector.selectNode();
+		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(nodePair.getNode(), IsEqual.equalTo(context.nodes[1]));
+		Assert.assertThat(node, IsEqual.equalTo(context.nodes[1]));
 	}
 
 	//endregion
@@ -79,13 +79,13 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(new ColumnVector(0, 0, 0, 0), random);
+		final TestContext context = new TestContext(10, new ColumnVector(0, 0, 0, 0), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(nodePairs.size(), IsEqual.equalTo(0));
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -93,14 +93,14 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(new ColumnVector(0.1, 0.2, 0.3, 0.4), random);
+		final TestContext context = new TestContext(2, new ColumnVector(0.1, 0.2, 0.3, 0.4), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -109,14 +109,14 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(new ColumnVector(20, 40, 60, 80), random);
+		final TestContext context = new TestContext(2, new ColumnVector(20, 40, 60, 80), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -125,14 +125,14 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(new ColumnVector(1, 0, 1, 0), random);
+		final TestContext context = new TestContext(10, new ColumnVector(1, 0, 1, 0), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -141,14 +141,14 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(new ColumnVector(10, 20, 30, 40), random);
+		final TestContext context = new TestContext(2, new ColumnVector(10, 20, 30, 40), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(2);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
@@ -157,14 +157,14 @@ public class BasicNodeSelectorTest {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40, 0.10, 0.40);
-		final TestContext context = new TestContext(new ColumnVector(10, 20, 30, 40), random);
+		final TestContext context = new TestContext(10, new ColumnVector(10, 20, 30, 40), random);
 
 		// Act:
-		final List<NodeExperiencePair> nodePairs = context.selector.selectNodes(10);
+		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
 		Assert.assertThat(
-				nodePairs.stream().map(NodeExperiencePair::getNode).collect(Collectors.toList()),
+				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
@@ -177,10 +177,10 @@ public class BasicNodeSelectorTest {
 		private final NodeSelector selector;
 
 		public TestContext(final ColumnVector trustValues) {
-			this(trustValues, new SecureRandom());
+			this(10, trustValues, new SecureRandom());
 		}
 
-		public TestContext(final ColumnVector trustValues, final Random random) {
+		public TestContext(final int maxNodes, final ColumnVector trustValues, final Random random) {
 			Mockito.when(context.getLocalNode()).thenReturn(this.localNode);
 
 			this.nodes = new Node[trustValues.size()];
@@ -193,7 +193,7 @@ public class BasicNodeSelectorTest {
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = new BasicNodeSelector(this.trustProvider, this.context, random);
+			this.selector = new BasicNodeSelector(maxNodes, this.trustProvider, this.context, random);
 		}
 	}
 }

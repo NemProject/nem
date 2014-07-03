@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.peer.trust.score.NodeExperiencePair;
+import org.nem.peer.node.Node;
 
 import java.util.List;
 
@@ -10,21 +10,16 @@ import java.util.List;
 public interface NodeSelector {
 
 	/**
-	 * Selects a node.
+	 * Selects a single node.
 	 *
-	 * @return Information about the selected node or null if
-	 * no suitable nodes could be found.
+	 * @return The node.
 	 */
-	public default NodeExperiencePair selectNode() {
-		final List<NodeExperiencePair> nodePairs = this.selectNodes(1);
-		return nodePairs.size() > 0 ? nodePairs.get(0) : null;
-	}
+	public Node selectNode();
 
 	/**
-	 * Selects at most the specified number of nodes.
+	 * Selects multiple nodes.
 	 *
-	 * @param maxNodes The maximum number of nodes to select.
-	 * @return Information about the selected nodes.
+	 * @return The nodes.
 	 */
-	public List<NodeExperiencePair> selectNodes(final int maxNodes);
+	public List<Node> selectNodes();
 }

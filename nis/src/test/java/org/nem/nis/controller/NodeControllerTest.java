@@ -155,22 +155,26 @@ public class NodeControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final PeerNetwork network = context.network;
-		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.2"), NodeInteractionResult.FAILURE);
-		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.7"), NodeInteractionResult.SUCCESS);
-		network.updateExperience(PeerUtils.createNodeWithHost("10.0.0.4"), NodeInteractionResult.SUCCESS);
+		Mockito.when(network.getLocalNodeAndExperiences()).thenReturn(
+				new NodeExperiencesPair(
+						PeerUtils.createNodeWithName("l"),
+						Arrays.asList(
+								new NodeExperiencePair(PeerUtils.createNodeWithName("n"), new NodeExperience(0, 1)),
+								new NodeExperiencePair(PeerUtils.createNodeWithName("e"), new NodeExperience(1, 0)),
+								new NodeExperiencePair(PeerUtils.createNodeWithName("m"), new NodeExperience(1, 0)))));
 
-		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.2"))).thenReturn(7);
-		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.7"))).thenReturn(0);
-		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithHost("10.0.0.4"))).thenReturn(2);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithName("n"))).thenReturn(7);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithName("e"))).thenReturn(0);
+		Mockito.when(context.host.getSyncAttempts(PeerUtils.createNodeWithName("m"))).thenReturn(2);
 
 		// Act:
 		final Collection<ExtendedNodeExperiencePair> pairs = context.controller.getExperiences().asCollection();
 
 		// Assert:
 		final List<ExtendedNodeExperiencePair> expectedPairs = Arrays.asList(
-				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.2"), new NodeExperience(0, 1), 7),
-				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.7"), new NodeExperience(1, 0), 0),
-				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithHost("10.0.0.4"), new NodeExperience(1, 0), 2));
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithName("n"), new NodeExperience(0, 1), 7),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithName("e"), new NodeExperience(1, 0), 0),
+				new ExtendedNodeExperiencePair(PeerUtils.createNodeWithName("m"), new NodeExperience(1, 0), 2));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
@@ -197,25 +201,15 @@ public class NodeControllerTest {
 	public void pingSetsSourceNodeExperiences() {
 		// Arrange:
 		final TestContext context = new TestContext();
-
-		final Node sourceNode = PeerUtils.createNodeWithName("alice");
-		final Node partnerNode = PeerUtils.createNodeWithName("bob");
-		final List<NodeExperiencePair> experiences = new ArrayList<>();
-		experiences.add(new NodeExperiencePair(partnerNode, createNodeExperience(12, 34)));
-		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, experiences);
-
-		// Arrange: sanity
-		Assert.assertThat(
-				context.nodeExperiences.getNodeExperience(sourceNode, partnerNode).successfulCalls().get(),
-				IsEqual.equalTo(0L));
+		final NodeExperiencesPair pair = new NodeExperiencesPair(
+				PeerUtils.createNodeWithName("alice"),
+				new ArrayList<>());
 
 		// Act:
 		context.controller.ping(pair);
 
 		// Assert:
-		final NodeExperience experience = context.nodeExperiences.getNodeExperience(sourceNode, partnerNode);
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(12L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(34L));
+		Mockito.verify(context.network, Mockito.times(1)).setRemoteNodeExperiences(pair);
 	}
 
 	@Test
@@ -272,20 +266,16 @@ public class NodeControllerTest {
 		return new JsonDeserializer(serializer.getObject(), null);
 	}
 
-	private static NodeExperience createNodeExperience(int numSuccessfulCalls, int numFailureCalls) {
-		final NodeExperience experience = new NodeExperience();
-		experience.successfulCalls().set(numSuccessfulCalls);
-		experience.failedCalls().set(numFailureCalls);
-		return experience;
-	}
-
 	private static class TestContext {
-		private final NodeExperiences nodeExperiences = new NodeExperiences();
-		private final MockPeerNetwork network = new MockPeerNetwork(this.nodeExperiences);
+		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final NodeController controller;
 
 		private TestContext() {
+			this.network = Mockito.mock(PeerNetwork.class);
+			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getNodes()).thenReturn(new NodeCollection());
+
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 

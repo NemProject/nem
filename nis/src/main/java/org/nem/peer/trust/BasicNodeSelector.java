@@ -2,8 +2,6 @@ package org.nem.peer.trust;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.peer.node.Node;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiencePair;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -12,7 +10,7 @@ import java.util.*;
  * A basic node selector implementation.
  */
 public class BasicNodeSelector implements NodeSelector {
-
+	private final int maxNodes;
 	private final TrustContext context;
 	private final ColumnVector trustVector;
 	private final Random random;
@@ -20,21 +18,31 @@ public class BasicNodeSelector implements NodeSelector {
 	/**
 	 * Creates a new basic node selector.
 	 *
-	 * @param trustProvider The trust context.
+	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
+	 * @param trustProvider The trust provider.
+	 * @param context The trust context.
 	 */
-	public BasicNodeSelector(final TrustProvider trustProvider, final TrustContext context) {
-		this(trustProvider, context, new SecureRandom());
+	public BasicNodeSelector(
+			final int maxNodes,
+			final TrustProvider trustProvider,
+			final TrustContext context) {
+		this(maxNodes, trustProvider, context, new SecureRandom());
 	}
 
 	/**
 	 * Creates a new basic node selector using a custom random number generator.
 	 *
-	 * @param trustProvider The trust context.
+	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
+	 * @param trustProvider The trust provider.
+	 * @param context The trust context.
+	 * @param random The random number generator.
 	 */
 	public BasicNodeSelector(
+			final int maxNodes,
 			final TrustProvider trustProvider,
 			final TrustContext context,
 			final Random random) {
+		this.maxNodes = maxNodes;
 		this.context = context;
 		this.trustVector = trustProvider.computeTrust(context);
 		this.trustVector.normalize();
@@ -42,16 +50,25 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	@Override
-	public List<NodeExperiencePair> selectNodes(final int maxNodes) {
-		final Node localNode = this.context.getLocalNode();
+	public Node selectNode() {
+		final List<Node> nodes = this.selectNodes(1);
+		return nodes.size() > 0 ? nodes.get(0) : null;
+	}
+
+	@Override
+	public List<Node> selectNodes() {
+		return this.selectNodes(this.maxNodes);
+	}
+
+	private List<Node> selectNodes(final int maxNodes) {
 		final Node[] nodes = this.context.getNodes();
 		final boolean[] usedNodes = new boolean[nodes.length];
-		final List<NodeExperiencePair> nodePairs = new ArrayList<>();
+		final List<Node> partnerNodes = new ArrayList<>();
 
 		int numSelectedNodes;
 		double remainingTrust = 1.0;
 		do {
-			numSelectedNodes = nodePairs.size();
+			numSelectedNodes = partnerNodes.size();
 
 			double sum = 0;
 			double rand = this.random.nextDouble() * remainingTrust;
@@ -67,14 +84,13 @@ public class BasicNodeSelector implements NodeSelector {
 
 				usedNodes[i] = true;
 				remainingTrust -= trust;
-				final NodeExperience experience = this.context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-				nodePairs.add(new NodeExperiencePair(nodes[i], experience));
+				partnerNodes.add(nodes[i]);
 				break;
 			}
 
 			// stop the loop if either maxNodes have been selected or the last iteration didn't select a node
-		} while (nodePairs.size() != maxNodes && nodePairs.size() != numSelectedNodes);
+		} while (partnerNodes.size() != maxNodes && partnerNodes.size() != numSelectedNodes);
 
-		return nodePairs;
+		return partnerNodes;
 	}
 }

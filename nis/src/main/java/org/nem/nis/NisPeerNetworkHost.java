@@ -1,62 +1,36 @@
 package org.nem.nis;
 
 import net.minidev.json.*;
-import org.nem.core.async.*;
-import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
+import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.*;
+import java.util.concurrent.atomic.*;
 
 /**
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
-
-	//region constants
-
-	private static final int ONE_SECOND = 1000;
-	private static final int ONE_MINUTE = 60 * ONE_SECOND;
-	private static final int ONE_HOUR = 60 * ONE_MINUTE;
-
-	private static final int REFRESH_INITIAL_DELAY = 200;
-	private static final int REFRESH_INITIAL_INTERVAL = ONE_SECOND;
-	private static final int REFRESH_PLATEAU_INTERVAL = 5 * ONE_MINUTE;
-	private static final int REFRESH_BACK_OFF_TIME = 12 * ONE_HOUR;
-
-	private static final int SYNC_INTERVAL = 5 * ONE_SECOND;
-
-	private static final int BROADCAST_INTERVAL = 5 * ONE_MINUTE;
-
-	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
-	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
-
-	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
-
-	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
-
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
-
-	//endregion
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
 	private final CountingBlockSynchronizer synchronizer;
-	private AsyncTimer foragingTimer;
-	private PeerNetworkHost host;
-	private final AtomicBoolean isBootAttempted = new AtomicBoolean(false);
-	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final AuditCollection outgoingAudits = createAuditCollection();
 	private final AuditCollection incomingAudits = createAuditCollection();
+	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
+	private final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(CommonStarter.TIME_PROVIDER);
+	private PeerNetwork network;
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
@@ -76,47 +50,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion());
 
-		return this.boot(config);
-	}
-
-	/**
-	 * Boots the network.
-	 *
-	 * @param config The network configuration.
-	 */
-	public CompletableFuture boot(final Config config) {
-		if (!this.isBootAttempted.compareAndSet(false, true))
-			throw new IllegalStateException("network boot was already attempted");
-
-		return PeerNetwork.createWithVerificationOfLocalNode(config, createNetworkServices())
-				.handle((network, e) -> {
-					if (null != e) {
-						this.isBootAttempted.set(false);
-						throw new IllegalStateException("network boot failed", e);
-					}
-
-					this.host = new PeerNetworkHost(network);
-					this.timerVisitors.addAll(this.host.getVisitors());
-
-					final NisAsyncTimerVisitor foragingTimerVisitor = this.host.createNamedVisitor("FORAGING");
-					this.timerVisitors.add(foragingTimerVisitor);
-
-					this.foragingTimer = new AsyncTimer(
-							this.host.runnableToFutureSupplier(() -> {
-								final Block block = this.blockChain.forageBlock();
-								if (null == block)
-									return;
-
-								final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-										block,
-										this.host.getNetwork().getLocalNode().getIdentity());
-								this.getNetwork().broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
-							}),
-							FORAGING_INITIAL_DELAY,
-							new UniformDelayStrategy(FORAGING_INTERVAL),
-							foragingTimerVisitor);
-					return null;
-				});
+		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
+		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
+			this.network = network;
+			this.scheduler.addTasks(this.network, this.blockChain);
+		});
 	}
 
 	private static JSONObject loadJsonObject(final String configFileName) {
@@ -138,10 +76,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return The hosted network.
 	 */
 	public PeerNetwork getNetwork() {
-		if (null == this.host)
+		if (null == this.network)
 			throw new IllegalStateException("network has not been booted yet");
 
-		return this.host.getNetwork();
+		return this.network;
 	}
 
 	/**
@@ -178,114 +116,30 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return All timer visitors.
 	 */
 	public List<NisAsyncTimerVisitor> getVisitors() {
-		final List<NisAsyncTimerVisitor> visitors = new ArrayList<>();
-		visitors.addAll(this.timerVisitors);
-		return visitors;
+		return this.scheduler.getVisitors();
 	}
 
 	@Override
 	public void close() {
-		if (null != foragingTimer)
-			this.foragingTimer.close();
-
-		if (null != this.host)
-			this.host.close();
+		this.scheduler.close();
 	}
 
-	private PeerNetworkServices createNetworkServices() {
+	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
-		return new PeerNetworkServices(connector, connectorPool, this.synchronizer);
+		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
+	}
+
+	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
+		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(config, networkState);
+		return new PeerNetworkBootstrapper(
+				networkState,
+				this.createNetworkServicesFactory(networkState),
+				selectorFactory);
 	}
 
 	private static AuditCollection createAuditCollection() {
 		return new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER);
-	}
-
-	private static class PeerNetworkHost implements AutoCloseable {
-		private final PeerNetwork network;
-		private final AsyncTimer refreshTimer;
-		private final List<NisAsyncTimerVisitor> timerVisitors;
-		private final List<AsyncTimer> secondaryTimers;
-		private final Executor executor = Executors.newCachedThreadPool();
-
-		public PeerNetworkHost(final PeerNetwork network) {
-			this.network = network;
-			this.timerVisitors = new ArrayList<>();
-
-			this.timerVisitors.add(this.createNamedVisitor("REFRESH"));
-			this.refreshTimer = new AsyncTimer(
-					() -> this.network.refresh(),
-					REFRESH_INITIAL_DELAY,
-					getRefreshDelayStrategy(),
-					this.timerVisitors.get(0));
-
-			this.secondaryTimers = Arrays.asList(
-					this.createSecondaryAsyncTimer(
-							() -> this.network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
-							BROADCAST_INTERVAL,
-							"BROADCAST"),
-					this.createSecondaryAsyncTimer(
-							this.runnableToFutureSupplier(() -> this.network.synchronize()),
-							SYNC_INTERVAL,
-							"SYNC"),
-					this.createSecondaryAsyncTimer(
-							this.runnableToFutureSupplier(() -> this.network.pruneInactiveNodes()),
-							PRUNE_INACTIVE_NODES_DELAY,
-							"PRUNING INACTIVE NODES"),
-					this.createSecondaryAsyncTimer(
-							this.runnableToFutureSupplier(() -> this.network.updateLocalNodeEndpoint()),
-							UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
-							"UPDATING LOCAL NODE ENDPOINT"));
-		}
-
-		private static AbstractDelayStrategy getRefreshDelayStrategy() {
-			// initially refresh at REFRESH_INITIAL_INTERVAL (1s), gradually increasing to
-			// REFRESH_PLATEAU_INTERVAL (5m) over REFRESH_BACK_OFF_TIME (12 hours),
-			// and then plateau at that rate forever
-			final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
-					LinearDelayStrategy.withDuration(
-							REFRESH_INITIAL_INTERVAL,
-							REFRESH_PLATEAU_INTERVAL,
-							REFRESH_BACK_OFF_TIME),
-					new UniformDelayStrategy(REFRESH_PLATEAU_INTERVAL));
-			return new AggregateDelayStrategy(subStrategies);
-		}
-
-		private AsyncTimer createSecondaryAsyncTimer(
-				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-				final int delay,
-				final String name) {
-			final NisAsyncTimerVisitor visitor = this.createNamedVisitor(name);
-			this.timerVisitors.add(visitor);
-
-			return AsyncTimer.After(
-					this.refreshTimer,
-					recurringFutureSupplier,
-					new UniformDelayStrategy(delay),
-					visitor);
-		}
-
-		public PeerNetwork getNetwork() {
-			return this.network;
-		}
-
-		public List<NisAsyncTimerVisitor> getVisitors() {
-			return this.timerVisitors;
-		}
-
-		@Override
-		public void close() {
-			this.refreshTimer.close();
-			this.secondaryTimers.forEach(obj -> obj.close());
-		}
-
-		public Supplier<CompletableFuture<?>> runnableToFutureSupplier(final Runnable runnable) {
-			return () -> CompletableFuture.runAsync(runnable, this.executor);
-		}
-
-		public static NisAsyncTimerVisitor createNamedVisitor(final String name) {
-			return new NisAsyncTimerVisitor(name, CommonStarter.TIME_PROVIDER);
-		}
 	}
 }

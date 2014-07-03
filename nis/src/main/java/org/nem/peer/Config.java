@@ -26,11 +26,34 @@ public class Config {
 	 * @param applicationVersion The application version.
 	 */
 	public Config(final Node localNode, final JSONObject peersConfig, final String applicationVersion) {
+		this(
+				localNode,
+				parseWellKnownPeers(new JsonDeserializer(peersConfig, null)),
+				getDefaultTrustParameters(),
+				getDefaultTrustProvider(),
+				applicationVersion);
+	}
+
+	/**
+	 * Creates a new configuration object.
+	 *
+	 * @param localNode The local node.
+	 * @param preTrustedNodes The pre-trusted nodes.
+	 * @param trustParameters The trust parameters.
+	 * @param trustProvider The trust provider.
+	 * @param applicationVersion The application version.
+	 */
+	public Config(
+			final Node localNode,
+			final PreTrustedNodes preTrustedNodes,
+			final TrustParameters trustParameters,
+			final TrustProvider trustProvider,
+			final String applicationVersion) {
 		updateLocalNodeMetaData(localNode, applicationVersion);
 		this.localNode = localNode;
-		this.preTrustedNodes = parseWellKnownPeers(new JsonDeserializer(peersConfig, null));
-		this.trustParameters = getDefaultTrustParameters();
-		this.trustProvider = getDefaultTrustProvider();
+		this.preTrustedNodes = preTrustedNodes;
+		this.trustParameters = trustParameters;
+		this.trustProvider = trustProvider;
 	}
 
 	private void updateLocalNodeMetaData(final Node localNode, final String applicationVersion) {
@@ -93,10 +116,6 @@ public class Config {
 	 */
 	public TrustProvider getTrustProvider() {
 		return this.trustProvider;
-	}
-
-	private static Node parseLocalNode(final Deserializer deserializer) {
-		return new LocalNodeDeserializer().deserialize(deserializer);
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
