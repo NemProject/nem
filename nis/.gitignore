@@ -9,3 +9,5 @@ my.*.sh
 .DS_Store
 /site
 nem.log.*
+/dependency-reduced-pom.xml
+/nis.temp.settings

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="7.0+" codebase="http://bob.nem.ninja" href="$outputFile" version="0.0.1">
+<jnlp spec="7.0+" codebase="$nem-code-base" href="$outputFile" version="${project.version}">
   <information>
     <title>NEM Server (NIS)</title>
     <vendor>NEM Community</vendor>
@@ -12,11 +12,8 @@
   </security>
   <resources>
     <java version="1.8+" java-vm-args="-esa -Xnoclassgc"/>
-    <property name="jnlp.versionEnabled" value="true"/>
     $dependencies
 </resources>
   <application-desc main-class="$mainClass">
-     <argument>1</argument>
-   <argument>2</argument>
   </application-desc>
 </jnlp> 
