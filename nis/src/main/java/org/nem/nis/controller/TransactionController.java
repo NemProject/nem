@@ -14,14 +14,14 @@ import java.util.logging.Logger;
 
 // TODO: add tests
 @RestController
-public class TransferController {
-	private static final Logger LOGGER = Logger.getLogger(TransferController.class.getName());
+public class TransactionController {
+	private static final Logger LOGGER = Logger.getLogger(TransactionController.class.getName());
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final PushService pushService;
 
 	@Autowired(required = true)
-	TransferController(
+	TransactionController(
 			final AccountAnalyzer accountAnalyzer,
 			final PushService pushService) {
 		this.accountAnalyzer = accountAnalyzer;
