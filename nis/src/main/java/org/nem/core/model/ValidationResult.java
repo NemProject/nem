@@ -46,7 +46,7 @@ public enum ValidationResult {
 	FAILURE_HASH_EXISTS(7),
 	
 	/**
-	 * Validation failed because the verification of the signature failed .
+	 * Validation failed because the verification of the signature failed.
 	 */
 	FAILURE_SIGNATURE_NOT_VERIFIABLE(8),
 	
@@ -75,38 +75,52 @@ public enum ValidationResult {
 	 */
 	FAILURE_CHAIN_INVALID(13);
 
-	/**
-	 * The integer representation of the result.
-	 */
-	private int result;
+	private int value;
 
-	/**
-	 * Creates a validation result.
-	 * @param result The result.
-	 */
-	private ValidationResult(int result) {
-		this.result = result;
+	private ValidationResult(int value) {
+		this.value = value;
 	}
 
 	/**
-	 * Creates a validation result. 
+	 * Creates a validation result given a raw value.
+	 *
 	 * @param value The value.
-	 * @return The validation result if the value is value, throws IllegalArgumentException otherwise.
+	 * @return The validation result if the value is known.
+	 * @throws IllegalArgumentException if the value is unknown.
 	 */
-	public static ValidationResult fromValue(int value) {  
-			for (ValidationResult result : values()) {  
-				if (result.getValue() == value) {  
-					return result;  
-				}  
-			}  
+	public static ValidationResult fromValue(int value) {
+        for (final ValidationResult result : values()) {
+            if (result.getValue() == value)
+                return result;
+        }
+
 		throw new IllegalArgumentException("Invalid validation result: " + value);
+	}
+
+	/**
+	 * Gets a value indicating whether or not this result indicates success.
+	 *
+	 * @return true if this result indicates success.
+	 */
+	public boolean isSuccess() {
+		return this == ValidationResult.SUCCESS;
+	}
+
+	/**
+	 * Gets a value indicating whether or not this result indicates an error.
+	 *
+	 * @return true if this result indicates an error.
+	 */
+	public boolean isFailure() {
+		return !this.isSuccess() && this != ValidationResult.NEUTRAL;
 	}
 	
 	/**
 	 * Gets the underlying integer representation of the result.
-	 * @return The underlying value; 
+	 *
+	 * @return The underlying value.
 	 */
     public int getValue() {
-        return result;
+        return this.value;
     }
 }

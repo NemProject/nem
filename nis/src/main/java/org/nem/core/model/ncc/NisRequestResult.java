@@ -1,49 +1,37 @@
 package org.nem.core.model.ncc;
 
+import org.nem.core.model.ValidationResult;
 import org.nem.core.serialization.*;
 
 /**
- * 
  * Result for NIS request from NCC.
- *
  */
 public class NisRequestResult implements SerializableEntity {
 	/**
-	 * Result type: validation result 
+	 * Result type indicating a validation result
 	 */
 	public static final int TYPE_VALIDATION_RESULT = 0x00000001;
-	
+
 	/**
-	 * Special code: neutral. 
+	 * Special code representing a neutral result.
 	 */
 	public static final int CODE_NEUTRAL = 0x00000000;
-	
+
 	/**
-	 * Special code: success. 
+	 * Special code representing a successful result.
 	 */
 	public static final int CODE_SUCCESS = 0x00000001;
-	
-	/**
-	 * The result type
-	 */
+
 	private final int type;
-	
-	/**
-	 * The result code
-	 */
 	private final int code;
-	
-	/**
-	 * The result message
-	 */
 	private final String message;
 	
 	/**
-	 * Creates a Nis request result.
+	 * Creates a NIS request result.
 	 * 
-	 * @param code The type of the request result.
-	 * @param code The code of the request result.
-	 * @param code The message of the request result.
+	 * @param type The result type.
+	 * @param code The result code.
+	 * @param message The message.
 	 */
 	public NisRequestResult(final int type, final int code, final String message) {
 		this.type = type;
@@ -52,46 +40,59 @@ public class NisRequestResult implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a Nis request result.
+	 * Creates a NIS request result from a validation result.
+	 *
+	 * @param result The validation result.
+	 */
+	public NisRequestResult(final ValidationResult result) {
+		this(TYPE_VALIDATION_RESULT, result.getValue(), result.toString());
+	}
+
+	/**
+	 * Deserializes a NIS request result.
 	 *
 	 * @param deserializer The deserializer.
 	 */
 	public NisRequestResult(final Deserializer deserializer) {
-		this(deserializer.readInt("type"), 
-			 deserializer.readInt("code"), 
-			 deserializer.readString("message"));
+		this.type = deserializer.readInt("type");
+		this.code = deserializer.readInt("code");
+		this.message = deserializer.readString("message");
 	}
 	
 	/**
-	 * Gets the type for the request result.
-	 * @return The type for the request result.
+	 * Gets the result type.
+	 *
+	 * @return The result type.
 	 */
 	public int getType() {
 		return this.type;
 	}
 	
 	/**
-	 * Gets the code for the request result.
-	 * @return The code for the request result.
+	 * Gets the result code.
+	 *
+	 * @return The result code.
 	 */
 	public int getCode() {
 		return this.code;
 	}
 	
 	/**
-	 * Gets the message for the request result.
-	 * @return The code for the request result.
+	 * Gets the message.
+	 *
+	 * @return The message.
 	 */
 	public String getMessage() {
 		return this.message;
 	}
-	
+
 	/**
-	 * Indicating whether or not the the result represents an error
+	 * Gets a value indicating whether or not this result indicates an error.
+	 *
+	 * @return true if this result indicates an error.
 	 */
 	public boolean isError() {
-		return CODE_NEUTRAL != this.code &&
-			   CODE_SUCCESS != this.code;
+		return CODE_NEUTRAL != this.code && CODE_SUCCESS != this.code;
 	}
 	
 	@Override

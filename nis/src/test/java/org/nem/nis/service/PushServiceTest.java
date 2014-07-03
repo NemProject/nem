@@ -10,7 +10,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
-import org.nem.nis.mappers.ValidationResultToNodeInteractionResultMapper;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
@@ -18,6 +17,22 @@ import org.nem.peer.node.*;
 public class PushServiceTest {
 
 	//region pushTransaction
+
+	@Test
+	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
+		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
+		transaction.signBy(Utils.generateRandomAccount());
+
+		// Act:
+		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
+
+		// Assert:
+		context.assertSingleUpdateExperience(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE);
+		Mockito.verify(context.network, Mockito.times(0)).broadcast(Mockito.any(), Mockito.any());
+	}
 
 	@Test
 	public void pushTransactionValidFailureIncrementsFailedExperience() {
@@ -256,8 +271,10 @@ public class PushServiceTest {
 		}
 
 		public void assertSingleUpdateExperience(final ValidationResult expectedResult) {
-			Mockito.verify(this.network, Mockito.times(1)).updateExperience(this.remoteNode, ValidationResultToNodeInteractionResultMapper.map(expectedResult));
-			Mockito.verify(this.network, Mockito.times(1)).updateExperience(Mockito.eq(this.remoteNode), Mockito.any());
+			Mockito.verify(this.network, Mockito.times(1))
+					.updateExperience(this.remoteNode, NodeInteractionResult.fromValidationResult(expectedResult));
+			Mockito.verify(this.network, Mockito.times(1))
+					.updateExperience(Mockito.eq(this.remoteNode), Mockito.any());
 		}
 	}
 }

@@ -3,7 +3,6 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
-import org.nem.nis.mappers.ValidationResultToNodeInteractionResultMapper;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
-		ValidationResult result = this.pushEntity(
+		final ValidationResult result = this.pushEntity(
 				entity,
 				obj -> PushService.checkTransaction(obj),
 				obj -> this.foraging.processTransaction(obj),
@@ -50,18 +49,16 @@ public class PushService {
 				NodeApiId.REST_PUSH_TRANSACTION,
 				identity);
 
-		if (ValidationResult.SUCCESS != result &&
-			ValidationResult.NEUTRAL != result)
-			LOGGER.info("Warning: ValidationResult=" + result.toString());
+		if (result.isFailure())
+			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 
 		return result;
 	}
 
 	private static ValidationResult checkTransaction(final Transaction transaction) {
-		if (false == transaction.verify()) {
-			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-		}
-		return transaction.checkValidity();
+		return !transaction.verify()
+			? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
+		    : transaction.checkValidity();
 	}
 
 	/**
@@ -71,7 +68,7 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public void pushBlock(final Block entity, final NodeIdentity identity) {
-		ValidationResult result = this.pushEntity(
+		final ValidationResult result = this.pushEntity(
 				entity,
 				obj -> this.blockChain.checkPushedBlock(obj),
 				obj -> this.blockChain.processBlock(obj),
@@ -79,9 +76,8 @@ public class PushService {
 				NodeApiId.REST_PUSH_BLOCK,
 				identity);
 
-		if (ValidationResult.SUCCESS != result &&
-			ValidationResult.NEUTRAL != result)
-			LOGGER.info("Warning: ValidationResult=" + result.toString());
+		if (result.isFailure())
+			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(
@@ -103,20 +99,19 @@ public class PushService {
 				network.updateExperience(remoteNode, status);
 		};
 
-		final ValidationResult isValidStatus = isValid.apply(entity);
-		if (isValidStatus != ValidationResult.SUCCESS &&
-			isValidStatus != ValidationResult.NEUTRAL) {
+		final ValidationResult isValidResult = isValid.apply(entity);
+		if (isValidResult.isFailure()) {
 			// Bad experience with the remote node.
 			updateStatus.accept(NodeInteractionResult.FAILURE);
-			return isValidStatus;
+			return isValidResult;
 		}
 
 		// validate entity and broadcast (async)
 		final ValidationResult status = isAccepted.apply(entity);
 		// Good or bad experience with the remote node.
-		updateStatus.accept(ValidationResultToNodeInteractionResultMapper.map(status));
+		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
-		if (status == ValidationResult.SUCCESS) {
+		if (status.isSuccess()) {
 			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
 					entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
