@@ -1,14 +1,15 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.Block;
+import org.nem.core.model.Address;
 import org.nem.core.model.BlockChainConstants;
-import org.nem.core.model.ncc.BlockMetaData;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.model.ncc.BlockMetaDataPair;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.controller.viewmodels.ExplorerBlockView;
+import org.nem.nis.controller.viewmodels.ExplorerTransferView;
 import org.nem.nis.service.RequiredBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,10 +33,10 @@ public class LocalController {
 
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)
 	@ClientApi
-	public SerializableList<BlockMetaDataPair> localBlocksAfter(@RequestBody final BlockHeight height) {
+	public SerializableList<ExplorerBlockView> localBlocksAfter(@RequestBody final BlockHeight height) {
 		// TODO: add tests for this action
 		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
-		final SerializableList<BlockMetaDataPair> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
+		final SerializableList<ExplorerBlockView> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
 		for (int i = 0; i < BlockChainConstants.BLOCKS_LIMIT; ++i) {
 			final Long curBlockId = dbBlock.getNextBlockId();
 			if (null == curBlockId) {
@@ -43,8 +44,29 @@ public class LocalController {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			Block block = BlockMapper.toModel(dbBlock, this.accountLookup);
-			blockList.add(new BlockMetaDataPair(block, new BlockMetaData(dbBlock.getBlockHash())));
+			long timestamp = SystemTimeProvider.getEpochTimeMillis() + dbBlock.getTimestamp().longValue()*1000;
+			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
+					dbBlock.getHeight(),
+					Address.fromPublicKey(dbBlock.getForger().getPublicKey()),
+					timestamp,
+					dbBlock.getBlockHash(),
+					dbBlock.getBlockTransfers().size()
+			);
+			dbBlock.getBlockTransfers().stream()
+					.map(tx -> new ExplorerTransferView(
+							tx.getType(),
+							Amount.fromMicroNem(tx.getFee()),
+							tx.getDeadline().longValue(),
+							Address.fromPublicKey(tx.getSender().getPublicKey()),
+							tx.getSenderProof(),
+							tx.getTransferHash(),
+							Address.fromEncoded(tx.getRecipient().getPrintableKey()),
+							Amount.fromMicroNem(tx.getAmount()),
+							tx.getMessageType(),
+							tx.getMessagePayload()
+					))
+					.forEach(tx -> explorerBlockView.addTransaction(tx));
+			blockList.add(explorerBlockView);
 		}
 
 		return blockList;
