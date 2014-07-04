@@ -167,7 +167,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
-		if (0 != (ComparisonResult.Code.REMOTE_IS_EVIL & result.getCode())) {
+		if (result.getCode().isEvil()) {
 			throw new FatalPeerException("remote node is evil");
 		}
 
@@ -192,7 +192,7 @@ public class BlockChain implements BlockSynchronizer {
 			}
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			return mapComparisonResultCodeToNodeInteractionResult(result.getCode());
+			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -210,18 +210,6 @@ public class BlockChain implements BlockSynchronizer {
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		final ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
-	}
-
-	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
-		switch (comparisonResultCode) {
-			case ComparisonResult.Code.REMOTE_IS_SYNCED:
-            case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
-            case ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-            case ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE:
-				return NodeInteractionResult.NEUTRAL;
-		}
-
-		return NodeInteractionResult.FAILURE;
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {

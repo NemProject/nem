@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import org.nem.core.model.ValidationResult;
+import org.nem.nis.sync.ComparisonResult;
 
 /**
  * Possible node interaction results.
@@ -33,5 +34,23 @@ public enum NodeInteractionResult {
 			case NEUTRAL: return NodeInteractionResult.NEUTRAL;
 			default: return NodeInteractionResult.FAILURE;
 		}
+	}
+
+	/**
+	 * Creates a new NodeInteractionResult from a comparison result code.
+	 *
+	 * @param comparisonResultCode The comparison result code.
+	 * @return The NodeInteractionResult.
+	 */
+	public static NodeInteractionResult fromComparisonResultCode(final ComparisonResult.Code comparisonResultCode) {
+		switch (comparisonResultCode) {
+			case REMOTE_IS_SYNCED:
+			case REMOTE_IS_TOO_FAR_BEHIND:
+			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
+			case REMOTE_REPORTED_LOWER_CHAIN_SCORE:
+				return NodeInteractionResult.NEUTRAL;
+		}
+
+		return NodeInteractionResult.FAILURE;
 	}
 }
