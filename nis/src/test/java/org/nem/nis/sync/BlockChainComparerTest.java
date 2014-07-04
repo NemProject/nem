@@ -61,6 +61,21 @@ public class BlockChainComparerTest {
 	}
 
 	@Test
+	public void remoteChainHeightIsStoredInResult() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final BlockChainComparer comparer = createBlockChainComparer();
+
+		// Act:
+		final BlockHeight height = comparer.compare(
+				new MockBlockLookup(createVerifiableBlock(account, 27)),
+				new MockBlockLookup(createVerifiableBlock(account, 11), new BlockChainScore(10))).getRemoteHeight();
+
+		// Assert:
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
+	}
+
+	@Test
 	public void remoteHasNoBlocksIfRemoteDoesNotHaveLastBlock() {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
