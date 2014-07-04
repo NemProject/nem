@@ -60,21 +60,6 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(7)));
 	}
 
-	// TODO: Do we need the height if the chains have same score?
-	@Test
-	public void remoteChainHeightIsStoredInResult() {
-		// Arrange:
-		final BlockChainComparer comparer = createBlockChainComparer();
-
-		// Act:
-		final BlockHeight height = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(7)),
-				new MockBlockLookup(createNonVerifiableBlock(7))).getRemoteHeight();
-
-		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(7)));
-	}
-
 	@Test
 	public void remoteHasNoBlocksIfRemoteDoesNotHaveLastBlock() {
 		// Arrange:

@@ -14,7 +14,7 @@ import org.nem.core.utils.*;
 // to follow/find/detect changes in /transfer/ API or serializers
 public class TransferControllerTest {
 
-	private static final String TRANSFER_PREPARE_PATH = "transfer/prepare";
+	private static final String TRANSFER_PREPARE_PATH = "transaction/prepare";
 
 	@Test
 	public void transferIncorrectType() {

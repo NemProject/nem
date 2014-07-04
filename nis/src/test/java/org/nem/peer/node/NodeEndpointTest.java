@@ -63,6 +63,7 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_NODE_PING, "node/ping");
 		apiIdToPathMap.put(NodeApiId.REST_PUSH_BLOCK, "push/block");
 		apiIdToPathMap.put(NodeApiId.REST_PUSH_TRANSACTION, "push/transaction");
+		apiIdToPathMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, "transactions/unconfirmed");
 
 		for (final NodeApiId apiId : NodeApiId.values()) {
 			if (!apiIdToPathMap.containsKey(apiId))
