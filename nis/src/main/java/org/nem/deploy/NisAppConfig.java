@@ -1,6 +1,6 @@
 package org.nem.deploy;
 
-import com.googlecode.flyway.core.Flyway;
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
 import org.nem.nis.dao.AccountDao;
@@ -19,6 +19,7 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.Properties;
 
@@ -59,8 +60,9 @@ public class NisAppConfig {
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		final Flyway flyway = new Flyway();
+		final org.flywaydb.core.Flyway flyway = new Flyway();
 		flyway.setDataSource(this.dataSource());
+		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
 		return flyway;
 	}

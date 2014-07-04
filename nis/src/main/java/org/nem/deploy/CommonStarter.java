@@ -22,9 +22,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
- * Did not find a better way of launching Jetty in combination with WebStart. The
- * physical location of the downloaded files is not pre-known, so passing a WAR
- * file to the Jetty runner does not work.
+ * Did not find a better way of launching Jetty in combination with WebStart.
+ * The physical location of the downloaded files is not pre-known, so passing a
+ * WAR file to the Jetty runner does not work.
  * <p/>
  * I had to switch to the Servlet API 3.x with programmatic configuration.
  */
@@ -34,7 +34,8 @@ public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 
 	static {
-		// initialize logging before anything is logged; otherwise not all settings will take effect
+		// initialize logging before anything is logged; otherwise not all
+		// settings will take effect
 		initializeLogging();
 	}
 
@@ -46,17 +47,15 @@ public class CommonStarter implements ServletContextListener {
 	/**
 	 * The application meta data.
 	 */
-	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(
-			CommonStarter.class,
-			TIME_PROVIDER);
+	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(CommonStarter.class, TIME_PROVIDER);
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting embedded Jetty Server.");
 
 		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
-		//JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
+		// JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
 
-		//Taken from Jetty doc
+		// Taken from Jetty doc
 		Server server = new Server(createThreadPool());
 		server.addBean(new ScheduledExecutorScheduler());
 
@@ -66,7 +65,7 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpAfterStart(false);
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
-		
+
 		LOGGER.info("Calling start().");
 		server.start();
 		server.join();
@@ -76,7 +75,7 @@ public class CommonStarter implements ServletContextListener {
 		HandlerCollection handlers = new HandlerCollection();
 		ServletContextHandler servletContext = new ServletContextHandler();
 
-		//Special Listener to set-up the environment for Spring
+		// Special Listener to set-up the environment for Spring
 		servletContext.addEventListener(new CommonStarter());
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler());
@@ -89,7 +88,7 @@ public class CommonStarter implements ServletContextListener {
 	public static Connector createConnector(Server server) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
-		//PORT
+		// PORT
 		http_config.setSecurePort(7891);
 		http_config.setOutputBufferSize(32768);
 		http_config.setRequestHeaderSize(8192);
@@ -135,13 +134,15 @@ public class CommonStarter implements ServletContextListener {
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
 		dosFilter.setInitParameter("delayMs", "1000");
 		dosFilter.setInitParameter("trackSessions", "false");
-		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes, too high or too low?
+		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes, too
+																// high or too
+																// low?
 		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
 		// GZIP filter
 		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-		//Zipping following MimeTypes
+		// Zipping following MimeTypes
 		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
@@ -149,9 +150,7 @@ public class CommonStarter implements ServletContextListener {
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
 			LogManager.getLogManager().readConfiguration(inputStream);
-		}
-		catch (final IOException e)
-		{
+		} catch (final IOException e) {
 			LOGGER.severe("Could not load default logging properties file");
 			LOGGER.severe(e.getMessage());
 		}
