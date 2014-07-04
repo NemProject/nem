@@ -180,7 +180,8 @@ public class BlockChain implements BlockSynchronizer {
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
-		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode()) {
+		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
+			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			// TODO: remove try-catch when we are sure everyone has nis version with unconfirmed transactions polling
 			try {
 				Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
@@ -215,7 +216,8 @@ public class BlockChain implements BlockSynchronizer {
 		switch (comparisonResultCode) {
 			case ComparisonResult.Code.REMOTE_IS_SYNCED:
             case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
-            case ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE:
+            case ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
+            case ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE:
 				return NodeInteractionResult.NEUTRAL;
 		}
 

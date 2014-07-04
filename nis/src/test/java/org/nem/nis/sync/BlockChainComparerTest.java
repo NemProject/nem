@@ -18,7 +18,7 @@ public class BlockChainComparerTest {
 		// Assert:
 		Assert.assertThat(
 				compareDifferentChainScores(10, 9),
-				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE));
 	}
 
 	@Test
@@ -26,7 +26,7 @@ public class BlockChainComparerTest {
 		// Assert:
 		Assert.assertThat(
 				compareDifferentChainScores(10, 10),
-				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE));
+				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE));
 	}
 
 	@Test
@@ -60,6 +60,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(7)));
 	}
 
+	// TODO: Do we need the height if the chains have same score?
 	@Test
 	public void remoteChainHeightIsStoredInResult() {
 		// Arrange:
