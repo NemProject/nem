@@ -98,7 +98,6 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
 	}
 
-
 	@Override
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED);

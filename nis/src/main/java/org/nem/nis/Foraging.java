@@ -158,8 +158,10 @@ public class Foraging  {
 	/**
 	 * Processes every transaction in the list.
 	 * Since this method is called in the synchronization process, it doesn't make sense to return a value.
+	 *
+	 * @param transactions The transactions.
 	 */
-	public void processTransactions(Collection<Transaction> transactions) {
+	public void processTransactions(final Collection<Transaction> transactions) {
 		transactions.stream().forEach(tx -> processTransaction(tx));
 	}
 

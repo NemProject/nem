@@ -11,6 +11,7 @@ import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 // TODO: add tests
@@ -68,12 +69,13 @@ public class TransactionController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(
 			@RequestBody final NodeChallenge challenge) {
-		SerializableList<Transaction> transactions = new SerializableList<>(this.foraging.getUnconfirmedTransactionsForNewBlock(NisMain.TIME_PROVIDER.getCurrentTime()));
+		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions());
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(
-				transactions, 
-				localNode.getIdentity(), 
-				challenge);
+		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), challenge);
+	}
+
+	private Collection<Transaction> getUnconfirmedTransactions() {
+		return this.foraging.getUnconfirmedTransactionsForNewBlock(NisMain.TIME_PROVIDER.getCurrentTime());
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
