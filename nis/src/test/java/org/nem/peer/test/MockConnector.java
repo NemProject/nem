@@ -229,6 +229,11 @@ public class MockConnector implements PeerConnector, SyncConnector {
 	public BlockChainScore getChainScore(final Node node) {
 		return null;
 	}
+
+	@Override
+	public List<Transaction> getUnconfirmedTransactions(final Node node) {
+		return null;
+	}
 	
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {

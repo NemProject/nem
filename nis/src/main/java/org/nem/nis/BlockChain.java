@@ -180,6 +180,16 @@ public class BlockChain implements BlockSynchronizer {
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
+		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode()) {
+			// TODO: remove try-catch when we are sure everyone has nis version with unconfirmed transactions polling
+			try {
+				Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+				this.foraging.processTransactions(unconfirmedTransactions);
+			} catch (Exception e) {
+				// Don't care at the moment
+				LOGGER.info("Exception calling getUnconfirmedTransactions(): " + e.toString());
+			}
+		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return mapComparisonResultCodeToNodeInteractionResult(result.getCode());
 		}

@@ -155,6 +155,14 @@ public class Foraging  {
 		return addUnconfirmedTransaction(transaction);
 	}
 
+	/**
+	 * Processes every transaction in the list.
+	 * Since this method is called in the synchronization process, it doesn't make sense to return a value.
+	 */
+	public void processTransactions(Collection<Transaction> transactions) {
+		transactions.stream().forEach(tx -> processTransaction(tx));
+	}
+
 	private boolean matchAddress(final Transaction transaction, final Address address) {
 		return (transaction.getSigner().getAddress().equals(address) ||
 				(transaction.getType() == TransactionTypes.TRANSFER &&

@@ -38,6 +38,15 @@ public enum NodeApiId {
 
 	//endregion
 
+	//region transactions/*
+
+	/**
+	 * The transactions/unconfirmed API.
+	 */
+	REST_TRANSACTIONS_UNCONFIRMED,
+
+	//endregion
+
 	//region node/*
 
 	/**
