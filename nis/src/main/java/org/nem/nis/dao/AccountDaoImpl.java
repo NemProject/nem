@@ -48,34 +48,6 @@ public class AccountDaoImpl implements AccountDao {
 		getCurrentSession().saveOrUpdate(account);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public Long count() {
-//		return (Long) getCurrentSession()
-//				.createCriteria("Account")
-//				.setProjection(Projections.rowCount())
-//				.uniqueResult();
-		return (Long)getCurrentSession().createQuery("select count (*) from Account").uniqueResult();
-	}
-
-	@Override
-	public void saveMulti(List<Account> recipientsAccounts) {
-		Session sess = sessionFactory.openSession();
-		org.hibernate.Transaction tx = null;
-		try {
-			tx = sess.beginTransaction();
-			recipientsAccounts.forEach(obj -> sess.saveOrUpdate(obj));
-			tx.commit();
-
-		} catch (RuntimeException e) {
-			if (tx != null) tx.rollback();
-			e.printStackTrace();
-
-		} finally {
-			sess.close();
-		}
-	}
-
 	private static Account firstFromQuery(final Query query) {
 		final List<?> userList = query.list();
 		return userList.size() > 0 ? (Account)userList.get(0) : null;
