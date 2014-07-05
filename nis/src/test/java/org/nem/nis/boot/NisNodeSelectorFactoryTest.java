@@ -19,8 +19,9 @@ public class NisNodeSelectorFactoryTest {
 		// Arrange:
 		final Config config = createConfig();
 		final NisNodeSelectorFactory factory = new NisNodeSelectorFactory(
-			createConfig(),
-			new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()));
+				15,
+				config.getTrustProvider(),
+				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()));
 
 		// Assert:
 		Assert.assertThat(factory.createNodeSelector(), IsNull.notNullValue());

@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import net.minidev.json.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.deploy.CommonStarter;
+import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
 import org.nem.peer.*;
@@ -25,6 +25,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
+	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
 	private final AuditCollection outgoingAudits = createAuditCollection();
 	private final AuditCollection incomingAudits = createAuditCollection();
@@ -33,9 +34,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetwork network;
 
 	@Autowired(required = true)
-	public NisPeerNetworkHost(final AccountLookup accountLookup, final BlockChain blockChain) {
+	public NisPeerNetworkHost(
+			final AccountLookup accountLookup,
+			final BlockChain blockChain,
+			final NisConfiguration nisConfiguration) {
 		this.accountLookup = accountLookup;
 		this.blockChain = blockChain;
+		this.nisConfiguration = nisConfiguration;
 		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
 
@@ -132,11 +137,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(config, networkState);
+		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(
+				this.nisConfiguration.getNodeLimit(),
+				config.getTrustProvider(),
+				networkState);
 		return new PeerNetworkBootstrapper(
 				networkState,
 				this.createNetworkServicesFactory(networkState),
-				selectorFactory);
+				selectorFactory,
+				!this.nisConfiguration.shouldBootWithoutAck());
 	}
 
 	private static AuditCollection createAuditCollection() {

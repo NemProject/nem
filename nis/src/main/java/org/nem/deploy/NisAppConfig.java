@@ -109,11 +109,23 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
-		return new NisMain();
+		return new NisMain(
+				this.accountDao,
+				this.blockDao,
+				this.accountAnalyzer(),
+				this.blockChain(),
+				this.nisPeerNetworkHost(),
+				this.blockChainLastBlockLayer,
+				this.nisConfiguration());
 	}
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
+		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain(), this.nisConfiguration());
+	}
+
+	@Bean
+	public NisConfiguration nisConfiguration() {
+		return new NisConfiguration();
 	}
 }

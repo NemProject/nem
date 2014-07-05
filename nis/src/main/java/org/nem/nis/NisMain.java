@@ -25,28 +25,35 @@ public class NisMain {
 	 * The time provider.
 	 */
 	public static final TimeProvider TIME_PROVIDER = CommonStarter.TIME_PROVIDER;
-	private static NisConfiguration nisConfiguration = new NisConfiguration();
 
 	private Block nemesisBlock;
 	private Hash nemesisBlockHash;
 
-	@Autowired
-	private AccountDao accountDao;
+	private final AccountDao accountDao;
+	private final BlockDao blockDao;
+	private final AccountAnalyzer accountAnalyzer;
+	private final BlockChain blockChain;
+	private final NisPeerNetworkHost networkHost;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final NisConfiguration nisConfiguration;
 
-	@Autowired
-	private BlockDao blockDao;
-
-	@Autowired
-	private AccountAnalyzer accountAnalyzer;
-
-	@Autowired
-	private BlockChain blockChain;
-
-	@Autowired
-	private NisPeerNetworkHost networkHost;
-
-	@Autowired
-	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+	@Autowired(required = true)
+	public NisMain(
+			final AccountDao accountDao,
+			final BlockDao blockDao,
+			final AccountAnalyzer accountAnalyzer,
+			final BlockChain blockChain,
+			final NisPeerNetworkHost networkHost,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final NisConfiguration nisConfiguration) {
+		this.accountDao = accountDao;
+		this.blockDao = blockDao;
+		this.accountAnalyzer = accountAnalyzer;
+		this.blockChain = blockChain;
+		this.networkHost = networkHost;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.nisConfiguration = nisConfiguration;
+	}
 
 	private void analyzeBlocks() {
 		Long curBlockId;
@@ -132,13 +139,13 @@ public class NisMain {
 
 		this.analyzeBlocks();
 
-		final PrivateKey autoBootKey = nisConfiguration.getAutoBootKey();
+		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
 		if (null == autoBootKey) {
 			LOGGER.info("auto-boot is off");
 			return;
 		}
 
-		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(nisConfiguration.getAutoBootKey()));
+		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey));
 		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 		this.networkHost.boot(new Node(autoBootNodeIdentity, NodeEndpoint.fromHost("127.0.0.1")));
 		LOGGER.warning("auto-booted!");
