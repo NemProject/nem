@@ -85,4 +85,13 @@ public enum NodeApiId {
 	REST_PUSH_TRANSACTION,
 
 	//endregion
+
+	//region transactions/*
+
+	/**
+	 * The transactions/unconfirmed API.
+	 */
+	REST_TRANSACTIONS_UNCONFIRMED,
+
+	//endregion
 }

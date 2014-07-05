@@ -9,11 +9,23 @@ import java.security.SecureRandom;
  * NodeSelector factor used by NIS.
  */
 public class NisNodeSelectorFactory implements NodeSelectorFactory {
-	private final Config config;
+	private final int nodeLimit;
+	private final TrustProvider trustProvider;
 	private final PeerNetworkState state;
 
-	public NisNodeSelectorFactory(final Config config, final PeerNetworkState state) {
-		this.config = config;
+	/**
+	 * Creates a new NIS node selector factory.
+	 *
+	 * @param nodeLimit The number of regular nodes that should be communicated with during broadcasts.
+	 * @param trustProvider The trust provider.
+	 * @param state The network state.
+	 */
+	public NisNodeSelectorFactory(
+			final int nodeLimit,
+			final TrustProvider trustProvider,
+			final PeerNetworkState state) {
+		this.nodeLimit = nodeLimit;
+		this.trustProvider = trustProvider;
 		this.state = state;
 	}
 
@@ -23,8 +35,8 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 		final SecureRandom random = new SecureRandom();
 		return new PreTrustAwareNodeSelector(
 				new BasicNodeSelector(
-						10, // TODO: read from configuration
-						new ActiveNodeTrustProvider(this.config.getTrustProvider(), this.state.getNodes()),
+						this.nodeLimit,
+						new ActiveNodeTrustProvider(this.trustProvider, this.state.getNodes()),
 						context,
 						random),
 				this.state.getNodes(),

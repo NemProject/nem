@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
+import org.nem.deploy.NisConfiguration;
 import org.nem.peer.node.*;
 
 import java.util.*;
@@ -13,7 +14,7 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void defaultHostCanBeBooted() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode()).join();
 		}
@@ -22,7 +23,7 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void defaultHostCanBeBootedAsync() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			final CompletableFuture future = host.boot(createLocalNode());
 
@@ -37,7 +38,7 @@ public class NisPeerNetworkHostTest {
 	@Test(expected = IllegalStateException.class)
 	public void getNetworkThrowsIfNetworkIsNotBooted() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.getNetwork();
 		}
@@ -46,7 +47,7 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void getNetworkDoesNotThrowIfNetworkIsBooted() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode()).join();
 
@@ -58,7 +59,7 @@ public class NisPeerNetworkHostTest {
 	@Test(expected = IllegalStateException.class)
 	public void networkCannotBeBootedMoreThanOnce() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode());
 			host.boot(createLocalNode());
@@ -68,7 +69,7 @@ public class NisPeerNetworkHostTest {
 	@Test
 	public void getVisitorsReturnsSixTimerVisitors() {
 		// Arrange:
-		try (final NisPeerNetworkHost host = new NisPeerNetworkHost(null, null)) {
+		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode()).join();
 			final List<NisAsyncTimerVisitor> visitors = host.getVisitors();
@@ -80,5 +81,9 @@ public class NisPeerNetworkHostTest {
 
 	private static Node createLocalNode() {
 		return new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("10.0.0.1"));
+	}
+
+	private static NisPeerNetworkHost createNetwork() {
+		return new NisPeerNetworkHost(null, null, new NisConfiguration());
 	}
 }

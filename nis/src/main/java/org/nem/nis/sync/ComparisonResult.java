@@ -9,67 +9,96 @@ import org.nem.core.model.primitive.BlockHeight;
 public class ComparisonResult {
 
 	/**
+	 * Special code flag indicating that the remote is evil and should be penalized.
+	 */
+	private static final int REMOTE_IS_EVIL = 0x80000000;
+
+	/**
 	 * Possible comparison end states.
 	 * TODO: this is probably too fine-grained and can be generalized.
 	 */
-	public class Code {
-		/**
-		 * Flag indicating that the remote is evil and should be penalized.
-		 */
-		public static final int REMOTE_IS_EVIL = 0x80000000;
-
+	public enum Code {
 		/**
 		 * The result of the comparison is unknown.
 		 */
-		public static final int UNKNOWN = 0;
+		UNKNOWN(0),
 
 		/**
 		 * The remote node has no blocks.
 		 */
-		public static final int REMOTE_HAS_NO_BLOCKS = 1;
+		REMOTE_HAS_NO_BLOCKS(1),
 
 		/**
 		 * The remote node is synchronized with the local node.
 		 */
-		public static final int REMOTE_IS_SYNCED = 2;
+		REMOTE_IS_SYNCED(2),
 
 		/**
 		 * The remote node is too far behind the local node.
 		 */
-		public static final int REMOTE_IS_TOO_FAR_BEHIND = 3;
+		REMOTE_IS_TOO_FAR_BEHIND(3),
 
 		/**
 		 * The remote node is not in sync with the local node.
 		 */
-		public static final int REMOTE_IS_NOT_SYNCED = 4;
+		REMOTE_IS_NOT_SYNCED(4),
+
+		/**
+		 * The remote node is reported an equal chain score compared the local node.
+		 */
+		REMOTE_REPORTED_EQUAL_CHAIN_SCORE(5),
 
 		/**
 		 * The remote node is reported a lower chain score than the local node.
 		 */
-		public static final int REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE = 5;
+		REMOTE_REPORTED_LOWER_CHAIN_SCORE(6),
 
 		/**
 		 * The remote node has returned a non-verifiable block.
 		 */
-		public static final int REMOTE_HAS_NON_VERIFIABLE_BLOCK = REMOTE_IS_EVIL | 1;
+		REMOTE_HAS_NON_VERIFIABLE_BLOCK(REMOTE_IS_EVIL | 1),
 
 		/**
 		 * The remote node has returned too many hashes.
 		 */
-		public static final int REMOTE_RETURNED_TOO_MANY_HASHES = REMOTE_IS_EVIL | 2;
+		REMOTE_RETURNED_TOO_MANY_HASHES(REMOTE_IS_EVIL | 2),
 
 		/**
 		 * The remote node has returned invalid hashes.
 		 */
-		public static final int REMOTE_RETURNED_INVALID_HASHES = REMOTE_IS_EVIL | 3;
+		REMOTE_RETURNED_INVALID_HASHES(REMOTE_IS_EVIL | 3),
 
 		/**
 		 * The remote node lied about having a higher chain score.
 		 */
-		public static final int REMOTE_LIED_ABOUT_CHAIN_SCORE = REMOTE_IS_EVIL | 4;
+		REMOTE_LIED_ABOUT_CHAIN_SCORE(REMOTE_IS_EVIL | 4);
+
+		private int value;
+
+		private Code(int value) {
+			this.value = value;
+		}
+
+		/**
+		 * Gets a value indicating whether or not this result indicates an error.
+		 *
+		 * @return true if this result indicates an error.
+		 */
+		public boolean isEvil() {
+			return 0 != (REMOTE_IS_EVIL & this.value);
+		}
+
+		/**
+		 * Gets the underlying integer representation of the result.
+		 *
+		 * @return The underlying value.
+		 */
+		public int getValue() {
+			return this.value;
+		}
 	}
 
-	private final int code;
+	private final Code code;
 	private final long commonBlockHeight;
 	private final BlockHeight remoteHeight;
 	private final boolean areChainsConsistent;
@@ -82,7 +111,7 @@ public class ComparisonResult {
 	 * @param areChainsConsistent true if the two chains are consistent.
 	 */
 	public ComparisonResult(
-			final int code,
+			final Code code,
 			final long commonBlockHeight,
 			final boolean areChainsConsistent,
 			final BlockHeight remoteHeight) {
@@ -97,7 +126,7 @@ public class ComparisonResult {
 	 *
 	 * @return The result code.
 	 */
-	public int getCode() { return this.code; }
+	public Code getCode() { return this.code; }
 
 	/**
 	 * Gets the common block height (only supported when code is REMOTE_IS_NOT_SYNCED).

@@ -167,7 +167,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
-		if (0 != (ComparisonResult.Code.REMOTE_IS_EVIL & result.getCode())) {
+		if (result.getCode().isEvil()) {
 			throw new FatalPeerException("remote node is evil");
 		}
 
@@ -180,8 +180,19 @@ public class BlockChain implements BlockSynchronizer {
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
+		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
+			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
+			// TODO: remove try-catch when we are sure everyone has nis version with unconfirmed transactions polling
+			try {
+				Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+				this.foraging.processTransactions(unconfirmedTransactions);
+			} catch (Exception e) {
+				// Don't care at the moment
+				LOGGER.info("Exception calling getUnconfirmedTransactions(): " + e.toString());
+			}
+		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			return mapComparisonResultCodeToNodeInteractionResult(result.getCode());
+			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -199,17 +210,6 @@ public class BlockChain implements BlockSynchronizer {
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		final ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
-	}
-
-	private NodeInteractionResult mapComparisonResultCodeToNodeInteractionResult(final int comparisonResultCode) {
-		switch (comparisonResultCode) {
-			case ComparisonResult.Code.REMOTE_IS_SYNCED:
-            case ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND:
-            case ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE:
-				return NodeInteractionResult.NEUTRAL;
-		}
-
-		return NodeInteractionResult.FAILURE;
 	}
 
 	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
