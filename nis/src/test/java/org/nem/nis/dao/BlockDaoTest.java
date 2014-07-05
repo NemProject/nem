@@ -44,7 +44,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 123);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 123, 0);
 		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -62,7 +62,7 @@ public class BlockDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
 		final TransferTransaction transferTransaction = prepareTransferTransaction(recipient, signer, 10);
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 133);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 133, 0);
 		emptyBlock.addTransaction(transferTransaction);
 		emptyBlock.sign();
 		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
@@ -84,7 +84,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 234);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 234, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -107,7 +107,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 345);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 345, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -130,7 +130,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -151,17 +151,47 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
-		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
-		// Act:
-		blockDao.save(dbBlock);
-		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime(), 25);
-		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime()-1, 25);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456, 0);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, 123, 25);
+		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, 122, 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(1));
+		Assert.assertThat(entities1.size(), equalTo(25));
 		Assert.assertThat(entities2.size(), equalTo(0));
+	}
+
+	@Test
+	public void getBlocksForAccountReturnsBlocksSortedByTime() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, (23*i + 3)%30);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, 123+30, 25);
+		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, 122, 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(0));
+
+		int lastTimestamp = 123+29;
+		for (final Block entity : entities1) {
+			Assert.assertThat(entity.getTimestamp(), equalTo(lastTimestamp));
+			lastTimestamp = lastTimestamp - 1;
+		}
 	}
 	//endregion
 
@@ -171,7 +201,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 567);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 567, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -191,7 +221,7 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 678);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 678, 0);
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 10));
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 20));
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 30));
@@ -227,9 +257,9 @@ public class BlockDaoTest {
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
-	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, long height) {
+	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, long height, int i) {
 		final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getKeyPair().getPublicKey());
-		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash, new TimeInstant(123), new BlockHeight(height));
+		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash, new TimeInstant(123 + i), new BlockHeight(height));
 		emptyBlock.sign();
 		return emptyBlock;
 	}
