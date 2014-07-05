@@ -8,6 +8,8 @@ import java.util.Properties;
 
 public class NisConfigurationTest {
 
+	//region nis.bootkey
+
 	@Test
 	public void canReadConfigurationWithAutoBootKey() {
 		// Arrange:
@@ -34,6 +36,10 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 	}
 
+	//endregion
+
+	//region nis.nodelimit
+
 	@Test
 	public void canReadConfigurationWithNodeLimit() {
 		// Arrange:
@@ -56,6 +62,66 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(config.getNodeLimit(), IsNull.nullValue());
+		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(20));
 	}
+
+	//endregion
+
+	//region nis.shouldBootWithoutAck
+
+	@Test
+	public void canReadConfigurationWithShouldBootWithoutAck() {
+		// Arrange:
+		final Properties properties = new Properties();
+		properties.setProperty("nis.shouldBootWithoutAck", "true");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.shouldBootWithoutAck(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canReadConfigurationWithoutShouldBootWithoutAck() {
+		// Arrange:
+		final Properties properties = new Properties();
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.shouldBootWithoutAck(), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region nis.shouldUseBinaryTransport
+
+	@Test
+	public void canReadConfigurationWithShouldUseBinaryTransport() {
+		// Arrange:
+		final Properties properties = new Properties();
+		properties.setProperty("nis.shouldUseBinaryTransport", "true");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.shouldUseBinaryTransport(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canReadConfigurationWithoutShouldUseBinaryTransport() {
+		// Arrange:
+		final Properties properties = new Properties();
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.shouldUseBinaryTransport(), IsEqual.equalTo(false));
+	}
+
+	//endregion
 }
