@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
@@ -19,8 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collection;
-
+import java.util.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -243,6 +243,73 @@ public class BlockDaoTest {
 		Assert.assertThat(transfer1, nullValue());
 		Assert.assertThat(transfer2, nullValue());
 		Assert.assertThat(transfer3, nullValue());
+	}
+	//endregion
+
+	//region getters
+
+	@Test
+	public void getHashesFromReturnsProperHashes() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final ArrayList<Hash> expectedHashes= new ArrayList<>(30);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, i*5);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedHashes.add(dbBlock.getBlockHash());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final HashChain entities1 = blockDao.getHashesFrom(new BlockHeight(456), 25);
+		final HashChain entities2 = blockDao.getHashesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final Hash entity : entities1.asCollection()) {
+			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getHashesFromReturnsHashesInBlockHeightOrder() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final TreeMap<Integer, Hash> expectedHashes = new TreeMap<>();
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, 0);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedHashes.put((i*23 + 3)%30, dbBlock.getBlockHash());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final HashChain entities1 = blockDao.getHashesFrom(new BlockHeight(456), 25);
+		final HashChain entities2 = blockDao.getHashesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final Hash entity : entities1.asCollection()) {
+			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			i = i + 1;
+		}
 	}
 	//endregion
 
