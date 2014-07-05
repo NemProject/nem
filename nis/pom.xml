@@ -251,6 +251,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.1.201405082137</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -440,9 +441,101 @@
 					<outputJarVersions>true</outputJarVersions>
 					<verbose>true</verbose>
 				</configuration>
-
 			</plugin>
-
+			<plugin>
+				<groupId>com.googlecode.velocity-maven-plugin</groupId>
+				<artifactId>velocity-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<templateValues>
+						<userName>${user.name}</userName>
+						<organizationName>${project.organization.name}</organizationName>
+						<nem-code-base>${nem-code-base}</nem-code-base>
+						<javaHome>${java.home}</javaHome>
+					</templateValues>
+				</configuration>
+				<executions>
+					<!-- ************************************************** -->
+					<!-- Generate Windows Start Script NCC -->
+					<!-- ************************************************** -->
+					<execution>
+						<id>windows-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>run-nis.*</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>site</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate Windows Obfuscation Script -->
+						<!-- ************************************************** -->
+						<id>windows-obfuscation-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>buildPackage-ws-sign-nis.bat</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate MANIFEST.MF for re-includion in JAR -->
+						<!-- ************************************************** -->
+						<id>manifest-mf</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>MANIFEST.MF</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation/META-INF</outputDirectory>
+							<removeExtension>true</removeExtension>
+						</configuration>
+					</execution>
+										<execution>
+						<!-- ************************************************** -->
+						<!-- Generate ProGuard settings for nem-infrastructure-server -->
+						<!-- ************************************************** -->
+						<id>proGuard-settings-nem-infrastructure-serve</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>nis-ws.new.settings</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+							<removeExtension>true</removeExtension>
+						</configuration>
+					</execution>
+					
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
