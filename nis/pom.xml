@@ -23,6 +23,7 @@
 		<nem-certificate-store>identity.jks</nem-certificate-store>
 		<nem-certificate-password>nem-start-201404</nem-certificate-password>
 		<nem-code-base>http://nem.pucchiwerk.eu/nem</nem-code-base>
+		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.1.3.v20140225</jetty.version>
@@ -452,6 +453,7 @@
 						<organizationName>${project.organization.name}</organizationName>
 						<nem-code-base>${nem-code-base}</nem-code-base>
 						<javaHome>${java.home}</javaHome>
+						<proGuard>${proGuard}</proGuard>
 					</templateValues>
 				</configuration>
 				<executions>
@@ -476,9 +478,28 @@
 					</execution>
 					<execution>
 						<!-- ************************************************** -->
-						<!-- Generate Windows Obfuscation Script -->
+						<!-- Generate obfuscation script (proguard jar path) -->
 						<!-- ************************************************** -->
 						<id>windows-obfuscation-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>obfuscate-ws.bat</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate Windows Obfuscation signing Script -->
+						<!-- ************************************************** -->
+						<id>windows-signing-script</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>velocity</goal>
@@ -513,7 +534,7 @@
 							<removeExtension>true</removeExtension>
 						</configuration>
 					</execution>
-										<execution>
+					<execution>
 						<!-- ************************************************** -->
 						<!-- Generate ProGuard settings for nem-infrastructure-server -->
 						<!-- ************************************************** -->
@@ -533,7 +554,7 @@
 							<removeExtension>true</removeExtension>
 						</configuration>
 					</execution>
-					
+
 				</executions>
 			</plugin>
 			<plugin>
