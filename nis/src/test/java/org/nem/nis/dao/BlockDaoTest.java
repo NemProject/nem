@@ -247,7 +247,6 @@ public class BlockDaoTest {
 	//endregion
 
 	//region getters
-
 	@Test
 	public void getHashesFromReturnsProperHashes() {
 		// Arrange:
@@ -291,7 +290,8 @@ public class BlockDaoTest {
 
 		final TreeMap<Integer, Hash> expectedHashes = new TreeMap<>();
 		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, 0);
+			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedHashes.put((i*23 + 3)%30, dbBlock.getBlockHash());
 
@@ -308,6 +308,73 @@ public class BlockDaoTest {
 		int i = 0;
 		for (final Hash entity : entities1.asCollection()) {
 			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getDifficultiesFromReturnsProperDifficulties() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final ArrayList<Long> expectedDifficulties= new ArrayList<>(30);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, i*5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedDifficulties.add(dbBlock.getDifficulty());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<BlockDifficulty> entities1 = blockDao.getDifficultiesFrom(new BlockHeight(456), 25);
+		final List<BlockDifficulty> entities2 = blockDao.getDifficultiesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final BlockDifficulty entity : entities1) {
+			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
+			i = i + 1;
+		}
+	}
+
+
+	@Test
+	public void getDifficultiesFromReturnsDifficultiesInBlockHeightOrder() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final TreeMap<Integer, Long> expectedDifficulties= new TreeMap<>();
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedDifficulties.put((i * 23 + 3) % 30, dbBlock.getDifficulty());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<BlockDifficulty> entities1 = blockDao.getDifficultiesFrom(new BlockHeight(456), 25);
+		final List<BlockDifficulty> entities2 = blockDao.getDifficultiesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final BlockDifficulty entity : entities1) {
+			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
 			i = i + 1;
 		}
 	}
