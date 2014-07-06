@@ -73,22 +73,6 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<Block> getAccountBlocks(final Address address, final String timestamp) {
-		final Account account = this.accountAnalyzer.findByAddress(address);
-		final Integer intTimestamp = intOrMaxInt(timestamp);
-		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
-
-		final SerializableList<Block> blockList = new SerializableList<>(0);
-		blocks.stream()
-				.forEach(bl -> bl.setBlockTransfers(new LinkedList<>()));
-
-		blocks.stream()
-				.map(bl -> BlockMapper.toModel(bl, this.accountAnalyzer))
-				.forEach(obj -> blockList.add(obj));
-		return blockList;
-	}
-
-	@Override
 	public SerializableList<HarvestInfo> getAccountHarvests(Address address, String timestamp) {
 		final Account account = this.accountAnalyzer.findByAddress(address);
 		final Integer intTimestamp = intOrMaxInt(timestamp);

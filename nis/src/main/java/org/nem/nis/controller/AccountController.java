@@ -97,20 +97,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets block information for the specified account starting at the specified time.
-	 *
-	 * @param builder The page builder.
-	 * @return Information about the matching blocks.
-	 */
-	// TODO: remove after appropriate changes will be made in NCC
-	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		return this.accountIo.getAccountBlocks(page.getAddress(), page.getTimestamp());
-	}
-
-	/**
 	 * Gets information about harvested blocks.
 	 *
 	 * @param builder The page builder.

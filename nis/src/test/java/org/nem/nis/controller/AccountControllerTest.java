@@ -137,28 +137,6 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void accountBlocksDelegatesToIoAdapter() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final SerializableList<Block> expectedList = new SerializableList<>(10);
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		final TestContext context = new TestContext(accountIoAdapter);
-
-		final AccountPageBuilder pageBuilder = new AccountPageBuilder();
-		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setTimestamp("12345");
-
-		Mockito.when(accountIoAdapter.getAccountBlocks(address, "12345")).thenReturn(expectedList);
-
-		// Act:
-		final SerializableList<Block> resultList = context.controller.accountBlocks(pageBuilder);
-
-		// Assert:
-		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountBlocks(address, "12345");
-	}
-
-	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
 		final List<Account> accounts = Arrays.asList(
