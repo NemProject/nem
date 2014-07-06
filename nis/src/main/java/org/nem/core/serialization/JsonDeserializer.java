@@ -70,7 +70,7 @@ public class JsonDeserializer extends Deserializer {
 	@Override
 	public BigInteger readOptionalBigInteger(final String label) {
 		final byte[] bytes = this.readOptionalBytes(label);
-		return null == bytes ? null : new BigInteger(bytes);
+		return null == bytes ? null : new BigInteger(1, bytes);
 	}
 
 	@Override
