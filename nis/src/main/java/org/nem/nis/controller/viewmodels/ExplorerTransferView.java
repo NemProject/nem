@@ -22,7 +22,7 @@ public class ExplorerTransferView implements SerializableEntity {
 	private int msgType;
 	private byte[] message;
 
-	public ExplorerTransferView(int type, final Amount fee, final long deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient1, final Amount amount, final int msgType, final byte[] encodedPayload) {
+	public ExplorerTransferView(int type, final Amount fee, final long deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient, final Amount amount, final int msgType, final byte[] encodedPayload) {
 		this.type = type;
 		this.fee = fee;
 		this.deadline = SystemTimeProvider.getEpochTimeMillis() + deadline*1000;
@@ -30,7 +30,7 @@ public class ExplorerTransferView implements SerializableEntity {
 		this.signature = HexEncoder.getString(signature);
 		this.hash = transactionHash;
 
-		this.recipient = recipient1;
+		this.recipient = recipient;
 		this.amount = amount;
 		this.msgType = msgType;
 		this.message = encodedPayload;
@@ -42,8 +42,9 @@ public class ExplorerTransferView implements SerializableEntity {
 		Amount.writeTo(serializer, "fee", this.fee);
 		serializer.writeLong("timestamp", this.deadline);
 		Address.writeTo(serializer, "sender", this.signerAddress);
+		serializer.writeString("senderPk", HexEncoder.getString(this.signerAddress.getPublicKey().getRaw()));
 		serializer.writeString("signature", this.signature);
-		serializer.writeObject("hash", this.hash);
+		serializer.writeString("hash", HexEncoder.getString(this.hash.getRaw()));
 
 		Address.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);

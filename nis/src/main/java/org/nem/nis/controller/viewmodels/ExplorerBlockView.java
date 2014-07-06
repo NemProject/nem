@@ -4,6 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.serialization.Serializer;
+import org.nem.core.utils.HexEncoder;
 
 import java.util.*;
 
@@ -26,8 +27,9 @@ public class ExplorerBlockView implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeLong("height", this.height);
 		Address.writeTo(serializer, "harvester", this.foragerAddress);
+		serializer.writeString("harvesterPk", HexEncoder.getString(this.foragerAddress.getPublicKey().getRaw()));
 		serializer.writeLong("timestamp", this.timestamp);
-		serializer.writeObject("hash", this.blockHash);
+		serializer.writeString("hash", HexEncoder.getString(this.blockHash.getRaw()));
 		serializer.writeObjectArray("txes", this.transactions);
 	}
 
