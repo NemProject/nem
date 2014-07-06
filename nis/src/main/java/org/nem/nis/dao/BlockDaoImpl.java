@@ -185,7 +185,8 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setMaxResults(limit)
 				.add(Restrictions.ge("height", height.getRaw())) // >=
-				.setProjection(Projections.property(name));
+				.setProjection(Projections.property(name))
+				.addOrder(Order.asc("height"));
 		return listAndCast(criteria);
 	}
 
