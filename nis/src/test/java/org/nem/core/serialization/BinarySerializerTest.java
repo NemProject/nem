@@ -101,7 +101,6 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 		}
 	}
 
-
 	@Test
 	public void canWriteBytes() throws Exception {
 		// Arrange:
@@ -214,6 +213,37 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	}
 
 	//endregion
+
+	@Test
+	public void canReadUnsignedBigInteger() throws Exception {
+		// Arrange:
+		final byte[] encodedBytes = new byte[] {
+				0x02, 0x00, 0x00, 0x00,
+				(byte)0x90, 0x12
+		};
+		final Deserializer deserializer = createBinaryDeserializer(encodedBytes);
+
+		// Act:
+		final BigInteger result = deserializer.readBigInteger("dummy");
+
+		Assert.assertThat(result, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12} )));
+	}
+
+
+	@Test
+	public void canReadPrefixedUnsignedBigInteger() throws Exception {
+		// Arrange:
+		final byte[] encodedBytes = new byte[] {
+				0x03, 0x00, 0x00, 0x00,
+				0x00, (byte)0x90, 0x12
+		};
+		final Deserializer deserializer = createBinaryDeserializer(encodedBytes);
+
+		// Act:
+		final BigInteger result = deserializer.readBigInteger("dummy");
+
+		Assert.assertThat(result, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12} )));
+	}
 
 	//region HasMoreData
 
