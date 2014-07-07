@@ -89,7 +89,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 		// Arrange:
 		try (final BinarySerializer serializer = new BinarySerializer()) {
 			// Act:
-			final BigInteger i = new BigInteger(1, new byte[]{ (byte)0x90, 0x12});
+			final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
 			serializer.writeBigInteger("BigInteger", i);
 
 			// Assert:
@@ -213,37 +213,6 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	}
 
 	//endregion
-
-	@Test
-	public void canReadUnsignedBigInteger() throws Exception {
-		// Arrange:
-		final byte[] encodedBytes = new byte[] {
-				0x02, 0x00, 0x00, 0x00,
-				(byte)0x90, 0x12
-		};
-		final Deserializer deserializer = createBinaryDeserializer(encodedBytes);
-
-		// Act:
-		final BigInteger result = deserializer.readBigInteger("dummy");
-
-		Assert.assertThat(result, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12} )));
-	}
-
-
-	@Test
-	public void canReadPrefixedUnsignedBigInteger() throws Exception {
-		// Arrange:
-		final byte[] encodedBytes = new byte[] {
-				0x03, 0x00, 0x00, 0x00,
-				0x00, (byte)0x90, 0x12
-		};
-		final Deserializer deserializer = createBinaryDeserializer(encodedBytes);
-
-		// Act:
-		final BigInteger result = deserializer.readBigInteger("dummy");
-
-		Assert.assertThat(result, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12} )));
-	}
 
 	//region HasMoreData
 

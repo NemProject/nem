@@ -117,18 +117,19 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
-	public void canRoundtripUnsignedBigInteger() {
+	public void canRoundtripPrefixedUnsignedBigInteger() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
 		// Act:
-		final BigInteger i = new BigInteger(1, new byte[]{(byte)0x90, 0x12});
+		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
 		serializer.writeBigInteger("BigInteger", i);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
 		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
 
 		// Assert:
+		Assert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
 
@@ -166,6 +167,23 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	//endregion
 
 	//region byte[] Roundtrip
+
+	@Test
+	public void canRoundtripNonPrefixedUnsignedBigInteger() throws Exception {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		final BigInteger i = new BigInteger(new byte[] { (byte)0x90, 0x12 });
+		serializer.writeBigInteger("BigInteger", i);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
+
+		// Assert:
+		Assert.assertThat(2, IsEqual.equalTo(i.toByteArray().length));
+		Assert.assertThat(readBigInteger, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12 })));
+	}
 
 	@Test
 	public void canRoundtripBytes() {
