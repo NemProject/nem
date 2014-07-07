@@ -117,6 +117,23 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
+	public void canRoundtripUnsignedBigInteger() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		final BigInteger i = new BigInteger(1, new byte[]{(byte)0x90, 0x12});
+		serializer.writeBigInteger("BigInteger", i);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
+
+		// Assert:
+		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
+	}
+
+
+	@Test
 	public void canRoundtripOptionalNullBigInteger() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
@@ -130,7 +147,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		// Assert:
 		Assert.assertThat(readBigInteger, IsNull.nullValue());
 	}
-
+	
 	@Test
 	public void cannotRoundtripRequiredNullBigInteger() {
 		// Arrange:
@@ -144,6 +161,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 				() -> deserializer.readBigInteger("BigInteger"),
 				"BigInteger");
 	}
+
 
 	//endregion
 

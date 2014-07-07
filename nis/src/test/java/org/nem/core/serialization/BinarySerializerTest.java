@@ -85,6 +85,24 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 	}
 
 	@Test
+	public void canWriteUnsignedBigInteger() throws Exception {
+		// Arrange:
+		try (final BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			final BigInteger i = new BigInteger(1, new byte[]{ (byte)0x90, 0x12});
+			serializer.writeBigInteger("BigInteger", i);
+
+			// Assert:
+			final byte[] expectedBytes = new byte[] {
+					0x03, 0x00, 0x00, 0x00,
+					0x00, (byte)0x90, 0x12
+			};
+			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+		}
+	}
+
+
+	@Test
 	public void canWriteBytes() throws Exception {
 		// Arrange:
 		try (final BinarySerializer serializer = new BinarySerializer()) {
