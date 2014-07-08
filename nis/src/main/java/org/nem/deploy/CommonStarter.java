@@ -147,7 +147,13 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
-			LogManager.getLogManager().readConfiguration(inputStream);
+			final LogManager logManager = LogManager.getLogManager();
+			logManager.readConfiguration(inputStream);
+
+			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
+			final File logDirectory = new File(logFile.getParent());
+			if (!logDirectory.exists() && !logDirectory.mkdirs())
+				throw new IOException(String.format("unable to create log directory %s", logDirectory));
 		} catch (final IOException e) {
 			LOGGER.severe("Could not load default logging properties file");
 			LOGGER.severe(e.getMessage());
