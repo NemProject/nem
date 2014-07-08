@@ -22,13 +22,13 @@ import javax.sql.DataSource;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 @Configuration
-@ComponentScan(basePackages = {"org.nem.nis"}, excludeFilters = {
-		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
-})
+@ComponentScan(basePackages = { "org.nem.nis" }, excludeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class) })
 @EnableTransactionManagement
 public class NisAppConfig {
+	private static final Logger LOGGER = Logger.getLogger(NisAppConfig.class.getName());
 
 	@Autowired
 	private AccountDao accountDao;
@@ -75,7 +75,8 @@ public class NisAppConfig {
 
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 
-		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
+		// TODO: it would be nicer, no get only hibernate props and add them all
+		// at once using .addProperties(properties);
 		localSessionFactoryBuilder.setProperty("hibernate.dialect", prop.getProperty("hibernate.dialect"));
 		localSessionFactoryBuilder.setProperty("hibernate.show_sql", prop.getProperty("hibernate.show_sql"));
 		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", prop.getProperty("hibernate.use_sql_comments"));
@@ -109,13 +110,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
-		return new NisMain(
-				this.accountDao,
-				this.blockDao,
-				this.accountAnalyzer(),
-				this.blockChain(),
-				this.nisPeerNetworkHost(),
-				this.blockChainLastBlockLayer,
+		return new NisMain(this.accountDao, this.blockDao, this.accountAnalyzer(), this.blockChain(), this.nisPeerNetworkHost(), this.blockChainLastBlockLayer,
 				this.nisConfiguration());
 	}
 
