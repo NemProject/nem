@@ -31,7 +31,9 @@ public enum NodeInteractionResult {
 	public static NodeInteractionResult fromValidationResult(final ValidationResult validationResult) {
 		switch (validationResult) {
 			case SUCCESS: return NodeInteractionResult.SUCCESS;
-			case NEUTRAL: return NodeInteractionResult.NEUTRAL;
+			case NEUTRAL: 
+			case FAILURE_ENTITY_UNUSABLE: // happens during initial sync or when one of the partners is on a fork
+				return NodeInteractionResult.NEUTRAL;
 			default: return NodeInteractionResult.FAILURE;
 		}
 	}
