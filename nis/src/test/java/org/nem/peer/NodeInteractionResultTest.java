@@ -11,17 +11,23 @@ public class NodeInteractionResultTest {
 
 	@Test
 	public void canCreateResultFromValidationResult() {
-		// Assert:
+		// Arrange:
+		final Map<ValidationResult, NodeInteractionResult> expectedMappings = new HashMap<ValidationResult, NodeInteractionResult>() {
+			{
+				put(ValidationResult.SUCCESS, NodeInteractionResult.SUCCESS);
+				put(ValidationResult.NEUTRAL, NodeInteractionResult.NEUTRAL);
+				put(ValidationResult.FAILURE_ENTITY_UNUSABLE, NodeInteractionResult.NEUTRAL);
+			}
+		};
+
 		for (final ValidationResult validationResult : ValidationResult.values()) {
 			// Act:
 			final NodeInteractionResult result = NodeInteractionResult.fromValidationResult(validationResult);
 
 			// Assert:
-			final NodeInteractionResult expectedResult = ValidationResult.SUCCESS == validationResult
-					? NodeInteractionResult.SUCCESS
-					: (ValidationResult.NEUTRAL == validationResult
-							? NodeInteractionResult.NEUTRAL
-							: NodeInteractionResult.FAILURE);
+			final NodeInteractionResult expectedResult = expectedMappings.getOrDefault(
+					validationResult,
+					NodeInteractionResult.FAILURE);
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
