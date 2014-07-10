@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Strategy for coercing an HTTP response into a null Deserializer.
  */
-public class HttpVoidResponseStrategy extends HttpJsonResponseStrategy<Deserializer> {
+public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	@Override
 	protected Deserializer coerce(final byte[] responseBytes) {

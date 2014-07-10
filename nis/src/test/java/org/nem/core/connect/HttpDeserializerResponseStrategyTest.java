@@ -1,69 +1,30 @@
 package org.nem.core.connect;
 
-import org.hamcrest.core.IsEqual;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.junit.*;
-import org.nem.core.model.Address;
-import org.nem.core.serialization.*;
+import org.mockito.Mockito;
 import org.nem.core.test.*;
-
-import java.io.IOException;
 
 public class HttpDeserializerResponseStrategyTest {
 
-	@Test
-	public void coercedDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
+	@Test(expected = FatalPeerException.class)
+	public void coerceThrowsFatalPeerExceptionOnHttpError() throws Exception {
 		// Arrange:
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
+		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
+		final HttpResponse response = Mockito.mock(HttpResponse.class);
+		ConnectUtils.mockStatusCode(response, 500);
 
 		// Act:
-		final Deserializer deserializer = coerceDeserializer(originalEntity, new MockAccountLookup());
-		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
-
-		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
-	}
-
-	@Test
-	public void coercedDeserializerIsAssociatedWithAccountLookup() throws Exception {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-
-		// Act:
-		final Deserializer deserializer = coerceDeserializer(originalEntity, accountLookup);
-		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
-
-		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedDataWhenDeserializerIsExpected() throws Exception {
+	public void coerceThrowsFatalPeerExceptionOnIoError() throws Exception {
 		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
+		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
 
 		// Act:
-		coerceDeserializer(new byte[] { }, accountLookup);
-	}
-
-	private static Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException {
-		// Arrange:
-		final byte[] serializedBytes = JsonSerializer.serializeToJson(originalEntity).toJSONString().getBytes();
-
-		// Act:
-		return coerceDeserializer(serializedBytes, accountLookup);
-	}
-
-	private static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
-		// Arrange:
-		final DeserializationContext context = new DeserializationContext(accountLookup);
-		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(context);
-
-		// Act:
-		return ConnectUtils.coerceDeserializer(serializedBytes, strategy);
+		ConnectUtils.coerceStreamWithIoError(strategy);
 	}
 }

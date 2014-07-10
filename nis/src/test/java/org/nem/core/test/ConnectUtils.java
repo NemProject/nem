@@ -23,7 +23,7 @@ public class ConnectUtils {
 	 */
 	public static Deserializer coerceDeserializer(
 			final byte[] serializedBytes,
-			final HttpJsonResponseStrategy<Deserializer> strategy) throws IOException {
+			final HttpDeserializerResponseStrategy strategy) throws IOException {
 		// Arrange:
 		final HttpResponse response = Mockito.mock(HttpResponse.class);
 		mockStatusCode(response, 200);

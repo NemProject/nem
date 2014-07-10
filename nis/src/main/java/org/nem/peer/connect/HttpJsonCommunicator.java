@@ -24,7 +24,7 @@ public class HttpJsonCommunicator implements Communicator {
 			final HttpMethodClient<Deserializer> httpMethodClient,
 			final DeserializationContext context) {
 		this.httpMethodClient = httpMethodClient;
-		this.responseStrategy = new HttpDeserializerResponseStrategy(context);
+		this.responseStrategy = new HttpJsonResponseStrategy(context);
 		this.voidResponseStrategy = new HttpVoidResponseStrategy();
 	}
 

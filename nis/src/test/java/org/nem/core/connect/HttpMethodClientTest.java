@@ -16,7 +16,7 @@ import java.util.concurrent.CancellationException;
 
 public class HttpMethodClientTest {
 
-	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpDeserializerResponseStrategy(null);
+	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 10000;
 
 	private final TestRunner getTestRunner = new TestRunner("GET", HttpMethodClient::get);
