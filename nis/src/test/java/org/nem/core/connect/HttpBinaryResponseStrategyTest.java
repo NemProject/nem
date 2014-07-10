@@ -48,15 +48,6 @@ public class HttpBinaryResponseStrategyTest {
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
-	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedDataWhenDeserializerIsExpected() throws Exception {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-
-		// Act:
-		coerceDeserializer(new byte[] { }, accountLookup);
-	}
-
 	private static Deserializer coerceDeserializer(
 			final SerializableEntity originalEntity,
 			final AccountLookup accountLookup) throws IOException {
