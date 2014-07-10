@@ -7,9 +7,9 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * HTTP-base communicator implementation.
+ * HTTP JSON-base communicator implementation.
  */
-public class HttpCommunicator implements Communicator {
+public class HttpJsonCommunicator implements Communicator {
 	private final HttpMethodClient<Deserializer> httpMethodClient;
 	private final HttpResponseStrategy<Deserializer> responseStrategy;
 	private final HttpResponseStrategy<Deserializer> voidResponseStrategy;
@@ -18,16 +18,14 @@ public class HttpCommunicator implements Communicator {
 	 * Creates a new HTTP communicator.
 	 *
 	 * @param httpMethodClient The HTTP client to use.
-	 * @param responseStrategy The response strategy to use for functions expected to return data.
-	 * @param voidResponseStrategy The response strategy to use for functions expected to not return data.
+	 * @param context The deserialization context.
 	 */
-	public HttpCommunicator(
+	public HttpJsonCommunicator(
 			final HttpMethodClient<Deserializer> httpMethodClient,
-			final HttpResponseStrategy<Deserializer> responseStrategy,
-			final HttpResponseStrategy<Deserializer> voidResponseStrategy) {
+			final DeserializationContext context) {
 		this.httpMethodClient = httpMethodClient;
-		this.responseStrategy = responseStrategy;
-		this.voidResponseStrategy = voidResponseStrategy;
+		this.responseStrategy = new HttpDeserializerResponseStrategy(context);
+		this.voidResponseStrategy = new HttpVoidResponseStrategy();
 	}
 
 	@Override

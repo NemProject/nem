@@ -1,6 +1,5 @@
 package org.nem.core.connect;
 
-import net.minidev.json.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.http.*;
@@ -22,7 +21,8 @@ public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrateg
 				throw new FatalPeerException(String.format("Peer returned: %d", statusCode));
 
 			try (final InputStream responseStream = response.getEntity().getContent()) {
-				return this.coerce(JSONValue.parse(responseStream));
+				final byte[] responseBytes = sun.misc.IOUtils.readFully(responseStream, -1, true);
+				return this.coerce(responseBytes);
 			}
 		} catch (final IOException e) {
 			throw new FatalPeerException(e);
@@ -30,9 +30,9 @@ public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrateg
 	}
 
 	/**
-	 * Coerces the parsed response stream into a deserializer.
+	 * Coerces the raw response bytes into a deserializer.
 	 *
-	 * @param parsedStream The parsed response stream.
+	 * @param responseBytes The raw response bytes.
 	 */
-	protected abstract T coerce(final Object parsedStream);
+	protected abstract T coerce(final byte[] responseBytes);
 }

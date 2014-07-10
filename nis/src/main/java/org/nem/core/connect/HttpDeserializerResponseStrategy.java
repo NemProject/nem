@@ -20,9 +20,10 @@ public class HttpDeserializerResponseStrategy extends HttpJsonResponseStrategy<D
 	}
 
 	@Override
-	protected Deserializer coerce(final Object parsedStream) {
+	protected Deserializer coerce(final byte[] responseBytes) {
+		final Object parsedStream = JSONValue.parse(responseBytes);
 		if (parsedStream instanceof JSONObject)
-			return new JsonDeserializer((JSONObject) parsedStream, this.context);
+			return new JsonDeserializer((JSONObject)parsedStream, this.context);
 
 		throw new FatalPeerException("Peer returned unexpected data");
 	}
