@@ -13,6 +13,15 @@ import java.io.IOException;
 public class HttpBinaryResponseStrategyTest {
 
 	@Test
+	public void getSupportedContentTypeReturnsCorrectContentType() throws Exception {
+		// Arrange:
+		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(null);
+
+		// Assert:
+		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
+	}
+
+	@Test
 	public void coercedDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
 		// Arrange:
 		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);

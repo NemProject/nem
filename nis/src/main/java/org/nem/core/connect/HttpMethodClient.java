@@ -112,6 +112,8 @@ public class HttpMethodClient<T> {
 
 			final HttpMethodClientFutureCallback callback = new HttpMethodClientFutureCallback();
 			final HttpRequestBase request = requestFactory.apply(uri);
+			request.setHeader("Accept", responseStrategy.getSupportedContentType());
+
 			this.httpClient.execute(request, callback);
 
 			final CompletableFuture<T> responseFuture = callback.getFuture()

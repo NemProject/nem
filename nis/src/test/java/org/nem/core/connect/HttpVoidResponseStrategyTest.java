@@ -1,11 +1,20 @@
 package org.nem.core.connect;
 
-import org.hamcrest.core.IsNull;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.ConnectUtils;
 
 public class HttpVoidResponseStrategyTest {
+
+	@Test
+	public void getSupportedContentTypeReturnsCorrectContentType() throws Exception {
+		// Arrange:
+		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
+
+		// Assert:
+		Assert.assertThat(strategy.getSupportedContentType(), IsNull.nullValue());
+	}
 
 	@Test
 	public void nullIsReturnedIfRequestSucceedsAndNoDataIsReturned() throws Exception {

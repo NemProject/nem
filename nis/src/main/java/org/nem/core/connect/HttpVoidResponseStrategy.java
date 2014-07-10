@@ -14,4 +14,10 @@ public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
 		throw new FatalPeerException(String.format("Peer returned unexpected data (length %d)", responseBytes.length));
 	}
+
+	@Override
+	public String getSupportedContentType() {
+		// TODO: refactor this
+		return null;
+	}
 }

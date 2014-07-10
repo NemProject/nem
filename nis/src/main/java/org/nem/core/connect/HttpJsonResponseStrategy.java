@@ -27,4 +27,10 @@ public class HttpJsonResponseStrategy extends HttpDeserializerResponseStrategy {
 
 		throw new FatalPeerException("Peer returned unexpected data");
 	}
+
+	@Override
+	public String getSupportedContentType() {
+		// TODO: refactor this
+		return "application/json";
+	}
 }

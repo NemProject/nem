@@ -11,6 +11,15 @@ import java.io.IOException;
 public class HttpJsonResponseStrategyTest {
 
 	@Test
+	public void getSupportedContentTypeReturnsCorrectContentType() throws Exception {
+		// Arrange:
+		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
+
+		// Assert:
+		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
+	}
+
+	@Test
 	public void coercedDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
 		// Arrange:
 		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);

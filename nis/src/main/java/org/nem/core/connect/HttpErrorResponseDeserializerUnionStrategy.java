@@ -31,4 +31,9 @@ public class HttpErrorResponseDeserializerUnionStrategy implements HttpResponseS
 				this.context),
 			obj -> new FatalPeerException(obj));
 	}
+
+	@Override
+	public String getSupportedContentType() {
+		return "application/json";
+	}
 }

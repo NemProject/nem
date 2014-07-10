@@ -27,4 +27,10 @@ public class HttpBinaryResponseStrategy extends HttpDeserializerResponseStrategy
 			throw new FatalPeerException(e);
 		}
 	}
+
+	@Override
+	public String getSupportedContentType() {
+		// TODO: refactor this
+		return "application/binary";
+	}
 }
