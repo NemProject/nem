@@ -27,7 +27,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<T> client,
 			final URL url,
 			final HttpResponseStrategy<T> responseStrategy) {
-		return client.post(url, new MockSerializableEntity(), responseStrategy);
+		return client.post(url, new HttpJsonPostRequest(new MockSerializableEntity()), responseStrategy);
 	}
 
 	//region get

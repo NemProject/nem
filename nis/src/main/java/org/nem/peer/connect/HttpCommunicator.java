@@ -32,11 +32,11 @@ public class HttpCommunicator implements Communicator {
 
 	@Override
 	public CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy).getFuture();
+		return this.httpMethodClient.post(url, new HttpJsonPostRequest(entity), this.responseStrategy).getFuture();
 	}
 
 	@Override
 	public CompletableFuture<Deserializer> postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).getFuture();
+		return this.httpMethodClient.post(url, new HttpJsonPostRequest(entity), this.voidResponseStrategy).getFuture();
 	}
 }
