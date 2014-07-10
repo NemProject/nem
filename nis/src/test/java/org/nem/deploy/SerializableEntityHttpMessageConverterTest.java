@@ -99,6 +99,23 @@ public class SerializableEntityHttpMessageConverterTest {
 		Assert.assertThat(mc.canRead(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void cannotReadIncompatibleMediaTypes() {
+		// Arrange:
+		final MediaType supportedType = new MediaType("application", "binary");
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
+
+		final Class[] types = new Class[] {
+				MockSerializableEntity.class,
+				SerializableEntityWithConstructorThatThrowsCheckedException.class,
+				SerializableEntityWithConstructorThatThrowsUncheckedException.class
+		};
+
+		// Assert:
+		for (final Class type : types)
+			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
+	}
+
 	//endregion
 
 	//region read
