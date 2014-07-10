@@ -11,3 +11,5 @@ my.*.sh
 nem.log.*
 /dependency-reduced-pom.xml
 /nis.temp.settings
+/data/
+/logs/

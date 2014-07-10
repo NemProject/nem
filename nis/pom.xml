@@ -5,7 +5,10 @@
 	<artifactId>nem-infrastructure-server</artifactId>
 	<version>0.0.62-ALPHA</version>
 	<name>NEM Infrastructure Server</name>
-
+	<organization>
+		<name>NEM - New Economy Movement</name>
+		<url>http://www.ournem.com</url>
+	</organization>
 	<repositories>
 		<repository>
 			<id>hibernate-repo</id>
