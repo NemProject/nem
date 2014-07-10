@@ -221,15 +221,16 @@ public class AddressTest {
 	public void canRoundtripAddress() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
+		final Address originalAddress = Address.fromEncoded("MockAcc");
 
 		// Act:
-		Address.writeTo(serializer, "Address", Address.fromEncoded("MockAcc"));
+		Address.writeTo(serializer, "Address", originalAddress);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
 		final Address address = Address.readFrom(deserializer, "Address");
 
 		// Assert:
-		Assert.assertThat(address, IsEqual.equalTo(address));
+		Assert.assertThat(address, IsEqual.equalTo(originalAddress));
 	}
 
 	//endregion
