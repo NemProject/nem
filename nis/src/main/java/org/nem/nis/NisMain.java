@@ -2,14 +2,19 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.deploy.CommonStarter;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
@@ -67,6 +72,8 @@ public class NisMain {
 		}
 
 		Block parentBlock = null;
+		List<org.nem.nis.dbmodel.Block> blockList = null;
+		Iterator<org.nem.nis.dbmodel.Block> currentBlock = null;
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
@@ -75,7 +82,7 @@ public class NisMain {
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 
-			if ((block.getHeight().getRaw() % 1000) == 0) {
+			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
 			}
 
@@ -101,12 +108,41 @@ public class NisMain {
 			parentBlock = block;
 
 			curBlockId = dbBlock.getNextBlockId();
+			long curHeight = dbBlock.getHeight();
+			// This is proper exit from this loop
 			if (null == curBlockId) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
-			dbBlock = this.blockDao.findById(curBlockId);
+			// ugly loop, this is equivalent to
+			// dbBlock = this.blockDao.findById(curBlockId);
+			do {
+				if (blockList == null || !currentBlock.hasNext()) {
+					blockList = this.blockDao.getBlocksAfter(curHeight, 2345);
+					currentBlock = blockList.iterator();
+				}
+
+				// in most cases this won't make any loops
+				while (currentBlock.hasNext()) {
+					dbBlock = currentBlock.next();
+					if (dbBlock.getId().equals(curBlockId)) {
+						break;
+					}
+
+					if (dbBlock.getHeight().compareTo(curHeight + 1) > 0) {
+						dbBlock = null;
+					}
+				}
+
+				if (dbBlock == null) {
+					break;
+				}
+
+				curHeight = dbBlock.getHeight();
+			}
+			while (! dbBlock.getId().equals(curBlockId));
+
 			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
 				System.exit(-1);

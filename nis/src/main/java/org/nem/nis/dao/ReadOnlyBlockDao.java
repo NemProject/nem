@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.Block;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Read-only DAO for accessing db Block objects.
@@ -65,4 +66,6 @@ public interface ReadOnlyBlockDao {
 	 * @return The blocks.
 	 */
 	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit);
+
+	public List<Block> getBlocksAfter(long blockHeight, int blocksCount);
 }
