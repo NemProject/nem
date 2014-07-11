@@ -27,7 +27,7 @@ public class LocalHostConnector {
 		final HttpErrorResponseDeserializerUnionStrategy strategy = new HttpErrorResponseDeserializerUnionStrategy(context);
 		return ExceptionUtils.propagate(() -> {
 			final URL url = new URL("http", "127.0.0.1", 7890, "/" + path);
-			return this.httpMethodClient.post(url, input, strategy).get();
+			return this.httpMethodClient.post(url, new HttpJsonPostRequest(input), strategy).get();
 		});
 	}
 }

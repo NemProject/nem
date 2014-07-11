@@ -16,7 +16,7 @@ import java.util.concurrent.CancellationException;
 
 public class HttpMethodClientTest {
 
-	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpDeserializerResponseStrategy(null);
+	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 10000;
 
 	private final TestRunner getTestRunner = new TestRunner("GET", HttpMethodClient::get);
@@ -27,7 +27,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<T> client,
 			final URL url,
 			final HttpResponseStrategy<T> responseStrategy) {
-		return client.post(url, new MockSerializableEntity(), responseStrategy);
+		return client.post(url, new HttpJsonPostRequest(new MockSerializableEntity()), responseStrategy);
 	}
 
 	//region get
@@ -197,6 +197,7 @@ public class HttpMethodClientTest {
 			// Assert:
 			Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
 			Assert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
+			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
 		public void sendThrowsInactivePeerExceptionOnTimeout() {
@@ -256,16 +257,24 @@ public class HttpMethodClientTest {
 
 		private String requestMethod;
 		private String requestContentType;
+		private String requestAcceptHeader;
 
 		@Override
 		public T coerce(final HttpRequestBase request, final HttpResponse response) {
 			final HttpEntity entity = response.getEntity();
 			this.requestMethod = request.getMethod();
 			this.requestContentType = null == entity ? null : ContentType.get(entity).getMimeType();
+			this.requestAcceptHeader = request.getFirstHeader("Accept").getValue();
 			return null;
+		}
+
+		@Override
+		public String getSupportedContentType() {
+			return "content-type/supported";
 		}
 
 		public String getRequestMethod() { return this.requestMethod; }
 		public String getRequestContentType() { return this.requestContentType; }
+		public String getRequestAcceptHeader() { return this.requestAcceptHeader; }
 	}
 }

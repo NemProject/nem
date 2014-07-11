@@ -130,7 +130,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
-		final HttpConnectorPool connectorPool = new HttpConnectorPool(this.getOutgoingAudits());
+		final CommunicationMode communicationMode = this.nisConfiguration.shouldUseBinaryTransport()
+				? CommunicationMode.BINARY
+				: CommunicationMode.JSON;
+		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
 		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
 	}

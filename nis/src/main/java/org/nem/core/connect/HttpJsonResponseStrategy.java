@@ -1,38 +1,36 @@
 package org.nem.core.connect;
 
 import net.minidev.json.*;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.springframework.http.*;
-
-import java.io.*;
+import org.nem.core.serialization.*;
 
 /**
- * Strategy for coercing an HTTP JSON response.
- *
- * @param <T> The result type.
+ * Strategy for coercing an HTTP JSON response into a deserializer.
  */
-public abstract class HttpJsonResponseStrategy<T> implements HttpResponseStrategy<T> {
+public class HttpJsonResponseStrategy extends HttpDeserializerResponseStrategy {
 
-	@Override
-	public T coerce(final HttpRequestBase request, final HttpResponse response) {
-		try {
-			final int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode != HttpStatus.OK.value())
-				throw new FatalPeerException(String.format("Peer returned: %d", statusCode));
-
-			try (final InputStream responseStream = response.getEntity().getContent()) {
-				return this.coerce(JSONValue.parse(responseStream));
-			}
-		} catch (final IOException e) {
-			throw new FatalPeerException(e);
-		}
-	}
+	private final DeserializationContext context;
 
 	/**
-	 * Coerces the parsed response stream into a deserializer.
+	 * Creates a new HTTP Deserializer response strategy.
 	 *
-	 * @param parsedStream The parsed response stream.
+	 * @param context The deserialization context to use when deserializing responses.
 	 */
-	protected abstract T coerce(final Object parsedStream);
+	public HttpJsonResponseStrategy(final DeserializationContext context) {
+		this.context = context;
+	}
+
+	@Override
+	protected Deserializer coerce(final byte[] responseBytes) {
+		final Object parsedStream = JSONValue.parse(responseBytes);
+		if (parsedStream instanceof JSONObject)
+			return new JsonDeserializer((JSONObject)parsedStream, this.context);
+
+		throw new FatalPeerException("Peer returned unexpected data");
+	}
+
+	@Override
+	public String getSupportedContentType() {
+		// TODO: refactor this
+		return "application/json";
+	}
 }
