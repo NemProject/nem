@@ -1,23 +1,23 @@
 package org.nem.core.connect;
 
-import org.nem.core.utils.StringUtils;
 import org.nem.core.serialization.*;
 
 /**
  * Strategy for coercing an HTTP response into a null Deserializer.
  */
-public class HttpVoidResponseStrategy extends HttpJsonResponseStrategy<Deserializer> {
+public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
-	/**
-	 * Coerces the parsed response stream into a deserializer.
-	 *
-	 * @param parsedStream The parsed response stream.
-	 */
-	protected Deserializer coerce(final Object parsedStream) {
-
-		if (parsedStream instanceof String && StringUtils.isNullOrEmpty((String) parsedStream))
+	@Override
+	protected Deserializer coerce(final byte[] responseBytes) {
+		if (0 == responseBytes.length)
 			return null;
 
-		throw new FatalPeerException("Peer returned unexpected data");
+		throw new FatalPeerException(String.format("Peer returned unexpected data (length %d)", responseBytes.length));
+	}
+
+	@Override
+	public String getSupportedContentType() {
+		// TODO: refactor this
+		return null;
 	}
 }

@@ -202,8 +202,14 @@ public class NodeCollectionTest {
 	public void updateSelectsNodeMetaDataFromUpdatedNode() {
 		// Arrange:
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
-		final Node node1 = new Node(identity, NodeEndpoint.fromHost("10.0.0.1"), new NodeMetaData("plat", "app", "ver"));
-		final Node node2 = new Node(identity, NodeEndpoint.fromHost("10.0.0.3"), new NodeMetaData("plat2", "app2", "ver2"));
+		final Node node1 = new Node(
+				identity,
+				NodeEndpoint.fromHost("10.0.0.1"),
+				new NodeMetaData("plat", "app", new NodeVersion(2, 1, 3)));
+		final Node node2 = new Node(
+				identity,
+				NodeEndpoint.fromHost("10.0.0.3"),
+				new NodeMetaData("plat2", "app2", new NodeVersion(8, 9, 7)));
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -213,7 +219,7 @@ public class NodeCollectionTest {
 		final NodeMetaData metaData = node.getMetaData();
 
 		// Assert:
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("ver2"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(8, 9, 7)));
 		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app2"));
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat2"));
 	}
@@ -465,7 +471,7 @@ public class NodeCollectionTest {
 		return new Node(
 				new WeakNodeIdentity(String.format("%s-%d", host, port)),
 				new NodeEndpoint("http", host, port),
-				new NodeMetaData(platform, "FooBar", "1.0"));
+				new NodeMetaData(platform, "FooBar", NodeVersion.ZERO));
 	}
 
 	private static NodeCollection createNodeCollectionWithMultipleNodes() {

@@ -7,10 +7,11 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * HTTP-base communicator implementation.
+ * HTTP JSON-base communicator implementation.
  */
 public class HttpCommunicator implements Communicator {
 	private final HttpMethodClient<Deserializer> httpMethodClient;
+	private final boolean isBinaryMode;
 	private final HttpResponseStrategy<Deserializer> responseStrategy;
 	private final HttpResponseStrategy<Deserializer> voidResponseStrategy;
 
@@ -18,25 +19,34 @@ public class HttpCommunicator implements Communicator {
 	 * Creates a new HTTP communicator.
 	 *
 	 * @param httpMethodClient The HTTP client to use.
-	 * @param responseStrategy The response strategy to use for functions expected to return data.
-	 * @param voidResponseStrategy The response strategy to use for functions expected to not return data.
+	 * @param communicationMode The communication mode.
+	 * @param context The deserialization context.
 	 */
 	public HttpCommunicator(
 			final HttpMethodClient<Deserializer> httpMethodClient,
-			final HttpResponseStrategy<Deserializer> responseStrategy,
-			final HttpResponseStrategy<Deserializer> voidResponseStrategy) {
+			final CommunicationMode communicationMode,
+			final DeserializationContext context) {
 		this.httpMethodClient = httpMethodClient;
-		this.responseStrategy = responseStrategy;
-		this.voidResponseStrategy = voidResponseStrategy;
+		this.isBinaryMode = CommunicationMode.BINARY == communicationMode;
+		this.responseStrategy = this.createResponseStrategy(context);
+		this.voidResponseStrategy = new HttpVoidResponseStrategy();
 	}
 
 	@Override
 	public CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.responseStrategy).getFuture();
+		return this.httpMethodClient.post(url, this.createPostRequest(entity), this.responseStrategy).getFuture();
 	}
 
 	@Override
 	public CompletableFuture<Deserializer> postVoid(final URL url, final SerializableEntity entity) {
-		return this.httpMethodClient.post(url, entity, this.voidResponseStrategy).getFuture();
+		return this.httpMethodClient.post(url, this.createPostRequest(entity), this.voidResponseStrategy).getFuture();
+	}
+
+	private HttpResponseStrategy<Deserializer> createResponseStrategy(final DeserializationContext context) {
+		return this.isBinaryMode ? new HttpBinaryResponseStrategy(context) : new HttpJsonResponseStrategy(context);
+	}
+
+	private HttpPostRequest createPostRequest(final SerializableEntity entity) {
+		return this.isBinaryMode ? new HttpBinaryPostRequest(entity) : new HttpJsonPostRequest(entity);
 	}
 }

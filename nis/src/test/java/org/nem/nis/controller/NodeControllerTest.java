@@ -253,7 +253,7 @@ public class NodeControllerTest {
 	private static JsonDeserializer createLocalNodeDeserializer(final NodeIdentity identity) {
 		// Arrange:
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final NodeMetaData metaData = new NodeMetaData("p", "a", NodeVersion.ZERO);
 
 		final JsonSerializer serializer = new JsonSerializer(true);
 		serializer.writeObject("identity", childSerializer -> {

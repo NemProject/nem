@@ -8,15 +8,17 @@ import org.nem.core.test.*;
 
 import java.io.IOException;
 
-public class HttpJsonResponseStrategyTest {
+// TODO: refactor these tests
+
+public class HttpBinaryResponseStrategyTest {
 
 	@Test
 	public void getSupportedContentTypeReturnsCorrectContentType() throws Exception {
 		// Arrange:
-		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
+		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(null);
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
+		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
 	}
 
 	@Test
@@ -46,20 +48,11 @@ public class HttpJsonResponseStrategyTest {
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
-	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionIfPeerReturnsUnexpectedDataWhenDeserializerIsExpected() throws Exception {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-
-		// Act:
-		coerceDeserializer(new byte[] { }, accountLookup);
-	}
-
 	private static Deserializer coerceDeserializer(
 			final SerializableEntity originalEntity,
 			final AccountLookup accountLookup) throws IOException {
 		// Arrange:
-		final byte[] serializedBytes = JsonSerializer.serializeToJson(originalEntity).toJSONString().getBytes();
+		final byte[] serializedBytes = BinarySerializer.serializeToBytes(originalEntity);
 
 		// Act:
 		return coerceDeserializer(serializedBytes, accountLookup);
@@ -70,7 +63,7 @@ public class HttpJsonResponseStrategyTest {
 			final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
-		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(context);
+		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(context);
 
 		// Act:
 		return ConnectUtils.coerceDeserializer(serializedBytes, strategy);

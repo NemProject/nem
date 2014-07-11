@@ -14,7 +14,7 @@ public class LocalNodeDeserializerTest {
 		final KeyPair keyPair = new KeyPair();
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final NodeMetaData metaData = new NodeMetaData("p", "a", NodeVersion.ZERO);
 
 		final JsonSerializer serializer = new JsonSerializer(true);
 		serializer.writeObject("identity", childSerializer -> {
