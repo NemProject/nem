@@ -8,6 +8,16 @@ import org.nem.core.test.*;
 
 public class NodeVersionTest {
 
+	//region constants
+
+	@Test
+	public void zeroConstantIsCorrect() {
+		// Assert:
+		Assert.assertThat(NodeVersion.ZERO, IsEqual.equalTo(new NodeVersion(0, 0, 0)));
+	}
+
+	//endregion
+
 	@Test
 	public void canCreateVersionWithTag() {
 		// Act:
@@ -23,7 +33,7 @@ public class NodeVersionTest {
 	@Test
 	public void canCreateVersionWithoutTag() {
 		// Act:
-		final NodeVersion version = new NodeVersion(2, 1, 12, null);
+		final NodeVersion version = new NodeVersion(2, 1, 12);
 
 		// Assert:
 		Assert.assertThat(version.getMajorVersion(), IsEqual.equalTo(2));
@@ -76,7 +86,7 @@ public class NodeVersionTest {
 		Assert.assertThat(new NodeVersion(2, 0, 12, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
 		Assert.assertThat(new NodeVersion(2, 1, 123, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
 		Assert.assertThat(new NodeVersion(2, 1, 12, "BETA"), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(new NodeVersion(2, 1, 12, null), IsNot.not(IsEqual.equalTo(version)));
+		Assert.assertThat(new NodeVersion(2, 1, 12), IsNot.not(IsEqual.equalTo(version)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(version)));
 		Assert.assertThat("ZETA", IsNot.not(IsEqual.equalTo((Object)version)));
 	}
@@ -93,7 +103,7 @@ public class NodeVersionTest {
 		Assert.assertThat(new NodeVersion(2, 0, 12, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(new NodeVersion(2, 1, 123, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(new NodeVersion(2, 1, 12, "BETA").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeVersion(2, 1, 12, null).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new NodeVersion(2, 1, 12).hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
@@ -147,7 +157,7 @@ public class NodeVersionTest {
 	@Test
 	public void canCreateStringRepresentationForVersionWithoutTag() {
 		// Arrange:
-		final NodeVersion version = new NodeVersion(2, 1, 12, null);
+		final NodeVersion version = new NodeVersion(2, 1, 12);
 
 		// Assert:
 		Assert.assertThat(version.toString(), IsEqual.equalTo("2.1.12"));

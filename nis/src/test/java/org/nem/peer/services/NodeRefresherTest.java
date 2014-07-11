@@ -119,7 +119,7 @@ public class NodeRefresherTest {
 				.thenReturn(CompletableFuture.completedFuture(new Node(
 						new WeakNodeIdentity("b"),
 						NodeEndpoint.fromHost("localhost"),
-						new NodeMetaData("c-plat", "c-app", "c-ver"))));
+						new NodeMetaData("c-plat", "c-app", new NodeVersion(2, 1, 3)))));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -129,7 +129,7 @@ public class NodeRefresherTest {
 		// Assert:
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("c-plat"));
 		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("c-app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("c-ver"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 1, 3)));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 

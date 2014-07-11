@@ -44,7 +44,7 @@ public class ConfigTest {
 		localNode.setMetaData(new NodeMetaData(null, localNodeMetaData.getApplication(), localNodeMetaData.getVersion()));
 
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
-		final Config config = new Config(localNode, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final Node node = config.getLocalNode();
@@ -64,7 +64,7 @@ public class ConfigTest {
 		Assert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
 		Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo(DEFAULT_LOCAL_NODE_HOST));
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("2.0"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 0, 0)));
 		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("FooBar"));
 	}
 
@@ -74,7 +74,7 @@ public class ConfigTest {
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final String[] expectedWellKnownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig(expectedWellKnownHosts);
-		final Config config = new Config(localNode, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -94,7 +94,7 @@ public class ConfigTest {
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
 		peersConfig.remove("knownPeers");
-		final Config config = new Config(localNode, peersConfig, "2.0");
+		final Config config = new Config(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();

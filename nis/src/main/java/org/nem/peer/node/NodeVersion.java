@@ -9,12 +9,31 @@ import java.util.regex.*;
  * Represents a node version.
  */
 public class NodeVersion {
+	/**
+	 * Zero version.
+	 */
+	public static NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
+
 	private static Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
 
 	private final int majorVersion;
 	private final int minorVersion;
 	private final int buildVersion;
 	private final String tag;
+
+	/**
+	 * Creates a new node version.
+	 *
+	 * @param majorVersion The major version.
+	 * @param minorVersion The minor version.
+	 * @param buildVersion The build version.
+	 */
+	public NodeVersion(
+			final int majorVersion,
+			final int minorVersion,
+			final int buildVersion) {
+		this(majorVersion, minorVersion, buildVersion, null);
+	}
 
 	/**
 	 * Creates a new node version.

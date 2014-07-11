@@ -14,7 +14,7 @@ public class JarFacade {
 
 	private static final String NEM_VENDOR = "NEM - New Economy Movement";
 	private static final String DEFAULT_TITLE = "NEM";
-	private static final String DEFAULT_VERSION = "DEVELOPER BUILD";
+	private static final String DEFAULT_VERSION = "0.0.0-DEVELOPER BUILD";
 
 	private final String name;
 	private final boolean isWebStart;
