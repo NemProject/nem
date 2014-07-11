@@ -66,8 +66,8 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
 
-		NISApp.INSTANCE.setServer(server);
-		NISApp.INSTANCE.showWindow();
+		NisApp.INSTANCE.setServer(server);
+		NisApp.INSTANCE.showWindow();
 
 		LOGGER.info("Calling start().");
 		server.start();
@@ -156,8 +156,7 @@ public class CommonStarter implements ServletContextListener {
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
 		dosFilter.setInitParameter("delayMs", "1000");
 		dosFilter.setInitParameter("trackSessions", "false");
-		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes seems
-																// reasonable
+		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes
 		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
