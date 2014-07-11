@@ -51,7 +51,7 @@ public class Node implements SerializableEntity {
 	}
 
 	private static NodeMetaData getMetaData(final NodeMetaData metaData) {
-		return null != metaData ? metaData : new NodeMetaData("?", "?", "?");
+		return null != metaData ? metaData : new NodeMetaData("?", "?", null);
 	}
 
 	@Override
