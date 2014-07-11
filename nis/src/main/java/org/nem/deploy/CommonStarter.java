@@ -66,9 +66,31 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
 
+		NISApp.INSTANCE.setServer(server);
+		NISApp.INSTANCE.showWindow();
+
 		LOGGER.info("Calling start().");
 		server.start();
 		server.join();
+
+		LOGGER.info(String.format("%s %s shutdown...", CommonStarter.META_DATA.getAppName(), CommonStarter.META_DATA.getVersion()));
+
+		System.exit(1);
+	}
+
+	private static void initializeLogging() {
+		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
+			final LogManager logManager = LogManager.getLogManager();
+			logManager.readConfiguration(inputStream);
+
+			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
+			final File logDirectory = new File(logFile.getParent());
+			if (!logDirectory.exists() && !logDirectory.mkdirs())
+				throw new IOException(String.format("unable to create log directory %s", logDirectory));
+		} catch (final IOException e) {
+			LOGGER.severe("Could not load default logging properties file");
+			LOGGER.severe(e.getMessage());
+		}
 	}
 
 	private static Handler createHandlers() {
@@ -134,7 +156,8 @@ public class CommonStarter implements ServletContextListener {
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
 		dosFilter.setInitParameter("delayMs", "1000");
 		dosFilter.setInitParameter("trackSessions", "false");
-		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes seems reasonable
+		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes seems
+																// reasonable
 		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
@@ -143,20 +166,5 @@ public class CommonStarter implements ServletContextListener {
 		// Zipping following MimeTypes
 		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-	}
-
-	private static void initializeLogging() {
-		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
-			final LogManager logManager = LogManager.getLogManager();
-			logManager.readConfiguration(inputStream);
-
-			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
-			final File logDirectory = new File(logFile.getParent());
-			if (!logDirectory.exists() && !logDirectory.mkdirs())
-				throw new IOException(String.format("unable to create log directory %s", logDirectory));
-		} catch (final IOException e) {
-			LOGGER.severe("Could not load default logging properties file");
-			LOGGER.severe(e.getMessage());
-		}
 	}
 }
