@@ -69,7 +69,7 @@ public class Config {
 		final NodeMetaData metaData = new NodeMetaData(
 				platform,
 				localNode.getMetaData().getApplication(),
-				applicationVersion);
+				NodeVersion.parse(applicationVersion));
 		localNode.setMetaData(metaData);
 	}
 

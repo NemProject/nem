@@ -10,9 +10,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Helper class for booting a PeerNetwork.
  */
 public class PeerNetworkBootstrapper {
+	private final boolean requirePeerAck;
 	private final PeerNetwork network;
 	private final AtomicBoolean canBoot = new AtomicBoolean(true);
-	private boolean isBooted = false;
+	private boolean isBooted;
 
 	/**
 	 * Creates a new factory.
@@ -20,11 +21,14 @@ public class PeerNetworkBootstrapper {
 	 * @param state The network state.
 	 * @param servicesFactory The network services factory.
 	 * @param selectorFactory The node selector factory.
+	 * @param requirePeerAck true if the boot should fail if a peer acknowledgement is not received.
 	 */
 	public PeerNetworkBootstrapper(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory) {
+			final NodeSelectorFactory selectorFactory,
+			final boolean requirePeerAck) {
+		this.requirePeerAck = requirePeerAck;
 		this.network = new PeerNetwork(state, servicesFactory, selectorFactory);
 	}
 
@@ -58,7 +62,7 @@ public class PeerNetworkBootstrapper {
 		return this.network.refresh()
 				.thenCompose(v -> this.network.updateLocalNodeEndpoint())
 				.handle((result, e) -> {
-					if (null != e || !result) {
+					if (null != e || (!result && this.requirePeerAck)) {
 						this.canBoot.set(true);
 						throw new IllegalStateException("network boot failed", e);
 					}

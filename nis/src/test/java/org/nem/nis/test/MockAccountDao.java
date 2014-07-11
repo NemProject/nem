@@ -58,14 +58,4 @@ public class MockAccountDao implements AccountDao {
 	public void save(org.nem.nis.dbmodel.Account account) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public Long count() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void saveMulti(List<Account> recipientsAccounts) {
-		throw new UnsupportedOperationException();
-	}
 }

@@ -11,6 +11,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="src/test_integration/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: org.springframework:spring-context:4.0.0.RELEASE"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: org.springframework:spring-aop:4.0.0.RELEASE"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: aopalliance:aopalliance:1.0"/>

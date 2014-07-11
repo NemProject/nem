@@ -46,7 +46,7 @@ public class BlockChainComparer {
 		private final BlockLookup remoteLookup;
 
 		private final Block localLastBlock;
-		private final Block remoteLastBlock;
+		private Block remoteLastBlock;
 
 		private long commonBlockIndex;
 		private boolean areChainsConsistent;
@@ -59,15 +59,12 @@ public class BlockChainComparer {
 			this.localLastBlock = this.localLookup.getLastBlock();
 			if (null == this.localLastBlock)
 				throw new IllegalArgumentException("Local does not have any blocks");
-
-			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 		}
 
 		public ComparisonResult compare() {
-			// BR: get peer chain as early as possible. The reason is that the remote peer could append a new block
-			//     which changes the peer chain's score. He will get punished because the promised score is not
-			//     equal to the actual peer chain score.
-			int code = this.compareChainScores();
+			// BR: Don't call getLastBlock in the constructor. The purpose of the chain score is to let the remote peer
+			//     only look up the last block if it is really needed.
+			ComparisonResult.Code code = this.compareChainScores();
 
 			if (ComparisonResult.Code.UNKNOWN == code)
 				code = this.compareLastBlock();
@@ -98,13 +95,17 @@ public class BlockChainComparer {
 			return heightDifference > this.context.getMaxNumBlocksToRewrite();
 		}
 
-		private int compareChainScores() {
-			return this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore()) <= 0
-					? ComparisonResult.Code.REMOTE_REPORTED_LOWER_OR_EQUAL_CHAIN_SCORE
-					: ComparisonResult.Code.UNKNOWN;
+		private ComparisonResult.Code compareChainScores() {
+			final int comparisonResult = this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore());
+			if (comparisonResult > 0)
+				return ComparisonResult.Code.UNKNOWN;
+
+            return 0 == comparisonResult
+                    ? ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE
+                    : ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE;
 		}
 
-		private int compareHashes() {
+		private ComparisonResult.Code compareHashes() {
 			final BlockHeight startingBlockHeight = new BlockHeight(Math.max(
 					1,
 					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite()));
@@ -139,14 +140,15 @@ public class BlockChainComparer {
 			return ComparisonResult.Code.REMOTE_IS_NOT_SYNCED;
 		}
 
-		private int compareLastBlock() {
+		private ComparisonResult.Code compareLastBlock() {
+			this.remoteLastBlock = this.remoteLookup.getLastBlock();
 			if (null == this.remoteLastBlock)
 				return ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS;
 
-			if (!remoteLastBlock.verify())
+			if (!this.remoteLastBlock.verify())
 				return ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 
-			if (areBlocksEqual(localLastBlock, remoteLastBlock))
+			if (areBlocksEqual(this.localLastBlock, this.remoteLastBlock))
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 
 			if (this.isRemoteTooFarBehind())

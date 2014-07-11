@@ -8,12 +8,14 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.
  */
 public class UnconfirmedTransactions {
+	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
@@ -34,7 +36,7 @@ public class UnconfirmedTransactions {
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
-	boolean add(final Transaction transaction) {
+	public ValidationResult add(final Transaction transaction) {
 		return this.add(transaction, hash -> false);
 	}
 
@@ -45,7 +47,7 @@ public class UnconfirmedTransactions {
 	 * @param exists Predicate that determines the existence of the transaction given its hash.
 	 * @return true if the transaction was added.
 	 */
-	boolean add(final Transaction transaction, final Predicate<Hash> exists) {
+	public ValidationResult add(final Transaction transaction, final Predicate<Hash> exists) {
 		return add(transaction, exists, true);
 	}
 
@@ -57,20 +59,21 @@ public class UnconfirmedTransactions {
 	 * @param execute determines if the transaction should be executed if valid.
 	 * @return true if the transaction was added.
 	 */
-	private boolean add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
+	private ValidationResult add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (exists.test(transactionHash)) {
-			return false;
+			return ValidationResult.NEUTRAL;
 		}
 
 		if (this.transactions.containsKey(transactionHash)) {
-			return false;
+			return ValidationResult.NEUTRAL;
 		}
 
 		// not sure if adding to cache here is a good idea...
 		addToCache(transaction.getSigner());
 		if (!isValid(transaction)) {
-			return false;
+			LOGGER.warning(String.format("Transaction from %s rejected. not enough NEM.", transaction.getSigner().getAddress()));
+			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 		
 		if (execute) {
@@ -78,7 +81,7 @@ public class UnconfirmedTransactions {
 		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction;
+		return null == previousTransaction? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
 
 	private boolean isValid(final Transaction transaction) {

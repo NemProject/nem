@@ -6,6 +6,27 @@ import org.nem.core.model.primitive.BlockHeight;
 
 public class ComparisonResultTest {
 
+	//region Code
+
+	@Test
+	public void codeGetValueReturnsUnderlyingValue() {
+		// Act:
+		final ComparisonResult.Code code = ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE;
+
+		// Assert:
+		Assert.assertThat(code.getValue(), IsEqual.equalTo(5));
+	}
+
+	@Test
+	public void isEvilOnlyReturnsTrueForEvilCodes() {
+		for (final ComparisonResult.Code code : ComparisonResult.Code.values()) {
+			// Assert: (check negative as an alternative to high bit check)
+			Assert.assertThat(code.isEvil(), IsEqual.equalTo(code.getValue() < 0));
+		}
+	}
+
+	//endregion
+
 	@Test
 	public void comparisonResultExposesAllConstructorParameters() {
 		// Act:
@@ -49,7 +70,7 @@ public class ComparisonResultTest {
 		result.getRemoteHeight();
 	}
 
-	private static ComparisonResult createResultWithCode(int code) {
+	private static ComparisonResult createResultWithCode(final ComparisonResult.Code code) {
 		return new ComparisonResult(code, 33, true, new BlockHeight(66));
 	}
 }

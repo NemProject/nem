@@ -1,10 +1,8 @@
 package org.nem.deploy;
 
-import com.googlecode.flyway.core.Flyway;
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
-import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dao.TransferDao;
@@ -21,12 +19,14 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = {"org.nem.nis"}, excludeFilters = {
-		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
+@ComponentScan(
+		basePackages = { "org.nem.nis" },
+		excludeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
 })
 @EnableTransactionManagement
 public class NisAppConfig {
@@ -61,8 +61,9 @@ public class NisAppConfig {
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		final Flyway flyway = new Flyway();
+		final org.flywaydb.core.Flyway flyway = new Flyway();
 		flyway.setDataSource(this.dataSource());
+		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
 		return flyway;
 	}
@@ -109,11 +110,23 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
-		return new NisMain();
+		return new NisMain(
+				this.accountDao,
+				this.blockDao,
+				this.accountAnalyzer(),
+				this.blockChain(),
+				this.nisPeerNetworkHost(),
+				this.blockChainLastBlockLayer,
+				this.nisConfiguration());
 	}
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain());
+		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain(), this.nisConfiguration());
+	}
+
+	@Bean
+	public NisConfiguration nisConfiguration() {
+		return new NisConfiguration();
 	}
 }

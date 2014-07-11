@@ -142,11 +142,25 @@ public class BlockDaoImpl implements BlockDao {
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
 				.add(Restrictions.le("timestamp", timestamp))
 				.addOrder(Order.desc("timestamp"))
+				// here we were lucky cause blocktransfers is set to select...
 				.setMaxResults(limit)
 				// nested criteria
 				.createCriteria("forger", "f")
 				.add(Restrictions.eq("f.printableKey", account.getAddress().getEncoded()));
 		return listAndCast(criteria);
+	}
+
+	@Override
+	@Transactional
+	// whatever it takes : DO NOT ADD setMaxResults here!
+	public List<Block> getBlocksAfter(long blockHeight, int blocksCount) {
+			final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+					.setFetchMode("forger", FetchMode.JOIN)
+					.setFetchMode("blockTransfers", FetchMode.JOIN)
+					.add(Restrictions.gt("height", blockHeight))
+					.add(Restrictions.lt("height", blockHeight + (long)blocksCount))
+					.addOrder(Order.asc("height"));
+			return listAndCast(criteria);
 	}
 
 	@Override
@@ -185,7 +199,8 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
 				.setMaxResults(limit)
 				.add(Restrictions.ge("height", height.getRaw())) // >=
-				.setProjection(Projections.property(name));
+				.setProjection(Projections.property(name))
+				.addOrder(Order.asc("height"));
 		return listAndCast(criteria);
 	}
 

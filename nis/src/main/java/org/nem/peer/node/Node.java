@@ -44,7 +44,7 @@ public class Node implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public Node(final Deserializer deserializer) {
-		this.identity = deserializer.readObject("identity", obj -> new NodeIdentity(obj));
+		this.identity = deserializer.readObject("identity", obj -> NodeIdentity.deserializeWithPublicKey(obj));
 		this.setEndpoint(deserializer.readObject("endpoint", obj -> new NodeEndpoint(obj)));
 		this.setMetaData(getMetaData(deserializer.readOptionalObject("metaData", obj -> new NodeMetaData(obj))));
 		this.ensureValidity();

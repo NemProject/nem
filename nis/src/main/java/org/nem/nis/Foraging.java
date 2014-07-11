@@ -112,11 +112,11 @@ public class Foraging  {
 	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
-	public boolean addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
+	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction);
 	}
 
-	private boolean addUnconfirmedTransaction(Transaction transaction) {
+	private ValidationResult addUnconfirmedTransaction(Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction, hash -> {
 			synchronized (blockChainLastBlockLayer) {
 				return null != transferDao.findByHash(hash.getRaw());
@@ -141,20 +141,35 @@ public class Foraging  {
 	 *
 	 * @return NEUTRAL if given transaction has already been seen or isn't within the time window, SUCCESS if it has been added
 	 */
-	public NodeInteractionResult processTransaction(Transaction transaction) {
+	public ValidationResult processTransaction(Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		//TODO: 30 seconds should probably be a constant instead of a magic number, below
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
-			return NodeInteractionResult.NEUTRAL;
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
-			return NodeInteractionResult.NEUTRAL;
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
-		return addUnconfirmedTransaction(transaction) ? NodeInteractionResult.SUCCESS : NodeInteractionResult.NEUTRAL;
+		return addUnconfirmedTransaction(transaction);
 	}
 
+	/**
+	 * Processes every transaction in the list.
+	 * Since this method is called in the synchronization process, it doesn't make sense to return a value.
+	 *
+	 * @param transactions The transactions.
+	 */
+	public void processTransactions(final Collection<Transaction> transactions) {
+		transactions.stream().forEach(tx -> processTransaction(tx));
+	}
+
+	private boolean matchAddress(final Transaction transaction, final Address address) {
+		return (transaction.getSigner().getAddress().equals(address) ||
+				(transaction.getType() == TransactionTypes.TRANSFER &&
+						((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
+	}
 	/**
 	 * This method is for GUI's usage.
 	 * Right now it returns only outgoing TXes, TODO: should it return incoming too?
@@ -164,7 +179,7 @@ public class Foraging  {
 	 */
 	public List<Transaction> getUnconfirmedTransactions(final Address address) {
 		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
-				.filter(tx -> (tx.getSigner().getAddress().equals(address)))
+				.filter(tx -> matchAddress(tx, address))
 				.collect(Collectors.toList());
 	}
 

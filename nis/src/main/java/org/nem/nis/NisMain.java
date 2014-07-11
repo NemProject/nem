@@ -2,18 +2,25 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.deploy.CommonStarter;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class NisMain {
@@ -27,23 +34,31 @@ public class NisMain {
 	private Block nemesisBlock;
 	private Hash nemesisBlockHash;
 
-	@Autowired
-	private AccountDao accountDao;
+	private final AccountDao accountDao;
+	private final BlockDao blockDao;
+	private final AccountAnalyzer accountAnalyzer;
+	private final BlockChain blockChain;
+	private final NisPeerNetworkHost networkHost;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final NisConfiguration nisConfiguration;
 
-	@Autowired
-	private BlockDao blockDao;
-
-	@Autowired
-	private AccountAnalyzer accountAnalyzer;
-
-	@Autowired
-	private BlockChain blockChain;
-
-	@Autowired
-	private NisPeerNetworkHost networkHost;
-
-	@Autowired
-	private BlockChainLastBlockLayer blockChainLastBlockLayer;
+	@Autowired(required = true)
+	public NisMain(
+			final AccountDao accountDao,
+			final BlockDao blockDao,
+			final AccountAnalyzer accountAnalyzer,
+			final BlockChain blockChain,
+			final NisPeerNetworkHost networkHost,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final NisConfiguration nisConfiguration) {
+		this.accountDao = accountDao;
+		this.blockDao = blockDao;
+		this.accountAnalyzer = accountAnalyzer;
+		this.blockChain = blockChain;
+		this.networkHost = networkHost;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.nisConfiguration = nisConfiguration;
+	}
 
 	private void analyzeBlocks() {
 		Long curBlockId;
@@ -57,6 +72,8 @@ public class NisMain {
 		}
 
 		Block parentBlock = null;
+		List<org.nem.nis.dbmodel.Block> blockList = null;
+		Iterator<org.nem.nis.dbmodel.Block> currentBlock = null;
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
@@ -65,8 +82,8 @@ public class NisMain {
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
 
-			if ((block.getHeight().getRaw() % 1000) == 0) {
-				System.out.print(String.format("\r%d", block.getHeight().getRaw()));
+			if ((block.getHeight().getRaw() % 5000) == 0) {
+				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
 			}
 
 			if (null != parentBlock) {
@@ -91,14 +108,41 @@ public class NisMain {
 			parentBlock = block;
 
 			curBlockId = dbBlock.getNextBlockId();
+			long curHeight = dbBlock.getHeight();
+			// This is proper exit from this loop
 			if (null == curBlockId) {
-				System.out.println();
-				System.out.flush();
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
-			dbBlock = this.blockDao.findById(curBlockId);
+			// ugly loop, this is equivalent to
+			// dbBlock = this.blockDao.findById(curBlockId);
+			do {
+				if (blockList == null || !currentBlock.hasNext()) {
+					blockList = this.blockDao.getBlocksAfter(curHeight, 2345);
+					currentBlock = blockList.iterator();
+				}
+
+				// in most cases this won't make any loops
+				while (currentBlock.hasNext()) {
+					dbBlock = currentBlock.next();
+					if (dbBlock.getId().equals(curBlockId)) {
+						break;
+					}
+
+					if (dbBlock.getHeight().compareTo(curHeight + 1) > 0) {
+						dbBlock = null;
+					}
+				}
+
+				if (dbBlock == null) {
+					break;
+				}
+
+				curHeight = dbBlock.getHeight();
+			}
+			while (! dbBlock.getId().equals(curBlockId));
+
 			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
 				System.exit(-1);
@@ -109,6 +153,7 @@ public class NisMain {
 	}
 
 	private void initializePoi(final BlockHeight height) {
+		LOGGER.info("Analyzed blocks: " + height);
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
 		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.size()));
 		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer);
@@ -129,6 +174,17 @@ public class NisMain {
 		this.populateDb();
 
 		this.analyzeBlocks();
+
+		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
+		if (null == autoBootKey) {
+			LOGGER.info("auto-boot is off");
+			return;
+		}
+
+		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey));
+		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
+		this.networkHost.boot(new Node(autoBootNodeIdentity, NodeEndpoint.fromHost("127.0.0.1")));
+		LOGGER.warning("auto-booted!");
 	}
 
 	private NemesisBlock loadNemesisBlock() {

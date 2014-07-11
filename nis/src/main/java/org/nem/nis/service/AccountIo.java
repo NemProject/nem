@@ -28,15 +28,6 @@ public interface AccountIo extends Iterable<Account> {
 	SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp);
 
 	/**
-	 * Gets all blocks forged by an account.
-	 *
-	 * @param address The account address.
-	 * @param timestamp The maximum timestamp of a block.
-	 * @return The blocks.
-	 */
-	SerializableList<Block> getAccountBlocks(final Address address, final String timestamp);
-
-	/**
 	 * Gets information about blocks harvested by an account.
 	 *
 	 * @param address The account address.

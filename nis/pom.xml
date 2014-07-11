@@ -3,9 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.nis</groupId>
 	<artifactId>nem-infrastructure-server</artifactId>
-	<version>0.0.55-ALPHA</version>
+	<version>0.0.64-ALPHA</version>
 	<name>NEM Infrastructure Server</name>
-
+	<organization>
+		<name>NEM - New Economy Movement</name>
+		<url>http://www.ournem.com</url>
+	</organization>
 	<repositories>
 		<repository>
 			<id>hibernate-repo</id>
@@ -20,17 +23,16 @@
 	</repositories>
 
 	<properties>
+		<nem-certificate-store>identity.jks</nem-certificate-store>
+		<nem-certificate-password>nem-start-201404</nem-certificate-password>
+		<nem-code-base>http://nem.pucchiwerk.eu/nem</nem-code-base>
+		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Should be without http so that the code base is valid for http and 
-			https -->
-		<nem-code-base>bob.nem.ninja</nem-code-base>
-
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.1.3.v20140225</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
 		<spring.version>4.0.0.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
-
 		<hibernate.version>4.3.0.Final</hibernate.version>
 		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
 	</properties>
@@ -178,9 +180,9 @@
 			<groupId>com.googlecode.flyway</groupId> <artifactId>flyway-maven-plugin</artifactId> 
 			<version>2.3</version> </dependency> -->
 		<dependency>
-			<groupId>com.googlecode.flyway</groupId>
+			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>2.3.1</version>
+			<version>3.0</version>
 		</dependency>
 
 		<dependency>
@@ -197,7 +199,7 @@
 			<groupId>com.googlecode.matrix-toolkits-java</groupId>
 			<artifactId>mtj</artifactId>
 			<version>1.0.1</version>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -253,6 +255,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.1.201405082137</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -388,7 +391,7 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
-                            <includeScope>runtime</includeScope>
+							<includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
@@ -432,19 +435,131 @@
 					</updateManifestEntries>
 					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
 					<sign>
-						<keystore>identity.jks</keystore>
+						<keystore>${nem-certificate-store}</keystore>
 						<alias>nem-cert</alias>
-						<storepass>nem-start-201404</storepass>
-						<keypass>nem-start-201404</keypass>
+						<storepass>${nem-certificate-password}</storepass>
+						<keypass>${nem-certificate-password}</keypass>
 						<verify>true</verify>
 					</sign>
 					<gzip>true</gzip>
 					<outputJarVersions>true</outputJarVersions>
 					<verbose>true</verbose>
 				</configuration>
-
 			</plugin>
+			<plugin>
+				<groupId>com.googlecode.velocity-maven-plugin</groupId>
+				<artifactId>velocity-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<templateValues>
+						<userName>${user.name}</userName>
+						<organizationName>${project.organization.name}</organizationName>
+						<nem-code-base>${nem-code-base}</nem-code-base>
+						<javaHome>${java.home}</javaHome>
+						<proGuard>${proGuard}</proGuard>
+					</templateValues>
+				</configuration>
+				<executions>
+					<!-- ************************************************** -->
+					<!-- Generate Windows Start Script NCC -->
+					<!-- ************************************************** -->
+					<execution>
+						<id>windows-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>run-nis.*</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>site</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate obfuscation script (proguard jar path) -->
+						<!-- ************************************************** -->
+						<id>windows-obfuscation-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>obfuscate-ws.bat</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate Windows Obfuscation signing Script -->
+						<!-- ************************************************** -->
+						<id>windows-signing-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>buildPackage-ws-sign-nis.bat</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate MANIFEST.MF for re-includion in JAR -->
+						<!-- ************************************************** -->
+						<id>manifest-mf</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>MANIFEST.MF</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation/META-INF</outputDirectory>
+							<removeExtension>true</removeExtension>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate ProGuard settings for nem-infrastructure-server -->
+						<!-- ************************************************** -->
+						<id>proGuard-settings-nem-infrastructure-serve</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>nis-ws.new.settings</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+							<removeExtension>true</removeExtension>
+						</configuration>
+					</execution>
 
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>

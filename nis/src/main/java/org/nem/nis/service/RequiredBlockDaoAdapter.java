@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.MissingResourceException;
 
 /**
@@ -65,6 +66,12 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	@Override
 	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
 		return this.blockDao.getBlocksForAccount(account, timestamp, limit);
+	}
+
+	@Override
+	public List<org.nem.nis.dbmodel.Block> getBlocksAfter(long blockHeight, int blocksCount) {
+		// TODO: throw exception?
+		return this.blockDao.getBlocksAfter(blockHeight, blocksCount);
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

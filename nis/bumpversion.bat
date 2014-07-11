@@ -21,5 +21,3 @@ git add pom.xml
 git add pom-core.xml
 git add pom-mariadb.xml
 sed -n "/ALPHA/{ s/.*\([0-9]\+.[0-9]\+.[0-9]\+-ALPHA\).*/bump version to \1/; p }" pom.xml | xargs -IXX git commit -m XX
-sed -n "/ALPHA/{ s/.*\([0-9]\+.[0-9]\+.[0-9]\+\)-ALPHA.*/alpha_\1/; p }" pom.xml | xargs -IXX git tag XX
-echo "don't forget to push branch and tag"

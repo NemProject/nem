@@ -177,7 +177,7 @@ public class BlockDebugInfo implements SerializableEntity {
 			final Serializer serializer,
 			final String label,
 			final TimeInstant timeInstant) {
-		final Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + timeInstant.getRawTime() * 1000);
+		final Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + ((long)timeInstant.getRawTime()) * 1000);
 		final String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 		serializer.writeString(label, dateString);
 	}

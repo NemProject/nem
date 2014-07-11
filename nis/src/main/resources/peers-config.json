@@ -30,6 +30,31 @@
 	    {
             endpoint: { "protocol": "http", "host": "nijuichi.nem.ninja", "port" : 7890 },
             identity: { "name": "nijuichi", "public-key": "AjyQSXWl08579r2RrZ6c2mSCrgnyD025pVId0HjNSRj+" }
+        },
+
+        {
+            endpoint: { "protocol": "http", "host": "instacash.nem.io", "port" : 7890 },
+            identity: { "name": "instacash-node1", "public-key": "A/fcSoKYbIkoPi8+QilF+OmXaizrUb3sKMZ7gRa8+idv" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "instacash2.nem.io", "port" : 7890 },
+            identity: { "name": "instacash-node2", "public-key": "A+gRG6ql85cnG3RAy9wx8VruOOQlyAULBlM/DdAyz7K2" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "instacash3.nem.io", "port" : 7890 },
+            identity: { "name": "instacash-node3", "public-key": "AlXZHWpVeeWrLCJTD2791Miw6dMIvl8KRVnXVfnyDadV" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "instacash4.nem.io", "port" : 7890 },
+            identity: { "name": "instacash-node4", "public-key": "AviD7YRbGjMRSXu2OrCLKvwMRfiQ67iJc4r/VyAmmult" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "seishin.nem.io", "port" : 7890 },
+            identity: { "name": "instacash-node4", "public-key": "A/ePsR8ICGVHVPnVBoOxexoxxbEgpTSAUPassRPB5Rf3" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "94.156.77.147", "port" : 7890 },
+            identity: { "name": "nemtrader-jaded", "public-key": "A8j4su+8DgaEV+LjvRi/Nw95v3E8XqpEHMMlhnCQ3cG0" }
         }
     ],
 }

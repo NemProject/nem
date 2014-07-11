@@ -83,7 +83,8 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets unconfirmed transaction information for the specified account
+	 * Gets unconfirmed transaction information for the specified account.
+	 * TODO: not sure if we should have an AccountPageBuilder here since there isn't paging.
 	 *
 	 * @param builder The page builder.
 	 * @return Information about matching transactions
@@ -93,20 +94,6 @@ public class AccountController {
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
 		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(page.getAddress()));
-	}
-
-	/**
-	 * Gets block information for the specified account starting at the specified time.
-	 *
-	 * @param builder The page builder.
-	 * @return Information about the matching blocks.
-	 */
-	// TODO: remove after appropriate changes will be made in NCC
-	@RequestMapping(value = "/account/blocks", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<Block> accountBlocks(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		return this.accountIo.getAccountBlocks(page.getAddress(), page.getTimestamp());
 	}
 
 	/**

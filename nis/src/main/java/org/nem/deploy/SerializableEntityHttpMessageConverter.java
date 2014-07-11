@@ -36,7 +36,7 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 	@Override
 	public boolean canRead(final Class<?> clazz, final MediaType type) {
-		return null != this.getConstructor(clazz);
+		return super.canRead(clazz, type) && null != this.getConstructor(clazz);
 	}
 
 	@Override

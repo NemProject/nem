@@ -9,17 +9,20 @@ import org.nem.nis.audit.AuditCollection;
  * (where HttpMethodClient is the shared resource).
  */
 public class HttpConnectorPool implements SyncConnectorPool {
-	private final HttpMethodClient<Deserializer> httpMethodClient;
+	private final CommunicationMode communicationMode;
 	private final AuditCollection auditCollection;
+	private final HttpMethodClient<Deserializer> httpMethodClient;
 
 	/**
 	 * Creates a new HTTP connector pool.
 	 *
+	 * @param communicationMode The communication mode.
 	 * @param auditCollection The audit collection.
 	 */
-	public HttpConnectorPool(final AuditCollection auditCollection) {
-		this.httpMethodClient = new HttpMethodClient<>();
+	public HttpConnectorPool(final CommunicationMode communicationMode, final AuditCollection auditCollection) {
+		this.communicationMode = communicationMode;
 		this.auditCollection = auditCollection;
+		this.httpMethodClient = new HttpMethodClient<>();
 	}
 
 	@Override
@@ -39,9 +42,7 @@ public class HttpConnectorPool implements SyncConnectorPool {
 
 	private HttpConnector getConnector(final AccountLookup accountLookup) {
 		final DeserializationContext context = new DeserializationContext(accountLookup);
-		final HttpDeserializerResponseStrategy strategy = new HttpDeserializerResponseStrategy(context);
-		final HttpVoidResponseStrategy voidStrategy = new HttpVoidResponseStrategy();
-		final Communicator communicator = new HttpCommunicator(this.httpMethodClient, strategy, voidStrategy);
+		final Communicator communicator = new HttpCommunicator(this.httpMethodClient, this.communicationMode, context);
 		return new HttpConnector(new AuditedCommunicator(communicator, this.auditCollection));
 	}
 }

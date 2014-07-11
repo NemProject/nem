@@ -1,6 +1,5 @@
 package org.nem.core.connect;
 
-import net.minidev.json.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
@@ -9,13 +8,10 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.nio.client.*;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
-import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.async.SleepFuture;
-import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.net.*;
-import java.nio.charset.Charset;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -28,7 +24,6 @@ import java.util.logging.Logger;
 public class HttpMethodClient<T> {
 	private static final Logger LOGGER = Logger.getLogger(HttpMethodClient.class.getName());
 
-	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 	private static final int MAX_CONNECTIONS = 100;
 	private static final int MAX_CONNECTIONS_PER_ROUTE = 20;
 
@@ -68,7 +63,7 @@ public class HttpMethodClient<T> {
 	}
 
 	/**
-	 * Issues a HTTP GET response.
+	 * Issues a HTTP GET request.
 	 *
 	 * @param url The url.
 	 * @param responseStrategy The response strategy.
@@ -79,41 +74,26 @@ public class HttpMethodClient<T> {
 	}
 
 	/**
-	 * Issues a HTTP POST response.
+	 * Issues a HTTP POST request.
 	 *
-	 * @param url    The url.
-	 * @param entity The request data.
+	 * @param url The url.
+	 * @param request The request.
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
 	public AsyncToken<T> post(
 			final URL url,
-			final SerializableEntity entity,
+			final HttpPostRequest request,
 			final HttpResponseStrategy<T> responseStrategy) {
-		return this.post(url, JsonSerializer.serializeToJson(entity), responseStrategy);
+		return sendRequest(url, uri -> createPostRequest(uri, request), responseStrategy);
 	}
 
-	/**
-	 * Issues a HTTP POST response.
-	 *
-	 * @param url         The url.
-	 * @param requestData The request data.
-	 * @param responseStrategy The response strategy.
-	 * @return The response from the server.
-	 */
-	public AsyncToken<T> post(
-			final URL url,
-			final JSONObject requestData,
-			final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, uri -> createPostRequest(uri, requestData), responseStrategy);
-	}
-
-	private static HttpPost createPostRequest(final URI uri, final JSONObject requestData) {
-		final HttpPost request = new HttpPost(uri);
-		final ByteArrayEntity entity = new ByteArrayEntity(requestData.toString().getBytes(ENCODING_CHARSET));
-		entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, MimeTypes.Type.APPLICATION_JSON.asString()));
-		request.setEntity(entity);
-		return request;
+	private static HttpPost createPostRequest(final URI uri, final HttpPostRequest request) {
+		final HttpPost post = new HttpPost(uri);
+		final ByteArrayEntity entity = new ByteArrayEntity(request.getPayload());
+		entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, request.getContentType()));
+		post.setEntity(entity);
+		return post;
 	}
 
 	/**
@@ -132,6 +112,8 @@ public class HttpMethodClient<T> {
 
 			final HttpMethodClientFutureCallback callback = new HttpMethodClientFutureCallback();
 			final HttpRequestBase request = requestFactory.apply(uri);
+			request.setHeader("Accept", responseStrategy.getSupportedContentType());
+
 			this.httpClient.execute(request, callback);
 
 			final CompletableFuture<T> responseFuture = callback.getFuture()

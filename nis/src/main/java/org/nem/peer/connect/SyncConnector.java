@@ -8,7 +8,7 @@ import org.nem.peer.node.Node;
 import java.util.Collection;
 
 /**
- * Interface that is used to sync blocks across peers.
+ * Interface that is used to sync blocks and transactions across peers.
  */
 public interface SyncConnector {
 
@@ -57,4 +57,12 @@ public interface SyncConnector {
 	 * @return The cumulative score for the endpoint's chain.
 	 */
 	public BlockChainScore getChainScore(final Node node);
+
+	/**
+	 * Requests information about the unconfirmed transaction from the specified node.
+	 *
+	 * @param node The remote node.
+	 * @return All non conflicting unconfirmed transactions the endpoint has.
+	 */
+	public Collection<Transaction> getUnconfirmedTransactions(final Node node);
 }

@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
@@ -19,8 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collection;
-
+import java.util.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -44,7 +44,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 123);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 123, 0);
 		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -62,7 +62,7 @@ public class BlockDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
 		final TransferTransaction transferTransaction = prepareTransferTransaction(recipient, signer, 10);
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 133);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 133, 0);
 		emptyBlock.addTransaction(transferTransaction);
 		emptyBlock.sign();
 		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
@@ -84,7 +84,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 234);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 234, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -107,7 +107,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 345);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 345, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -130,7 +130,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -151,17 +151,47 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456);
-		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
-		// Act:
-		blockDao.save(dbBlock);
-		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime(), 25);
-		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, emptyBlock.getTimeStamp().getRawTime()-1, 25);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456, 0);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, 123, 25);
+		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, 122, 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(1));
+		Assert.assertThat(entities1.size(), equalTo(25));
 		Assert.assertThat(entities2.size(), equalTo(0));
+	}
+
+	@Test
+	public void getBlocksForAccountReturnsBlocksSortedByTime() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, (23*i + 3)%30);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = blockDao.getBlocksForAccount(signer, 123+30, 25);
+		final Collection<Block> entities2 = blockDao.getBlocksForAccount(signer, 122, 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(0));
+
+		int lastTimestamp = 123+29;
+		for (final Block entity : entities1) {
+			Assert.assertThat(entity.getTimestamp(), equalTo(lastTimestamp));
+			lastTimestamp = lastTimestamp - 1;
+		}
 	}
 	//endregion
 
@@ -171,7 +201,7 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 567);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 567, 0);
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -191,7 +221,7 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, recipient);
-		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 678);
+		final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 678, 0);
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 10));
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 20));
 		emptyBlock.addTransaction(prepareTransferTransaction(signer, recipient, 30));
@@ -216,6 +246,205 @@ public class BlockDaoTest {
 	}
 	//endregion
 
+	//region getters
+	@Test
+	public void getHashesFromReturnsProperHashes() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final ArrayList<Hash> expectedHashes= new ArrayList<>(30);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, i*5);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedHashes.add(dbBlock.getBlockHash());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final HashChain entities1 = blockDao.getHashesFrom(new BlockHeight(456), 25);
+		final HashChain entities2 = blockDao.getHashesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final Hash entity : entities1.asCollection()) {
+			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getHashesFromReturnsHashesInBlockHeightOrder() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final TreeMap<Integer, Hash> expectedHashes = new TreeMap<>();
+		for (int i = 0; i<30; i++) {
+			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedHashes.put((i*23 + 3)%30, dbBlock.getBlockHash());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final HashChain entities1 = blockDao.getHashesFrom(new BlockHeight(456), 25);
+		final HashChain entities2 = blockDao.getHashesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final Hash entity : entities1.asCollection()) {
+			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getDifficultiesFromReturnsProperDifficulties() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final ArrayList<Long> expectedDifficulties= new ArrayList<>(30);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, i*5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedDifficulties.add(dbBlock.getDifficulty());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<BlockDifficulty> entities1 = blockDao.getDifficultiesFrom(new BlockHeight(456), 25);
+		final List<BlockDifficulty> entities2 = blockDao.getDifficultiesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final BlockDifficulty entity : entities1) {
+			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
+			i = i + 1;
+		}
+	}
+
+
+	@Test
+	public void getDifficultiesFromReturnsDifficultiesInBlockHeightOrder() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final TreeMap<Integer, Long> expectedDifficulties= new TreeMap<>();
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedDifficulties.put((i * 23 + 3) % 30, dbBlock.getDifficulty());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<BlockDifficulty> entities1 = blockDao.getDifficultiesFrom(new BlockHeight(456), 25);
+		final List<BlockDifficulty> entities2 = blockDao.getDifficultiesFrom(new BlockHeight(456+20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final BlockDifficulty entity : entities1) {
+			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getTimestampsFromReturnsProperTimestamps() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final ArrayList<Integer> expectedTimestamps= new ArrayList<>(30);
+		for (int i = 0; i<30; i++) {
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + i, i*5);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedTimestamps.add(dbBlock.getTimestamp());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<TimeInstant> entities1 = blockDao.getTimestampsFrom(new BlockHeight(456), 25);
+		final List<TimeInstant> entities2 = blockDao.getTimestampsFrom(new BlockHeight(456 + 20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final TimeInstant entity : entities1) {
+			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimestamps.get(i)));
+			i = i + 1;
+		}
+	}
+
+	@Test
+	public void getTimestampsFromReturnsTimestampsInBlockHeightOrder() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = prepareMapping(signer, Utils.generateRandomAccount());
+
+		// !!!
+		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+
+		final TreeMap<Integer, Integer> expectedTimestamps = new TreeMap<>();
+		for (int i = 0; i<30; i++) {
+			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
+			final org.nem.core.model.Block emptyBlock = createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			expectedTimestamps.put((i * 23 + 3) % 30, dbBlock.getTimestamp());
+
+			// Act:
+			blockDao.save(dbBlock);
+		}
+		final List<TimeInstant> entities1 = blockDao.getTimestampsFrom(new BlockHeight(456), 25);
+		final List<TimeInstant> entities2 = blockDao.getTimestampsFrom(new BlockHeight(456 + 20), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities2.size(), equalTo(10));
+
+		int i = 0;
+		for (final TimeInstant entity : entities1) {
+			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimestamps.get(i)));
+			i = i + 1;
+		}
+	}
+	//endregion
+
 	//region helpers
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
@@ -227,9 +456,9 @@ public class BlockDaoTest {
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
-	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, long height) {
+	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, long height, int i) {
 		final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getKeyPair().getPublicKey());
-		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash, new TimeInstant(123), new BlockHeight(height));
+		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash, new TimeInstant(123 + i), new BlockHeight(height));
 		emptyBlock.sign();
 		return emptyBlock;
 	}

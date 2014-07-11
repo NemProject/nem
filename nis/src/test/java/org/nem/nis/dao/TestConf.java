@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import com.googlecode.flyway.core.Flyway;
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.dbmodel.Account;
 import org.nem.nis.dbmodel.Block;
@@ -12,6 +12,7 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 
 @Configuration

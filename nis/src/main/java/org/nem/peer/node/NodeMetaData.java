@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class NodeMetaData implements SerializableEntity {
 	private final String platform;
 	private final String application;
-	private final String version;
+	private final NodeVersion version;
 
 	/**
 	 * Creates a new node meta data.
@@ -22,10 +22,10 @@ public class NodeMetaData implements SerializableEntity {
 	public NodeMetaData(
 			final String platform,
 			final String application,
-			final String version) {
+			final NodeVersion version) {
 		this.platform = platform;
 		this.application = application;
-		this.version = version;
+		this.version = null == version? NodeVersion.ZERO : version;
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class NodeMetaData implements SerializableEntity {
 	public NodeMetaData(final Deserializer deserializer) {
 		this.platform = deserializer.readString("platform");
 		this.application = deserializer.readString("application");
-		this.version = deserializer.readString("version");
+		this.version = NodeVersion.readFrom(deserializer, "version");
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class NodeMetaData implements SerializableEntity {
 	 *
 	 * @return The version.
 	 */
-	public String getVersion() {
+	public NodeVersion getVersion() {
 		return this.version;
 	}
 
@@ -70,7 +70,7 @@ public class NodeMetaData implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeString("platform", this.platform);
 		serializer.writeString("application", this.application);
-		serializer.writeString("version", this.version);
+		NodeVersion.writeTo(serializer, "version", this.version);
 	}
 
 	@Override
@@ -87,8 +87,8 @@ public class NodeMetaData implements SerializableEntity {
 		return Arrays.equals(this.getParts(), rhs.getParts());
 	}
 
-	private String[] getParts() {
-		return new String[] {
+	private Object[] getParts() {
+		return new Object[] {
 			this.platform,
 			this.application,
 			this.version

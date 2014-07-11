@@ -40,8 +40,8 @@ public class PushService {
 	 * @param entity The transaction.
 	 * @param identity The identity of the pushing node.
 	 */
-	public boolean pushTransaction(final Transaction entity, final NodeIdentity identity) {
-		boolean result = this.pushEntity(
+	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
+		final ValidationResult result = this.pushEntity(
 				entity,
 				obj -> PushService.checkTransaction(obj),
 				obj -> this.foraging.processTransaction(obj),
@@ -49,15 +49,16 @@ public class PushService {
 				NodeApiId.REST_PUSH_TRANSACTION,
 				identity);
 
-		if (!result)
-			throw new IllegalArgumentException("transfer must be valid and verifiable");
+		if (result.isFailure())
+			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 
-		return true;
+		return result;
 	}
 
-	private static NodeInteractionResult checkTransaction(final Transaction transaction) {
-		final boolean isValid = ValidationResult.SUCCESS == transaction.checkValidity() && transaction.verify();
-		return isValid ? NodeInteractionResult.SUCCESS : NodeInteractionResult.FAILURE;
+	private static ValidationResult checkTransaction(final Transaction transaction) {
+		return !transaction.verify()
+			? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
+		    : transaction.checkValidity();
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public void pushBlock(final Block entity, final NodeIdentity identity) {
-		boolean result = this.pushEntity(
+		final ValidationResult result = this.pushEntity(
 				entity,
 				obj -> this.blockChain.checkPushedBlock(obj),
 				obj -> this.blockChain.processBlock(obj),
@@ -75,14 +76,14 @@ public class PushService {
 				NodeApiId.REST_PUSH_BLOCK,
 				identity);
 
-		if (!result)
-			throw new IllegalArgumentException("block must be verifiable");
+		if (result.isFailure())
+			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 	}
 
-	private <T extends VerifiableEntity & SerializableEntity> boolean pushEntity(
+	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(
 			final T entity,
-			final Function<T, NodeInteractionResult> isValid,
-			final Function<T, NodeInteractionResult> isAccepted,
+			final Function<T, ValidationResult> isValid,
+			final Function<T, ValidationResult> isAccepted,
 			final Consumer<T> logAdditionalInfo,
 			final NodeApiId broadcastId,
 			final NodeIdentity identity) {
@@ -98,25 +99,25 @@ public class PushService {
 				network.updateExperience(remoteNode, status);
 		};
 
-		final NodeInteractionResult isValidStatus = isValid.apply(entity);
-		if (isValidStatus == NodeInteractionResult.FAILURE) {
+		final ValidationResult isValidResult = isValid.apply(entity);
+		if (isValidResult.isFailure()) {
 			// Bad experience with the remote node.
-			updateStatus.accept(isValidStatus);
-			return false;
+			updateStatus.accept(NodeInteractionResult.FAILURE);
+			return isValidResult;
 		}
 
-		// validate block and broadcast (async)
-		final NodeInteractionResult status = isAccepted.apply(entity);
+		// validate entity and broadcast (async)
+		final ValidationResult status = isAccepted.apply(entity);
 		// Good or bad experience with the remote node.
-		updateStatus.accept(status);
+		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
-		if (status == NodeInteractionResult.SUCCESS) {
+		if (status.isSuccess()) {
 			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
 					entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
 			network.broadcast(broadcastId, secureEntity);
 		}
 
-		return true;
+		return status;
 	}
 }

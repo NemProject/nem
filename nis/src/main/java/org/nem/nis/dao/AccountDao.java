@@ -33,18 +33,4 @@ public interface AccountDao {
 	 * @param account Account that's going to be saved.
 	 */
 	public void save(Account account);
-
-	/**
-	 * Counts number of accounts in the database.
-	 *
-	 * @return number of accounts in the database.
-	 */
-	public Long count();
-
-	/**
-	 * Save multiple accounts at once (in a single transaction).
-	 *
-	 * @param recipientsAccounts list of Accounts to be saved.
-	 */
-	public void saveMulti(List<Account> recipientsAccounts);
 }

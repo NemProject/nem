@@ -46,7 +46,7 @@ public class ConfigFactory {
 		return new Node(
 				new NodeIdentity(new KeyPair(privateKey), "local larry"),
 				new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890),
-				new NodeMetaData("Mac", "FooBar", "1.0"));
+				new NodeMetaData("Mac", "FooBar", new NodeVersion(1, 0, 0)));
 	}
 
 	/**
@@ -88,6 +88,6 @@ public class ConfigFactory {
 		return new Config(
 				createDefaultLocalNode(),
 				createDefaultPeersConfig(),
-				"2.0");
+				"2.0.0");
 	}
 }

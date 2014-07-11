@@ -31,7 +31,7 @@ public class NodeTest {
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
 		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
 		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class NodeTest {
 		// Arrange:
 		final NodeIdentity identity = new WeakNodeIdentity("alice");
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(1, 0, 0));
 
 		// Act:
 		final Node node = new Node(identity, endpoint, metaData);
@@ -55,7 +55,7 @@ public class NodeTest {
 		// Arrange:
 		final NodeIdentity identity = new WeakNodeIdentity("alice");
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", "v");
+		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(1, 0, 0));
 		final Node originalNode = new Node(identity, endpoint, metaData);
 
 		// Act:
@@ -88,7 +88,7 @@ public class NodeTest {
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
 		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
 		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
 	}
 
 	@Test
