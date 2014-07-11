@@ -21,6 +21,7 @@ public class NodeRefresher {
 	private final PeerConnector connector;
 	private final Map<Node, NodeStatus> nodesToUpdate;
 	private final ConcurrentHashSet<Node> connectedNodes;
+	private final NodeVersionCheck versionCheck;
 
 	/**
 	 * Creates a new refresher.
@@ -32,10 +33,12 @@ public class NodeRefresher {
 	public NodeRefresher(
 			final Node localNode,
 			final NodeCollection nodes,
-			final PeerConnector connector) {
+			final PeerConnector connector,
+			final NodeVersionCheck versionCheck) {
 		this.localNode = localNode;
 		this.nodes = nodes;
 		this.connector = connector;
+		this.versionCheck = versionCheck;
 		this.nodesToUpdate = new ConcurrentHashMap<>();
 		this.connectedNodes = new ConcurrentHashSet<>();
 	}
@@ -71,8 +74,11 @@ public class NodeRefresher {
 		CompletableFuture<NodeStatus> future = this.connector.getInfo(node)
 				.thenApply(n -> {
 					// if the node returned inconsistent information, drop it for this round
-					if (!areCompatible(node, n))
+					if (!node.equals(n))
 						throw new FatalPeerException("node response is not compatible with node identity");
+
+					if (!this.versionCheck.check(this.localNode.getMetaData().getVersion(), n.getMetaData().getVersion()))
+						throw new FatalPeerException("the local and remote nodes are not compatible");
 
 					node.setEndpoint(n.getEndpoint());
 					node.setMetaData(n.getMetaData());
@@ -100,10 +106,6 @@ public class NodeRefresher {
 	private NodeStatus getNodeStatusFromException(Throwable ex) {
 		ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
 		return InactivePeerException.class == ex.getClass() ? NodeStatus.INACTIVE : NodeStatus.FAILURE;
-	}
-
-	private static boolean areCompatible(final Node lhs, final Node rhs) {
-		return lhs.equals(rhs);
 	}
 
 	private void update(final Node node, final NodeStatus status) {

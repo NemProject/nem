@@ -83,15 +83,34 @@ public class NodeRefresherTest {
 		final Node changedNode = PeerUtils.createNodeWithName("p");
 		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
 				.thenReturn(CompletableFuture.completedFuture(changedNode));
-		final NodeRefresher refresher = new NodeRefresher(context.localNode, context.nodes, context.connector);
 
 		// Act:
-		refresher.refresh(context.refreshNodes).join();
+		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
 		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ });
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(changedNode);
+	}
+
+	@Test
+	public void refreshGetInfoIncompatibleNodeRemovesNodesFromBothLists() {
+		// Arrange:
+		final NodeVersionCheck versionCheck = Mockito.mock(NodeVersionCheck.class);
+		final TestContext context = new TestContext(versionCheck);
+		Mockito.when(versionCheck.check(Mockito.any(), Mockito.any())).thenReturn(true);
+
+		final Node incompatibleNode = context.refreshNodes.get(1);
+		incompatibleNode.setMetaData(new NodeMetaData("p", "a", new NodeVersion(1, 0, 0)));
+		Mockito.when(versionCheck.check(context.localNode.getMetaData().getVersion(), new NodeVersion(1, 0, 0)))
+				.thenReturn(false);
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Assert:
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{ "a", "c" }, new String[]{ });
+		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
 	@Test
@@ -365,7 +384,15 @@ public class NodeRefresherTest {
 		private final Node localNode = PeerUtils.createNodeWithName("l");
 		private final NodeCollection nodes = new NodeCollection();
 		private final PeerConnector connector = mockPeerConnector();
-		private final NodeRefresher refresher = new NodeRefresher(this.localNode, this.nodes, this.connector);
+		private final NodeRefresher refresher;
+
+		public TestContext() {
+			this((l, r) -> true);
+		}
+
+		public TestContext(final NodeVersionCheck versionCheck) {
+			this.refresher = new NodeRefresher(this.localNode, this.nodes, this.connector, versionCheck);
+		}
 
 		public void setInactiveGetInfoForNode(final String name) {
 			this.setInactiveGetInfoForNode(name, 0);

@@ -2,7 +2,7 @@ package org.nem.peer.services;
 
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.trust.*;
+import org.nem.peer.node.DefaultNodeVersionCheck;
 
 /**
  * Factory class for creating peer network services.
@@ -66,7 +66,7 @@ public class PeerNetworkServicesFactory {
 	 * @return A node refresher.
 	 */
 	public NodeRefresher createNodeRefresher() {
-		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector);
+		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, new DefaultNodeVersionCheck());
 	}
 
 	/**
