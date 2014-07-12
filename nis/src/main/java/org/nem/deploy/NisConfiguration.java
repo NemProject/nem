@@ -17,6 +17,7 @@ public class NisConfiguration {
 	private final PrivateKey bootKey;
 	private final boolean shouldBootWithoutAck;
 	private final boolean shouldUseBinaryTransport;
+	private final String nemFolder;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -47,6 +48,7 @@ public class NisConfiguration {
 		this.nodeLimit = getOptionalInteger(properties, "nis.nodelimit", 20);
 		this.shouldBootWithoutAck = getOptionalBoolean(properties, "nis.shouldBootWithoutAck", false);
 		this.shouldUseBinaryTransport = getOptionalBoolean(properties, "nis.shouldUseBinaryTransport", false);
+		this.nemFolder = properties.getProperty("nem.folder", getDefaultFolder()).replace("%h", getDefaultFolder());
 	}
 
 	private static int getOptionalInteger(final Properties properties, final String name, final Integer defaultValue) {
@@ -95,5 +97,24 @@ public class NisConfiguration {
 	 */
 	public boolean shouldUseBinaryTransport() {
 		return this.shouldUseBinaryTransport;
+	}
+	
+	/**
+	 * Gets the path to the folder where database and log files should be located
+	 *
+	 * @return The path to the folder
+	 */
+	public String getNemFolder() {
+		return this.nemFolder;
+	}
+
+
+	/**
+	 * Get the default folder for database and log files.
+	 *  
+	 * @return path to the folder location.
+	 */
+	private String getDefaultFolder() {
+		return System.getProperty("user.home");
 	}
 }
