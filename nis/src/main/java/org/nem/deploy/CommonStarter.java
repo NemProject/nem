@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import java.io.*;
 import java.util.EnumSet;
+import java.util.Properties;
 import java.util.logging.*;
 
 import javax.servlet.*;
@@ -16,6 +17,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
+import org.nem.core.utils.StringEncoder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -66,8 +68,8 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
 
-		NISApp.INSTANCE.setServer(server);
-		NISApp.INSTANCE.showWindow();
+		NisApp.INSTANCE.setServer(server);
+		NisApp.INSTANCE.showWindow();
 
 		LOGGER.info("Calling start().");
 		server.start();
@@ -80,8 +82,10 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
+
 			final LogManager logManager = LogManager.getLogManager();
-			logManager.readConfiguration(inputStream);
+			InputStream inputStringStream = adaptFileLocation(inputStream);
+			logManager.readConfiguration(inputStringStream);
 
 			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
 			final File logDirectory = new File(logFile.getParent());
@@ -91,6 +95,29 @@ public class CommonStarter implements ServletContextListener {
 			LOGGER.severe("Could not load default logging properties file");
 			LOGGER.severe(e.getMessage());
 		}
+	}
+
+	/**
+	 * log configuration may include a placeholder for the nem folder
+	 * The method replaces the pattern ${nemFolder} with the value defined within the
+	 * NisConfiguration
+	 * Only for "java.util.logging.FileHandler.pattern" value
+	 *  
+	 * @param inputStream stream of the logging properties
+	 * @return new stream which contains the replaced FileHandler.pattern
+	 * @throws IOException
+	 */
+	private static InputStream adaptFileLocation(InputStream inputStream) throws IOException {
+		final Properties props = new Properties();
+		final NisConfiguration configuration = new NisConfiguration();
+		props.load(inputStream);
+		String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
+		tmpStr = tmpStr.replace("${nemFolder}", configuration.getNemFolder());
+		props.setProperty("java.util.logging.FileHandler.pattern", tmpStr);
+		StringWriter strWriter = new StringWriter();
+		props.store(strWriter, null);
+
+		return new ByteArrayInputStream(StringEncoder.getBytes(strWriter.toString()));
 	}
 
 	private static Handler createHandlers() {
@@ -156,8 +183,7 @@ public class CommonStarter implements ServletContextListener {
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
 		dosFilter.setInitParameter("delayMs", "1000");
 		dosFilter.setInitParameter("trackSessions", "false");
-		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes seems
-																// reasonable
+		dosFilter.setInitParameter("maxRequestMs", "120000"); // 2 minutes
 		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 

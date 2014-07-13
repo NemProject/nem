@@ -152,15 +152,15 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	// whatever it takes : DO NOT ADD setMaxResults here!
-	public List<Block> getBlocksAfter(long blockHeight, int blocksCount) {
-			final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
-					.setFetchMode("forger", FetchMode.JOIN)
-					.setFetchMode("blockTransfers", FetchMode.JOIN)
-					.add(Restrictions.gt("height", blockHeight))
-					.add(Restrictions.lt("height", blockHeight + (long)blocksCount))
-					.addOrder(Order.asc("height"));
-			return listAndCast(criteria);
+	public Collection<Block> getBlocksAfter(long blockHeight, int blocksCount) {
+		// whatever it takes : DO NOT ADD setMaxResults here!
+        final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+                .setFetchMode("forger", FetchMode.JOIN)
+                .setFetchMode("blockTransfers", FetchMode.JOIN)
+                .add(Restrictions.gt("height", blockHeight))
+                .add(Restrictions.lt("height", blockHeight + (long)blocksCount))
+                .addOrder(Order.asc("height"));
+        return listAndCast(criteria);
 	}
 
 	@Override

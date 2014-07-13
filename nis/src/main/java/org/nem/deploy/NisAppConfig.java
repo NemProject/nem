@@ -45,12 +45,16 @@ public class NisAppConfig {
 
 	@Bean
 	public DataSource dataSource() throws IOException {
+		final NisConfiguration configuration = this.nisConfiguration();
+		final String nemFolder = configuration.getNemFolder();
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
+		//Replace ${nisFolder} with the value from configuration
+		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nemFolder}", nemFolder);
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
-		dataSource.setUrl(prop.getProperty("jdbc.url"));
+		dataSource.setUrl(jdbcUrl);
 		dataSource.setUsername(prop.getProperty("jdbc.username"));
 		dataSource.setPassword(prop.getProperty("jdbc.password"));
 		return dataSource;

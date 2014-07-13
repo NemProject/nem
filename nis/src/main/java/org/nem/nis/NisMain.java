@@ -2,22 +2,18 @@ package org.nem.nis;
 
 import javax.annotation.PostConstruct;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.*;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.deploy.CommonStarter;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.core.model.*;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.node.*;
@@ -72,8 +68,9 @@ public class NisMain {
 		}
 
 		Block parentBlock = null;
-		List<org.nem.nis.dbmodel.Block> blockList = null;
-		Iterator<org.nem.nis.dbmodel.Block> currentBlock = null;
+		final BlockIterator iterator = new BlockIterator(this.blockDao);
+
+		// TODO: we should really test this procedure ;)
 
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
@@ -108,40 +105,14 @@ public class NisMain {
 			parentBlock = block;
 
 			curBlockId = dbBlock.getNextBlockId();
-			long curHeight = dbBlock.getHeight();
+
 			// This is proper exit from this loop
 			if (null == curBlockId) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				break;
 			}
 
-			// ugly loop, this is equivalent to
-			// dbBlock = this.blockDao.findById(curBlockId);
-			do {
-				if (blockList == null || !currentBlock.hasNext()) {
-					blockList = this.blockDao.getBlocksAfter(curHeight, 2345);
-					currentBlock = blockList.iterator();
-				}
-
-				// in most cases this won't make any loops
-				while (currentBlock.hasNext()) {
-					dbBlock = currentBlock.next();
-					if (dbBlock.getId().equals(curBlockId)) {
-						break;
-					}
-
-					if (dbBlock.getHeight().compareTo(curHeight + 1) > 0) {
-						dbBlock = null;
-					}
-				}
-
-				if (dbBlock == null) {
-					break;
-				}
-
-				curHeight = dbBlock.getHeight();
-			}
-			while (! dbBlock.getId().equals(curBlockId));
+			dbBlock = iterator.findById(curBlockId);
 
 			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
@@ -150,6 +121,49 @@ public class NisMain {
 		} while (dbBlock != null);
 
 		this.initializePoi(parentBlock.getHeight());
+	}
+
+	private static class BlockIterator {
+		private final BlockDao blockDao;
+		private long curHeight;
+		private Iterator<org.nem.nis.dbmodel.Block> iterator;
+
+		public BlockIterator(final BlockDao blockDao) {
+			this.curHeight = 1; // the nemesis block height
+			this.blockDao = blockDao;
+		}
+
+		public org.nem.nis.dbmodel.Block findById(final long id) {
+			// ugly loop, this is equivalent to
+			// dbBlock = this.blockDao.findById(curBlockId);
+			org.nem.nis.dbmodel.Block dbBlock = null;
+			do {
+				if (null == this.iterator || !this.iterator.hasNext()) {
+					this.iterator = this.blockDao.getBlocksAfter(curHeight, 2345).iterator();
+				}
+
+				// in most cases this won't make any loops
+				while (this.iterator.hasNext()) {
+					dbBlock = this.iterator.next();
+					if (dbBlock.getId().equals(id)) {
+						break;
+					}
+
+					if (dbBlock.getHeight().compareTo(this.curHeight + 1) > 0) {
+						dbBlock = null;
+					}
+				}
+
+				if (dbBlock == null) {
+					break;
+				}
+
+				this.curHeight = dbBlock.getHeight();
+			}
+			while (!dbBlock.getId().equals(id));
+
+			return dbBlock;
+		}
 	}
 
 	private void initializePoi(final BlockHeight height) {

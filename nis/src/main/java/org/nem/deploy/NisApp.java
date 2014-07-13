@@ -30,10 +30,10 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NISApp implements WindowListener {
-	private static final Logger LOGGER = Logger.getLogger(NISApp.class.getName());
+public class NisApp implements WindowListener {
+	private static final Logger LOGGER = Logger.getLogger(NisApp.class.getName());
 
-	public static final NISApp INSTANCE = createApplicationWindow();
+	public static final NisApp INSTANCE = createApplicationWindow();
 
 	private Server server;
 	private boolean isAvailable;
@@ -48,13 +48,12 @@ public class NISApp implements WindowListener {
 	/**
 	 * Create the application.
 	 */
-	protected NISApp() {
-
+	private NisApp() {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static NISApp createApplicationWindow() {
-		NISApp result = new NISApp();
+	public static NisApp createApplicationWindow() {
+		NisApp result = new NisApp();
 		try {
 			final Class serviceManager = Class.forName("javax.jnlp.ServiceManager");
 			final Method lookUpMethod = serviceManager.getMethod("lookup", String.class);
@@ -220,20 +219,18 @@ public class NISApp implements WindowListener {
 		}
 
 		LOGGER.info("Open window scheduled.");
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				LOGGER.info("Processing open window.");
-				try {
-					initialize();
-					ApplicationMetaData amd = CommonStarter.META_DATA;
-					getLbVersion().setText(amd.getVersion());
-					frmNemInfrastructureServer.setTitle(amd.getAppName());
-					frmNemInfrastructureServer.pack();
-					frmNemInfrastructureServer.setVisible(true);
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "Could not start GUI.", e);
-					isAvailable = false;
-				}
+		EventQueue.invokeLater(() -> {
+			LOGGER.info("Processing open window.");
+			try {
+				initialize();
+				ApplicationMetaData amd = CommonStarter.META_DATA;
+				getLbVersion().setText(amd.getVersion());
+				frmNemInfrastructureServer.setTitle(amd.getAppName());
+				frmNemInfrastructureServer.pack();
+				frmNemInfrastructureServer.setVisible(true);
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, "Could not start GUI.", e);
+				isAvailable = false;
 			}
 		});
 	}
@@ -243,51 +240,44 @@ public class NISApp implements WindowListener {
 		try {
 			server.stop();
 		} catch (Exception e) {
-			//
 			LOGGER.log(Level.WARNING, "Jetty Server could not be stopped.", e);
 		}
 	}
 
 	@Override
 	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
 		//
-		LOGGER.info("shutting down...");
-		shutdown();
+		LOGGER.info("NisApp shutting down...");
+		this.shutdown();
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+		// do nothing
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
+        // do nothing
 	}
 }
