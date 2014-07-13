@@ -1,9 +1,10 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.deploy.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.*;

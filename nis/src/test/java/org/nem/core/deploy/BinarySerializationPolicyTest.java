@@ -1,7 +1,8 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.deploy.BinarySerializationPolicy;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;

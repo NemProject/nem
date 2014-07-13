@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
@@ -18,10 +18,11 @@ import java.io.Writer;
 public class JsonErrorHandler extends ErrorHandler {
 
 	@Override
-	public void handle(final String target,
-					   final Request baseRequest,
-					   final HttpServletRequest request,
-					   final HttpServletResponse response) throws IOException {
+	public void handle(
+			final String target,
+			final Request baseRequest,
+			final HttpServletRequest request,
+			final HttpServletResponse response) throws IOException {
 		// note: handle needs to be overridden instead of something more specific like handleErrorPage
 		// because we need to set the content type to application/json and this is the only way to do that.
 		// the rest of the implementation comes from the reflected base class.

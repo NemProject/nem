@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import net.minidev.json.*;
 import org.nem.core.serialization.*;

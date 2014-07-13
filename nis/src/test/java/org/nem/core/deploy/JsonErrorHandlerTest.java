@@ -1,10 +1,11 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import net.minidev.json.*;
 import org.eclipse.jetty.server.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.deploy.JsonErrorHandler;
 import org.nem.core.serialization.*;
 import org.nem.core.connect.ErrorResponse;
 
