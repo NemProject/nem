@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.nem.core.deploy.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.interceptors.*;

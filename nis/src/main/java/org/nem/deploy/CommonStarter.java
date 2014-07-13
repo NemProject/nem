@@ -15,6 +15,7 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.nem.core.deploy.JsonErrorHandler;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.StringEncoder;
