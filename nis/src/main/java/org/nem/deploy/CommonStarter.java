@@ -68,9 +68,6 @@ public class CommonStarter implements ServletContextListener {
 		server.setDumpBeforeStop(false);
 		server.setStopAtShutdown(true);
 
-		NisApp.INSTANCE.setServer(server);
-		NisApp.INSTANCE.showWindow();
-
 		LOGGER.info("Calling start().");
 		server.start();
 		server.join();
