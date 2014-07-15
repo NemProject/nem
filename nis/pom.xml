@@ -519,6 +519,45 @@
 					</execution>
 					<execution>
 						<!-- ************************************************** -->
+						<!-- Generate obfuscation script (proguard jar path) -->
+						<!-- ************************************************** -->
+						<id>linux-obfuscation-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>obfuscate-ws.sh</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate Windows Obfuscation signing Script -->
+						<!-- ************************************************** -->
+						<id>linux-signing-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>buildPackage-ws-sign-nis.sh</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<!-- ************************************************** -->
 						<!-- Generate MANIFEST.MF for re-includion in JAR -->
 						<!-- ************************************************** -->
 						<id>manifest-mf</id>
