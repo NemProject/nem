@@ -11,12 +11,6 @@ awk "{ if (match($0, /(.*\.)([0-9]+)(-ALPHA.*)/, arr)) { printf \"%%s%%d%%s\n\",
 tr --delete "\r" < pom.out > pom-mariadb.xml
 rm pom.out
 
-pushd obfuscation
-awk "{ if (match($0, /(.*\.)([0-9]+)(-ALPHA.*)/, arr)) { printf \"%%s%%d%%s\n\", arr[1], arr[2]+1, arr[3] } else { print } }" < nis.new.settings > nis.out
-move /Y nis.out nis.new.settings
-git add nis.new.settings
-popd
-
 git add pom.xml
 git add pom-core.xml
 git add pom-mariadb.xml

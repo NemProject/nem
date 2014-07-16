@@ -8,7 +8,7 @@ superlog.txt
 my.*.sh
 .DS_Store
 /site
-nem.log.*
+nis-*.log*
 /dependency-reduced-pom.xml
 /nis.temp.settings
 /data/

@@ -1,10 +1,12 @@
 package org.nem.core.connect;
 
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.*;
+
+import java.io.ByteArrayInputStream;
 
 public class HttpDeserializerResponseStrategyTest {
 
@@ -14,6 +16,11 @@ public class HttpDeserializerResponseStrategyTest {
 		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
 		final HttpResponse response = Mockito.mock(HttpResponse.class);
 		ConnectUtils.mockStatusCode(response, 500);
+
+		final HttpEntity entity = Mockito.mock(HttpEntity.class);
+		final ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[] { });
+		Mockito.when(response.getEntity()).thenReturn(entity);
+		Mockito.when(entity.getContent()).thenReturn(inputStream);
 
 		// Act:
 		strategy.coerce(Mockito.mock(HttpRequestBase.class), response);

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.nis</groupId>
 	<artifactId>nem-infrastructure-server</artifactId>
-	<version>0.0.68-ALPHA</version>
+	<version>0.0.72-ALPHA</version>
 	<name>NEM Infrastructure Server</name>
 	<organization>
 		<name>NEM - New Economy Movement</name>
@@ -25,7 +25,7 @@
 	<properties>
 		<nem-certificate-store>identity.jks</nem-certificate-store>
 		<nem-certificate-password>nem-start-201404</nem-certificate-password>
-		<nem-code-base>http://nem.pucchiwerk.eu/nem</nem-code-base>
+		<nem-code-base>http://bob.nem.ninja/webstart</nem-code-base>
 		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
@@ -517,6 +517,45 @@
 							<outputDirectory>obfuscation</outputDirectory>
 						</configuration>
 					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate obfuscation script (proguard jar path) -->
+						<!-- ************************************************** -->
+						<id>linux-obfuscation-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>obfuscate-ws.sh</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- ************************************************** -->
+						<!-- Generate Windows Obfuscation signing Script -->
+						<!-- ************************************************** -->
+						<id>linux-signing-script</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>velocity</goal>
+						</goals>
+						<configuration>
+							<templateFiles>
+								<directory>src/main/templates</directory>
+								<includes>
+									<include>buildPackage-ws-sign-nis.sh</include>
+								</includes>
+							</templateFiles>
+							<outputDirectory>obfuscation</outputDirectory>
+						</configuration>
+					</execution>
+
 					<execution>
 						<!-- ************************************************** -->
 						<!-- Generate MANIFEST.MF for re-includion in JAR -->
