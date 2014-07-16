@@ -210,6 +210,8 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	//endregion
 
+	//region String Roundtrip
+
 	@Test
 	public void canRoundtripString() {
 		// Arrange:
@@ -242,11 +244,28 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	@Test(expected = SerializationException.class)
 	public void cannotRoundtripRequiredNullString() {
+		// Act:
+		attemptToRoundtripString(null);
+	}
+
+	@Test(expected = SerializationException.class)
+	public void cannotRoundtripRequiredEmptyString() {
+		// Act:
+		attemptToRoundtripString("");
+	}
+
+	@Test(expected = SerializationException.class)
+	public void cannotRoundtripRequiredWhitespaceString() {
+		// Act:
+		attemptToRoundtripString("  \t \t");
+	}
+
+	private void attemptToRoundtripString(final String s) {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
 		// Act:
-		serializer.writeString("String", null);
+		serializer.writeString("String", s);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
 		deserializer.readString("String");

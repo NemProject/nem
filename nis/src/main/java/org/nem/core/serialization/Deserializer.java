@@ -1,5 +1,7 @@
 package org.nem.core.serialization;
 
+import org.nem.core.utils.StringUtils;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -142,14 +144,18 @@ public abstract class Deserializer {
 	//region read[Optional]String
 
 	/**
-	 * Reads a String value.
+	 * Reads a String value that is required to be non-whitespace.
 	 *
 	 * @param label The optional name of the value.
 	 *
 	 * @return The read value.
 	 */
 	public final String readString(final String label) {
-		return this.requireNonNull(label, this.readOptionalString(label));
+		final String value = this.readOptionalString(label);
+		if (StringUtils.isNullOrWhitespace(value))
+			throw new SerializationException(String.format("expected non-whitespace value for property %s", label));
+
+		return value;
 	}
 
 	/**
