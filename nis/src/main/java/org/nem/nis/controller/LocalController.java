@@ -2,12 +2,14 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.ExplorerBlockView;
 import org.nem.nis.controller.viewmodels.ExplorerTransferView;
 import org.nem.nis.service.RequiredBlockDao;
@@ -29,6 +31,13 @@ public class LocalController {
 			final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
+	}
+
+	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
+	@PublicApi
+	public NisRequestResult heartbeat()
+	{
+		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
 	}
 
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)
