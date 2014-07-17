@@ -75,7 +75,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 *
 	 * @param rhs The value to subtract.
 	 *
-	 * @return The subtraction result.
+	 * @return The subtraction result in seconds.
 	 */
 	public int subtract(final TimeInstant rhs) {
 		return this.time - rhs.time;
