@@ -153,7 +153,7 @@ public abstract class Deserializer {
 	public final String readString(final String label) {
 		final String value = this.readOptionalString(label);
 		if (StringUtils.isNullOrWhitespace(value))
-			throw new SerializationException(String.format("expected non-whitespace value for property %s", label));
+			throw new MissingRequiredPropertyException(label);
 
 		return value;
 	}
@@ -234,7 +234,7 @@ public abstract class Deserializer {
 
 	private <T> T requireNonNull(final String label, final T value) {
 		if (null == value)
-			throw new SerializationException(String.format("expected non-null value for property %s", label));
+			throw new MissingRequiredPropertyException(label);
 
 		return value;
 	}

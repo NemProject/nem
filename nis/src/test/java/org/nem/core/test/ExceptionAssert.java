@@ -18,12 +18,29 @@ public class ExceptionAssert {
 	 * @param exceptionClass The expected exception class.
 	 */
 	public static void assertThrows(final Consumer<Void> consumer, final Class<?> exceptionClass) {
+		assertThrows(consumer, exceptionClass, ex -> { });
+	}
+
+	/**
+	 * Asserts that the execution of consumer throws an exception of the specific class.
+	 *
+	 * @param consumer The consumer.
+	 * @param exceptionClass The expected exception class.
+	 * @param assertExceptionProperties Consumer that is passed the matching exception to run any additional validation.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> void assertThrows(
+			final Consumer<Void> consumer,
+			final Class<T> exceptionClass,
+			final Consumer<T> assertExceptionProperties) {
 		try {
 			consumer.accept(null);
 		}
 		catch (Exception ex) {
-			if (ex.getClass() == exceptionClass)
+			if (ex.getClass() == exceptionClass) {
+				assertExceptionProperties.accept((T)ex);
 				return;
+			}
 
 			Assert.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
 		}
