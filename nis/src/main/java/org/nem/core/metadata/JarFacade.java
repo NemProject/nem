@@ -46,6 +46,8 @@ public class JarFacade {
 
 		this.title = null == attributes ? DEFAULT_TITLE : attributes.title;
 		this.version = null == attributes ? DEFAULT_VERSION : attributes.version;
+
+		LOGGER.info(String.format("Meta data title <%s>, version <%s>", this.title, this.version));
 	}
 
 	/**
