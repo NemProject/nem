@@ -1,9 +1,9 @@
 package org.nem.core.deploy;
 
+import org.apache.commons.io.IOUtils;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 import org.springframework.http.MediaType;
-import sun.misc.IOUtils;
 
 import java.io.InputStream;
 
@@ -35,7 +35,7 @@ public class BinarySerializationPolicy implements SerializationPolicy {
 
 	@Override
 	public Deserializer fromStream(final InputStream stream) {
-		final byte[] bytes = ExceptionUtils.propagate(() -> IOUtils.readFully(stream, -1, true));
+		final byte[] bytes = ExceptionUtils.propagate(() -> IOUtils.toByteArray(stream));
 		final DeserializationContext context = new DeserializationContext(this.accountLookup);
 		return new BinaryDeserializer(bytes, context);
 	}
