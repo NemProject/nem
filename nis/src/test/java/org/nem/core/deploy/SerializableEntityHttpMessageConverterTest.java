@@ -4,13 +4,11 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.deploy.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SerializableEntityHttpMessageConverterTest {
@@ -31,7 +29,17 @@ public class SerializableEntityHttpMessageConverterTest {
 		// Assert:
 		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
 		Assert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
-		Mockito.verify(policy, Mockito.times(2)).getMediaType();
+		Mockito.verify(policy, Mockito.times(1)).getMediaType();
+	}
+
+	@Test
+	public void cannotReadCompatibleTypes() {
+		// Arrange:
+		final MediaType supportedType = new MediaType("application", "json");
+		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
+
+		// Assert:
+		Assert.assertThat(mc.canRead(MockSerializableEntity.class, supportedType), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -56,143 +64,22 @@ public class SerializableEntityHttpMessageConverterTest {
 		Assert.assertThat(mc.canWrite(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
-	@Test
-	public void canReadCompatibleTypesWithDeserializerConstructor() {
-		// Arrange:
-		final MediaType supportedType = new MediaType("application", "json");
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		final Class[] types = new Class[] {
-				MockSerializableEntity.class,
-				SerializableEntityWithConstructorThatThrowsCheckedException.class,
-				SerializableEntityWithConstructorThatThrowsUncheckedException.class
-		};
-
-		// Assert:
-		for (final Class type : types)
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void cannotReadCompatibleTypesWithoutDeserializerConstructor() {
-		// Arrange:
-		final MediaType supportedType = new MediaType("application", "json");
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		final Class[] types = new Class[] {
-				SerializableEntity.class,
-				SerializableEntityWithoutDeserializerConstructor.class
-		};
-
-		// Assert:
-		for (final Class type : types)
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void cannotReadIncompatibleTypes() {
-		// Arrange:
-		final MediaType supportedType = new MediaType("application", "json");
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		// Assert:
-		Assert.assertThat(mc.canRead(MediaType.class, supportedType), IsEqual.equalTo(false));
-		Assert.assertThat(mc.canRead(Object.class, supportedType), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void cannotReadIncompatibleMediaTypes() {
-		// Arrange:
-		final MediaType supportedType = new MediaType("application", "binary");
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		final Class[] types = new Class[] {
-				MockSerializableEntity.class,
-				SerializableEntityWithConstructorThatThrowsCheckedException.class,
-				SerializableEntityWithConstructorThatThrowsUncheckedException.class
-		};
-
-		// Assert:
-		for (final Class type : types)
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
-	}
-
 	//endregion
 
 	//region read
 
-	@Test
-	public void readIsSupportedForCompatibleTypeWithDeserializerConstructor() throws Exception {
-		// Arrange:
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		// Act:
-		final MockSerializableEntity entity = (MockSerializableEntity)mc.read(
-				MockSerializableEntity.class,
-				new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity)));
-
-		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
-	}
-
-	@Test
-	public void readDelegatesToPolicy() throws Exception {
-		// Arrange:
-		final MediaType mediaType = new MediaType("application", "json");
-		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
-		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
-		Mockito.when(policy.fromStream(Mockito.any())).thenReturn(Mockito.mock(Deserializer.class));
-
-		// Arrange:
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter(policy);
-
-		// Act:
-		final MockHttpInputMessage message = new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity));
-		mc.read(MockSerializableEntity.class, message);
-
-		// Assert:
-		Mockito.verify(policy, Mockito.times(1)).fromStream(message.getBody());
-	}
-
 	@Test(expected = UnsupportedOperationException.class)
-	public void readIsUnsupportedForCompatibleTypeWithConstructorThatThrowsCheckedException() throws Exception {
+	public void readIsUnsupported() throws Exception {
 		// Arrange:
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
 		// Act:
-		mc.read(
-				SerializableEntityWithConstructorThatThrowsCheckedException.class,
-				new MockHttpInputMessage(new JSONObject()));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void readIsUnsupportedForCompatibleTypeWithConstructorThatThrowsUncheckedException() throws Exception {
-		// Arrange:
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		// Act:
-		mc.read(
-				SerializableEntityWithConstructorThatThrowsUncheckedException.class,
-				new MockHttpInputMessage(new JSONObject()));
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void readIsUnsupportedForCompatibleTypeWithoutDeserializerConstructor() throws Exception {
-		// Arrange:
-		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
-
-		// Act:
-		mc.read(
-				SerializableEntityWithoutDeserializerConstructor.class,
-				new MockHttpInputMessage(new JSONObject()));
+		mc.read(MockSerializableEntity.class, new MockHttpInputMessage(new JSONObject()));
 	}
 
 	//endregion
 
 	//region write
-
 
 	@Test
 	public void writeCreatesJsonStringWithTerminatingNewline() throws Exception {
@@ -260,25 +147,5 @@ public class SerializableEntityHttpMessageConverterTest {
 
 	private static SerializableEntityHttpMessageConverter createMessageConverter(final SerializationPolicy policy) {
 		return new SerializableEntityHttpMessageConverter(policy);
-	}
-
-	private static class SerializableEntityWithoutDeserializerConstructor extends MockSerializableEntity {
-
-		public SerializableEntityWithoutDeserializerConstructor() {
-		}
-	}
-
-	private static class SerializableEntityWithConstructorThatThrowsUncheckedException extends MockSerializableEntity{
-
-		public SerializableEntityWithConstructorThatThrowsUncheckedException(final Deserializer deserializer) {
-			throw new IllegalArgumentException("constructor failed: " + deserializer.toString());
-		}
-	}
-
-	private static class SerializableEntityWithConstructorThatThrowsCheckedException extends MockSerializableEntity{
-
-		public SerializableEntityWithConstructorThatThrowsCheckedException(final Deserializer deserializer) throws IOException {
-			throw new IOException("constructor failed: " + deserializer.toString());
-		}
 	}
 }

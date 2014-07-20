@@ -6,15 +6,11 @@ import org.springframework.http.*;
 import org.springframework.http.converter.*;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * An HttpMessageConverter that maps SerializableEntity responses to application/json.
  */
 public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<SerializableEntity> {
-
-	private final DeserializerHttpMessageConverter deserializerMessageConverter;
 	private final SerializationPolicy policy;
 
 	/**
@@ -25,7 +21,6 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 	@Autowired(required = true)
 	public SerializableEntityHttpMessageConverter(final SerializationPolicy policy) {
 		super(policy.getMediaType());
-		this.deserializerMessageConverter = new DeserializerHttpMessageConverter(policy);
 		this.policy = policy;
 	}
 
@@ -36,19 +31,14 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 	@Override
 	public boolean canRead(final Class<?> clazz, final MediaType type) {
-		return super.canRead(clazz, type) && null != this.getConstructor(clazz);
+		return false;
 	}
 
 	@Override
 	protected SerializableEntity readInternal(
 			final Class<? extends SerializableEntity> aClass,
 			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
-
-		final Deserializer deserializer = this.deserializerMessageConverter.readInternal(
-				Deserializer.class,
-				httpInputMessage);
-
-		return this.createInstance(aClass, deserializer);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -57,30 +47,5 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
 
 		httpOutputMessage.getBody().write(this.policy.toBytes(serializableEntity));
-	}
-
-	private <T> Constructor<T> getConstructor(final Class<T> aClass) {
-		try {
-			return aClass.getConstructor(Deserializer.class);
-		} catch (NoSuchMethodException e) {
-			return null;
-		}
-	}
-
-	private SerializableEntity createInstance(
-			final Class<? extends SerializableEntity> aClass,
-			final Deserializer deserializer) {
-		try {
-			final Constructor<? extends SerializableEntity> constructor = this.getConstructor(aClass);
-			if (null == constructor)
-				throw new UnsupportedOperationException("could not find compatible constructor");
-
-			return constructor.newInstance(deserializer);
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			if (e.getCause() instanceof RuntimeException)
-				throw (RuntimeException)e.getCause();
-
-			throw new UnsupportedOperationException("could not instantiate object");
-		}
 	}
 }

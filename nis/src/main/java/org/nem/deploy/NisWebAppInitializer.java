@@ -34,6 +34,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport  {
 			final SerializationPolicy policy) {
 		converters.add(new DeserializerHttpMessageConverter(policy));
 		converters.add(new SerializableEntityHttpMessageConverter(policy));
+		converters.add(new DeserializableEntityMessageConverter(policy));
 	}
 
 	@Override
