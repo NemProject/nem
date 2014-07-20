@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.logging.Logger;
+
 import org.nem.core.model.Address;
 import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.ncc.NisRequestResult;
@@ -8,6 +10,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.SystemTimeProvider;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.ExplorerBlockView;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LocalController {
+	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
+
+	private final long SHUTDOWN_DELAY = 200;
 	private final RequiredBlockDao blockDao;
 	private final AccountLookup accountLookup;
 
@@ -31,6 +37,28 @@ public class LocalController {
 			final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
+	}
+
+	/**
+	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
+	 */
+	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
+	public void shutdown() {
+		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
+		final Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(SHUTDOWN_DELAY);
+				} catch (final InterruptedException e) {
+					// We do nothing than continuing
+				}
+				CommonStarter.INSTANCE.stopServer();
+			}
+		};
+
+		final Thread thread = new Thread(r);
+		thread.start();
 	}
 
 	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
