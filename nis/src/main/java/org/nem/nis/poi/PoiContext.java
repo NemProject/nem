@@ -202,18 +202,24 @@ public class PoiContext {
 		}
 
 		private void createStartVector() {
+			// TODO: BR: After unwinding a chain to height x in order to resolve a fork, the start vector is different
+			//           from the start vector we use when growing an incomplete chain at height x. This results in
+			//           a slightly different importance value. This in turn leads to a slightly different target for
+			//           a block and could in theory lead to an unresolvable fork. Better use a constant vector for now.
+
 			// (1) Assign the start vector to the last page rank
-			int i = 0;
-			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
-				this.poiStartVector.setAt(i, importance.getLastPageRank());
-				++i;
-			}
+//			int i = 0;
+//			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+//				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+//				this.poiStartVector.setAt(i, importance.getLastPageRank());
+//				++i;
+//			}
+//
+//			// (2) normalize the start vector
+//			if (this.poiStartVector.isZeroVector())
+//				this.poiStartVector.setAll(1.0);
 
-			// (2) normalize the start vector
-			if (this.poiStartVector.isZeroVector())
-				this.poiStartVector.setAll(1.0);
-
+			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
 		}
 
