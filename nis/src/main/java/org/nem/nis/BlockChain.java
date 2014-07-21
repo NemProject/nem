@@ -374,6 +374,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.createLocalBlockLookup(),
 					commonBlockHeight,
 					visitor);
+			this.accountAnalyzer.undoVesting(commonBlockHeight);
 
 			return scoreVisitor.getScore();
 		}
