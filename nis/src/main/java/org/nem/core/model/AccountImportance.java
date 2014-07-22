@@ -182,7 +182,7 @@ public class AccountImportance implements SerializableEntity {
 		serializer.writeInt("isSet", this.isSet() ? 1 : 0);
 		if (this.isSet()) {
 			serializer.writeDouble("score", this.importance);
-			serializer.writeDouble("page-rank", this.lastPageRank);
+			serializer.writeDouble("ev", this.lastPageRank);
 			BlockHeight.writeTo(serializer, "height", this.importanceHeight);
 		}
 	}
