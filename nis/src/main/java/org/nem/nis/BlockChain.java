@@ -567,10 +567,10 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		private static void logAccounts(final String heading, final Iterable<Account> accounts) {
-			LOGGER.info(String.format("[%s]", heading));
-			for (final Account account : accounts) {
-				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
-			}
+//			LOGGER.info(String.format("[%s]", heading));
+//			for (final Account account : accounts) {
+//				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
+//			}
 		}
 
 		private void addRevertedTransactionsAsUnconfirmed(
