@@ -111,7 +111,11 @@ public class SecureMessage extends Message {
 		}
 
 		public boolean canDecode() {
-			return this.getRecipientKeyPair().hasPrivateKey() || this.getSenderKeyPair().hasPrivateKey();
+			KeyPair senderKeyPair = this.getSenderKeyPair();
+			KeyPair recipientKeyPair = this.getRecipientKeyPair();
+			return (recipientKeyPair != null && senderKeyPair != null &&
+					((recipientKeyPair.hasPrivateKey() && senderKeyPair.hasPublicKey())|| 
+					 (senderKeyPair.hasPrivateKey() && recipientKeyPair.hasPublicKey())));
 		}
 
 		public byte[] getEncoded() {
