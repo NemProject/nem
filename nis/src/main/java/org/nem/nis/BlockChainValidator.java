@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
  */
 public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
+	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final int maxChainSize;
@@ -48,6 +50,11 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+			if (block.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
+				return false;
+			}
+			
 			if (!isBlockHit(parentBlock, block)) {
 				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
@@ -56,6 +63,10 @@ public class BlockChainValidator {
 			for (final Transaction transaction : block.getTransactions()) {
 				if (ValidationResult.SUCCESS != transaction.checkValidity() || !transaction.verify())
 					return false;
+
+				if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
+					return false;
+				}
 			}
 
 			parentBlock = block;
