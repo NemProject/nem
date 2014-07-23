@@ -11,7 +11,6 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.peer.NodeInteractionResult;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -289,6 +288,35 @@ public class ForagingTest {
 		Assert.assertThat(transactionsList.get(1), IsEqual.equalTo(transaction1));
 	}
 
+	@Test
+	public void transactionsCanBeFilteredForHarvester() {
+		// Arrange:
+		final Account harvester = createAccountWithBalance(200);
+		final Account signer = createAccountWithBalance(400);
+		final Account recipient = Utils.generateRandomAccount();
+		final Foraging foraging = createMockForaging();
+		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
+
+		// Act:
+		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
+		Transaction transaction3 = createSignedTransactionWithTime(harvester, recipient, Amount.fromNem(5), now.addSeconds(5));
+		final ValidationResult result1 = foraging.processTransaction(transaction1);
+		final ValidationResult result2 = foraging.processTransaction(transaction2);
+		final ValidationResult result3 = foraging.processTransaction(transaction3);
+		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+		List<Transaction> filteredTransactionsList = foraging.filterTransactionsForHarvester(transactionsList, harvester);
+		List<Transaction> filteredTransactionsList2 = foraging.filterTransactionsForHarvester(transactionsList, Utils.generateRandomAccount());
+
+		// Assert
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result3, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(transactionsList.size(), IsEqual.equalTo(3));
+		Assert.assertThat(filteredTransactionsList.size(), IsEqual.equalTo(2));
+		Assert.assertThat(filteredTransactionsList2.size(), IsEqual.equalTo(3));
+	}
+	
 	private TransferTransaction createSignedTransactionWithTime(Account signer, Account recipient, Amount fee, TimeInstant now) {
 		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
 		transaction1.setDeadline(now.addHours(1));

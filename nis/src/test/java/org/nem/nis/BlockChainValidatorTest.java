@@ -226,6 +226,25 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
+	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
+		// Arrange:
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidator(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+	
+	@Test
 	public void chainIsValidIfAllTransactionChecksPass() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -345,7 +364,7 @@ public class BlockChainValidatorTest {
 			block.sign();
 	}
 	
-	private static Block createFutureBlock(Block parentBlock) {
+	private static Block createFutureBlock(final Block parentBlock) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
 		block.sign();
@@ -382,6 +401,13 @@ public class BlockChainValidatorTest {
 		return transaction;
 	}
 
+	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
+		final Transaction transaction =  new MockTransaction(account);
+		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
+		transaction.sign();
+		return transaction;
+	}
+
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
 		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
 		Mockito.when(accountAnalyzer.findByAddress(Mockito.anyObject())).thenReturn(Utils.generateRandomAccount());
@@ -396,11 +422,11 @@ public class BlockChainValidatorTest {
 		return createValidator(new MockBlockScorer());
 	}
 
-	private static Block createBlock(final Account account, long height) {
+	private static Block createBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 	}
 
-	private static Block createBlock(final Account account, Block parentBlock) {
+	private static Block createBlock(final Account account, final Block parentBlock) {
 		return new Block(account, parentBlock, TimeInstant.ZERO);
 	}
 
