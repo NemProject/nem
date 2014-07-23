@@ -121,7 +121,7 @@ public class BlockChainTest {
 	}
 
 	@Test
-	public void canSuccessfullyProcessBlock() throws NoSuchFieldException, IllegalAccessException {
+	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer((blockHeight, accounts, scoringAlg) -> {
 			accounts.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accounts.size()));
@@ -165,6 +165,14 @@ public class BlockChainTest {
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
+		
+		// siblings with same score must be rejected
+		// Act:
+		Block sibling = createBlockSiblingWithSameScore(block, parentBlock, accounts);
+		final ValidationResult siblingResult = blockChain.processBlock(sibling);
+
+		// Assert:
+		Assert.assertTrue(siblingResult == ValidationResult.NEUTRAL);
 	}
 
 	private org.nem.nis.dbmodel.Account retrieveAccount(long i, Account signer) {
@@ -199,7 +207,7 @@ public class BlockChainTest {
 		return b;
 	}
 
-	private TransferTransaction createSignedTransactionWithAmount(List<Account> accounts, int i, AccountAnalyzer accountAnalyzer, long amount, TimeInstant timeInstant) {
+	private TransferTransaction createSignedTransactionWithAmount(List<Account> accounts, int i, long amount, TimeInstant timeInstant) {
 		final TransferTransaction transaction = new TransferTransaction(
 				timeInstant,
 				accounts.get(i),
@@ -240,15 +248,26 @@ public class BlockChainTest {
 		block = new Block(forger, lastBlock, blockTime);
 		block.setDifficulty(difficulty);
 
-		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, accountAnalyzer, 17, blockTime.addMinutes(-2));
+		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, 17, blockTime.addMinutes(-2));
 		block.addTransaction(transaction1);
 
-		final TransferTransaction transaction2 = createSignedTransactionWithAmount(accounts, 3, accountAnalyzer, 290, blockTime.addMinutes(-5));
+		final TransferTransaction transaction2 = createSignedTransactionWithAmount(accounts, 3, 290, blockTime.addMinutes(-5));
 		block.addTransaction(transaction2);
 		block.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		block.sign();
 
 		return roundTripBlock(accountAnalyzer, block);
+	}
+	
+	private Block createBlockSiblingWithSameScore(Block block, Block parentBlock, List<Account> accounts) {
+		Account signer = accounts.get(accounts.indexOf(block.getSigner()));
+		Block sibling = new Block(signer, parentBlock, block.getTimeStamp());
+		sibling.setDifficulty(block.getDifficulty());
+		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
+		sibling.addTransaction(transaction1);
+		sibling.sign();
+		
+		return sibling;
 	}
 
 	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {

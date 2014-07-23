@@ -188,6 +188,19 @@ public class Foraging  {
 				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
 		);
 	}
+	
+	/**
+	 * Filter out any transaction that has the harvester as sender.
+	 * 
+	 * @param transactions The original list of transactions.
+	 * @param harvester The harvester's account.
+	 * @return The filtered list of transactions.
+	 */
+	public List<Transaction> filterTransactionsForHarvester(final Collection<Transaction> transactions, final Account harvester) {
+		return transactions.stream()
+				.filter(tx -> !tx.getSigner().equals(harvester))
+				.collect(Collectors.toList());
+	}
 
 	/**
 	 * returns foraged block or null
@@ -214,9 +227,11 @@ public class Foraging  {
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
 				for (Account virtualForger : unlockedAccounts) {
-
+					// Don't allow a harvester to include his own transactions
+					Collection<Transaction> txList = filterTransactionsForHarvester(transactionList, virtualForger);
+					
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, transactionList, lastBlock, virtualForger, difficulty);
+					final Block newBlock = createSignedBlock(blockTime, txList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
