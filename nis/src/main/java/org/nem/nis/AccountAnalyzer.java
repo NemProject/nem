@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.nem.core.crypto.*;
-import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
@@ -201,7 +200,7 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 	 * 
 	 * @param height The block height.
 	 */
-	public void undoVesting(BlockHeight height) {
+	public void undoVesting(final BlockHeight height) {
 		this.addressToAccountMap.values().stream().forEach(a -> a.getWeightedBalances().undoChain(height));
 	}
 

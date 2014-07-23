@@ -538,8 +538,6 @@ public class BlockChain implements BlockSynchronizer {
 		 */
 		private void updateOurChain() {
 			synchronized (this.blockChainLastBlockLayer) {
-				logAccounts("original", this.originalAnalyzer);
-				logAccounts("new", this.accountAnalyzer);
 				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
 				if (this.hasOwnChain) {
@@ -560,13 +558,6 @@ public class BlockChain implements BlockSynchronizer {
 						.filter(tr -> this.blockChainLastBlockLayer.addBlockToDb(tr))
 						.forEach(tr -> this.foraging.removeFromUnconfirmedTransactions(tr));
 			}
-		}
-
-		private static void logAccounts(final String heading, final Iterable<Account> accounts) {
-//			LOGGER.info(String.format("[%s]", heading));
-//			for (final Account account : accounts) {
-//				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
-//			}
 		}
 
 		private void addRevertedTransactionsAsUnconfirmed(
