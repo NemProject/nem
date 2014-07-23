@@ -3,6 +3,8 @@ package org.nem.core.model;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
+import java.util.*;
+
 public class ValidationResultTest {
 
 	//region getValue / fromValue
@@ -37,18 +39,28 @@ public class ValidationResultTest {
 
 	@Test
 	public void isSuccessOnlyReturnsTrueForSuccessValues() {
+		// Arrange:
+		final Set<ValidationResult> successValues = new HashSet<ValidationResult>() {
+			{ add(ValidationResult.SUCCESS); }
+		};
+
 		// Assert:
-		Assert.assertThat(ValidationResult.SUCCESS.isSuccess(), IsEqual.equalTo(true));
-		Assert.assertThat(ValidationResult.NEUTRAL.isSuccess(), IsEqual.equalTo(false));
-		Assert.assertThat(ValidationResult.FAILURE_UNKNOWN.isSuccess(), IsEqual.equalTo(false));
+		for (final ValidationResult result : ValidationResult.values())
+			Assert.assertThat(result.isSuccess(), IsEqual.equalTo(successValues.contains(result)));
 	}
 
 	@Test
 	public void isFailureOnlyReturnsTrueForFailureValues() {
+		// Arrange:
+		final Set<ValidationResult> nonFailureValues = new HashSet<ValidationResult>() {
+			{ add(ValidationResult.SUCCESS); }
+			{ add(ValidationResult.NEUTRAL); }
+			{ add(ValidationResult.FAILURE_ENTITY_UNUSABLE); }
+		};
+
 		// Assert:
-		Assert.assertThat(ValidationResult.SUCCESS.isFailure(), IsEqual.equalTo(false));
-		Assert.assertThat(ValidationResult.NEUTRAL.isFailure(), IsEqual.equalTo(false));
-		Assert.assertThat(ValidationResult.FAILURE_UNKNOWN.isFailure(), IsEqual.equalTo(true));
+		for (final ValidationResult result : ValidationResult.values())
+			Assert.assertThat(result.isFailure(), IsEqual.equalTo(!nonFailureValues.contains(result)));
 	}
 
 	//endregion

@@ -152,25 +152,34 @@ public class SecureMessageTest {
 	}
 
 	@Test
-	public void secureMessageCannotBeDecodedWithEitherSenderOrRecipientHavingNoKeyPair() {
+	public void secureMessageCannotBeDecodedWithNullSenderKeyPair() {
 		// Arrange:
 		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final Account recipientWithoutKeyPair = new Account(Address.fromEncoded(recipient.getAddress().getEncoded()));
-		SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
+		final Account senderWithoutKeyPair = new Account(Address.fromEncoded(sender.getAddress().getEncoded()));
+		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Act:
-		SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientWithoutKeyPair);
+		final SecureMessage message = createRoundTrippedMessage(originalMessage, senderWithoutKeyPair, recipient);
 
 		// Assert:
 		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
 		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
 		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+	}
+
+	@Test
+	public void secureMessageCannotBeDecodedWithNullRecipientKeyPair() {
+		// Arrange:
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account recipientWithoutKeyPair = new Account(Address.fromEncoded(recipient.getAddress().getEncoded()));
+		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Act:
-		final Account senderWithoutKeyPair = new Account(Address.fromEncoded(sender.getAddress().getEncoded()));
-		message = createRoundTrippedMessage(originalMessage, senderWithoutKeyPair, recipient);
+		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientWithoutKeyPair);
 
 		// Assert:
 		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
