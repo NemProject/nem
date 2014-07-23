@@ -100,7 +100,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void poiStartVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
+	public void poiStartVectorIsOnesVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<Account> accounts = createTestPoiAccounts(height);
@@ -113,11 +113,10 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accounts);
 
 		// Assert:
-		// (1) start vector is derived from previous page rank
-		// (2) start vector is normalized
+		// (1) start vector is ones vector
 		Assert.assertThat(
 				context.getPoiStartVector(),
-				IsEqual.equalTo(new ColumnVector(3.0 / 9, 4.0 / 9, 0.0, 2.0 / 9)));
+				IsEqual.equalTo(new ColumnVector(1, 1, 1, 1)));
 	}
 
 	@Test
