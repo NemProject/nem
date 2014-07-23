@@ -34,7 +34,7 @@ public class PreTrustAwareNodeSelectorTest {
 	//region selectNodes
 
 	@Test
-	public void selectNodesDoesNotAddPreTrustedNodesWhenAllAreOffline() {
+	public void selectNodesAddsAllPreTrustedNodesWhenAllAreOffline() {
 		// Arrange:
 		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p", "q", "r"));
 		final List<Node> nodes = PeerUtils.createNodesWithNames("a", "p", "c");
@@ -45,7 +45,9 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(selectedNodes, IsEquivalent.equivalentTo(nodes));
+		Assert.assertThat(
+				selectedNodes,
+				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("p", "q", "r", "a", "c")));
 	}
 
 	@Test
