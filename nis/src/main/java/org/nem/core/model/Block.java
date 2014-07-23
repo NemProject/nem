@@ -249,7 +249,11 @@ public class Block extends VerifiableEntity {
 				this.height,
 				isExecute);
 		final TransferObserver outlinkObserver = new OutlinkObserver(this.height, isExecute);
-		return new AggregateTransferObserver(Arrays.asList(aggregateObserver, outlinkObserver));
+		List<TransferObserver> observers = Arrays.asList(aggregateObserver, outlinkObserver);
+		if (!isExecute) {
+			Collections.reverse(observers);
+		}
+		return new AggregateTransferObserver(observers);
 	}
 
 	@Override

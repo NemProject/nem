@@ -151,6 +151,33 @@ public class SecureMessageTest {
 		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
+	@Test
+	public void secureMessageCannotBeDecodedWithEitherSenderOrRecipientHavingNoKeyPair() {
+		// Arrange:
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account recipientWithoutKeyPair = new Account(Address.fromEncoded(recipient.getAddress().getEncoded()));
+		SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
+
+		// Act:
+		SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientWithoutKeyPair);
+
+		// Assert:
+		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+
+		// Act:
+		final Account senderWithoutKeyPair = new Account(Address.fromEncoded(sender.getAddress().getEncoded()));
+		message = createRoundTrippedMessage(originalMessage, senderWithoutKeyPair, recipient);
+
+		// Assert:
+		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+	}
+
 	private static SecureMessage createRoundTrippedMessage(
 			final byte[] input,
 			final boolean useSenderPrivateKey,

@@ -41,7 +41,7 @@ public class AccountImportance implements SerializableEntity {
 		boolean isSet = 0 != deserializer.readInt("isSet");
 		if (isSet) {
 			this.importance = deserializer.readDouble("score");
-			this.lastPageRank = deserializer.readDouble("page-rank");
+			this.lastPageRank = deserializer.readDouble("ev");
 			this.importanceHeight = BlockHeight.readFrom(deserializer, "height");
 		}
 	}
@@ -182,7 +182,7 @@ public class AccountImportance implements SerializableEntity {
 		serializer.writeInt("isSet", this.isSet() ? 1 : 0);
 		if (this.isSet()) {
 			serializer.writeDouble("score", this.importance);
-			serializer.writeDouble("page-rank", this.lastPageRank);
+			serializer.writeDouble("ev", this.lastPageRank);
 			BlockHeight.writeTo(serializer, "height", this.importanceHeight);
 		}
 	}

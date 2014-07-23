@@ -135,6 +135,22 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
+	public void allBlocksInChainMustHaveValidTimestamp() {
+		// Arrange:
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidator(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 3);
+		Block block = createFutureBlock(blocks.get(2));
+		blocks.add(block);
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void chainIsValidIfAllBlockChecksPass() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -183,6 +199,25 @@ public class BlockChainValidatorTest {
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createInvalidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void allTransactionsInChainMustHaveValidTimestamp() {
+		// Arrange:
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidator(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createSignedFutureTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 
@@ -309,6 +344,14 @@ public class BlockChainValidatorTest {
 		for (final Block block : blocks)
 			block.sign();
 	}
+	
+	private static Block createFutureBlock(Block parentBlock) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
+		block.sign();
+		
+		return block;
+	}
 
 	private static Transaction createInvalidSignedTransaction() {
 		final Transaction transaction =  new MockTransaction();
@@ -327,6 +370,14 @@ public class BlockChainValidatorTest {
 	private static Transaction createValidSignedTransaction() {
 		final Transaction transaction =  new MockTransaction();
 		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
+		transaction.sign();
+		return transaction;
+	}
+
+	private static Transaction createSignedFutureTransaction() {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction =  new MockTransaction(0, currentTime.addMinutes(2));
+		transaction.setDeadline(currentTime.addHours(2));
 		transaction.sign();
 		return transaction;
 	}

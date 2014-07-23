@@ -224,7 +224,7 @@ public class WeightedBalances {
 		}
 	}
 
-	private void undoChain(final BlockHeight height) {
+	public void undoChain(final BlockHeight height) {
 		while (this.balances.size() > 1) {
 			if (this.balances.get(this.balances.size()-1).getBlockHeight().compareTo(height) > 0) {
 				balances.remove(this.balances.size()-1);

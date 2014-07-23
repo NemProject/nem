@@ -229,14 +229,6 @@ public class BlockChain implements BlockSynchronizer {
 
 		final org.nem.nis.dbmodel.Block dbParent;
 
-		// this method processes foraged blocks (which should have time currentTime almost the same)
-		// and blocks that have been sent directly (pushed) to us, so we can add quite strict rule here
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		if (receivedBlock.getTimeStamp().compareTo(currentTime.addMinutes(3)) > 0) {
-			// This really should not happen
-			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
-		}
-
 		// receivedBlock already seen
 		synchronized (blockChainLastBlockLayer) {
 			if (blockDao.findByHash(blockHash) != null) {
@@ -374,6 +366,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.createLocalBlockLookup(),
 					commonBlockHeight,
 					visitor);
+			this.accountAnalyzer.undoVesting(commonBlockHeight);
 
 			return scoreVisitor.getScore();
 		}
@@ -566,10 +559,10 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		private static void logAccounts(final String heading, final Iterable<Account> accounts) {
-			LOGGER.info(String.format("[%s]", heading));
-			for (final Account account : accounts) {
-				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
-			}
+//			LOGGER.info(String.format("[%s]", heading));
+//			for (final Account account : accounts) {
+//				LOGGER.info(String.format("%s : %s", account.getAddress().getEncoded(), account.getImportanceInfo()));
+//			}
 		}
 
 		private void addRevertedTransactionsAsUnconfirmed(

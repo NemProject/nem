@@ -190,12 +190,13 @@ public class NisMain {
 		this.analyzeBlocks();
 
 		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
+		final String autoBootName = this.nisConfiguration.getAutoBootName();
 		if (null == autoBootKey) {
 			LOGGER.info("auto-boot is off");
 			return;
 		}
 
-		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey));
+		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
 		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 		this.networkHost.boot(new Node(autoBootNodeIdentity, NodeEndpoint.fromHost("127.0.0.1")));
 		LOGGER.warning("auto-booted!");

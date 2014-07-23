@@ -1,18 +1,25 @@
 package org.nem.deploy;
 
 import java.io.*;
+import java.net.BindException;
+import java.net.URL;
 import java.util.EnumSet;
 import java.util.Properties;
+import java.util.function.Predicate;
 import java.util.logging.*;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.MultiException;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.nem.core.deploy.JsonErrorHandler;
@@ -25,9 +32,8 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
- * Did not find a better way of launching Jetty in combination with WebStart.
- * The physical location of the downloaded files is not pre-known, so passing a
- * WAR file to the Jetty runner does not work.
+ * Did not find a better way of launching Jetty in combination with WebStart. The physical location of the downloaded files is not pre-known, so passing a WAR
+ * file to the Jetty runner does not work.
  * <p/>
  * I had to switch to the Servlet API 3.x with programmatic configuration.
  */
@@ -51,29 +57,21 @@ public class CommonStarter implements ServletContextListener {
 	 * The application meta data.
 	 */
 	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(CommonStarter.class, TIME_PROVIDER);
+	public static final CommonStarter INSTANCE = new CommonStarter();
 
-	public static void main(String[] args) throws Exception {
+	public static final String LOCAL_SHUTDOWN_URL = "http://127.0.0.1:7890/shutdown";
+
+	private Server server;
+
+	public static void main(String[] args) {
 		LOGGER.info("Starting embedded Jetty Server.");
 
-		// https://code.google.com/p/json-smart/wiki/ParserConfiguration
-		// JSONParser.DEFAULT_PERMISSIVE_MODE = JSONParser.MODE_JSON_SIMPLE;
-
-		// Taken from Jetty doc
-		Server server = new Server(createThreadPool());
-		server.addBean(new ScheduledExecutorScheduler());
-
-		server.addConnector(createConnector(server));
-		server.setHandler(createHandlers());
-
-		server.setDumpAfterStart(false);
-		server.setDumpBeforeStop(false);
-		server.setStopAtShutdown(true);
-
-		LOGGER.info("Calling start().");
-		server.start();
-		server.join();
-
-		LOGGER.info(String.format("%s %s shutdown...", CommonStarter.META_DATA.getAppName(), CommonStarter.META_DATA.getVersion()));
+		try {
+			INSTANCE.boot();
+		} catch (Exception e) {
+			//
+			LOGGER.log(Level.SEVERE, "Stopping Jetty Server.", e);
+		}
 
 		System.exit(1);
 	}
@@ -96,11 +94,9 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	/**
-	 * log configuration may include a placeholder for the nem folder
-	 * The method replaces the pattern ${nemFolder} with the value defined within the
-	 * NisConfiguration
-	 * Only for "java.util.logging.FileHandler.pattern" value
-	 *  
+	 * log configuration may include a placeholder for the nem folder The method replaces the pattern ${nemFolder} with the value defined within the
+	 * NisConfiguration Only for "java.util.logging.FileHandler.pattern" value
+	 * 
 	 * @param inputStream stream of the logging properties
 	 * @return new stream which contains the replaced FileHandler.pattern
 	 * @throws IOException
@@ -155,6 +151,28 @@ public class CommonStarter implements ServletContextListener {
 		return threadPool;
 	}
 
+	protected void boot() throws Exception {
+		server = new Server(createThreadPool());
+		server.addBean(new ScheduledExecutorScheduler());
+
+		server.addConnector(createConnector(server));
+		server.setHandler(createHandlers());
+
+		server.setDumpAfterStart(false);
+		server.setDumpBeforeStop(false);
+		server.setStopAtShutdown(true);
+
+		LOGGER.info("Calling start().");
+		startServer(server, new URL(LOCAL_SHUTDOWN_URL));
+		try {
+			server.join();
+		} catch (InterruptedException e) {
+			// Just do nothing. NIS should shutdown.
+		}
+
+		LOGGER.info(String.format("%s %s shutdown...", CommonStarter.META_DATA.getAppName(), CommonStarter.META_DATA.getVersion()));
+	}
+
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing
@@ -190,5 +208,58 @@ public class CommonStarter implements ServletContextListener {
 		// Zipping following MimeTypes
 		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	}
+
+	protected void startServer(final Server server, final URL stopURL) throws Exception {
+		try {
+			server.start();
+		} catch (final MultiException e) {
+			long bindExceptions = e.getThrowables().stream().filter(new Predicate<Throwable>() {
+
+				@Override
+				public boolean test(Throwable t) {
+					return t instanceof BindException;
+				}
+			}).count();
+
+			if (bindExceptions > 0) {
+				LOGGER.log(Level.WARNING, "Port already used, trying to shutdown other instance");
+				// We assume it is already running?
+				// Kill the old one
+				stopOtherInstance(stopURL);
+
+				// One more try
+				LOGGER.log(Level.WARNING, "Re-trying to start server.");
+				server.start();
+			} else {
+				LOGGER.log(Level.SEVERE, "Could not start server.", e);
+			}
+		}
+	}
+
+	public void stopServer() {
+		try {
+			server.stop();
+		} catch (final Exception e) {
+			//
+			LOGGER.log(Level.SEVERE, "Can't stop server.", e);
+		}
+	}
+
+	protected void stopOtherInstance(final URL stopURL) throws Exception {
+		final HttpClient httpClient2 = new HttpClient();
+		try {
+			httpClient2.start();
+			LOGGER.info("Send shutdown to other instance...");
+			final ContentResponse response = httpClient2.GET(stopURL.toURI());
+			if (response.getStatus() != HttpStatus.OK_200) {
+				LOGGER.info(String.format("Other instance returned %d: %s", response.getStatus(), response.getContentAsString()));
+			} else {
+				LOGGER.info("Pause 2 seconds");
+				Thread.sleep(2000);
+			}
+		} finally {
+			httpClient2.stop();
+		}
 	}
 }

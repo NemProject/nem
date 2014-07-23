@@ -196,6 +196,15 @@ public class AccountAnalyzer implements AccountLookup, Iterable<Account> {
 		this.lastPoiRecalc = blockHeight;
 	}
 
+	/**
+	 * Undo weighted balances vesting to a given block height.
+	 * 
+	 * @param height The block height.
+	 */
+	public void undoVesting(BlockHeight height) {
+		this.addressToAccountMap.values().stream().forEach(a -> a.getWeightedBalances().undoChain(height));
+	}
+
 	private static class AutoCacheAccountLookup implements AccountLookup {
 
 		private final AccountAnalyzer accountAnalyzer;

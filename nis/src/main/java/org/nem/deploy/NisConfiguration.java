@@ -18,6 +18,7 @@ public class NisConfiguration {
 	private final boolean shouldBootWithoutAck;
 	private final boolean shouldUseBinaryTransport;
 	private final String nemFolder;
+	private final String bootName;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -44,6 +45,8 @@ public class NisConfiguration {
 	public NisConfiguration(final Properties properties) {
 		final String autoBootKey = properties.getProperty("nis.bootkey");
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
+		final String autoBootName = properties.getProperty("nis.bootname");
+		this.bootName = null == autoBootName ? null : autoBootName.trim();
 
 		this.nodeLimit = getOptionalInteger(properties, "nis.nodelimit", 20);
 		this.shouldBootWithoutAck = getOptionalBoolean(properties, "nis.shouldBootWithoutAck", false);
@@ -78,6 +81,16 @@ public class NisConfiguration {
 	 */
 	public PrivateKey getAutoBootKey() {
 		return this.bootKey;
+	}
+
+
+	/**
+	 * Gets the name of the auto-boot node.
+	 *
+	 * @return The name of the auto-boot node.
+	 */
+	public String getAutoBootName() {
+		return this.bootName;
 	}
 
 	/**
