@@ -22,23 +22,6 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
-		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
-	}
-
-	@Test
-	public void canReadConfigurationWithAutoBootKeyAndName() {
-		// Arrange:
-		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
-		final Properties properties = new Properties();
-		properties.setProperty("nis.bootkey", originalPrivateKey.toString());
-		properties.setProperty("nis.bootname", " \t string with spaces  ");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
-		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
 
 	@Test
@@ -51,6 +34,48 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
+	}
+
+	//endregion
+
+	//region nis.bootname
+
+	@Test
+	public void canReadConfigurationWithAutoBootName() {
+		// Arrange:
+		final Properties properties = new Properties();
+		properties.setProperty("nis.bootname", "my name");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
+	}
+
+	@Test
+	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
+		// Arrange:
+		final Properties properties = new Properties();
+		properties.setProperty("nis.bootname", " \t string with spaces\t  ");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
+	}
+
+	@Test
+	public void canReadConfigurationWithoutAutoBootName() {
+		// Arrange:
+		final Properties properties = new Properties();
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 	}
 
 	//endregion

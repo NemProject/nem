@@ -7,7 +7,6 @@ import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.CommonStarter;
@@ -22,39 +21,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+// TODO: add tests for this controller
 @RestController
 public class LocalController {
 	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
 
 	private final long SHUTDOWN_DELAY = 200;
 	private final RequiredBlockDao blockDao;
-	private final AccountLookup accountLookup;
-
 
 	@Autowired(required = true)
-	public LocalController(
-			final RequiredBlockDao blockDao,
-			final AccountLookup accountLookup) {
+	public LocalController(final RequiredBlockDao blockDao) {
 		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
 	}
 
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
 	 */
+	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
 	public void shutdown() {
 		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
-		final Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(SHUTDOWN_DELAY);
-				} catch (final InterruptedException e) {
-					// We do nothing than continuing
-				}
-				CommonStarter.INSTANCE.stopServer();
+		final Runnable r = () -> {
+			try {
+				Thread.sleep(SHUTDOWN_DELAY);
+			} catch (final InterruptedException e) {
+				// We do nothing than continuing
 			}
+			CommonStarter.INSTANCE.stopServer();
 		};
 
 		final Thread thread = new Thread(r);
@@ -63,8 +56,7 @@ public class LocalController {
 
 	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
 	@PublicApi
-	public NisRequestResult heartbeat()
-	{
+	public NisRequestResult heartbeat() {
 		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
 	}
 

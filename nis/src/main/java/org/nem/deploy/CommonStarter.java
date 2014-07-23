@@ -5,7 +5,6 @@ import java.net.BindException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Properties;
-import java.util.function.Predicate;
 import java.util.logging.*;
 
 import javax.servlet.*;
@@ -214,13 +213,7 @@ public class CommonStarter implements ServletContextListener {
 		try {
 			server.start();
 		} catch (final MultiException e) {
-			long bindExceptions = e.getThrowables().stream().filter(new Predicate<Throwable>() {
-
-				@Override
-				public boolean test(Throwable t) {
-					return t instanceof BindException;
-				}
-			}).count();
+			long bindExceptions = e.getThrowables().stream().filter(t -> t instanceof BindException).count();
 
 			if (bindExceptions > 0) {
 				LOGGER.log(Level.WARNING, "Port already used, trying to shutdown other instance");

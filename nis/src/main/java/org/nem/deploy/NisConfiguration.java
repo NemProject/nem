@@ -83,7 +83,6 @@ public class NisConfiguration {
 		return this.bootKey;
 	}
 
-
 	/**
 	 * Gets the name of the auto-boot node.
 	 *
