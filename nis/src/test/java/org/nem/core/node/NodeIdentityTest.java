@@ -7,7 +7,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ArrayUtils;
-import org.nem.peer.node.NodeChallenge;
 
 public class NodeIdentityTest {
 
@@ -184,9 +183,8 @@ public class NodeIdentityTest {
 		final Signature signedDataWithoutPrefix = signer.sign(payload);
 
 		// Assert:
-		final NodeChallenge challenge = new NodeChallenge(payload);
-		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithPrefix), IsEqual.equalTo(true));
-		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithoutPrefix), IsEqual.equalTo(false));
+		Assert.assertThat(identity.verify(payload, signedDataWithPrefix), IsEqual.equalTo(true));
+		Assert.assertThat(identity.verify(payload, signedDataWithoutPrefix), IsEqual.equalTo(false));
 	}
 
 	//endregion
