@@ -55,6 +55,10 @@
         {
             endpoint: { "protocol": "http", "host": "94.156.77.147", "port" : 7890 },
             identity: { "name": "nemtrader-jaded", "public-key": "A8j4su+8DgaEV+LjvRi/Nw95v3E8XqpEHMMlhnCQ3cG0" }
+        },
+        {
+            endpoint: { "protocol": "http", "host": "178.254.43.15", "port" : 7890 },
+            identity: { "name": "Trudy<3", "public-key": "A8Vb0lDlbCku1MiYsIg2djEygyUdIbapCZu5iduZ1zbS" }
         }
     ],
 }
