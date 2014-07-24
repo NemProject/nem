@@ -100,7 +100,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void poiStartVectorIsOnesVector() {
+	public void poiStartVectorIsInitializedToNormalizedUniformVectorForSubsequentIterations() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<Account> accounts = createTestPoiAccounts(height);
@@ -113,10 +113,11 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accounts);
 
 		// Assert:
-		// (1) start vector is ones vector
+		// (1) start vector is uniform
+		// (2) start vector is normalized
 		Assert.assertThat(
 				context.getPoiStartVector(),
-				IsEqual.equalTo(new ColumnVector(1, 1, 1, 1)));
+				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
 
 	@Test
