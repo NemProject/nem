@@ -115,7 +115,7 @@ public class CommonStarter implements ServletContextListener {
 		// Special Listener to set-up the environment for Spring
 		servletContext.addEventListener(new CommonStarter());
 		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(new JsonErrorHandler());
+		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
 		handlers.setHandlers(new Handler[] { servletContext });
 

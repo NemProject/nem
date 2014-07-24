@@ -7,6 +7,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.io.*;
 
@@ -34,7 +35,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		// Act:
 		final ErrorResponseDeserializerUnion union = coerceUnion(
 				404,
-				JsonSerializer.serializeToJson(new ErrorResponse("badness", 700)).toJSONString().getBytes(),
+				JsonSerializer.serializeToJson(new ErrorResponse(new TimeInstant(3), "badness", 700)).toJSONString().getBytes(),
 				null);
 		final ErrorResponse response = union.getError();
 

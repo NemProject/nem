@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
+import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
@@ -126,5 +127,10 @@ public class NisAppConfig {
 	@Bean
 	public NisConfiguration nisConfiguration() {
 		return new NisConfiguration();
+	}
+
+	@Bean
+	public TimeProvider timeProvider() {
+		return CommonStarter.TIME_PROVIDER;
 	}
 }

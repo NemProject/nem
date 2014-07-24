@@ -14,11 +14,12 @@ public class ErrorResponseTest {
 	public void canBeCreatedAroundException() {
 		// Arrange:
 		final ErrorResponse response = new ErrorResponse(
+				new TimeInstant(18),
 				new RuntimeException("exception message"),
 				HttpStatus.NOT_FOUND);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
 		Assert.assertThat(response.getError(), IsEqual.equalTo("Not Found"));
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(404));
@@ -27,10 +28,10 @@ public class ErrorResponseTest {
 	@Test
 	public void canBeCreatedAroundMessage() {
 		// Arrange:
-		final ErrorResponse response = new ErrorResponse("badness", 500);
+		final ErrorResponse response = new ErrorResponse(new TimeInstant(29), "badness", 500);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(29)));
 		Assert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(500));
@@ -39,10 +40,10 @@ public class ErrorResponseTest {
 	@Test
 	public void canBeCreatedAroundUnknownHttpStatus() {
 		// Arrange:
-		final ErrorResponse response = new ErrorResponse("exception message", -123);
+		final ErrorResponse response = new ErrorResponse(new TimeInstant(18), "exception message", -123);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
 		Assert.assertThat(response.getError(), IsNull.nullValue());
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(-123));
@@ -52,14 +53,14 @@ public class ErrorResponseTest {
 	public void responseCanBeSerialized() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final ErrorResponse response = new ErrorResponse("badness", 500);
+		final ErrorResponse response = new ErrorResponse(new TimeInstant(18), "badness", 500);
 
 		// Act:
 		response.serialize(serializer);
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("timeStamp"), IsNot.not(IsEqual.equalTo((Integer)0)));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(18));
 		Assert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
 		Assert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));
@@ -68,10 +69,10 @@ public class ErrorResponseTest {
 	@Test
 	public void responseCanBeRoundTripped() {
 		// Act:
-		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse("badness", 500));
+		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(new TimeInstant(18), "badness", 500));
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
 		Assert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(500));
@@ -80,10 +81,10 @@ public class ErrorResponseTest {
 	@Test
 	public void responseWithoutDescriptionsCanBeRoundTripped() {
 		// Act:
-		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(null, 890));
+		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(new TimeInstant(54), null, 890));
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsNot.not(IsEqual.equalTo(0)));
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(54)));
 		Assert.assertThat(response.getError(), IsNull.nullValue());
 		Assert.assertThat(response.getMessage(), IsNull.nullValue());
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(890));
@@ -96,34 +97,14 @@ public class ErrorResponseTest {
 	}
 
 	@Test
-	public void timeStampIsPopulatedWithCurrentSystemTime() {
-		// Act:
-		final TimeProvider timeProvider = new SystemTimeProvider();
-		ErrorResponse response;
-		int systemTime;
-		int systemTimeEnd;
-		do {
-			systemTime = timeProvider.getCurrentTime().getRawTime();
-
-			response = new ErrorResponse("badness", 500);
-
-			systemTimeEnd = timeProvider.getCurrentTime().getRawTime();
-
-		} while (systemTime != systemTimeEnd);
-
-		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(systemTime));
-	}
-
-	@Test
 	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsKnown() {
 		// Assert:
 		Assert.assertThat(
 				"Http Status Code 404: badness",
-				IsEqual.equalTo(new ErrorResponse("badness", 404).toString()));
+				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", 404).toString()));
 		Assert.assertThat(
 				"Http Status Code 404: Not Found",
-				IsEqual.equalTo(new ErrorResponse(null, 404).toString()));
+				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, 404).toString()));
 	}
 
 	@Test
@@ -131,9 +112,9 @@ public class ErrorResponseTest {
 		// Assert:
 		Assert.assertThat(
 				"Http Status Code -123: badness",
-				IsEqual.equalTo(new ErrorResponse("badness", -123).toString()));
+				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", -123).toString()));
 		Assert.assertThat(
 				"Http Status Code -123",
-				IsEqual.equalTo(new ErrorResponse(null, -123).toString()));
+				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, -123).toString()));
 	}
 }

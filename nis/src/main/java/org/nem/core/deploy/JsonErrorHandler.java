@@ -6,6 +6,8 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
 import org.nem.core.connect.ErrorResponse;
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.time.TimeProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.*;
 import java.io.*;
@@ -15,6 +17,17 @@ import java.io.*;
  * ExceptionControllerAdvice.
  */
 public class JsonErrorHandler extends ErrorHandler {
+	private final TimeProvider timeProvider;
+
+	/**
+	 * Creates a new JSON error handler.
+	 *
+	 * @param timeProvider The time provider.
+	 */
+	@Autowired(required = true)
+	public JsonErrorHandler(final TimeProvider timeProvider) {
+		this.timeProvider = timeProvider;
+	}
 
 	@Override
 	public void handle(
@@ -52,7 +65,7 @@ public class JsonErrorHandler extends ErrorHandler {
 			final Writer writer,
 			final int code,
 			final String message) throws IOException {
-		final ErrorResponse response = new ErrorResponse(message, code);
+		final ErrorResponse response = new ErrorResponse(this.timeProvider.getCurrentTime(), message, code);
 		final String jsonString = JsonSerializer.serializeToJson(response).toJSONString();
 		writer.write(jsonString + "\r\n");
 	}
