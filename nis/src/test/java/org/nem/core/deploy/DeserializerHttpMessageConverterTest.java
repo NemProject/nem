@@ -1,11 +1,11 @@
 package org.nem.core.deploy;
 
-import net.minidev.json.*;
-import org.hamcrest.core.*;
+import net.minidev.json.JSONObject;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 

@@ -1,9 +1,9 @@
 package org.nem.core.crypto;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.security.*;
 import java.util.logging.Logger;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Static class that exposes hash functions.

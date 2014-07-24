@@ -5,10 +5,8 @@ import org.junit.*;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.*;
+import java.util.*;
+import java.util.function.Supplier;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
 

@@ -1,6 +1,6 @@
 package org.nem.peer.connect;
 
-import org.nem.core.connect.*;
+import org.nem.core.connect.HttpMethodClient;
 import org.nem.core.serialization.*;
 import org.nem.nis.audit.AuditCollection;
 

@@ -2,7 +2,7 @@ package org.nem.nis.poi;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 
 public class WeightedLinkTest {

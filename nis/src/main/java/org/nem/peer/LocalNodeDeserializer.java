@@ -1,7 +1,7 @@
 package org.nem.peer;
 
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.node.*;
 
 /**
  * A deserializer for local node data.

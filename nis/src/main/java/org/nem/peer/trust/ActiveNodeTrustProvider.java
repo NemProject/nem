@@ -1,6 +1,7 @@
 package org.nem.peer.trust;
 
 import org.nem.core.math.ColumnVector;
+import org.nem.core.node.Node;
 import org.nem.peer.node.*;
 
 /**

@@ -1,11 +1,11 @@
 package org.nem.peer;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.node.*;
-import org.nem.peer.test.*;
+import org.nem.peer.test.ConfigFactory;
 import org.nem.peer.trust.*;
 
 import java.util.*;

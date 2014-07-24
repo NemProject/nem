@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
@@ -7,6 +7,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ArrayUtils;
+import org.nem.peer.node.NodeChallenge;
 
 public class NodeIdentityTest {
 

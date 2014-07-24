@@ -4,7 +4,7 @@ import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 import java.io.*;
 

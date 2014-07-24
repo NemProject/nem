@@ -1,12 +1,12 @@
 package org.nem.core.async;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.util.*;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 

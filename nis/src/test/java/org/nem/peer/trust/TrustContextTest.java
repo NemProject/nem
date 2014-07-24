@@ -1,8 +1,8 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.score.NodeExperiences;
 

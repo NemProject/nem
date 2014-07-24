@@ -1,12 +1,12 @@
 package org.nem.peer.services;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.node.Node;
 import org.nem.peer.*;
-import org.nem.peer.connect.*;
-import org.nem.peer.node.*;
-import org.nem.peer.test.*;
+import org.nem.peer.connect.SyncConnectorPool;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 
 public class NodeSynchronizerTest {

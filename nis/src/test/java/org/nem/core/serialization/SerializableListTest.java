@@ -6,7 +6,7 @@ import org.junit.*;
 import org.nem.core.test.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 public class SerializableListTest {
 

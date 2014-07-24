@@ -12,7 +12,7 @@ import org.nem.core.async.SleepFuture;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.net.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.logging.Logger;
 

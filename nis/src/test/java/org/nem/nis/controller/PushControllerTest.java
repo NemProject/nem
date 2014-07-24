@@ -5,13 +5,13 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.service.PushService;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.SecureSerializableEntity;
-import org.nem.peer.node.NodeIdentity;
 
 public class PushControllerTest {
 

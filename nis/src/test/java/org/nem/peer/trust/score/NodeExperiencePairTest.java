@@ -3,7 +3,7 @@ package org.nem.peer.trust.score;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
-import org.nem.peer.node.*;
+import org.nem.core.node.*;
 import org.nem.peer.test.PeerUtils;
 
 public class NodeExperiencePairTest {

@@ -2,10 +2,10 @@ package org.nem.peer.test;
 
 import net.minidev.json.*;
 import org.nem.core.crypto.*;
+import org.nem.core.node.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.peer.Config;
-import org.nem.peer.node.*;
 
 import java.math.BigInteger;
 

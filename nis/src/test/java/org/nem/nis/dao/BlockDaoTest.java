@@ -1,26 +1,24 @@
 package org.nem.nis.dao;
 
 import org.hibernate.LazyInitializationException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.HashChain;
+import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;

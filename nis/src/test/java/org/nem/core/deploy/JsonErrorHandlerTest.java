@@ -5,14 +5,12 @@ import org.eclipse.jetty.server.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.deploy.JsonErrorHandler;
-import org.nem.core.serialization.*;
 import org.nem.core.connect.ErrorResponse;
+import org.nem.core.serialization.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class JsonErrorHandlerTest {
 

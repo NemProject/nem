@@ -1,19 +1,14 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dao.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.PoiAccountInfo;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-
-
-import org.nem.peer.NodeInteractionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;

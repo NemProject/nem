@@ -4,12 +4,11 @@ import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
-import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.connect.ErrorResponse;
+import org.nem.core.serialization.JsonSerializer;
 
 import javax.servlet.http.*;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Custom error handler that returns JSON error responses in the same format as the

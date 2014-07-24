@@ -5,8 +5,8 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.model.*;
-import org.nem.nis.test.LocalHostConnector;
 import org.nem.core.utils.*;
+import org.nem.nis.test.LocalHostConnector;
 
 // this test requires node to be running on local host
 //

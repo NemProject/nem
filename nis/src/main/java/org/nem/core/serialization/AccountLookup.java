@@ -1,7 +1,6 @@
 package org.nem.core.serialization;
 
-import org.nem.core.model.Address;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 
 /**
  * An interface for looking up accounts.

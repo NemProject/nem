@@ -1,5 +1,7 @@
 package org.nem.peer.node;
 
+import org.nem.core.node.NodeVersion;
+
 /**
  * An interface for checking the compatibility of two node versions.
  */

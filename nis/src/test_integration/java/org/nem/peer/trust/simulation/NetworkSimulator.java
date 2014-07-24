@@ -1,21 +1,16 @@
 package org.nem.peer.trust.simulation;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.logging.Logger;
-
 import org.nem.core.math.ColumnVector;
+import org.nem.core.node.Node;
 import org.nem.peer.PeerNetworkState;
-import org.nem.peer.node.Node;
-import org.nem.peer.node.NodeCollection;
-import org.nem.peer.node.NodeStatus;
+import org.nem.peer.node.*;
 import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.peer.trust.score.*;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.logging.Logger;
 
 public class NetworkSimulator {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulator.class.getName());

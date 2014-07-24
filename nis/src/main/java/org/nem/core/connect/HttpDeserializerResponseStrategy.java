@@ -3,7 +3,7 @@ package org.nem.core.connect;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.StringEncoder;
 import org.springframework.http.HttpStatus;
 

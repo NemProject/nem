@@ -6,16 +6,14 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.PoiImportanceGenerator;
-import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.poi.PoiImportanceGenerator;
+import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.test.MockForaging;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 
 import static org.mockito.Mockito.mock;
 

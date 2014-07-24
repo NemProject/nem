@@ -1,12 +1,11 @@
 package org.nem.peer.node;
 
 import org.hamcrest.core.*;
-import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.metadata.ApplicationMetaData;
-import org.nem.core.time.TimeInstant;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.node.Node;
+import org.nem.core.time.*;
 import org.nem.peer.test.PeerUtils;
 
 public class NisNodeInfoTest {

@@ -1,14 +1,12 @@
 package org.nem.nis.dao;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.*;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;

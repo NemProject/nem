@@ -4,12 +4,12 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.serialization.*;
+import org.nem.core.node.*;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.*;
-import org.nem.peer.test.*;
+import org.nem.peer.test.PeerUtils;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

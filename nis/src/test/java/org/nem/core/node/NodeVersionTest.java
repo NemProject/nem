@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;

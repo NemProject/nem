@@ -1,13 +1,12 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.text.*;
-import java.util.Date;
-
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
+
+import java.text.*;
+import java.util.Date;
 
 /**
  * Debug information about a transaction.

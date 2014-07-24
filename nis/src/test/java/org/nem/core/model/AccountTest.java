@@ -11,8 +11,7 @@ import org.nem.core.test.*;
 import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public class AccountTest {

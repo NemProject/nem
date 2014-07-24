@@ -1,9 +1,8 @@
 package org.nem.peer.test;
 
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 import org.nem.peer.trust.ScoreProvider;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.TrustScores;
+import org.nem.peer.trust.score.*;
 
 /**
  * A test wrapper around a ScoreProvider.

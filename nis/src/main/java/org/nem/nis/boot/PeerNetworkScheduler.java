@@ -2,10 +2,10 @@ package org.nem.nis.boot;
 
 import org.nem.core.async.*;
 import org.nem.core.model.Block;
+import org.nem.core.node.NodeApiId;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
 import org.nem.peer.*;
-import org.nem.peer.node.NodeApiId;
 
 import java.util.*;
 import java.util.concurrent.*;

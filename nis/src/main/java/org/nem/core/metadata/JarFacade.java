@@ -1,7 +1,6 @@
 package org.nem.core.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.jar.*;
 import java.util.logging.Logger;

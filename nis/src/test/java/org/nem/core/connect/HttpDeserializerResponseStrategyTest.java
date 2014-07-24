@@ -2,9 +2,9 @@ package org.nem.core.connect;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.junit.*;
+import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.test.*;
+import org.nem.core.test.ConnectUtils;
 
 import java.io.ByteArrayInputStream;
 

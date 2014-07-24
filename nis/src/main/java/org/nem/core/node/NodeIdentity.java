@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;

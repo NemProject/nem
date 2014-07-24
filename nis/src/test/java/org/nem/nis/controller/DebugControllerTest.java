@@ -2,10 +2,10 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;

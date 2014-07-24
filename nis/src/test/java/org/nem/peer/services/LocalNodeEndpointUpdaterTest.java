@@ -2,12 +2,12 @@ package org.nem.peer.services;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.connect.*;
-import org.nem.peer.connect.*;
-import org.nem.peer.node.*;
-import org.nem.peer.test.*;
-import org.nem.peer.trust.*;
+import org.nem.core.node.*;
+import org.nem.peer.connect.PeerConnector;
+import org.nem.peer.test.PeerUtils;
+import org.nem.peer.trust.NodeSelector;
 
 import java.util.concurrent.CompletableFuture;
 

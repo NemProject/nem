@@ -1,11 +1,5 @@
 package org.nem.nis.poi;
 
-import java.security.SecureRandom;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.*;
@@ -13,6 +7,12 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.test.MockAccount;
+
+import java.security.SecureRandom;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * If someone can manipulate their importance so that they can often or at-will

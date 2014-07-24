@@ -5,8 +5,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.interceptors.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
 

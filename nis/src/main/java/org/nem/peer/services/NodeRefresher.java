@@ -2,6 +2,7 @@ package org.nem.peer.services;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
+import org.nem.core.node.Node;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.*;
 

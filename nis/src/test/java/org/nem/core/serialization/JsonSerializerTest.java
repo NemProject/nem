@@ -3,10 +3,9 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.util.*;
 
 public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {

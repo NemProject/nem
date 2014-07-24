@@ -1,26 +1,14 @@
 package org.nem.deploy;
 
-import java.io.*;
-import java.net.BindException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Properties;
-import java.util.logging.*;
-
-import javax.servlet.*;
-import javax.servlet.annotation.WebListener;
-
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.http.MimeTypes;
+import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.MultiException;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.eclipse.jetty.util.thread.*;
 import org.nem.core.deploy.JsonErrorHandler;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
@@ -29,6 +17,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebListener;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.logging.*;
 
 /**
  * Did not find a better way of launching Jetty in combination with WebStart. The physical location of the downloaded files is not pre-known, so passing a WAR

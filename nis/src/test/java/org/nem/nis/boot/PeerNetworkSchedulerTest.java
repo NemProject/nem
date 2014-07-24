@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
-import org.nem.peer.*;
+import org.nem.peer.PeerNetwork;
 
 import java.util.*;
 import java.util.stream.Collectors;

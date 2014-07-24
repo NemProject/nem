@@ -3,7 +3,6 @@ package org.nem.core.deploy;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.deploy.JsonSerializationPolicy;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;

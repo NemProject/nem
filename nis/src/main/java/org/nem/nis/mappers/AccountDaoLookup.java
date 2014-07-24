@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
-import org.nem.nis.dbmodel.Account;
 import org.nem.core.model.Address;
+import org.nem.nis.dbmodel.Account;
 
 /**
  * An interface for looking up dao accounts.

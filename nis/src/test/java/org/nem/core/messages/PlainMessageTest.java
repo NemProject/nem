@@ -2,8 +2,8 @@ package org.nem.core.messages;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
-import org.nem.core.serialization.*;
+import org.nem.core.model.MessageTypes;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
 public class PlainMessageTest {

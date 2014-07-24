@@ -5,14 +5,15 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
-import org.nem.peer.*;
+import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.*;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.score.*;
 
 import javax.servlet.http.HttpServletRequest;

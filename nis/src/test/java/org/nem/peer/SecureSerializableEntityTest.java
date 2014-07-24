@@ -4,9 +4,10 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.HashUtils;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.peer.node.*;
+import org.nem.peer.node.ImpersonatingPeerException;
 
 public class SecureSerializableEntityTest {
 

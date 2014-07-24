@@ -5,8 +5,8 @@ import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.IESEngine;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
-import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.IESParameters;
 
 /**
  * Wraps EC IES encryption and decryption logic.

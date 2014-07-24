@@ -5,8 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 public class SecureMessageTest {
 

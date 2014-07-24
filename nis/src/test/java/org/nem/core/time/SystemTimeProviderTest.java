@@ -1,6 +1,6 @@
 package org.nem.core.time;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
 public class SystemTimeProviderTest {

@@ -3,11 +3,11 @@ package org.nem.nis;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
-import org.nem.peer.node.*;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class NisPeerNetworkHostTest {
 

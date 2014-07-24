@@ -1,6 +1,6 @@
 package org.nem.peer.trust.score;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.peer.test.MockScore;
 

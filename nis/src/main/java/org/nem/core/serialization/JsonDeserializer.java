@@ -3,8 +3,7 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.nem.core.utils.Base64Encoder;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.util.*;
 
 /**

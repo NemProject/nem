@@ -3,23 +3,17 @@ package org.nem.deploy;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.*;
-import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
+import org.springframework.orm.hibernate4.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.util.Properties;
 

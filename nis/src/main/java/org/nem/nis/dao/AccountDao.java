@@ -1,7 +1,5 @@
 package org.nem.nis.dao;
 
-import java.util.List;
-
 import org.nem.nis.dbmodel.Account;
 
 /**

@@ -2,13 +2,12 @@ package org.nem.nis.test;
 
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Static class containing NIS test helper functions.

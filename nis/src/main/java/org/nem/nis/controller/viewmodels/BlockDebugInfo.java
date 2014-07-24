@@ -1,13 +1,13 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.math.BigInteger;
-import java.text.*;
-import java.util.*;
-
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
+
+import java.math.BigInteger;
+import java.text.*;
+import java.util.*;
 
 /**
  * Debug information about a block.

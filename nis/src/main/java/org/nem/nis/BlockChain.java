@@ -2,19 +2,17 @@ package org.nem.nis;
 
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.primitive.*;
-import org.nem.nis.mappers.*;
-import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dao.BlockDao;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
+import org.nem.core.node.Node;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.dao.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
