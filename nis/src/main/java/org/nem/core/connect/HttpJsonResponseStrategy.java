@@ -25,7 +25,7 @@ public class HttpJsonResponseStrategy extends HttpDeserializerResponseStrategy {
 		if (parsedStream instanceof JSONObject)
 			return new JsonDeserializer((JSONObject)parsedStream, this.context);
 
-		throw new FatalPeerException("Peer returned unexpected data");
+		throw new FatalPeerException(String.format("Peer returned unexpected data: %s", parsedStream));
 	}
 
 	@Override
