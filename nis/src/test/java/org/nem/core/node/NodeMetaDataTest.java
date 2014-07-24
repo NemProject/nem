@@ -1,11 +1,14 @@
 package org.nem.core.node;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.test.Utils;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 
 public class NodeMetaDataTest {
+
+	//region construction
 
 	@Test
 	public void metaDataCanBeCreated() {
@@ -29,6 +32,46 @@ public class NodeMetaDataTest {
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
 	}
 
+	//endregion
+
+	//region serialization
+
+	@Test
+	public void metaDataCanBeDeserializedWithAllParameters() {
+		// Act:
+		final NodeMetaData metaData = createMetaDataFromJson("plat", "app", "3.0.0");
+
+		// Assert:
+		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+	}
+
+	@Test
+	public void metaDataCanBeDeserializedWithOnlyVersion() {
+		// Act:
+		final NodeMetaData metaData = createMetaDataFromJson(null, null, "3.0.0");
+
+		// Assert:
+		Assert.assertThat(metaData.getPlatform(), IsNull.nullValue());
+		Assert.assertThat(metaData.getApplication(), IsNull.nullValue());
+		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+	}
+
+	@Test(expected = MissingRequiredPropertyException.class)
+	public void metaDataCannotBeDeserializedWithoutVersion() {
+		// Act:
+		createMetaDataFromJson("plat", "app", null);
+	}
+
+	private static NodeMetaData createMetaDataFromJson(final String platform, final String application, final String version) {
+		final JSONObject jsonObject = new JSONObject();
+		jsonObject.put("platform", platform);
+		jsonObject.put("application", application);
+		jsonObject.put("version", version);
+		return new NodeMetaData(Utils.createDeserializer(jsonObject));
+	}
+
 	@Test
 	public void metaDataCanBeRoundTripped() {
 		// Act:
@@ -42,6 +85,8 @@ public class NodeMetaDataTest {
 		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
 	}
+
+	//endregion
 
 	//region equals / hashCode
 

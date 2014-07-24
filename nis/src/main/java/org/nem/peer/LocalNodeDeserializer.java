@@ -18,7 +18,7 @@ public class LocalNodeDeserializer implements ObjectDeserializer<Node> {
 
 	private static NodeMetaData deserializeLocalNodeMetaData(final Deserializer deserializer) {
 		// the only property we care about is application; platform and version will get populated automatically
-		final String application = deserializer.readString("application");
+		final String application = deserializer.readOptionalString("application");
 		return new NodeMetaData(null, application, null);
 	}
 }
