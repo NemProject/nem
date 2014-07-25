@@ -59,7 +59,7 @@ public class HttpJsonResponseStrategyTest {
 			final SerializableEntity originalEntity,
 			final AccountLookup accountLookup) throws IOException {
 		// Arrange:
-		final byte[] serializedBytes = JsonSerializer.serializeToJson(originalEntity).toJSONString().getBytes();
+		final byte[] serializedBytes = JsonSerializer.serializeToBytes(originalEntity);
 
 		// Act:
 		return coerceDeserializer(serializedBytes, accountLookup);

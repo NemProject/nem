@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
-import org.nem.core.utils.Base64Encoder;
+import org.nem.core.utils.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -125,5 +125,16 @@ public class JsonSerializer extends Serializer {
 		JsonSerializer serializer = new JsonSerializer();
 		entity.serialize(serializer);
 		return serializer.getObject();
+	}
+
+	/**
+	 * Helper function that serializes a SerializableEntity to a byte array.
+	 *
+	 * @param entity The entity to serialize.
+	 *
+	 * @return The resulting byte array.
+	 */
+	public static byte[] serializeToBytes(final SerializableEntity entity) {
+		return StringEncoder.getBytes(serializeToJson(entity).toJSONString());
 	}
 }

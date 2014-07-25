@@ -21,7 +21,7 @@ public class HttpJsonPostRequestTest {
 		// Assert:
 		Assert.assertThat(
 				request.getPayload(),
-				IsEqual.equalTo(JsonSerializer.serializeToJson(entity).toString().getBytes("UTF-8")));
+				IsEqual.equalTo(JsonSerializer.serializeToBytes(entity)));
 	}
 
 	@Test

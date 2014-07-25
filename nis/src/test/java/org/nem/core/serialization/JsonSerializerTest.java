@@ -4,6 +4,7 @@ import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.utils.StringEncoder;
 
 import java.math.*;
 import java.util.*;
@@ -321,20 +322,37 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//endregion
 
-	//region serializeToJson
+	//region serializeToJson / serializeToBytes
 
 	@Test
-	public void serializeToJsonProducesSameBytesAsEntitySerialize() throws Exception {
+	public void serializeToJsonProducesSameJsonObjectAsEntitySerialize() throws Exception {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
+		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42000000000L);
+		entity.serialize(serializer);
+		final JSONObject expectedJsonObject = serializer.getObject();
 
 		// Act:
-		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
-		entity.serialize(serializer);
-		JSONObject writeObjectJson = serializer.getObject();
+		final JSONObject resultingJsonObject = JsonSerializer.serializeToJson(entity);
 
-		// Assert:
-		Assert.assertThat(JsonSerializer.serializeToJson(entity), IsEqual.equalTo(writeObjectJson));
+		// Act / Assert:
+		Assert.assertThat(resultingJsonObject, IsEqual.equalTo(expectedJsonObject));
+	}
+
+	@Test
+	public void serializeToBytesProducesSameBytesAsEntitySerialize() throws Exception {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42000000000L);
+		entity.serialize(serializer);
+		final JSONObject expectedJsonObject = serializer.getObject();
+
+		// Act:
+		final byte[] resultingBytes = JsonSerializer.serializeToBytes(entity);
+		final JSONObject resultingJsonObject = (JSONObject)JSONValue.parse(StringEncoder.getString(resultingBytes));
+
+		// Act / Assert:
+		Assert.assertThat(resultingJsonObject, IsEqual.equalTo(expectedJsonObject));
 	}
 
 	//endregion
