@@ -92,12 +92,4 @@ public class PrivateKey implements SerializableEntity {
 			throw new CryptoException(e);
 		}
 	}
-
-	private static PrivateKey fromString(final String s, final int base) {
-		try {
-			return new PrivateKey(new BigInteger(s, base));
-		} catch (NumberFormatException e) {
-			throw new CryptoException(e);
-		}
-	}
 }
