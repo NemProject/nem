@@ -8,12 +8,12 @@ public class UnixTimeTest {
 	@Test
 	public void unixTimeCanBeCreatedAroundTimeInstant() {
 		// Act:
-		final UnixTime unixTime = UnixTime.fromTimeInstant(new TimeInstant(1856002));
+		final UnixTime unixTime = UnixTime.fromTimeInstant(new TimeInstant(65));
 
 		// Assert:
-		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(1856002)));
-		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1403696002000L));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-25 11:33:22"));
+		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(65)));
+		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(SystemTimeProvider.getEpochTimeMillis() + 65000));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-04 00:01:05"));
 	}
 
 	@Test
