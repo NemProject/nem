@@ -65,7 +65,7 @@ public class UnixTime {
 	 * @return The unix time.
 	 */
 	public long getMillis() {
-		return SystemTimeProvider.getEpochTimeMillis() + this.timeInstant.getRawTime() * 1000;
+		return SystemTimeProvider.getEpochTimeMillis() + this.timeInstant.getRawTime() * 1000L;
 	}
 
 	/**

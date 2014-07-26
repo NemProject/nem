@@ -30,12 +30,12 @@ public class UnixTimeTest {
 	@Test
 	public void unixTimeCanBeCreatedAroundSystemTime() {
 		// Act:
-		final UnixTime unixTime = UnixTime.fromUnixTimeInMillis(1403696002000L);
+		final UnixTime unixTime = UnixTime.fromUnixTimeInMillis(1406288002000L);
 
 		// Assert:
-		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(1856002)));
-		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1403696002000L));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-25 11:33:22"));
+		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(4448002)));
+		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1406288002000L));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-07-25 11:33:22"));
 	}
 
 	@Test
