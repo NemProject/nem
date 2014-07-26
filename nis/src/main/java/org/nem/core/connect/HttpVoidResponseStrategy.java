@@ -17,7 +17,6 @@ public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	@Override
 	public String getSupportedContentType() {
-		// TODO: refactor this
-		return null;
+		return ContentType.VOID;
 	}
 }

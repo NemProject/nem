@@ -29,7 +29,6 @@ public class HttpBinaryResponseStrategy extends HttpDeserializerResponseStrategy
 
 	@Override
 	public String getSupportedContentType() {
-		// TODO: refactor this
-		return "application/binary";
+		return ContentType.BINARY;
 	}
 }

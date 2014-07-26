@@ -30,7 +30,6 @@ public class HttpJsonResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	@Override
 	public String getSupportedContentType() {
-		// TODO: refactor this
-		return "application/json";
+		return ContentType.JSON;
 	}
 }

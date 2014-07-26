@@ -39,6 +39,6 @@ public class HttpJsonPostRequest implements HttpPostRequest {
 
 	@Override
 	public String getContentType() {
-		return MimeTypes.Type.APPLICATION_JSON.asString();
+		return ContentType.JSON;
 	}
 }
