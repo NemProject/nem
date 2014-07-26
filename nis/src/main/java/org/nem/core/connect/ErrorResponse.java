@@ -1,7 +1,7 @@
 package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.springframework.http.HttpStatus;
 
 import java.util.logging.*;

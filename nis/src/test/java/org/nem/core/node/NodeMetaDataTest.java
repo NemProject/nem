@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 
 public class NodeMetaDataTest {
 

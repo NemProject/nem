@@ -1,7 +1,6 @@
 package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
-import org.eclipse.jetty.http.MimeTypes;
 import org.nem.core.serialization.*;
 
 import java.nio.charset.Charset;

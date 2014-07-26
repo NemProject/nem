@@ -5,7 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.springframework.http.HttpStatus;
 
 public class ErrorResponseTest {
