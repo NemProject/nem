@@ -3,16 +3,16 @@ package org.nem.core.node;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.time.*;
-import org.nem.peer.test.PeerUtils;
 
 public class NisNodeInfoTest {
 
 	@Test
 	public void nodeInfoExposesAllConstructorParameters() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("a");
+		final Node node = createNodeWithName("a");
 		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
@@ -26,7 +26,7 @@ public class NisNodeInfoTest {
 	@Test
 	public void canRoundtripNodeInfoMetaData() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("b");
+		final Node node = createNodeWithName("b");
 		final ApplicationMetaData appMetaData = createAppMetaData("nem", "1.0");
 
 		// Act:
@@ -35,6 +35,12 @@ public class NisNodeInfoTest {
 		// Assert:
 		Assert.assertThat(nodeInfo.getNode(), IsEqual.equalTo(node));
 		Assert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
+	}
+
+	private static Node createNodeWithName(final String name) {
+		return new Node(
+				new NodeIdentity(new KeyPair(), name),
+				NodeEndpoint.fromHost("localhost"));
 	}
 
 	private static NisNodeInfo roundtripNodeInfo(final NisNodeInfo nodeInfo) {
