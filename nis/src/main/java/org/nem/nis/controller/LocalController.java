@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.nem.deploy.CommonStarter;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
@@ -66,7 +66,7 @@ public class LocalController {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			long timestamp = SystemTimeProvider.getEpochTimeMillis() + dbBlock.getTimestamp().longValue()*1000;
+			long timestamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimestamp())).getMillis();
 			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
 					dbBlock.getHeight(),
 					Address.fromPublicKey(dbBlock.getForger().getPublicKey()),
@@ -78,7 +78,7 @@ public class LocalController {
 					.map(tx -> new ExplorerTransferView(
 							tx.getType(),
 							Amount.fromMicroNem(tx.getFee()),
-							tx.getDeadline().longValue(),
+							tx.getDeadline(),
 							Address.fromPublicKey(tx.getSender().getPublicKey()),
 							tx.getSenderProof(),
 							tx.getTransferHash(),
