@@ -182,14 +182,8 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
-			// TODO: remove try-catch when we are sure everyone has nis version with unconfirmed transactions polling
-			try {
-				Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-				this.foraging.processTransactions(unconfirmedTransactions);
-			} catch (Exception e) {
-				// Don't care at the moment
-				LOGGER.info("Exception calling getUnconfirmedTransactions(): " + e.toString());
-			}
+			Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+			this.foraging.processTransactions(unconfirmedTransactions);
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
