@@ -113,8 +113,7 @@ public enum ValidationResult {
 	 */
 	public boolean isFailure() {
 		return !this.isSuccess() && 
-				ValidationResult.NEUTRAL != this &&
-				ValidationResult.FAILURE_ENTITY_UNUSABLE != this;
+				ValidationResult.NEUTRAL != this;
 	}
 	
 	/**

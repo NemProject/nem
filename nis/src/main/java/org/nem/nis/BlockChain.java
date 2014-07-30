@@ -195,7 +195,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
-			LOGGER.info("Chain inconsistent: calling undoTxesAndGetScore().");
+			LOGGER.info("synchronizeNodeInternal -> Chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
@@ -240,12 +240,6 @@ public class BlockChain implements BlockSynchronizer {
 			return ValidationResult.NEUTRAL;
 		}
 
-		// TODO: we should have some time limit set
-		// BR: Why that? Could just be bad luck.
-//		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
-//			return false;
-//		}
-
 		final BlockChainSyncContext context = this.createSyncContext();
 
 		fixGenerationHash(receivedBlock, dbParent);
@@ -260,6 +254,7 @@ public class BlockChain implements BlockSynchronizer {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (dbParent.getNextBlockId() != null) {
+			LOGGER.info("processBlock -> Chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
