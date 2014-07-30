@@ -114,7 +114,6 @@ public enum ValidationResult {
 	public boolean isFailure() {
 		switch (this) {
 			case NEUTRAL:
-			case FAILURE_ENTITY_UNUSABLE:
 				return false;
 		}
 

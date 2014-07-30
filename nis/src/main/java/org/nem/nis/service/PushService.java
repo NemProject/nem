@@ -101,8 +101,10 @@ public class PushService {
 
 		final ValidationResult isValidResult = isValid.apply(entity);
 		if (isValidResult.isFailure()) {
-			// Bad experience with the remote node.
-			updateStatus.accept(NodeInteractionResult.FAILURE);
+			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
+				// Bad experience with the remote node.
+				updateStatus.accept(NodeInteractionResult.FAILURE);
+			}
 			return isValidResult;
 		}
 

@@ -180,14 +180,8 @@ public class BlockChain implements BlockSynchronizer {
 
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
-			// TODO: remove try-catch when we are sure everyone has nis version with unconfirmed transactions polling
-			try {
-				Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-				this.foraging.processTransactions(unconfirmedTransactions);
-			} catch (Exception e) {
-				// Don't care at the moment
-				LOGGER.info("Exception calling getUnconfirmedTransactions(): " + e.toString());
-			}
+			Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+			this.foraging.processTransactions(unconfirmedTransactions);
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
@@ -199,7 +193,7 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
-			LOGGER.info("Chain inconsistent: calling undoTxesAndGetScore().");
+			LOGGER.info("synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
@@ -244,12 +238,6 @@ public class BlockChain implements BlockSynchronizer {
 			return ValidationResult.NEUTRAL;
 		}
 
-		// TODO: we should have some time limit set
-		// BR: Why that? Could just be bad luck.
-//		if (receivedBlock.getTimeStamp() > parent.getTimestamp() + 20*30) {
-//			return false;
-//		}
-
 		final BlockChainSyncContext context = this.createSyncContext();
 
 		fixGenerationHash(receivedBlock, dbParent);
@@ -264,6 +252,7 @@ public class BlockChain implements BlockSynchronizer {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (dbParent.getNextBlockId() != null) {
+			LOGGER.info("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
