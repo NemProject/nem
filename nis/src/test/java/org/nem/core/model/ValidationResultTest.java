@@ -55,7 +55,6 @@ public class ValidationResultTest {
 		final Set<ValidationResult> nonFailureValues = new HashSet<ValidationResult>() {
 			{ add(ValidationResult.SUCCESS); }
 			{ add(ValidationResult.NEUTRAL); }
-			{ add(ValidationResult.FAILURE_ENTITY_UNUSABLE); }
 		};
 
 		// Assert:
