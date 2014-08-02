@@ -8,7 +8,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.*;
+import org.nem.peer.node.NodeVersionCheck;
 import org.nem.peer.test.*;
 
 import java.util.*;

@@ -1,9 +1,8 @@
 package org.nem.peer.test;
 
 import org.junit.Assert;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.node.NodeCollection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,28 +11,6 @@ import java.util.stream.Collectors;
  * Static class containing asserts that are used to validate NodeCollection objects.
  */
 public class NodeCollectionAssert {
-
-	/**
-	 * Asserts that nodes have matching active and inactive hosts.
-	 *
-	 * @param nodes                 The nodes.
-	 * @param expectedActiveHosts   The expected active hosts.
-	 * @param expectedInactiveHosts The expected inactive hosts.
-	 */
-	public static void areHostsEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActiveHosts,
-			final String[] expectedInactiveHosts) {
-		// Assert:
-		Assert.assertThat(getHosts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveHosts));
-		Assert.assertThat(getHosts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveHosts));
-	}
-
-	private static List<String> getHosts(final Collection<Node> nodes) {
-		return nodes.stream()
-				.map(node -> node.getEndpoint().getBaseUrl().getHost())
-				.collect(Collectors.toList());
-	}
 
 	/**
 	 * Asserts that nodes have matching active and inactive names.

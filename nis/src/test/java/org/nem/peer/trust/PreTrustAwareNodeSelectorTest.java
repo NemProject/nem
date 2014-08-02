@@ -3,9 +3,8 @@ package org.nem.peer.trust;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
 import java.security.SecureRandom;

@@ -2,7 +2,6 @@ package org.nem.peer;
 
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.peer.node.NodeCollection;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;

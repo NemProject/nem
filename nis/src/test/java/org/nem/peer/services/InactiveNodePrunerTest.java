@@ -3,8 +3,7 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.node.Node;
-import org.nem.peer.node.NodeCollection;
+import org.nem.core.node.*;
 
 import java.util.*;
 

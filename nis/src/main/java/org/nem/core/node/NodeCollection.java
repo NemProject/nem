@@ -1,6 +1,5 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
-import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 
 import java.util.*;

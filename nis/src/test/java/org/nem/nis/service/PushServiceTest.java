@@ -12,7 +12,6 @@ import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
-import org.nem.peer.node.*;
 
 public class PushServiceTest {
 
