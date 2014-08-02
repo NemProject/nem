@@ -7,6 +7,8 @@ import org.nem.core.serialization.*;
  * Each Node is uniquely identified by its endpoint.
  */
 public class Node implements SerializableEntity {
+	public final static ObjectDeserializer<Node> DESERIALIZER = deserializer -> new Node(deserializer);
+
 	private final NodeIdentity identity;
 	private NodeEndpoint endpoint;
 	private NodeMetaData metaData;

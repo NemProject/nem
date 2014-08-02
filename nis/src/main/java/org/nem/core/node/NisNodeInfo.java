@@ -7,6 +7,8 @@ import org.nem.core.serialization.*;
  * Information about a node that is returned by NIS.
  */
 public class NisNodeInfo implements SerializableEntity {
+	public final static ObjectDeserializer<NisNodeInfo> DESERIALIZER = deserializer -> new NisNodeInfo(deserializer);
+
 	private Node node;
 	private ApplicationMetaData appMetaData;
 

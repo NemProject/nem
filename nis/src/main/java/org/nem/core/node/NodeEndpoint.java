@@ -9,6 +9,8 @@ import java.util.*;
  * The endpoint of a node in the NEM network.
  */
 public class NodeEndpoint implements SerializableEntity {
+	public final static ObjectDeserializer<NodeEndpoint> DESERIALIZER = deserializer -> new NodeEndpoint(deserializer);
+
 	private final String protocol;
 	private final String host;
 	private final int port;
