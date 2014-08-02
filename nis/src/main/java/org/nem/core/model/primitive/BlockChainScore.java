@@ -1,8 +1,8 @@
 package org.nem.core.model.primitive;
 
-import java.math.BigInteger;
-
 import org.nem.core.serialization.*;
+
+import java.math.BigInteger;
 
 /**
  * Represents a score for an entire block chain.

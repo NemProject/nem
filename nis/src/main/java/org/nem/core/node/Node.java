@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.nem.core.serialization.*;
 
@@ -46,12 +46,12 @@ public class Node implements SerializableEntity {
 	public Node(final Deserializer deserializer) {
 		this.identity = deserializer.readObject("identity", obj -> NodeIdentity.deserializeWithPublicKey(obj));
 		this.setEndpoint(deserializer.readObject("endpoint", obj -> new NodeEndpoint(obj)));
-		this.setMetaData(getMetaData(deserializer.readObject("metaData", obj -> new NodeMetaData(obj))));
+		this.setMetaData(getMetaData(deserializer.readOptionalObject("metaData", obj -> new NodeMetaData(obj))));
 		this.ensureValidity();
 	}
 
 	private static NodeMetaData getMetaData(final NodeMetaData metaData) {
-		return null != metaData ? metaData : new NodeMetaData(null, null, null);
+		return null != metaData ? metaData : new NodeMetaData("?", "?", null);
 	}
 
 	@Override

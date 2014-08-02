@@ -1,11 +1,11 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
-import net.minidev.json.*;
-import org.hamcrest.core.*;
+import net.minidev.json.JSONObject;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 
@@ -33,17 +33,6 @@ public class DeserializerHttpMessageConverterTest {
 	}
 
 	@Test
-	public void cannotWriteCompatibleTypes() {
-		// Arrange:
-		final MediaType supportedType = new MediaType("application", "json");
-		final DeserializerHttpMessageConverter mc = createMessageConverter();
-
-		// Assert:
-		Assert.assertThat(mc.canWrite(JsonDeserializer.class, supportedType), IsEqual.equalTo(false));
-		Assert.assertThat(mc.canWrite(Deserializer.class, supportedType), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void canReadCompatibleTypes() {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
@@ -65,20 +54,20 @@ public class DeserializerHttpMessageConverterTest {
 		Assert.assertThat(mc.canRead(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
-	//endregion
-
-	//region read / write
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void writeIsUnsupported() throws Exception {
+	@Test
+	public void cannotWriteCompatibleTypes() {
 		// Arrange:
 		final MediaType supportedType = new MediaType("application", "json");
 		final DeserializerHttpMessageConverter mc = createMessageConverter();
-		final JsonDeserializer deserializer = new JsonDeserializer(new JSONObject(), new DeserializationContext(null));
 
-		// Act:
-		mc.write(deserializer, supportedType, new MockHttpOutputMessage());
+		// Assert:
+		Assert.assertThat(mc.canWrite(JsonDeserializer.class, supportedType), IsEqual.equalTo(false));
+		Assert.assertThat(mc.canWrite(Deserializer.class, supportedType), IsEqual.equalTo(false));
 	}
+
+	//endregion
+
+	//region read
 
 	@Test
 	public void readDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
@@ -113,6 +102,21 @@ public class DeserializerHttpMessageConverterTest {
 
 		// Assert:
 		Mockito.verify(policy, Mockito.times(1)).fromStream(message.getBody());
+	}
+
+	//endregion
+
+	//region write
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void writeIsUnsupported() throws Exception {
+		// Arrange:
+		final MediaType supportedType = new MediaType("application", "json");
+		final DeserializerHttpMessageConverter mc = createMessageConverter();
+		final JsonDeserializer deserializer = new JsonDeserializer(new JSONObject(), new DeserializationContext(null));
+
+		// Act:
+		mc.write(deserializer, supportedType, new MockHttpOutputMessage());
 	}
 
 	//endregion

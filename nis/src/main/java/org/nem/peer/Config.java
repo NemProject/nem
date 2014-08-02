@@ -1,12 +1,11 @@
 package org.nem.peer;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
-import org.nem.peer.node.*;
 import org.nem.peer.trust.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents peer configuration.
@@ -119,8 +118,12 @@ public class Config {
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<Node> wellKnownNodes = deserializer.readObjectArray("knownPeers", obj -> new Node(obj));
-		return new PreTrustedNodes(wellKnownNodes.stream().collect(Collectors.toSet()));
+		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", obj -> new Node(obj));
+		final Set<Node> preTrustedNodes = new HashSet<>();
+		if (null != wellKnownNodes)
+			preTrustedNodes.addAll(wellKnownNodes);
+
+		return new PreTrustedNodes(preTrustedNodes);
 	}
 
 	private static TrustParameters getDefaultTrustParameters() {

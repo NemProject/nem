@@ -1,6 +1,6 @@
 package org.nem.peer.trust.score;
 
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

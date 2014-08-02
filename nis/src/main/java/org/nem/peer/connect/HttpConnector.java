@@ -1,13 +1,13 @@
 package org.nem.peer.connect;
 
-import org.nem.core.connect.*;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 
-import java.net.*;
+import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 

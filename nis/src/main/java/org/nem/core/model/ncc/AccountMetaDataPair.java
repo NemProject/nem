@@ -7,9 +7,8 @@ import org.nem.core.serialization.*;
  * A pair containing both an account and account meta data.
  */
 public class AccountMetaDataPair implements SerializableEntity {
-
-	private Account account;
-	private AccountMetaData metaData;
+	private final Account account;
+	private final AccountMetaData metaData;
 
 	/**
 	 * Creates a new pair.

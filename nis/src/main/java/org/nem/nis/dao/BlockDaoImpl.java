@@ -1,23 +1,19 @@
 package org.nem.nis.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.HashChain;
-import org.nem.core.model.*;
+import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Block;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.dbmodel.Block;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {

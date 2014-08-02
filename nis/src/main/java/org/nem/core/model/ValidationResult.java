@@ -112,8 +112,12 @@ public enum ValidationResult {
 	 * @return true if this result indicates an error.
 	 */
 	public boolean isFailure() {
-		return !this.isSuccess() && 
-				ValidationResult.NEUTRAL != this;
+		switch (this) {
+			case NEUTRAL:
+				return false;
+		}
+
+		return !this.isSuccess();
 	}
 	
 	/**

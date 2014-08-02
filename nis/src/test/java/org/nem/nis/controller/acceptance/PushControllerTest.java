@@ -6,11 +6,11 @@ import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.nis.test.LocalHostConnector;
-import org.nem.peer.node.NodeIdentity;
 
 public class PushControllerTest {
 

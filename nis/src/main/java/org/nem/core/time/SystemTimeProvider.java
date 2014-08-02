@@ -49,7 +49,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 *
 	 * @param millis The system time in milliseconds.
 	 *
-	 * @return The normalized time.
+	 * @return The normalized time in seconds.
 	 */
 	public static int getTime(long millis) {
 		return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);

@@ -1,12 +1,9 @@
 package org.nem.nis.test;
 
 import net.minidev.json.JSONObject;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpInputMessage;
+import org.springframework.http.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * A mock HttpInputMessage implementation.

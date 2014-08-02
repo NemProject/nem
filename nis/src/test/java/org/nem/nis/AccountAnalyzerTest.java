@@ -569,6 +569,39 @@ public class AccountAnalyzerTest {
 
 	//endregion
 
+	//region undoVesting
+
+	@Test
+	public void undoVestingDelegatesToWeightedBalances() {
+		// Arrange:
+		final AccountAnalyzer analyzer = createAccountAnalyzer();
+		final List<Account> accounts = createAccountsForUndoVestingTests(3, analyzer);
+
+		// Expect: all accounts should have two weighted balance entries
+		for (final Account account : accounts)
+			Assert.assertThat(account.getWeightedBalances().size(), IsEqual.equalTo(2));
+
+		// Act:
+		analyzer.undoVesting(new BlockHeight(7));
+
+		// Assert: one weighted balance entry should have been removed from all accounts
+		for (final Account account : accounts)
+			Assert.assertThat(account.getWeightedBalances().size(), IsEqual.equalTo(1));
+	}
+
+	private static List<Account> createAccountsForUndoVestingTests(final int numAccounts, final AccountAnalyzer analyzer) {
+		final List<Account> accounts = new ArrayList<>();
+		for (int i = 0; i < numAccounts; ++i) {
+			accounts.add(analyzer.addAccountToCache(Utils.generateRandomAddress()));
+			accounts.get(i).getWeightedBalances().addFullyVested(new BlockHeight(7), Amount.fromNem(i + 1));
+			accounts.get(i).getWeightedBalances().addFullyVested(new BlockHeight(8), Amount.fromNem(2 * (i + 1)));
+		}
+
+		return accounts;
+	}
+
+	//endregion
+
 	private static AccountAnalyzer createAccountAnalyzer() {
 		return new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
 	}

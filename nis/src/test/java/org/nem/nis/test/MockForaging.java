@@ -2,10 +2,8 @@ package org.nem.nis.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.Foraging;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
+import org.nem.nis.*;
+import org.nem.nis.dao.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 public class MockForaging extends Foraging {

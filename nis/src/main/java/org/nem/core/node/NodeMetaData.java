@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.nem.core.serialization.*;
 
@@ -34,13 +34,13 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeMetaData(final Deserializer deserializer) {
-		this.platform = deserializer.readString("platform");
-		this.application = deserializer.readString("application");
+		this.platform = deserializer.readOptionalString("platform");
+		this.application = deserializer.readOptionalString("application");
 		this.version = NodeVersion.readFrom(deserializer, "version");
 	}
 
 	/**
-	 * Gets the platform.
+	 * Gets the (optional) platform.
 	 *
 	 * @return The platform.
 	 */
@@ -49,7 +49,7 @@ public class NodeMetaData implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the application.
+	 * Gets the (optional) application.
 	 *
 	 * @return The application.
 	 */

@@ -1,23 +1,20 @@
 package org.nem.nis;
 
-import javax.annotation.PostConstruct;
-
-import java.util.*;
-import java.util.logging.*;
-
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
-import org.nem.deploy.CommonStarter;
-import org.nem.deploy.NisConfiguration;
+import org.nem.core.time.TimeProvider;
+import org.nem.deploy.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
-import org.nem.core.time.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());

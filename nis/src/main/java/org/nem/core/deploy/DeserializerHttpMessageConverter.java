@@ -1,6 +1,6 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;

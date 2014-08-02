@@ -1,7 +1,6 @@
 package org.nem.core.connect;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.hamcrest.core.*;

@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
@@ -183,9 +183,8 @@ public class NodeIdentityTest {
 		final Signature signedDataWithoutPrefix = signer.sign(payload);
 
 		// Assert:
-		final NodeChallenge challenge = new NodeChallenge(payload);
-		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithPrefix), IsEqual.equalTo(true));
-		Assert.assertThat(identity.verify(challenge.getRaw(), signedDataWithoutPrefix), IsEqual.equalTo(false));
+		Assert.assertThat(identity.verify(payload, signedDataWithPrefix), IsEqual.equalTo(true));
+		Assert.assertThat(identity.verify(payload, signedDataWithoutPrefix), IsEqual.equalTo(false));
 	}
 
 	//endregion

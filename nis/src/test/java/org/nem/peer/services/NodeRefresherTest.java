@@ -2,11 +2,12 @@ package org.nem.peer.services;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.connect.*;
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.peer.connect.*;
+import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.*;
 import org.nem.peer.test.*;
 

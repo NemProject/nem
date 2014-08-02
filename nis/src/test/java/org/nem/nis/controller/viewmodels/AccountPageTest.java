@@ -3,8 +3,7 @@ package org.nem.nis.controller.viewmodels;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 public class AccountPageTest {
 

@@ -1,19 +1,20 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import net.minidev.json.*;
 import org.eclipse.jetty.server.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.serialization.*;
 import org.nem.core.connect.ErrorResponse;
+import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class JsonErrorHandlerTest {
+	private static final TimeInstant CURRENT_TIME = new TimeInstant(84);
 
 	@Test
 	public void nothingIsWrittenIfHttpMethodIsUnsupported() throws Exception {
@@ -96,6 +97,7 @@ public class JsonErrorHandlerTest {
 		final ErrorResponse response = context.getErrorResponse();
 
 		// Assert:
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(123));
 		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
 	}
@@ -111,6 +113,7 @@ public class JsonErrorHandlerTest {
 		final ErrorResponse response = context.getErrorResponse();
 
 		// Assert:
+		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
 		Assert.assertThat(response.getStatus(), IsEqual.equalTo(123));
 		Assert.assertThat(response.getMessage(), IsNull.nullValue());
 	}
@@ -145,8 +148,8 @@ public class JsonErrorHandlerTest {
 	//region TestContext
 
 	private static class TestContext {
-
-		private final JsonErrorHandler handler = new JsonErrorHandler();
+		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		private final JsonErrorHandler handler = new JsonErrorHandler(this.timeProvider);
 		private final Request mockBaseRequest = Mockito.mock(Request.class);
 		private final HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
 		private final MockServletOutputStream outputStream = new MockServletOutputStream();
@@ -157,6 +160,8 @@ public class JsonErrorHandlerTest {
 		}
 
 		public TestContext(final String httpMethod, final HttpServletResponse response) throws IOException {
+			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_TIME);
+
 			this.mockResponse = response;
 			Mockito.when(this.getRequest().getMethod()).thenReturn(httpMethod);
 			Mockito.when(this.getResponse().getOutputStream()).thenReturn(this.outputStream);

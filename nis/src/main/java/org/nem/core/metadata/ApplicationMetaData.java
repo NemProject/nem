@@ -1,9 +1,9 @@
 package org.nem.core.metadata;
 
-import java.security.cert.X509Certificate;
-
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
+
+import java.security.cert.X509Certificate;
 
 /**
  * Meta data information about the application.
@@ -48,7 +48,7 @@ public class ApplicationMetaData implements SerializableEntity {
 	public ApplicationMetaData(Deserializer deserializer) {
 		this.appName = deserializer.readString("application");
 		this.version = deserializer.readString("version");
-		this.certificateSigner = deserializer.readString("signer");
+		this.certificateSigner = deserializer.readOptionalString("signer");
 		this.startTime = TimeInstant.readFrom(deserializer, "startTime");
 		this.currentTime = TimeInstant.readFrom(deserializer, "currentTime");
 		this.timeProvider = null;

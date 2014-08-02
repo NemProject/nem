@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.peer.node.*;
+import org.nem.core.node.*;
 import org.nem.peer.trust.score.NodeExperience;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
@@ -225,6 +225,7 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
+	@Ignore // TODO: ignored until the block chain is restarted!
 	@Test
 	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
 		// Arrange:
@@ -363,12 +364,11 @@ public class BlockChainValidatorTest {
 		for (final Block block : blocks)
 			block.sign();
 	}
-	
+
 	private static Block createFutureBlock(final Block parentBlock) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
 		block.sign();
-		
 		return block;
 	}
 

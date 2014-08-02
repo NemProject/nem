@@ -1,8 +1,8 @@
 package org.nem.nis.service;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.crypto.Hash;
 
 public interface BlockIo {
 

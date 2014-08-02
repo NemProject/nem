@@ -1,26 +1,17 @@
 package org.nem.nis.service;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.TransferTransaction;
-import org.nem.core.model.ncc.TransactionMetaData;
+import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TestConf;
-import org.nem.nis.dao.TransferDao;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.dao.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,8 +20,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Vector;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

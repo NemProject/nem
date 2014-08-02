@@ -1,8 +1,7 @@
 package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.EncodingException;
-import org.nem.core.utils.HexEncoder;
+import org.nem.core.utils.*;
 
 import java.math.BigInteger;
 
@@ -89,14 +88,6 @@ public class PrivateKey implements SerializableEntity {
 	public static PrivateKey fromDecimalString(final String decimal) {
 		try {
 			return new PrivateKey(new BigInteger(decimal, 10));
-		} catch (NumberFormatException e) {
-			throw new CryptoException(e);
-		}
-	}
-
-	private static PrivateKey fromString(final String s, final int base) {
-		try {
-			return new PrivateKey(new BigInteger(s, base));
 		} catch (NumberFormatException e) {
 			throw new CryptoException(e);
 		}

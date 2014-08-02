@@ -1,7 +1,9 @@
 package org.nem.nis.controller;
 
 import org.nem.core.connect.ErrorResponse;
+import org.nem.core.time.TimeProvider;
 import org.nem.nis.controller.interceptors.UnauthorizedAccessException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,17 @@ import java.util.MissingResourceException;
 @ResponseBody
 @ControllerAdvice
 public class ExceptionControllerAdvice {
+	private final TimeProvider timeProvider;
+
+	/**
+	 * Creates a new exception controller advice.
+	 *
+	 * @param timeProvider The time provider.
+	 */
+	@Autowired(required = true)
+	public ExceptionControllerAdvice(final TimeProvider timeProvider) {
+		this.timeProvider = timeProvider;
+	}
 
 	/**
 	 * Handler for resource-not-found exceptions.
@@ -22,7 +35,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(MissingResourceException.class)
 	public ResponseEntity<ErrorResponse> handleMissingResourceException(final Exception e) {
-		return createResponse(e, HttpStatus.NOT_FOUND);
+		return this.createResponse(e, HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -33,7 +46,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final Exception e) {
-		return createResponse(e, HttpStatus.BAD_REQUEST);
+		return this.createResponse(e, HttpStatus.BAD_REQUEST);
 	}
 
 	/**
@@ -44,7 +57,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(UnauthorizedAccessException.class)
 	public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(final Exception e) {
-		return createResponse(e, HttpStatus.UNAUTHORIZED);
+		return this.createResponse(e, HttpStatus.UNAUTHORIZED);
 	}
 
 	/**
@@ -55,10 +68,10 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleException(final Exception e) {
-		return createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		return this.createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	private static ResponseEntity<ErrorResponse> createResponse(final Exception e, final HttpStatus status) {
-		return new ResponseEntity<>(new ErrorResponse(e, status), status);
+	private ResponseEntity<ErrorResponse> createResponse(final Exception e, final HttpStatus status) {
+		return new ResponseEntity<>(new ErrorResponse(this.timeProvider.getCurrentTime(), e, status), status);
 	}
 }

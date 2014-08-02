@@ -3,6 +3,7 @@ package org.nem.peer.node;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 

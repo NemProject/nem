@@ -720,6 +720,88 @@ public class BlockTest {
 
 	//endregion
 
+	//region execute / undo outlink update ordering
+
+	@Test
+	public void executeAddsOutlinkAfterUpdatingBalances() {
+		// Arrange:
+		final Account foragerAccount = Utils.generateRandomAccount();
+		foragerAccount.incrementBalance(Amount.fromNem(50));
+		foragerAccount.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(50));
+		final Block block = createBlock(foragerAccount);
+		block.addTransaction(createTransactionWithFee(Amount.fromNem(2)));
+
+		final Amount[] balanceInObserver = new Amount[1];
+		block.subscribe(new BlockTransferObserver() {
+			@Override
+			public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
+			}
+
+			@Override
+			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+					balanceInObserver[0] = account.getBalance();
+			}
+
+			@Override
+			public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
+			}
+
+			@Override
+			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
+			}
+		});
+
+		// Act:
+		block.execute();
+
+		// Assert:
+		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));
+		Assert.assertThat(foragerAccount.getBalance(), IsEqual.equalTo(Amount.fromNem(52)));
+	}
+
+	@Test
+	public void undoRemovesOutlinkBeforeUpdatingBalances() {
+		// Arrange:
+		final Account foragerAccount = Utils.generateRandomAccount();
+		foragerAccount.incrementBalance(Amount.fromNem(50));
+		foragerAccount.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(50));
+		final Block block = createBlock(foragerAccount);
+		block.addTransaction(createTransactionWithFee(Amount.fromNem(2)));
+
+		final Amount[] balanceInObserver = new Amount[1];
+		block.subscribe(new BlockTransferObserver() {
+			@Override
+			public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
+			}
+
+			@Override
+			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
+
+			}
+
+			@Override
+			public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
+			}
+
+			@Override
+			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+					balanceInObserver[0] = account.getBalance();
+			}
+		});
+
+		// Act:
+		block.execute();
+		block.undo();
+
+		// Assert:
+		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));
+		Assert.assertThat(foragerAccount.getBalance(), IsEqual.equalTo(Amount.fromNem(50)));
+	}
+
+	//endregion
+
 	//region toString
 
 	@Test
@@ -745,6 +827,14 @@ public class BlockTest {
 		Account sender = Utils.generateRandomAccount();
 		MockTransaction transaction = new MockTransaction(sender, customField);
 		transaction.setFee(new Amount(fee));
+		return transaction;
+	}
+
+	private static MockTransaction createTransactionWithFee(final Amount fee) {
+		// Arrange:
+		Account sender = Utils.generateRandomAccount();
+		MockTransaction transaction = new MockTransaction(sender, 7);
+		transaction.setFee(fee);
 		return transaction;
 	}
 

@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import java.util.*;
 import java.util.logging.*;
@@ -10,6 +10,9 @@ public class ColorConsoleFormatter extends SimpleFormatter {
 
 	private final MessageFormatter impl;
 
+	/**
+	 * Creates a new formatter.
+	 */
 	public ColorConsoleFormatter() {
 		this.impl = isWindows() ? new WindowsMessageFormatter() : new NixMessageFormatter();
 	}

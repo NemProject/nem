@@ -7,11 +7,11 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.service.*;
+import org.nem.nis.service.AccountIoAdapter;
 
 import java.util.*;
 

@@ -1,6 +1,6 @@
 package org.nem.core.test;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Message;
 import org.nem.core.serialization.*;
 
 /**

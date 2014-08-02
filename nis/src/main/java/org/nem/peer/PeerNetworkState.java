@@ -1,7 +1,8 @@
 package org.nem.peer;
 
+import org.nem.core.node.Node;
 import org.nem.peer.node.*;
-import org.nem.peer.trust.*;
+import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
 import java.util.logging.Logger;

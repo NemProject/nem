@@ -1,13 +1,12 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.math.BigInteger;
-import java.text.*;
-import java.util.*;
-
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Debug information about a block.
@@ -161,24 +160,14 @@ public class BlockDebugInfo implements SerializableEntity {
 		serializer.writeObjectArray("transactions", this.transactionDebugInfos);
 	}
 
-	// TODO: refactor this
-
 	private static TimeInstant readTimeStringAsTimeInstant(final Deserializer deserializer, final String name) {
-		try {
-			final Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(deserializer.readString(name));
-			return new TimeInstant(SystemTimeProvider.getTime(date.getTime()));
-		}
-		catch (ParseException e) {
-			return TimeInstant.ZERO;
-		}
+		return UnixTime.fromDateString(deserializer.readString(name), TimeInstant.ZERO).getTimeInstant();
 	}
 
 	private static void writeTimeInstantAsTimeString(
 			final Serializer serializer,
 			final String label,
 			final TimeInstant timeInstant) {
-		final Date date = new Date(SystemTimeProvider.getEpochTimeMillis() + ((long)timeInstant.getRawTime()) * 1000);
-		final String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-		serializer.writeString(label, dateString);
+		serializer.writeString(label, UnixTime.fromTimeInstant(timeInstant).getDateString());
 	}
 }

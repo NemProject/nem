@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
@@ -38,7 +38,7 @@ public class NodeIdentity implements SerializableEntity {
 	private NodeIdentity(final Deserializer deserializer, boolean containsPrivateKey) {
 		this.keyPair = deserializeKeyPair(deserializer, containsPrivateKey);
 		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
-		this.name = deserializer.readString("name");
+		this.name = deserializer.readOptionalString("name");
 	}
 
 	private static KeyPair deserializeKeyPair(final Deserializer deserializer, boolean containsPrivateKey) {

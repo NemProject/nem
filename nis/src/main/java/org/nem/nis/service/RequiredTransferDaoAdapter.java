@@ -1,14 +1,12 @@
 package org.nem.nis.service;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.MissingResourceException;
+import java.util.*;
 
 @Service
 public class RequiredTransferDaoAdapter implements RequiredTransferDao {

@@ -1,27 +1,40 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
-import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.connect.ErrorResponse;
+import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.time.TimeProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.*;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Custom error handler that returns JSON error responses in the same format as the
  * ExceptionControllerAdvice.
  */
 public class JsonErrorHandler extends ErrorHandler {
+	private final TimeProvider timeProvider;
+
+	/**
+	 * Creates a new JSON error handler.
+	 *
+	 * @param timeProvider The time provider.
+	 */
+	@Autowired(required = true)
+	public JsonErrorHandler(final TimeProvider timeProvider) {
+		this.timeProvider = timeProvider;
+	}
 
 	@Override
-	public void handle(final String target,
-					   final Request baseRequest,
-					   final HttpServletRequest request,
-					   final HttpServletResponse response) throws IOException {
+	public void handle(
+			final String target,
+			final Request baseRequest,
+			final HttpServletRequest request,
+			final HttpServletResponse response) throws IOException {
 		// note: handle needs to be overridden instead of something more specific like handleErrorPage
 		// because we need to set the content type to application/json and this is the only way to do that.
 		// the rest of the implementation comes from the reflected base class.
@@ -52,7 +65,7 @@ public class JsonErrorHandler extends ErrorHandler {
 			final Writer writer,
 			final int code,
 			final String message) throws IOException {
-		final ErrorResponse response = new ErrorResponse(message, code);
+		final ErrorResponse response = new ErrorResponse(this.timeProvider.getCurrentTime(), message, code);
 		final String jsonString = JsonSerializer.serializeToJson(response).toJSONString();
 		writer.write(jsonString + "\r\n");
 	}

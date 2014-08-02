@@ -24,6 +24,6 @@ public class HttpBinaryPostRequest implements HttpPostRequest {
 
 	@Override
 	public String getContentType() {
-		return "application/binary";
+		return ContentType.BINARY;
 	}
 }

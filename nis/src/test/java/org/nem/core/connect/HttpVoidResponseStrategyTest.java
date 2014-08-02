@@ -1,6 +1,6 @@
 package org.nem.core.connect;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.ConnectUtils;

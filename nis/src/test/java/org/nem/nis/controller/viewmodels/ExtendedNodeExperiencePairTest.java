@@ -2,9 +2,9 @@ package org.nem.nis.controller.viewmodels;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 import org.nem.peer.test.PeerUtils;
-import org.nem.peer.trust.score.*;
+import org.nem.peer.trust.score.NodeExperience;
 
 public class ExtendedNodeExperiencePairTest {
 

@@ -1,21 +1,15 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 
-/**
- * An HttpMessageConverter that maps SerializableEntity responses to application/json.
- */
-public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageConverter<SerializableEntity> {
-
+public class DeserializableEntityMessageConverter extends AbstractHttpMessageConverter<Object> {
 	private final DeserializerHttpMessageConverter deserializerMessageConverter;
-	private final SerializationPolicy policy;
 
 	/**
 	 * Creates a new http message converter.
@@ -23,27 +17,25 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 	 * @param policy The serialization policy.
 	 */
 	@Autowired(required = true)
-	public SerializableEntityHttpMessageConverter(final SerializationPolicy policy) {
+	public DeserializableEntityMessageConverter(final SerializationPolicy policy) {
 		super(policy.getMediaType());
 		this.deserializerMessageConverter = new DeserializerHttpMessageConverter(policy);
-		this.policy = policy;
 	}
 
 	@Override
-	protected boolean supports(final Class<?> aClass) {
-		return SerializableEntity.class.isAssignableFrom(aClass);
+	protected boolean supports(Class<?> clazz) {
+		return null != this.getConstructor(clazz);
 	}
 
 	@Override
-	public boolean canRead(final Class<?> clazz, final MediaType type) {
-		return super.canRead(clazz, type) && null != this.getConstructor(clazz);
+	public boolean canWrite(final Class<?> clazz, final MediaType type) {
+		return false;
 	}
 
 	@Override
-	protected SerializableEntity readInternal(
-			final Class<? extends SerializableEntity> aClass,
+	protected Object readInternal(
+			final Class<?> aClass,
 			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
-
 		final Deserializer deserializer = this.deserializerMessageConverter.readInternal(
 				Deserializer.class,
 				httpInputMessage);
@@ -53,13 +45,12 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 
 	@Override
 	protected void writeInternal(
-			final SerializableEntity serializableEntity,
+			final Object o,
 			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
-
-		httpOutputMessage.getBody().write(this.policy.toBytes(serializableEntity));
+		throw new UnsupportedOperationException();
 	}
 
-	private <T> Constructor<T> getConstructor(final Class<T> aClass) {
+	private Constructor<?> getConstructor(final Class<?> aClass) {
 		try {
 			return aClass.getConstructor(Deserializer.class);
 		} catch (NoSuchMethodException e) {
@@ -67,11 +58,11 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 		}
 	}
 
-	private SerializableEntity createInstance(
-			final Class<? extends SerializableEntity> aClass,
+	private Object createInstance(
+			final Class<?> aClass,
 			final Deserializer deserializer) {
 		try {
-			final Constructor<? extends SerializableEntity> constructor = this.getConstructor(aClass);
+			final Constructor<?> constructor = this.getConstructor(aClass);
 			if (null == constructor)
 				throw new UnsupportedOperationException("could not find compatible constructor");
 

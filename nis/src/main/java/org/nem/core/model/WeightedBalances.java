@@ -224,6 +224,12 @@ public class WeightedBalances {
 		}
 	}
 
+	/**
+	 * Undoes all changes to weighted balances after the specified block height.
+	 * In other words, reverts the weighted balances to the specified block height.
+	 *
+	 * @param height The block height.
+	 */
 	public void undoChain(final BlockHeight height) {
 		while (this.balances.size() > 1) {
 			if (this.balances.get(this.balances.size()-1).getBlockHeight().compareTo(height) > 0) {

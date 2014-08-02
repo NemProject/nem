@@ -1,8 +1,9 @@
 package org.nem.core.connect;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.StringEncoder;
 import org.springframework.http.HttpStatus;
 
@@ -19,7 +20,7 @@ public abstract class HttpDeserializerResponseStrategy implements HttpResponseSt
 			final int statusCode = response.getStatusLine().getStatusCode();
 
 			try (final InputStream responseStream = response.getEntity().getContent()) {
-				final byte[] responseBytes = sun.misc.IOUtils.readFully(responseStream, -1, true);
+				final byte[] responseBytes = IOUtils.toByteArray(responseStream);
 
 				if (statusCode != HttpStatus.OK.value()) {
 					final String message = String.format(

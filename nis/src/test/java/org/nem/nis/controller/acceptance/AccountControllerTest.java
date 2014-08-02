@@ -1,6 +1,6 @@
 package org.nem.nis.controller.acceptance;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.crypto.PrivateKey;

@@ -7,8 +7,7 @@ import org.nem.nis.dao.BlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.MissingResourceException;
+import java.util.*;
 
 /**
  * Adapter around BlockDao that throws a MissingResourceException if a requested

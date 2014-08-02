@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.core.deploy;
 
 import net.minidev.json.*;
 import org.hamcrest.core.*;
@@ -120,6 +120,6 @@ public class JsonSerializationPolicyTest {
 	//endregion
 
 	private static InputStream getStream(final SerializableEntity entity) {
-		return new ByteArrayInputStream(JsonSerializer.serializeToJson(entity).toJSONString().getBytes());
+		return new ByteArrayInputStream(JsonSerializer.serializeToBytes(entity));
 	}
 }

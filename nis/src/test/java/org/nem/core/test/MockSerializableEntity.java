@@ -25,7 +25,7 @@ public class MockSerializableEntity implements SerializableEntity {
 	 * @param stringValue The string value.
 	 * @param longValue   The long value.
 	 */
-	public MockSerializableEntity(final int intValue, final String stringValue, final int longValue) {
+	public MockSerializableEntity(final int intValue, final String stringValue, final long longValue) {
 		this.intValue = intValue;
 		this.stringValue = stringValue;
 		this.longValue = longValue;
@@ -38,7 +38,7 @@ public class MockSerializableEntity implements SerializableEntity {
 	 */
 	public MockSerializableEntity(final Deserializer deserializer) {
 		this.intValue = deserializer.readInt("int");
-		this.stringValue = deserializer.readString("s");
+		this.stringValue = deserializer.readOptionalString("s");
 		this.longValue = deserializer.readLong("long");
 	}
 

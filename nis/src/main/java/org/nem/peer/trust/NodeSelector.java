@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 
 import java.util.List;
 

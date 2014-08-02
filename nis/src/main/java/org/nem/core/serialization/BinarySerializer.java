@@ -2,15 +2,14 @@ package org.nem.core.serialization;
 
 import org.nem.core.utils.StringEncoder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.Collection;
 
 /**
  * A binary serializer that supports forward-only serialization.
  */
-public class BinarySerializer implements AutoCloseable, Serializer {
+public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	/**
 	 * Sentinel value used to indicate that a serialized byte array should be deserialized as null.
@@ -50,7 +49,7 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 
 	@Override
 	public void writeBigInteger(final String label, final BigInteger i) {
-		this.writeBytes(null, i.toByteArray());
+		this.writeBytes(null, null == i ? null : i.toByteArray());
 	}
 
 	@Override
@@ -77,12 +76,12 @@ public class BinarySerializer implements AutoCloseable, Serializer {
 	@Override
 	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects) {
 		if (null == objects) {
-			this.writeInt(null, 0);
+			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
 			return;
 		}
 
 		this.writeInt(null, objects.size());
-		for (SerializableEntity object : objects)
+		for (final SerializableEntity object : objects)
 			this.writeBytes(null, serializeObject(object));
 	}
 

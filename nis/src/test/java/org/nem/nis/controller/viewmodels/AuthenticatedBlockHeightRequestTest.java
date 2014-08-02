@@ -5,8 +5,7 @@ import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
-import org.nem.peer.node.AuthenticatedRequest;
-import org.nem.peer.node.NodeChallenge;
+import org.nem.peer.node.*;
 
 public class AuthenticatedBlockHeightRequestTest {
 

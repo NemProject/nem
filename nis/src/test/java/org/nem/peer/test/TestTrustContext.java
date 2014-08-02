@@ -1,11 +1,10 @@
 package org.nem.peer.test;
 
-import org.nem.peer.node.Node;
+import org.nem.core.node.Node;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A test wrapper around a TrustContext.

@@ -1,18 +1,15 @@
 package org.nem.core.metadata;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.time.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.security.CodeSource;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import java.security.cert.*;
+import java.util.jar.*;
 
 public class MetaDataFactoryTest {
 

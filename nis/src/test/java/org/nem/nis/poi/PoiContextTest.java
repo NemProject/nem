@@ -1,6 +1,6 @@
 package org.nem.nis.poi;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.model.*;
@@ -100,7 +100,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void poiStartVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
+	public void poiStartVectorIsInitializedToNormalizedUniformVectorForSubsequentIterations() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<Account> accounts = createTestPoiAccounts(height);
@@ -113,11 +113,11 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accounts);
 
 		// Assert:
-		// (1) start vector is derived from previous page rank
+		// (1) start vector is uniform
 		// (2) start vector is normalized
 		Assert.assertThat(
 				context.getPoiStartVector(),
-				IsEqual.equalTo(new ColumnVector(3.0 / 9, 4.0 / 9, 0.0, 2.0 / 9)));
+				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
 
 	@Test

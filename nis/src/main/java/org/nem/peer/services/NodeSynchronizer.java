@@ -1,10 +1,9 @@
 package org.nem.peer.services;
 
+import org.nem.core.node.Node;
 import org.nem.peer.*;
-import org.nem.peer.connect.*;
-import org.nem.peer.node.Node;
+import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.trust.NodeSelector;
-import org.nem.peer.trust.score.*;
 
 import java.util.logging.Logger;
 

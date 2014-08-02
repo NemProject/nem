@@ -1,6 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
-import org.nem.nis.audit.*;
+import org.nem.nis.audit.AuditCollection;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
+	private static final String HEARTBEAT_PATH = "/heartbeat";
 
 	private final AuditCollection auditCollection;
 
@@ -28,10 +29,11 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler) throws Exception {
-		if (! request.getServletPath().equals("/heartbeat")) {
-			LOGGER.info(String.format("entering %s [%s]", request.getServletPath(), request.getRemoteAddr()));
-			this.auditCollection.add(request.getRemoteAddr(), request.getServletPath());
-		}
+		if (request.getServletPath().equals(HEARTBEAT_PATH))
+			return true;
+
+		LOGGER.info(String.format("entering %s [%s]", request.getServletPath(), request.getRemoteAddr()));
+		this.auditCollection.add(request.getRemoteAddr(), request.getServletPath());
 		return true;
 	}
 
@@ -42,9 +44,10 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final Object handler,
 			final Exception ex)
 			throws Exception {
-		if (! request.getServletPath().equals("/heartbeat")) {
-			this.auditCollection.remove(request.getRemoteAddr(), request.getServletPath());
-			LOGGER.info(String.format("exiting %s [%s]", request.getServletPath(), request.getRemoteAddr()));
-		}
+		if (request.getServletPath().equals(HEARTBEAT_PATH))
+			return;
+
+		this.auditCollection.remove(request.getRemoteAddr(), request.getServletPath());
+		LOGGER.info(String.format("exiting %s [%s]", request.getServletPath(), request.getRemoteAddr()));
 	}
 }

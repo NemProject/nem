@@ -1,4 +1,4 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -29,8 +29,8 @@ public class NodeTest {
 		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
 		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
 		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
 	}
 
@@ -85,8 +85,8 @@ public class NodeTest {
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
 		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsNull.nullValue());
-		Assert.assertThat(node.getMetaData().getApplication(), IsNull.nullValue());
+		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
+		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
 		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
 	}
 

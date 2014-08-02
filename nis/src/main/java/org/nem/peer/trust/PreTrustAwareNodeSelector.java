@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.nem.core.node.Node;
 import org.nem.peer.node.*;
 
 import java.util.*;
@@ -47,11 +48,9 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 
 	private List<Node> getAdditionalPreTrustedNodes() {
 		final List<Node> onlinePreTrustedNodes = this.getOnlinePreTrustedNodes();
-		if (0 == onlinePreTrustedNodes.size()) {
-			// BR: We are starving!
-			//     Refresh ALL pretrusted nodes, maybe we are lucky.
+		// BR: if all pre-trusted nodes are offline, include all of them because the network is starving
+		if (0 == onlinePreTrustedNodes.size())
 			return new ArrayList<>(this.context.getPreTrustedNodes().getNodes());
-		}
 
 		if (this.isPreTrusted())
 			return onlinePreTrustedNodes;

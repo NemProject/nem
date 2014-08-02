@@ -2,7 +2,7 @@ package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**

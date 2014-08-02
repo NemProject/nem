@@ -1,10 +1,10 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
 import org.nem.peer.*;
-import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

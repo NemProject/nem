@@ -1,12 +1,11 @@
 package org.nem.core.serialization;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.*;
 import java.util.*;
 
 public class BinarySerializerTest extends SerializerTest<BinarySerializer, BinaryDeserializer> {

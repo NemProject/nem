@@ -2,10 +2,9 @@ package org.nem.nis.visitors;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
-import org.nem.nis.test.MockBlockScorer;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 public class PartialWeightedScoreVisitorTest {
 

@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class PoiScorerTest {
 

@@ -2,12 +2,9 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.PublicKey;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
-import org.nem.core.test.MockVerifiableEntity;
-import org.nem.core.test.Utils;
+import org.nem.core.crypto.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 
 public class HashUtilsTest {
 

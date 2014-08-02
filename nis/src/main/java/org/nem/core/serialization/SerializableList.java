@@ -6,16 +6,28 @@ import java.util.*;
  * Helper class for storing lists of serializable entities
  */
 public class SerializableList<T extends SerializableEntity> implements SerializableEntity {
+	private static final String DEFAULT_LABEL = "data";
 
 	private final List<T> list;
+	private final String label;
 
 	/**
 	 * Creates a new list with the specified capacity.
 	 *
 	 * @param initialCapacity The initial capacity.
 	 */
-	public SerializableList(int initialCapacity) {
+	public SerializableList(final int initialCapacity) {
+		this(initialCapacity, DEFAULT_LABEL);
+	}
+
+	/**
+	 * Creates a new list with the specified capacity and custom label.
+	 *
+	 * @param initialCapacity The initial capacity.
+	 */
+	public SerializableList(final int initialCapacity, final String label) {
 		this.list = new ArrayList<>(initialCapacity);
+		this.label = label;
 	}
 
 	/**
@@ -24,7 +36,17 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @param collection The collection containing the initial elements.
 	 */
 	public SerializableList(final Collection<T> collection) {
-		this(collection.size());
+		this(collection, DEFAULT_LABEL);
+	}
+
+	/**
+	 * Creates a new list with a custom label and initializes it with the elements in collection.
+	 *
+	 * @param collection The collection containing the initial elements.
+	 * @param label The name of the list
+	 */
+	public SerializableList(final Collection<T> collection, final String label) {
+		this(collection.size(), label);
 		collection.forEach(obj -> this.add(obj));
 	}
 
@@ -35,12 +57,27 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @param elementDeserializer The element deserializer.
 	 */
 	public SerializableList(final Deserializer deserializer, final ObjectDeserializer<T> elementDeserializer) {
-		this.list = deserializer.readObjectArray("data", elementDeserializer);
+		this(deserializer, elementDeserializer, DEFAULT_LABEL);
+	}
+
+	/**
+	 * Deserializes a serializable list with a custom label.
+	 *
+	 * @param deserializer The deserializer.
+	 * @param elementDeserializer The element deserializer.
+	 * @param label The custom label.
+	 */
+	public SerializableList(
+			final Deserializer deserializer,
+			final ObjectDeserializer<T> elementDeserializer,
+			final String label) {
+		this.list = deserializer.readObjectArray(label, elementDeserializer);
+		this.label = label;
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeObjectArray("data", this.list);
+		serializer.writeObjectArray(this.label, this.list);
 	}
 
 	/**
@@ -61,8 +98,15 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @return The number of elements.
 	 */
 	public int size() {
-		return list.size();
+		return this.list.size();
 	}
+
+	/**
+	 * Gets the label associated with this list.
+	 *
+	 * @return The label associated with this list.
+	 */
+	public String getLabel() { return this.label; }
 
 	/**
 	 * Gets the element in this list at the specified index.

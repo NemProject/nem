@@ -2,13 +2,11 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Supplier;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
 
@@ -40,7 +38,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			final TSerializer serializer,
 			final DeserializationContext context);
 
-	//region Basic Roundtrip
+	//region Primitive Roundtrip (int, long, double)
 
 	@Test
 	public void canRoundtripInt() {
@@ -98,6 +96,10 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(readDouble, IsEqual.equalTo(d));
 	}
 
+	//endregion
+
+	//region BigInteger Roundtrip
+
 	@Test
 	public void canRoundtripBigInteger() {
 		// Arrange:
@@ -113,6 +115,39 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		// Assert:
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
+
+	@Test
+	public void canRoundtripOptionalNullBigInteger() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeBigInteger("BigInteger", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final BigInteger readBigInteger = deserializer.readOptionalBigInteger("BigInteger");
+
+		// Assert:
+		Assert.assertThat(readBigInteger, IsNull.nullValue());
+	}
+
+	@Test
+	public void cannotRoundtripRequiredNullBigInteger() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeBigInteger("BigInteger", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		assertThrowsMissingPropertyException(
+				() -> deserializer.readBigInteger("BigInteger"),
+				"BigInteger");
+	}
+
+	//endregion
+
+	//region byte[] Roundtrip
 
 	@Test
 	public void canRoundtripBytes() {
@@ -131,7 +166,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
-	public void canRoundtripNullBytes() {
+	public void canRoundtripOptionalNullBytes() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
@@ -139,10 +174,24 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeBytes("bytes", null);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
-		final byte[] readBytes = deserializer.readBytes("bytes");
+		final byte[] readBytes = deserializer.readOptionalBytes("bytes");
 
 		// Assert:
 		Assert.assertThat(readBytes, IsNull.nullValue());
+	}
+
+	@Test
+	public void cannotRoundtripRequiredNullBytes() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeBytes("bytes", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		assertThrowsMissingPropertyException(
+				() -> deserializer.readBytes("bytes"),
+				"bytes");
 	}
 
 	@Test
@@ -161,6 +210,10 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(readBytes, IsEqual.equalTo(bytes));
 	}
 
+	//endregion
+
+	//region String Roundtrip
+
 	@Test
 	public void canRoundtripString() {
 		// Arrange:
@@ -177,7 +230,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
-	public void canRoundtripNullString() {
+	public void canRoundtripOptionalNullString() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
@@ -185,11 +238,46 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeString("String", null);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
-		final String s = deserializer.readString("String");
+		final String s = deserializer.readOptionalString("String");
 
 		// Assert:
 		Assert.assertThat(s, IsNull.nullValue());
 	}
+
+	@Test
+	public void cannotRoundtripRequiredNullString() {
+		// Act:
+		assertStringCannotBeRoundTripped(null);
+	}
+
+	@Test
+	public void cannotRoundtripRequiredEmptyString() {
+		// Act:
+		assertStringCannotBeRoundTripped("");
+	}
+
+	@Test
+	public void cannotRoundtripRequiredWhitespaceString() {
+		// Act:
+		assertStringCannotBeRoundTripped("  \t \t");
+	}
+
+	private void assertStringCannotBeRoundTripped(final String s) {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeString("String", s);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		assertThrowsMissingPropertyException(
+				() -> deserializer.readString("String"),
+				"String");
+	}
+
+	//endregion
+
+	//region Object Roundtrip
 
 	@Test
 	public void canRoundtripObject() {
@@ -207,8 +295,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
-	public void canRoundtripNullObject() {
-
+	public void canRoundtripOptionalNullObject() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
@@ -216,11 +303,29 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObject("SerializableEntity", null);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
+		final MockSerializableEntity object = deserializer.readOptionalObject("SerializableEntity", new MockSerializableEntity.Activator());
 
 		// Assert:
 		Assert.assertThat(object, IsNull.nullValue());
 	}
+
+	@Test
+	public void cannotRoundtripRequiredNullObject() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeObject("SerializableEntity", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		assertThrowsMissingPropertyException(
+				() -> deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator()),
+				"SerializableEntity");
+	}
+
+	//endregion
+
+	//region List<SerializableEntity> RoundTrip
 
 	@Test
 	public void canRoundtripObjectArray() {
@@ -262,7 +367,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
-	public void canRoundtripNullArray() {
+	public void canRoundtripOptionalNullArray() {
 		// Arrange:
 		final TSerializer serializer = createSerializer();
 
@@ -270,7 +375,36 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObjectArray("oa", null);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("oa", new MockSerializableEntity.Activator());
+		final List<MockSerializableEntity> objects = deserializer.readOptionalObjectArray("oa", new MockSerializableEntity.Activator());
+
+		// Assert:
+		Assert.assertThat(objects, IsNull.nullValue());
+	}
+
+	@Test
+	public void cannotRoundtripRequiredNullArray() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeObjectArray("oa", null);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		assertThrowsMissingPropertyException(
+				() -> deserializer.readObjectArray("oa", new MockSerializableEntity.Activator()),
+				"oa");
+	}
+
+	@Test
+	public void canRoundtripEmptyArray() {
+		// Arrange:
+		final TSerializer serializer = createSerializer();
+
+		// Act:
+		serializer.writeObjectArray("oa", new ArrayList<>());
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final List<MockSerializableEntity> objects = deserializer.readOptionalObjectArray("oa", new MockSerializableEntity.Activator());
 
 		// Assert:
 		Assert.assertThat(objects.size(), IsEqual.equalTo(0));
@@ -369,4 +503,11 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	//endregion
+
+	private static void assertThrowsMissingPropertyException(final Supplier<Object> consumer, final String propertyName) {
+		ExceptionAssert.assertThrows(
+				v -> consumer.get(),
+				MissingRequiredPropertyException.class,
+				ex -> Assert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
+	}
 }

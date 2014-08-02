@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.test.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class SerializableListTest {
 
@@ -18,6 +19,17 @@ public class SerializableListTest {
 
 		// Assert:
 		Assert.assertThat(list.size(), IsEqual.equalTo(0));
+		Assert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
+	}
+
+	@Test
+	public void ctorCapacityCanSpecifyCustomLabel() {
+		// Act:
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(100, "items");
+
+		// Assert:
+		Assert.assertThat(list.size(), IsEqual.equalTo(0));
+		Assert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
 	}
 
 	@Test
@@ -34,6 +46,24 @@ public class SerializableListTest {
 		Assert.assertThat(list.size(), IsEqual.equalTo(2));
 		Assert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
 		Assert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
+		Assert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
+	}
+
+	@Test
+	public void ctorListCanSpecifyCustomLabel() {
+		// Arrange:
+		final List<MockSerializableEntity> rawList = new ArrayList<>();
+		rawList.add(new MockSerializableEntity());
+		rawList.add(new MockSerializableEntity());
+
+		// Act:
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList, "items");
+
+		// Assert:
+		Assert.assertThat(list.size(), IsEqual.equalTo(2));
+		Assert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
+		Assert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
+		Assert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
 	}
 
 	@Test
@@ -208,12 +238,34 @@ public class SerializableListTest {
 	//region Serialization
 
 	@Test
-	public void canSerializeList() {
+	public void canSerializeListWithDefaultLabel() {
+		// Assert:
+		assertSerializedData(list -> {
+			final SerializableList<MockSerializableEntity> serializableList = new SerializableList<>(10);
+			list.forEach(serializableList::add);
+			return serializableList;
+		}, "data");
+		assertSerializedData(SerializableList::new, "data");
+	}
+
+	@Test
+	public void canSerializeListWithCustomLabel() {
+		// Assert:
+		assertSerializedData(list -> {
+			final SerializableList<MockSerializableEntity> serializableList = new SerializableList<>(10, "objects");
+			list.forEach(serializableList::add);
+			return serializableList;
+		}, "objects");
+		assertSerializedData(list -> new SerializableList<>(list, "objects"), "objects");
+	}
+
+	private static void assertSerializedData(
+			final Function<List<MockSerializableEntity>, SerializableList<MockSerializableEntity>> factory,
+			final String expectedArrayName) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final SerializableList<MockSerializableEntity> list1 = new SerializableList<>(10);
-		list1.add(new MockSerializableEntity(5, "foo", 6));
-		list1.add(new MockSerializableEntity(8, "bar", 7));
+		final SerializableList<MockSerializableEntity> list1 = factory.apply(
+				Arrays.asList(new MockSerializableEntity(5, "foo", 6), new MockSerializableEntity(8, "bar", 7)));
 
 		// Act:
 		list1.serialize(serializer);
@@ -221,7 +273,7 @@ public class SerializableListTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		final JSONArray dataArray = (JSONArray)object.get("data");
+		final JSONArray dataArray = (JSONArray)object.get(expectedArrayName);
 		Assert.assertThat(dataArray.size(), IsEqual.equalTo(2));
 		Assert.assertThat(deserializeFromObject(dataArray.get(0)), IsEqual.equalTo(list1.get(0)));
 		Assert.assertThat(deserializeFromObject(dataArray.get(1)), IsEqual.equalTo(list1.get(1)));
@@ -237,7 +289,23 @@ public class SerializableListTest {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
 		final SerializableList<MockSerializableEntity> list =
-				new SerializableList<>(deserializer, obj -> new MockSerializableEntity(obj));
+				new SerializableList<>(deserializer, MockSerializableEntity::new);
+
+		// Assert:
+		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
+	}
+
+	@Test
+	public void canRoundTripListWithCustomLabel() {
+		// Arrange:
+		final SerializableList<MockSerializableEntity> originalList = new SerializableList<>(10, "objects");
+		originalList.add(new MockSerializableEntity(5, "foo", 6));
+		originalList.add(new MockSerializableEntity(8, "bar", 7));
+
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
+		final SerializableList<MockSerializableEntity> list =
+				new SerializableList<>(deserializer, MockSerializableEntity::new, "objects");
 
 		// Assert:
 		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));

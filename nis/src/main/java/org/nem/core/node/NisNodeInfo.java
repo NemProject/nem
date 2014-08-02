@@ -1,9 +1,7 @@
-package org.nem.peer.node;
+package org.nem.core.node;
 
 import org.nem.core.metadata.ApplicationMetaData;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 /**
  * Information about a node that is returned by NIS.

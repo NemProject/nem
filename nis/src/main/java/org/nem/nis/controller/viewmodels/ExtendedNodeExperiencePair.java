@@ -1,10 +1,8 @@
 package org.nem.nis.controller.viewmodels;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.Serializer;
-import org.nem.peer.node.Node;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiencePair;
+import org.nem.core.node.Node;
+import org.nem.core.serialization.*;
+import org.nem.peer.trust.score.*;
 
 /**
  * A NodeExperience pair with additional information.
