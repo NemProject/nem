@@ -1,5 +1,5 @@
 {
-	"signature": "ODPgoFVrhL+GKsu7zwIQ1obMhEtFuK928G5Qlnzq42+Sri5qwLv/8aFm0tWetfQTyzEukim1lLw2tZBOOlHOLw==",
+	"signature": "j3GVj5xjfW3wBHlLinByUck3yzwuPEjdBsN2YbS3TFw0e56RULCXeGGcRU3B19Ft4GcM18lnv+u8S5eHskYcDg==",
 		"prevBlockHash": {
 			"data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 		},
@@ -18,8 +18,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "xog1Xv2alZKIrT+gWVuBVph6ELrFcMyee/S1w5SwCTEOWfmpxqvUND8psVxgeGFKL2L+94D/bDYn0mmxhOKXLw==",
+			"amount": 62500000000000,
+			"signature": "uYF3zdLSv9imJZOsU3QAoUSb4bCPdGu1+v4xSU49/2e2KnhEjVxa1GdrUHu58tsJJM1Y23w5WFEmspVgh1BxRA==",
 			"fee": 0,
 			"recipient": "TDMAKOTEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT",
 			"type": 257,
@@ -30,8 +30,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "Ze7rM/NoEisd04ypNKWfzCiCJYCGk7mjHefTnWBuTDed5xRmfsDcbb96gLryhuDPF9AccQlJo5yfmDmTKGWdYQ==",
+			"amount": 62500000000000,
+			"signature": "vGP2WDMNrlwq9xPLuzUW1XzWSWZe9bwS0FNR3DHA+E9wNvAKeecwywCX4lqYHRhd8S5bSJF8cnqt6vQsF0GRBQ==",
 			"fee": 0,
 			"recipient": "TDPATEMA4HXS7D44AQNT6VH3AHKDSNVC3MYROLEZ",
 			"type": 257,
@@ -42,8 +42,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "CsGrTqc7QGHVyOexsESsigh2aC+aOwiLWA/J4KYvRy5RKkiEGj6P98LJF6Jb0dgLnrrhrSdeql98QruDqCG1GQ==",
+			"amount": 62500000000000,
+			"signature": "XmTudhXW+HxuqWNs4MDCZxvErdUtrvpMe4uzauJ/jdMP64vjCR+Vl11ap3/zacYoMNd76x1DJ4Vip0urXb+XNw==",
 			"fee": 0,
 			"recipient": "TBGIMREUQQ5ZQX6C3IGLBSVPMROHCMPEIHY4GV2L",
 			"type": 257,
@@ -54,8 +54,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "qxQXZGb0toIofsZIUmyeJ8e2H1ID8Gs8k/WZ01/evwBCWh+jx9qoZD16/XdZr9R7FKRYHyqBeU2YOD6JkiH0Vg==",
+			"amount": 62500000000000,
+			"signature": "9C2S3/LqIDSIVWyXs5on/p/B7Z4FgGWNtBDEKna64ElrXe+Qu3ivI6sEDRgkzRygpEP8M1D3f81kOkNtOcSEAg==",
 			"fee": 0,
 			"recipient": "TDIUWEJAGUAWGXI56V5MO7GJAQGHJXE2IZXEK6S5",
 			"type": 257,
@@ -66,8 +66,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "r0sD2Sc/74h2j3pzIfQi92w1teYkDMsktfPbCwTOKWrRz+dW+AN/6aZhHHF+J7wLv32RdZ1sED6d475t9jbOcw==",
+			"amount": 62500000000000,
+			"signature": "Pu5tRaJ27Jjxh3XHBQGQxFb/pMJ1oP0lvhBi+9BqNnwL5pd2Jz0fyIY4RdG+F/oWliJg/+/S2EV6ExMa2DqaQA==",
 			"fee": 0,
 			"recipient": "TALICEMYYJFPJ4FWCMMNFCCOTFV635SBL2QWP73K",
 			"type": 257,
@@ -78,8 +78,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "u71vFw/esKKqNxWr1jLipvwIleMNPVMMx5ZdcblPsb9tWbbvAoZyeQZA+JnpTEkNCOklBuBzWqX45CqQrMtKAw==",
+			"amount": 62500000000000,
+			"signature": "jW8Cb8qJTtGTowJ3/8/FNlQEUWzsXNjYA8gx68zU+Vddo/0GhrqzTzUOcVc4KxFXjrA2eTNz4xhoWbs1GGIITA==",
 			"fee": 0,
 			"recipient": "TCBMYGMLALICE2FITJVBJDEC2SNSPLYDMDM4WL5W",
 			"type": 257,
@@ -90,8 +90,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "T0lm0TD3/+I3dI7+EmCuXa1ClQBfGmw+Xe8bPhCl2mtmhuTzGVYEBmNu9ZvZLNhp8pU0yDtrS7uX7moPbwJSOg==",
+			"amount": 62500000000000,
+			"signature": "Pw07Cj9nmXPXIpN9CaWSdtysYhW2UwbqIkfcglhRcPSCf7tqSGuTtSXftaSSs0jXqlMePa3jtjQIRInhiw4hEg==",
 			"fee": 0,
 			"recipient": "TASANSNZYUMZMBFMU72HVXTZHDPKVXTG4ZUEHDJD",
 			"type": 257,
@@ -102,8 +102,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "2a4YxvnfJRYtTYfuZZxWKBvpLNc4hCrcqMZJBAt16Yau6dmcVDxCLWKuE9+sTrzEJVMiZp7KMYML/U4XGfq2eg==",
+			"amount": 62500000000000,
+			"signature": "KbzGyIwgk6GE9Zh8H4zIshjeR4ZCLBpNEqbCikdIhxx1xI7+Lb30ByOWAWaIyCZIzn9UzEDQ6qnVEwcPpl5rWA==",
 			"fee": 0,
 			"recipient": "TAGOGON3WOI5PVKG24DQABJGX6M32H4ZEIK5LTGG",
 			"type": 257,
@@ -114,8 +114,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "wtA3NSvJ0yYwIINXolQ4ALoBuDWwCHXpgf1YTz6TqRNOUYJUVzKQixCXfyIiAADj34I4L6onOZT9GkAia3eRHg==",
+			"amount": 62500000000000,
+			"signature": "oox4IxFfcpmoE8cALAb36e7hqIPOC3lAjfVndtNIqvacXsk2w5fLym2aCRxS/wcy1n8CZPLb3mwCbYy6pQNfGA==",
 			"fee": 0,
 			"recipient": "TAPPSA2RTKVSZYVA645Q64HACHIL4LDTSGXEGTCL",
 			"type": 257,
@@ -126,8 +126,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "Oc1NqUXUsxtJME7+KYfxfsQOmXgoi71+9omW6J0z78iLDVsD9VxsFUm5xGorpqgJz7VWm3URHnA86gsRgiYQaA==",
+			"amount": 62500000000000,
+			"signature": "QR6YDY+57T7YNEAOVg5Gh51HEMoZk/ogR/3B3CmkBOAy1W7d1it7mxWjbQSI7d9TnORC9qUcCK7x5IRAwwMPOg==",
 			"fee": 0,
 			"recipient": "TB6TEQCWJUSANWAAFRGKTQKMOGOB6G2ZH7OMKOGO",
 			"type": 257,
@@ -138,8 +138,8 @@
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		},
 		{
-			"amount": 125000000000000,
-			"signature": "BS+T+pwsZnPGInglzWEq01rVmsKNgdDda/ZhmMBsNFzQJ/Z9KMaSfHHz5SPVgnlNmBLsd9RxLhGS6IT1VGNdJA==",
+			"amount": 62500000000000,
+			"signature": "zkvRLSA1y2jNh3yejSq6+CLJr51Eqn9HRrkyRlPn+WIiDF8gb+dn30lAeMpQYxM4SpadwnQKuM19sHNMD+DBJQ==",
 			"fee": 0,
 			"recipient": "TCPAWXE3EP2JXOTXNIJU7FDMCNQR6WEKWOTZTCXE",
 			"type": 257,
