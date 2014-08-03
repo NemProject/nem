@@ -225,7 +225,6 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
-	@Ignore // TODO: ignored until the block chain is restarted!
 	@Test
 	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
 		// Arrange:
