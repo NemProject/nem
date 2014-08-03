@@ -1,7 +1,10 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
+import org.nem.core.model.ncc.TransactionMetaData;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,69 @@ public class TransferDaoImpl implements TransferDao {
 				.setParameter("timestamp", timestamp)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
+		return listAndCast(query);
+	}
+
+	private String buildAddressQuery(final TransferType transferType) {
+		switch (transferType) {
+			case INCOMING:
+				return "(t.recipient.printableKey = :pubkey)";
+			case OUTGOING:
+				return "(t.sender.printableKey = :pubkey)";
+		}
+		return "(t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey)";
+	}
+
+	@Override
+	@Transactional
+	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account address, final Hash hash, final TransferType transferType, int limit) {
+		final String addressString = buildAddressQuery(transferType);
+		Query query;
+
+		if (hash == null) {
+			query = getCurrentSession()
+					.createQuery("select t, t.block.height from Transfer t " +
+							"WHERE " +
+							addressString +
+							" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
+					.setParameter("pubkey", address.getAddress().getEncoded())
+					.setMaxResults(limit);
+
+		} else {
+			Query prequery = getCurrentSession()
+					.createQuery("select t, t.block.height from Transfer t " +
+							"WHERE " +
+							addressString +
+							" AND t.transferHash = :hash" +
+							" ORDER BY t.timestamp desc")
+					.setParameter("hash", hash.getRaw())
+					.setParameter("pubkey", address.getAddress().getEncoded())
+					.setMaxResults(limit);
+			final List<Object[]> tempList = listAndCast(prequery);
+			if (tempList.size() < 1) {
+				throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
+			}
+			final Object[] tx = tempList.get(0);
+			final Transfer topMostTranser = (Transfer)tx[0];
+
+			long blockHeight = (long)tx[1];
+			int timestamp = topMostTranser.getTimestamp();
+			int indexInsideBlock = topMostTranser.getBlkIndex();
+
+			query = getCurrentSession()
+					.createQuery("select t, t.block.height from Transfer t " +
+							"WHERE " +
+							addressString +
+							" AND ((t.block.height < :height)" +
+								" OR (t.block.height = :height AND t.timestamp < :timestamp)" +
+								" OR (t.block.height = :height AND t.timestamp = :timestamp AND t.blkIndex > :blockIndex))" +
+							" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC")
+					.setParameter("height", blockHeight)
+					.setParameter("timestamp", timestamp)
+					.setParameter("blockIndex", indexInsideBlock)
+					.setParameter("pubkey", address.getAddress().getEncoded())
+					.setMaxResults(limit);
+		}
 		return listAndCast(query);
 	}
 
