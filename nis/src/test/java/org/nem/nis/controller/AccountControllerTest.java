@@ -11,6 +11,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 
 import java.util.*;
@@ -134,6 +135,76 @@ public class AccountControllerTest {
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
+	}
+
+
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapter() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.ALL)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersAll(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.ALL);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapter() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.INCOMING)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersIncoming(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.INCOMING);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapter() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.OUTGOING)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersOutgoing(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	@Test

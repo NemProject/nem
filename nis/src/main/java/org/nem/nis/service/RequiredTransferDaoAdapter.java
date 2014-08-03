@@ -37,12 +37,13 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 	@Override
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, int limit) {
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, timestamp, limit);
-		// TODO: throw execption
+		// TODO: throw exception
 		return transfers;
 	}
 
 	@Override
 	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account account, final Hash hash, final TransferType transferType, int limit) {
+		// this can throw
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, hash, transferType, limit);
 		return transfers;
 	}

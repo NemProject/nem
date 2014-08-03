@@ -2,6 +2,7 @@ package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
+import org.nem.core.utils.StringUtils;
 
 public class AccountTransactionsPage {
 
@@ -22,7 +23,7 @@ public class AccountTransactionsPage {
 		if (!this.address.isValid())
 			throw new IllegalArgumentException("address must be valid");
 
-		this.hash = (hash != null) ? Hash.fromHexString(hash) : null;
+		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
 	}
 
 	/**

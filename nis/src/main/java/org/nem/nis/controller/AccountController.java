@@ -7,6 +7,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +81,46 @@ public class AccountController {
 	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
 		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
+	}
+
+
+	/**
+	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.ALL);
+	}
+
+	/**
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash).
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.INCOMING);
+	}
+
+	/**
+	 * Gets information about outgoing transactions of a specified account ending at the specified transaction (via hash).
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	/**
