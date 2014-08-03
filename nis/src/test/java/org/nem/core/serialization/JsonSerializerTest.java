@@ -82,6 +82,21 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
+	public void canWriteUnsignedBigInteger() throws Exception {
+		// Arrange:
+		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeBigInteger("BigInteger", i);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("AJAS"));
+	}
+
+	@Test
 	public void canWriteBytes() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();

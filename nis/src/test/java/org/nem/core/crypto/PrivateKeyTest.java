@@ -62,7 +62,7 @@ public class PrivateKeyTest {
 		final PrivateKey key = PrivateKey.fromHexString("8000");
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[] { (byte)0x80, 0x00 })));
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x80, 0x00 })));
 	}
 
 	@Test(expected = CryptoException.class)

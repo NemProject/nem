@@ -72,7 +72,7 @@ public class PrivateKey implements SerializableEntity {
 	 */
 	public static PrivateKey fromHexString(final String hex) {
 		try {
-			return new PrivateKey(new BigInteger(HexEncoder.getBytes(hex)));
+			return new PrivateKey(new BigInteger(1, HexEncoder.getBytes(hex)));
 		} catch (EncodingException e) {
 			throw new CryptoException(e);
 		}

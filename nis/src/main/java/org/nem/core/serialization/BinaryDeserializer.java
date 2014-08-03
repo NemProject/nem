@@ -49,7 +49,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	@Override
 	public BigInteger readOptionalBigInteger(final String label) {
 		byte[] bytes = this.readOptionalBytes(null);
-		return null == bytes ? null : new BigInteger(bytes);
+		return null == bytes ? null : new BigInteger(1, bytes);
 	}
 
 	@Override
