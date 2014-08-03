@@ -61,11 +61,12 @@ public class BlockChainValidator {
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
-				if (ValidationResult.SUCCESS != transaction.checkValidity() || 
-					!transaction.verify() ||
-					transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0/* ||
-					transaction.getSigner().equals(block.getSigner())*/) // TODO: Remove if we restart the chain
+				if (ValidationResult.SUCCESS != transaction.checkValidity() ||
+						!transaction.verify() ||
+						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
+						transaction.getSigner().equals(block.getSigner())) {
 					return false;
+				}
 			}
 
 			parentBlock = block;
