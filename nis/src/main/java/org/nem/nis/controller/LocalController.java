@@ -29,6 +29,7 @@ public class LocalController {
 
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
+	 * TODO-CR: we should refactor since this is similar (the same as whats in NIS);
 	 */
 	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)

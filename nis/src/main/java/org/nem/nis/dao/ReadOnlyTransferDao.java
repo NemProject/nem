@@ -10,6 +10,7 @@ import java.util.Collection;
  * Read-only DAO for accessing db Transfer objects.
  */
 public interface ReadOnlyTransferDao {
+	//TODO-CR: we should comment public enums and values
 	public enum TransferType {
 		ALL,
 		INCOMING,
@@ -48,6 +49,7 @@ public interface ReadOnlyTransferDao {
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
+	 * TODO-CR: it might make sense to return a small DTO instead of an Object[]
 	 *
 	 * @param account The account.
 	 * @param hash The hash of "top-most" transfer.

@@ -50,6 +50,8 @@ public class AccountIoAdapter implements AccountIo {
 		return intTimestamp;
 	}
 
+	// TODO-CR: might make sense to add a test for at least the new code
+
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp) {
 

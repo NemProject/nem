@@ -2,6 +2,7 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+// TODO-CR: remove unused imports; gimre really easy in intellij :)
 import org.nem.core.model.Address;
 
 public class KeyPairTest {
@@ -70,6 +71,8 @@ public class KeyPairTest {
 
 	@Test
 	public void keyPairProducesCorrectPublicKeysSuite() {
+		// TODO-CR: nice test, but i would suggest storing the test data in a map (private-key, public-key)
+		// it's easier to ensure everything lines up that way
 		final String[] privateKeys = {
 				"9201D5322CDB870181830D7529EDB9A668A09324277263865B5D136500234CB2"
 				, "FED8F9D7E0428821D24E5429FFA5F8232FC08313D61C1BF6DF9B1DDF81973ADE"
@@ -132,6 +135,7 @@ public class KeyPairTest {
 			final String privateKey = privateKeys[i];
 			// Act:
 			final KeyPair keyPair = new KeyPair(PrivateKey.fromHexString(privateKey));
+			//TODO-CR: should remove commented out code
 			//System.out.println("\"" + Address.fromPublicKey(keyPair.getPublicKey()).getEncoded() + "\"");
 
 			// Assert:

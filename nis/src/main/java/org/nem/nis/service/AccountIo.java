@@ -32,7 +32,7 @@ public interface AccountIo extends Iterable<Account> {
 	 * Gets all transaction information associated with an account.
 	 *
 	 * @param address The account address.
-	 * @param transactionHash The hash of "top-most" transfer..
+	 * @param transactionHash The hash of "top-most" transfer.
 	 * @param transfersType The type of transfers.
 	 * @return The transaction information.
 	 */

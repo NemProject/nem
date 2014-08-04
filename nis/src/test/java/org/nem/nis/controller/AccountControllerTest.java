@@ -137,10 +137,14 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
 	}
 
-
+// TODO-CR: multiple blank lines
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// Arrange:
+		// TODO-CR: i might have set a bad (lazy example) but we might want to refactor this setup block
+		// actually, you can refactor these three tests since the only difference is the controller method
+		// being called (BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>>)
+		// and the TransferType
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);

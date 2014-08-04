@@ -34,6 +34,8 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 		return transfer;
 	}
 
+	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation
+
 	@Override
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, int limit) {
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, timestamp, limit);

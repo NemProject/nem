@@ -83,6 +83,7 @@ public class AccountController {
 		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
 	}
 
+	// TODO-CR, with this change, who do we expect to call account/transfers?
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
@@ -93,6 +94,8 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
+		// TODO-CR: consider adding a private function like getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType)
+		// (the only difference between this and the next two functions in the TransferType value)
 		final AccountTransactionsPage page = builder.build();
 		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.ALL);
 	}

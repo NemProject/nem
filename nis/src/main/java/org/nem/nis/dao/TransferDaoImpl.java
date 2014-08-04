@@ -3,6 +3,7 @@ package org.nem.nis.dao;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
+// TODO-CR: unused imports
 import org.nem.core.model.ncc.TransactionMetaData;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.ByteUtils;
@@ -92,6 +93,7 @@ public class TransferDaoImpl implements TransferDao {
 		final String addressString = buildAddressQuery(transferType);
 		Query query;
 
+		// TODO-CR: consider moving each branch into a private function (should improve readability)
 		if (hash == null) {
 			query = getCurrentSession()
 					.createQuery("select t, t.block.height from Transfer t " +
@@ -102,6 +104,8 @@ public class TransferDaoImpl implements TransferDao {
 					.setMaxResults(limit);
 
 		} else {
+			// TODO-CR: additional locals can be made final (i like to aggressively mark things as final, but not sure how everyone else feels)
+			// (i doubt the JVM does anything special with non-member finals)
 			Query prequery = getCurrentSession()
 					.createQuery("select t, t.block.height from Transfer t " +
 							"WHERE " +
@@ -114,7 +118,7 @@ public class TransferDaoImpl implements TransferDao {
 			final List<Object[]> tempList = listAndCast(prequery);
 			if (tempList.size() < 1) {
 				throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
-			}
+			}  // TODO-CR: i generally prefer to have a blank line after '}'
 			final Object[] tx = tempList.get(0);
 			final Transfer topMostTranser = (Transfer)tx[0];
 

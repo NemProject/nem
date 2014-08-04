@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+// TODO: i configured intellij to collapse imports when there are at least two imports from the same package
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -147,16 +148,19 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Act
+		// TODO-CR: i generally like to format arrays with more spaces e.g. like byte[] { #, #, # } vs new byte[]{#,#,#}
 		this.transferDao.getTransactionsForAccountUsingHash(sender, new Hash(new byte[]{6,66}), ReadOnlyTransferDao.TransferType.ALL, 25);
 	}
 
+	// TODO-CR: tests like this with a lot of setup can be hard to follow (i know i don't always follow this rule,
+	// but it might be consider commenting what this utility function does)
 	private Account prepareIncomingOutgoingData() {
 		final Account testedAccount = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		addMapping(mockAccountDao, testedAccount);
 		final Block dummyBlock = new Block(testedAccount, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
-
+// TODO-CR: double-blank line
 
 		for (int i = 0; i<100; i++) {
 			final Account otherAccount = Utils.generateRandomAccount();
@@ -176,6 +180,9 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 		return testedAccount;
 	}
+
+	// TODO-CR: consider refactoring the three following tests; for these tests, it's probably best to have
+	// one test for each entity group (e.g. getTransactionsForAccountUsingHashStrategyIncoming could be split up into three tests - from start, from hash, from end)
 
 	@Test
 	public void getTransactionsForAccountUsingHashStrategyIncoming() {
@@ -319,6 +326,7 @@ public class TransferDaoTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 
+		// TODO-CR: i think "original" is somewhat misleading; "expected" / "sorted" might be better
 		final List<Long> originalHeights = Arrays.asList(4l,4l,4l,3l,3l,2l,2l,1l,1l);
 		final List<Integer> originalTimestamps = Arrays.asList(1900, 1700, 1700, 1800, 1600, 1500, 1300, 1400, 1200);
 		long heights[] = { 3, 4, 1, 2 };

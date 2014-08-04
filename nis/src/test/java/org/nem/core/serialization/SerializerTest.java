@@ -132,7 +132,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
-
+//TODO-CR: remove consecutive blank lines
 
 	@Test
 	public void canRoundtripOptionalNullBigInteger() {
@@ -148,7 +148,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		// Assert:
 		Assert.assertThat(readBigInteger, IsNull.nullValue());
 	}
-	
+
 	@Test
 	public void cannotRoundtripRequiredNullBigInteger() {
 		// Arrange:
@@ -163,11 +163,12 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 				"BigInteger");
 	}
 
-
+//TODO-CR: remove consecutive blank lines
 	//endregion
 
 	//region byte[] Roundtrip
 
+//TODO-CR: this test should be moved up to the BigInteger test group
 	@Test
 	public void canRoundtripNonPrefixedUnsignedBigInteger() throws Exception {
 		// Arrange:
