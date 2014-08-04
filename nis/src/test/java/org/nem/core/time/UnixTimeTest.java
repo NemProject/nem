@@ -13,29 +13,29 @@ public class UnixTimeTest {
 		// Assert:
 		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(65)));
 		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(SystemTimeProvider.getEpochTimeMillis() + 65000));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-04 00:01:05"));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-08-04 00:01:05"));
 	}
 
 	@Test
 	public void unixTimeCanBeCreatedAroundDateString() {
 		// Act:
-		final UnixTime unixTime = UnixTime.fromDateString("2014-06-25 11:33:22", TimeInstant.ZERO);
+		final UnixTime unixTime = UnixTime.fromDateString("2014-08-25 11:33:22", TimeInstant.ZERO);
 
 		// Assert:
 		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(1856002)));
-		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1403696002000L));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-25 11:33:22"));
+		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1408966402000L));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-08-25 11:33:22"));
 	}
 
 	@Test
 	public void unixTimeCanBeCreatedAroundSystemTime() {
 		// Act:
-		final UnixTime unixTime = UnixTime.fromUnixTimeInMillis(1406288002000L);
+		final UnixTime unixTime = UnixTime.fromUnixTimeInMillis(1408966402000L);
 
 		// Assert:
-		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(4448002)));
-		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1406288002000L));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-07-25 11:33:22"));
+		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(1856002)));
+		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1408966402000L));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-08-25 11:33:22"));
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class UnixTimeTest {
 
 		// Assert:
 		Assert.assertThat(unixTime.getTimeInstant(), IsEqual.equalTo(new TimeInstant(1856002)));
-		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1403696002000L));
-		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-06-25 11:33:22"));
+		Assert.assertThat(unixTime.getMillis(), IsEqual.equalTo(1408966402000L));
+		Assert.assertThat(unixTime.getDateString(), IsEqual.equalTo("2014-08-25 11:33:22"));
 	}
 }

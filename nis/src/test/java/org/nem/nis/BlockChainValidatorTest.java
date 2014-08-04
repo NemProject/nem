@@ -330,11 +330,8 @@ public class BlockChainValidatorTest {
 		sender.getWeightedBalances().addReceive(BlockHeight.ONE, senderAmount);
 
 		for (final Account recipient : recipients) {
-			final MockTransaction transaction = new MockTransaction();
+			final MockTransaction transaction = createValidSignedTransaction();
 			transaction.setTransferAction(observer -> observer.notifyTransfer(sender, recipient, Amount.fromNem(90)));
-			transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
-			transaction.sign();
-
 			block.addTransaction(transaction);
 		}
 
@@ -379,15 +376,17 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Transaction createValidNonVerifiableTransaction() {
-		final Transaction transaction =  new MockTransaction();
-		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
+		final TimeInstant timeStamp = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(15);
+		final MockTransaction transaction = new MockTransaction(/* custom field */ 12, timeStamp);
+		transaction.setDeadline(timeStamp.addSeconds(1));
 		transaction.setSignature(new Signature(Utils.generateRandomBytes(64)));
 		return transaction;
 	}
 
-	private static Transaction createValidSignedTransaction() {
-		final Transaction transaction =  new MockTransaction();
-		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
+	private static MockTransaction createValidSignedTransaction() {
+		final TimeInstant timeStamp = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(15);
+		final MockTransaction transaction = new MockTransaction(/* custom field */ 12, timeStamp);
+		transaction.setDeadline(timeStamp.addSeconds(1));
 		transaction.sign();
 		return transaction;
 	}
