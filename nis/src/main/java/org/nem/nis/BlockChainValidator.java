@@ -50,6 +50,7 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			// TODO-CR: not sure if i like having a hard dependency on NisMain here instead of injecting the TimeProvider
 			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 			if (block.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
 				return false;
