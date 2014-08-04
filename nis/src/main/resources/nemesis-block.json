@@ -1,10 +1,10 @@
 {
-	"signature": "j3GVj5xjfW3wBHlLinByUck3yzwuPEjdBsN2YbS3TFw0e56RULCXeGGcRU3B19Ft4GcM18lnv+u8S5eHskYcDg==",
-		"prevBlockHash": {
-			"data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-		},
-		"type": -1,
-		"transactions": [
+	"signature": "LAzGM+KLOy0gGI+FuEhLmqMFcqwM1+MSDOCb/9KzpMe1Zez6I6y6WAujCWAx6m06CduUn9uAlXHZqhBLijMzJw==",
+	"prevBlockHash": {
+		"data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+	},
+	"type": -1,
+	"transactions": [
 		{
 			"amount": 62500000000000,
 			"signature": "TS56GIKeuc8y+7k53S6gy0BstaSS6h4FqWZ4yu90z2C2/H7xnisULRGLqj2mu11drYfmCuU3JkYcpL8ZbElWNA==",
@@ -571,18 +571,6 @@
 		},
 		{
 			"amount": 62500000000000,
-			"signature": "yQqVf2vcjXsCF2pvSsqzHU9Kbivt8EgNPHe7KAGcTKDSmYzCLg9WcP79nL9F/DfEutveHY38tmU3xPD3CvVYJg==",
-			"fee": 0,
-			"recipient": "TD3666JESDOZROMKZGQ6AUGMOHZ6SEAOTGOX5UR4",
-			"type": 257,
-			"deadline": 0,
-			"message": {},
-			"version": 1,
-			"timestamp": 0,
-			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
-		},
-		{
-			"amount": 62500000000000,
 			"signature": "AVjI/68E9ijitL1fiGcnpuwhjmFzl42wzzDdUSSRW3yb8/mXI26c6AsySGQM7Jowexchaoxs1L8fHcLfYk2YTA==",
 			"fee": 0,
 			"recipient": "TDJ7BAZA2DBYTCQ5PTCG6N23XJADEDJQQMMW2W64",
@@ -772,14 +760,26 @@
 			"version": 1,
 			"timestamp": 0,
 			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
+		},
+		{
+			"amount": 62500000000000,
+			"signature": "uQ1BYCYiWaFW8hfT/9LepQ791Dvkh4APLOmVfmXFJfRJy29pD4oohL4e6oZ7iHyXIB6jQYX9ScQei3TULVwDIg==",
+			"fee": 0,
+			"recipient": "TAZUHLTXN2LNZNIYANLYFJVKCROXKJPPRXGD5FJT",
+			"type": 257,
+			"deadline": 0,
+			"message": {},
+			"version": 1,
+			"timestamp": 0,
+			"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI"
 		}
 	],
-		"version": 1,
-		"timestamp": 0,
-		"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI",
-		"height": 1,
-		"_propertyOrderArray": [
-			"type",
+	"version": 1,
+	"timestamp": 0,
+	"signer": "A47MelfT2TIzCtFSGkr702vqzY17uIVTc1D3n3+DT1HI",
+	"height": 1,
+	"_propertyOrderArray": [
+		"type",
 		"version",
 		"timestamp",
 		"signer",
@@ -787,5 +787,5 @@
 		"prevBlockHash",
 		"height",
 		"transactions"
-			]
+	]
 }
