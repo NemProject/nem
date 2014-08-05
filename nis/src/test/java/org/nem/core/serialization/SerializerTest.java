@@ -1,12 +1,11 @@
 package org.nem.core.serialization;
 
-import org.hamcrest.core.*;
-import org.junit.*;
-import org.nem.core.test.*;
-
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Supplier;
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.core.test.*;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
 
@@ -58,7 +57,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripLong() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeLong("long", 0xF239A033CE951350L);
@@ -84,7 +83,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	private void assertDoubleRoundtrip(final double d) {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeDouble("double", d);
@@ -103,7 +102,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripBigInteger() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		final BigInteger i = new BigInteger("958A7561F014", 16);
@@ -119,7 +118,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripPrefixedUnsignedBigInteger() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
@@ -132,12 +131,14 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
-//TODO-CR: remove consecutive blank lines
+
+	//TODO-CR: remove consecutive blank lines
+	// BR: Should be fixed with auto formatting.
 
 	@Test
 	public void canRoundtripOptionalNullBigInteger() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeBigInteger("BigInteger", null);
@@ -152,7 +153,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void cannotRoundtripRequiredNullBigInteger() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeBigInteger("BigInteger", null);
@@ -163,16 +164,17 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 				"BigInteger");
 	}
 
-//TODO-CR: remove consecutive blank lines
+	//TODO-CR: remove consecutive blank lines
+	// BR: Should be fixed with auto formatting.
 	//endregion
 
 	//region byte[] Roundtrip
 
-//TODO-CR: this test should be moved up to the BigInteger test group
+	//TODO-CR: this test should be moved up to the BigInteger test group
 	@Test
 	public void canRoundtripNonPrefixedUnsignedBigInteger() throws Exception {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		final BigInteger i = new BigInteger(new byte[] { (byte)0x90, 0x12 });
@@ -189,7 +191,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripBytes() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
@@ -205,7 +207,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripOptionalNullBytes() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeBytes("bytes", null);
@@ -220,7 +222,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void cannotRoundtripRequiredNullBytes() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeBytes("bytes", null);
@@ -234,10 +236,10 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripEmptyBytes() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
-		final byte[] bytes = new byte[] { };
+		final byte[] bytes = new byte[] {};
 		serializer.writeBytes("bytes", bytes);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
@@ -254,7 +256,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripString() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeString("String", "BEta GaMMa");
@@ -269,7 +271,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripOptionalNullString() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeString("String", null);
@@ -284,24 +286,24 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void cannotRoundtripRequiredNullString() {
 		// Act:
-		assertStringCannotBeRoundTripped(null);
+		this.assertStringCannotBeRoundTripped(null);
 	}
 
 	@Test
 	public void cannotRoundtripRequiredEmptyString() {
 		// Act:
-		assertStringCannotBeRoundTripped("");
+		this.assertStringCannotBeRoundTripped("");
 	}
 
 	@Test
 	public void cannotRoundtripRequiredWhitespaceString() {
 		// Act:
-		assertStringCannotBeRoundTripped("  \t \t");
+		this.assertStringCannotBeRoundTripped("  \t \t");
 	}
 
 	private void assertStringCannotBeRoundTripped(final String s) {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeString("String", s);
@@ -319,7 +321,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripObject() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
@@ -334,7 +336,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripOptionalNullObject() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObject("SerializableEntity", null);
@@ -349,7 +351,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void cannotRoundtripRequiredNullObject() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObject("SerializableEntity", null);
@@ -367,8 +369,8 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripObjectArray() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
-		List<SerializableEntity> originalObjects = new ArrayList<>();
+		final TSerializer serializer = this.createSerializer();
+		final List<SerializableEntity> originalObjects = new ArrayList<>();
 		originalObjects.add(new MockSerializableEntity(17, "foo", 42));
 		originalObjects.add(new MockSerializableEntity(111, "bar", 22));
 		originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
@@ -381,15 +383,16 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 		// Assert:
 		Assert.assertThat(objects.size(), IsEqual.equalTo(3));
-		for (int i = 0; i < objects.size(); ++i)
+		for (int i = 0; i < objects.size(); ++i) {
 			Assert.assertThat(objects.get(i), IsEqual.equalTo(originalObjects.get(i)));
+		}
 	}
 
 	@Test
 	public void canRoundtripArrayContainingNullValue() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
-		List<SerializableEntity> originalObjects = new ArrayList<>();
+		final TSerializer serializer = this.createSerializer();
+		final List<SerializableEntity> originalObjects = new ArrayList<>();
 		originalObjects.add(null);
 
 		// Act:
@@ -406,7 +409,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripOptionalNullArray() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObjectArray("oa", null);
@@ -421,7 +424,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void cannotRoundtripRequiredNullArray() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObjectArray("oa", null);
@@ -435,7 +438,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripEmptyArray() {
 		// Arrange:
-		final TSerializer serializer = createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeObjectArray("oa", new ArrayList<>());
@@ -454,11 +457,12 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	@Test
 	public void canRoundtripMultipleValues() {
 		// Assert:
-		assertRoundtripMultipleValues(createSerializer());
+		this.assertRoundtripMultipleValues(this.createSerializer());
 	}
 
 	/**
-	 * Asserts that using the specified serializer multiple values can be round-tripped.
+	 * Asserts that using the specified serializer multiple values can be
+	 * round-tripped.
 	 *
 	 * @param serializer The serializer.
 	 */
@@ -475,7 +479,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObjectArray("entities", Arrays.asList(
 				new MockSerializableEntity(5, "ooo", 62),
 				new MockSerializableEntity(8, "ala", 15)
-		));
+				));
 		serializer.writeBigInteger("bi", new BigInteger("14"));
 		serializer.writeLong("sigma", 8);
 
@@ -532,7 +536,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 		// Act:
 		final TDeserializer deserializer = this.createDeserializer(serializer, context);
-		MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
+		final MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
 		deserializer.readObject("test", objectDeserializer);
 
 		// Assert:

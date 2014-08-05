@@ -2,15 +2,16 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+
 // TODO-CR: remove unused imports; gimre really easy in intellij :)
-import org.nem.core.model.Address;
+//BR: Should be fixed with auto formatting.
 
 public class KeyPairTest {
 
 	@Test
 	public void ctorCanCreateNewKeyPair() {
 		// Act:
-		KeyPair kp = new KeyPair();
+		final KeyPair kp = new KeyPair();
 
 		// Assert:
 		Assert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
@@ -22,7 +23,7 @@ public class KeyPairTest {
 	@Test
 	public void ctorCanCreateNewKeyPairWithCompressedPublicKey() {
 		// Act:
-		KeyPair kp = new KeyPair();
+		final KeyPair kp = new KeyPair();
 
 		// Assert:
 		Assert.assertThat(kp.getPublicKey().getRaw().length, IsEqual.equalTo(33));
@@ -31,8 +32,8 @@ public class KeyPairTest {
 	@Test
 	public void ctorCreatesDifferentInstancesWithDifferentKeys() {
 		// Act:
-		KeyPair kp1 = new KeyPair();
-		KeyPair kp2 = new KeyPair();
+		final KeyPair kp1 = new KeyPair();
+		final KeyPair kp2 = new KeyPair();
 
 		// Assert:
 		Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
@@ -42,10 +43,10 @@ public class KeyPairTest {
 	@Test
 	public void ctorCanCreateKeyPairAroundPrivateKey() {
 		// Arrange:
-		KeyPair kp1 = new KeyPair();
+		final KeyPair kp1 = new KeyPair();
 
 		// Act:
-		KeyPair kp2 = new KeyPair(kp1.getPrivateKey());
+		final KeyPair kp2 = new KeyPair(kp1.getPrivateKey());
 
 		// Assert:
 		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
@@ -57,10 +58,10 @@ public class KeyPairTest {
 	@Test
 	public void ctorCanCreateKeyPairAroundPublicKey() {
 		// Arrange:
-		KeyPair kp1 = new KeyPair();
+		final KeyPair kp1 = new KeyPair();
 
 		// Act:
-		KeyPair kp2 = new KeyPair(kp1.getPublicKey());
+		final KeyPair kp2 = new KeyPair(kp1.getPublicKey());
 
 		// Assert:
 		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
@@ -136,12 +137,11 @@ public class KeyPairTest {
 			// Act:
 			final KeyPair keyPair = new KeyPair(PrivateKey.fromHexString(privateKey));
 			//TODO-CR: should remove commented out code
-			//System.out.println("\"" + Address.fromPublicKey(keyPair.getPublicKey()).getEncoded() + "\"");
+			// BR:     Ok for private tests but should not be commited.
 
 			// Assert:
 			Assert.assertThat(keyPair.getPublicKey(), IsEqual.equalTo(PublicKey.fromHexString(expectedPublicKeys[i])));
 		}
-
 	}
 
 	@Test(expected = IllegalArgumentException.class)

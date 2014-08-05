@@ -1,15 +1,13 @@
 package org.nem.core.math;
 
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.function.DoubleConsumer;
+import org.nem.core.utils.FormatUtils;
 
 /**
  * Represents a dense matrix.
  */
 public final class DenseMatrix extends Matrix {
-
 	final int numCols;
 	final double[] values;
 
@@ -35,8 +33,9 @@ public final class DenseMatrix extends Matrix {
 	public DenseMatrix(final int rows, final int cols, final double[] values) {
 		super(rows, cols);
 
-		if (values.length != this.getElementCount())
+		if (values.length != this.getElementCount()) {
 			throw new IllegalArgumentException("incompatible number of values");
+		}
 
 		this.numCols = cols;
 		this.values = values;
@@ -51,7 +50,7 @@ public final class DenseMatrix extends Matrix {
 		return this.values;
 	}
 
-	//region Matrix abstract functions
+	// region Matrix abstract functions
 
 	@Override
 	protected final Matrix create(final int numRows, final int numCols) {
@@ -71,13 +70,15 @@ public final class DenseMatrix extends Matrix {
 	class SetWrapper implements DoubleConsumer {
 		final int i;
 		final int j;
-		SetWrapper(int i, int j) {
+
+		SetWrapper(final int i, final int j) {
 			this.i = i;
 			this.j = j;
 		}
+
 		@Override
-		public void accept(double value) {
-			setAtUnchecked(i, j, value);
+		public void accept(final double value) {
+			DenseMatrix.this.setAtUnchecked(this.i, this.j, value);
 		}
 	}
 
@@ -93,7 +94,7 @@ public final class DenseMatrix extends Matrix {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public String toString() {
@@ -101,11 +102,13 @@ public final class DenseMatrix extends Matrix {
 		final StringBuilder builder = new StringBuilder();
 
 		this.forEach((r, c, v) -> {
-			if (0 != r && 0 == c)
+			if (0 != r && 0 == c) {
 				builder.append(System.lineSeparator());
+			}
 
-			if (0 != c)
+			if (0 != c) {
 				builder.append(" ");
+			}
 
 			builder.append(format.format(v));
 		});

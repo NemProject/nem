@@ -1,5 +1,11 @@
 package org.nem.nis.dao;
 
+// TODO: i configured intellij to collapse imports when there are at least two imports from the same package
+// BR: Should be fixed with auto formatting..
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import java.util.*;
+import java.util.stream.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -13,14 +19,6 @@ import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-// TODO: i configured intellij to collapse imports when there are at least two imports from the same package
-
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,12 +34,12 @@ public class TransferDaoTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 123);
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
+		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, accountDaoLookup);
 
 		// Act
-		transferDao.save(entity);
+		this.transferDao.save(entity);
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
@@ -54,13 +52,13 @@ public class TransferDaoTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 0);
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
+		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
 		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 
 		// Act
-		transferDao.save(dbTransfer);
-		final Transfer entity = transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
+		this.transferDao.save(dbTransfer);
+		final Transfer entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
 
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
@@ -78,20 +76,20 @@ public class TransferDaoTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 123);
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
+		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 		final Transfer dbTransfer1 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
-		final Long initialCount = transferDao.count();
+		final Long initialCount = this.transferDao.count();
 
 		// Act
-		transferDao.save(dbTransfer1);
-		final Long count1 = transferDao.count();
-		transferDao.save(dbTransfer2);
-		final Long count2 = transferDao.count();
-		transferDao.save(dbTransfer3);
-		final Long count3 = transferDao.count();
+		this.transferDao.save(dbTransfer1);
+		final Long count1 = this.transferDao.count();
+		this.transferDao.save(dbTransfer2);
+		final Long count2 = this.transferDao.count();
+		this.transferDao.save(dbTransfer3);
+		final Long count3 = this.transferDao.count();
 
 		// Assert:
 		Assert.assertThat(count1, equalTo(initialCount + 1));
@@ -105,13 +103,13 @@ public class TransferDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		addMapping(mockAccountDao, sender);
+		this.addMapping(mockAccountDao, sender);
 		final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
 
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			final Account recipient = Utils.generateRandomAccount();
-			addMapping(mockAccountDao, recipient);
-			final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 123);
+			this.addMapping(mockAccountDao, recipient);
+			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.addTransaction(transferTransaction);
@@ -139,7 +137,7 @@ public class TransferDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		addMapping(mockAccountDao, sender);
+		this.addMapping(mockAccountDao, sender);
 		final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
 		dummyBlock.sign();
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
@@ -149,7 +147,8 @@ public class TransferDaoTest {
 
 		// Act
 		// TODO-CR: i generally like to format arrays with more spaces e.g. like byte[] { #, #, # } vs new byte[]{#,#,#}
-		this.transferDao.getTransactionsForAccountUsingHash(sender, new Hash(new byte[]{6,66}), ReadOnlyTransferDao.TransferType.ALL, 25);
+		// BR: Fixed with auto formatting.
+		this.transferDao.getTransactionsForAccountUsingHash(sender, new Hash(new byte[] { 6, 66 }), ReadOnlyTransferDao.TransferType.ALL, 25);
 	}
 
 	// TODO-CR: tests like this with a lot of setup can be hard to follow (i know i don't always follow this rule,
@@ -158,18 +157,18 @@ public class TransferDaoTest {
 		final Account testedAccount = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		addMapping(mockAccountDao, testedAccount);
+		this.addMapping(mockAccountDao, testedAccount);
 		final Block dummyBlock = new Block(testedAccount, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
-// TODO-CR: double-blank line
+		// TODO-CR: double-blank line
 
-		for (int i = 0; i<100; i++) {
+		for (int i = 0; i < 100; i++) {
 			final Account otherAccount = Utils.generateRandomAccount();
-			addMapping(mockAccountDao, otherAccount);
+			this.addMapping(mockAccountDao, otherAccount);
 			if (i % 2 == 0) {
-				final TransferTransaction transferTransaction = prepareTransferTransaction(testedAccount, otherAccount, 10, 500+i);
+				final TransferTransaction transferTransaction = this.prepareTransferTransaction(testedAccount, otherAccount, 10, 500 + i);
 				dummyBlock.addTransaction(transferTransaction);
 			} else {
-				final TransferTransaction transferTransaction = prepareTransferTransaction(otherAccount, testedAccount, 10, 500+i);
+				final TransferTransaction transferTransaction = this.prepareTransferTransaction(otherAccount, testedAccount, 10, 500 + i);
 				dummyBlock.addTransaction(transferTransaction);
 			}
 		}
@@ -187,12 +186,12 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingHashStrategyIncoming() {
 		// Arrange:
-		final List<Integer> incomingTimestamps = IntStream.range(0,50)
-				.map(o -> 500 + 2*(49-o) + 1)
+		final List<Integer> incomingTimestamps = IntStream.range(0, 50)
+				.map(o -> 500 + 2 * (49 - o) + 1)
 				.boxed()
 				.collect(Collectors.toList());
 
-		final Account testedAccount = prepareIncomingOutgoingData();
+		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
 		final List<Transfer> incomingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.INCOMING, 25).stream()
@@ -226,12 +225,12 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingHashStrategyOutgoing() {
 		// Arrange:
-		final List<Integer> outgoingTimestamps = IntStream.range(0,50)
-				.map(o -> 500 + 2*(49-o))
+		final List<Integer> outgoingTimestamps = IntStream.range(0, 50)
+				.map(o -> 500 + 2 * (49 - o))
 				.boxed()
 				.collect(Collectors.toList());
 
-		final Account testedAccount = prepareIncomingOutgoingData();
+		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
 		final List<Transfer> outgoingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.OUTGOING, 25).stream()
@@ -262,16 +261,15 @@ public class TransferDaoTest {
 		Assert.assertThat(outgoingEntities3.size(), equalTo(0));
 	}
 
-
 	@Test
 	public void getTransactionsForAccountUsingHashStrategyAll() {
 		// Arrange:
-		final List<Integer> outgoingTimestamps = IntStream.range(0,100)
-				.map(o -> 500 + (99-o))
+		final List<Integer> outgoingTimestamps = IntStream.range(0, 100)
+				.map(o -> 500 + (99 - o))
 				.boxed()
 				.collect(Collectors.toList());
 
-		final Account testedAccount = prepareIncomingOutgoingData();
+		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
 		final List<Transfer> allEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.ALL, 25).stream()
@@ -293,22 +291,22 @@ public class TransferDaoTest {
 		Assert.assertThat(allTimeStamps2, equalTo(outgoingTimestamps.subList(25, 50)));
 	}
 
-	private void createTestBlocks(long[] heights, int[] blockTimestamp, int[][] txTimestamps, Account sender) {
+	private void createTestBlocks(final long[] heights, final int[] blockTimestamp, final int[][] txTimestamps, final Account sender) {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
-		addMapping(mockAccountDao, sender);
+		this.addMapping(mockAccountDao, sender);
 
 		for (int i = 0; i < heights.length; ++i) {
-			long height = heights[i];
-			int blockTs = blockTimestamp[i];
+			final long height = heights[i];
+			final int blockTs = blockTimestamp[i];
 
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTs), new BlockHeight(height));
 
-			for (int txTimestamp : txTimestamps[i]) {
+			for (final int txTimestamp : txTimestamps[i]) {
 				final Account recipient = Utils.generateRandomAccount();
-				addMapping(mockAccountDao, recipient);
-				final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, txTimestamp);
+				this.addMapping(mockAccountDao, recipient);
+				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, txTimestamp);
 
 				// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 				dummyBlock.addTransaction(transferTransaction);
@@ -327,12 +325,12 @@ public class TransferDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 
 		// TODO-CR: i think "original" is somewhat misleading; "expected" / "sorted" might be better
-		final List<Long> originalHeights = Arrays.asList(4l,4l,4l,3l,3l,2l,2l,1l,1l);
+		final List<Long> originalHeights = Arrays.asList(4l, 4l, 4l, 3l, 3l, 2l, 2l, 1l, 1l);
 		final List<Integer> originalTimestamps = Arrays.asList(1900, 1700, 1700, 1800, 1600, 1500, 1300, 1400, 1200);
-		long heights[] = { 3, 4, 1, 2 };
-		int blockTimestamp[] = {1801, 1901, 1401, 1501};
-		int txTimestamps[][] = { {1800, 1600}, {1900, 1700, 1700}, {1200, 1400}, {1300, 1500} };
-		createTestBlocks(heights, blockTimestamp, txTimestamps, sender);
+		final long heights[] = { 3, 4, 1, 2 };
+		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
+		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender);
 
 		// Act
 		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
@@ -352,13 +350,13 @@ public class TransferDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		addMapping(mockAccountDao, sender);
+		this.addMapping(mockAccountDao, sender);
 		final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
 
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			final Account recipient = Utils.generateRandomAccount();
-			addMapping(mockAccountDao, recipient);
-			final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 123);
+			this.addMapping(mockAccountDao, recipient);
+			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.addTransaction(transferTransaction);
@@ -378,21 +376,20 @@ public class TransferDaoTest {
 		Assert.assertThat(entities2.size(), equalTo(0));
 	}
 
-
 	@Test
 	public void getTransactionsForAccountReturnsTransactionsSortedByTime() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		addMapping(mockAccountDao, sender);
+		this.addMapping(mockAccountDao, sender);
 
 		final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(123 + 30), BlockHeight.ONE);
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			final Account recipient = Utils.generateRandomAccount();
-			addMapping(mockAccountDao, recipient);
+			this.addMapping(mockAccountDao, recipient);
 			// pseudorandom times
-			final TransferTransaction transferTransaction = prepareTransferTransaction(sender, recipient, 10, 100 + (i*23 + 3)%30);
+			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 100 + (i * 23 + 3) % 30);
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.addTransaction(transferTransaction);
@@ -404,13 +401,13 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Act
-		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccount(sender, 100+30, 25);
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccount(sender, 100 + 30, 25);
 		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccount(sender, 99, 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
 		Assert.assertThat(entities2.size(), equalTo(0));
-		int lastTimestamp = 100+29;
+		int lastTimestamp = 100 + 29;
 		for (final Object[] entity : entities1) {
 			Assert.assertThat(((Transfer)entity[0]).getTimestamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
@@ -420,12 +417,12 @@ public class TransferDaoTest {
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount, final int i) {
 		// Arrange:
 		final TransferTransaction transferTransaction = new TransferTransaction(
-				new TimeInstant(i),
-				sender,
-				recipient,
-				Amount.fromNem(amount),
-				null
-		);
+			new TimeInstant(i),
+			sender,
+			recipient,
+			Amount.fromNem(amount),
+			null
+				);
 		transferTransaction.sign();
 		return transferTransaction;
 	}
@@ -435,7 +432,7 @@ public class TransferDaoTest {
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
-	private AccountDaoLookup prepareMapping(Account sender, Account recipient) {
+	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());

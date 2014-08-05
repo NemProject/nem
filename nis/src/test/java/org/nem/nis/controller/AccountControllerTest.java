@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,8 +14,6 @@ import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
-
-import java.util.*;
 
 public class AccountControllerTest {
 
@@ -137,7 +136,8 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
 	}
 
-// TODO-CR: multiple blank lines
+	// TODO-CR: multiple blank lines
+	// BR: Should be fixed with auto formatting.
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// Arrange:
@@ -240,8 +240,9 @@ public class AccountControllerTest {
 			final int blockHeight,
 			final int importance) {
 		final Account account = new Account(Address.fromEncoded(encodedAddress));
-		if (blockHeight > 0)
+		if (blockHeight > 0) {
 			account.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
+		}
 
 		return account;
 	}
@@ -251,8 +252,9 @@ public class AccountControllerTest {
 			final int blockHeight,
 			final int importance) {
 		final AccountImportance ai = new AccountImportance();
-		if (blockHeight > 0)
+		if (blockHeight > 0) {
 			ai.setImportance(new BlockHeight(blockHeight), importance);
+		}
 
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
 	}
