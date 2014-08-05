@@ -14,6 +14,39 @@
         },
         {
             "endpoint": {
+                "host": "alice2.nem.ninja",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "alice2",
+                "public-key": "02c621aba26b261b629edddd912aac1acd8be7b9f0c798823fe4ed0fa65d69d80e"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "alice3.nem.ninja",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "alice3",
+                "public-key": "0336cabee030463a5d7df818d1e76a843d065a5b6841ccefe16e5805a754038b7a"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "alice4.nem.ninja",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "alice4",
+                "public-key": "03327f6bc7311e96f257e4fbde0351cf40ae7cea6a0662019d4140d43b24519b17"
+            }
+        },
+        {
+            "endpoint": {
                 "host": "bob.nem.ninja",
                 "port": 7890,
                 "protocol": "http"
