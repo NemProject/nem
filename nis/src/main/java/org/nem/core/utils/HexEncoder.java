@@ -22,8 +22,8 @@ public class HexEncoder {
 
 		try {
 			return codec.decode(encodedBytes);
-		} catch (DecoderException e) {
-			throw new EncodingException(e);
+		} catch (final DecoderException e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 

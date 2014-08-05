@@ -658,7 +658,7 @@ public class AccountTest {
 		assertCanWriteAccountWithEncoding(
 				new Account(kp),
 				AccountEncoding.PUBLIC_KEY,
-				Base64Encoder.getString(kp.getPublicKey().getRaw()));
+				kp.getPublicKey().toString());
 	}
 
 	@Test

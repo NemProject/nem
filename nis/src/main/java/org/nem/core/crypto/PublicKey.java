@@ -42,7 +42,7 @@ public class PublicKey implements SerializableEntity {
 	public static PublicKey fromHexString(final String hex) {
 		try {
 			return new PublicKey(HexEncoder.getBytes(hex));
-		} catch (EncodingException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new CryptoException(e);
 		}
 	}

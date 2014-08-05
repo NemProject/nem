@@ -92,7 +92,7 @@ public class BlockChainScoreTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				jsonObject.get("score"),
-				IsEqual.equalTo(Base64Encoder.getString(BigInteger.valueOf(142).toByteArray())));
+				IsEqual.equalTo("008e"));
 	}
 
 	@Test

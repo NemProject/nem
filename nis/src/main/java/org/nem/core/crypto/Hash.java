@@ -55,7 +55,7 @@ public class Hash implements SerializableEntity {
 	public static Hash fromHexString(final String hex) {
 		try {
 			return new Hash(HexEncoder.getBytes(hex));
-		} catch (EncodingException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new CryptoException(e);
 		}
 	}

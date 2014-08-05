@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
-import org.nem.core.utils.Base64Encoder;
+import org.nem.core.utils.*;
 
 import java.math.*;
 import java.util.*;
@@ -79,7 +79,7 @@ public class JsonDeserializer extends Deserializer {
 		if (null == s)
 			return null;
 
-		return s.isEmpty() ? new byte[] { } : Base64Encoder.getBytes(s);
+		return s.isEmpty() ? new byte[] { } : HexEncoder.getBytes(s);
 	}
 
 	@Override

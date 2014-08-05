@@ -59,7 +59,7 @@ public class JsonSerializer extends Serializer {
 
 	@Override
 	public void writeBytes(final String label, final byte[] bytes) {
-		final String s = null == bytes ? null : Base64Encoder.getString(bytes);
+		final String s = null == bytes ? null : HexEncoder.getString(bytes);
 		this.writeString(label, s);
 	}
 
