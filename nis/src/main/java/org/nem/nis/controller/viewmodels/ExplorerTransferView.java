@@ -7,6 +7,9 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.HexEncoder;
 
+// TODO-CR: add public documentation
+// TODO-CR: add basic tests
+
 public class ExplorerTransferView implements SerializableEntity {
 	private int type;
 	private Amount fee;
@@ -42,9 +45,9 @@ public class ExplorerTransferView implements SerializableEntity {
 		Amount.writeTo(serializer, "fee", this.fee);
 		serializer.writeLong("timestamp", this.deadline);
 		Address.writeTo(serializer, "sender", this.signerAddress);
-		serializer.writeString("senderPk", HexEncoder.getString(this.signerAddress.getPublicKey().getRaw()));
+		serializer.writeBytes("senderPk", this.signerAddress.getPublicKey().getRaw());
 		serializer.writeString("signature", this.signature);
-		serializer.writeString("hash", HexEncoder.getString(this.hash.getRaw()));
+		serializer.writeBytes("hash", this.hash.getRaw());
 
 		Address.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
