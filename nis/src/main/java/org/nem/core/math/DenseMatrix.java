@@ -8,6 +8,7 @@ import org.nem.core.utils.FormatUtils;
  * Represents a dense matrix.
  */
 public final class DenseMatrix extends Matrix {
+	// TODO-CR: is there anyway to flag members like this without access modifiers and change them to private?
 	final int numCols;
 	final double[] values;
 

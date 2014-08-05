@@ -136,8 +136,6 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
 	}
 
-	// TODO-CR: multiple blank lines
-	// BR: Should be fixed with auto formatting.
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// Arrange:

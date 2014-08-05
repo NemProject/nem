@@ -146,8 +146,6 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Act
-		// TODO-CR: i generally like to format arrays with more spaces e.g. like byte[] { #, #, # } vs new byte[]{#,#,#}
-		// BR: Fixed with auto formatting.
 		this.transferDao.getTransactionsForAccountUsingHash(sender, new Hash(new byte[] { 6, 66 }), ReadOnlyTransferDao.TransferType.ALL, 25);
 	}
 
@@ -159,7 +157,6 @@ public class TransferDaoTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		this.addMapping(mockAccountDao, testedAccount);
 		final Block dummyBlock = new Block(testedAccount, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
-		// TODO-CR: double-blank line
 
 		for (int i = 0; i < 100; i++) {
 			final Account otherAccount = Utils.generateRandomAccount();
@@ -422,7 +419,7 @@ public class TransferDaoTest {
 			recipient,
 			Amount.fromNem(amount),
 			null
-				);
+				); // TODO-CR: again weird formatting?
 		transferTransaction.sign();
 		return transferTransaction;
 	}

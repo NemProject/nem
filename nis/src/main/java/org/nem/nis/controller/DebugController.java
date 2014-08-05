@@ -89,7 +89,8 @@ public class DebugController {
 		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountAnalyzer);
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
-		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here?
+		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here? ...
+        // TODO-CR: my point was that this is test code, so what exactly are you testing that you didn't want to use a mock BlockScorer?
 												// BR: Yes!
 
 		final BigInteger hit = scorer.calculateHit(block);

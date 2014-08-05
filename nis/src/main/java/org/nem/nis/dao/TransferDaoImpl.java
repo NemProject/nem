@@ -9,8 +9,6 @@ import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-// TODO-CR: unused imports
-// BR: Should be fixed with auto formatting.
 
 @Repository
 public class TransferDaoImpl implements TransferDao {

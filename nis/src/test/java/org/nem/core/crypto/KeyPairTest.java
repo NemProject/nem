@@ -3,9 +3,6 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-// TODO-CR: remove unused imports; gimre really easy in intellij :)
-//BR: Should be fixed with auto formatting.
-
 public class KeyPairTest {
 
 	@Test
@@ -140,8 +137,6 @@ public class KeyPairTest {
 			final String privateKey = privateKeys[i];
 			// Act:
 			final KeyPair keyPair = new KeyPair(PrivateKey.fromHexString(privateKey));
-			//TODO-CR: should remove commented out code
-			// BR:     Ok for private tests but should not be commited.
 
 			// Assert:
 			Assert.assertThat(keyPair.getPublicKey(), IsEqual.equalTo(PublicKey.fromHexString(expectedPublicKeys[i])));

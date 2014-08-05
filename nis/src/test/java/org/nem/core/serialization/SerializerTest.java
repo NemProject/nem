@@ -132,9 +132,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
 	}
 
-	//TODO-CR: remove consecutive blank lines
-	// BR: Should be fixed with auto formatting.
-
 	@Test
 	public void canRoundtripOptionalNullBigInteger() {
 		// Arrange:
@@ -164,8 +161,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 				"BigInteger");
 	}
 
-	//TODO-CR: remove consecutive blank lines
-	// BR: Should be fixed with auto formatting.
 	//endregion
 
 	//region byte[] Roundtrip
@@ -479,7 +474,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObjectArray("entities", Arrays.asList(
 				new MockSerializableEntity(5, "ooo", 62),
 				new MockSerializableEntity(8, "ala", 15)
-				));
+				)); // TODO-CR: spacing looks funny here, i would expect )); to be aligned with serializer, but not sure if that is possible, no big deal
 		serializer.writeBigInteger("bi", new BigInteger("14"));
 		serializer.writeLong("sigma", 8);
 
