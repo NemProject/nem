@@ -78,7 +78,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
+		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("00958a7561f014"));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("AJAS"));
+		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("009012"));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("bytes"), IsEqual.equalTo("UP8AfCFa"));
+		Assert.assertThat(object.get("bytes"), IsEqual.equalTo("50ff007c215a"));
 	}
 
 	@Test
