@@ -5,7 +5,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 

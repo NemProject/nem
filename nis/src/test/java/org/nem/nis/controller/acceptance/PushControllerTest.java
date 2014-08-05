@@ -9,7 +9,7 @@ import org.nem.core.model.*;
 import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.MockTransaction;
-import org.nem.core.utils.Base64Encoder;
+import org.nem.core.utils.HexEncoder;
 import org.nem.nis.test.LocalHostConnector;
 
 public class PushControllerTest {
@@ -29,14 +29,14 @@ public class PushControllerTest {
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 		final JSONObject jsonIdentity = new JSONObject();
-		jsonIdentity.put("public-key", Base64Encoder.getString(identity.getKeyPair().getPublicKey().getRaw()));
+		jsonIdentity.put("public-key", HexEncoder.getString(identity.getKeyPair().getPublicKey().getRaw()));
 		jsonIdentity.put("name", "test");
 
 		final Signature signature = identity.sign(HashUtils.calculateHash(transaction).getRaw());
 
 		final JSONObject obj = new JSONObject();
 		obj.put("entity", jsonEntity);
-		obj.put("signature", Base64Encoder.getString(signature.getBytes()));
+		obj.put("signature", HexEncoder.getString(signature.getBytes()));
 		obj.put("identity", jsonIdentity);
 
 		// Act:
