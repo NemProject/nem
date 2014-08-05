@@ -16,7 +16,7 @@ public class NemesisBlockTest {
 	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
 	private final static NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource(new DeserializationContext(MOCK_ACCOUNT_LOOKUP));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
-	private final static int NUM_NEMESIS_TRANSACTIONS = 64;
+	private final static int NUM_NEMESIS_TRANSACTIONS = 80;
 
 	//region basic
 
