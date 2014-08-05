@@ -1,8 +1,7 @@
 package org.nem.core.crypto;
 
 import org.bouncycastle.crypto.digests.SHA3Digest;
-import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
+import org.bouncycastle.crypto.signers.*;
 
 import java.math.BigInteger;
 

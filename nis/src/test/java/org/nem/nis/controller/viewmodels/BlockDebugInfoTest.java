@@ -1,14 +1,14 @@
 package org.nem.nis.controller.viewmodels;
 
-import java.math.BigInteger;
-
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+
+import java.math.BigInteger;
 
 public class BlockDebugInfoTest {
 

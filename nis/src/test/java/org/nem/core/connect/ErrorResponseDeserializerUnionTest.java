@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 public class ErrorResponseDeserializerUnionTest {
 
@@ -12,7 +13,7 @@ public class ErrorResponseDeserializerUnionTest {
 		// Arrange:
 		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(
 				500,
-				JsonSerializer.serializeToJson(new ErrorResponse("badness", 700)),
+				JsonSerializer.serializeToJson(new ErrorResponse(new TimeInstant(7), "badness", 700)),
 				null);
 
 		// Assert:

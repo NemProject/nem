@@ -2,8 +2,9 @@ package org.nem.peer;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.HashUtils;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.*;
-import org.nem.peer.node.*;
+import org.nem.peer.node.ImpersonatingPeerException;
 
 /**
  * Secure serializable entity that can be used to authenticate the sender.

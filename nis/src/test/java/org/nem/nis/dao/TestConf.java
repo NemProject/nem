@@ -2,17 +2,13 @@ package org.nem.nis.dao;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
+import org.springframework.orm.hibernate4.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-
 import java.io.IOException;
 
 @Configuration
@@ -45,7 +41,7 @@ public class TestConf {
 
 		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
 		localSessionFactoryBuilder.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-		localSessionFactoryBuilder.setProperty("hibernate.show_sql", "true");
+		localSessionFactoryBuilder.setProperty("hibernate.show_sql", "false");
 		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", "false");
 		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", "20");
 

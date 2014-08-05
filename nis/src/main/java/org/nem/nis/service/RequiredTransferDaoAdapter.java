@@ -1,14 +1,14 @@
 package org.nem.nis.service;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.MissingResourceException;
+import java.util.*;
 
 @Service
 public class RequiredTransferDaoAdapter implements RequiredTransferDao {
@@ -34,10 +34,19 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 		return transfer;
 	}
 
+	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation
+
 	@Override
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, int limit) {
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, timestamp, limit);
-		// TODO: throw execption
+		// TODO: throw exception
+		return transfers;
+	}
+
+	@Override
+	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account account, final Hash hash, final TransferType transferType, int limit) {
+		// this can throw
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, hash, transferType, limit);
 		return transfers;
 	}
 

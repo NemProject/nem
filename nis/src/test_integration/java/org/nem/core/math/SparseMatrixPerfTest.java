@@ -1,8 +1,8 @@
 package org.nem.core.math;
 
-import no.uib.cipr.matrix.*;
+import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
-import org.junit.*;
+import org.junit.Test;
 
 import java.security.SecureRandom;
 import java.util.function.Consumer;

@@ -3,10 +3,11 @@ package org.nem.nis.controller.viewmodels;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
-import org.nem.core.serialization.Serializer;
-import org.nem.core.utils.HexEncoder;
 
 import java.util.*;
+
+// TODO-CR: add public documentation
+// TODO-CR: add basic tests
 
 public class ExplorerBlockView implements SerializableEntity {
 	private final Long height;
@@ -27,9 +28,9 @@ public class ExplorerBlockView implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeLong("height", this.height);
 		Address.writeTo(serializer, "harvester", this.foragerAddress);
-		serializer.writeString("harvesterPk", HexEncoder.getString(this.foragerAddress.getPublicKey().getRaw()));
+		serializer.writeBytes("harvesterPk", this.foragerAddress.getPublicKey().getRaw());
 		serializer.writeLong("timestamp", this.timestamp);
-		serializer.writeString("hash", HexEncoder.getString(this.blockHash.getRaw()));
+		serializer.writeBytes("hash", this.blockHash.getRaw());
 		serializer.writeObjectArray("txes", this.transactions);
 	}
 

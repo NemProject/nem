@@ -1,11 +1,8 @@
 package org.nem.nis.test;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * A mock HttpOutputMessage implementation.

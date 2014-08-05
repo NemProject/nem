@@ -1,8 +1,6 @@
 package org.nem.core.utils;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsSame;
+import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.math.BigInteger;

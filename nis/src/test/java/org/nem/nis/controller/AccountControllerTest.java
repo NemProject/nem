@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -7,13 +8,12 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.service.*;
-
-import java.util.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.service.AccountIoAdapter;
 
 public class AccountControllerTest {
 
@@ -136,6 +136,81 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
 	}
 
+	// TODO-CR: multiple blank lines
+	// BR: Should be fixed with auto formatting.
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapter() {
+		// Arrange:
+		// TODO-CR: i might have set a bad (lazy example) but we might want to refactor this setup block
+		// actually, you can refactor these three tests since the only difference is the controller method
+		// being called (BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>>)
+		// and the TransferType
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.ALL)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersAll(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.ALL);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapter() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.INCOMING)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersIncoming(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.INCOMING);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapter() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.OUTGOING)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = context.controller.accountTransfersOutgoing(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, ReadOnlyTransferDao.TransferType.OUTGOING);
+	}
+
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
@@ -165,8 +240,9 @@ public class AccountControllerTest {
 			final int blockHeight,
 			final int importance) {
 		final Account account = new Account(Address.fromEncoded(encodedAddress));
-		if (blockHeight > 0)
+		if (blockHeight > 0) {
 			account.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
+		}
 
 		return account;
 	}
@@ -176,8 +252,9 @@ public class AccountControllerTest {
 			final int blockHeight,
 			final int importance) {
 		final AccountImportance ai = new AccountImportance();
-		if (blockHeight > 0)
+		if (blockHeight > 0) {
 			ai.setImportance(new BlockHeight(blockHeight), importance);
+		}
 
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
 	}

@@ -7,7 +7,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.InetAddress;
 import java.util.logging.Logger;
 
 /**

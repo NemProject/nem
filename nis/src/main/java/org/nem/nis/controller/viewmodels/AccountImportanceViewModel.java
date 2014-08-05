@@ -1,7 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
-import org.nem.core.model.AccountImportance;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**

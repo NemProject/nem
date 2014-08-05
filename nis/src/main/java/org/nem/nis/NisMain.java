@@ -1,23 +1,20 @@
 package org.nem.nis;
 
-import javax.annotation.PostConstruct;
-
-import java.util.*;
-import java.util.logging.*;
-
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
-import org.nem.deploy.CommonStarter;
-import org.nem.deploy.NisConfiguration;
+import org.nem.core.time.TimeProvider;
+import org.nem.deploy.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
-import org.nem.core.time.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
@@ -61,6 +58,10 @@ public class NisMain {
 		LOGGER.info("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
+		if (dbBlock == null) {
+			LOGGER.severe("couldn't find nemesis block, did you remove OLD database?");
+			System.exit(-1);
+		}
 		LOGGER.info(String.format("hex: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");

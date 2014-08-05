@@ -1,6 +1,7 @@
 package org.nem.peer.node;
 
 import org.nem.core.crypto.Signature;
+import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.*;
 
 import java.util.logging.Logger;

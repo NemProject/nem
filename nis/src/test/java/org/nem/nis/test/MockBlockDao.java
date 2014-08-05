@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;

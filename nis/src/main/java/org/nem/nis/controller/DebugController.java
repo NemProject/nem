@@ -1,9 +1,11 @@
 package org.nem.nis.controller;
 
+import java.math.BigInteger;
+import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
@@ -13,9 +15,6 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigInteger;
-import java.util.logging.Logger;
 
 /**
  * Controller that exposes debug endpoints.
@@ -54,14 +53,14 @@ public class DebugController {
 	@RequestMapping(value = "/debug/fix-node", method = RequestMethod.GET)
 	public String nodeFixer(@RequestParam(value = "data") final String signature) {
 		final byte[] data = ArrayUtils.concat(
-				StringEncoder.getBytes(host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
-				ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
+			StringEncoder.getBytes(this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
+			ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
 
 		final Signer signer = new Signer(new KeyPair(NemesisBlock.ADDRESS.getPublicKey()));
 		final byte[] signed = Base32Encoder.getBytes(signature);
 		LOGGER.info(String.format("%d %s",
-				NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
-				host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
+			NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
+			this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
 
 		if (signer.verify(data, new Signature(signed))) {
 			LOGGER.info("forced shut down");
@@ -91,21 +90,23 @@ public class DebugController {
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here?
+												// BR: Yes!
 
 		final BigInteger hit = scorer.calculateHit(block);
 		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);
 		final int interBlockTime = null == parent ? 0 : block.getTimeStamp().subtract(parent.getTimeStamp());
-		final BlockDebugInfo blockDebugInfo =  new BlockDebugInfo(
-				block.getHeight(),
-				block.getTimeStamp(),
-				block.getSigner().getAddress(),
-				block.getDifficulty(),
-				hit,
-				target,
-				interBlockTime);
+		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(
+			block.getHeight(),
+			block.getTimeStamp(),
+			block.getSigner().getAddress(),
+			block.getDifficulty(),
+			hit,
+			target,
+			interBlockTime);
 
-		for (final Transaction transaction : block.getTransactions())
+		for (final Transaction transaction : block.getTransactions()) {
 			blockDebugInfo.addTransactionDebugInfo(mapToDebugInfo(transaction));
+		}
 
 		return blockDebugInfo;
 	}
@@ -154,17 +155,18 @@ public class DebugController {
 			amount = transfer.getAmount();
 
 			final Message message = transfer.getMessage();
-			if (null != message && message.canDecode())
+			if (null != message && message.canDecode()) {
 				messageText = StringEncoder.getString(message.getDecodedPayload());
+			}
 		}
 
 		return new TransactionDebugInfo(
-				transaction.getTimeStamp(),
-				transaction.getDeadline(),
-				transaction.getSigner().getAddress(),
-				recipient,
-				amount,
-				transaction.getFee(),
-				messageText);
+			transaction.getTimeStamp(),
+			transaction.getDeadline(),
+			transaction.getSigner().getAddress(),
+			recipient,
+			amount,
+			transaction.getFee(),
+			messageText);
 	}
 }

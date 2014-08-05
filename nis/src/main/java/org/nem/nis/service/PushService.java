@@ -1,15 +1,14 @@
 package org.nem.nis.service;
 
+import java.util.function.*;
+import java.util.logging.Logger;
 import org.nem.core.model.*;
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
 import org.nem.peer.*;
-import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.function.*;
-import java.util.logging.Logger;
 
 // TODO: add unit tests for this
 
@@ -45,20 +44,21 @@ public class PushService {
 				entity,
 				obj -> PushService.checkTransaction(obj),
 				obj -> this.foraging.processTransaction(obj),
-				transaction -> { },
+				transaction -> {},
 				NodeApiId.REST_PUSH_TRANSACTION,
 				identity);
 
-		if (result.isFailure())
+		if (result.isFailure()) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
+		}
 
 		return result;
 	}
 
 	private static ValidationResult checkTransaction(final Transaction transaction) {
 		return !transaction.verify()
-			? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
-		    : transaction.checkValidity();
+				? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
+				: transaction.checkValidity();
 	}
 
 	/**
@@ -76,8 +76,9 @@ public class PushService {
 				NodeApiId.REST_PUSH_BLOCK,
 				identity);
 
-		if (result.isFailure())
+		if (result.isFailure()) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
+		}
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(
@@ -95,16 +96,20 @@ public class PushService {
 		final PeerNetwork network = this.host.getNetwork();
 		final Node remoteNode = null == identity ? null : network.getNodes().findNodeByIdentity(identity);
 		final Consumer<NodeInteractionResult> updateStatus = status -> {
-			if (null != remoteNode)
+			if (null != remoteNode) {
 				network.updateExperience(remoteNode, status);
+			}
 		};
 
 		final ValidationResult isValidResult = isValid.apply(entity);
 		if (isValidResult.isFailure()) {
+			// TODO: it would be good to add a test for the FAILURE_ENTITY_UNUSABLE case since it is the result of a bug fix.
+			// BR:   Done.
 			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
-			}
+			} // TODO-CR: space after '}' ?
+			// BR: I prefer space after } in this case but I can't auto format it.
 			return isValidResult;
 		}
 

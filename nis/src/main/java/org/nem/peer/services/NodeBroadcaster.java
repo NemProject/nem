@@ -1,11 +1,11 @@
 package org.nem.peer.services;
 
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.*;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**

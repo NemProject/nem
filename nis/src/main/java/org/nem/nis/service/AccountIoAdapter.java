@@ -1,22 +1,20 @@
 package org.nem.nis.service;
 
-import org.nem.core.time.*;
+import org.nem.core.crypto.CryptoException;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountAnalyzer;
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.mappers.TransferMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
@@ -52,6 +50,8 @@ public class AccountIoAdapter implements AccountIo {
 		return intTimestamp;
 	}
 
+	// TODO-CR: might make sense to add a test for at least the new code
+
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp) {
 
@@ -61,6 +61,21 @@ public class AccountIoAdapter implements AccountIo {
 		final Account account = this.accountAnalyzer.findByAddress(address);
 		final Integer intTimestamp = intOrMaxInt(timestamp);
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimestamp, 25);
+
+		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
+		transfers.stream()
+				.map(tr -> new TransactionMetaDataPair(
+						TransferMapper.toModel((Transfer)tr[0], this.accountAnalyzer),
+						new TransactionMetaData(new BlockHeight((long)tr[1]))
+				))
+				.forEach(obj -> transactionList.add(obj));
+		return transactionList;
+	}
+
+	@Override
+	public SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final Address address, final Hash transactionHash, final ReadOnlyTransferDao.TransferType transfersType) {
+		final Account account = this.accountAnalyzer.findByAddress(address);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, transfersType, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()

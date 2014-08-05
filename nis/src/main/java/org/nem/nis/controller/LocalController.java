@@ -1,60 +1,47 @@
 package org.nem.nis.controller;
 
-import java.util.logging.Logger;
-
-import org.nem.core.model.Address;
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.ncc.NisRequestResult;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.AccountLookup;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.nem.deploy.CommonStarter;
-import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.controller.annotations.PublicApi;
-import org.nem.nis.controller.viewmodels.ExplorerBlockView;
-import org.nem.nis.controller.viewmodels.ExplorerTransferView;
+import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.service.RequiredBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
+// TODO: add tests for this controller
 @RestController
 public class LocalController {
 	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
 
 	private final long SHUTDOWN_DELAY = 200;
 	private final RequiredBlockDao blockDao;
-	private final AccountLookup accountLookup;
-
 
 	@Autowired(required = true)
-	public LocalController(
-			final RequiredBlockDao blockDao,
-			final AccountLookup accountLookup) {
+	public LocalController(final RequiredBlockDao blockDao) {
 		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
 	}
 
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
+	 * TODO-CR: we should refactor since this is similar (the same as whats in NIS);
 	 */
+	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
 	public void shutdown() {
 		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
-		final Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(SHUTDOWN_DELAY);
-				} catch (final InterruptedException e) {
-					// We do nothing than continuing
-				}
-				CommonStarter.INSTANCE.stopServer();
+		final Runnable r = () -> {
+			try {
+				Thread.sleep(SHUTDOWN_DELAY);
+			} catch (final InterruptedException e) {
+				// We do nothing than continuing
 			}
+			CommonStarter.INSTANCE.stopServer();
 		};
 
 		final Thread thread = new Thread(r);
@@ -63,8 +50,7 @@ public class LocalController {
 
 	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
 	@PublicApi
-	public NisRequestResult heartbeat()
-	{
+	public NisRequestResult heartbeat() {
 		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
 	}
 
@@ -81,7 +67,7 @@ public class LocalController {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			long timestamp = SystemTimeProvider.getEpochTimeMillis() + dbBlock.getTimestamp().longValue()*1000;
+			long timestamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimestamp())).getMillis();
 			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
 					dbBlock.getHeight(),
 					Address.fromPublicKey(dbBlock.getForger().getPublicKey()),
@@ -93,7 +79,7 @@ public class LocalController {
 					.map(tx -> new ExplorerTransferView(
 							tx.getType(),
 							Amount.fromMicroNem(tx.getFee()),
-							tx.getDeadline().longValue(),
+							tx.getDeadline(),
 							Address.fromPublicKey(tx.getSender().getPublicKey()),
 							tx.getSenderProof(),
 							tx.getTransferHash(),

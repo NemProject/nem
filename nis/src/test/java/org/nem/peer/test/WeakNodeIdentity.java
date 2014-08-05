@@ -1,7 +1,7 @@
 package org.nem.peer.test;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.peer.node.NodeIdentity;
+import org.nem.core.node.NodeIdentity;
 
 /**
  * A weak node identity that uses a name as an identifier.

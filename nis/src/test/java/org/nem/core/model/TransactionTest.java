@@ -1,11 +1,11 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 

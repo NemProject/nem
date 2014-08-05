@@ -1,21 +1,21 @@
 package org.nem.nis;
 
 import net.minidev.json.*;
+import org.nem.core.node.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * NIS PeerNetworkHost

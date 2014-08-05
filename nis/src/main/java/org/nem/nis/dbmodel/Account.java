@@ -2,12 +2,7 @@ package org.nem.nis.dbmodel;
 
 import org.nem.core.crypto.PublicKey;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 
 /**
  * Db Account entity.

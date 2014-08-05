@@ -100,7 +100,7 @@ public class NetworkInfo {
 		final NetworkInfo info = new NetworkInfo();
 		info.version = (byte)0x98;
 		info.addressStartChar = 'T';
-		info.nemesisAccountId = "TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6";
+		info.nemesisAccountId = "TAE7ZJ56WL475EK67QHBAPJXCCMNOGEPWH6ZSQKX";
 		info.nemesisRecipientAccountIds = new String[] {
 				"TbloodZW6W4DUVL4NGAQXHZXFQJLNHPDXHULLHZW",
 				"TAthiesMY6QO6XKPCBZFEVVVFVL2UT3ESDHAVGL7",

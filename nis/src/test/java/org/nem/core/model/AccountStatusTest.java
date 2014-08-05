@@ -1,12 +1,9 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
-
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-import org.nem.core.serialization.JsonDeserializer;
-import org.nem.core.serialization.JsonSerializer;
+import org.junit.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 public class AccountStatusTest {

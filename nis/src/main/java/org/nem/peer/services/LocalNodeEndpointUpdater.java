@@ -1,10 +1,10 @@
 package org.nem.peer.services;
 
+import org.nem.core.node.Node;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.*;
 import org.nem.peer.trust.NodeSelector;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 /**

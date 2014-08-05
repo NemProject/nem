@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.HexEncoder;

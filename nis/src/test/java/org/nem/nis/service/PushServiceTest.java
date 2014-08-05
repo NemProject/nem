@@ -2,17 +2,16 @@ package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
-import org.nem.peer.node.*;
 
 public class PushServiceTest {
 
@@ -73,9 +72,9 @@ public class PushServiceTest {
 		Mockito.verify(context.network, Mockito.times(1))
 				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		Assert.assertThat(((MockTransaction) secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	private static TestContext assertPushTransactionExperienceChange(final ValidationResult result) {
@@ -113,6 +112,24 @@ public class PushServiceTest {
 		// Assert:
 		context.assertSingleUpdateExperience(ValidationResult.FAILURE_UNKNOWN);
 		Mockito.verify(context.network, Mockito.times(0)).broadcast(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void pushBlockValidFailureEntityUnusableDoesNotChangeExperienceAndDoesNotGetProcessedOrBroadcasted() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block block = NisUtils.createRandomBlockWithHeight(12);
+		block.sign();
+
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+
+		// Act:
+		context.service.pushBlock(block, context.remoteNodeIdentity);
+
+		// Assert:
+		context.assertNoUpdateExperience();
+		Mockito.verify(context.network, Mockito.times(0)).broadcast(Mockito.any(), Mockito.any());
+		Mockito.verify(context.blockChain, Mockito.times(0)).processBlock(Mockito.any());
 	}
 
 	@Test
@@ -164,9 +181,9 @@ public class PushServiceTest {
 		Mockito.verify(context.network, Mockito.times(1))
 				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_BLOCK), broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((Block)secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
+		Assert.assertThat(((Block) secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
 	}
 
 	private static TestContext assertPushBlockExperienceChange(
@@ -227,9 +244,9 @@ public class PushServiceTest {
 		Mockito.verify(context.network, Mockito.times(1))
 				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		Assert.assertThat(((MockTransaction) secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	//endregion

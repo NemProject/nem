@@ -6,8 +6,7 @@ import javax.security.auth.x500.X500Principal;
 import java.io.*;
 import java.net.*;
 import java.security.cert.X509Certificate;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
+import java.util.jar.*;
 
 /**
  * Static class containing helper functions for meta data tests.

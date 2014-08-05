@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.MockAccountLookup;

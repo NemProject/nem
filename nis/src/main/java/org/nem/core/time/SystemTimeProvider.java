@@ -14,7 +14,7 @@ public class SystemTimeProvider implements TimeProvider {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, GregorianCalendar.AD);
 		calendar.set(Calendar.YEAR, 2014);
-		calendar.set(Calendar.MONTH, Calendar.JUNE);
+		calendar.set(Calendar.MONTH, Calendar.AUGUST);
 		calendar.set(Calendar.DAY_OF_MONTH, 4);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
@@ -49,7 +49,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 *
 	 * @param millis The system time in milliseconds.
 	 *
-	 * @return The normalized time.
+	 * @return The normalized time in seconds.
 	 */
 	public static int getTime(long millis) {
 		return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);

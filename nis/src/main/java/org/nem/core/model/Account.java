@@ -170,7 +170,7 @@ public class Account implements SerializableEntity {
 
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
-		this.label = deserializer.readString("label");
+		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
 
 		if (DeserializationOptions.ALL == options)
@@ -482,7 +482,7 @@ public class Account implements SerializableEntity {
 			final AccountEncoding encoding) {
 		switch (encoding) {
 		case PUBLIC_KEY:
-			final byte[] publicKeyBytes = deserializer.readBytes(label);
+			final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
 			return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
 
 		case ADDRESS:

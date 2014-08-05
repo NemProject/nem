@@ -1,7 +1,6 @@
 package org.nem.core.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.jar.*;
 import java.util.logging.Logger;
@@ -14,7 +13,7 @@ public class JarFacade {
 
 	private static final String NEM_VENDOR = "NEM - New Economy Movement";
 	private static final String DEFAULT_TITLE = "NEM";
-	private static final String DEFAULT_VERSION = "0.0.0-DEVELOPER BUILD";
+	private static final String DEFAULT_VERSION = "0.1.0-DEVELOPER BUILD";
 
 	private final String name;
 	private final boolean isWebStart;

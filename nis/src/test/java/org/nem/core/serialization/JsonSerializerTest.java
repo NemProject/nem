@@ -3,10 +3,10 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.utils.StringEncoder;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.util.*;
 
 public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {
@@ -78,7 +78,22 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("AJWKdWHwFA=="));
+		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("00958a7561f014"));
+	}
+
+	@Test
+	public void canWriteUnsignedBigInteger() throws Exception {
+		// Arrange:
+		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeBigInteger("BigInteger", i);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("BigInteger"), IsEqual.equalTo("009012"));
 	}
 
 	@Test
@@ -93,7 +108,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("bytes"), IsEqual.equalTo("UP8AfCFa"));
+		Assert.assertThat(object.get("bytes"), IsEqual.equalTo("50ff007c215a"));
 	}
 
 	@Test
@@ -177,13 +192,13 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	//region Read
 
 	@Test
-	public void canReadNullInt() {
+	public void canReadOptionalNullInt() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Integer i = deserializer.readInt("int");
+		final Integer i = deserializer.readOptionalInt("int");
 
 		// Assert:
 		Assert.assertThat(i, IsNull.nullValue());
@@ -205,13 +220,13 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadNullLong() {
+	public void canReadOptionalNullLong() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Long l = deserializer.readLong("long");
+		final Long l = deserializer.readOptionalLong("long");
 
 		// Assert:
 		Assert.assertThat(l, IsNull.nullValue());
@@ -233,43 +248,16 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadNullDouble() {
+	public void canReadOptionalNullDouble() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Double d = deserializer.readDouble("double");
+		final Double d = deserializer.readOptionalDouble("double");
 
 		// Assert:
 		Assert.assertThat(d, IsNull.nullValue());
-	}
-
-	@Test
-	public void canReadNullBigInteger() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final BigInteger i = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(i, IsNull.nullValue());
-	}
-
-	@Test
-	public void canReadNullObject() {
-
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(object, IsNull.nullValue());
 	}
 
 	//endregion
@@ -349,20 +337,37 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//endregion
 
-	//region serializeToJson
+	//region serializeToJson / serializeToBytes
 
 	@Test
-	public void serializeToJsonProducesSameBytesAsEntitySerialize() throws Exception {
+	public void serializeToJsonProducesSameJsonObjectAsEntitySerialize() throws Exception {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
+		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42000000000L);
+		entity.serialize(serializer);
+		final JSONObject expectedJsonObject = serializer.getObject();
 
 		// Act:
-		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
-		entity.serialize(serializer);
-		JSONObject writeObjectJson = serializer.getObject();
+		final JSONObject resultingJsonObject = JsonSerializer.serializeToJson(entity);
 
-		// Assert:
-		Assert.assertThat(JsonSerializer.serializeToJson(entity), IsEqual.equalTo(writeObjectJson));
+		// Act / Assert:
+		Assert.assertThat(resultingJsonObject, IsEqual.equalTo(expectedJsonObject));
+	}
+
+	@Test
+	public void serializeToBytesProducesSameBytesAsEntitySerialize() throws Exception {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42000000000L);
+		entity.serialize(serializer);
+		final JSONObject expectedJsonObject = serializer.getObject();
+
+		// Act:
+		final byte[] resultingBytes = JsonSerializer.serializeToBytes(entity);
+		final JSONObject resultingJsonObject = (JSONObject)JSONValue.parse(StringEncoder.getString(resultingBytes));
+
+		// Act / Assert:
+		Assert.assertThat(resultingJsonObject, IsEqual.equalTo(expectedJsonObject));
 	}
 
 	//endregion

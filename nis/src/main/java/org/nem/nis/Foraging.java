@@ -1,19 +1,14 @@
 package org.nem.nis;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dao.TransferDao;
-import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dao.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.PoiAccountInfo;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-
-
-import org.nem.peer.NodeInteractionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -188,7 +183,7 @@ public class Foraging  {
 				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
 		);
 	}
-	
+
 	/**
 	 * Filter out any transaction that has the harvester as sender.
 	 * 
@@ -228,10 +223,10 @@ public class Foraging  {
 
 				for (Account virtualForger : unlockedAccounts) {
 					// Don't allow a harvester to include his own transactions
-					Collection<Transaction> txList = filterTransactionsForHarvester(transactionList, virtualForger);
+					final Collection<Transaction> eligibleTxList = filterTransactionsForHarvester(transactionList, virtualForger);
 					
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, txList, lastBlock, virtualForger, difficulty);
+					final Block newBlock = createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 

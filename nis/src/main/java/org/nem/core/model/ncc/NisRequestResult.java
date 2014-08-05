@@ -12,7 +12,10 @@ public class NisRequestResult implements SerializableEntity {
 	 */
 	public static final int TYPE_VALIDATION_RESULT = 0x00000001;
 
-	public static final int TYPE_HEARTBEAT = 0x00000001;
+	/**
+	 * Result type indicating a heartbeat.
+	 */
+	public static final int TYPE_HEARTBEAT = 0x00000002;
 
 	/**
 	 * Special code representing a neutral result.

@@ -1,13 +1,13 @@
 package org.nem.peer;
 
+import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
-import org.nem.peer.services.*;
-import org.nem.peer.node.*;
-import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.*;
+import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.trust.NodeSelector;
+import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the NEM network (basically a facade on top of the trust and services packages).

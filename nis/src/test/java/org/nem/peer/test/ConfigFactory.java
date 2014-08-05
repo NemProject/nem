@@ -2,10 +2,10 @@ package org.nem.peer.test;
 
 import net.minidev.json.*;
 import org.nem.core.crypto.*;
+import org.nem.core.node.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.peer.Config;
-import org.nem.peer.node.*;
 
 import java.math.BigInteger;
 
@@ -62,7 +62,7 @@ public class ConfigFactory {
 			final PublicKey publicKey = Utils.generateRandomPublicKey();
 			final JSONObject jsonWellKnownPeer = new JSONObject();
 			jsonWellKnownPeer.put("endpoint", createEndpointJsonObject("ftp", hostName, 12));
-			jsonWellKnownPeer.put("identity", createIdentityJsonObject(Base64Encoder.getString(publicKey.getRaw())));
+			jsonWellKnownPeer.put("identity", createIdentityJsonObject(publicKey.toString()));
 			jsonWellKnownPeers.add(jsonWellKnownPeer);
 		}
 

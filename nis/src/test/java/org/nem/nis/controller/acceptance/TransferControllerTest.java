@@ -6,7 +6,6 @@ import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.model.*;
 import org.nem.nis.test.LocalHostConnector;
-import org.nem.core.utils.*;
 
 // this test requires node to be running on local host
 //
@@ -25,15 +24,14 @@ public class TransferControllerTest {
 		obj.put("type", 123456);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -52,15 +50,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", "AAAANBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -79,15 +76,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", -13L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -106,15 +102,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", 66);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -133,15 +128,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "dbcdefghijklmnopqrstuvwxyz)(*&^%$#@!");
+		message.put("payload", "48656C6C6F2G20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -160,15 +154,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("4202a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "4202a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 
 		// Act:
@@ -211,15 +204,14 @@ public class TransferControllerTest {
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
 		obj.put("recipient", getRecipientAccountId());
-		final byte[] signersKey = HexEncoder.getBytes("02f25538f7fbdb0dbe7d3363be67f9edac8033c777cf3fc10ededae1a990c5459f");
-		obj.put("signer", Base64Encoder.getString(signersKey));
+		obj.put("signer", "0350f94f8c3a04a4f47356ba749b74418a55511d88a56d180998130d8c26b28bfd");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
 		obj.put("timestamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "SGVsbG8sIFdvcmxkIQ==");
+		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 		return obj;
 	}

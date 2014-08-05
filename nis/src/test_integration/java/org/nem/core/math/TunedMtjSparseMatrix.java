@@ -1,8 +1,7 @@
 package org.nem.core.math;
 
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.MatrixEntry;
+import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
 /**

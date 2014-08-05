@@ -1,6 +1,6 @@
 package org.nem.core.metadata;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
 import java.io.*;
@@ -127,7 +127,7 @@ public class JarFacadeTest {
 
 	private static void assertFacadeHasDefaultProperties(final JarFacade facade) {
 		// Assert:
-		Assert.assertThat(facade.getVersion(), IsEqual.equalTo("0.0.0-DEVELOPER BUILD"));
+		Assert.assertThat(facade.getVersion(), IsEqual.equalTo("0.1.0-DEVELOPER BUILD"));
 		Assert.assertThat(facade.getTitle(), IsEqual.equalTo("NEM"));
 	}
 }

@@ -20,10 +20,10 @@ public class ExceptionUtilsTest {
 		Assert.assertThat(result, IsEqual.equalTo(7));
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateAllowsRuntimeExceptionsToPropagate() {
 		// Act:
-		ExceptionUtils.propagate(() -> { throw new EncodingException(); });
+		ExceptionUtils.propagate(() -> { throw new IllegalArgumentException(); });
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -32,18 +32,18 @@ public class ExceptionUtilsTest {
 		ExceptionUtils.propagate(() -> { throw new IOException(); });
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
 		// Act:
 		ExceptionUtils.propagate(
 				() -> { throw new IOException(); },
-				obj -> new EncodingException(obj));
+				obj -> new IllegalArgumentException(obj));
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateUnwrapsUncheckedExecutionExceptions() {
 		// Act:
-		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new EncodingException()); });
+		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IllegalArgumentException()); });
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -52,12 +52,12 @@ public class ExceptionUtilsTest {
 		ExceptionUtils.propagate(() -> { throw new MockExecutionException(new IOException()); });
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
 		// Act:
 		ExceptionUtils.propagate(
 				() -> { throw new MockExecutionException(new IOException()); },
-				obj -> new EncodingException(obj));
+				obj -> new IllegalArgumentException(obj));
 	}
 
 	@Test
@@ -106,10 +106,10 @@ public class ExceptionUtilsTest {
 		// Assert: (no exception)
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateVoidAllowsRuntimeExceptionsToPropagate() {
 		// Act:
-		ExceptionUtils.propagateVoid(() -> { throw new EncodingException(); });
+		ExceptionUtils.propagateVoid(() -> { throw new IllegalArgumentException(); });
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -118,18 +118,18 @@ public class ExceptionUtilsTest {
 		ExceptionUtils.propagateVoid(() -> { throw new IOException(); });
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateVoidCanWrapCheckedExceptionsInCustomRuntimeException() {
 		// Act:
 		ExceptionUtils.propagateVoid(
 				() -> { throw new IOException(); },
-				obj -> new EncodingException(obj));
+				obj -> new IllegalArgumentException(obj));
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateVoidUnwrapsUncheckedExecutionExceptions() {
 		// Act:
-		ExceptionUtils.propagateVoid(() -> { throw new MockExecutionException(new EncodingException()); });
+		ExceptionUtils.propagateVoid(() -> { throw new MockExecutionException(new IllegalArgumentException()); });
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -138,12 +138,12 @@ public class ExceptionUtilsTest {
 		ExceptionUtils.propagateVoid(() -> { throw new MockExecutionException(new IOException()); });
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void propagateVoidCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
 		// Act:
 		ExceptionUtils.propagateVoid(
 				() -> { throw new MockExecutionException(new IOException()); },
-				obj -> new EncodingException(obj));
+				obj -> new IllegalArgumentException(obj));
 	}
 
 	@Test

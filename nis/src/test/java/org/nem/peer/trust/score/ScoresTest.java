@@ -2,9 +2,9 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.peer.node.Node;
-import org.nem.peer.test.*;
 import org.nem.core.math.*;
+import org.nem.core.node.Node;
+import org.nem.peer.test.*;
 
 public class ScoresTest {
 

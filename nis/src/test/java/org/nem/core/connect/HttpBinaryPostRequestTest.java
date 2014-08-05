@@ -2,7 +2,7 @@ package org.nem.core.connect;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.BinarySerializer;
 import org.nem.core.test.MockSerializableEntity;
 
 public class HttpBinaryPostRequestTest {

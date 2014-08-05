@@ -2,8 +2,9 @@ package org.nem.peer.services;
 
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
+import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.*;
+import org.nem.peer.node.NodeVersionCheck;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -99,7 +100,13 @@ public class NodeRefresher {
 		}
 
 		return future
-				.exceptionally(this::getNodeStatusFromException)
+				.exceptionally(e -> {
+					final NodeStatus status = this.getNodeStatusFromException(e);
+					if (NodeStatus.FAILURE == status)
+						LOGGER.severe(String.format("Fatal error encountered while communicating with <%s>: %s", node, e));
+
+					return status;
+				})
 				.thenAccept(ns -> this.update(node, ns));
 	}
 

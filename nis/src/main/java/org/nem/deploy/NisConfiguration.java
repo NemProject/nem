@@ -1,10 +1,10 @@
 package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
-import org.nem.core.utils.*;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Properties;
 
 /**
  * Class responsible for holding all NIS configuration settings.
@@ -82,7 +82,6 @@ public class NisConfiguration {
 	public PrivateKey getAutoBootKey() {
 		return this.bootKey;
 	}
-
 
 	/**
 	 * Gets the name of the auto-boot node.

@@ -3,34 +3,24 @@ package org.nem.nis;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.math.ColumnVector;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.time.TimeInstant;
-import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dbmodel.*;
 import org.nem.core.model.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.MockAccountDao;
-import org.nem.nis.test.MockBlockDao;
-import org.nem.nis.test.MockForaging;
-import org.nem.peer.NodeInteractionResult;
+import org.nem.nis.test.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
@@ -183,7 +173,7 @@ public class BlockChainTest {
 
 	private static Block createBlock(final Account forger, final AccountLookup accountLookup) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime().addDays(-1), new BlockHeight(3));
+		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime().addHours(-1), new BlockHeight(3));
 		block.sign();
 
 		return roundTripBlock(accountLookup, block);

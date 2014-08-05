@@ -2,7 +2,7 @@ package org.nem.peer.connect;
 
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.audit.*;
+import org.nem.nis.audit.AuditCollection;
 
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;

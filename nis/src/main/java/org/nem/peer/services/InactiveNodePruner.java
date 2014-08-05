@@ -1,6 +1,6 @@
 package org.nem.peer.services;
 
-import org.nem.peer.node.NodeCollection;
+import org.nem.core.node.NodeCollection;
 
 import java.util.logging.Logger;
 

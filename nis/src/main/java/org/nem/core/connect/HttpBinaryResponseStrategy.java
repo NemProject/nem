@@ -1,7 +1,6 @@
 package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
-import org.nem.core.serialization.SerializationException;
 
 /**
  * Strategy for coercing an HTTP binary response into a deserializer.
@@ -30,7 +29,6 @@ public class HttpBinaryResponseStrategy extends HttpDeserializerResponseStrategy
 
 	@Override
 	public String getSupportedContentType() {
-		// TODO: refactor this
-		return "application/binary";
+		return ContentType.BINARY;
 	}
 }

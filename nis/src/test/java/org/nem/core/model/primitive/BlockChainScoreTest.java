@@ -1,14 +1,12 @@
 package org.nem.core.model.primitive;
 
-import java.math.BigInteger;
-
 import net.minidev.json.JSONObject;
-
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.core.utils.Base64Encoder;
+
+import java.math.BigInteger;
 
 public class BlockChainScoreTest {
 
@@ -93,7 +91,7 @@ public class BlockChainScoreTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				jsonObject.get("score"),
-				IsEqual.equalTo(Base64Encoder.getString(BigInteger.valueOf(142).toByteArray())));
+				IsEqual.equalTo("008e"));
 	}
 
 	@Test

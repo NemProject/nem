@@ -5,7 +5,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
 
@@ -172,7 +171,7 @@ public class SignatureTest {
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Signature"), IsEqual.equalTo(Base64Encoder.getString(signature.getBytes())));
+		Assert.assertThat(object.get("Signature"), IsEqual.equalTo(signature.toString()));
 	}
 
 	@Test

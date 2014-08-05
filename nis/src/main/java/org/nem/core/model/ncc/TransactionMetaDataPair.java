@@ -1,7 +1,6 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.model.Transaction;
-import org.nem.core.model.TransactionFactory;
+import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**

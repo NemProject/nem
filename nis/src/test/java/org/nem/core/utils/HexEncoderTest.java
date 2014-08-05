@@ -1,6 +1,6 @@
 package org.nem.core.utils;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
 public class HexEncoderTest {
@@ -45,7 +45,7 @@ public class HexEncoderTest {
 				IsEqual.equalTo("00000d465457"));
 	}
 
-	@Test(expected = EncodingException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void malformedStringCannotBeConvertedToByteArray() {
 		// Act:
 		HexEncoder.getBytes("4e454g465457");

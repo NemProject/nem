@@ -249,10 +249,13 @@ public class Block extends VerifiableEntity {
 				this.height,
 				isExecute);
 		final TransferObserver outlinkObserver = new OutlinkObserver(this.height, isExecute);
-		List<TransferObserver> observers = Arrays.asList(aggregateObserver, outlinkObserver);
-		if (!isExecute) {
+
+		// in an undo operation, the OutlinkObserver should be run before the balance is updated
+		// (so that the matching link can be found and removed)
+		final List<TransferObserver> observers = Arrays.asList(aggregateObserver, outlinkObserver);
+		if (!isExecute)
 			Collections.reverse(observers);
-		}
+
 		return new AggregateTransferObserver(observers);
 	}
 

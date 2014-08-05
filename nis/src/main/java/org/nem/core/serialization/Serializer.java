@@ -4,10 +4,10 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 /**
- * An interface for forward-only serialization of primitive data types.
+ * An abstract class for forward-only serialization of primitive data types.
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
-public interface Serializer {
+public abstract class Serializer {
 
 	/**
 	 * Writes a 32-bit integer value.
@@ -15,7 +15,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param i     The value.
 	 */
-	public void writeInt(final String label, final int i);
+	public abstract void writeInt(final String label, final int i);
 
 	/**
 	 * Writes a 64-bit long value.
@@ -23,7 +23,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param l     The value.
 	 */
-	public void writeLong(final String label, final long l);
+	public abstract void writeLong(final String label, final long l);
 
 	/**
 	 * Writes a 64-bit double value.
@@ -31,7 +31,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param d The value.
 	 */
-	void writeDouble(final String label, final double d);
+	public abstract void writeDouble(final String label, final double d);
 
 	/**
 	 * Writes a BigInteger value.
@@ -39,7 +39,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param i     The value.
 	 */
-	public void writeBigInteger(final String label, final BigInteger i);
+	public abstract void writeBigInteger(final String label, final BigInteger i);
 
 	/**
 	 * Writes a byte array value.
@@ -47,7 +47,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param bytes The value.
 	 */
-	public void writeBytes(final String label, final byte[] bytes);
+	public abstract void writeBytes(final String label, final byte[] bytes);
 
 	/**
 	 * Writes a String value.
@@ -55,7 +55,7 @@ public interface Serializer {
 	 * @param label The optional name of the value.
 	 * @param s     The value.
 	 */
-	public void writeString(final String label, final String s);
+	public abstract void writeString(final String label, final String s);
 
 	/**
 	 * Writes an object value.
@@ -63,7 +63,7 @@ public interface Serializer {
 	 * @param label  The optional name of the value.
 	 * @param object The value.
 	 */
-	public void writeObject(final String label, final SerializableEntity object);
+	public abstract void writeObject(final String label, final SerializableEntity object);
 
 	/**
 	 * Writes an array of object values.
@@ -71,5 +71,5 @@ public interface Serializer {
 	 * @param label   The optional name of the value.
 	 * @param objects The array.
 	 */
-	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects);
+	public abstract void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects);
 }

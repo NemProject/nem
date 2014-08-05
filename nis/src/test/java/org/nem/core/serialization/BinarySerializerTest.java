@@ -1,12 +1,11 @@
 package org.nem.core.serialization;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.*;
 import java.util.*;
 
 public class BinarySerializerTest extends SerializerTest<BinarySerializer, BinaryDeserializer> {
@@ -80,6 +79,23 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 			final byte[] expectedBytes = new byte[] {
 					0x07, 0x00, 0x00, 0x00,
 					0x00, (byte)0x95, (byte)0x8A, 0x75, 0x61, (byte)0xF0, 0x14
+			};
+			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+		}
+	}
+
+	@Test
+	public void canWriteUnsignedBigInteger() throws Exception {
+		// Arrange:
+		try (final BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
+			serializer.writeBigInteger("BigInteger", i);
+
+			// Assert:
+			final byte[] expectedBytes = new byte[] {
+					0x03, 0x00, 0x00, 0x00,
+					0x00, (byte)0x90, 0x12
 			};
 			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}

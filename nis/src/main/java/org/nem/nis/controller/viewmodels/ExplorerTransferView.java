@@ -1,11 +1,14 @@
 package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.nem.core.utils.HexEncoder;
+
+// TODO-CR: add public documentation
+// TODO-CR: add basic tests
 
 public class ExplorerTransferView implements SerializableEntity {
 	private int type;
@@ -22,10 +25,10 @@ public class ExplorerTransferView implements SerializableEntity {
 	private int msgType;
 	private byte[] message;
 
-	public ExplorerTransferView(int type, final Amount fee, final long deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient, final Amount amount, final int msgType, final byte[] encodedPayload) {
+	public ExplorerTransferView(int type, final Amount fee, final int deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient, final Amount amount, final int msgType, final byte[] encodedPayload) {
 		this.type = type;
 		this.fee = fee;
-		this.deadline = SystemTimeProvider.getEpochTimeMillis() + deadline*1000;
+		this.deadline = UnixTime.fromTimeInstant(new TimeInstant(deadline)).getMillis();
 		this.signerAddress = signer;
 		this.signature = HexEncoder.getString(signature);
 		this.hash = transactionHash;
@@ -42,9 +45,9 @@ public class ExplorerTransferView implements SerializableEntity {
 		Amount.writeTo(serializer, "fee", this.fee);
 		serializer.writeLong("timestamp", this.deadline);
 		Address.writeTo(serializer, "sender", this.signerAddress);
-		serializer.writeString("senderPk", HexEncoder.getString(this.signerAddress.getPublicKey().getRaw()));
+		serializer.writeBytes("senderPk", this.signerAddress.getPublicKey().getRaw());
 		serializer.writeString("signature", this.signature);
-		serializer.writeString("hash", HexEncoder.getString(this.hash.getRaw()));
+		serializer.writeBytes("hash", this.hash.getRaw());
 
 		Address.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);

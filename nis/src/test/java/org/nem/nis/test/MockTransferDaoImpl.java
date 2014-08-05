@@ -1,11 +1,11 @@
 package org.nem.nis.test;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class MockTransferDaoImpl implements TransferDao {
 	@Override
@@ -30,6 +30,11 @@ public class MockTransferDaoImpl implements TransferDao {
 
 	@Override
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, int limit) {
+		return null;
+	}
+
+	@Override
+	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account account, final Hash hash, final TransferType transferType, int limit) {
 		return null;
 	}
 }

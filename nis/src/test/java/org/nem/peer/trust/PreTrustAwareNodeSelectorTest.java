@@ -2,9 +2,9 @@ package org.nem.peer.trust;
 
 import org.hamcrest.core.IsSame;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
+import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
 import java.security.SecureRandom;
@@ -34,7 +34,7 @@ public class PreTrustAwareNodeSelectorTest {
 	//region selectNodes
 
 	@Test
-	public void selectNodesDoesNotAddPreTrustedNodesWhenAllAreOffline() {
+	public void selectNodesAddsAllPreTrustedNodesWhenAllAreOffline() {
 		// Arrange:
 		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p", "q", "r"));
 		final List<Node> nodes = PeerUtils.createNodesWithNames("a", "p", "c");
@@ -45,7 +45,9 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(selectedNodes, IsEquivalent.equivalentTo(nodes));
+		Assert.assertThat(
+				selectedNodes,
+				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("p", "q", "r", "a", "c")));
 	}
 
 	@Test

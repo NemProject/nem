@@ -1,17 +1,17 @@
 package org.nem.peer;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.test.*;
-import org.nem.peer.node.*;
+import org.nem.core.node.*;
+import org.nem.core.test.MockSerializableEntity;
 import org.nem.peer.services.*;
-import org.nem.peer.test.*;
-import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.*;
+import org.nem.peer.test.PeerUtils;
+import org.nem.peer.trust.NodeSelector;
+import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
 

@@ -6,8 +6,7 @@ import org.mockito.Mockito;
 
 import java.net.URL;
 import java.security.CodeSource;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 
 public class CodeSourceFacadeTest {
 

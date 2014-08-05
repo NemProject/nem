@@ -8,11 +8,9 @@ import org.nem.core.messages.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.core.utils.Base64Encoder;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public class AccountTest {
@@ -581,7 +579,7 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
-		Assert.assertThat(deserializer.readBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
@@ -659,7 +657,7 @@ public class AccountTest {
 		assertCanWriteAccountWithEncoding(
 				new Account(kp),
 				AccountEncoding.PUBLIC_KEY,
-				Base64Encoder.getString(kp.getPublicKey().getRaw()));
+				kp.getPublicKey().toString());
 	}
 
 	@Test
