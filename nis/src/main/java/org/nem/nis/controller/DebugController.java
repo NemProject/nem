@@ -53,14 +53,14 @@ public class DebugController {
 	@RequestMapping(value = "/debug/fix-node", method = RequestMethod.GET)
 	public String nodeFixer(@RequestParam(value = "data") final String signature) {
 		final byte[] data = ArrayUtils.concat(
-			StringEncoder.getBytes(this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
-			ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
+				StringEncoder.getBytes(this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
+				ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
 
 		final Signer signer = new Signer(new KeyPair(NemesisBlock.ADDRESS.getPublicKey()));
 		final byte[] signed = Base32Encoder.getBytes(signature);
 		LOGGER.info(String.format("%d %s",
-			NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
-			this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
+				NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
+				this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
 
 		if (signer.verify(data, new Signature(signed))) {
 			LOGGER.info("forced shut down");
@@ -90,20 +90,20 @@ public class DebugController {
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
 		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here? ...
-        // TODO-CR: my point was that this is test code, so what exactly are you testing that you didn't want to use a mock BlockScorer?
-												// BR: Yes!
+		// TODO-CR: my point was that this is test code, so what exactly are you testing that you didn't want to use a mock BlockScorer?
+		// BR: This is not a unit test, it is for debug purposes at runtime, so we process real data and provide real data as output.
 
 		final BigInteger hit = scorer.calculateHit(block);
 		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);
 		final int interBlockTime = null == parent ? 0 : block.getTimeStamp().subtract(parent.getTimeStamp());
 		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(
-			block.getHeight(),
-			block.getTimeStamp(),
-			block.getSigner().getAddress(),
-			block.getDifficulty(),
-			hit,
-			target,
-			interBlockTime);
+				block.getHeight(),
+				block.getTimeStamp(),
+				block.getSigner().getAddress(),
+				block.getDifficulty(),
+				hit,
+				target,
+				interBlockTime);
 
 		for (final Transaction transaction : block.getTransactions()) {
 			blockDebugInfo.addTransactionDebugInfo(mapToDebugInfo(transaction));
@@ -162,12 +162,12 @@ public class DebugController {
 		}
 
 		return new TransactionDebugInfo(
-			transaction.getTimeStamp(),
-			transaction.getDeadline(),
-			transaction.getSigner().getAddress(),
-			recipient,
-			amount,
-			transaction.getFee(),
-			messageText);
+				transaction.getTimeStamp(),
+				transaction.getDeadline(),
+				transaction.getSigner().getAddress(),
+				recipient,
+				amount,
+				transaction.getFee(),
+				messageText);
 	}
 }

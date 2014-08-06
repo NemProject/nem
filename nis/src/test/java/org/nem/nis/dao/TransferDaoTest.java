@@ -414,12 +414,12 @@ public class TransferDaoTest {
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount, final int i) {
 		// Arrange:
 		final TransferTransaction transferTransaction = new TransferTransaction(
-			new TimeInstant(i),
-			sender,
-			recipient,
-			Amount.fromNem(amount),
-			null
-				); // TODO-CR: again weird formatting?
+				new TimeInstant(i),
+				sender,
+				recipient,
+				Amount.fromNem(amount),
+				null); // TODO-CR: again weird formatting?
+						// BR: I turned off argument auto wrapping. Hopefully will leave the code as dev formatted it.
 		transferTransaction.sign();
 		return transferTransaction;
 	}

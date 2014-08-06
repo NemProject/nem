@@ -9,6 +9,7 @@ import org.nem.core.utils.FormatUtils;
  */
 public final class DenseMatrix extends Matrix {
 	// TODO-CR: is there anyway to flag members like this without access modifiers and change them to private?
+	// BR: At least in eclipse I don't see how to do this automatically.
 	final int numCols;
 	final double[] values;
 

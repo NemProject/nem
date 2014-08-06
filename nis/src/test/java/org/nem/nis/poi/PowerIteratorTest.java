@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
 
-
 public class PowerIteratorTest {
 
 	@Test
@@ -21,7 +20,7 @@ public class PowerIteratorTest {
 	@Test
 	public void iteratorStopsAfterMaxIterations() {
 		// Act:
-		final PowerIterator iterator = createTestIterator(2, 0.0001);
+		final PowerIterator iterator = createTestIterator(3, 0.0001);
 
 		// Act:
 		iterator.run();
@@ -50,38 +49,38 @@ public class PowerIteratorTest {
 		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.001);
 	}
 
-	private static PowerIterator createTestIterator(int maxIterations, double epsilon) {
+	private static PowerIterator createTestIterator(final int maxIterations, final double epsilon) {
 		// Arrange: (EigenVector for test matrix is [3, 1])
 		final ColumnVector vector = new ColumnVector(2);
-		vector.setAt(0, 1.0 / 3);
-		vector.setAt(1, 2.0 / 3);
+		vector.setAt(0, 1.0);
+		vector.setAt(1, 1.0);
 
 		final Matrix matrix = new DenseMatrix(2, 2);
-		matrix.setAt(0, 0, 2);
-		matrix.setAt(0, 1, -12);
+		matrix.setAt(0, 0, 5);
+		matrix.setAt(0, 1, 3);
 		matrix.setAt(1, 0, 1);
-		matrix.setAt(1, 1, -5);
+		matrix.setAt(1, 1, 3);
 
 		return new SimplePowerIterator(vector, matrix, maxIterations, epsilon);
 	}
 
 	private static class SimplePowerIterator extends PowerIterator {
 
-		private Matrix matrix;
+		private final Matrix matrix;
 
 		/**
 		 * Creates a new poi power iterator.
 		 *
-		 * @param startVector	 The start vector.
-		 * @param matrix    	 The matrix.
-		 * @param maxIterations  The maximum number of iterations.
-		 * @param epsilon        The convergence epsilon value.
+		 * @param startVector The start vector.
+		 * @param matrix The matrix.
+		 * @param maxIterations The maximum number of iterations.
+		 * @param epsilon The convergence epsilon value.
 		 */
 		public SimplePowerIterator(
 				final ColumnVector startVector,
 				final Matrix matrix,
-				int maxIterations,
-				double epsilon) {
+				final int maxIterations,
+				final double epsilon) {
 			super(startVector, maxIterations, epsilon);
 			this.matrix = matrix;
 		}
@@ -92,7 +91,8 @@ public class PowerIteratorTest {
 			// TODO: this makes sure the vectors are always pointing in the same direction
 			// TODO: but i'm not sure why it's needed
 			// TODO: if removed, the unit tests fail
-			updatedVector.align();
+			// BR: Fixed (reason for failure: expected behavior is only guaranteed for
+			//     multiples of left stochastic matrices).
 			return updatedVector;
 		}
 	}

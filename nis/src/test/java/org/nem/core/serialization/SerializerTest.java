@@ -473,8 +473,8 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeString("epsilon", "FooBar");
 		serializer.writeObjectArray("entities", Arrays.asList(
 				new MockSerializableEntity(5, "ooo", 62),
-				new MockSerializableEntity(8, "ala", 15)
-				)); // TODO-CR: spacing looks funny here, i would expect )); to be aligned with serializer, but not sure if that is possible, no big deal
+				new MockSerializableEntity(8, "ala", 15))); // TODO-CR: spacing looks funny here, i would expect )); to be aligned with serializer, but not sure if that is possible, no big deal
+															// BR: Changed so that auto formatting doesn't alter the way it was formatted by the dev.
 		serializer.writeBigInteger("bi", new BigInteger("14"));
 		serializer.writeLong("sigma", 8);
 

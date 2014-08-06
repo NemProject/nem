@@ -1,5 +1,9 @@
 package org.nem.nis;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -11,11 +15,6 @@ import org.nem.nis.poi.PoiAccountInfo;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 //
 // Initial logic is as follows:
 //   * we receive new TX, IF it hasn't been seen,
@@ -26,8 +25,9 @@ import java.util.stream.Collectors;
 //
 // fork resolution should solve the rest
 //
-public class Foraging  {
+public class Foraging {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	private static final int TRANSACTION_MAX_ALLOWED_TIME_DEVIATION = 30;
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 	private final UnconfirmedTransactions unconfirmedTransactions;
@@ -57,15 +57,17 @@ public class Foraging  {
 	 * @param account The account.
 	 */
 	public UnlockResult addUnlockedAccount(final Account account) {
-		if (!this.accountLookup.isKnownAddress(account.getAddress()))
+		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
+		}
 
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(
 				-1,
 				account,
 				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
-		if (!accountInfo.canForage())
+		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
+		}
 
 		this.unlockedAccounts.add(account);
 		return UnlockResult.SUCCESS;
@@ -104,17 +106,16 @@ public class Foraging  {
 	 * Adds transaction to list of unconfirmed transactions.
 	 *
 	 * @param transaction transaction that isValid() and verify()-ed
-	 *
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
-	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(Transaction transaction) {
+	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(final Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction);
 	}
 
-	private ValidationResult addUnconfirmedTransaction(Transaction transaction) {
+	private ValidationResult addUnconfirmedTransaction(final Transaction transaction) {
 		return this.unconfirmedTransactions.add(transaction, hash -> {
-			synchronized (blockChainLastBlockLayer) {
-				return null != transferDao.findByHash(hash.getRaw());
+			synchronized (this.blockChainLastBlockLayer) {
+				return null != this.transferDao.findByHash(hash.getRaw());
 			}
 		});
 	}
@@ -124,7 +125,7 @@ public class Foraging  {
 	 *
 	 * @param block
 	 */
-	public void removeFromUnconfirmedTransactions(Block block) {
+	public void removeFromUnconfirmedTransactions(final Block block) {
 		this.unconfirmedTransactions.removeAll(block);
 	}
 
@@ -133,21 +134,21 @@ public class Foraging  {
 	 * list of unconfirmed transactions.
 	 *
 	 * @param transaction - transaction that isValid() and verify()-ed
-	 *
 	 * @return NEUTRAL if given transaction has already been seen or isn't within the time window, SUCCESS if it has been added
 	 */
-	public ValidationResult processTransaction(Transaction transaction) {
+	public ValidationResult processTransaction(final Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		//TODO: 30 seconds should probably be a constant instead of a magic number, below
+		// TODO: 30 seconds should probably be a constant instead of a magic number, below
+		// BR: agreed.
 		// rest is checked by isValid()
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(30)) > 0) {
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-30)) < 0) {
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) < 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
-		return addUnconfirmedTransaction(transaction);
+		return this.addUnconfirmedTransaction(transaction);
 	}
 
 	/**
@@ -157,14 +158,13 @@ public class Foraging  {
 	 * @param transactions The transactions.
 	 */
 	public void processTransactions(final Collection<Transaction> transactions) {
-		transactions.stream().forEach(tx -> processTransaction(tx));
+		transactions.stream().forEach(tx -> this.processTransaction(tx));
 	}
 
 	private boolean matchAddress(final Transaction transaction, final Address address) {
-		return (transaction.getSigner().getAddress().equals(address) ||
-				(transaction.getType() == TransactionTypes.TRANSFER &&
-						((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
+		return (transaction.getSigner().getAddress().equals(address) || (transaction.getType() == TransactionTypes.TRANSFER && ((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
 	}
+
 	/**
 	 * This method is for GUI's usage.
 	 * Right now it returns only outgoing TXes, TODO: should it return incoming too?
@@ -174,19 +174,19 @@ public class Foraging  {
 	 */
 	public List<Transaction> getUnconfirmedTransactions(final Address address) {
 		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
-				.filter(tx -> matchAddress(tx, address))
+				.filter(tx -> this.matchAddress(tx, address))
 				.collect(Collectors.toList());
 	}
 
-	public List<Transaction> getUnconfirmedTransactionsForNewBlock(TimeInstant blockTime) {
+	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime) {
 		return this.unconfirmedTransactions.removeConflictingTransactions(
 				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
-		);
+				);
 	}
 
 	/**
 	 * Filter out any transaction that has the harvester as sender.
-	 * 
+	 *
 	 * @param transactions The original list of transactions.
 	 * @param harvester The harvester's account.
 	 * @return The filtered list of transactions.
@@ -199,34 +199,35 @@ public class Foraging  {
 
 	/**
 	 * returns foraged block or null
+	 * 
 	 * @return
 	 */
 	public Block forageBlock(final BlockScorer blockScorer) {
-		if (blockChainLastBlockLayer.getLastDbBlock() == null) {
+		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
 			return null;
 		}
 
-		LOGGER.fine("block generation " + Integer.toString(unconfirmedTransactions.size()) + " " + Integer.toString(unlockedAccounts.size()));
+		LOGGER.fine("block generation " + Integer.toString(this.unconfirmedTransactions.size()) + " " + Integer.toString(this.unlockedAccounts.size()));
 
 		Block bestBlock = null;
 		long bestScore = Long.MIN_VALUE;
 		// because of access to unconfirmedTransactions, and lastBlock*
 
-		TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		unconfirmedTransactions.dropExpiredTransactions(blockTime);
-		Collection<Transaction> transactionList = getUnconfirmedTransactionsForNewBlock(blockTime);
+		final TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
+		final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime);
 		try {
-			synchronized (blockChainLastBlockLayer) {
-				final org.nem.nis.dbmodel.Block dbLastBlock = blockChainLastBlockLayer.getLastDbBlock();
+			synchronized (this.blockChainLastBlockLayer) {
+				final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
-				for (Account virtualForger : unlockedAccounts) {
+				for (final Account virtualForger : this.unlockedAccounts) {
 					// Don't allow a harvester to include his own transactions
-					final Collection<Transaction> eligibleTxList = filterTransactionsForHarvester(transactionList, virtualForger);
-					
+					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, virtualForger);
+
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock = createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
+					final Block newBlock = this.createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
 
 					LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
@@ -251,7 +252,7 @@ public class Foraging  {
 				}
 			} // synchronized
 
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			LOGGER.warning("exception occurred during generation of a block");
 			LOGGER.warning(e.toString());
 		}
@@ -259,11 +260,11 @@ public class Foraging  {
 		return bestBlock;
 	}
 
-	private BlockDifficulty calculateDifficulty(BlockScorer scorer, Block lastBlock) {
+	private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final Block lastBlock) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
-		int limit = (int)Math.min(lastBlock.getHeight().getRaw(), ((long)BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
-		final List<TimeInstant> timestamps = blockDao.getTimestampsFrom(blockHeight, limit);
-		final List<BlockDifficulty> difficulties = blockDao.getDifficultiesFrom(blockHeight, limit);
+		final int limit = (int)Math.min(lastBlock.getHeight().getRaw(), (BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
+		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 		return scorer.calculateDifficulty(difficulties, timestamps);
 	}
 
