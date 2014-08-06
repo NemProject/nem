@@ -72,8 +72,6 @@ public class PushServiceTest {
 		Mockito.verify(context.network, Mockito.times(1))
 				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
-		// TODO-CR: style comment do you like casts with or without a space eg. { (T)obj } vs { (T) obj }
-		// BR: Auto formatting is configured to eliminate space. Change it?
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
 		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));

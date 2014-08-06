@@ -73,6 +73,8 @@ public class PowerIteratorTest {
 		 *
 		 * @param startVector The start vector.
 		 * @param matrix The matrix.
+		 *               This matrix must be a multiple of a left stochastic matrix.
+		 *               (i.e. all the matrix columns must sum to the same value).
 		 * @param maxIterations The maximum number of iterations.
 		 * @param epsilon The convergence epsilon value.
 		 */
@@ -87,13 +89,7 @@ public class PowerIteratorTest {
 
 		@Override
 		protected ColumnVector stepImpl(final ColumnVector vector) {
-			final ColumnVector updatedVector = this.matrix.multiply(vector);
-			// TODO: this makes sure the vectors are always pointing in the same direction
-			// TODO: but i'm not sure why it's needed
-			// TODO: if removed, the unit tests fail
-			// BR: Fixed (reason for failure: expected behavior is only guaranteed for
-			//     multiples of left stochastic matrices).
-			return updatedVector;
+			return this.matrix.multiply(vector);
 		}
 	}
 }

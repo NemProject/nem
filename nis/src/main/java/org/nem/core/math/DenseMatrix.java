@@ -8,10 +8,8 @@ import org.nem.core.utils.FormatUtils;
  * Represents a dense matrix.
  */
 public final class DenseMatrix extends Matrix {
-	// TODO-CR: is there anyway to flag members like this without access modifiers and change them to private?
-	// BR: At least in eclipse I don't see how to do this automatically.
-	final int numCols;
-	final double[] values;
+	private final int numCols;
+	private final double[] values;
 
 	/**
 	 * Creates a new matrix of the specified size.

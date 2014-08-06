@@ -138,8 +138,6 @@ public class Foraging {
 	 */
 	public ValidationResult processTransaction(final Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		// TODO: 30 seconds should probably be a constant instead of a magic number, below
-		// BR: agreed.
 		// rest is checked by isValid()
 		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
@@ -162,6 +160,7 @@ public class Foraging {
 	}
 
 	private boolean matchAddress(final Transaction transaction, final Address address) {
+		// TODO-CR: J->BR (reformatting) it's kind of unreadable having everything on a single line
 		return (transaction.getSigner().getAddress().equals(address) || (transaction.getType() == TransactionTypes.TRANSFER && ((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
 	}
 
@@ -180,8 +179,7 @@ public class Foraging {
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime) {
 		return this.unconfirmedTransactions.removeConflictingTransactions(
-				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
-				);
+				this.unconfirmedTransactions.getTransactionsBefore(blockTime));
 	}
 
 	/**

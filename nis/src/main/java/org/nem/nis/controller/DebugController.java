@@ -88,10 +88,11 @@ public class DebugController {
 		final org.nem.nis.dbmodel.Block dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
 		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountAnalyzer);
 
+		// this API can be called for any block in the chain, so we need to force an importance recalculation
+		// because we want the returned importances to be relative to the requested height
+		// (note that the recalculation is done on a copy of the AccountAnalyzer so it will not impact the real block-chain)
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
-		scorer.forceImportanceCalculation(); // TODO: why do we need to force the calculation here? ...
-		// TODO-CR: my point was that this is test code, so what exactly are you testing that you didn't want to use a mock BlockScorer?
-		// BR: This is not a unit test, it is for debug purposes at runtime, so we process real data and provide real data as output.
+		scorer.forceImportanceCalculation();
 
 		final BigInteger hit = scorer.calculateHit(block);
 		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);

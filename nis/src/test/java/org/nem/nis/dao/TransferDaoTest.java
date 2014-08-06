@@ -418,8 +418,7 @@ public class TransferDaoTest {
 				sender,
 				recipient,
 				Amount.fromNem(amount),
-				null); // TODO-CR: again weird formatting?
-						// BR: I turned off argument auto wrapping. Hopefully will leave the code as dev formatted it.
+				null);
 		transferTransaction.sign();
 		return transferTransaction;
 	}
