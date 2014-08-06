@@ -8,6 +8,7 @@ import org.nem.core.messages.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.nis.secret.WeightedBalances;
 
 import java.math.BigInteger;
 import java.util.*;

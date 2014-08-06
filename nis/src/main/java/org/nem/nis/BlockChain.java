@@ -8,6 +8,7 @@ import org.nem.core.node.Node;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;

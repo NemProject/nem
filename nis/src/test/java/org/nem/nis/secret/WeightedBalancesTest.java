@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

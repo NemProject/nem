@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
 /**
  * Common place to have BlockChain-related constants accessible

@@ -1,5 +1,6 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
+import org.nem.core.model.AccountLink;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.LinkedList;

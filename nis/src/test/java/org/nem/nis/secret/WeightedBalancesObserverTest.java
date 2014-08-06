@@ -1,7 +1,8 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 
 public class WeightedBalancesObserverTest {

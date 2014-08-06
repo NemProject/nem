@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 

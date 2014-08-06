@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.FormatUtils;
+import org.nem.nis.secret.HistoricalOutlinks;
 
 import java.text.DecimalFormat;
 import java.util.Iterator;
