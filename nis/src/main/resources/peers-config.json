@@ -113,6 +113,17 @@
         },
         {
             "endpoint": {
+                "host": "chain.nem.ninja",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "pat",
+                "public-key": "02bb032b4eaf976090d00776259602b09baebf06908d7855372d2a4eb1db21042a"
+            }
+        },
+        {
+            "endpoint": {
                 "host": "94.156.77.147",
                 "port": 7890,
                 "protocol": "http"
