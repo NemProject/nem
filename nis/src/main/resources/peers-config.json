@@ -113,61 +113,6 @@
         },
         {
             "endpoint": {
-                "host": "instacash.nem.io",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "instacash-node1",
-                "public-key": "03f7dc4a82986c89283e2f3e422945f8e9976a2ceb51bdec28c67b8116bcfa276f"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "instacash2.nem.io",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "instacash-node2",
-                "public-key": "03e8111baaa5f397271b7440cbdc31f15aee38e425c8050b06533f0dd032cfb2b6"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "instacash3.nem.io",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "instacash-node3",
-                "public-key": "0255d91d6a5579e5ab2c22530f6efdd4c8b0e9d308be5f0a4559d755f9f20da755"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "instacash4.nem.io",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "instacash-node4",
-                "public-key": "02f883ed845b1a3311497bb63ab08b2afc0c45f890ebb889738aff5720269ae96d"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "seishin.nem.io",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "instacash-node4",
-                "public-key": "03f78fb11f0808654754f9d50683b17b1a31c5b120a5348050f6acb113c1e517f7"
-            }
-        },
-        {
-            "endpoint": {
                 "host": "94.156.77.147",
                 "port": 7890,
                 "protocol": "http"
@@ -175,6 +120,28 @@
             "identity": {
                 "name": "nemtrader-jaded",
                 "public-key": "03c8f8b2efbc0e068457e2e3bd18bf370f79bf713c5eaa441cc325867090ddc1b4"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "5.249.147.16",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "rigel",
+                "public-key": "03f9e8e717e79d38096e5dfb7ec0e7ebe12ac803fed495d2c82d703d689db25ab9"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "87.121.52.165",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "nemdeck",
+                "public-key": "039e48b4b867ffc3028ed71f2627106d1005f37e889db3a78870302dcfb0485a2e"
             }
         },
         {
