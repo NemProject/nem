@@ -72,7 +72,6 @@ public class UndoBlockVisitorTest {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(amount);
 		account.getWeightedBalances().addReceive(BlockHeight.ONE, amount);
-		account.getWeightedBalances().historicalBalances.add(BlockHeight.ONE, amount);
 		return account;
 	}
 

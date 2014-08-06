@@ -15,8 +15,7 @@ public class MockBlockScorerAnalyzer extends AccountAnalyzer {
 	@Override
 	public void recalculateImportances(final BlockHeight blockHeight) {
 		for (final Account account : this) {
-			final HistoricalBalances historicalBalances = account.getWeightedBalances().historicalBalances;
-			final Amount balance = historicalBalances.getHistoricalBalance(blockHeight, blockHeight).getBalance();
+			final Amount balance = account.getWeightedBalances().getUnvested(blockHeight);
 			final double importance = balance.getNumMicroNem() / 1000.0;
 			account.getImportanceInfo().setImportance(blockHeight, importance);
 		}

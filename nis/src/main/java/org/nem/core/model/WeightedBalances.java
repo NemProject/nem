@@ -15,19 +15,16 @@ import java.util.stream.Collectors;
 public class WeightedBalances {
 
 	private final List<WeightedBalance> balances;
-	// TODO: this should not be a public field
-	public final HistoricalBalances historicalBalances;
 
 	/**
 	 * Creates a new weighted balances instance.
 	 */
 	public WeightedBalances() {
-		this(new ArrayList<>(), new HistoricalBalances());
+		this(new ArrayList<>());
 	}
 
-	private WeightedBalances(final List<WeightedBalance> balances, final HistoricalBalances historicalBalances) {
+	private WeightedBalances(final List<WeightedBalance> balances) {
 		this.balances = balances;
-		this.historicalBalances = historicalBalances;
 	}
 
 	/**
@@ -37,8 +34,7 @@ public class WeightedBalances {
 	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
-				balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()),
-				this.historicalBalances.copy());
+				balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()));
 	}
 
 	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
@@ -56,7 +52,6 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void addFullyVested(final BlockHeight height, final Amount amount) {
-		this.historicalBalances.add(height, amount);
 		this.balances.add(WeightedBalance.createVested(height, amount));
 	}
 	/**
@@ -66,8 +61,6 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
-		this.historicalBalances.add(height, amount);
-
 		if (! this.balances.isEmpty()) {
 			int idx = this.balances.size() - 1;
 			final WeightedBalance last = this.balances.get(idx);
@@ -88,8 +81,6 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void undoReceive(final BlockHeight height, final Amount amount) {
-		this.historicalBalances.subtract(height, amount);
-
 		this.undoChain(height);
 		int idx = this.balances.size() - 1;
 		final WeightedBalance last = this.balances.get(idx);
@@ -109,8 +100,6 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
-		this.historicalBalances.subtract(height, amount);
-
 		if (! this.balances.isEmpty()) {
 			int idx = this.balances.size() - 1;
 			final WeightedBalance last = this.balances.get(idx);
@@ -131,8 +120,6 @@ public class WeightedBalances {
 	 * @param amount The amount.
 	 */
 	public void undoSend(final BlockHeight height, final Amount amount) {
-		this.historicalBalances.add(height, amount);
-
 		this.undoChain(height);
 		int idx = this.balances.size() - 1;
 		final WeightedBalance last = this.balances.get(idx);
