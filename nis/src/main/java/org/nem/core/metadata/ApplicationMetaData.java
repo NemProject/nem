@@ -1,9 +1,8 @@
 package org.nem.core.metadata;
 
+import java.security.cert.X509Certificate;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
-
-import java.security.cert.X509Certificate;
 
 /**
  * Meta data information about the application.
@@ -45,7 +44,7 @@ public class ApplicationMetaData implements SerializableEntity {
 	 *
 	 * @param deserializer The deserializer
 	 */
-	public ApplicationMetaData(Deserializer deserializer) {
+	public ApplicationMetaData(final Deserializer deserializer) {
 		this.appName = deserializer.readString("application");
 		this.version = deserializer.readString("version");
 		this.certificateSigner = deserializer.readOptionalString("signer");
@@ -106,5 +105,25 @@ public class ApplicationMetaData implements SerializableEntity {
 		serializer.writeString("signer", this.certificateSigner);
 		TimeInstant.writeTo(serializer, "startTime", this.startTime);
 		TimeInstant.writeTo(serializer, "currentTime", this.getCurrentTime());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.appName.hashCode() ^
+				this.version.hashCode() ^
+				(this.certificateSigner == null ? 0 : this.certificateSigner.hashCode());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof ApplicationMetaData)) {
+			return false;
+		}
+
+		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
+		return this.appName.equals(rhs.appName) &&
+				this.version.equals(rhs.version) &&
+				((this.certificateSigner == null && rhs.certificateSigner == null) ||
+				this.certificateSigner.equals(rhs.certificateSigner));
 	}
 }
