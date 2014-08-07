@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.BlockChainConstants;
-import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
@@ -347,7 +347,7 @@ public class BlockChain implements BlockSynchronizer {
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
 			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer)));
+			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer), new BlockExecutor()));
 			visitors.add(scoreVisitor);
 			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 			BlockIterator.unwindUntil(
@@ -367,16 +367,16 @@ public class BlockChain implements BlockSynchronizer {
 				final boolean hasOwnChain) {
 
 				final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
-					this.accountAnalyzer,
-					this.originalAnalyzer,
-					this.blockScorer,
-					this.blockChainLastBlockLayer,
-					this.blockDao,
-					foraging,
-					dbParentBlock,
-					peerChain,
-					ourScore,
-					hasOwnChain);
+						this.accountAnalyzer,
+						this.originalAnalyzer,
+						this.blockScorer,
+						this.blockChainLastBlockLayer,
+						this.blockDao,
+						foraging,
+						dbParentBlock,
+						peerChain,
+						ourScore,
+						hasOwnChain);
 
 			final UpdateChainResult result = new UpdateChainResult();
 			result.validationResult = updateContext.update();
@@ -482,6 +482,7 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainValidator validator = new BlockChainValidator(
 					this.accountAnalyzer,
 					this.blockScorer,
+					new BlockExecutor(),
 					BlockChainConstants.BLOCKS_LIMIT);
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);

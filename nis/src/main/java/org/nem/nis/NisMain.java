@@ -9,11 +9,11 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class NisMain {
@@ -88,9 +88,7 @@ public class NisMain {
 				this.blockChain.updateScore(parentBlock, block);
 			}
 
-			block.subscribe(observer);
-			block.execute();
-			block.unsubscribe(observer);
+			new BlockExecutor().execute(block, Arrays.asList(observer));
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {

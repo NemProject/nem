@@ -23,7 +23,6 @@ public class Block extends VerifiableEntity {
 	private Hash prevBlockHash;
 
 	private final List<Transaction> transactions;
-	private final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
 
 	// these are helper fields and shouldn't be serialized
 	private BlockDifficulty difficulty;
@@ -52,8 +51,6 @@ public class Block extends VerifiableEntity {
 		this.height = height;
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
-
-		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	/**
@@ -83,7 +80,6 @@ public class Block extends VerifiableEntity {
 		this.transactions = deserializer.readObjectArray("transactions", TransactionFactory.VERIFIABLE);
 
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
-		this.blockTransferObservers.add(new WeightedBalancesObserver());
 	}
 
 	//region Getters
@@ -206,60 +202,6 @@ public class Block extends VerifiableEntity {
 		transactions.forEach(tx -> addTransaction(tx));
 	}
 
-	/**
-	 * Executes all transactions in the block.
-	 */
-	public void execute() {
-		final TransferObserver observer = this.createTransferObserver(true);
-
-		for (final Transaction transaction : this.transactions) {
-			transaction.execute();
-			transaction.execute(observer);
-		}
-
-		final Account signer = this.getSigner();
-		signer.incrementForagedBlocks();
-		signer.incrementBalance(this.getTotalFee());
-		observer.notifyCredit(this.getSigner(), this.getTotalFee());
-	}
-
-	/**
-	 * Undoes all transactions in the block.
-	 */
-	public void undo() {
-		final TransferObserver observer = this.createTransferObserver(false);
-
-		final Account signer = this.getSigner();
-		observer.notifyDebit(this.getSigner(), this.getTotalFee());
-		signer.decrementForagedBlocks();
-		signer.decrementBalance(this.getTotalFee());
-
-		for (final Transaction transaction : this.getReverseTransactions()) {
-			transaction.undo(observer);
-			transaction.undo();
-		}
-	}
-
-	private Iterable<Transaction> getReverseTransactions() {
-		return () -> new ReverseListIterator<>(transactions);
-	}
-
-	private TransferObserver createTransferObserver(final boolean isExecute) {
-		final TransferObserver aggregateObserver = new AggregateBlockTransferObserverToTransferObserverAdapter(
-				this.blockTransferObservers,
-				this.height,
-				isExecute);
-		final TransferObserver outlinkObserver = new OutlinkObserver(this.height, isExecute);
-
-		// in an undo operation, the OutlinkObserver should be run before the balance is updated
-		// (so that the matching link can be found and removed)
-		final List<TransferObserver> observers = Arrays.asList(aggregateObserver, outlinkObserver);
-		if (!isExecute)
-			Collections.reverse(observers);
-
-		return new AggregateTransferObserver(observers);
-	}
-
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeObject("prevBlockHash", this.prevBlockHash);
@@ -271,23 +213,5 @@ public class Block extends VerifiableEntity {
 	@Override
 	public String toString() {
 		return String.format("height: %d, #tx: %d", this.height.getRaw(), this.transactions.size());
-	}
-
-	/**
-	 * Subscribes the observer to transfers initiated by this block.
-	 *
-	 * @param observer The observer.
-	 */
-	public void subscribe(final BlockTransferObserver observer) {
-		this.blockTransferObservers.add(observer);
-	}
-
-	/**
-	 * Unsubscribes the observer from transfers initiated by this block.
-	 *
-	 * @param observer The observer.
-	 */
-	public void unsubscribe(final BlockTransferObserver observer) {
-		this.blockTransferObservers.remove(observer);
 	}
 }

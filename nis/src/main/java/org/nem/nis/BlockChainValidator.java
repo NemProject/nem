@@ -3,9 +3,10 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.service.BlockExecutor;
 
 import java.math.BigInteger;
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -16,17 +17,26 @@ public class BlockChainValidator {
 	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
 	private final AccountAnalyzer accountAnalyzer;
-	private final int maxChainSize;
 	private final BlockScorer scorer;
+	private final BlockExecutor executor;
+	private final int maxChainSize;
 
 	/**
 	 * Creates a new block chain validator.
 	 *
+	 * @param accountAnalyzer The account analyzer to use.
 	 * @param scorer The block scorer to use.
+	 * @param executor The block executor to use.
+	 * @param maxChainSize The maximum chain size.
 	 */
-	public BlockChainValidator(final AccountAnalyzer accountAnalyzer, final BlockScorer scorer, final int maxChainSize) {
+	public BlockChainValidator(
+			final AccountAnalyzer accountAnalyzer,
+			final BlockScorer scorer,
+			final BlockExecutor executor,
+			final int maxChainSize) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.scorer = scorer;
+		this.executor = executor;
 		this.maxChainSize = maxChainSize;
 	}
 
@@ -73,10 +83,9 @@ public class BlockChainValidator {
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();
 
-			block.subscribe(observer);
-			block.execute();
-			block.unsubscribe(observer);
+			this.executor.execute(block, Arrays.asList(observer));
 		}
+
 		return true;
 	}
 
