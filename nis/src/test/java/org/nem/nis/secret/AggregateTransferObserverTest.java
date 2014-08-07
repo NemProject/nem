@@ -1,7 +1,8 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 

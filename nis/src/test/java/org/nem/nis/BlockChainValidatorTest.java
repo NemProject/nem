@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.PoiImportanceGenerator;
+import org.nem.nis.secret.BlockTransferObserver;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.test.MockBlockScorer;
 

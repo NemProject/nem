@@ -1,5 +1,6 @@
-package org.nem.core.model;
+package org.nem.nis.secret;
 
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 
 import java.util.List;
