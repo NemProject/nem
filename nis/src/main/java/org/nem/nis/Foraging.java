@@ -26,8 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 // fork resolution should solve the rest
 //
 public class Foraging {
-	private static final Logger LOGGER =
-			Logger.getLogger(BlockChain.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private static final int TRANSACTION_MAX_ALLOWED_TIME_DEVIATION = 30;
 
 	private final ConcurrentHashSet<Account> unlockedAccounts;
@@ -62,11 +61,7 @@ public class Foraging {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
-		final PoiAccountInfo accountInfo =
-				new PoiAccountInfo(
-						-1,
-						account,
-						new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
+		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, account, new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
 		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}
@@ -141,12 +136,10 @@ public class Foraging {
 	public ValidationResult processTransaction(final Transaction transaction) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		// rest is checked by isValid()
-		if (transaction.getTimeStamp().compareTo(
-				currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
-		if (transaction.getTimeStamp().compareTo(
-				currentTime.addSeconds(-TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) < 0) {
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) < 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
@@ -217,12 +210,7 @@ public class Foraging {
 			return null;
 		}
 
-		LOGGER.fine("block generation " +
-				Integer.toString(this.unconfirmedTransactions.size())
-				+
-				" "
-				+
-				Integer.toString(this.unlockedAccounts.size()));
+		LOGGER.fine("block generation " + Integer.toString(this.unconfirmedTransactions.size()) + " " + Integer.toString(this.unlockedAccounts.size()));
 
 		Block bestBlock = null;
 		long bestScore = Long.MIN_VALUE;
@@ -230,56 +218,35 @@ public class Foraging {
 
 		final TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
-		final Collection<Transaction> transactionList =
-				this.getUnconfirmedTransactionsForNewBlock(blockTime);
+		final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime);
 		try {
 			synchronized (this.blockChainLastBlockLayer) {
-				final org.nem.nis.dbmodel.Block dbLastBlock =
-						this.blockChainLastBlockLayer.getLastDbBlock();
-				final Block lastBlock =
-						BlockMapper.toModel(dbLastBlock, this.accountLookup);
-				final BlockDifficulty difficulty =
-						this.calculateDifficulty(blockScorer, lastBlock);
+				final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
+				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
 				for (final Account virtualForger : this.unlockedAccounts) {
 					// Don't allow a harvester to include his own transactions
-					final Collection<Transaction> eligibleTxList =
-							this.filterTransactionsForHarvester(
-									transactionList, virtualForger);
+					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, virtualForger);
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
-					final Block newBlock =
-							this.createSignedBlock(blockTime, eligibleTxList,
-									lastBlock, virtualForger, difficulty);
+					final Block newBlock = this.createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
 
-					LOGGER.info(String.format("generated signature: %s",
-							newBlock.getSignature()));
+					LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
 					final BigInteger hit = blockScorer.calculateHit(newBlock);
 					LOGGER.info("   hit: 0x" + hit.toString(16));
-					final BigInteger target =
-							blockScorer.calculateTarget(lastBlock, newBlock);
+					final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
 					LOGGER.info("target: 0x" + target.toString(16));
-					LOGGER.info("difficulty: " + (difficulty.getRaw() * 100L)
-							/
-							BlockDifficulty.INITIAL_DIFFICULTY.getRaw()
-							+
-							"%");
+					LOGGER.info("difficulty: " + (difficulty.getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
 					if (hit.compareTo(target) < 0) {
-						LOGGER.info("[HIT] forger balance: " +
-								blockScorer.calculateForgerBalance(newBlock));
-						LOGGER.info("[HIT] last block: " +
-								dbLastBlock.getShortId());
-						LOGGER.info("[HIT] timestamp diff: " +
-								newBlock.getTimeStamp().subtract(
-										lastBlock.getTimeStamp()));
-						LOGGER.info("[HIT] block diff: " +
-								newBlock.getDifficulty());
+						LOGGER.info("[HIT] forger balance: " + blockScorer.calculateForgerBalance(newBlock));
+						LOGGER.info("[HIT] last block: " + dbLastBlock.getShortId());
+						LOGGER.info("[HIT] timestamp diff: " + newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp()));
+						LOGGER.info("[HIT] block diff: " + newBlock.getDifficulty());
 
-						final long score =
-								blockScorer.calculateBlockScore(lastBlock,
-										newBlock);
+						final long score = blockScorer.calculateBlockScore(lastBlock, newBlock);
 						if (score > bestScore) {
 							bestBlock = newBlock;
 							bestScore = score;
@@ -298,17 +265,10 @@ public class Foraging {
 
 	private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final Block lastBlock) {
 		final BlockHeight blockHeight =
-				new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() -
-						BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION
-						+
-						1));
-		final int limit =
-				(int)Math.min(lastBlock.getHeight().getRaw(),
-						(BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
-		final List<TimeInstant> timestamps =
-				this.blockDao.getTimestampsFrom(blockHeight, limit);
-		final List<BlockDifficulty> difficulties =
-				this.blockDao.getDifficultiesFrom(blockHeight, limit);
+				new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+		final int limit = (int)Math.min(lastBlock.getHeight().getRaw(), (BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
+		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 		return scorer.calculateDifficulty(difficulties, timestamps);
 	}
 
@@ -318,8 +278,7 @@ public class Foraging {
 			final Block lastBlock,
 			final Account virtualForger,
 			final BlockDifficulty difficulty) {
-		final Account forger =
-				this.accountLookup.findByAddress(virtualForger.getAddress());
+		final Account forger = this.accountLookup.findByAddress(virtualForger.getAddress());
 
 		// TODO: Probably better to include difficulty in the block constructor?
 		final Block newBlock = new Block(forger, lastBlock, blockTime);
