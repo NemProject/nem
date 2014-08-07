@@ -292,8 +292,8 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 
 		// Assert:
-		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block1), Mockito.any());
-		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block2), Mockito.any());
+		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block1), Mockito.any(BlockTransferObserver.class));
+		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block2), Mockito.any(BlockTransferObserver.class));
 	}
 
 	@Test

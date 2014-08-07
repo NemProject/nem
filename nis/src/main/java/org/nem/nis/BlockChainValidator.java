@@ -83,7 +83,7 @@ public class BlockChainValidator {
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();
 
-			this.executor.execute(block, Arrays.asList(observer));
+			this.executor.execute(block, observer);
 		}
 
 		return true;

@@ -25,6 +25,16 @@ public class BlockExecutor {
 	}
 
 	/**
+	 * Executes all transactions in the block with a custom observer.
+	 *
+	 * @param block The block.
+	 * @param observer The observer.
+	 */
+	public void execute(final Block block, final BlockTransferObserver observer) {
+		this.execute(block, Arrays.asList(observer));
+	}
+
+	/**
 	 * Executes all transactions in the block with custom observers.
 	 *
 	 * @param block The block.
@@ -55,6 +65,16 @@ public class BlockExecutor {
 	 */
 	public void undo(final Block block) {
 		this.undo(block, new ArrayList<>());
+	}
+
+	/**
+	 * Undoes all transactions in the block with a custom observer.
+	 *
+	 * @param block The block.
+	 * @param observer The observer.
+	 */
+	public void undo(final Block block, final BlockTransferObserver observer) {
+		this.undo(block, Arrays.asList(observer));
 	}
 
 	/**

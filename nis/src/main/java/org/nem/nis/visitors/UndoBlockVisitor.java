@@ -3,8 +3,6 @@ package org.nem.nis.visitors;
 import org.nem.core.model.*;
 import org.nem.nis.service.BlockExecutor;
 
-import java.util.Arrays;
-
 /**
  * Block visitor that undoes all blocks.
  */
@@ -27,6 +25,6 @@ public class UndoBlockVisitor implements BlockVisitor {
 	
 	@Override
 	public void visit(final Block parentBlock, final Block block) {
-		this.executor.undo(block, Arrays.asList(this.observer));
+		this.executor.undo(block, this.observer);
 	}
 }

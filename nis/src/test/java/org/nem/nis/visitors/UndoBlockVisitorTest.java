@@ -5,8 +5,6 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.nis.service.BlockExecutor;
 
-import java.util.Arrays;
-
 public class UndoBlockVisitorTest {
 
 	@Test
@@ -19,7 +17,7 @@ public class UndoBlockVisitorTest {
 		context.visitor.visit(null, block);
 
 		// Assert:
-		Mockito.verify(context.executor, Mockito.times(1)).undo(block, Arrays.asList(context.observer));
+		Mockito.verify(context.executor, Mockito.times(1)).undo(block, context.observer);
 	}
 
 	private static class TestContext {

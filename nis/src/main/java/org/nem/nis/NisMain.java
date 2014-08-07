@@ -88,7 +88,7 @@ public class NisMain {
 				this.blockChain.updateScore(parentBlock, block);
 			}
 
-			new BlockExecutor().execute(block, Arrays.asList(observer));
+			new BlockExecutor().execute(block, observer);
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {

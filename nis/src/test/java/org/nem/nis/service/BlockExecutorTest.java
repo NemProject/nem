@@ -9,7 +9,6 @@ import org.nem.core.test.*;
 import org.nem.nis.secret.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class BlockExecutorTest {
 
@@ -196,7 +195,11 @@ public class BlockExecutorTest {
 		final BlockExecutor executor = createBlockExecutor();
 
 		// Act:
-		executor.execute(block, observers);
+		if (1 == observers.size()) {
+			executor.execute(block, observers.get(0));
+		} else {
+			executor.execute(block, observers);
+		}
 
 		// Assert:
 		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
