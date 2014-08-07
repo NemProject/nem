@@ -13,6 +13,7 @@ import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.AccountIoAdapter;
 
 public class AccountControllerTest {

@@ -4,7 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.secret.WeightedBalances;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 

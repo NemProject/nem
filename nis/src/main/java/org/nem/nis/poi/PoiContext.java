@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.secret.AccountImportance;
 
 import java.util.*;
 

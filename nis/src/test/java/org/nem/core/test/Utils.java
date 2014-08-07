@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.secret.AccountLink;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

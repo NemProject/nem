@@ -6,6 +6,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.secret.*;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;

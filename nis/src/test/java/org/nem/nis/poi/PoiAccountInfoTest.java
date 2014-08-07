@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.MockAccount;
 
 import java.util.*;
