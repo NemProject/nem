@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.nis.secret.AccountImportance;
 
 import java.util.function.Function;
 
@@ -15,16 +14,13 @@ public class AccountInfoTest {
 
 	@Test
 	public void infoCanBeCreatedWithoutPublicKey() {
-		// Arrange:
-		final AccountImportance importance = new AccountImportance();
-
 		// Act:
 		final AccountInfo info = new AccountInfo(
 				Address.fromEncoded("test"),
 				Amount.fromNem(1234),
 				new BlockAmount(7),
 				"my account",
-				importance);
+				2.3);
 
 		// Assert:
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
@@ -32,14 +28,13 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
-		Assert.assertThat(info.getImportanceInfo(), IsEqual.equalTo(importance));
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
 
 	@Test
 	public void infoCanBeCreatedWithPublicKey() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountImportance importance = new AccountImportance();
 
 		// Act:
 		final AccountInfo info = new AccountInfo(
@@ -47,7 +42,7 @@ public class AccountInfoTest {
 				Amount.fromNem(1234),
 				new BlockAmount(7),
 				"my account",
-				importance);
+				2.3);
 
 		// Assert:
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
@@ -55,7 +50,7 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
-		Assert.assertThat(info.getImportanceInfo(), IsEqual.equalTo(importance));
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
 
 
@@ -97,17 +92,6 @@ public class AccountInfoTest {
 		assertAccountRoundTrip(address, null);
 	}
 
-	@Test
-	public void canRoundTripUnsetAccountImportance() {
-		// Act:
-		final AccountInfo accountInfo = new AccountInfo(Utils.roundtripSerializableEntity(
-				new AccountInfo(Address.fromEncoded("blah"), Amount.ZERO, BlockAmount.ZERO, null, new AccountImportance()),
-				null));
-
-		// Assert:
-		Assert.assertThat(accountInfo.getImportanceInfo().isSet(), IsEqual.equalTo(false));
-	}
-
 	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
 		// Assert:
 		assertAccountRoundTrip(address, AccountInfo::new, expectedPublicKey);
@@ -138,7 +122,7 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 
-		Assert.assertThat(info.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
 
 	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
@@ -156,10 +140,7 @@ public class AccountInfoTest {
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
-
-		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
-		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
+		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
 
 		// 6 "real" properties and 1 "hidden" (ordering) property
 		final int expectedProperties = 6 + 1;
@@ -168,14 +149,12 @@ public class AccountInfoTest {
 
 	private static AccountInfo createAccountInfoForSerializationTests(final Address address) {
 		// Arrange:
-		final AccountImportance importance = new AccountImportance();
-		importance.setImportance(new BlockHeight(123), 0.796);
 		return new AccountInfo(
 				address,
 				Amount.fromNem(747),
 				new BlockAmount(3),
 				"alpha gamma",
-				importance);
+				2.3);
 	}
 
 	//endregion

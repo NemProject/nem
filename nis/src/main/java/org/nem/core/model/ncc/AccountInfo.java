@@ -4,7 +4,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.secret.*;
 
 /**
  * Represents an external view of an account.
@@ -15,7 +14,7 @@ public class AccountInfo implements SerializableEntity {
 	private final Amount balance;
 	private final BlockAmount numForagedBlocks;
 	private final String label;
-	private final AccountImportance importance;
+	private final double importance;
 
 	/**
 	 * Creates a new account view model.
@@ -31,9 +30,9 @@ public class AccountInfo implements SerializableEntity {
 			final Amount balance,
 			final BlockAmount numForagedBlocks,
 			final String label,
-			final AccountImportance importance) {
+			final double importance) {
 		this.address = address;
-		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());;
+		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
 		this.numForagedBlocks = numForagedBlocks;
 		this.label = label;
@@ -51,7 +50,7 @@ public class AccountInfo implements SerializableEntity {
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.numForagedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
 		this.label = deserializer.readOptionalString("label");
-		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
+		this.importance = deserializer.readDouble("importance");
 	}
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
@@ -106,11 +105,11 @@ public class AccountInfo implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the importance information associated with this account.
+	 * Gets the importance associated with this account.
 	 *
-	 * @return The importance information associated with this account.
+	 * @return The importance associated with this account.
 	 */
-	public AccountImportance getImportanceInfo() {
+	public double getImportance() {
 		return this.importance;
 	}
 
@@ -123,6 +122,6 @@ public class AccountInfo implements SerializableEntity {
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getNumForagedBlocks());
 		serializer.writeString("label", this.getLabel());
 
-		serializer.writeObject("importance", this.getImportanceInfo());
+		serializer.writeDouble("importance", this.getImportance());
 	}
 }

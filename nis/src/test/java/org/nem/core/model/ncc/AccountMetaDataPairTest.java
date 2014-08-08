@@ -41,7 +41,7 @@ public class AccountMetaDataPairTest {
 		// Arrange:
 		final AccountMetaData metaData = new AccountMetaData(status);
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
-				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, new AccountImportance()),
+				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
 				metaData);
 
 		// Act:

@@ -29,7 +29,29 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfo() {
+	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSet() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Account account = createAccount(address);
+		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
+		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
+		Mockito.when(accountLookup.findByAddress(address)).thenReturn(account);
+		final AccountInfoFactory factory = new AccountInfoFactory(accountLookup);
+
+		// Act:
+		final AccountInfo info = factory.createInfo(address);
+
+		// Assert:
+		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
+		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(0.796));
+	}
+
+	@Test
+	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsUnset() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final Account account = createAccount(address);
@@ -46,7 +68,7 @@ public class AccountInfoFactoryTest {
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(info.getImportanceInfo().getImportance(new BlockHeight(123)), IsEqual.equalTo(0.796));
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(0.0));
 	}
 
 	private static Account createAccount(final Address address) {
@@ -57,7 +79,6 @@ public class AccountInfoFactoryTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
-		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
