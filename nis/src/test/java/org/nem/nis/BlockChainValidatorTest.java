@@ -8,13 +8,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.PoiImportanceGenerator;
-import org.nem.nis.secret.BlockTransferObserver;
-import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.test.MockBlockScorer;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class BlockChainValidatorTest {
 
@@ -277,9 +275,10 @@ public class BlockChainValidatorTest {
 	//region block execution
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void validatorCallsExecuteOnEachBlock() {
 		// Arrange:
-		final BlockExecutor executor = Mockito.mock(BlockExecutor.class);
+		final Consumer<Block> executor = (Consumer<Block>)Mockito.mock(Consumer.class);
 		final BlockChainValidator validator = createValidator(executor);
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
@@ -293,54 +292,8 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 
 		// Assert:
-		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block1), Mockito.any(BlockTransferObserver.class));
-		Mockito.verify(executor, Mockito.times(1)).execute(Mockito.eq(block2), Mockito.any(BlockTransferObserver.class));
-	}
-
-	@Test
-	public void validatorUpdatesAccountHeights() {
-		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
-		final Account recipient1 = accountAnalyzer.addAccountToCache(Utils.generateRandomAddress());
-		final Account recipient2 = accountAnalyzer.addAccountToCache(Utils.generateRandomAddress());
-		final Account recipient3 = accountAnalyzer.addAccountToCache(Utils.generateRandomAddress());
-		final Account recipient4 = accountAnalyzer.addAccountToCache(Utils.generateRandomAddress());
-
-		final BlockChainValidator validator = createValidator(accountAnalyzer);
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final Block block1 = createSignedBlockWithTransfers(parentBlock, recipient1);
-		final Block block2 = createSignedBlockWithTransfers(block1, recipient2, recipient3);
-		final Block block3 = createSignedBlockWithTransfers(block2, recipient4, recipient1);
-		final List<Block> blocks = Arrays.asList(block1, block2, block3);
-
-		// Act:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
-
-		// Assert:
-		Assert.assertThat(recipient1.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
-		Assert.assertThat(recipient2.getHeight(), IsEqual.equalTo(new BlockHeight(13)));
-		Assert.assertThat(recipient3.getHeight(), IsEqual.equalTo(new BlockHeight(13)));
-		Assert.assertThat(recipient4.getHeight(), IsEqual.equalTo(new BlockHeight(14)));
-	}
-
-	private static Block createSignedBlockWithTransfers(final Block parentBlock, final Account... recipients) {
-		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, TimeInstant.ZERO);
-
-		final Account sender = Utils.generateRandomAccount();
-		final Amount senderAmount = Amount.fromNem(100 * recipients.length);
-		sender.incrementBalance(senderAmount);
-		sender.getWeightedBalances().addReceive(BlockHeight.ONE, senderAmount);
-
-		for (final Account recipient : recipients) {
-			final MockTransaction transaction = createValidSignedTransaction();
-			transaction.setTransferAction(observer -> observer.notifyTransfer(sender, recipient, Amount.fromNem(90)));
-			block.addTransaction(transaction);
-		}
-
-		block.sign();
-		return block;
+		Mockito.verify(executor, Mockito.times(1)).accept(block1);
+		Mockito.verify(executor, Mockito.times(1)).accept(block2);
 	}
 
 	//endregion
@@ -410,12 +363,6 @@ public class BlockChainValidatorTest {
 		return transaction;
 	}
 
-	private static AccountAnalyzer createMockAccountAnalyzer() {
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
-		Mockito.when(accountAnalyzer.findByAddress(Mockito.anyObject())).thenReturn(Utils.generateRandomAccount());
-		return accountAnalyzer;
-	}
-
 	private static BlockScorer createMockBlockScorer() {
 		final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		Mockito.when(scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -424,19 +371,11 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(createMockAccountAnalyzer(), scorer, new BlockExecutor(), 21);
+		return new BlockChainValidator(block -> { }, scorer, 21);
 	}
 
-	private static BlockChainValidator createValidator(final AccountAnalyzer accountAnalyzer) {
-		return new BlockChainValidator(accountAnalyzer, createMockBlockScorer(), new BlockExecutor(), 21);
-	}
-
-	private static BlockChainValidator createValidator(final BlockExecutor executor) {
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
-		Mockito.when(accountAnalyzer.findByAddress(Mockito.anyObject())).thenReturn(Utils.generateRandomAccount());
-
-
-		return new BlockChainValidator(createMockAccountAnalyzer(), createMockBlockScorer(), executor, 21);
+	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21);
 	}
 
 	private static BlockChainValidator createValidator() {
