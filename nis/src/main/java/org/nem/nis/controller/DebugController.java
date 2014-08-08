@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
@@ -81,17 +81,18 @@ public class DebugController {
 	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
 		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
 		final AccountAnalyzer accountAnalyzer = this.blockChain.copyAccountAnalyzer();
+		final AccountLookup accountLookup = accountAnalyzer.getAccountCache();
 
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
-		final Block block = BlockMapper.toModel(dbBlock, accountAnalyzer);
+		final Block block = BlockMapper.toModel(dbBlock, accountLookup);
 
 		final org.nem.nis.dbmodel.Block dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
-		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountAnalyzer);
+		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountLookup);
 
 		// this API can be called for any block in the chain, so we need to force an importance recalculation
 		// because we want the returned importances to be relative to the requested height
 		// (note that the recalculation is done on a copy of the AccountAnalyzer so it will not impact the real block-chain)
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 		scorer.forceImportanceCalculation();
 
 		final BigInteger hit = scorer.calculateHit(block);
