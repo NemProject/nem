@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
-import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.secret.*;
@@ -11,23 +10,7 @@ import java.util.*;
 /**
  * A NEM account.
  */
-public class Account implements SerializableEntity {
-
-	/**
-	 * Enumeration of deserialization options.
-	 */
-	public enum DeserializationOptions {
-		/**
-		 * The serialized data only includes summary account information.
-		 */
-		SUMMARY,
-
-		/**
-		 * The serialized data includes all account information.
-		 */
-		ALL
-	}
-
+public class Account {
 	private KeyPair keyPair;
 	private Address address;
 	private final List<Message> messages;
@@ -149,67 +132,6 @@ public class Account implements SerializableEntity {
 	 */
 	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
 		return new Account(this, keyPair);
-	}
-
-	/**
-	 * Deserializes an account. Currently this deserializer is used ONLY by NCC.
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public Account(final Deserializer deserializer) {
-		this(deserializer, DeserializationOptions.SUMMARY);
-	}
-
-	/**
-	 * Deserializes an account. Currently this deserializer is used ONLY by NCC.
-	 *
-	 * @param deserializer The deserializer.
-	 * @param options The deserialization options.
-	 */
-	public Account(final Deserializer deserializer, final DeserializationOptions options) {
-		this(deserializeAddress(deserializer));
-
-		this.balance = Amount.readFrom(deserializer, "balance");
-		this.foragedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
-		this.label = deserializer.readOptionalString("label");
-		this.importance = deserializer.readObject("importance", AccountImportance.DESERIALIZER);
-
-		if (DeserializationOptions.ALL == options)
-			this.messages.addAll(deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER));
-	}
-
-	private static Address deserializeAddress(final Deserializer deserializer) {
-		final Address addressWithoutPublicKey = Address.readFrom(deserializer, "address", AddressEncoding.COMPRESSED);
-		final Address addressWithPublicKey = Address.readFrom(deserializer, "publicKey", AddressEncoding.PUBLIC_KEY);
-		return null != addressWithPublicKey ? addressWithPublicKey : addressWithoutPublicKey;
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		this.serialize(serializer, false);
-	}
-
-	private void serialize(final Serializer serializer, final boolean isSummary) {
-		writeTo(serializer, "address", this, AddressEncoding.COMPRESSED);
-		writeTo(serializer, "publicKey", this, AddressEncoding.PUBLIC_KEY);
-
-		Amount.writeTo(serializer, "balance", this.getBalance());
-		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
-		serializer.writeString("label", this.getLabel());
-
-		serializer.writeObject("importance", this.getImportanceInfo());
-
-		if (!isSummary)
-			serializer.writeObjectArray("messages", this.getMessages());
-	}
-
-	/**
-	 * Returns a summary serializable entity for the current entity.
-	 *
-	 * @return A summary serializable entity.
-	 */
-	public SerializableEntity asSummary() {
-		return serializer -> this.serialize(serializer, true);
 	}
 
 	/**

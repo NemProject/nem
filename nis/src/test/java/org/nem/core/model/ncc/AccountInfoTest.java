@@ -99,14 +99,13 @@ public class AccountInfoTest {
 
 	@Test
 	public void canRoundTripUnsetAccountImportance() {
-		// Arrange:
-		final Account original = Utils.generateRandomAccount();
-
 		// Act:
-		final Account account = new Account(Utils.roundtripSerializableEntity(original, null));
+		final AccountInfo accountInfo = new AccountInfo(Utils.roundtripSerializableEntity(
+				new AccountInfo(Address.fromEncoded("blah"), Amount.ZERO, BlockAmount.ZERO, null, new AccountImportance()),
+				null));
 
 		// Assert:
-		Assert.assertThat(account.getImportanceInfo().isSet(), IsEqual.equalTo(false));
+		Assert.assertThat(accountInfo.getImportanceInfo().isSet(), IsEqual.equalTo(false));
 	}
 
 	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
