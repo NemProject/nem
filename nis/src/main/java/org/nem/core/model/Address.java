@@ -158,19 +158,66 @@ public class Address {
 	 * @param address    The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Address address) {
-		serializer.writeString(label, address.getEncoded());
+		writeTo(serializer, label, address, AddressEncoding.COMPRESSED);
+	}
+
+	/**
+	 * Writes an address object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label The optional label.
+	 * @param address The object.
+	 * @param encoding The address encoding mode.
+	 */
+	public static void writeTo(
+			final Serializer serializer,
+			final String label,
+			final Address address,
+			final AddressEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				serializer.writeBytes(label, null == address.publicKey ? null : address.publicKey.getRaw());
+				break;
+
+			case COMPRESSED:
+			default:
+				serializer.writeString(label, address.getEncoded());
+				break;
+		}
 	}
 
 	/**
 	 * Reads an address object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static Address readFrom(final Deserializer deserializer, final String label) {
-		final String encodedAddress = deserializer.readString(label);
-		return Address.fromEncoded(encodedAddress);
+		return readFrom(deserializer, label, AddressEncoding.COMPRESSED);
+	}
+
+	/**
+	 * Reads an address object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param encoding The address encoding.
+	 * @param label The optional label.
+	 * @return The read object.
+	 */
+	public static Address readFrom(
+			final Deserializer deserializer,
+			final String label,
+			final AddressEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
+				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
+
+			case COMPRESSED:
+			default:
+				final String encodedAddress = deserializer.readString(label);
+				return Address.fromEncoded(encodedAddress);
+		}
 	}
 }

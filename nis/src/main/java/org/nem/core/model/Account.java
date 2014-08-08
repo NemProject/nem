@@ -179,8 +179,8 @@ public class Account implements SerializableEntity {
 	}
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
-		final Address addressWithoutPublicKey = readAddress(deserializer, "address", AccountEncoding.ADDRESS);
-		final Address addressWithPublicKey = readAddress(deserializer, "publicKey", AccountEncoding.PUBLIC_KEY);
+		final Address addressWithoutPublicKey = Address.readFrom(deserializer, "address", AddressEncoding.COMPRESSED);
+		final Address addressWithPublicKey = Address.readFrom(deserializer, "publicKey", AddressEncoding.PUBLIC_KEY);
 		return null != addressWithPublicKey ? addressWithPublicKey : addressWithoutPublicKey;
 	}
 
@@ -190,8 +190,8 @@ public class Account implements SerializableEntity {
 	}
 
 	private void serialize(final Serializer serializer, final boolean isSummary) {
-		writeTo(serializer, "address", this, AccountEncoding.ADDRESS);
-		writeTo(serializer, "publicKey", this, AccountEncoding.PUBLIC_KEY);
+		writeTo(serializer, "address", this, AddressEncoding.COMPRESSED);
+		writeTo(serializer, "publicKey", this, AddressEncoding.PUBLIC_KEY);
 
 		Amount.writeTo(serializer, "balance", this.getBalance());
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getForagedBlocks());
@@ -420,7 +420,7 @@ public class Account implements SerializableEntity {
 	 * @param account The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Account account) {
-		writeTo(serializer, label, account, AccountEncoding.ADDRESS);
+		writeTo(serializer, label, account, AddressEncoding.COMPRESSED);
 	}
 
 	/**
@@ -435,18 +435,8 @@ public class Account implements SerializableEntity {
 			final Serializer serializer,
 			final String label,
 			final Account account,
-			final AccountEncoding encoding) {
-		switch (encoding) {
-            case PUBLIC_KEY:
-                final KeyPair keyPair = account.getKeyPair();
-                serializer.writeBytes(label, null != keyPair ? keyPair.getPublicKey().getRaw() : null);
-                break;
-
-            case ADDRESS:
-            default:
-                Address.writeTo(serializer, label, account.getAddress());
-                break;
-		}
+			final AddressEncoding encoding) {
+		Address.writeTo(serializer, label, account.getAddress(), encoding);
 	}
 
 	/**
@@ -458,7 +448,7 @@ public class Account implements SerializableEntity {
 	 * @return The read object.
 	 */
 	public static Account readFrom(final Deserializer deserializer, final String label) {
-		return readFrom(deserializer, label, AccountEncoding.ADDRESS);
+		return readFrom(deserializer, label, AddressEncoding.COMPRESSED);
 	}
 
 	/**
@@ -472,24 +462,10 @@ public class Account implements SerializableEntity {
 	 */
 	public static Account readFrom(
 			final Deserializer deserializer,
-			final String label, final AccountEncoding encoding) {
-		final Address address = readAddress(deserializer, label, encoding);
-		return deserializer.getContext().findAccountByAddress(address);
-	}
-
-	private static Address readAddress(
-			final Deserializer deserializer,
 			final String label,
-			final AccountEncoding encoding) {
-		switch (encoding) {
-		case PUBLIC_KEY:
-			final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
-			return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
-
-		case ADDRESS:
-		default:
-			return Address.readFrom(deserializer, label);
-		}
+			final AddressEncoding encoding) {
+		final Address address = Address.readFrom(deserializer, label, encoding);
+		return deserializer.getContext().findAccountByAddress(address);
 	}
 
 	//endregion

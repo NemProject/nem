@@ -3,7 +3,7 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
@@ -203,35 +203,120 @@ public class AddressTest {
 	//region inline serialization
 
 	@Test
-	public void canWriteAddress() {
+	public void canWriteAddressWithDefaultEncoding() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final Address address = Address.fromEncoded("MockAcc");
+		final Address address = Address.fromEncoded("BlahAddress");
 
 		// Act:
-		Address.writeTo(serializer, "Address", address);
+		Address.writeTo(serializer, "address", address);
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Address"), IsEqual.equalTo(address.getEncoded()));
+		Assert.assertThat(object.get("address"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test
-	public void canRoundtripAddress() {
+	public void canWriteAddressWithAddressEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("BlahAddress");
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.COMPRESSED,
+				address.getEncoded());
+	}
+
+	@Test
+	public void canWriteAddressWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Address.fromPublicKey((new KeyPair()).getPublicKey());
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.PUBLIC_KEY,
+				address.getPublicKey().toString());
+	}
+
+	@Test
+	public void canWriteAddressThatDoesNotHavePublicKeyWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("BlahAddress");
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.PUBLIC_KEY,
+				null);
+	}
+
+	private static void assertCanWriteAddressWithEncoding(
+			final Address address,
+			final AddressEncoding encoding,
+			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final Address originalAddress = Address.fromEncoded("MockAcc");
 
 		// Act:
-		Address.writeTo(serializer, "Address", originalAddress);
+		Address.writeTo(serializer, "address", address, encoding);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("address"), IsEqual.equalTo(expectedSerializedString));
+	}
+
+	@Test
+	public void canRoundtripAddressWithDefaultEncoding() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address originalAddress = Address.fromEncoded("BlahAddress");
+
+		// Act:
+		Address.writeTo(serializer, "address", originalAddress);
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Address address = Address.readFrom(deserializer, "address");
+
+		// Assert:
+		Assert.assertThat(originalAddress, IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void canRoundtripAddressWithAddressEncoding() {
+		// Assert:
+		assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false);
+	}
+
+	@Test
+	public void canRoundtripAddressWithPublicKeyEncoding() {
+		// Assert:
+		assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true);
+	}
+
+	private void assertAddressRoundTripInMode(final AddressEncoding encoding, final boolean isPublicKeyPreserved) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address originalAddress = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		Address.writeTo(serializer, "address", originalAddress, encoding);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
-		final Address address = Address.readFrom(deserializer, "Address");
+		final Address address = Address.readFrom(deserializer, "address", encoding);
 
 		// Assert:
 		Assert.assertThat(address, IsEqual.equalTo(originalAddress));
+		if (isPublicKeyPreserved) {
+			Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(originalAddress.getPublicKey()));
+		} else {
+			Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		}
 	}
+
+	//endregion
 
 	//endregion
 

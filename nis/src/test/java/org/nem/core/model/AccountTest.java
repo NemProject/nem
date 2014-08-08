@@ -645,7 +645,7 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(address),
-				AccountEncoding.ADDRESS,
+				AddressEncoding.COMPRESSED,
 				address.getEncoded());
 	}
 
@@ -657,7 +657,7 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(kp),
-				AccountEncoding.PUBLIC_KEY,
+				AddressEncoding.PUBLIC_KEY,
 				kp.getPublicKey().toString());
 	}
 
@@ -669,13 +669,13 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(address),
-				AccountEncoding.PUBLIC_KEY,
+				AddressEncoding.PUBLIC_KEY,
 				null);
 	}
 
 	private static void assertCanWriteAccountWithEncoding(
 			final Account account,
-			final AccountEncoding encoding,
+			final AddressEncoding encoding,
 			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -712,16 +712,16 @@ public class AccountTest {
 	@Test
 	public void canRoundtripAccountWithAddressEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
+		assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
 	}
 
 	@Test
 	public void canRoundtripAccountWithPublicKeyEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
+		assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
 	}
 
-	private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
+	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
