@@ -4,7 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.DeserializationContext;
+import org.nem.core.serialization.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.dao.*;
@@ -78,7 +78,7 @@ public class NisMain {
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 		do {
-			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.asAutoCache());
+			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.getAccountCache().asAutoCache());
 
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
@@ -92,7 +92,7 @@ public class NisMain {
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
-				for (final Account account : this.accountAnalyzer) {
+				for (final Account account : this.accountAnalyzer.getAccountCache()) {
 					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
 						continue;
 					}
@@ -167,11 +167,11 @@ public class NisMain {
 
 	private void initializePoi(final BlockHeight height) {
 		LOGGER.info("Analyzed blocks: " + height);
-		LOGGER.info("Known accounts: " + this.accountAnalyzer.size());
-		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.size()));
-		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer);
+		LOGGER.info("Known accounts: " + this.accountAnalyzer.getAccountCache().size());
+		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.getAccountCache().size()));
+		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 		final BlockHeight blockHeight = blockScorer.getGroupedHeight(height);
-		this.accountAnalyzer.recalculateImportances(blockHeight);
+		this.accountAnalyzer.getPoiFacade().recalculateImportances(blockHeight);
 		LOGGER.info("PoI initialized");
 	}
 
@@ -203,13 +203,13 @@ public class NisMain {
 
 	private NemesisBlock loadNemesisBlock() {
 		// set up the nemesis block amounts
-		final Account nemesisAccount = this.accountAnalyzer.addAccountToCache(NemesisBlock.ADDRESS);
+		final Account nemesisAccount = this.accountAnalyzer.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
 		nemesisAccount.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisAccount.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(this.accountAnalyzer.asAutoCache()));
+		return NemesisBlock.fromResource(new DeserializationContext(this.accountAnalyzer.getAccountCache().asAutoCache()));
 	}
 
 	private void logNemesisInformation() {
