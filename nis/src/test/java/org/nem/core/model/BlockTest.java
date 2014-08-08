@@ -12,9 +12,6 @@ import java.util.*;
 
 public class BlockTest {
 
-	final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
-	final static Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
-
 	//region Constructors
 
 	@Test
@@ -23,7 +20,7 @@ public class BlockTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		final Block block = createBlock(signer);
+		final Block block = BlockUtils.createBlock(signer);
 
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
@@ -32,19 +29,19 @@ public class BlockTest {
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(DUMMY_GENERATION_HASH));
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(BlockUtils.DUMMY_GENERATION_HASH));
 	}
 
 	@Test
 	public void ctorCanCreateBlockAroundPreviousBlock() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		final Block previousBlock = createBlock(signer);
+		final Block previousBlock = BlockUtils.createBlock(signer);
 
 		// Act:
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
@@ -74,8 +71,8 @@ public class BlockTest {
 	@Test
 	public void previousBlockCanSet() {
 		// Arrange:
-		final Block previousBlock = createBlock(Utils.generateRandomAccount());
-		final Block block = createBlock(Utils.generateRandomAccount());
+		final Block previousBlock = BlockUtils.createBlock(Utils.generateRandomAccount());
+		final Block block = BlockUtils.createBlock(Utils.generateRandomAccount());
 
 		// Act:
 		block.setPrevious(previousBlock);
@@ -91,7 +88,7 @@ public class BlockTest {
 	@Test
 	public void previousGenerationHashCanBeSet() {
 		// Arrange:
-		final Block block = createBlock(Utils.generateRandomAccount());
+		final Block block = BlockUtils.createBlock(Utils.generateRandomAccount());
 		final Hash previousGenerationHash = Utils.generateRandomHash();
 
 		// Act:
@@ -107,7 +104,7 @@ public class BlockTest {
 	@Test
 	public void blockDifficultyCanBeSet() {
 		// Arrange:
-		final Block block = createBlock(Utils.generateRandomAccount());
+		final Block block = BlockUtils.createBlock(Utils.generateRandomAccount());
 		final BlockDifficulty blockDifficulty = new BlockDifficulty(44_444_444_444L);
 
 		// Act:
@@ -137,7 +134,7 @@ public class BlockTest {
 
 		// (t1 has a fee of 1 and t2 has a fee of 2)
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(3L)));
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(DUMMY_PREVIOUS_HASH));
+		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
 		final List<Transaction> transactions = block.getTransactions();
@@ -177,7 +174,7 @@ public class BlockTest {
 	@Test
 	public void changingPreviousBlockInvalidatesBlock() {
 		// Arrange:
-		final Block previousBlock = createBlock(Utils.generateRandomAccount());
+		final Block previousBlock = BlockUtils.createBlock(Utils.generateRandomAccount());
 		final Block block = createBlockForRoundTripTests(true, null);
 
 		// Act
@@ -228,7 +225,7 @@ public class BlockTest {
 
 	private Block createBlockForRoundTripTests(boolean verifiable, final Account signer) {
 		// Arrange:
-		final Block originalBlock = createBlock(null == signer ? Utils.generateRandomAccount() : signer);
+		final Block originalBlock = BlockUtils.createBlock(null == signer ? Utils.generateRandomAccount() : signer);
 		final TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
 		originalBlock.addTransaction(transaction1);
 
@@ -271,8 +268,8 @@ public class BlockTest {
 	@Test
 	public void singleTransactionCanBeAddedToBlock() {
 		// Arrange:
-		final Block block = createBlock();
-		final Transaction transaction = createTransactionWithFee(17);
+		final Block block = BlockUtils.createBlock();
+		final Transaction transaction = BlockUtils.createTransactionWithFee(17);
 
 		// Act:
 		block.addTransaction(transaction);
@@ -285,10 +282,10 @@ public class BlockTest {
 	@Test
 	public void multipleTransactionsCanBeAddedToBlock() {
 		// Arrange:
-		final Block block = createBlock();
+		final Block block = BlockUtils.createBlock();
 		final List<Transaction> transactions = new ArrayList<>();
-		transactions.add(createTransactionWithFee(17));
-		transactions.add(createTransactionWithFee(11));
+		transactions.add(BlockUtils.createTransactionWithFee(17));
+		transactions.add(BlockUtils.createTransactionWithFee(11));
 
 		// Act:
 		block.addTransactions(transactions);
@@ -306,11 +303,13 @@ public class BlockTest {
 	@Test
 	public void blockFeeIsSumOfTransactionFees() {
 		// Arrange:
-		final Block block = createBlock();
-		block.addTransaction(createTransactionWithFee(17));
-		block.addTransaction(createTransactionWithFee(11));
-		block.addTransactions(Arrays.asList((Transaction) createTransactionWithFee(3), createTransactionWithFee(50)));
-		block.addTransaction(createTransactionWithFee(22));
+		final Block block = BlockUtils.createBlock();
+		block.addTransaction(BlockUtils.createTransactionWithFee(17));
+		block.addTransaction(BlockUtils.createTransactionWithFee(11));
+		block.addTransactions(Arrays.asList(
+				(Transaction)BlockUtils.createTransactionWithFee(3),
+				BlockUtils.createTransactionWithFee(50)));
+		block.addTransaction(BlockUtils.createTransactionWithFee(22));
 
 		// Assert:
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
@@ -323,36 +322,13 @@ public class BlockTest {
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
 		// Arrange:
-		final Block block = createBlock();
-		block.addTransaction(createTransactionWithFee(1));
-		block.addTransaction(createTransactionWithFee(7));
+		final Block block = BlockUtils.createBlock();
+		block.addTransaction(BlockUtils.createTransactionWithFee(1));
+		block.addTransaction(BlockUtils.createTransactionWithFee(7));
 
 		// Assert:
 		Assert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
 	}
 
 	//endregion
-
-	private static MockTransaction createTransactionWithFee(final long fee) {
-		// Arrange:
-		return createTransactionWithFee(127, fee);
-	}
-
-	private static MockTransaction createTransactionWithFee(final int customField, final long fee) {
-		// Arrange:
-		Account sender = Utils.generateRandomAccount();
-		MockTransaction transaction = new MockTransaction(sender, customField);
-		transaction.setFee(new Amount(fee));
-		return transaction;
-	}
-
-	private static Block createBlock(final Account forger) {
-		// Arrange:
-		return new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, new TimeInstant(7), new BlockHeight(3));
-	}
-
-	private static Block createBlock() {
-		// Arrange:
-		return createBlock(Utils.generateRandomAccount());
-	}
 }

@@ -7,12 +7,17 @@ import org.nem.core.time.TimeInstant;
 
 /**
  * Static class containing test utilities for creating blocks and transactions.
- *
- * TODO J -> update BlockTest to call these functions.
  */
 public class BlockUtils {
-	private final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
-	private final static Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
+	/**
+	 * The previous hash used in created blocks.
+	 */
+	public static final Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
+
+	/**
+	 * The generation hash used in created blocks.
+	 */
+	public static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 
 	/**
 	 * Creates a transaction with the specified fee.
