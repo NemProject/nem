@@ -1,18 +1,15 @@
-package org.nem.nis.controller.viewmodels;
+package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.*;
-import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.secret.*;
 
-import java.util.List;
-
 /**
  * Represents an external view of an account.
  */
-public class AccountViewModel implements SerializableEntity {
+public class AccountInfo implements SerializableEntity {
 	private final Address address;
 	private final KeyPair keyPair;
 	private final Amount balance;
@@ -29,14 +26,14 @@ public class AccountViewModel implements SerializableEntity {
 	 * @param label The label.
 	 * @param importance The importance.
 	 */
-	 public AccountViewModel(
+	public AccountInfo(
 			final Address address,
 			final Amount balance,
 			final BlockAmount numForagedBlocks,
 			final String label,
 			final AccountImportance importance) {
 		this.address = address;
-		this.keyPair = null;
+		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());;
 		this.balance = balance;
 		this.numForagedBlocks = numForagedBlocks;
 		this.label = label;
@@ -48,7 +45,7 @@ public class AccountViewModel implements SerializableEntity {
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public AccountViewModel(final Deserializer deserializer) {
+	public AccountInfo(final Deserializer deserializer) {
 		this.address = deserializeAddress(deserializer);
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = Amount.readFrom(deserializer, "balance");

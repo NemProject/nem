@@ -1,13 +1,12 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.model.Account;
 import org.nem.core.serialization.*;
 
 /**
  * A pair containing both an account and account meta data.
  */
 public class AccountMetaDataPair implements SerializableEntity {
-	private final Account account;
+	private final AccountInfo account;
 	private final AccountMetaData metaData;
 
 	/**
@@ -16,7 +15,7 @@ public class AccountMetaDataPair implements SerializableEntity {
 	 * @param account The account.
 	 * @param metaData The meta data.
 	 */
-	public AccountMetaDataPair(final Account account, final AccountMetaData metaData) {
+	public AccountMetaDataPair(final AccountInfo account, final AccountMetaData metaData) {
 		this.account = account;
 		this.metaData = metaData;
 	}
@@ -27,7 +26,7 @@ public class AccountMetaDataPair implements SerializableEntity {
 	 * @param deserializer The deserializer
 	 */
 	public AccountMetaDataPair(final Deserializer deserializer) {
-		this(deserializer.readObject("account", obj -> new Account(obj)),
+		this(deserializer.readObject("account", obj -> new AccountInfo(obj)),
 			 deserializer.readObject("meta", obj -> new AccountMetaData(obj)));
 	}
 
@@ -42,7 +41,7 @@ public class AccountMetaDataPair implements SerializableEntity {
 	 *
 	 * @return The account.
 	 */
-	public Account getAccount() {
+	public AccountInfo getAccount() {
 		return this.account;
 	}
 

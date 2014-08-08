@@ -18,7 +18,7 @@ public class AccountImportance implements SerializableEntity {
 
 	private BlockHeight importanceHeight;
 	private double importance;
-	private double lastPageRank; // TODO: not sure if this is the right place for this
+	private double lastPageRank;
 
 	public static final ObjectDeserializer<AccountImportance> DESERIALIZER =
 			deserializer -> new AccountImportance(deserializer);

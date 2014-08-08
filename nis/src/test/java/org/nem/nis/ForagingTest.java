@@ -51,7 +51,7 @@ public class ForagingTest {
 		
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
+		assertAccountIsUnlocked(foraging, account);
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class ForagingTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_FORAGING_INELIGIBLE));
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
+		assertAccountIsLocked(foraging, account);
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class ForagingTest {
 		
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_UNKNOWN_ACCOUNT));
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
+		assertAccountIsLocked(foraging, account);
 	}
 
 	private static Account copyAccountWithBalance(final Account original, final Amount amount) {
@@ -99,15 +99,25 @@ public class ForagingTest {
 		foraging.addUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
+		assertAccountIsUnlocked(foraging, account);
 
 		// Act:
 		foraging.removeUnlockedAccount(account);
 		
 		// Assert:
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
+		assertAccountIsLocked(foraging, account);
 	}
-	
+
+	private static void assertAccountIsLocked(final Foraging foraging, final Account account) {
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
+		Assert.assertThat(foraging.isAccountUnlocked(account.getAddress()), IsEqual.equalTo(false));
+	}
+
+	private static void assertAccountIsUnlocked(final Foraging foraging, final Account account) {
+		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
+		Assert.assertThat(foraging.isAccountUnlocked(account.getAddress()), IsEqual.equalTo(true));
+	}
+
 	// endregion
 	
 	@Test

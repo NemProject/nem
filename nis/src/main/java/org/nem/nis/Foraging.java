@@ -87,10 +87,27 @@ public class Foraging {
 	/**
 	 * Determines if a given account is unlocked.
 	 *
-	 * @param account true if the account is unlocked, false otherwise.
+	 * @param account The account.
+	 * @return true if the account is unlocked, false otherwise.
 	 */
 	public boolean isAccountUnlocked(final Account account) {
 		return this.unlockedAccounts.contains(account);
+	}
+
+	/**
+	 * Determines if a given account is unlocked.
+	 *
+	 * @param address The account address.
+	 * @return true if the account is unlocked, false otherwise.
+	 */
+	public boolean isAccountUnlocked(final Address address) {
+		for (final Account account : this.unlockedAccounts) {
+			if (account.getAddress().equals(address)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

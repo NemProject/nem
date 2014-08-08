@@ -14,7 +14,7 @@ import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.secret.AccountImportance;
-import org.nem.nis.service.AccountIoAdapter;
+import org.nem.nis.service.*;
 
 public class AccountControllerTest {
 
@@ -90,19 +90,37 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void accountGetDelegatesToAccountIoAdapter() {
+	public void accountGetDelegatesToAccountInfoFactory() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
-		final TestContext context = new TestContext(accountIoAdapter);
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+
+		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(account.getAddress().getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(account));
-		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
+		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+	}
+
+	@Test
+	public void accountGetDelegatesToForaging() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
+		Mockito.when(context.foraging.isAccountUnlocked(address)).thenReturn(true);
+
+		// Act:
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+
+		// Assert:
+		Mockito.verify(context.foraging, Mockito.times(1)).isAccountUnlocked(address);
+		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -261,6 +279,7 @@ public class AccountControllerTest {
 	private static class TestContext {
 		private final Foraging foraging;
 		private final AccountController controller;
+		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -272,7 +291,7 @@ public class AccountControllerTest {
 
 		public TestContext(final Foraging foraging, final AccountIoAdapter accountIoAdapter) {
 			this.foraging = foraging;
-			this.controller = new AccountController(this.foraging, accountIoAdapter);
+			this.controller = new AccountController(this.foraging, accountIoAdapter, this.accountInfoFactory);
 		}
 	}
 }

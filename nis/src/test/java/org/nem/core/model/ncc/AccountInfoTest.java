@@ -1,4 +1,4 @@
-package org.nem.nis.controller.viewmodels;
+package org.nem.core.model.ncc;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -11,15 +11,15 @@ import org.nem.nis.secret.AccountImportance;
 
 import java.util.function.Function;
 
-public class AccountViewModelTest {
+public class AccountInfoTest {
 
 	@Test
-	public void viewModelCanBeCreated() {
+	public void infoCanBeCreatedWithoutPublicKey() {
 		// Arrange:
 		final AccountImportance importance = new AccountImportance();
 
 		// Act:
-		final AccountViewModel viewModel = new AccountViewModel(
+		final AccountInfo info = new AccountInfo(
 				Address.fromEncoded("test"),
 				Amount.fromNem(1234),
 				new BlockAmount(7),
@@ -27,12 +27,37 @@ public class AccountViewModelTest {
 				importance);
 
 		// Assert:
-		Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
-		Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(viewModel.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
-		Assert.assertThat(viewModel.getLabel(), IsEqual.equalTo("my account"));
-		Assert.assertThat(viewModel.getImportanceInfo(), IsEqual.equalTo(importance));
+		Assert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
+		Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
+		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
+		Assert.assertThat(info.getImportanceInfo(), IsEqual.equalTo(importance));
 	}
+
+	@Test
+	public void infoCanBeCreatedWithPublicKey() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountImportance importance = new AccountImportance();
+
+		// Act:
+		final AccountInfo info = new AccountInfo(
+				address,
+				Amount.fromNem(1234),
+				new BlockAmount(7),
+				"my account",
+				importance);
+
+		// Assert:
+		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
+		Assert.assertThat(info.getImportanceInfo(), IsEqual.equalTo(importance));
+	}
+
 
 	//region Serialization
 
@@ -86,54 +111,54 @@ public class AccountViewModelTest {
 
 	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
 		// Assert:
-		assertAccountRoundTrip(address, AccountViewModel::new, expectedPublicKey);
+		assertAccountRoundTrip(address, AccountInfo::new, expectedPublicKey);
 	}
 
 	private static void assertAccountRoundTrip(
 			final Address address,
-			final Function<Deserializer, AccountViewModel> viewModelDeserializer,
+			final Function<Deserializer, AccountInfo> infoDeserializer,
 			final PublicKey expectedPublicKey) {
 		// Arrange:
-		final AccountViewModel originalViewModel = createAccountViewModelForSerializationTests(address);
+		final AccountInfo originalInfo = createAccountInfoForSerializationTests(address);
 
 		// Act:
-		final AccountViewModel viewModel = viewModelDeserializer.apply(Utils.roundtripSerializableEntity(originalViewModel, null));
+		final AccountInfo info = infoDeserializer.apply(Utils.roundtripSerializableEntity(originalInfo, null));
 
 		// Assert:
-		Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(viewModel.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 
 		if (null == expectedPublicKey) {
-			Assert.assertThat(viewModel.getKeyPair(), IsNull.nullValue());
+			Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
 		} else {
-			Assert.assertThat(viewModel.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-			Assert.assertThat(viewModel.getKeyPair().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			Assert.assertThat(info.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
+			Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 		}
 
-		Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
-		Assert.assertThat(viewModel.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
-		Assert.assertThat(viewModel.getLabel(), IsEqual.equalTo("alpha gamma"));
+		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
+		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
+		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 
-		Assert.assertThat(viewModel.getImportanceInfo(), IsNull.notNullValue());
+		Assert.assertThat(info.getImportanceInfo(), IsNull.notNullValue());
 	}
 
 	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
 		// Arrange:
-		final AccountViewModel originalViewModel = createAccountViewModelForSerializationTests(address);
+		final AccountInfo originalInfo = createAccountInfoForSerializationTests(address);
 
 		// Act:
 		final JsonSerializer serializer = new JsonSerializer(true);
-		originalViewModel.serialize(serializer);
+		originalInfo.serialize(serializer);
 		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 
 		// Assert:
-		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalViewModel.getAddress().getEncoded()));
+		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalInfo.getAddress().getEncoded()));
 		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 
-		final AccountImportance importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
+		final AccountImportance importance = deserializer.readObject("importance", AccountImportance::new);
 		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
 
@@ -142,11 +167,11 @@ public class AccountViewModelTest {
 		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
-	private static AccountViewModel createAccountViewModelForSerializationTests(final Address address) {
+	private static AccountInfo createAccountInfoForSerializationTests(final Address address) {
 		// Arrange:
 		final AccountImportance importance = new AccountImportance();
 		importance.setImportance(new BlockHeight(123), 0.796);
-		return new AccountViewModel(
+		return new AccountInfo(
 				address,
 				Amount.fromNem(747),
 				new BlockAmount(3),
