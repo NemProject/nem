@@ -103,7 +103,7 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	 */
 	@Override
 	public Account findByAddress(final Address address) {
-		LOGGER.finer(String.format("looking for [%s] %s", address, this.addressToAccountMap.size()));
+		LOGGER.finer(String.format("looking for [%s] %s", address, this.size()));
 		return this.findByAddress(address, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
