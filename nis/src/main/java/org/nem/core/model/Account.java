@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.secret.*;
 
 import java.util.*;
 
@@ -17,14 +16,6 @@ public class Account {
 	private String label;
 	private Amount balance = Amount.ZERO;
 	private BlockAmount foragedBlocks = BlockAmount.ZERO;
-
-	private final WeightedBalances weightedBalances;
-
-	// importance is not final because it could get set twice: once in Account(KeyPair, Address)
-	// and again in Account(Deserializer)
-	private AccountImportance importance;
-
-	private BlockHeight height;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
 
 	/**
@@ -58,7 +49,7 @@ public class Account {
 	 * This method is public, but it should be used very carefully.
 	 * TODO: revisit
 	 *
-	 * @param address
+	 * @param address An address that matches account's address but includes a public key.
 	 */
 	public void _setPublicKey(final Address address) {
 		if (!Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
@@ -79,8 +70,6 @@ public class Account {
 		this.keyPair = keyPair;
 		this.address = address;
 		this.messages = new ArrayList<>();
-		this.weightedBalances = new WeightedBalances();
-		this.importance = new AccountImportance();
 	}
 
 	private Account(final Account rhs) {
@@ -93,10 +82,7 @@ public class Account {
 
 		this.messages = new ArrayList<>();
 		this.messages.addAll(rhs.getMessages());
-		this.weightedBalances = rhs.weightedBalances.copy();
-		this.importance = rhs.importance.copy();
 
-		this.height = rhs.getHeight();
 		this.refCount = rhs.getReferenceCount();
 	}
 
@@ -108,9 +94,6 @@ public class Account {
 		this.foragedBlocks = rhs.getForagedBlocks();
 
 		this.messages = rhs.getMessages();
-		this.weightedBalances = rhs.weightedBalances;
-		this.importance = rhs.importance;
-		this.height = rhs.getHeight();
 		this.refCount = rhs.getReferenceCount();
 	}
 
@@ -253,25 +236,6 @@ public class Account {
 	}
 
 	/**
-	 * Returns height of an account.
-	 *
-	 * @return The height of an account - when the account has been created.
-	 */
-	public BlockHeight getHeight() {
-		return this.height;
-	}
-
-	/**
-	 * Sets height of an account if the account does not already have a height.
-	 *
-	 * @param height The height.
-	 */
-	public void setHeight(final BlockHeight height) {
-		if (null == this.height)
-			this.height = height;
-	}
-
-	/**
 	 * Returns the reference count.
 	 * 
 	 * @return The reference count.
@@ -298,24 +262,6 @@ public class Account {
 	public ReferenceCount decrementReferenceCount() {
 		this.refCount = this.refCount.decrement();
 		return this.refCount;
-	}
-	
-	/**
-	 * Gets the weighted balances associated with this account.
-	 *
-	 * @return The weighted balances
-	 */
-	public WeightedBalances getWeightedBalances() {
-		return this.weightedBalances;
-	}
-
-	/**
-	 * Gets the importance information associated with this account.
-	 *
-	 * @return The importance information associated with this account.
-	 */
-	public AccountImportance getImportanceInfo() {
-		return this.importance;
 	}
 
 	@Override

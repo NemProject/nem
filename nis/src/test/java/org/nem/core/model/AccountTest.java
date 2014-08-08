@@ -8,7 +8,6 @@ import org.nem.core.messages.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.nis.secret.*;
 
 import java.math.BigInteger;
 
@@ -30,10 +29,6 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-		Assert.assertThat(account.getHeight(), IsNull.nullValue());
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -49,10 +44,6 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-        Assert.assertThat(account.getHeight(), IsNull.nullValue());
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -70,10 +61,6 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-        Assert.assertThat(account.getHeight(), IsNull.nullValue());
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	//endregion
@@ -138,42 +125,13 @@ public class AccountTest {
 
 	//endregion
 
-	//region height
-
-	@Test
-	public void accountHeightCanBeSetIfNull() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setHeight(new BlockHeight(17));
-
-		// Assert:
-		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
-	}
-
-	@Test
-	public void accountHeightCannotBeUpdatedIfNonNull() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setHeight(new BlockHeight(17));
-		account.setHeight(new BlockHeight(32));
-
-		// Assert:
-		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
-	}
-
-	//endregion
-
 	//region refCount
 
 	@Test
 	public void referenceCountIsZeroForNewAccount() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		
+
 		// Assert:
 		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
@@ -182,7 +140,7 @@ public class AccountTest {
 	public void referenceCountCanBeIncremented() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		
+
 		// Act:
 		final ReferenceCount result = account.incrementReferenceCount();
 
@@ -196,7 +154,7 @@ public class AccountTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		account.incrementReferenceCount();
-		
+
 		// Act:
 		final ReferenceCount result = account.decrementReferenceCount();
 
@@ -206,7 +164,7 @@ public class AccountTest {
 	}
 
 	//endregion
-	
+
 	//region foraged blocks
 
 	@Test
@@ -575,45 +533,6 @@ public class AccountTest {
 		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
 	}
 
-	@Test
-	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final WeightedBalances balances = account.getWeightedBalances();
-		balances.addReceive(new BlockHeight(17), Amount.fromNem(1234));
-
-		// Act:
-		final Account copyAccount = account.copy();
-		final WeightedBalances copyBalances = copyAccount.getWeightedBalances();
-
-		// Assert:
-		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
-		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
-	}
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfAccountImportance() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final AccountImportance importance = account.getImportanceInfo();
-		importance.setImportance(BlockHeight.ONE, 0.03125);
-		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
-
-		// Act:
-		final Account copyAccount = account.copy();
-		final AccountImportance copyImportance = copyAccount.getImportanceInfo();
-		copyAccount.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
-
-		// Assert:
-		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
-		Assert.assertThat(importance.getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyImportance.getImportance(new BlockHeight(2)), IsEqual.equalTo(0.0234375));
-		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
-		Assert.assertThat(
-				copyImportance.getOutlinksIterator(BlockHeight.ONE).next(),
-				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE).next()));
-	}
-
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
 		// Arrange:
 		setAccountValuesForCopyTests(account);
@@ -627,21 +546,17 @@ public class AccountTest {
 		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
 
 		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
-		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
-		Assert.assertThat(copyAccount.getWeightedBalances(), IsNot.not(IsSame.sameInstance(account.getWeightedBalances())));
-		Assert.assertThat(copyAccount.getImportanceInfo(), IsNot.not(IsSame.sameInstance(account.getImportanceInfo())));
 		return copyAccount;
 	}
 
 	private static void setAccountValuesForCopyTests(final Account account) {
 		account.incrementBalance(new Amount(1000));
-		account.setHeight(new BlockHeight(123));
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
@@ -692,12 +607,8 @@ public class AccountTest {
 		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
-		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
 		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
-
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
-		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
-		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));
 	}
 
 	//endregion
