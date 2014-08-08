@@ -3,7 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 
@@ -22,12 +22,12 @@ public class PoiContext {
 	/**
 	 * Creates a new context.
 	 *
-	 * @param accounts The accounts.
+	 * @param accountStates The account states.
 	 * @param height The current block height.
 	 */
-	public PoiContext(final Iterable<Account> accounts, final BlockHeight height) {
+	public PoiContext(final Iterable<PoiAccountState> accountStates, final BlockHeight height) {
 		// (1) build the account vectors and matrices
-		this.accountProcessor = new AccountProcessor(accounts, height);
+		this.accountProcessor = new AccountProcessor(accountStates, height);
 		this.accountProcessor.process();
 
 		// (2) build the teleportation vectors
@@ -137,18 +137,19 @@ public class PoiContext {
 		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
-		public AccountProcessor(final Iterable<Account> accounts, final BlockHeight height) {
+		public AccountProcessor(final Iterable<PoiAccountState> accountStates, final BlockHeight height) {
 			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
 
 			int i = 0;
-			for (final Account account : accounts) {
-				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, account, height);
+			for (final PoiAccountState accountState : accountStates) {
+				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				if (!accountInfo.canForage())
 					continue;
 
-				this.addressToAccountInfoMap.put(account.getAddress(), accountInfo);
-				this.addressToIndexMap.put(account.getAddress(), i);
+				final Address address = accountState.getAddress();
+				this.addressToAccountInfoMap.put(address, accountInfo);
+				this.addressToIndexMap.put(address, i);
 
 				this.accountInfos.add(accountInfo);
 				++i;
@@ -170,9 +171,9 @@ public class PoiContext {
 			int i = 0;
 			int numOutlinks = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-				final Account account = accountInfo.getAccount();
-				numOutlinks += account.getImportanceInfo().getOutlinksSize(this.height);
-				this.vestedBalanceVector.setAt(i, account.getWeightedBalances().getVested(this.height).getNumMicroNem());
+				final PoiAccountState accountState = accountInfo.getState();
+				numOutlinks += accountState.getImportanceInfo().getOutlinksSize(this.height);
+				this.vestedBalanceVector.setAt(i, accountState.getWeightedBalances().getVested(this.height).getNumMicroNem());
 				++i;
 			}
 
@@ -194,7 +195,7 @@ public class PoiContext {
 
 			int i = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+				final AccountImportance importance = accountInfo.getState().getImportanceInfo();
 				importance.setLastPageRank(pageRankVector.getAt(i));
 				importance.setImportance(this.height, importanceVector.getAt(i));
 				++i;
@@ -231,7 +232,7 @@ public class PoiContext {
 					if (null == otherAccountInfo)
 						continue;
 
-					otherAccountInfo.addInlink(new WeightedLink(accountInfo.getAccount().getAddress(), link.getWeight()));
+					otherAccountInfo.addInlink(new WeightedLink(accountInfo.getState().getAddress(), link.getWeight()));
 				}
 			}
 

@@ -1,7 +1,6 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Collection;
@@ -29,15 +28,15 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 	@Override
 	public void updateAccountImportances(
 			final BlockHeight blockHeight,
-			final Collection<Account> accounts,
+			final Collection<PoiAccountState> accountStates,
 			final PoiScorer.ScoringAlg scoringAlg) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accounts, blockHeight);
+		final PoiContext context = new PoiContext(accountStates, blockHeight);
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm
-		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accounts.size());
+		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accountStates.size());
 
 		long start = System.currentTimeMillis();
 		iterator.run();
