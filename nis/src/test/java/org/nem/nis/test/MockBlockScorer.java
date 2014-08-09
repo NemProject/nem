@@ -1,7 +1,9 @@
 package org.nem.nis.test;
 
+import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
+import org.nem.nis.poi.PoiFacade;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -15,7 +17,7 @@ public class MockBlockScorer extends BlockScorer {
 	private Map<BlockScoreKey, Long> blockScores = new HashMap<>();
 
 	public MockBlockScorer() {
-		super(new MockBlockScorerAnalyzer());
+		super(Mockito.mock(PoiFacade.class));
 	}
 
 	/**
@@ -54,7 +56,6 @@ public class MockBlockScorer extends BlockScorer {
 	}
 
 	private static class BlockScoreKey {
-
 		private final Block parentBlock;
 		private final Block block;
 
