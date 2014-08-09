@@ -205,6 +205,10 @@ public class BlockScorerTest {
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
+
+		final Address signerAddress = block.getSigner().getAddress();
+		Mockito.when(poiFacade.findStateByAddress(signerAddress))
+				.thenReturn(new PoiAccountState(signerAddress));
 		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(groupedHeight), 0.75);
 
 		// Act:
@@ -267,8 +271,9 @@ public class BlockScorerTest {
 
 		private Account createAccountWithBalance(final long balance) {
 			final Account account = Utils.generateRandomAccount();
-			this.poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances()
-					.addReceive(BlockHeight.ONE, Amount.fromNem(balance));
+			final PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
+			accountState.setHeight(BlockHeight.ONE);
 			return account;
 		}
 
