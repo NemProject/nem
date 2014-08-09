@@ -9,6 +9,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -88,7 +89,7 @@ public class NisMain {
 				this.blockChain.updateScore(parentBlock, block);
 			}
 
-			new BlockExecutor().execute(block, observer);
+			new BlockExecutor(this.accountAnalyzer.getPoiFacade()).execute(block, observer);
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
@@ -97,7 +98,8 @@ public class NisMain {
 						continue;
 					}
 
-					account.getWeightedBalances().convertToFullyVested();
+					final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress());
+					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}
 
@@ -205,8 +207,10 @@ public class NisMain {
 		// set up the nemesis block amounts
 		final Account nemesisAccount = this.accountAnalyzer.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
-		nemesisAccount.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
-		nemesisAccount.setHeight(BlockHeight.ONE);
+
+		final PoiAccountState nemesisState = this.accountAnalyzer.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
+		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
 		return NemesisBlock.fromResource(new DeserializationContext(this.accountAnalyzer.getAccountCache().asAutoCache()));
