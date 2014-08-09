@@ -12,7 +12,6 @@ import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.*;
-import org.nem.deploy.NisConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -119,7 +118,6 @@ public class CommonStarter implements ServletContextListener {
         final Properties props = new Properties();
         props.load(inputStream);
         String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
-        final NisConfiguration configuration = new NisConfiguration();
         final String nemFolder = INSTANCE.configProps.getProperty("nem.folder", getDefaultFolder()).replace("%h", getDefaultFolder());
         tmpStr = tmpStr.replace("${nemFolder}", nemFolder);
         props.setProperty("java.util.logging.FileHandler.pattern", tmpStr);
