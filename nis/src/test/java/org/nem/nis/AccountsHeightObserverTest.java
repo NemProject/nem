@@ -3,67 +3,83 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.poi.*;
 
 public class AccountsHeightObserverTest {
 
 	//region notifyReceive
 
 	@Test
-	public void notifyReceiveDelegatesToAccountAnalyzer() {
+	public void notifyReceiveDelegatesToAccountCache() {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
-		Mockito.when(accountAnalyzer.findByAddress(account1.getAddress())).thenReturn(account1);
-		Mockito.when(accountAnalyzer.findByAddress(account2.getAddress())).thenReturn(account2);
-
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		context.setupAccount(account1);
+		context.setupAccount(account2);
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
-		observer.notifyReceive(new BlockHeight(34), account2, Amount.fromNem(10));
+		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
+		context.observer.notifyReceive(new BlockHeight(34), account2, Amount.fromNem(10));
 
 		// Assert:
-		Mockito.verify(accountAnalyzer, Mockito.times(2)).findByAddress(account1.getAddress());
-		Mockito.verify(accountAnalyzer, Mockito.times(1)).findByAddress(account2.getAddress());
+		Mockito.verify(context.accountCache, Mockito.times(2)).findByAddress(account1.getAddress());
+		Mockito.verify(context.accountCache, Mockito.times(1)).findByAddress(account2.getAddress());
+	}
+
+	@Test
+	public void notifyReceiveDelegatesToPoiFacade() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		context.setupAccount(account1);
+		context.setupAccount(account2);
+
+		// Act:
+		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
+		context.observer.notifyReceive(new BlockHeight(34), account2, Amount.fromNem(10));
+
+		// Assert:
+		Mockito.verify(context.poiFacade, Mockito.times(2)).findStateByAddress(account1.getAddress());
+		Mockito.verify(context.poiFacade, Mockito.times(1)).findStateByAddress(account2.getAddress());
 	}
 
 	@Test
 	public void notifyReceiveSetsAccountHeightToHeightAtWhichAccountWasFirstSeen() {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
+		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
-		accountAnalyzer.addAccountToCache(account1.getAddress());
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		context.setupAccount(account1);
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
+		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
 
 		// Assert:
-		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
-		final Account result = accountAnalyzer.findByAddress(account1.getAddress());
-		Assert.assertThat(result.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
+		final PoiAccountState state = context.poiFacade.findStateByAddress(account1.getAddress());
+		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
 	@Test
 	public void notifyReceiveIncrementsReferenceCounter() {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
+		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
-		accountAnalyzer.addAccountToCache(account1.getAddress());
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		context.setupAccount(account1);
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
 
 		// Assert:
-		final Account result = accountAnalyzer.findByAddress(account1.getAddress());
-		Assert.assertThat(result.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
+		final Account cachedAccount = context.accountCache.findByAddress(account1.getAddress());
+		Assert.assertThat(cachedAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
 	//endregion
@@ -84,41 +100,42 @@ public class AccountsHeightObserverTest {
 
 	private static void assertReceiveUndoRemovesAccount(final int accountHeight, final int undoHeight) {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(accountHeight);
+		final TestContext context = new TestContext();
+		final Account account1 = context.createAccountWithHeight(accountHeight);
 		account1.incrementReferenceCount();
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
-		accountAnalyzer.addAccountToCache(account1.getAddress());
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(undoHeight), account1, Amount.fromNem(2));
+		context.observer.notifyReceiveUndo(new BlockHeight(undoHeight), account1, Amount.fromNem(2));
 
 		// Assert:
-		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(0));
+		Mockito.verify(context.accountCache, Mockito.times(1)).removeFromCache(account1.getAddress());
+		Mockito.verify(context.poiFacade, Mockito.times(1)).removeFromCache(account1.getAddress());
 	}
 
 	@Test
 	public void notifyReceiveUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
+		final TestContext context = new TestContext();
+		final Account account1 = context.createAccountWithHeight(12);
 		account1.incrementReferenceCount();
 		account1.incrementReferenceCount();
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
+		context.observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
 
 		// Assert:
-		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
+		Mockito.verify(context.accountCache, Mockito.times(0)).removeFromCache(Mockito.any());
+		Mockito.verify(context.poiFacade, Mockito.times(0)).removeFromCache(Mockito.any());
 	}
 
 	@Test
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
+		final AccountCache accountCache = new AccountCache();
+		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(accountCache, poiFacade);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
 		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
@@ -130,66 +147,69 @@ public class AccountsHeightObserverTest {
 		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
 
 		// Assert:
-		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(1));
+		Assert.assertThat(accountCache.size(), IsEqual.equalTo(1));
 
 		// Act:
 		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
 
 		// Assert:
-		Assert.assertThat(accountAnalyzer.size(), IsEqual.equalTo(0));
+		Assert.assertThat(accountCache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void notifyReceiveUndoFailsIfThereIsNoMatchingAccount() {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account account1 = context.createAccountWithHeight(12);
+		account1.incrementReferenceCount();
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
+		context.observer.notifyReceiveUndo(new BlockHeight(12), Utils.generateRandomAccount(), Amount.fromNem(2));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void notifyReceiveUndoFailsIfMatchingAccountHasUnsetHeight() {
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
-		accountAnalyzer.addAccountToCache(account1.getAddress());
+		final TestContext context = new TestContext();
+		final Account account1 = context.createAccountWithHeight(0);
+		account1.incrementReferenceCount();
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
+		context.observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void notifyReceiveUndoFailsIfReferenceCounterUnderflows() {
 		// Arrange:
-		final Account account1 = createAccountWithHeight(12);
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzerWithAccount(account1);
-		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account account1 = context.createAccountWithHeight(12);
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
-	}
-
-	private static Account createAccountWithHeight(final int height) {
-		final Account account = Utils.generateRandomAccount();
-		account.setHeight(new BlockHeight(height));
-		return account;
-	}
-
-	private static AccountAnalyzer createAccountAnalyzerWithAccount(final Account account) {
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(null);
-		accountAnalyzer.addAccountToCache(account.getAddress());
-
-		final Account cachedAccount = accountAnalyzer.findByAddress(account.getAddress());
-		cachedAccount.setHeight(account.getHeight());
-		for (int i = 0; i < account.getReferenceCount().getRaw(); ++i)
-			cachedAccount.incrementReferenceCount();
-
-		return accountAnalyzer;
+		context.observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
 	}
 
 	//endregion
+
+	private static class TestContext {
+		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(this.accountCache, this.poiFacade);
+		private final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
+
+		private void setupAccount(final Account account) {
+			final Address address = account.getAddress();
+			Mockito.when(this.accountCache.findByAddress(address)).thenReturn(account);
+			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(new PoiAccountState(address));
+		}
+
+		private Account createAccountWithHeight(final int height) {
+			final Account account = Utils.generateRandomAccount();
+			setupAccount(account);
+
+			if (height > 0)
+				this.poiFacade.findStateByAddress(account.getAddress()).setHeight(new BlockHeight(height));
+
+			return account;
+		}
+	}
 }
