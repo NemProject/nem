@@ -10,7 +10,9 @@ import java.util.Collection;
  * Read-only DAO for accessing db Transfer objects.
  */
 public interface ReadOnlyTransferDao {
-	//TODO-CR: we should comment public enums and values
+	/*
+	 * Types of transfers that can be requested.
+	 */
 	public enum TransferType {
 		ALL,
 		INCOMING,
