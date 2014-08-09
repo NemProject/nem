@@ -11,7 +11,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.PoiAccountInfo;
+import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +32,7 @@ public class Foraging {
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final AccountLookup accountLookup;
+	private final PoiFacade poiFacade;
 	private final BlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final TransferDao transferDao;
@@ -39,10 +40,12 @@ public class Foraging {
 	@Autowired(required = true)
 	public Foraging(
 			final AccountLookup accountLookup,
+			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final TransferDao transferDao) {
 		this.accountLookup = accountLookup;
+		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.transferDao = transferDao;
@@ -63,7 +66,7 @@ public class Foraging {
 
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(
 				-1,
-				account,
+				this.poiFacade.findStateByAddress(account.getAddress()),
 				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
 		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;

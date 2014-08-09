@@ -6,16 +6,15 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.poi.PoiImportanceGenerator;
+import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.MockForaging;
+import org.nem.nis.test.*;
 
 import java.lang.reflect.*;
 import java.util.*;
-
-import static org.mockito.Mockito.mock;
 
 public class ForagingTest {
 	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
@@ -39,16 +38,16 @@ public class ForagingTest {
 	}
 
 	// region add/remove unlocked account
-	
+
 	@Test
 	public void canUnlockKnownForagingEligibleAccount() {
 		// Arrange:
-		final Foraging foraging = createMockForaging();
-		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(10000));
-		
+		final Account account = RECIPIENT1;
+		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
+
 		// Act:
 		final UnlockResult result = foraging.addUnlockedAccount(account);
-		
+
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
 		assertAccountIsUnlocked(foraging, account);
@@ -57,8 +56,8 @@ public class ForagingTest {
 	@Test
 	public void cannotUnlockForagingIneligibleAccount() {
 		// Arrange:
-		final Foraging foraging = createMockForaging();
-		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(100));
+		final Account account = RECIPIENT1;
+		final Foraging foraging = createForaging(account, Amount.fromNem(100));
 
 		// Act:
 		final UnlockResult result = foraging.addUnlockedAccount(account);
@@ -71,41 +70,44 @@ public class ForagingTest {
 	@Test
 	public void cannotUnlockUnknownAccount() {
 		// Arrange:
-		final Foraging foraging = createMockForaging();
-		final Account account = copyAccountWithBalance(RECIPIENT2, Amount.fromNem(10000));
-		
+		final Account account = RECIPIENT1;
+		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
+
 		// Act:
-		final UnlockResult result = foraging.addUnlockedAccount(account);
-		
+		final UnlockResult result = foraging.addUnlockedAccount(RECIPIENT2);
+
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_UNKNOWN_ACCOUNT));
 		assertAccountIsLocked(foraging, account);
 	}
 
-	private static Account copyAccountWithBalance(final Account original, final Amount amount) {
-		final Account copy = original.copy();
-		copy.getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
-		copy.incrementBalance(amount);
-		return copy;
-	}
-
 	@Test
 	public void canLockUnlockedAccount() {
 		// Arrange:
-		final Foraging foraging = createMockForaging();
-		final Account account = copyAccountWithBalance(RECIPIENT1, Amount.fromNem(10000));
-		
+		final Account account = RECIPIENT1;
+		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
+
 		// Act:
 		foraging.addUnlockedAccount(account);
-		
+
 		// Assert:
 		assertAccountIsUnlocked(foraging, account);
 
 		// Act:
 		foraging.removeUnlockedAccount(account);
-		
+
 		// Assert:
 		assertAccountIsLocked(foraging, account);
+	}
+
+	private static Foraging createForaging(final Account original, final Amount amount) {
+		final AccountCache accountCache = new AccountCache();
+		accountCache.addAccountToCache(original.getAddress());
+
+		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		poiFacade.findStateByAddress(original.getAddress()).getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
+
+		return createMockForaging(accountCache, poiFacade);
 	}
 
 	private static void assertAccountIsLocked(final Foraging foraging, final Account account) {
@@ -119,7 +121,7 @@ public class ForagingTest {
 	}
 
 	// endregion
-	
+
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
 		// Arrange:
@@ -324,7 +326,7 @@ public class ForagingTest {
 		Assert.assertThat(filteredTransactionsList.size(), IsEqual.equalTo(2));
 		Assert.assertThat(filteredTransactionsList2.size(), IsEqual.equalTo(3));
 	}
-	
+
 	private TransferTransaction createSignedTransactionWithTime(Account signer, Account recipient, Amount fee, TimeInstant now) {
 		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
 		transaction1.setDeadline(now.addHours(1));
@@ -336,12 +338,12 @@ public class ForagingTest {
 	@Test
 	public void canSignBlock() {
 		// Arrange:
-		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
-		final MockForaging foraging = new MockForaging(accountAnalyzer, lastBlockLayer);
 		final Account account = Utils.generateRandomAccount();
-		accountAnalyzer.addAccountToCache(account.getAddress());
-		final Account accountWithoutSecret = accountAnalyzer.findByAddress(account.getAddress());
+		final AccountCache accountCache = new AccountCache();
+		accountCache.addAccountToCache(account.getAddress());
+		final Foraging foraging = createMockForaging(accountCache, new PoiFacade(Mockito.mock(PoiImportanceGenerator.class)));
+
+		final Account accountWithoutSecret = accountCache.findByAddress(account.getAddress());
 		accountWithoutSecret.incrementBalance(Amount.fromNem(100));
 
 		final Account signer = createAccountWithBalance(100);
@@ -385,16 +387,22 @@ public class ForagingTest {
 		return account;
 	}
 
-	private Foraging createMockForaging() {
-		final BlockChainLastBlockLayer lastBlockLayer = mock(BlockChainLastBlockLayer.class);
-		Mockito.when(lastBlockLayer.getLastBlockHeight()).thenReturn(9L);
-
-		final AccountAnalyzer accountAnalyzer = createAccountAnalyzer();
-		accountAnalyzer.addAccountToCache(RECIPIENT1.getAddress());
-		return new MockForaging(accountAnalyzer, lastBlockLayer);
+	private static Foraging createMockForaging() {
+		final AccountCache accountLookup = new AccountCache();
+		accountLookup.addAccountToCache(RECIPIENT1.getAddress());
+		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		return createMockForaging(accountLookup, poiFacade);
 	}
 
-	private static AccountAnalyzer createAccountAnalyzer() {
-		return new AccountAnalyzer(Mockito.mock(PoiImportanceGenerator.class));
+	private static Foraging createMockForaging(final AccountLookup accountLookup, final PoiFacade poiFacade) {
+		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		Mockito.when(lastBlockLayer.getLastBlockHeight()).thenReturn(9L);
+
+		return new Foraging(
+				accountLookup,
+				poiFacade,
+				new MockBlockDao(null),
+				lastBlockLayer,
+				new MockTransferDaoImpl());
 	}
 }
