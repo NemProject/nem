@@ -2,14 +2,12 @@ package org.nem.nis;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
@@ -135,25 +133,6 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	@Override
 	public Iterator<Account> iterator() {
 		return this.addressToAccountMap.values().iterator();
-	}
-
-	/**
-	 * Gets all accounts that should be included in the importance calculation
-	 * at the specified block height.
-	 *
-	 * @param blockHeight The block height.
-	 * @return The accounts.
-	 */
-	public Collection<Account> getAccounts(final BlockHeight blockHeight) {
-		return this.addressToAccountMap.values().stream()
-				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
-				.collect(Collectors.toList());
-	}
-
-	private static boolean shouldIncludeInImportanceCalculation(final Account account, final BlockHeight blockHeight) {
-		return null != account.getHeight()
-				&& account.getHeight().compareTo(blockHeight) <= 0
-				&& !account.getAddress().equals(NemesisBlock.ADDRESS);
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {
