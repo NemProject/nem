@@ -87,44 +87,41 @@ public class TransferDaoImpl implements TransferDao {
 	@Transactional
 	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account address, final Hash hash, final TransferType transferType, final int limit) {
 		final String addressString = this.buildAddressQuery(transferType);
-		Query query;
-
-		// TODO-CR: consider moving each branch into a private function (should improve readability)
 		if (hash == null) {
-			query = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
-						"WHERE " +
-						addressString +
-						" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
-				.setParameter("pubkey", address.getAddress().getEncoded())
-				.setMaxResults(limit);
-
+			return getLatestTransactionsForAccount(address, limit, addressString);
 		} else {
-			// TODO-CR: additional locals can be made final (i like to aggressively mark things as final, but not sure how everyone else feels)
-			// (i doubt the JVM does anything special with non-member finals)
-			// BR: Should be fixed with auto formatting.
-			final Query prequery = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
-						"WHERE " +
-						addressString +
-						" AND t.transferHash = :hash" +
-						" ORDER BY t.timestamp desc")
-				.setParameter("hash", hash.getRaw())
-				.setParameter("pubkey", address.getAddress().getEncoded())
-				.setMaxResults(limit);
-			final List<Object[]> tempList = listAndCast(prequery);
-			if (tempList.size() < 1) {
-				throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
-			} // TODO-CR: i generally prefer to have a blank line after '}'
-				// BR: agree, but no auto format.
-			final Object[] tx = tempList.get(0);
-			final Transfer topMostTranser = (Transfer)tx[0];
+			final Object[] tx = getTransactionDescriptorUsingHash(address, hash, limit, addressString);
+			return getTransactionsForAccountUptoTransaction(address, limit, addressString, tx);
+		}
+	}
 
-			final long blockHeight = (long)tx[1];
-			final int timestamp = topMostTranser.getTimestamp();
-			final int indexInsideBlock = topMostTranser.getBlkIndex();
+	private Object[] getTransactionDescriptorUsingHash(Account address, Hash hash, int limit, String addressString) {
+		final Query prequery = this.getCurrentSession()
+			.createQuery("select t, t.block.height from Transfer t " +
+					"WHERE " +
+					addressString +
+					" AND t.transferHash = :hash" +
+					" ORDER BY t.timestamp desc")
+			.setParameter("hash", hash.getRaw())
+			.setParameter("pubkey", address.getAddress().getEncoded())
+			.setMaxResults(limit);
+		final List<Object[]> tempList = listAndCast(prequery);
+		if (tempList.size() < 1) {
+			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
+		}
 
-			query = this.getCurrentSession()
+		return tempList.get(0);
+	}
+
+	private Collection<Object[]> getTransactionsForAccountUptoTransaction(Account address, int limit, String addressString, Object[] tx) {
+		final Query query;
+		final Transfer topMostTranser = (Transfer)tx[0];
+
+		final long blockHeight = (long)tx[1];
+		final int timestamp = topMostTranser.getTimestamp();
+		final int indexInsideBlock = topMostTranser.getBlkIndex();
+
+		query = this.getCurrentSession()
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						addressString +
@@ -137,7 +134,18 @@ public class TransferDaoImpl implements TransferDao {
 				.setParameter("blockIndex", indexInsideBlock)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
-		}
+		return listAndCast(query);
+	}
+
+	private Collection<Object[]> getLatestTransactionsForAccount(Account address, int limit, String addressString) {
+		final Query query = this.getCurrentSession()
+			.createQuery("select t, t.block.height from Transfer t " +
+					"WHERE " +
+					addressString +
+					" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
+			.setParameter("pubkey", address.getAddress().getEncoded())
+			.setMaxResults(limit);
+
 		return listAndCast(query);
 	}
 
