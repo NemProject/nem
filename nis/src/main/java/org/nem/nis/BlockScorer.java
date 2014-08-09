@@ -2,21 +2,15 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.secret.*;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Provides functions for scoring block hits and targets.
  */
 public class BlockScorer {
-
-	/**
-	 * The target time between two blocks in seconds.
-	 */
-	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * BigInteger constant 2^64
@@ -45,17 +39,18 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 31;
 
-	public final AccountAnalyzer accountAnalyzer;
+	public final PoiFacade poiFacade;
 
-	public BlockScorer(final AccountAnalyzer accountAnalyzer) {
-		this.accountAnalyzer = accountAnalyzer;
+	public BlockScorer(final PoiFacade poiFacade) {
+		this.poiFacade = poiFacade;
 	}
 
 	/**
 	 * Forces a recalculation of the importances the next time calculateForgerBalance() is called.
 	 */
 	public void forceImportanceCalculation() {
-		this.accountAnalyzer.resetLastPoiRecalc();
+		// TODO: fix me1
+//		this.poiFacade();
 	}
 
 	/**
@@ -111,9 +106,11 @@ public class BlockScorer {
 	 */
 	public long calculateForgerBalance(final Block block) {
 		final BlockHeight blockHeight = this.getGroupedHeight(block.getHeight());
-		this.accountAnalyzer.recalculateImportances(blockHeight);
+		this.poiFacade.recalculateImportances(blockHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
-		return (long)(block.getSigner().getImportanceInfo().getImportance(blockHeight) * multiplier);
+		final Address signerAddress = block.getSigner().getAddress();
+		final AccountImportance accountImportance = this.poiFacade.findStateByAddress(signerAddress).getImportanceInfo();
+		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
 	}
 
 	/**
@@ -133,43 +130,11 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Calculates the difficulty based the last n blocks.
-	 * 
-	 * @param difficulties historical difficulties.
-	 * @param timestamps historical timestamps.
+	 * Returns the default block difficulty scorer.
 	 *
-	 * @return The difficulty for the next block.
+	 * @return The block difficulty scorer.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timestamps) {
-		if (difficulties.size() < 2) {
-			return BlockDifficulty.INITIAL_DIFFICULTY;
-		}
-
-		final TimeInstant newestTimestamp = timestamps.get(timestamps.size() - 1);
-		final TimeInstant oldestTimestamp = timestamps.get(0);
-		final long timeDiff = newestTimestamp.subtract(oldestTimestamp);
-		final long heightDiff = difficulties.size();
-		long averageDifficulty = 0;
-		for (final BlockDifficulty diff : difficulties) {
-			averageDifficulty += diff.getRaw();
-		}
-
-		averageDifficulty /= heightDiff;
-
-		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
-															   .multiply(BigInteger.valueOf(heightDiff))
-															   .divide(BigInteger.valueOf(timeDiff))
-															   .longValue();
-
-		long oldDifficulty = difficulties.get(difficulties.size()-1).getRaw();
-		if (19L * oldDifficulty > 20L * difficulty) {
-			difficulty = (19L * oldDifficulty)/20L;
-		} else {
-			if (21L * oldDifficulty < 20L * difficulty) {
-				difficulty = (21L * oldDifficulty)/20L;
-			}
-		}
-
-		return new BlockDifficulty(difficulty);
+	public BlockDifficultyScorer getDifficultyScorer() {
+		return new BlockDifficultyScorer();
 	}
 }

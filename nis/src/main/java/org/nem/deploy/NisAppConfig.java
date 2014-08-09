@@ -96,6 +96,7 @@ public class NisAppConfig {
 	public Foraging foraging() {
 		return new Foraging(
 				this.accountCache(),
+				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
 				this.transferDao);

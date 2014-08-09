@@ -9,6 +9,8 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.poi.*;
+import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.test.*;
 
 import java.lang.reflect.Field;
@@ -31,14 +33,13 @@ public class BlockScorerTest {
 		(byte) 0xD7, (byte) 0xD6, (byte) 0xD5, (byte) 0xD4, (byte) 0xD3, (byte) 0xD2, (byte) 0xD1, (byte) 0xD0,
 		(byte) 0xC7, (byte) 0xC6, (byte) 0xC5, (byte) 0xC4, (byte) 0xC3, (byte) 0xC2, (byte) 0xC1, (byte) 0xC0
 	};
-	
+
 	@Test
 	public void hitIsCalculatedCorrectly() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair(new PublicKey(PUBKEY_BYTES));
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = accountAnalyzer.addAccountToCache(new Account(keyPair).getAddress());
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final Account blockSigner = new Account(keyPair);
+		final BlockScorer scorer = createScorer();
 		final Block previousBlock = new Block(blockSigner, Hash.ZERO, new Hash(HASH_BYTES), TimeInstant.ZERO, new BlockHeight(11));
 
 		// Act:
@@ -51,15 +52,14 @@ public class BlockScorerTest {
 	@Test
 	public void targetIsZeroWhenBalanceIsZero() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 0);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account blockSigner = context.createAccountWithBalance(0);
 
-		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(accountAnalyzer, blockSigner, 101, 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 101, 11);
 
 		// Act:
-		final BigInteger target = scorer.calculateTarget(previousBlock, block);
+		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
 		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
@@ -68,15 +68,14 @@ public class BlockScorerTest {
 	@Test
 	public void targetIsZeroWhenElapsedTimeIsZero() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account blockSigner = context.createAccountWithBalance(72);
 
-		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(accountAnalyzer, blockSigner, 1, 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 1, 11);
 
 		// Act:
-		final BigInteger target = scorer.calculateTarget(previousBlock, block);
+		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
 		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
@@ -85,37 +84,34 @@ public class BlockScorerTest {
 	@Test
 	public void targetIsZeroWhenElapsedTimeIsNegative() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account blockSigner = context.createAccountWithBalance(72);
 
-		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 101, 11);
-		final Block block = createBlock(accountAnalyzer, blockSigner, 1, 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 101, 11);
+		final Block block = createBlock(blockSigner, 1, 11);
 
 		// Act:
-		final BigInteger target = scorer.calculateTarget(previousBlock, block);
+		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
 		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
-
 	@Test
 	public void targetIsCalculatedCorrectlyWhenBalanceIsNonZero() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account blockSigner = context.createAccountWithBalance(72);
 
-		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
-		final Block block = createBlock(accountAnalyzer, blockSigner, 101, 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block = createBlock(blockSigner, 101, 11);
 
 		block.setDifficulty(new BlockDifficulty((long)60E12));
-		accountAnalyzer.recalculateImportances(block.getHeight());
-		blockSigner.getImportanceInfo().setImportance(block.getHeight(), 1572);
+		context.poiFacade.recalculateImportances(block.getHeight());
+		context.getImportanceInfo(blockSigner).setImportance(block.getHeight(), 1572);
 
 		// Act:
-		final BigInteger target = scorer.calculateTarget(previousBlock, block);
+		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
 		// (time-difference [100] * block-signer-importance [72000^] * multiplier * magic-number / difficulty [60e12])
@@ -132,17 +128,16 @@ public class BlockScorerTest {
 	@Test
 	public void targetIncreasesAsTimeElapses() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final MockBlockScorerAnalyzer accountAnalyzer = new MockBlockScorerAnalyzer();
-		final Account blockSigner = createAccountWithBalance(accountAnalyzer, 72);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
+		final Account blockSigner = context.createAccountWithBalance(72);
 
-		final Block previousBlock = createBlock(accountAnalyzer, Utils.generateRandomAccount(), 1, 11);
-		final Block block1 = createBlock(accountAnalyzer, blockSigner, 101, 11);
-		final Block block2 = createBlock(accountAnalyzer, blockSigner, 201, 11);
+		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
+		final Block block1 = createBlock(blockSigner, 101, 11);
+		final Block block2 = createBlock(blockSigner, 201, 11);
 
 		// Act:
-		final BigInteger target1 = scorer.calculateTarget(previousBlock, block1);
-		final BigInteger target2 = scorer.calculateTarget(previousBlock, block2);
+		final BigInteger target1 = context.scorer.calculateTarget(previousBlock, block1);
+		final BigInteger target2 = context.scorer.calculateTarget(previousBlock, block2);
 
 		// Assert: (time-difference * block-signer-balance * magic-number)
 		Assert.assertTrue(target1.compareTo(target2) < 0);
@@ -171,11 +166,10 @@ public class BlockScorerTest {
 
 	private static void assertGroupedHeight(final long height, final long expectedGroupedHeight) {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final TestContext context = new TestContext();
 
 		// Act:
-		final BlockHeight groupedHeight = scorer.getGroupedHeight(new BlockHeight(height));
+		final BlockHeight groupedHeight = context.scorer.getGroupedHeight(new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
@@ -188,13 +182,12 @@ public class BlockScorerTest {
 	@Test
 	public void calculateForgerBalanceDerivesBalanceFromImportance() {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final TestContext context = new TestContext();
 		final Block block = NisUtils.createRandomBlockWithHeight(100);
-		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(93), 0.75); // this is the grouped height
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(93), 0.75); // this is the grouped height
 
 		// Act:
-		final long balance = scorer.calculateForgerBalance(block);
+		final long balance = context.scorer.calculateForgerBalance(block);
 
 		// Assert:
 		Assert.assertThat(balance, IsEqual.equalTo(3_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
@@ -209,16 +202,16 @@ public class BlockScorerTest {
 
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
-		block.getSigner().getImportanceInfo().setImportance(new BlockHeight(groupedHeight), 0.75);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(groupedHeight), 0.75);
 
 		// Act:
-		scorer.calculateForgerBalance(block);
+		context.scorer.calculateForgerBalance(block);
 
 		// Assert:
-		Mockito.verify(accountAnalyzer, Mockito.times(1)).recalculateImportances(new BlockHeight(groupedHeight));
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(new BlockHeight(groupedHeight));
 	}
 
 	//endregion
@@ -240,19 +233,47 @@ public class BlockScorerTest {
 		return b;
 	}
 
-	private static Block createBlock(final AccountLookup accountLookup, final Account account, int timeStamp, long height) throws NoSuchFieldException, IllegalAccessException {
+	private static Block createBlock(final Account account, int timeStamp, long height) throws NoSuchFieldException, IllegalAccessException {
 		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 		block.sign();
-		return roundTripBlock(accountLookup, block);
+
+		final AccountCache accountCache = new AccountCache();
+		accountCache.addAccountToCache(account.getAddress());
+		return roundTripBlock(accountCache, block);
 	}
 
-	private Account createAccountWithBalance(MockBlockScorerAnalyzer mockBlockScorerAnalyzer, long balance) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(Amount.fromNem(balance));
-		account.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
-		final Account blockSigner = mockBlockScorerAnalyzer.addAccountToCache(account.getAddress());
-		blockSigner.incrementBalance(Amount.fromNem(balance));
-		blockSigner.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
-		return account;
+	private static BlockScorer createScorer() {
+		return new BlockScorer(Mockito.mock(PoiFacade.class));
+	}
+
+	private static class TestContext {
+		private final PoiFacade poiFacade;
+		private final BlockScorer scorer;
+
+		private TestContext() {
+			this(new PoiFacade((blockHeight, accountStates, scoringAlg) -> {
+				for (final PoiAccountState accountState : accountStates) {
+					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
+					final double importance = balance.getNumMicroNem() / 1000.0;
+					accountState.getImportanceInfo().setImportance(blockHeight, importance);
+				}
+			}));
+		}
+
+		private TestContext(final PoiFacade poiFacade) {
+			this.poiFacade = poiFacade;
+			this.scorer = new BlockScorer(this.poiFacade);
+		}
+
+		private Account createAccountWithBalance(final long balance) {
+			final Account account = Utils.generateRandomAccount();
+			this.poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances()
+					.addReceive(BlockHeight.ONE, Amount.fromNem(balance));
+			return account;
+		}
+
+		private AccountImportance getImportanceInfo(final Account account) {
+			return this.poiFacade.findStateByAddress(account.getAddress()).getImportanceInfo();
+		}
 	}
 }

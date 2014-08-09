@@ -283,7 +283,7 @@ public class Foraging {
 		final int limit = (int)Math.min(lastBlock.getHeight().getRaw(), (BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
 		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-		return scorer.calculateDifficulty(difficulties, timestamps);
+		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timestamps);
 	}
 
 	public Block createSignedBlock(
