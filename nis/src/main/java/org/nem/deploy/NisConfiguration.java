@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
+import org.nem.core.deploy.CommonStarter;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.io.InputStream;

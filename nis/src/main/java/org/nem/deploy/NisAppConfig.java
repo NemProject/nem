@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
+import org.nem.core.deploy.CommonStarter;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
 import org.nem.nis.dao.*;
