@@ -70,7 +70,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param block The block.
 	 */
 	public void updateScore(final Block parentBlock, final Block block) {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer);
+		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
 
@@ -122,7 +122,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	public Block forageBlock() {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer);
+		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 		final Block block = this.foraging.forageBlock(scorer);
 
 		// make a full-blown analysis
@@ -176,7 +176,7 @@ public class BlockChain implements BlockSynchronizer {
 	private NodeInteractionResult synchronizeNodeInternal(final SyncConnectorPool connectorPool, final Node node) {
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.getAccountCache().asAutoCache());
 		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
@@ -246,7 +246,7 @@ public class BlockChain implements BlockSynchronizer {
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
 		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
-		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.asAutoCache());
+		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.getAccountCache().asAutoCache());
 		// EVIL hack end
 
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -327,7 +327,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainScore ourScore) {
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = new BlockScorer(this.accountAnalyzer);
+			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
 			this.ourScore = ourScore;
@@ -347,14 +347,14 @@ public class BlockChain implements BlockSynchronizer {
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
 			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer), new BlockExecutor()));
+			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer), new BlockExecutor(this.accountAnalyzer.getPoiFacade())));
 			visitors.add(scoreVisitor);
 			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 			BlockIterator.unwindUntil(
 					this.createLocalBlockLookup(),
 					commonBlockHeight,
 					visitor);
-			this.accountAnalyzer.undoVesting(commonBlockHeight);
+			this.accountAnalyzer.getPoiFacade().undoVesting(commonBlockHeight);
 
 			return scoreVisitor.getScore();
 		}
@@ -388,7 +388,7 @@ public class BlockChain implements BlockSynchronizer {
 		private BlockLookup createLocalBlockLookup() {
 			return new LocalBlockLookupAdapter(
 					this.blockDao,
-					this.accountAnalyzer,
+					this.accountAnalyzer.getAccountCache(),
 					this.blockChainLastBlockLayer.getLastDbBlock(),
 					this.ourScore,
 					BlockChainConstants.BLOCKS_LIMIT);
@@ -433,7 +433,7 @@ public class BlockChain implements BlockSynchronizer {
 			this.foraging = foraging;
 
 			// do not trust peer, take first block from our db and convert it
-			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer);
+			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer.getAccountCache());
 
 			this.peerChain = peerChain;
 			this.ourScore = ourScore;
@@ -479,10 +479,12 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score or -1 if chain is invalid
 		 */
 		private boolean validatePeerChain() {
+			final BlockExecutor executor = new BlockExecutor(this.accountAnalyzer.getPoiFacade());
+			final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
+
 			final BlockChainValidator validator = new BlockChainValidator(
-					this.accountAnalyzer,
+					block -> executor.execute(block, observer),
 					this.blockScorer,
-					new BlockExecutor(),
 					BlockChainConstants.BLOCKS_LIMIT);
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
@@ -503,7 +505,7 @@ public class BlockChain implements BlockSynchronizer {
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
 			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.calculateDifficulty(difficulties, timestamps);
+				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timestamps);
 				block.setDifficulty(difficulty);
 
 				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
@@ -563,7 +565,7 @@ public class BlockChain implements BlockSynchronizer {
 				// as unconfirmed
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer))
+						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
 						.forEach(tr -> this.foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
 				currentHeight--;
 			}

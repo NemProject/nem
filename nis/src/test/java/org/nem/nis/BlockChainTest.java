@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -11,6 +12,7 @@ import org.nem.core.time.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.*;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
 
@@ -67,45 +69,36 @@ public class BlockChainTest {
 	}
 
 	private Vector<Account> prepareSigners(AccountAnalyzer accountAnalyzer) {
-		Vector<Account> accounts = new Vector<>();
+		final AccountCache accountCache = accountAnalyzer.getAccountCache();
+		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
+		final Vector<Account> accounts = new Vector<>();
 
 		Account a;
-		Account temp;
 
 		// 0 = signer
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		a.incrementBalance(Amount.fromNem(1_000_000_000));
-		temp = accountAnalyzer.addAccountToCache(a.getAddress());
-		temp.incrementBalance(Amount.fromNem(1_000_000_000));
-		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
+		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		a.incrementBalance(Amount.fromNem(1_000));
-		temp = accountAnalyzer.addAccountToCache(a.getAddress());
-		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		accountAnalyzer.addAccountToCache(a.getAddress());
+		accountCache.addAccountToCache(a.getAddress());
 
 		// 2nd sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		a.incrementBalance(Amount.fromNem(1_000));
-		a.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
-		temp = accountAnalyzer.addAccountToCache(a.getAddress());
-		temp.incrementBalance(Amount.fromNem(1_000));
-		temp.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		accountAnalyzer.addAccountToCache(a.getAddress());
+		accountCache.addAccountToCache(a.getAddress());
 
 		return accounts;
 	}
@@ -113,20 +106,22 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer((blockHeight, accounts, scoringAlg) -> {
-			accounts.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accounts.size()));
-		});
+		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates, scoringAlg) ->
+				accountStates.stream()
+						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
 		final Account signer = accounts.get(0);
 
-		final Block parentBlock = createBlock(signer, accountAnalyzer);
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final Block parentBlock = createBlock(signer, accountAnalyzer.getAccountCache());
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
-		for (final Account account : accountAnalyzer)
-			account.setHeight(BlockHeight.ONE);
+		for (final Account account : accountAnalyzer.getAccountCache()) {
+			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+		}
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
@@ -138,13 +133,13 @@ public class BlockChainTest {
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
-		final Foraging foraging = new MockForaging(accountAnalyzer, blockChainLastBlockLayer);
+		final Foraging foraging = Mockito.mock(Foraging.class);
 		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, foraging);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));
 		final ValidationResult result = blockChain.processBlock(block);
-		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer);
+		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
 		TransferTransaction transaction;
 
 		// Assert:
@@ -155,7 +150,7 @@ public class BlockChainTest {
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
-		
+
 		// siblings with same score must be rejected
 		// Act:
 		Block sibling = createBlockSiblingWithSameScore(block, parentBlock, accounts);
@@ -225,7 +220,7 @@ public class BlockChainTest {
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
 		List<Block> historicalBlocks = blocks.subList(Math.max(0, blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), blocks.size());
-		final BlockDifficulty difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
+		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
@@ -246,9 +241,9 @@ public class BlockChainTest {
 		block.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		block.sign();
 
-		return roundTripBlock(accountAnalyzer, block);
+		return roundTripBlock(accountAnalyzer.getAccountCache(), block);
 	}
-	
+
 	private Block createBlockSiblingWithSameScore(Block block, Block parentBlock, List<Account> accounts) {
 		Account signer = accounts.get(accounts.indexOf(block.getSigner()));
 		Block sibling = new Block(signer, parentBlock, block.getTimeStamp());
@@ -256,7 +251,7 @@ public class BlockChainTest {
 		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
 		sibling.addTransaction(transaction1);
 		sibling.sign();
-		
+
 		return sibling;
 	}
 
