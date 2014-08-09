@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 
@@ -70,15 +71,15 @@ public class AccountImportanceTest {
 		final AccountImportance ai = new AccountImportance();
 
 		// Act:
-		ai.addOutlink(Utils.createLink(7, 27, "BBB"));
-		ai.addOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.addOutlink(Utils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Assert:
 		final List<AccountLink> expectedLinks = Arrays.asList(
-				Utils.createLink(7, 27, "BBB"),
-				Utils.createLink(8, 35, "CCC"),
-				Utils.createLink(9, 18, "AAA"));
+				NisUtils.createLink(7, 27, "BBB"),
+				NisUtils.createLink(8, 35, "CCC"),
+				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = toList(ai.getOutlinksIterator(new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
@@ -91,15 +92,15 @@ public class AccountImportanceTest {
 		final AccountImportance ai = new AccountImportance();
 
 		// Act:
-		ai.addOutlink(Utils.createLink(7, 27, "BBB"));
-		ai.addOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.removeOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.addOutlink(Utils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.removeOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Assert:
 		final List<AccountLink> expectedLinks = Arrays.asList(
-				Utils.createLink(7, 27, "BBB"),
-				Utils.createLink(9, 18, "AAA"));
+				NisUtils.createLink(7, 27, "BBB"),
+				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = toList(ai.getOutlinksIterator(new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
@@ -112,14 +113,14 @@ public class AccountImportanceTest {
 		final AccountImportance ai = new AccountImportance();
 
 		// Act:
-		ai.addOutlink(Utils.createLink(7, 27, "BBB"));
-		ai.addOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.addOutlink(Utils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Assert:
 		final List<AccountLink> expectedLinks = Arrays.asList(
-				Utils.createLink(7, 27, "BBB"),
-				Utils.createLink(8, 35, "CCC"));
+				NisUtils.createLink(7, 27, "BBB"),
+				NisUtils.createLink(8, 35, "CCC"));
 
 		final List<AccountLink> links = toList(ai.getOutlinksIterator(new BlockHeight(8)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
@@ -247,18 +248,18 @@ public class AccountImportanceTest {
 	public void copyCopiesHistoricalOutlinkInformation() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
-		ai.addOutlink(Utils.createLink(7, 27, "BBB"));
-		ai.addOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.addOutlink(Utils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Act:
 		final AccountImportance copy = ai.copy();
 
 		// Assert:
 		final List<AccountLink> expectedLinks = Arrays.asList(
-				Utils.createLink(7, 27, "BBB"),
-				Utils.createLink(8, 35, "CCC"),
-				Utils.createLink(9, 18, "AAA"));
+				NisUtils.createLink(7, 27, "BBB"),
+				NisUtils.createLink(8, 35, "CCC"),
+				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = toList(copy.getOutlinksIterator(new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
@@ -269,13 +270,13 @@ public class AccountImportanceTest {
 	public void copyCreatesDeepCopyOfHistoricalOutlinkInformation() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
-		ai.addOutlink(Utils.createLink(7, 27, "BBB"));
-		ai.addOutlink(Utils.createLink(8, 35, "CCC"));
-		ai.addOutlink(Utils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Act:
 		final AccountImportance copy = ai.copy();
-		copy.addOutlink(Utils.createLink(11, 14, "DDD"));
+		copy.addOutlink(NisUtils.createLink(11, 14, "DDD"));
 
 		// Assert:
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(3));

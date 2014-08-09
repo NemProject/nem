@@ -2,10 +2,11 @@ package org.nem.nis.test;
 
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Block;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.secret.AccountLink;
 
 import java.util.*;
 
@@ -97,5 +98,20 @@ public class NisUtils {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);
 		return timeProvider;
+	}
+
+	/**
+	 * Creates a new account link.
+	 *
+	 * @param blockHeight The block height.
+	 * @param amount The amount.
+	 * @param address The address.
+	 * @return The account link.
+	 */
+	public static AccountLink createLink(final int blockHeight, final long amount, final String address) {
+		return new AccountLink(
+				new BlockHeight(blockHeight),
+				Amount.fromNem(amount),
+				Address.fromEncoded(address));
 	}
 }

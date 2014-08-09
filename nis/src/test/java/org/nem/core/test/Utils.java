@@ -3,10 +3,8 @@ package org.nem.core.test;
 import net.minidev.json.JSONObject;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.secret.AccountLink;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -293,20 +291,5 @@ public class Utils {
 		return new JsonDeserializer(
 				object,
 				new DeserializationContext(new MockAccountLookup()));
-	}
-
-	/**
-	 * Creates a new account link.
-	 *
-	 * @param blockHeight The block height.
-	 * @param amount The amount.
-	 * @param address The address.
-	 * @return The account link.
-	 */
-	public static AccountLink createLink(final int blockHeight, final long amount, final String address) {
-		return new AccountLink(
-				new BlockHeight(blockHeight),
-				Amount.fromNem(amount),
-				Address.fromEncoded(address));
 	}
 }
