@@ -77,6 +77,7 @@ public class NisMain {
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
+		final BlockExecutor executor = new BlockExecutor(this.accountAnalyzer.getPoiFacade());
 		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.getAccountCache().asAutoCache());
@@ -89,7 +90,7 @@ public class NisMain {
 				this.blockChain.updateScore(parentBlock, block);
 			}
 
-			new BlockExecutor(this.accountAnalyzer.getPoiFacade()).execute(block, observer);
+			executor.execute(block, observer);
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {

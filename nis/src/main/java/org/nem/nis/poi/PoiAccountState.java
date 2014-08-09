@@ -19,13 +19,18 @@ public class PoiAccountState {
 	 * Creates a new NIS account state.
 	 */
 	public PoiAccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances());
+		this(address, new AccountImportance(), new WeightedBalances(), null);
 	}
 
-	private PoiAccountState(final Address address, final AccountImportance importance, final WeightedBalances weightedBalances) {
+	private PoiAccountState(
+			final Address address,
+			final AccountImportance importance,
+			final WeightedBalances weightedBalances,
+			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
+		this.height = height;
 	}
 
 	/**
@@ -80,6 +85,6 @@ public class PoiAccountState {
 	 * @return A copy of this state.
 	 */
 	public PoiAccountState copy() {
-		return new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy());
+		return new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
 	}
 }

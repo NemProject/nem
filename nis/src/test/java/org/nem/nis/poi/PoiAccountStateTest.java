@@ -21,6 +21,7 @@ public class PoiAccountStateTest {
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
+		Assert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -77,6 +78,19 @@ public class PoiAccountStateTest {
 		// Assert:
 		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
 		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
+	}
+
+	@Test
+	public void copyCopiesHeight() {
+		// Arrange:
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		state.setHeight(new BlockHeight(17));
+
+		// Act:
+		final PoiAccountState copy = state.copy();
+
+		// Assert:
+		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
 	//endregion
