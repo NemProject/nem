@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,16 @@ import java.util.*;
  */
 @Service
 public class BlockExecutor {
+	private final PoiFacade poiFacade;
+
+	/**
+	 * Creates a new block executor.
+	 *
+	 * @param poiFacade The poi facade.
+	 */
+	public BlockExecutor(final PoiFacade poiFacade) {
+		this.poiFacade = poiFacade;
+	}
 
 	//region execute
 
@@ -108,14 +119,14 @@ public class BlockExecutor {
 			final boolean isExecute,
 			final Collection<BlockTransferObserver> observers) {
 		final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
-		blockTransferObservers.add(new WeightedBalancesObserver());
+		blockTransferObservers.add(new WeightedBalancesObserver(this.poiFacade));
 		blockTransferObservers.addAll(observers);
 
 		final TransferObserver aggregateObserver = new AggregateBlockTransferObserverToTransferObserverAdapter(
 				blockTransferObservers,
 				block.getHeight(),
 				isExecute);
-		final TransferObserver outlinkObserver = new OutlinkObserver(block.getHeight(), isExecute);
+		final TransferObserver outlinkObserver = new OutlinkObserver(this.poiFacade, block.getHeight(), isExecute);
 
 		// in an undo operation, the OutlinkObserver should be run before the balance is updated
 		// (so that the matching link can be found and removed)

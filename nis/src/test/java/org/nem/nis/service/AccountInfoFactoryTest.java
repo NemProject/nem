@@ -9,66 +9,57 @@ import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
+import org.nem.nis.poi.*;
 
 public class AccountInfoFactoryTest {
 
 	@Test
 	public void factoryDelegatesToAccountLookup() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final Account account = createAccount(address);
-		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		Mockito.when(accountLookup.findByAddress(address)).thenReturn(account);
-		final AccountInfoFactory factory = new AccountInfoFactory(accountLookup);
+		final TestContext context = new TestContext();
 
 		// Act:
-		factory.createInfo(address);
+		context.factory.createInfo(context.address);
 
 		// Assert:
-		Mockito.verify(accountLookup, Mockito.times(1)).findByAddress(address);
+		Mockito.verify(context.accountLookup, Mockito.times(1)).findByAddress(context.address);
+	}
+
+	@Test
+	public void factoryDelegatesToPoiFacade() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.factory.createInfo(context.address);
+
+		// Assert:
+		Mockito.verify(context.poiFacade, Mockito.times(1)).findStateByAddress(context.address);
 	}
 
 	@Test
 	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSet() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final Account account = createAccount(address);
-		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
-		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		Mockito.when(accountLookup.findByAddress(address)).thenReturn(account);
-		final AccountInfoFactory factory = new AccountInfoFactory(accountLookup);
+		final TestContext context = new TestContext();
+		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
 
 		// Act:
-		final AccountInfo info = factory.createInfo(address);
+		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(0.796));
+		assertAccountInfo(info, context.address, 0.796);
 	}
 
 	@Test
 	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsUnset() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final Account account = createAccount(address);
-		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		Mockito.when(accountLookup.findByAddress(address)).thenReturn(account);
-		final AccountInfoFactory factory = new AccountInfoFactory(accountLookup);
+		final TestContext context = new TestContext();
 
 		// Act:
-		final AccountInfo info = factory.createInfo(address);
+		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(0.0));
+		assertAccountInfo(info, context.address, 0.0);
 	}
 
 	private static Account createAccount(final Address address) {
@@ -82,5 +73,29 @@ public class AccountInfoFactoryTest {
 		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
 		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
+	}
+
+	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance) {
+		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
+		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
+		Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
+	}
+
+	private static class TestContext {
+		private final Address address = Utils.generateRandomAddressWithPublicKey();
+		private final Account account = createAccount(this.address);
+		private final PoiAccountState accountState = new PoiAccountState(this.address);
+
+		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.poiFacade);
+
+		private TestContext() {
+			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
+			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(this.accountState);
+		}
 	}
 }

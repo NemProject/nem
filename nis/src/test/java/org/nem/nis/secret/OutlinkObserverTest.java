@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.poi.*;
 
 public class OutlinkObserverTest {
 
@@ -14,7 +15,7 @@ public class OutlinkObserverTest {
 	public void notifyTransferExecuteAddsSenderOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), true);
+		final OutlinkObserver observer = context.createObserver(true);
 
 		// Act:
 		observer.notifyTransfer(context.account1, context.account2, new Amount(752));
@@ -30,7 +31,7 @@ public class OutlinkObserverTest {
 	public void notifyTransferUndoRemovesRecipientOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), false);
+		final OutlinkObserver observer = context.createObserver(false);
 
 		// Act:
 		observer.notifyTransfer(context.account2, context.account1, new Amount(752));
@@ -46,7 +47,7 @@ public class OutlinkObserverTest {
 	public void notifyTransferDoesNotAddSelfOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), true);
+		final OutlinkObserver observer = context.createObserver(true);
 
 		// Act:
 		observer.notifyTransfer(context.account1, context.account1, new Amount(752));
@@ -75,7 +76,7 @@ public class OutlinkObserverTest {
 	private static void assertNotifyCreditDoesNotChangeOutlinks(boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), isExecute);
+		final OutlinkObserver observer = context.createObserver(isExecute);
 
 		// Act:
 		observer.notifyCredit(context.account1, new Amount(432));
@@ -103,7 +104,7 @@ public class OutlinkObserverTest {
 	private static void assertNotifyDebitDoesNotChangeOutlinks(boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = new OutlinkObserver(new BlockHeight(111), isExecute);
+		final OutlinkObserver observer = context.createObserver(isExecute);
 
 		// Act:
 		observer.notifyDebit(context.account1, new Amount(432));
@@ -129,9 +130,10 @@ public class OutlinkObserverTest {
 		private final AccountImportance importance2;
 		private final WeightedBalances weightedBalances1;
 		private final WeightedBalances weightedBalances2;
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
-			BlockHeight height = new BlockHeight(111);
+			final BlockHeight height = new BlockHeight(111);
 			this.account1 = Mockito.mock(Account.class);
 			this.importance1 = Mockito.mock(AccountImportance.class);
 			this.weightedBalances1 = Mockito.mock(WeightedBalances.class);
@@ -143,10 +145,19 @@ public class OutlinkObserverTest {
 			this.hook(this.account2, this.importance2, this.weightedBalances2, height);
 		}
 
+		private OutlinkObserver createObserver(final boolean isExecute) {
+			return new OutlinkObserver(this.poiFacade, new BlockHeight(111), isExecute);
+		}
+
 		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
-			Mockito.when(account.getAddress()).thenReturn(Utils.generateRandomAddress());
-			Mockito.when(account.getImportanceInfo()).thenReturn(importance);
-			Mockito.when(account.getWeightedBalances()).thenReturn(weightedBalances);
+			final Address address = Utils.generateRandomAddress();
+			Mockito.when(account.getAddress()).thenReturn(address);
+
+			final PoiAccountState poiAccountState = Mockito.mock(PoiAccountState.class);
+			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(poiAccountState);
+			Mockito.when(poiAccountState.getAddress()).thenReturn(address);
+			Mockito.when(poiAccountState.getImportanceInfo()).thenReturn(importance);
+			Mockito.when(poiAccountState.getWeightedBalances()).thenReturn(weightedBalances);
 			Mockito.when(weightedBalances.getUnvested(height)).thenReturn(Amount.fromNem(7));
 			Mockito.when(weightedBalances.getVested(height)).thenReturn(Amount.fromNem(3));
 		}

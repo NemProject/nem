@@ -2,8 +2,10 @@ package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.test.Utils;
+import org.nem.nis.poi.*;
 
 public class WeightedBalancesObserverTest {
 
@@ -77,11 +79,19 @@ public class WeightedBalancesObserverTest {
 		private final WeightedBalancesObserver observer;
 
 		public TestContext() {
+			final Address address = Utils.generateRandomAddress();
 			this.account = Mockito.mock(Account.class);
-			this.balances = Mockito.mock(WeightedBalances.class);
-			Mockito.when(this.account.getWeightedBalances()).thenReturn(this.balances);
+			Mockito.when(account.getAddress()).thenReturn(address);
 
-			this.observer = new WeightedBalancesObserver();
+			this.balances = Mockito.mock(WeightedBalances.class);
+
+			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
+
+			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+			Mockito.when(poiFacade.findStateByAddress(address)).thenReturn(accountState);
+
+			this.observer = new WeightedBalancesObserver(poiFacade);
 		}
 	}
 }

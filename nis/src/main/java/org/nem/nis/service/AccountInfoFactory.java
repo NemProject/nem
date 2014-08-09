@@ -3,6 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.AccountImportance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
+	private final PoiFacade poiFacade;
 
 	/**
 	 * Creates a new account info factory.
@@ -20,8 +22,11 @@ public class AccountInfoFactory {
 	 * @param accountLookup The account lookup.
 	 */
 	@Autowired(required = true)
-	public AccountInfoFactory(final AccountLookup accountLookup) {
+	public AccountInfoFactory(
+			final AccountLookup accountLookup,
+			final PoiFacade poiFacade) {
 		this.accountLookup = accountLookup;
+		this.poiFacade = poiFacade;
 	}
 
 	/**
@@ -32,7 +37,7 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
-		final AccountImportance ai = account.getImportanceInfo();
+		final AccountImportance ai = this.poiFacade.findStateByAddress(address).getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
 				account.getBalance(),
