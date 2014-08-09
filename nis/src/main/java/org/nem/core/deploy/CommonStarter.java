@@ -239,6 +239,13 @@ public class CommonStarter implements ServletContextListener {
         server.setDumpBeforeStop(false);
         server.setStopAtShutdown(true);
 
+		/*
+		TODO: no time left to get this working :/
+		this.startWebApplication(this.jettyServer);
+		WebStartProxy.openWebBrowser(NCC_HOME_URL);
+		NISController.startNISViaWebStart(this.nisJnlpUrl);
+		*/
+
         LOGGER.info("Calling start().");
         final StringBuilder builder = new StringBuilder();
         builder.append(configProps.getProperty("nem.url"))
