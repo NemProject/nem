@@ -45,7 +45,6 @@ public class DebugControllerTest {
 				timestamp.addSeconds(60),
 				height);
 		blockDaoBlock.setDifficulty(difficulty);
-		blockDaoBlock.getSigner().setHeight(BlockHeight.ONE);
 
 		final Block blockDaoParent = new Block(
 				signer2,
@@ -54,7 +53,6 @@ public class DebugControllerTest {
 				timestamp,
 				height.prev());
 		blockDaoParent.setDifficulty(difficulty);
-		blockDaoParent.getSigner().setHeight(BlockHeight.ONE);
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 		scorer.forceImportanceCalculation();
@@ -152,10 +150,14 @@ public class DebugControllerTest {
 	}
 
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
-		final Account account = accountAnalyzer.getAccountCache().addAccountToCache(Utils.generateRandomAccount().getAddress());
+		final Account accountWithPrivateKey = Utils.generateRandomAccount();
+		final Account account = accountAnalyzer.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
 		account.incrementBalance(Amount.fromNem(10000));
-		account.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
-		return account;
+
+		final PoiAccountState accountState = accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress());
+		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
+		accountState.setHeight(BlockHeight.ONE);
+		return accountWithPrivateKey;
 	}
 
 	private static class TestContext {
