@@ -85,6 +85,7 @@ public class AccountController {
 
 	// TODO-CR, with this change, who do we expect to call account/transfers?
 	// G-J: noone, account/transfers, should finally be removed and replaced by calls to methods below
+	// J-G: so, why don't we remove it?
 
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(AccountTransactionsPageBuilder builder, ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();

@@ -139,6 +139,8 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
 	}
 
+	// TODO-CR 20140809 -(minor) probably clearer to drop each param to its own line (also use final and remove the unused imports,
+	// and following double blank lines) ... will be much easier when we run our "code cleanup"
 	private void accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType transferType, BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
@@ -163,6 +165,7 @@ public class AccountControllerTest {
 
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
+		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
 		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersAll(accountTransactionsPageBuilder));

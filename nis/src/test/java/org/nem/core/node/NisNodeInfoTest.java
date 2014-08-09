@@ -38,6 +38,9 @@ public class NisNodeInfoTest {
 		Assert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
 	}
 
+	// TODO-CR 20140809 - minor - might want to consider constants for the indexes { ORIGINAL, DIFFERENT, EQUIVALENT } ->
+	// new NisNodeInfo(nodes.get(ORIGINAL), appMetaData.get(DIFFERENT)); --> just makes it easier to read the tests, imo
+
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
@@ -96,6 +99,7 @@ public class NisNodeInfoTest {
 		return new NisNodeInfo(org.nem.core.test.Utils.roundtripSerializableEntity(nodeInfo, null));
 	}
 
+	// TODO-CR 20140809 - minor (group this closer to the tests using it (e.g. right after createThreeTestNodes)
 	private static List<ApplicationMetaData> createThreeAppMetaData() {
 		return Arrays.asList(
 				createAppMetaData("nem", "1.0"),

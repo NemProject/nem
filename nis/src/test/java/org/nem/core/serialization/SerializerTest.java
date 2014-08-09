@@ -177,9 +177,11 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 				() -> deserializer.readBigInteger("BigInteger"),
 				"BigInteger");
 	}
+
 	//endregion
 
 	//region byte[] Roundtrip
+
 	@Test
 	public void canRoundtripBytes() {
 		// Arrange:

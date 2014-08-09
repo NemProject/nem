@@ -120,6 +120,7 @@ public class ApplicationMetaData implements SerializableEntity {
 			return false;
 		}
 
+		// TODO-CR: 20140809 - instead of null checks here, we can use Objects.equals(...)
 		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
 		return this.appName.equals(rhs.appName) &&
 				this.version.equals(rhs.version) &&

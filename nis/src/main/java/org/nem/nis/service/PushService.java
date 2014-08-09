@@ -107,6 +107,7 @@ public class PushService {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
 			}
+
 			return isValidResult;
 		}
 

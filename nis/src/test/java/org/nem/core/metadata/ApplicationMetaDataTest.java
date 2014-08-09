@@ -103,6 +103,10 @@ public class ApplicationMetaDataTest {
 		Assert.assertThat(metaData1, IsEqual.equalTo(metaData4));
 		Assert.assertThat(metaData1, IsNot.not(IsEqual.equalTo(metaData2)));
 		Assert.assertThat(metaData1, IsNot.not(IsEqual.equalTo(metaData3)));
+
+		// TODO-CR 20140809 - missing comparison with metaData4
+		// TODO-CR 20140809 - also, should consider testing comparison with a different certificate
+		// TODO-CR 20140809 - also, a good idea to test inequality against null and an object of a different type for completeness
 	}
 
 	@Test
@@ -123,6 +127,8 @@ public class ApplicationMetaDataTest {
 		Assert.assertThat(metaData1.hashCode(), IsEqual.equalTo(metaData4.hashCode()));
 		Assert.assertThat(metaData1.hashCode(), IsNot.not(IsEqual.equalTo(metaData2.hashCode())));
 		Assert.assertThat(metaData1.hashCode(), IsNot.not(IsEqual.equalTo(metaData3.hashCode())));
+
+		// TODO-CR 20140809 - same comments as equals
 	}
 
 	//endregion

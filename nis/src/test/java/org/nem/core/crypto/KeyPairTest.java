@@ -72,9 +72,7 @@ public class KeyPairTest {
 
 	@Test
 	public void keyPairProducesCorrectPublicKeysSuite() {
-		// TODO-CR: nice test, but i would suggest storing the test data in a map (private-key, public-key)
-		// G->J hope it's better
-		Map<String, String> priv2Pub = new HashMap<String, String>() {{
+		final Map<String, String> priv2Pub = new HashMap<String, String>() {{
 			put("9201D5322CDB870181830D7529EDB9A668A09324277263865B5D136500234CB2", "024095F37906AB8FFB9EA44085BED4748F3F5E3FFD66C5A70818399BFCD24308B4");
 			put("FED8F9D7E0428821D24E5429FFA5F8232FC08313D61C1BF6DF9B1DDF81973ADE", "02213e18b3c33f06518b6d4d3324b6f0961db98253232666bdd126552e05a0d0f3");
 			/* alice  */ put("008c1f538e0f15a1253692b076dfad46578dc874912b148019dd3c7076d4025dba", "02d2de7addd7fce7b3c0144ca40269fdafc2cae7bb08f2c4f8c5f6c665a8a59698");
@@ -102,8 +100,9 @@ public class KeyPairTest {
 		}};
 
 		// Arrange:
-		for (Map.Entry<String, String> entry : priv2Pub.entrySet()) {
+		for (final Map.Entry<String, String> entry : priv2Pub.entrySet()) {
 			final String privateKey = entry.getKey();
+
 			// Act:
 			final KeyPair keyPair = new KeyPair(PrivateKey.fromHexString(privateKey));
 
