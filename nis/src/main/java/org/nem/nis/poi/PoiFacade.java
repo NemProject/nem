@@ -50,6 +50,26 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	}
 
 	/**
+	 * Removes an account state from the cache if it is in the cache.
+	 *
+	 * @param address The address of the account state to remove.
+	 */
+	public void removeFromCache(final Address address) {
+		this.addressToStateMap.remove(address);
+	}
+
+	/**
+	 * Copies this facade's states to another facade's map.
+	 *
+	 * @param rhs The other facade.
+	 */
+	public void shallowCopyTo(final PoiFacade rhs) {
+		rhs.addressToStateMap.clear();
+		rhs.addressToStateMap.putAll(this.addressToStateMap);
+		rhs.lastPoiRecalculationHeight = this.lastPoiRecalculationHeight;
+	}
+
+	/**
 	 * Undoes weighted balances vesting to a given block height.
 	 *
 	 * @param height The block height.

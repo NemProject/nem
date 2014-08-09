@@ -37,7 +37,7 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	}
 
 	/**
-	 * Copies this analyzer's account to address map to another analyzer's map.
+	 * Copies this cache's accounts to another cache's map.
 	 *
 	 * @param rhs The other analyzer.
 	 */
@@ -65,7 +65,7 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	 *
 	 * @param address The address of the account to remove.
 	 */
-	public void removeAccountFromCache(final Address address) {
+	public void removeFromCache(final Address address) {
 		this.addressToAccountMap.remove(address);
 	}
 

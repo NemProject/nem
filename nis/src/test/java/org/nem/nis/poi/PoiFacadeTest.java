@@ -46,6 +46,52 @@ public class PoiFacadeTest {
 
 	//endregion
 
+	//region removeFromCache
+
+	@Test
+	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		facade.findStateByAddress(address);
+		facade.removeFromCache(address);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void accountWithPublicKeyCanBeRemovedFromCache() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		facade.findStateByAddress(address);
+		facade.removeFromCache(address);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		facade.findStateByAddress(address);
+		facade.removeFromCache(Utils.generateRandomAddress());
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+	}
+
+	//endregion
+
 	//region copy
 
 	@Test
@@ -113,6 +159,78 @@ public class PoiFacadeTest {
 		// Assert:
 		Assert.assertThat(copyFacade.size(), IsEqual.equalTo(1));
 		Assert.assertThat(copyStateFromEncoded, IsSame.sameInstance(copyStateFromPublicKey));
+	}
+
+	//endregion
+
+	//region shallowCopyTo
+
+	@Test
+	public void shallowCopyToCreatesLinkedAnalyzerCopy() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		final Address address3 = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		final PoiAccountState state1 = facade.findStateByAddress(address1);
+		final PoiAccountState state2 = facade.findStateByAddress(address2);
+		final PoiAccountState state3 = facade.findStateByAddress(address3);
+
+		// Act:
+		final PoiFacade copyFacade = createPoiFacade();
+		facade.shallowCopyTo(copyFacade);
+
+		final PoiAccountState copyState1 = copyFacade.findStateByAddress(address1);
+		final PoiAccountState copyState2 = copyFacade.findStateByAddress(address2);
+		final PoiAccountState copyState3 = copyFacade.findStateByAddress(address3);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(3));
+		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
+		Assert.assertThat(copyState2, IsSame.sameInstance(state2));
+		Assert.assertThat(copyState3, IsSame.sameInstance(state3));
+	}
+
+	@Test
+	public void shallowCopyDoesNotRecalculateImportancesForSameBlock() {
+		// Arrange:
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		facade.recalculateImportances(new BlockHeight(1234));
+
+		// Act:
+		final PoiFacade copyFacade = createPoiFacade();
+		facade.shallowCopyTo(copyFacade);
+
+		facade.recalculateImportances(new BlockHeight(1234));
+
+		// Assert: updateAccountImportances was only called once because the copy is using the cached result from the original
+		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void shallowCopyToRemovesAnyPreviouslyExistingEntries() {
+		// Arrange:
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		final PoiAccountState state1 = facade.findStateByAddress(address1);
+
+		final PoiFacade copyFacade = createPoiFacade();
+		final PoiAccountState state2 = copyFacade.findStateByAddress(address2);
+
+		// Act:
+		facade.shallowCopyTo(copyFacade);
+
+		final PoiAccountState copyState1 = copyFacade.findStateByAddress(address1);
+		final PoiAccountState copyState2 = copyFacade.findStateByAddress(address2);
+
+		// Assert:
+		Assert.assertThat(copyFacade.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
+		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
+		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2)));
 	}
 
 	//endregion

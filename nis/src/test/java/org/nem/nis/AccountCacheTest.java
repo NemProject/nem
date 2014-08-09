@@ -107,7 +107,7 @@ public class AccountCacheTest {
 
 	//endregion
 
-	//region remove
+	//region removeFromCache
 
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
@@ -117,7 +117,7 @@ public class AccountCacheTest {
 
 		// Act:
 		final Account account = cache.addAccountToCache(address);
-		cache.removeAccountFromCache(account.getAddress());
+		cache.removeFromCache(account.getAddress());
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
@@ -131,7 +131,7 @@ public class AccountCacheTest {
 
 		// Act:
 		final Account account = cache.addAccountToCache(address);
-		cache.removeAccountFromCache(account.getAddress());
+		cache.removeFromCache(account.getAddress());
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
@@ -145,7 +145,7 @@ public class AccountCacheTest {
 
 		// Act:
 		cache.addAccountToCache(address);
-		cache.removeAccountFromCache(Utils.generateRandomAddress());
+		cache.removeFromCache(Utils.generateRandomAddress());
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
