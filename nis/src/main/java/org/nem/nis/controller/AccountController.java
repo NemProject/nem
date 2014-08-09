@@ -84,6 +84,12 @@ public class AccountController {
 	}
 
 	// TODO-CR, with this change, who do we expect to call account/transfers?
+	// G-J: noone, account/transfers, should finally be removed and replaced by calls to methods below
+
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(AccountTransactionsPageBuilder builder, ReadOnlyTransferDao.TransferType transferType) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
+	}
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
@@ -94,10 +100,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
-		// TODO-CR: consider adding a private function like getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType)
-		// (the only difference between this and the next two functions in the TransferType value)
-		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.ALL);
+		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
@@ -109,8 +112,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
-		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.INCOMING);
+		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
@@ -122,8 +124,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
-		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), ReadOnlyTransferDao.TransferType.OUTGOING);
+		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	/**
