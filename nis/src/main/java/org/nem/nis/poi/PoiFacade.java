@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * A facade on top of the poi package.
  */
-public class PoiFacade {
+public class PoiFacade implements Iterable<PoiAccountState> {
 	private final Map<Address, PoiAccountState> addressToStateMap = new ConcurrentHashMap<>();
 	private final PoiImportanceGenerator importanceGenerator;
 	private BlockHeight lastPoiRecalculationHeight;
@@ -96,5 +96,10 @@ public class PoiFacade {
 
 		copy.lastPoiRecalculationHeight = this.lastPoiRecalculationHeight;
 		return copy;
+	}
+
+	@Override
+	public Iterator<PoiAccountState> iterator() {
+		return this.addressToStateMap.values().iterator();
 	}
 }

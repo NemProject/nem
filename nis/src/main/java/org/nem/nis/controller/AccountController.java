@@ -8,6 +8,7 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,15 +24,18 @@ public class AccountController {
 	private final Foraging foraging;
 	private final AccountIo accountIo;
 	private final AccountInfoFactory accountInfoFactory;
+	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
 	AccountController(
 			final Foraging foraging,
 			final AccountIo accountIo,
-			final AccountInfoFactory accountInfoFactory) {
+			final AccountInfoFactory accountInfoFactory,
+			final PoiFacade poiFacade) {
 		this.foraging = foraging;
 		this.accountIo = accountIo;
 		this.accountInfoFactory = accountInfoFactory;
+		this.poiFacade = poiFacade;
 	}
 
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
@@ -178,10 +182,10 @@ public class AccountController {
 	@PublicApi
 	@ClientApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		final List<AccountImportanceViewModel> accounts = StreamSupport.stream(this.accountIo.spliterator(), false)
+		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.poiFacade.spliterator(), false)
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 
-		return new SerializableList<>(accounts);
+		return new SerializableList<>(viewModels);
 	}
 }

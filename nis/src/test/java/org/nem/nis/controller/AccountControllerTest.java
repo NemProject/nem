@@ -13,6 +13,7 @@ import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.*;
 
@@ -231,15 +232,13 @@ public class AccountControllerTest {
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
-		final List<Account> accounts = Arrays.asList(
-				createAccount("alpha", 12, 45),
-				createAccount("gamma", 0, 0),
-				createAccount("sigma", 4, 88));
+		final List<PoiAccountState> accountStates = Arrays.asList(
+				createAccountState("alpha", 12, 45),
+				createAccountState("gamma", 0, 0),
+				createAccountState("sigma", 4, 88));
 
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.spliterator()).thenReturn(accounts.spliterator());
-
-		final TestContext context = new TestContext(accountIoAdapter);
+		final TestContext context = new TestContext();
+		Mockito.when(context.poiFacade.spliterator()).thenReturn(accountStates.spliterator());
 
 		// Act:
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
@@ -252,16 +251,16 @@ public class AccountControllerTest {
 		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
-	private static Account createAccount(
+	private static PoiAccountState createAccountState(
 			final String encodedAddress,
 			final int blockHeight,
 			final int importance) {
-		final Account account = new Account(Address.fromEncoded(encodedAddress));
+		final PoiAccountState state = new PoiAccountState(Address.fromEncoded(encodedAddress));
 		if (blockHeight > 0) {
-			account.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
+			state.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
 		}
 
-		return account;
+		return state;
 	}
 
 	private static AccountImportanceViewModel createAccountImportanceViewModel(
@@ -280,6 +279,7 @@ public class AccountControllerTest {
 		private final Foraging foraging;
 		private final AccountController controller;
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -291,7 +291,11 @@ public class AccountControllerTest {
 
 		public TestContext(final Foraging foraging, final AccountIoAdapter accountIoAdapter) {
 			this.foraging = foraging;
-			this.controller = new AccountController(this.foraging, accountIoAdapter, this.accountInfoFactory);
+			this.controller = new AccountController(
+					this.foraging,
+					accountIoAdapter,
+					this.accountInfoFactory,
+					this.poiFacade);
 		}
 	}
 }

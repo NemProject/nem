@@ -261,6 +261,30 @@ public class PoiFacadeTest {
 
 	//endregion
 
+	//region iterator
+
+	@Test
+	public void iteratorReturnsAllAccounts() {
+		// Arrange:
+		final PoiFacade facade = createPoiFacade();
+
+		final List<PoiAccountState> accountStates = new ArrayList<>();
+		for (int i = 0; i < 3; ++i)
+			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
+
+		// Act:
+		final List<PoiAccountState> iteratedAccountStates = StreamSupport.stream(facade.spliterator(), false)
+				.collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(iteratedAccountStates.size(), IsEqual.equalTo(3));
+		Assert.assertThat(
+				iteratedAccountStates.stream().map(a -> a.getAddress()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(accountStates.stream().map(a -> a.getAddress()).collect(Collectors.toList())));
+	}
+
+	//endregion
+
 	private static PoiFacade createPoiFacade() {
 		return new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
 	}
