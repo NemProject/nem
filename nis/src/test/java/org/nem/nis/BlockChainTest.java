@@ -78,12 +78,12 @@ public class BlockChainTest {
 		// 0 = signer
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000_000_000));
+		setBalance(a, Amount.fromNem(1_000_000_000), accountCache, poiFacade);
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		setBalance(a, Amount.fromNem(1_000), accountCache, poiFacade);
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -93,7 +93,7 @@ public class BlockChainTest {
 		// 2nd sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		poiFacade.findStateByAddress(a.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(1_000));
+		setBalance(a, Amount.fromNem(1_000), accountCache, poiFacade);
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
@@ -101,6 +101,23 @@ public class BlockChainTest {
 		accountCache.addAccountToCache(a.getAddress());
 
 		return accounts;
+	}
+
+	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final PoiFacade poiFacade) {
+		account.incrementBalance(amount);
+		final Account cachedAccount = accountCache.addAccountToCache(account.getAddress());
+
+		// TODO-CR 20140809 J->B i needed to increment the reference count because otherwise when adding the sibling block,
+		// undoTxesAndGetScore will remove the account and importance for the forager
+		//
+		// since we are assuming that the forager has a balance at block parent, it seems reasonable to assume that
+		// it has been added to the cache before and has a non-zero reference count
+		//
+		// if this is not reasonable, then there is a bug
+		cachedAccount.incrementReferenceCount();
+
+		cachedAccount.incrementBalance(amount);
+		poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
 	}
 
 	@Test
@@ -112,6 +129,10 @@ public class BlockChainTest {
 
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
 		final List<Account> accounts = prepareSigners(accountAnalyzer);
+		for (final Account account : accounts) {
+			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+		}
+
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, accountAnalyzer.getAccountCache());
@@ -119,9 +140,6 @@ public class BlockChainTest {
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
-		for (final Account account : accountAnalyzer.getAccountCache()) {
-			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
-		}
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
