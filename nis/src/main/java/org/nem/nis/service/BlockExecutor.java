@@ -4,6 +4,7 @@ import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,6 +21,7 @@ public class BlockExecutor {
 	 *
 	 * @param poiFacade The poi facade.
 	 */
+	@Autowired(required = true)
 	public BlockExecutor(final PoiFacade poiFacade) {
 		this.poiFacade = poiFacade;
 	}
