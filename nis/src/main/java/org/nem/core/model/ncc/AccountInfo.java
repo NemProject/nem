@@ -124,4 +124,18 @@ public class AccountInfo implements SerializableEntity {
 
 		serializer.writeDouble("importance", this.getImportance());
 	}
+
+	@Override
+	public int hashCode() {
+		return this.address.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof AccountInfo))
+			return false;
+
+		final AccountInfo rhs = (AccountInfo)obj;
+		return this.address.equals(rhs.address);
+	}
 }

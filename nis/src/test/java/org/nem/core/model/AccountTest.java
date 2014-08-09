@@ -63,6 +63,21 @@ public class AccountTest {
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
+	@Test
+	public void accountCanBeCreatedAroundAccountInformation() {
+		// Arrange:
+		final Address expectedAccountId = Utils.generateRandomAddressWithPublicKey();
+		final Account account = new Account(expectedAccountId, Amount.fromNem(124), new BlockAmount(4), "blah");
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+		Assert.assertThat(account.getLabel(), IsEqual.equalTo("blah"));
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
+	}
+
 	//endregion
 
 	//region Label

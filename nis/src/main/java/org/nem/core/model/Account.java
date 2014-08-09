@@ -37,6 +37,25 @@ public class Account {
 		this(getKeyPairFromAddress(address), address);
 	}
 
+	/**
+	 * Creates a new account.
+	 *
+	 * @param address The address.
+	 * @param balance The balance.
+	 * @param numForagedBlocks The number of foraged blocks.
+	 * @param label The label.
+	 */
+	public Account(
+			final Address address,
+			final Amount balance,
+			final BlockAmount numForagedBlocks,
+			final String label) {
+		this(address);
+		this.balance = balance;
+		this.foragedBlocks = numForagedBlocks;
+		this.label = label;
+	}
+
 	private static KeyPair getKeyPairFromAddress(final Address address) {
 		return null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
 	}
