@@ -8,6 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
+import java.util.function.*;
 
 public class AddressTest {
 
@@ -72,15 +73,6 @@ public class AddressTest {
 	}
 
 	@Test
-	public void addressPaddedWithSpacesIsInvalid() {
-		// Arrange:
-		final Address address = Address.fromEncoded("TD5AXB37QG5DXD25YHLMS4VDMI3A7HBGBYHDNB63 ");
-
-		// Assert:
-		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void addressesWithDifferentCasingsAreValid() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
@@ -118,26 +110,29 @@ public class AddressTest {
 
 	@Test
 	public void addressWithNonBase32CharactersIsNotValid() {
-		// Act:
-		final Address address = Address.fromEncoded("A*B");
-
 		// Assert:
-		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
+		assertInvalidAddressAfterTransform(address -> address.substring(0, 20) + "*" + address.substring(21));
 	}
 
 	@Test
 	public void addressWithIncorrectLengthIsNotValid() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		// Assert:
+		assertInvalidAddressAfterTransform(address -> address.substring(0, address.length() - 1));
+	}
 
+	@Test
+	public void addressWithIncorrectNumberOfDecodedBytesIsNotValid() {
+		// Assert:
+		assertInvalidAddressAfterTransform(address -> address.substring(0, address.length() - 8) + "========");
+	}
+
+	private static void assertInvalidAddressAfterTransform(final Function<String, String> transform) {
 		// Act:
-		final Address address = Address.fromPublicKey(publicKey);
-		final String realAddress = address.getEncoded();
-		final String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
+		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
+		final String invalidAddress = transform.apply(address.toString());
 
 		// Assert:
-		Assert.assertThat(Address.fromEncoded(realAddress).isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(Address.fromEncoded(invalidAddress).isValid(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -168,6 +163,35 @@ public class AddressTest {
 
 		// Assert:
 		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void addressWithLeadingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> padding + address.toString());
+	}
+
+	@Test
+	public void addressWithTrailingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> address.toString() + padding);
+	}
+
+	@Test
+	public void addressWithLeadingAndTrailingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> padding + address.toString() + padding);
+	}
+
+	private static void assertAddressWithPaddingInvalid(final BiFunction<Address, String, String> paddingFunction) {
+		// Arrange:
+		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
+
+		// Assert:
+		for (final String padding : new String[] { " ", "\t", "  \t \t " }) {
+			final String paddedAddress = paddingFunction.apply(address, padding);
+			Assert.assertThat(Address.fromEncoded(paddedAddress).isValid(), IsEqual.equalTo(false));
+		}
 	}
 
 	//region equals / hashCode

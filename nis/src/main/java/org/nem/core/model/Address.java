@@ -11,6 +11,7 @@ import java.util.Arrays;
  */
 public class Address {
 	private static final int NUM_CHECKSUM_BYTES = 4;
+	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
 	private String encoded; // base-32 encoded address
 	private PublicKey publicKey;
@@ -110,6 +111,10 @@ public class Address {
 	 * @return true if the address is valid.
 	 */
 	public boolean isValid() {
+		// this check should prevent leading and trailing whitespace
+		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
+			return false;
+
 		byte[] encodedBytes;
 
 		try {
