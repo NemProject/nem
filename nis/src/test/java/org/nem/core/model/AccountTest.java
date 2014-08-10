@@ -80,6 +80,51 @@ public class AccountTest {
 
 	//endregion
 
+	//region setPublicKey
+
+	@Test(expected = IllegalArgumentException.class)
+	public void inconsistentPublicKeyCannotBeSet() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+
+		// Act: the set fails because the public key is not consistent with the account's address
+		account.setPublicKey(publicKey);
+	}
+
+	@Test
+	public void consistentPublicKeyCanBeSet() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Address address = Address.fromEncoded(Address.fromPublicKey(keyPair.getPublicKey()).getEncoded());
+		final Account account = new Account(address);
+
+		// Act:
+		account.setPublicKey(keyPair.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+	}
+
+	@Test
+	public void settingConsistentPublicKeyDoesNotOverwritePrivateKey() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+
+		// Act:
+		account.setPublicKey(keyPair.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+	}
+
+	//endregion
+
 	//region Label
 
 	@Test

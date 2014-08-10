@@ -86,7 +86,7 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
 			// earlier there was new object created and data copied into it
 			// this was very, VERY wrong
-			account._setPublicKey(address);
+			account.setPublicKey(address.getPublicKey());
 		}
 
 		return account;

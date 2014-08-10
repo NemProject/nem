@@ -65,18 +65,23 @@ public class Account {
 	}
 
 	/**
-	 * This method is public, but it should be used very carefully.
-	 * TODO: revisit
+	 * Sets the public key associated with this account.
+	 * The public key must be consistent with this account's address.
 	 *
-	 * @param address An address that matches account's address but includes a public key.
+	 * @param publicKey The public key.
 	 */
-	public void _setPublicKey(final Address address) {
-		if (!Address.fromPublicKey(address.getPublicKey()).getEncoded().equals(address.getEncoded())) {
+	public void setPublicKey(final PublicKey publicKey) {
+		if (!Address.fromPublicKey(publicKey).equals(this.address)) {
 			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
 		}
 
-		this.keyPair = new KeyPair(address.getPublicKey());
-		this.address = Address.fromPublicKey(address.getPublicKey());
+		// only update the public key if it is not already set
+		if (null != this.getKeyPair()) {
+			return;
+		}
+
+		this.keyPair = new KeyPair(publicKey);
+		this.address = Address.fromPublicKey(publicKey);
 	}
 
 	/**
