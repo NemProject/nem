@@ -36,6 +36,7 @@ public class TransactionController {
 
 	@RequestMapping(value = "/transaction/prepare", method = RequestMethod.POST)
 	@ClientApi
+	@Deprecated
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
