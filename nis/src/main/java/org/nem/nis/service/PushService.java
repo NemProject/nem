@@ -106,8 +106,8 @@ public class PushService {
 			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
-			} // TODO-CR: space after '}' ? ... i guess you're using eclipse for the auto-formatting? maybe T has an idea how
-			// BR: I prefer space after } in this case but I can't auto format it.
+			}
+
 			return isValidResult;
 		}
 

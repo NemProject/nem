@@ -72,6 +72,15 @@ public class AddressTest {
 	}
 
 	@Test
+	public void addressPaddedWithSpacesIsInvalid() {
+		// Arrange:
+		final Address address = Address.fromEncoded("TD5AXB37QG5DXD25YHLMS4VDMI3A7HBGBYHDNB63 ");
+
+		// Assert:
+		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void addressesWithDifferentCasingsAreValid() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();

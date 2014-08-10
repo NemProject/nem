@@ -9,8 +9,8 @@ import org.nem.core.serialization.*;
 public class NisNodeInfo implements SerializableEntity {
 	public final static ObjectDeserializer<NisNodeInfo> DESERIALIZER = deserializer -> new NisNodeInfo(deserializer);
 
-	private Node node;
-	private ApplicationMetaData appMetaData;
+	private final Node node;
+	private final ApplicationMetaData appMetaData;
 
 	/**
 	 * Creates a new node info.
@@ -55,5 +55,21 @@ public class NisNodeInfo implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("node", this.node);
 		serializer.writeObject("nisInfo", this.appMetaData);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.node.hashCode() ^ this.appMetaData.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof NisNodeInfo)) {
+			return false;
+		}
+
+		final NisNodeInfo rhs = (NisNodeInfo)obj;
+		return this.node.equals(rhs.node) &&
+				this.appMetaData.equals(rhs.appMetaData);
 	}
 }

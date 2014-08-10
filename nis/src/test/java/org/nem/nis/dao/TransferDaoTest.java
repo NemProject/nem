@@ -321,9 +321,8 @@ public class TransferDaoTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 
-		// TODO-CR: i think "original" is somewhat misleading; "expected" / "sorted" might be better
-		final List<Long> originalHeights = Arrays.asList(4l, 4l, 4l, 3l, 3l, 2l, 2l, 1l, 1l);
-		final List<Integer> originalTimestamps = Arrays.asList(1900, 1700, 1700, 1800, 1600, 1500, 1300, 1400, 1200);
+		final List<Long> expectedHeights = Arrays.asList(4l, 4l, 4l, 3l, 3l, 2l, 2l, 1l, 1l);
+		final List<Integer> expectedTimestamps = Arrays.asList(1900, 1700, 1700, 1800, 1600, 1500, 1300, 1400, 1200);
 		final long heights[] = { 3, 4, 1, 2 };
 		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
 		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
@@ -337,8 +336,8 @@ public class TransferDaoTest {
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(9));
-		Assert.assertThat(resultHeights, equalTo(originalHeights));
-		Assert.assertThat(resultTimestamps, equalTo(originalTimestamps));
+		Assert.assertThat(resultHeights, equalTo(expectedHeights));
+		Assert.assertThat(resultTimestamps, equalTo(expectedTimestamps));
 	}
 
 	@Test
