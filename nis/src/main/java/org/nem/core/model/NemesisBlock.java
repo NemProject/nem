@@ -22,17 +22,9 @@ public class NemesisBlock extends Block {
 	 */
 	public final static Amount AMOUNT = Amount.fromNem(4000000000L);
 
-	// this will be removed later, only public key will be present in the code
-	// all signatures will be pre-generated and placed in-code
-	private final static PrivateKey CREATOR_PRIVATE_KEY = PrivateKey.fromHexString(
-			"0000000000000000000000000000000000000000000000000000000000000000");
-		//sha3("Remember, remember, the fifth of November, Gunpowder Treason and Plot")
-		//"aa761e0715669beb77f71de0ce3c29b792e8eb3130d21f697f59070665100c04");
-
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
 			"038ecc7a57d3d932330ad1521a4afbd36beacd8d7bb885537350f79f7f834f51c8");
 
-	//private final static Hash NEMESIS_GENERATION_HASH = new Hash(Hashes.sha3("If ever I to the moment shall say: Beautiful moment, do not pass away! Then you may forge your chains to bind me,".getBytes()));
 	private final static Hash NEMESIS_GENERATION_HASH = Hash.fromHexString(
 			"c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8");
 

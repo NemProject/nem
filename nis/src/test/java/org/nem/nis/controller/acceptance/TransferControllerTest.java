@@ -217,6 +217,8 @@ public class TransferControllerTest {
 	}
 
 	private static String getRecipientAccountId() {
-		return NetworkInfo.getDefault().getNemesisRecipientAccountIds()[2];
+		// since we should only be testing on test net and not stealing makoto's nem on main net,
+		// it is ok to hard-code this as a test net address
+		return "TDmakotEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT";
 	}
 }

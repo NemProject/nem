@@ -14,8 +14,6 @@ public class NetworkInfoTest {
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
 		Assert.assertThat(info.getNemesisAccountId().charAt(0), IsEqual.equalTo('N'));
-		for (final String accountId : info.getNemesisRecipientAccountIds())
-			Assert.assertThat(accountId.charAt(0), IsEqual.equalTo('N'));
 	}
 
 	@Test
@@ -27,8 +25,6 @@ public class NetworkInfoTest {
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x98));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('T'));
 		Assert.assertThat(info.getNemesisAccountId().charAt(0), IsEqual.equalTo('T'));
-		for (final String accountId : info.getNemesisRecipientAccountIds())
-			Assert.assertThat(accountId.charAt(0), IsEqual.equalTo('T'));
 	}
 
 	@Test
