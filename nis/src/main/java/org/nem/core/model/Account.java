@@ -67,6 +67,7 @@ public class Account {
 	/**
 	 * Sets the public key associated with this account.
 	 * The public key must be consistent with this account's address.
+	 * This function should be used sparingly, and avoided if possible.
 	 *
 	 * @param publicKey The public key.
 	 */
