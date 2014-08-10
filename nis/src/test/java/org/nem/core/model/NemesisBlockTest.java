@@ -75,6 +75,18 @@ public class NemesisBlockTest {
 		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(1 + 2 * NUM_NEMESIS_TRANSACTIONS));
 	}
 
+	@Test
+	public void nemesisAddressesAreValid() {
+		// Arrange:
+		final Block block = NEMESIS_BLOCK;
+
+		for (final Transaction otx : block.getTransactions()) {
+			if (otx.getType() == TransactionTypes.TRANSFER) {
+				final TransferTransaction tx = (TransferTransaction)otx;
+				Assert.assertTrue(tx.getRecipient().getAddress().isValid());
+			}
+		}
+	}
 	//endregion
 
 	//region constants
