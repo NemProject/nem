@@ -169,4 +169,18 @@ public class NodeCollection implements SerializableEntity {
 		serializer.writeObjectArray("active", new ArrayList<>(this.activeNodes));
 		serializer.writeObjectArray("inactive", new ArrayList<>(this.inactiveNodes));
 	}
+
+	@Override
+	public int hashCode() {
+		return this.activeNodes.hashCode() ^ this.inactiveNodes.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof NodeCollection))
+			return false;
+
+		final NodeCollection rhs = (NodeCollection)obj;
+		return this.activeNodes.equals(rhs.activeNodes) && this.inactiveNodes.equals(rhs.inactiveNodes);
+	}
 }

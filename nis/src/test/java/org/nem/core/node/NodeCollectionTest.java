@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.peer.test.*;
 
-import java.util.Iterator;
+import java.util.*;
 
 public class NodeCollectionTest {
 
@@ -456,6 +456,45 @@ public class NodeCollectionTest {
 
 	//endregion
 
+	//region equals / hashCode
+
+	private static final Map<String, NodeCollection> DESC_TO_NODES_MAP = new HashMap<String, NodeCollection>() {
+		{
+			put("default", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" }));
+			put("diff-active", createNodeCollection(new String[] { "A", "F", "P", "Z" }, new String[] { "B", "Y" }));
+			put("diff-inactive", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B" }));
+			put("diff-status", createNodeCollection(new String[] { "A", "F", "Y" }, new String[] { "B", "P" }));
+		}
+	};
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" });
+
+		// Assert:
+		Assert.assertThat(DESC_TO_NODES_MAP.get("default"), IsEqual.equalTo(nodes));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-active"), IsNot.not(IsEqual.equalTo(nodes)));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive"), IsNot.not(IsEqual.equalTo(nodes)));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-status"), IsNot.not(IsEqual.equalTo(nodes)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(nodes)));
+		Assert.assertThat(new String[] { "A", "F", "Y" }, IsNot.not(IsEqual.equalTo((Object)nodes)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final NodeCollection nodes = createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" });
+		final int hashCode = nodes.hashCode();
+
+		// Assert:
+		Assert.assertThat(DESC_TO_NODES_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-active").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-status").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
 	private static Node createNode(final String platform) {
 		// Arrange:
 		return createNode(platform, platform.charAt(0));
@@ -483,6 +522,22 @@ public class NodeCollectionTest {
 		nodes.update(createNode("D"), NodeStatus.ACTIVE);
 		nodes.update(createNode("E"), NodeStatus.FAILURE);
 		nodes.update(createNode("F"), NodeStatus.ACTIVE);
+		return nodes;
+	}
+
+	private static NodeCollection createNodeCollection(
+			final String[] activeNodeNames,
+			final String[] inactiveNodeNames) {
+		// Arrange:
+		final NodeCollection nodes = new NodeCollection();
+		for (final String nodeName : activeNodeNames) {
+			nodes.update(createNode(nodeName), NodeStatus.ACTIVE);
+		}
+
+		for (final String nodeName : inactiveNodeNames) {
+			nodes.update(createNode(nodeName), NodeStatus.INACTIVE);
+		}
+
 		return nodes;
 	}
 }
