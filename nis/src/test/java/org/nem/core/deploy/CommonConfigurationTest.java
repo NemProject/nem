@@ -33,6 +33,7 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.isWebStart(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getNisJnlpUrl(), IsEqual.equalTo("url"));
 	}
+
 	@Test
 	public void additionalInformationCanBeRetrieved() {
 		// Arrange:
@@ -52,6 +53,8 @@ public class CommonConfigurationTest {
 
 	//region mandatory entries
 
+	// TODO-CR 20140811 J-B annotation spacing is off; elsewhere I've been formating as
+	// @Test(expected = RuntimeException.class)
 	@Test (expected=RuntimeException.class)
 	public void cannotReadConfigurationWithoutShortServerName() {
 		// Arrange:
@@ -59,8 +62,12 @@ public class CommonConfigurationTest {
 		properties.remove("nem.shortServerName");
 
 		// Act:
+		// TODO-CR 2014081 J-B in the mandatory tests, you don't need to declare the local config
 		final CommonConfiguration config = new CommonConfiguration(properties);
 	}
+
+	// TODO-CR 2014081 J-B for all of the integer tests, consider adding a helper function like assertIntPropertyIsRequired(propName)
+	// inside that function, you can use ExceptionAssert
 
 	@Test (expected=RuntimeException.class)
 	public void cannotReadConfigurationWithoutMaxThreads() {

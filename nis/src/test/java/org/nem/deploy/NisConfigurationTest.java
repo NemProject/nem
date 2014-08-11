@@ -69,7 +69,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutAutoBootName() {
 		// Arrange:
-		final Properties properties =getCommonProperties();
+		final Properties properties = getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -183,7 +183,6 @@ public class NisConfigurationTest {
 		properties.setProperty("nem.useDosFilter", "true");
 		properties.setProperty("nem.isWebStart", "false");
 		properties.setProperty("nem.nisJnlpUrl", "url");
-
 		return properties;
 	}
 }

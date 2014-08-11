@@ -25,26 +25,27 @@ import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
 import java.util.logging.*;
-/**
- * Did not find a better way of launching Jetty in combination with WebStart. The physical location of the downloaded files is not pre-known, so passing a WAR
- * file to the Jetty runner does not work.
- * <p/>
- * I had to switch to the Servlet API 3.x with programmatic configuration.
- */
 
 /**
- * Simple jetty bootstrapper
+ * Simple jetty bootstrapper using the Servlet API 3.x with programmatic configuration.
+ *
+ * TODO-CR 20140811 - is spring able to inject dependencies into the CommonStarter (instance) constructor?
+ * if so, we can inject a NIS / NCC policy class (that exposes the classes for instance) and avoid string -> class transformations
+ * if not, what is here is fine
  */
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 
-	private static final int IDLE_TIMEOUT = 30000;
-	private static final int HTTPS_HEADER_SIZE = 8192;
-	private static final int HTTPS_BUFFER_SIZE = 32768;
+	// TODO-CR 20140811: comment publics
 	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(CommonStarter.class, TIME_PROVIDER);
 	public static final CommonStarter INSTANCE = new CommonStarter();
+
+	private static final int IDLE_TIMEOUT = 30000;
+	private static final int HTTPS_HEADER_SIZE = 8192;
+	private static final int HTTPS_BUFFER_SIZE = 32768;
+
 	private Server server;
 	private static CommonConfiguration configuration;
 
@@ -57,6 +58,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void loadConfigurationProperties() {
 		ExceptionUtils.propagate(() -> {
+			// TODO-CR 20140811: don't access static member via instance
 			INSTANCE.configuration = new CommonConfiguration();
 			return configuration;
 		}, IllegalStateException::new);
@@ -70,8 +72,7 @@ public class CommonStarter implements ServletContextListener {
 			INSTANCE.server.join();
 		} catch (final InterruptedException e) {
 			LOGGER.log(Level.INFO, "Received signal to shutdown.");
-		} catch (Exception e) {
-			//
+		} catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Stopping Jetty Server.", e);
 		} finally {
 			// Last chance to save configuration
@@ -84,6 +85,7 @@ public class CommonStarter implements ServletContextListener {
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties")) {
 
+			// TODO-CR - should this stream be in a try block?
 			final InputStream inputStringStream = adaptFileLocation(inputStream);
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);
@@ -129,7 +131,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[]{ servletContext });
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
 
 		return handlers;
 	}
@@ -200,7 +202,6 @@ public class CommonStarter implements ServletContextListener {
 		try {
 			this.server.stop();
 		} catch (final Exception e) {
-			//
 			LOGGER.log(Level.SEVERE, "Can't stop server.", e);
 		}
 	}
@@ -263,21 +264,20 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	@Override
-	public void contextDestroyed(final ServletContextEvent arg0) {
+	public void contextDestroyed(final ServletContextEvent event) {
 		// nothing
 	}
 
 	@Override
 	public void contextInitialized(final ServletContextEvent event) {
-		// This is the replacement for the web.xml
-		// New with Servlet 3.0
+		// This is the replacement for the web.xml (new with Servlet 3.0)
 		try {
 			final String appConfigClassName = String.format("%s%s%s", "org.nem.deploy.", this.configuration.getShortServerName(), "AppConfig");
 			final String webAppInitializerClassName = String.format("%s%s%s", "org.nem.deploy.", this.configuration.getShortServerName(), "WebAppInitializer");
 			final Class appConfigClass = getClass(appConfigClassName);
 			final Class appWebAppInitializerClass = getClass(webAppInitializerClassName);
-			AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(appConfigClass);
-			AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+			final AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(appConfigClass);
+			final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
 			webCtx.register(appWebAppInitializerClass);
 			webCtx.setParent(appCtx);
 
@@ -288,6 +288,7 @@ public class CommonStarter implements ServletContextListener {
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
+			// TODO-CR - can you move this to separate function
 			if (this.configuration.isNcc()) {
 				ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", "org.nem.ncc.web.servlet.JarFileServlet");
 				servlet.setInitParameter("maxCacheSize", "0");
@@ -299,6 +300,7 @@ public class CommonStarter implements ServletContextListener {
 				servlet.setLoadOnStartup(1);
 			}
 
+			// TODO-CR - can you move this to separate function
 			if (this.configuration.useDosFilter()) {
 				javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
 				dosFilter.setInitParameter("delayMs", "1000");
@@ -314,6 +316,7 @@ public class CommonStarter implements ServletContextListener {
 				dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 			}
 		} catch (final Exception e) {
+			//TODO-CR: pass e to runtime exception
 			throw new RuntimeException("Exception in contextInitialized");
 		}
 	}
