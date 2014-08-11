@@ -165,18 +165,21 @@ public class AddressTest {
 		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
 	}
 
+	@Ignore
 	@Test
 	public void addressWithLeadingWhitespaceIsInvalid() {
 		// Assert:
 		assertAddressWithPaddingInvalid((address, padding) -> padding + address.toString());
 	}
 
+	@Ignore
 	@Test
 	public void addressWithTrailingWhitespaceIsInvalid() {
 		// Assert:
 		assertAddressWithPaddingInvalid((address, padding) -> address.toString() + padding);
 	}
 
+	@Ignore
 	@Test
 	public void addressWithLeadingAndTrailingWhitespaceIsInvalid() {
 		// Assert:
