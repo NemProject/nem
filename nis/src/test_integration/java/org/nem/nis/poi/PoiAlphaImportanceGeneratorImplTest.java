@@ -7,25 +7,24 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.test.MockAccount;
+import org.nem.nis.secret.AccountLink;
 
 /**
- * If someone can manipulate their importance so that they can often or at-will
- * be chosen to forage, then things like double-spend attacks become possible.
- * Thus the tests considered here focus on verifying that a user cannot
- * arbitrarily manipulate their importance to cause them to be chosen to forage.
- * some tests we should consider: - Sybil attack (master node creates a ton of
- * other nodes and transacts with them (and maybe some other nodes) to try to
- * boost score)</br>
- * - infinite loop attack<br/>
- * - closed loop attack<br/>
- * - small transaction spam attack<br/>
- * -
- */
+* If someone can manipulate their importance so that they can often or at-will
+* be chosen to forage, then things like double-spend attacks become possible.
+* Thus the tests considered here focus on verifying that a user cannot
+* arbitrarily manipulate their importance to cause them to be chosen to forage.
+* some tests we should consider: - Sybil attack (master node creates a ton of
+* other nodes and transacts with them (and maybe some other nodes) to try to
+* boost score)</br>
+* - infinite loop attack<br/>
+* - closed loop attack<br/>
+* - small transaction spam attack<br/>
+* -
+*/
 public class PoiAlphaImportanceGeneratorImplTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
 
@@ -41,16 +40,16 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	@Test
 	public void threeSimpleAccounts() {
 		// Arrange:
-		final Account a = createAccountWithBalance(100);
-		final Account b = createAccountWithBalance(100);
-		final Account c = createAccountWithBalance(100);
+		final PoiAccountState a = createAccountWithBalance(100);
+		final PoiAccountState b = createAccountWithBalance(100);
+		final PoiAccountState c = createAccountWithBalance(100);
 
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
 		// A sends all 100 NEM to B,
 		this.addOutlink(a, b, blockHeight, 100);
 
-		final List<Account> accts = Arrays.asList(a, b, c);
+		final List<PoiAccountState> accts = Arrays.asList(a, b, c);
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(blockHeight, accts);
@@ -77,14 +76,14 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	public void fourNodeSimpleLoopAttack() {
 
 		// Arrange:
-		final Account a = createAccountWithBalance(400);
-		final Account b = createAccountWithBalance(0);
-		final Account c = createAccountWithBalance(0);
-		final Account d = createAccountWithBalance(0);
+		final PoiAccountState a = createAccountWithBalance(400);
+		final PoiAccountState b = createAccountWithBalance(0);
+		final PoiAccountState c = createAccountWithBalance(0);
+		final PoiAccountState d = createAccountWithBalance(0);
 
-		final Account e = createAccountWithBalance(400);
-		final Account f = createAccountWithBalance(400);
-		final Account g = createAccountWithBalance(400);
+		final PoiAccountState e = createAccountWithBalance(400);
+		final PoiAccountState f = createAccountWithBalance(400);
+		final PoiAccountState g = createAccountWithBalance(400);
 
 		final BlockHeight blockHeight = new BlockHeight(1337);
 
@@ -107,7 +106,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// g sends 100 NEM to f
 		this.addOutlink(g, f, blockHeight, 100);
 
-		final List<Account> accts = Arrays.asList(a, b, c, d, e, f, g);
+		final List<PoiAccountState> accts = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(blockHeight, accts);
@@ -123,7 +122,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		Assert.assertTrue(importances.getAt(0) > importances.getAt(3));// a>d
 	}
 
-	private void addOutlink(final Account a, final Account b, final BlockHeight blockHeight, final long amount) {
+	private void addOutlink(final PoiAccountState a, final PoiAccountState b, final BlockHeight blockHeight, final long amount) {
 		a.getImportanceInfo().addOutlink(new AccountLink(blockHeight, Amount.fromNem(amount), b.getAddress()));
 	}
 
@@ -133,7 +132,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange:
 		// TODO: Loops should be detected.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP_SELF));
 		accounts.addAll(this.createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
@@ -157,7 +156,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange 1 vs many:
 		// Splitting of one account into many small accounts should have no influence on the importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 2; i < 10; i++) {
 			accounts.clear();
 			accounts.addAll(this.createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -183,7 +182,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange 1 vs 8, with lazy accounts:
 		// The presence of many small lazy accounts should have no influence on the importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 0; i < 400; i = i + 40) {
 			accounts.clear();
 			accounts.addAll(this.createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -214,7 +213,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange 1 vs 8, with 0 or 1 big lazy account:
 		// The presence of a big lazy account should have no influence on the relative importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 0; i < 2; i++) {
 			accounts.clear();
 			accounts.addAll(this.createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -245,7 +244,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange: 1 vs 1, the latter distributes the strength to many outlinks:
 		// Splitting one transaction into many small transactions should have no influence on the importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 1; i < 10; i++) {
 			accounts.clear();
 			accounts.addAll(this.createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -271,7 +270,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange:
 		// The strength of an outlink should have influence on the importance distribution (but how much?).
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(this.createUserAccounts(1, 2, 1000, 1, 50, OUTLINK_STRATEGY_LOOP));
 
@@ -295,7 +294,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange:
 		// The vested balance of an account should have influence on the importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(this.createUserAccounts(1, 2, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
@@ -321,7 +320,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// Accounts with smaller vested balance should be able to have more importance than accounts with high balance and low activity
 		final int numAccounts = 10;
 
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 10000, 1, 500, OUTLINK_STRATEGY_RANDOM));
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 1000, 10, 500, OUTLINK_STRATEGY_RANDOM));
 
@@ -354,7 +353,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		LOGGER.info("Check that an account can't just send most of their balance to another account to boost their score");
 		// Arrange:
 		// Accounts should not just be able to transfer all their balance to another account to boost their score
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, 2, 10000, 2, 100, OUTLINK_STRATEGY_LOOP));
 		accounts.addAll(this.createUserAccounts(1, 2, 10000, 2, 9900, OUTLINK_STRATEGY_LOOP));
 
@@ -379,7 +378,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// Arrange 1 vs many, the latter concentrate the strength to one account:
 		// Colluding accounts that try to push one account with many links should have no influence on the importance distribution.
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 4; i < 40; i++) {
 			accounts.clear();
 			accounts.addAll(this.createUserAccounts(1, 1, 800, 1, 400, OUTLINK_STRATEGY_LOOP_SELF));
@@ -410,7 +409,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// BR: 1s is probably way to high. We will need to address this later.
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 5000;
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
@@ -440,7 +439,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		long prevTimeDiff = -1;
 		for (int numAccounts = 5; numAccounts < 10000; numAccounts *= 10) {
 			// Arrange:
-			final List<Account> accounts = new ArrayList<>();
+			final List<PoiAccountState> accounts = new ArrayList<>();
 			accounts.addAll(this.createUserAccounts(1, numAccounts, 1000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 			// Act: calculate importances
@@ -467,26 +466,25 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		}
 	}
 
-	private List<MockAccount> createUserAccounts(final long blockHeight, final int numAccounts, final long totalVestedBalance, final int numOutlinksPerAccount, final long totalOutlinkStrength, final int outlinkStrategy) {
-		final List<MockAccount> accounts = new ArrayList<>();
+	private List<PoiAccountState> createUserAccounts(final long blockHeight, final int numAccounts, final long totalVestedBalance, final int numOutlinksPerAccount, final long totalOutlinkStrength, final int outlinkStrategy) {
+		final List<PoiAccountState> accounts = new ArrayList<>();
 
 		for (int i = 0; i < numAccounts; i++) {
 			if (outlinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
 				if (i == 0) {
-					accounts.add(createMockAccountWithBalance(totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
+					accounts.add(createAccountWithBalance(blockHeight, totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
 				} else {
-					accounts.add(createMockAccountWithBalance(1));
+					accounts.add(createAccountWithBalance(blockHeight, 1));
 				}
 			} else {
-				accounts.add(createMockAccountWithBalance((totalVestedBalance - totalOutlinkStrength) / numAccounts));
+				accounts.add(createAccountWithBalance(blockHeight, (totalVestedBalance - totalOutlinkStrength) / numAccounts));
 			}
 		}
 
 		final SecureRandom sr = new SecureRandom();
-		MockAccount otherAccount = null;
+		PoiAccountState otherAccount = null;
 		for (int i = 0; i < numAccounts; i++) {
-			final MockAccount account = accounts.get(i);
-			account.setVestedBalanceAt(account.getBalance(), new BlockHeight(blockHeight));
+			final PoiAccountState account = accounts.get(i);
 			for (int j = 0; j < numOutlinksPerAccount; j++) {
 				switch (outlinkStrategy) {
 					case OUTLINK_STRATEGY_RANDOM:
@@ -502,7 +500,9 @@ public class PoiAlphaImportanceGeneratorImplTest {
 						otherAccount = accounts.get(0);
 						break;
 				}
-				final long outlinkStrength = (account.getBalance().getNumNem() * totalOutlinkStrength) / ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
+
+				final Amount vested = account.getWeightedBalances().getVested(new BlockHeight(blockHeight));
+				final long outlinkStrength = (vested.getNumNem() * totalOutlinkStrength) / ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
 				this.addOutlink(account, otherAccount, BlockHeight.ONE, outlinkStrength);
 			}
 		}
@@ -514,21 +514,19 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		Assert.assertTrue(1.0 - tolerance < ratio && ratio < 1.0 + tolerance);
 	}
 
-	private static Account createAccountWithBalance(final long numNEM) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(Amount.fromNem(numNEM));
-		return account;
+	private static PoiAccountState createAccountWithBalance(long numNEM) {
+		return createAccountWithBalance(1, numNEM);
 	}
 
-	private static MockAccount createMockAccountWithBalance(final long numNEM) {
-		final MockAccount account = new MockAccount(Utils.generateRandomAddress());
-		account.incrementBalance(Amount.fromNem(numNEM));
-		return account;
+	private static PoiAccountState createAccountWithBalance(final long blockHeight,  long numNEM) {
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), Amount.fromNem(numNEM));
+		return state;
 	}
 
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
-			final Collection<Account> accounts) {
+			final Collection<PoiAccountState> accounts) {
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
 		poi.updateAccountImportances(blockHeight, accounts);
 		final List<Double> importances = accounts.stream()

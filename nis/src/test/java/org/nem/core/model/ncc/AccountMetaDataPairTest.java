@@ -2,7 +2,9 @@ package org.nem.core.model.ncc;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 public class AccountMetaDataPairTest {
@@ -10,34 +12,36 @@ public class AccountMetaDataPairTest {
 	@Test
 	public void canCreateAccountMetaDataPair() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 		final AccountMetaData metaData = new AccountMetaData(AccountStatus.UNLOCKED);
-		final AccountMetaDataPair entity = new AccountMetaDataPair(account, metaData);
+		final AccountMetaDataPair entity = new AccountMetaDataPair(accountInfo, metaData);
 
 		// Assert:
-		Assert.assertThat(entity.getAccount(), IsSame.sameInstance(account));
+		Assert.assertThat(entity.getAccount(), IsSame.sameInstance(accountInfo));
 		Assert.assertThat(entity.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test
 	public void canRoundTripAccountMetaDataPair() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(account, AccountStatus.LOCKED);
+		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED);
 
 		// Assert:
-		Assert.assertThat(metaDataPair.getAccount(), IsEqual.equalTo(account));
+		Assert.assertThat(metaDataPair.getAccount().getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	private static AccountMetaDataPair createRoundTrippedPair(
-			final Account account,
+			final Address address,
 			final AccountStatus status) {
 		// Arrange:
 		final AccountMetaData metaData = new AccountMetaData(status);
-		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(account, metaData);
+		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
+				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
+				metaData);
 
 		// Act:
 		return new AccountMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, null));

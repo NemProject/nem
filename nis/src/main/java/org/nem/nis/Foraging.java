@@ -11,7 +11,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.PoiAccountInfo;
+import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +32,7 @@ public class Foraging {
 	private final ConcurrentHashSet<Account> unlockedAccounts;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final AccountLookup accountLookup;
+	private final PoiFacade poiFacade;
 	private final BlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final TransferDao transferDao;
@@ -39,10 +40,12 @@ public class Foraging {
 	@Autowired(required = true)
 	public Foraging(
 			final AccountLookup accountLookup,
+			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final TransferDao transferDao) {
 		this.accountLookup = accountLookup;
+		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.transferDao = transferDao;
@@ -61,7 +64,10 @@ public class Foraging {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
-		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, account, new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
+		final PoiAccountInfo accountInfo = new PoiAccountInfo(
+				-1,
+				this.poiFacade.findStateByAddress(account.getAddress()),
+				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
 		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}
@@ -84,10 +90,27 @@ public class Foraging {
 	/**
 	 * Determines if a given account is unlocked.
 	 *
-	 * @param account true if the account is unlocked, false otherwise.
+	 * @param account The account.
+	 * @return true if the account is unlocked, false otherwise.
 	 */
 	public boolean isAccountUnlocked(final Account account) {
 		return this.unlockedAccounts.contains(account);
+	}
+
+	/**
+	 * Determines if a given account is unlocked.
+	 *
+	 * @param address The account address.
+	 * @return true if the account is unlocked, false otherwise.
+	 */
+	public boolean isAccountUnlocked(final Address address) {
+		for (final Account account : this.unlockedAccounts) {
+			if (account.getAddress().equals(address)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -177,8 +200,7 @@ public class Foraging {
 	 * @return The list of transactions.
 	 */
 	public List<Transaction> getUnconfirmedTransactions(final Address address) {
-		return this.unconfirmedTransactions.getTransactionsBefore(
-				NisMain.TIME_PROVIDER.getCurrentTime()).stream()
+		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
 				.filter(tx -> this.matchAddress(tx, address))
 				.collect(Collectors.toList());
 	}
@@ -265,12 +287,11 @@ public class Foraging {
 	}
 
 	private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final Block lastBlock) {
-		final BlockHeight blockHeight =
-				new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 		final int limit = (int)Math.min(lastBlock.getHeight().getRaw(), (BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
 		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-		return scorer.calculateDifficulty(difficulties, timestamps);
+		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timestamps);
 	}
 
 	public Block createSignedBlock(

@@ -11,6 +11,7 @@ import java.util.Arrays;
  */
 public class Address {
 	private static final int NUM_CHECKSUM_BYTES = 4;
+	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
 	private String encoded; // base-32 encoded address
 	private PublicKey publicKey;
@@ -110,6 +111,13 @@ public class Address {
 	 * @return true if the address is valid.
 	 */
 	public boolean isValid() {
+		// this check should prevent leading and trailing whitespace
+		// TODO: we can't release this change now, as there is a bug in current nemesis block,
+		// quote: "I've added such (invalid) account by mistake to nemesis block"
+		// you can check it by un-commenting and running test added to NemesisBlockTest
+//		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
+//			return false;
+
 		byte[] encodedBytes;
 
 		try {
@@ -117,7 +125,6 @@ public class Address {
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
-
 		if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
 			return false;
 
@@ -158,19 +165,66 @@ public class Address {
 	 * @param address    The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Address address) {
-		serializer.writeString(label, address.getEncoded());
+		writeTo(serializer, label, address, AddressEncoding.COMPRESSED);
+	}
+
+	/**
+	 * Writes an address object.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label The optional label.
+	 * @param address The object.
+	 * @param encoding The address encoding mode.
+	 */
+	public static void writeTo(
+			final Serializer serializer,
+			final String label,
+			final Address address,
+			final AddressEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				serializer.writeBytes(label, null == address.publicKey ? null : address.publicKey.getRaw());
+				break;
+
+			case COMPRESSED:
+			default:
+				serializer.writeString(label, address.getEncoded());
+				break;
+		}
 	}
 
 	/**
 	 * Reads an address object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static Address readFrom(final Deserializer deserializer, final String label) {
-		final String encodedAddress = deserializer.readString(label);
-		return Address.fromEncoded(encodedAddress);
+		return readFrom(deserializer, label, AddressEncoding.COMPRESSED);
+	}
+
+	/**
+	 * Reads an address object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param encoding The address encoding.
+	 * @param label The optional label.
+	 * @return The read object.
+	 */
+	public static Address readFrom(
+			final Deserializer deserializer,
+			final String label,
+			final AddressEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
+				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
+
+			case COMPRESSED:
+			default:
+				final String encodedAddress = deserializer.readString(label);
+				return Address.fromEncoded(encodedAddress);
+		}
 	}
 }

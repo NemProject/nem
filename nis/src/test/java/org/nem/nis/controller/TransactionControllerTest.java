@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.Node;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -64,9 +64,9 @@ public class TransactionControllerTest {
 		transactions.add(transaction);
 		return transactions;
 	}
-	
+
 	private static class TestContext {
-		private final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PushService pushService = Mockito.mock(PushService.class);
 		private final Foraging foraging = Mockito.mock(Foraging.class);
 		private final PeerNetwork network;
@@ -81,7 +81,7 @@ public class TransactionControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			this.controller = new TransactionController(
-					this.accountAnalyzer,
+					this.accountLookup,
 					this.pushService,
 					this.foraging,
 					this.host);

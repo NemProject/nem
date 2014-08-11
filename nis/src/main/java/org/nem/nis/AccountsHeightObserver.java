@@ -2,6 +2,8 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.secret.BlockTransferObserver;
 
 /**
  * A BlockTransferObserver implementation that updates account heights.
@@ -35,24 +37,32 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 
 	@Override
 	public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-		this.tryRemoveFromAccountAnalyzer(height, account);
+		this.tryRemoveFromAccountAnalyzer(account);
 	}
 
 	private void addToAccountAnalyzer(final BlockHeight height, final Account account) {
-		final Account found = this.accountAnalyzer.findByAddress(account.getAddress());
-		found.setHeight(height);
-		found.incrementReferenceCount();
+		final Address address = account.getAddress();
+		final Account cachedAccount = this.accountAnalyzer.getAccountCache().findByAddress(address);
+		final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(address);
+
+		cachedAccount.incrementReferenceCount();
+		accountState.setHeight(height);
 	}
 
-	private void tryRemoveFromAccountAnalyzer(final BlockHeight height, final Account account) {
+	private void tryRemoveFromAccountAnalyzer(final Account account) {
 		final Address address = account.getAddress();
-		final Account found = this.accountAnalyzer.findByAddress(address);
+		final Account cachedAccount = this.accountAnalyzer.getAccountCache().findByAddress(address);
+		if (null == cachedAccount) {
+			throw new IllegalArgumentException("problem during undo, account not present in cache");
+		}
 
-		if (null == found || null == found.getHeight())
-			throw new IllegalArgumentException("problem during undo, account not present in AA or account height is null");
+		final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(address);
+		if (null == accountState.getHeight()) {
+			throw new IllegalArgumentException("problem during undo, account height not set");
+		}
 
-		if (ReferenceCount.ZERO.equals(found.decrementReferenceCount())) {
-			this.accountAnalyzer.removeAccountFromCache(address);
+		if (ReferenceCount.ZERO.equals(cachedAccount.decrementReferenceCount())) {
+			this.accountAnalyzer.removeAccount(address);
 		}
 	}
 }

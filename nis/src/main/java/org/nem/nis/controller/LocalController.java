@@ -8,6 +8,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.RequiredBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -79,7 +80,7 @@ public class LocalController {
 					.map(tx -> new ExplorerTransferView(
 							tx.getType(),
 							Amount.fromMicroNem(tx.getFee()),
-							tx.getDeadline(),
+							tx.getTimestamp(),
 							Address.fromPublicKey(tx.getSender().getPublicKey()),
 							tx.getSenderProof(),
 							tx.getTransferHash(),

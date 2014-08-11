@@ -5,7 +5,8 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
-import java.util.Collection;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -15,17 +16,22 @@ public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
 	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
-	private final AccountAnalyzer accountAnalyzer;
-	private final int maxChainSize;
+	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
+	private final int maxChainSize;
 
 	/**
 	 * Creates a new block chain validator.
 	 *
+	 * @param executor The block executor to use.
 	 * @param scorer The block scorer to use.
+	 * @param maxChainSize The maximum chain size.
 	 */
-	public BlockChainValidator(final AccountAnalyzer accountAnalyzer, final BlockScorer scorer, final int maxChainSize) {
-		this.accountAnalyzer = accountAnalyzer;
+	public BlockChainValidator(
+			final Consumer<Block> executor,
+			final BlockScorer scorer,
+			final int maxChainSize) {
+		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 	}
@@ -40,8 +46,6 @@ public class BlockChainValidator {
 	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
 		if (blocks.size() > this.maxChainSize)
 			return false;
-
-		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -73,10 +77,9 @@ public class BlockChainValidator {
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();
 
-			block.subscribe(observer);
-			block.execute();
-			block.unsubscribe(observer);
+			this.executor.accept(block);
 		}
+
 		return true;
 	}
 

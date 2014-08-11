@@ -16,7 +16,9 @@ import org.nem.core.test.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
-import org.nem.nis.service.AccountIoAdapter;
+import org.nem.nis.poi.*;
+import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.service.*;
 
 public class AccountControllerTest {
 
@@ -92,19 +94,37 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void accountGetDelegatesToAccountIoAdapter() {
+	public void accountGetDelegatesToAccountInfoFactory() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
-		final TestContext context = new TestContext(accountIoAdapter);
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+
+		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(account.getAddress().getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(account));
-		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
+		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+	}
+
+	@Test
+	public void accountGetDelegatesToForaging() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+
+		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
+		Mockito.when(context.foraging.isAccountUnlocked(address)).thenReturn(true);
+
+		// Act:
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+
+		// Assert:
+		Mockito.verify(context.foraging, Mockito.times(1)).isAccountUnlocked(address);
+		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -189,15 +209,13 @@ public class AccountControllerTest {
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
-		final List<Account> accounts = Arrays.asList(
-				createAccount("alpha", 12, 45),
-				createAccount("gamma", 0, 0),
-				createAccount("sigma", 4, 88));
+		final List<PoiAccountState> accountStates = Arrays.asList(
+				createAccountState("alpha", 12, 45),
+				createAccountState("gamma", 0, 0),
+				createAccountState("sigma", 4, 88));
 
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.spliterator()).thenReturn(accounts.spliterator());
-
-		final TestContext context = new TestContext(accountIoAdapter);
+		final TestContext context = new TestContext();
+		Mockito.when(context.poiFacade.spliterator()).thenReturn(accountStates.spliterator());
 
 		// Act:
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
@@ -210,16 +228,16 @@ public class AccountControllerTest {
 		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
-	private static Account createAccount(
+	private static PoiAccountState createAccountState(
 			final String encodedAddress,
 			final int blockHeight,
 			final int importance) {
-		final Account account = new Account(Address.fromEncoded(encodedAddress));
+		final PoiAccountState state = new PoiAccountState(Address.fromEncoded(encodedAddress));
 		if (blockHeight > 0) {
-			account.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
+			state.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
 		}
 
-		return account;
+		return state;
 	}
 
 	private static AccountImportanceViewModel createAccountImportanceViewModel(
@@ -237,6 +255,8 @@ public class AccountControllerTest {
 	private static class TestContext {
 		private final Foraging foraging;
 		private final AccountController controller;
+		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -248,7 +268,11 @@ public class AccountControllerTest {
 
 		public TestContext(final Foraging foraging, final AccountIoAdapter accountIoAdapter) {
 			this.foraging = foraging;
-			this.controller = new AccountController(this.foraging, accountIoAdapter);
+			this.controller = new AccountController(
+					this.foraging,
+					accountIoAdapter,
+					this.accountInfoFactory,
+					this.poiFacade);
 		}
 	}
 }

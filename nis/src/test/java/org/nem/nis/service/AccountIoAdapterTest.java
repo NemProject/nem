@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.AccountAnalyzer;
+import org.nem.nis.AccountCache;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
@@ -33,16 +33,16 @@ public class AccountIoAdapterTest {
 	BlockDao blockDao;
 
 	@Test
-	public void AccountIoAdapterForwardsFindToAccountAnalyzer() {
+	public void AccountIoAdapterForwardsFindToAccountCache() {
 		// Arrange:
-		final AccountAnalyzer accountAnalyzer = mock(AccountAnalyzer.class);
+		final AccountCache accountCache = mock(AccountCache.class);
 		final Vector<Account> accounts = new Vector<>();
 		for (int i = 0; i < 10; ++i) {
 			final Account account = Utils.generateRandomAccount();
 			accounts.add(account);
-			when(accountAnalyzer.findByAddress(account.getAddress())).thenReturn(account);
+			when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountAnalyzer);
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountCache);
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
@@ -98,8 +98,8 @@ public class AccountIoAdapterTest {
 		final Account harvester = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		final AccountAnalyzer accountAnalyzer = mock(AccountAnalyzer.class);
-		addMapping(accountAnalyzer, mockAccountDao, harvester);
+		final AccountCache accountCache = mock(AccountCache.class);
+		addMapping(accountCache, mockAccountDao, harvester);
 
 		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
@@ -122,10 +122,10 @@ public class AccountIoAdapterTest {
 		for (int blocks = 0; blocks < 10; ++blocks) {
 			final Block dummyBlock = new Block(harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTimes[blocks]), new BlockHeight(10 + blocks));
 
-			addMapping(accountAnalyzer, mockAccountDao, recipient);
+			addMapping(accountCache, mockAccountDao, recipient);
 			for (int i = 0; i < TX_COUNT; i++) {
 				final Account randomSender = Utils.generateRandomAccount();
-				addMapping(accountAnalyzer, mockAccountDao, randomSender);
+				addMapping(accountCache, mockAccountDao, randomSender);
 				final TransferTransaction transferTransaction = prepareTransferTransaction(randomSender, recipient, 10, txTimes[blocks][i]);
 
 				// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
@@ -138,7 +138,7 @@ public class AccountIoAdapterTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		return new AccountIoAdapter(new RequiredTransferDaoAdapter(transferDao), new RequiredBlockDaoAdapter(blockDao), accountAnalyzer);
+		return new AccountIoAdapter(new RequiredTransferDaoAdapter(transferDao), new RequiredBlockDaoAdapter(blockDao), accountCache);
 	}
 
 
@@ -175,9 +175,9 @@ public class AccountIoAdapterTest {
 		return transferTransaction;
 	}
 
-	private void addMapping(AccountAnalyzer accountAnalyzer, final MockAccountDao mockAccountDao, final Account account) {
+	private void addMapping(AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
 		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
-		when(accountAnalyzer.findByAddress(account.getAddress())).thenReturn(account);
+		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 	}
 }

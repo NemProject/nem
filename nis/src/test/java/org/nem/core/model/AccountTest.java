@@ -10,8 +10,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Function;
 
 public class AccountTest {
 
@@ -31,10 +29,6 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-		Assert.assertThat(account.getHeight(), IsNull.nullValue());
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -50,10 +44,6 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-        Assert.assertThat(account.getHeight(), IsNull.nullValue());
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -71,10 +61,66 @@ public class AccountTest {
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
 		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-        Assert.assertThat(account.getHeight(), IsNull.nullValue());
+	}
 
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
+	@Test
+	public void accountCanBeCreatedAroundAccountInformation() {
+		// Arrange:
+		final Address expectedAccountId = Utils.generateRandomAddressWithPublicKey();
+		final Account account = new Account(expectedAccountId, Amount.fromNem(124), new BlockAmount(4), "blah");
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
+		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+		Assert.assertThat(account.getLabel(), IsEqual.equalTo("blah"));
+		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
+	}
+
+	//endregion
+
+	//region setPublicKey
+
+	@Test(expected = IllegalArgumentException.class)
+	public void inconsistentPublicKeyCannotBeSet() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+
+		// Act: the set fails because the public key is not consistent with the account's address
+		account.setPublicKey(publicKey);
+	}
+
+	@Test
+	public void consistentPublicKeyCanBeSet() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Address address = Address.fromEncoded(Address.fromPublicKey(keyPair.getPublicKey()).getEncoded());
+		final Account account = new Account(address);
+
+		// Act:
+		account.setPublicKey(keyPair.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+	}
+
+	@Test
+	public void settingConsistentPublicKeyDoesNotOverwritePrivateKey() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+
+		// Act:
+		account.setPublicKey(keyPair.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
 	}
 
 	//endregion
@@ -139,42 +185,13 @@ public class AccountTest {
 
 	//endregion
 
-	//region height
-
-	@Test
-	public void accountHeightCanBeSetIfNull() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setHeight(new BlockHeight(17));
-
-		// Assert:
-		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
-	}
-
-	@Test
-	public void accountHeightCannotBeUpdatedIfNonNull() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setHeight(new BlockHeight(17));
-		account.setHeight(new BlockHeight(32));
-
-		// Assert:
-		Assert.assertThat(account.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
-	}
-
-	//endregion
-
 	//region refCount
 
 	@Test
 	public void referenceCountIsZeroForNewAccount() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		
+
 		// Assert:
 		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
@@ -183,7 +200,7 @@ public class AccountTest {
 	public void referenceCountCanBeIncremented() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		
+
 		// Act:
 		final ReferenceCount result = account.incrementReferenceCount();
 
@@ -197,7 +214,7 @@ public class AccountTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		account.incrementReferenceCount();
-		
+
 		// Act:
 		final ReferenceCount result = account.decrementReferenceCount();
 
@@ -207,7 +224,7 @@ public class AccountTest {
 	}
 
 	//endregion
-	
+
 	//region foraged blocks
 
 	@Test
@@ -397,228 +414,6 @@ public class AccountTest {
 
 	//endregion
 
-	//region Serialization
-
-	@Test
-	public void accountWithPublicKeyCanBeSerialized() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-
-		// Assert:
-		assertAccountSerialization(address, address.getPublicKey().getRaw(), true);
-		assertAccountSerialization(address, address.getPublicKey().getRaw(), false);
-	}
-
-	@Test
-	public void accountWithoutPublicKeyCanBeSerialized() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-
-		// Assert:
-		assertAccountSerialization(address, null, true);
-		assertAccountSerialization(address, null, false);
-	}
-
-	@Test
-	public void accountWithPublicKeyCanBeRoundTripped() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-
-		// Assert:
-		assertAccountRoundTrip(address, address.getPublicKey());
-	}
-
-	@Test
-	public void accountWithoutPublicKeyCanBeRoundTripped() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-
-		// Assert:
-		assertAccountRoundTrip(address, null);
-	}
-
-	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
-		// Arrange:
-		final Account.DeserializationOptions allOption = Account.DeserializationOptions.ALL;
-		final Account.DeserializationOptions summaryOption = Account.DeserializationOptions.SUMMARY;
-
-		// Assert:
-		assertAccountRoundTrip(address, obj -> new Account(obj), expectedPublicKey, true);
-		assertAccountRoundTrip(address, d -> new Account(d, allOption), expectedPublicKey, false);
-		assertAccountRoundTrip(address, d -> new Account(d, summaryOption), expectedPublicKey, true);
-	}
-
-	@Test
-	public void canRoundTripUnsetAccountImportance() {
-		// Arrange:
-		final Account original = Utils.generateRandomAccount();
-
-		// Act:
-		final Account account = new Account(Utils.roundtripSerializableEntity(original, null));
-
-		// Assert:
-		Assert.assertThat(account.getImportanceInfo().isSet(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void secureMessagesCanBeRoundTrippedWithPrivateKey() {
-		// Arrange: create 3 secure messages from three different senders
-		final List<Account> senders = Arrays.asList(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount());
-		final Account recipient = Utils.generateRandomAccount();
-
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(0), recipient, new byte[] { 1, 1, 1 }));
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(1), recipient, new byte[] { 2, 4, 8 }));
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(2), recipient, new byte[] { 3, 9, 27 }));
-
-		// add the recipient (private key) and senders (public key only)
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(recipient);
-		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
-
-		// Act:
-		final Account roundTrippedRecipient = new Account(
-				Utils.roundtripSerializableEntity(recipient, accountLookup),
-				Account.DeserializationOptions.ALL);
-
-		// Assert:
-		final List<Message> messages = roundTrippedRecipient.getMessages();
-		Assert.assertThat(messages.size(), IsEqual.equalTo(3));
-		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 1, 1 }));
-		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 2, 4, 8 }));
-		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(new byte[] { 3, 9, 27 }));
-	}
-
-	@Test
-	public void secureMessagesRequireAtLeastOnePrivateKeyToBeRoundTripped() {
-		// Arrange: create 3 secure messages from three different senders
-		final List<Account> senders = Arrays.asList(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount());
-		final Account recipient = Utils.generateRandomAccount();
-
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(0), recipient, new byte[] { 1, 1, 1 }));
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(1), recipient, new byte[] { 2, 4, 8 }));
-		recipient.addMessage(SecureMessage.fromDecodedPayload(senders.get(2), recipient, new byte[] { 3, 9, 27 }));
-
-		// add the recipient (public key only) and senders ([0, 2] - public key only, [1] - private key)
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(recipient));
-		senders.stream().forEach(s -> accountLookup.setMockAccount(Utils.createPublicOnlyKeyAccount(s)));
-		accountLookup.setMockAccount(senders.get(1));
-
-		// Act:
-		final Account roundTrippedRecipient = new Account(
-				Utils.roundtripSerializableEntity(recipient, accountLookup),
-				Account.DeserializationOptions.ALL);
-
-		// Assert:
-		final List<Message> messages = roundTrippedRecipient.getMessages();
-		Assert.assertThat(messages.size(), IsEqual.equalTo(3));
-		Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(null));
-		Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 2, 4, 8 }));
-		Assert.assertThat(messages.get(2).getDecodedPayload(), IsEqual.equalTo(null));
-	}
-
-	private static void assertAccountRoundTrip(
-			final Address address,
-			final Function<Deserializer, Account> accountDeserializer,
-			final PublicKey expectedPublicKey,
-			final boolean isSummary) {
-		// Arrange:
-		final Account originalAccount = createAccountForSerializationTests(address);
-		final SerializableEntity entity = isSummary ? originalAccount.asSummary() : originalAccount;
-
-		// Act:
-		final Account account = accountDeserializer.apply(Utils.roundtripSerializableEntity(entity, null));
-
-		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
-
-		if (null == expectedPublicKey) {
-			Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
-		} else {
-			Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-			Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
-		}
-
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(747L)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo("alpha gamma"));
-
-		final List<Message> messages = account.getMessages();
-		if (isSummary) {
-			// messages are not serialized in summary mode
-			Assert.assertThat(messages.size(), IsEqual.equalTo(0));
-		} else {
-			Assert.assertThat(messages.size(), IsEqual.equalTo(2));
-			Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
-			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
-		}
-
-		Assert.assertThat(account.getImportanceInfo(), IsNull.notNullValue());
-		Assert.assertThat(account.getWeightedBalances(), IsNull.notNullValue());
-	}
-
-	private static void assertAccountSerialization(
-			final Address address,
-			final byte[] expectedPublicKey,
-			final boolean isSummary) {
-		// Arrange:
-		final Account originalAccount = createAccountForSerializationTests(address);
-		final SerializableEntity entity = isSummary ? originalAccount.asSummary() : originalAccount;
-
-		// Act:
-		final JsonSerializer serializer = new JsonSerializer(true);
-		entity.serialize(serializer);
-		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
-
-		// Assert:
-		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalAccount.getAddress().getEncoded()));
-		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
-		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747L));
-		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
-		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
-
-		final AccountImportance importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
-		Assert.assertThat(importance.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(importance.getImportance(importance.getHeight()), IsEqual.equalTo(0.796));
-
-		if (isSummary) {
-			// messages are not serialized in summary mode
-			Assert.assertThat(serializer.getObject().containsKey("messages"), IsEqual.equalTo(false));
-		} else {
-			final List<Message> messages = deserializer.readObjectArray("messages", MessageFactory.DESERIALIZER);
-			Assert.assertThat(messages.size(), IsEqual.equalTo(2));
-			Assert.assertThat(messages.get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 4, 5 }));
-			Assert.assertThat(messages.get(1).getDecodedPayload(), IsEqual.equalTo(new byte[] { 8, 12, 4 }));
-		}
-
-		// 6-7 "real" properties and 1 "hidden" (ordering) property
-		final int expectedProperties = 6 + (isSummary ? 0 : 1) + 1 ;
-		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
-	}
-
-	private static Account createAccountForSerializationTests(final Address address) {
-		// Arrange:
-		final Account account = new Account(address);
-		account.setLabel("alpha gamma");
-		account.incrementBalance(new Amount(747));
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
-		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
-		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
-		return account;
-	}
-
-	//endregion
-
 	//region inline serialization
 
 	@Test
@@ -644,7 +439,7 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(address),
-				AccountEncoding.ADDRESS,
+				AddressEncoding.COMPRESSED,
 				address.getEncoded());
 	}
 
@@ -656,7 +451,7 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(kp),
-				AccountEncoding.PUBLIC_KEY,
+				AddressEncoding.PUBLIC_KEY,
 				kp.getPublicKey().toString());
 	}
 
@@ -668,13 +463,13 @@ public class AccountTest {
 		// Assert:
 		assertCanWriteAccountWithEncoding(
 				new Account(address),
-				AccountEncoding.PUBLIC_KEY,
+				AddressEncoding.PUBLIC_KEY,
 				null);
 	}
 
 	private static void assertCanWriteAccountWithEncoding(
 			final Account account,
-			final AccountEncoding encoding,
+			final AddressEncoding encoding,
 			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -711,16 +506,16 @@ public class AccountTest {
 	@Test
 	public void canRoundtripAccountWithAddressEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AccountEncoding.ADDRESS);
+		assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
 	}
 
 	@Test
 	public void canRoundtripAccountWithPublicKeyEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AccountEncoding.PUBLIC_KEY);
+		assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
 	}
 
-	private void assertAccountRoundTripInMode(final AccountEncoding encoding) {
+	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
@@ -798,45 +593,6 @@ public class AccountTest {
 		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
 	}
 
-	@Test
-	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final WeightedBalances balances = account.getWeightedBalances();
-		balances.addReceive(new BlockHeight(17), Amount.fromNem(1234));
-
-		// Act:
-		final Account copyAccount = account.copy();
-		final WeightedBalances copyBalances = copyAccount.getWeightedBalances();
-
-		// Assert:
-		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
-		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
-	}
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfAccountImportance() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final AccountImportance importance = account.getImportanceInfo();
-		importance.setImportance(BlockHeight.ONE, 0.03125);
-		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
-
-		// Act:
-		final Account copyAccount = account.copy();
-		final AccountImportance copyImportance = copyAccount.getImportanceInfo();
-		copyAccount.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
-
-		// Assert:
-		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
-		Assert.assertThat(importance.getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyImportance.getImportance(new BlockHeight(2)), IsEqual.equalTo(0.0234375));
-		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
-		Assert.assertThat(
-				copyImportance.getOutlinksIterator(BlockHeight.ONE).next(),
-				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE).next()));
-	}
-
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
 		// Arrange:
 		setAccountValuesForCopyTests(account);
@@ -850,21 +606,17 @@ public class AccountTest {
 		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
 
 		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
-		Assert.assertThat(copyAccount.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 
 		// verify that the mutable objects are not the same
 		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
-		Assert.assertThat(copyAccount.getWeightedBalances(), IsNot.not(IsSame.sameInstance(account.getWeightedBalances())));
-		Assert.assertThat(copyAccount.getImportanceInfo(), IsNot.not(IsSame.sameInstance(account.getImportanceInfo())));
 		return copyAccount;
 	}
 
 	private static void setAccountValuesForCopyTests(final Account account) {
 		account.incrementBalance(new Amount(1000));
-		account.setHeight(new BlockHeight(123));
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
@@ -915,12 +667,8 @@ public class AccountTest {
 		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
-		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(original.getHeight()));
 		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
-
 		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
-		Assert.assertThat(copy.getWeightedBalances(), IsSame.sameInstance(original.getWeightedBalances()));
-		Assert.assertThat(copy.getImportanceInfo(), IsSame.sameInstance(original.getImportanceInfo()));
 	}
 
 	//endregion

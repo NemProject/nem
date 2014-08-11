@@ -3,10 +3,9 @@ package org.nem.nis.poi;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.test.MockAccount;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,10 +20,10 @@ public class PoiContextTest {
 		final List<TestAccountInfo> accountInfos = Arrays.asList();
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
-		createTestPoiContext(height, accounts);
+		createTestPoiContext(height, accountStates);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -32,14 +31,14 @@ public class PoiContextTest {
 		// Arrange:
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier - 1, multiplier - 1, null), // non-foraging account
-				new TestAccountInfo(multiplier - 1, multiplier - 1, null)); // non-foraging account
+				new TestAccountInfo(multiplier - 1, null), // non-foraging account
+				new TestAccountInfo(multiplier - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
-		createTestPoiContext(height, accounts);
+		createTestPoiContext(height, accountStates);
 	}
 
 	//endregion
@@ -103,14 +102,14 @@ public class PoiContextTest {
 	public void poiStartVectorIsInitializedToNormalizedUniformVectorForSubsequentIterations() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		accounts.get(0).getImportanceInfo().setLastPageRank(3);
-		accounts.get(1).getImportanceInfo().setLastPageRank(7);
-		accounts.get(2).getImportanceInfo().setLastPageRank(4);
-		accounts.get(4).getImportanceInfo().setLastPageRank(2);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		accountStates.get(0).getImportanceInfo().setLastPageRank(3);
+		accountStates.get(1).getImportanceInfo().setLastPageRank(7);
+		accountStates.get(2).getImportanceInfo().setLastPageRank(4);
+		accountStates.get(4).getImportanceInfo().setLastPageRank(2);
 
 		// Act:
-		final PoiContext context = createTestPoiContext(height, accounts);
+		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Assert:
 		// (1) start vector is uniform
@@ -198,14 +197,14 @@ public class PoiContextTest {
 	public void canUpdateFilteredAccountsWithCompatiblePageRankVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		final PoiContext context = createTestPoiContext(height, accounts);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Act:
 		context.updateImportances(new ColumnVector(5, 2, 7, 3), new ColumnVector(4));
 
 		// Assert:
-		final List<Double> importances = accounts.stream()
+		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getLastPageRank())
 				.collect(Collectors.toList());
 		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
@@ -215,14 +214,14 @@ public class PoiContextTest {
 	public void canUpdateFilteredAccountsWithCompatibleImportanceVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		final PoiContext context = createTestPoiContext(height, accounts);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Act:
 		context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3));
 
 		// Assert:
-		final List<Double> importances = accounts.stream()
+		final List<Double> importances = accountStates.stream()
 				.map(a -> {
 					final AccountImportance ai = a.getImportanceInfo();
 					return ai.isSet() ? ai.getImportance(height) : 0.0;
@@ -235,8 +234,8 @@ public class PoiContextTest {
 	public void cannotUpdateFilteredAccountsWithIncompatiblePageRankVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		final PoiContext context = createTestPoiContext(height, accounts);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -251,8 +250,8 @@ public class PoiContextTest {
 	public void cannotUpdateFilteredAccountsWithIncompatibleImportanceVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		final PoiContext context = createTestPoiContext(height, accounts);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -267,93 +266,89 @@ public class PoiContextTest {
 
 	private static void addAccountLink(
 			final BlockHeight height,
-			final Account sender,
-			final Account recipient,
+			final PoiAccountState sender,
+			final PoiAccountState recipient,
 			final int amount) {
 
 		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient.getAddress());
 		sender.getImportanceInfo().addOutlink(link);
 	}
 
-	private static List<Account> createTestPoiAccounts(
+	private static List<PoiAccountState> createTestPoiAccountStates(
 			final List<TestAccountInfo> accountInfos,
 			final BlockHeight height) {
-		final List<Account> accounts = new ArrayList<>();
+		final List<PoiAccountState> accountStates = new ArrayList<>();
 		for (final TestAccountInfo info : accountInfos) {
-			final MockAccount account = new MockAccount();
-			account.incrementBalance(Amount.fromMicroNem(info.balance));
-			account.setVestedBalanceAt(Amount.fromMicroNem(info.vestedBalance), height);
+			final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+			state.getWeightedBalances().addFullyVested(height, Amount.fromMicroNem(info.vestedBalance));
 
 			for (final int amount : info.amounts) {
 				final AccountLink link = new AccountLink(height, Amount.fromNem(amount), Utils.generateRandomAddress());
-				account.getImportanceInfo().addOutlink(link);
+				state.getImportanceInfo().addOutlink(link);
 			}
 
-			accounts.add(account);
+			accountStates.add(state);
 		}
 
-		return accounts;
+		return accountStates;
 	}
 
-	private static List<Account> createTestPoiAccounts(final BlockHeight height) {
+	private static List<PoiAccountState> createTestPoiAccountStates(final BlockHeight height) {
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * multiplier - 1,	4 * multiplier,		null),
-				new TestAccountInfo(3 * multiplier + 1,	multiplier - 1,		new int[] { 1 }), // 1 (insufficient balance)
-				new TestAccountInfo(5 * multiplier, 	multiplier,			new int[] { 1, 2 }), // 3
-				new TestAccountInfo(multiplier,			3 * multiplier - 1,	null),
-				new TestAccountInfo(multiplier,			3 * multiplier + 1,	new int[] { 1, 1, 4, 3, 1 }), // 10
-				new TestAccountInfo(multiplier - 1,		5 * multiplier,		new int[] { 7 })); // 7 (insufficient vested balance)
+				new TestAccountInfo(3 * multiplier - 1, null),
+				new TestAccountInfo(multiplier - 1,     new int[] { 1 }), // 1 (insufficient balance)
+				new TestAccountInfo(5 * multiplier,     new int[] { 1, 2 }), // 3
+				new TestAccountInfo(multiplier,         null),
+				new TestAccountInfo(multiplier,         new int[] { 1, 1, 4, 3, 1 }), // 10
+				new TestAccountInfo(multiplier - 1,     new int[] { 7 })); // 7 (insufficient vested balance)
 
-		return createTestPoiAccounts(accountInfos, height);
+		return createTestPoiAccountStates(accountInfos, height);
 	}
 
 	private static PoiContext createTestPoiContext() {
 		final BlockHeight height = new BlockHeight(21);
-		final List<Account> accounts = createTestPoiAccounts(height);
-		return createTestPoiContext(height, accounts);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
+		return createTestPoiContext(height, accountStates);
 	}
 
-	private static PoiContext createTestPoiContext(final BlockHeight height, final List<Account> accounts) {
-		return new PoiContext(accounts, height);
+	private static PoiContext createTestPoiContext(final BlockHeight height, final List<PoiAccountState> accountStates) {
+		return new PoiContext(accountStates, height);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
 		// Arrange: create 4 accounts
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier, multiplier, null),
-				new TestAccountInfo(multiplier, multiplier, null),
-				new TestAccountInfo(multiplier, multiplier, null),
-				new TestAccountInfo(multiplier, multiplier, null),
-				new TestAccountInfo(multiplier - 1, multiplier - 1, null)); // non-foraging account
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<Account> accounts = createTestPoiAccounts(accountInfos, height);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// set up account links
-		addAccountLink(height, accounts.get(0), accounts.get(1), 8);
-		addAccountLink(height, accounts.get(0), accounts.get(2), 4);
-		addAccountLink(height, accounts.get(1), accounts.get(0), 2);
-		addAccountLink(height, accounts.get(1), accounts.get(2), 6);
-		addAccountLink(height, accounts.get(3), accounts.get(0), 3);
-		addAccountLink(height, accounts.get(3), accounts.get(2), 5);
-		addAccountLink(height, accounts.get(4), accounts.get(2), 5); // from non-foraging account (ignored)
-		addAccountLink(height, accounts.get(0), accounts.get(4), 2); // to non-foraging account (included in scores)
+		addAccountLink(height, accountStates.get(0), accountStates.get(1), 8);
+		addAccountLink(height, accountStates.get(0), accountStates.get(2), 4);
+		addAccountLink(height, accountStates.get(1), accountStates.get(0), 2);
+		addAccountLink(height, accountStates.get(1), accountStates.get(2), 6);
+		addAccountLink(height, accountStates.get(3), accountStates.get(0), 3);
+		addAccountLink(height, accountStates.get(3), accountStates.get(2), 5);
+		addAccountLink(height, accountStates.get(4), accountStates.get(2), 5); // from non-foraging account (ignored)
+		addAccountLink(height, accountStates.get(0), accountStates.get(4), 2); // to non-foraging account (included in scores)
 
 		// Act:
-		return new PoiContext(accounts, height);
+		return new PoiContext(accountStates, height);
 	}
 
 	private static class TestAccountInfo {
-
 		public final long vestedBalance;
-		public final long balance;
 		public final int[] amounts;
 
-		public TestAccountInfo(long vestedBalance, long balance, int[] amounts) {
+		public TestAccountInfo(long vestedBalance, int[] amounts) {
 			this.vestedBalance = vestedBalance;
-			this.balance = balance;
 			this.amounts = null == amounts ? new int[] { } : amounts;
 		}
 	}

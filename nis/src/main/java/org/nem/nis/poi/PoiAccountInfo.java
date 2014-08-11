@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 
@@ -14,7 +15,7 @@ public class PoiAccountInfo {
 	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR/(double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
-	private final Account account;
+	private final PoiAccountState accountState;
 	private final BlockHeight height;
 
 	private final Map<Address, Double> netOutlinks = new HashMap<>();
@@ -24,15 +25,15 @@ public class PoiAccountInfo {
 	 * Creates a new POI account info.
 	 *
 	 * @param index The temporal account index.
-	 * @param account The account.
+	 * @param accountState The account state.
 	 * @param height The height at which the strength is evaluated.
 	 */
-	public PoiAccountInfo(final int index, final Account account, final BlockHeight height) {
+	public PoiAccountInfo(final int index, final PoiAccountState accountState, final BlockHeight height) {
 		this.index = index;
-		this.account = account;
+		this.accountState = accountState;
 		this.height = height;
 
-		final AccountImportance importanceInfo = this.account.getImportanceInfo();
+		final AccountImportance importanceInfo = this.accountState.getImportanceInfo();
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
 
 		// weight = out-link amount * DECAY_BASE^(age in days)
@@ -59,11 +60,11 @@ public class PoiAccountInfo {
 	public int getIndex() { return this.index; }
 
 	/**
-	 * Gets the account.
+	 * Gets the account state.
 	 *
-	 * @return The account.
+	 * @return The account state.
 	 */
-	public Account getAccount() { return this.account; }
+	public PoiAccountState getState() { return this.accountState; }
 
 	/**
 	 * Determines whether or not the account is eligible for foraging.
@@ -71,8 +72,7 @@ public class PoiAccountInfo {
 	 * @return true if the account is eligible.
 	 */
 	public boolean canForage() {
-		return this.account.getWeightedBalances().getVested(this.height).compareTo(MIN_FORAGING_BALANCE) >= 0
-				&& this.account.getBalance().compareTo(MIN_FORAGING_BALANCE) >= 0;
+		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(MIN_FORAGING_BALANCE) >= 0;
 	}
 
 	/**

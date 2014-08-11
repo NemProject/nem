@@ -12,7 +12,7 @@ import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
+import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.test.PeerUtils;
@@ -32,7 +32,9 @@ public class DebugControllerTest {
 		final BlockHeight height = new BlockHeight(10);
 		final TimeInstant timestamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
+				new AccountCache(),
+				new PoiFacade(new PoiAlphaImportanceGeneratorImpl()));
 		final Account signer1 = addRandomAccountWithBalance(accountAnalyzer);
 		final Account signer2 = addRandomAccountWithBalance(accountAnalyzer);
 
@@ -43,7 +45,6 @@ public class DebugControllerTest {
 				timestamp.addSeconds(60),
 				height);
 		blockDaoBlock.setDifficulty(difficulty);
-		blockDaoBlock.getSigner().setHeight(BlockHeight.ONE);
 
 		final Block blockDaoParent = new Block(
 				signer2,
@@ -52,9 +53,8 @@ public class DebugControllerTest {
 				timestamp,
 				height.prev());
 		blockDaoParent.setDifficulty(difficulty);
-		blockDaoParent.getSigner().setHeight(BlockHeight.ONE);
 
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer);
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 		scorer.forceImportanceCalculation();
 		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
 		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
@@ -150,10 +150,14 @@ public class DebugControllerTest {
 	}
 
 	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
-		final Account account = accountAnalyzer.addAccountToCache(Utils.generateRandomAccount().getAddress());
+		final Account accountWithPrivateKey = Utils.generateRandomAccount();
+		final Account account = accountAnalyzer.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
 		account.incrementBalance(Amount.fromNem(10000));
-		account.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
-		return account;
+
+		final PoiAccountState accountState = accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress());
+		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
+		accountState.setHeight(BlockHeight.ONE);
+		return accountWithPrivateKey;
 	}
 
 	private static class TestContext {

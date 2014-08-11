@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
+import org.nem.nis.poi.*;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -52,7 +52,7 @@ public class BlockScorerITCase {
 			foragerAccounts[i]	= createAccountWithBalance(numNEM/numForagers);
 		}
 		int averageTime = 0, maxTime = 0, minTime = Integer.MAX_VALUE, index=0;
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		Block block;
 		Block[] blocks = new Block[numRounds];
 		int[] secondsBetweenBlocks = new int[numRounds];
@@ -66,7 +66,7 @@ public class BlockScorerITCase {
 		for (int i=1; i<numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(foragerAccounts[0], blocks[i-1], new TimeInstant(1));
-			block.setDifficulty(scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks)));
+			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j=0; j<numForagers; j++) {
 				Block temporaryDummy = new Block(foragerAccounts[j], blocks[i-1], new TimeInstant(1));
@@ -228,7 +228,7 @@ public class BlockScorerITCase {
 		final Account foragerA = createAccountWithBalance(1_000_000_000);
 		final Account foragerB = createAccountWithBalance(100_000_000);
 
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
 		byte[] rndBytes = new byte[32];
 
@@ -261,7 +261,7 @@ public class BlockScorerITCase {
 
 	public int normalForagerVersusSelfishForager(int numRounds, int maxTime, long normalForgerBalance, long selfishForgerBalance) {
 		// Arrange:
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -320,7 +320,7 @@ public class BlockScorerITCase {
 	public int normalForgersOldVersusSelfishNew(GenerateStrategy strategy, int numRounds, int maxTime, long foragedBlocksPerNormalForager, int count, long normalForgerBalance, int selfishCount, long selfishForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -387,7 +387,7 @@ public class BlockScorerITCase {
 	public int normalXForagerVersusSelfishForager(GenerateStrategy strategy, int numRounds, int maxTime, int count, long normalForgerBalance,  long selfishForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -448,7 +448,7 @@ public class BlockScorerITCase {
 	public int normalXRandomForagerVersusSelfishForager(GenerateStrategy strategy, int numRounds, int maxTime, int percentage, int count, long normalForgerBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -511,7 +511,7 @@ public class BlockScorerITCase {
 	public long oneForagersVersusManyForagers(int maxTime, int count, long manyForagersBalance) {
 		// Arrange:
 
-		final BlockScorer scorer = new BlockScorer(new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl()));
+		final BlockScorer scorer = createBlockScorer();
 		List<Block> blocks = new LinkedList<>();
 		SecureRandom sr = new SecureRandom();
 		byte[] rndBytes = new byte[32];
@@ -566,7 +566,7 @@ public class BlockScorerITCase {
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
 		List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
-		final BlockDifficulty difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
+		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
@@ -598,7 +598,7 @@ public class BlockScorerITCase {
 			Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
 			List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
-			final BlockDifficulty difficulty = scorer.calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
+			final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
 			block.setDifficulty(difficulty);
 			BigInteger hit = scorer.calculateHit(block);
 			int seconds = hit.multiply(block.getDifficulty().asBigInteger())
@@ -677,8 +677,8 @@ public class BlockScorerITCase {
 //		Assert.assertThat(blockScore, IsEqual.equalTo(Math.abs(0xE2E3E4E5) + blockScoreHashPart));
 //	}
 
-	private static Block createBlock(final Account account, int timeStamp, long height) {
-		return new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
+	private static BlockScorer createBlockScorer() {
+		return new BlockScorer(new PoiFacade(new PoiAlphaImportanceGeneratorImpl()));
 	}
 
 	private static Account createAccountWithBalance(long balance) {

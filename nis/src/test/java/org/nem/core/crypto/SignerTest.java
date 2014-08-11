@@ -7,34 +7,24 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.HexEncoder;
+import org.nem.core.utils.StringEncoder;
 
 import java.math.BigInteger;
 
 public class SignerTest {
 
-	// TODO: this test doesn't seem to be doing anything with Signer
-	// TODO: we should probably add at least one test validating the produced signature exactly
-
 	@Test
-	public void sha3HmacUsedInSignerCreateEcdsaSigner() {
+	public void signerProducesCorrectSignatureUsing256bitSha3() {
 		// Arrange
-		final SHA3Digest sha3 = new SHA3Digest(256);
-		final HMac hMac = new HMac(sha3);
-
-		final byte[] key = { 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb };
-		final byte[] data = { 0x48, 0x69, 0x20, 0x54, 0x68, 0x65, 0x72, 0x65 };
+		final KeyPair keyPair = new KeyPair(new PrivateKey(BigInteger.valueOf(1L)));
+		final Signer signer = new Signer(keyPair);
 
 		// Act:
-		hMac.init(new KeyParameter(key));
-		hMac.update(data, 0, data.length);
-		final byte[] result = new byte[32];
-		hMac.doFinal(result, 0);
+		final Signature signature = signer.sign(StringEncoder.getBytes("NEM"));
 
 		// Assert:
-		final byte[] expectedResult = HexEncoder.getBytes(
-				"9663d10c73ee294054dc9faf95647cb99731d12210ff7075fb3d3395abfb9821");
-
-		Assert.assertArrayEquals(result, expectedResult);
+		final String expectedSignature = "01485191de9fa79887300a2543e2ae5860c744863c380e9ccd2b0c62d768e61b68e3c1f8e8fe4206a4b598f512b5944a43cf8dac03fc871c2ed7d2b927643852";
+		Assert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
 	}
 
 	@Test

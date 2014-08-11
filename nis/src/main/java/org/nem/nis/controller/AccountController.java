@@ -8,7 +8,8 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
-import org.nem.nis.service.AccountIo;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,23 +23,32 @@ import java.util.stream.*;
 public class AccountController {
 	private final Foraging foraging;
 	private final AccountIo accountIo;
+	private final AccountInfoFactory accountInfoFactory;
+	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
-	AccountController(final Foraging foraging, final AccountIo accountIo) {
+	AccountController(
+			final Foraging foraging,
+			final AccountIo accountIo,
+			final AccountInfoFactory accountInfoFactory,
+			final PoiFacade poiFacade) {
 		this.foraging = foraging;
 		this.accountIo = accountIo;
+		this.accountInfoFactory = accountInfoFactory;
+		this.poiFacade = poiFacade;
 	}
 
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaDataPair accountGet(@RequestParam(value = "address") final String nemAddress) {
-		final Account account = this.accountIo.findByAddress(this.getAddress(nemAddress));
-		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(account));
+		final Address address = this.getAddress(nemAddress);
+		final AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(address));
 		return new AccountMetaDataPair(account, metaData);
 	}
 
-	private AccountStatus getAccountStatus(final Account account) {
-		return this.foraging.isAccountUnlocked(account)? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
+	private AccountStatus getAccountStatus(final Address address) {
+		return this.foraging.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
 	/**
@@ -174,10 +184,10 @@ public class AccountController {
 	@PublicApi
 	@ClientApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		final List<AccountImportanceViewModel> accounts = StreamSupport.stream(this.accountIo.spliterator(), false)
+		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.poiFacade.spliterator(), false)
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 
-		return new SerializableList<>(accounts);
+		return new SerializableList<>(viewModels);
 	}
 }

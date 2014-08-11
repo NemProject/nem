@@ -3,11 +3,12 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
+import java.util.function.*;
 
 public class AddressTest {
 
@@ -72,15 +73,6 @@ public class AddressTest {
 	}
 
 	@Test
-	public void addressPaddedWithSpacesIsInvalid() {
-		// Arrange:
-		final Address address = Address.fromEncoded("TD5AXB37QG5DXD25YHLMS4VDMI3A7HBGBYHDNB63 ");
-
-		// Assert:
-		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void addressesWithDifferentCasingsAreValid() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
@@ -118,26 +110,29 @@ public class AddressTest {
 
 	@Test
 	public void addressWithNonBase32CharactersIsNotValid() {
-		// Act:
-		final Address address = Address.fromEncoded("A*B");
-
 		// Assert:
-		Assert.assertThat(address.isValid(), IsEqual.equalTo(false));
+		assertInvalidAddressAfterTransform(address -> address.substring(0, 20) + "*" + address.substring(21));
 	}
 
 	@Test
 	public void addressWithIncorrectLengthIsNotValid() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		// Assert:
+		assertInvalidAddressAfterTransform(address -> address.substring(0, address.length() - 1));
+	}
 
+	@Test
+	public void addressWithIncorrectNumberOfDecodedBytesIsNotValid() {
+		// Assert:
+		assertInvalidAddressAfterTransform(address -> address.substring(0, address.length() - 8) + "========");
+	}
+
+	private static void assertInvalidAddressAfterTransform(final Function<String, String> transform) {
 		// Act:
-		final Address address = Address.fromPublicKey(publicKey);
-		final String realAddress = address.getEncoded();
-		final String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
+		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
+		final String invalidAddress = transform.apply(address.toString());
 
 		// Assert:
-		Assert.assertThat(Address.fromEncoded(realAddress).isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(Address.fromEncoded(invalidAddress).isValid(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -168,6 +163,35 @@ public class AddressTest {
 
 		// Assert:
 		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void addressWithLeadingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> padding + address.toString());
+	}
+
+	@Test
+	public void addressWithTrailingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> address.toString() + padding);
+	}
+
+	@Test
+	public void addressWithLeadingAndTrailingWhitespaceIsInvalid() {
+		// Assert:
+		assertAddressWithPaddingInvalid((address, padding) -> padding + address.toString() + padding);
+	}
+
+	private static void assertAddressWithPaddingInvalid(final BiFunction<Address, String, String> paddingFunction) {
+		// Arrange:
+		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
+
+		// Assert:
+		for (final String padding : new String[] { " ", "\t", "  \t \t " }) {
+			final String paddedAddress = paddingFunction.apply(address, padding);
+			Assert.assertThat(Address.fromEncoded(paddedAddress).isValid(), IsEqual.equalTo(false));
+		}
 	}
 
 	//region equals / hashCode
@@ -212,35 +236,120 @@ public class AddressTest {
 	//region inline serialization
 
 	@Test
-	public void canWriteAddress() {
+	public void canWriteAddressWithDefaultEncoding() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final Address address = Address.fromEncoded("MockAcc");
+		final Address address = Address.fromEncoded("BlahAddress");
 
 		// Act:
-		Address.writeTo(serializer, "Address", address);
+		Address.writeTo(serializer, "address", address);
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Address"), IsEqual.equalTo(address.getEncoded()));
+		Assert.assertThat(object.get("address"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test
-	public void canRoundtripAddress() {
+	public void canWriteAddressWithAddressEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("BlahAddress");
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.COMPRESSED,
+				address.getEncoded());
+	}
+
+	@Test
+	public void canWriteAddressWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Address.fromPublicKey((new KeyPair()).getPublicKey());
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.PUBLIC_KEY,
+				address.getPublicKey().toString());
+	}
+
+	@Test
+	public void canWriteAddressThatDoesNotHavePublicKeyWithPublicKeyEncoding() {
+		// Arrange:
+		final Address address = Address.fromEncoded("BlahAddress");
+
+		// Assert:
+		assertCanWriteAddressWithEncoding(
+				address,
+				AddressEncoding.PUBLIC_KEY,
+				null);
+	}
+
+	private static void assertCanWriteAddressWithEncoding(
+			final Address address,
+			final AddressEncoding encoding,
+			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final Address originalAddress = Address.fromEncoded("MockAcc");
 
 		// Act:
-		Address.writeTo(serializer, "Address", originalAddress);
+		Address.writeTo(serializer, "address", address, encoding);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("address"), IsEqual.equalTo(expectedSerializedString));
+	}
+
+	@Test
+	public void canRoundtripAddressWithDefaultEncoding() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address originalAddress = Address.fromEncoded("BlahAddress");
+
+		// Act:
+		Address.writeTo(serializer, "address", originalAddress);
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Address address = Address.readFrom(deserializer, "address");
+
+		// Assert:
+		Assert.assertThat(originalAddress, IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void canRoundtripAddressWithAddressEncoding() {
+		// Assert:
+		assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false);
+	}
+
+	@Test
+	public void canRoundtripAddressWithPublicKeyEncoding() {
+		// Assert:
+		assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true);
+	}
+
+	private void assertAddressRoundTripInMode(final AddressEncoding encoding, final boolean isPublicKeyPreserved) {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+		final Address originalAddress = Utils.generateRandomAddressWithPublicKey();
+
+		// Act:
+		Address.writeTo(serializer, "address", originalAddress, encoding);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
-		final Address address = Address.readFrom(deserializer, "Address");
+		final Address address = Address.readFrom(deserializer, "address", encoding);
 
 		// Assert:
 		Assert.assertThat(address, IsEqual.equalTo(originalAddress));
+		if (isPublicKeyPreserved) {
+			Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(originalAddress.getPublicKey()));
+		} else {
+			Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		}
 	}
+
+	//endregion
 
 	//endregion
 

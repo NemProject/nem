@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.test.MockAccount;
+import org.nem.nis.secret.AccountLink;
 
 import java.util.*;
 
@@ -16,51 +16,43 @@ public class PoiAccountInfoTest {
 	public void accountInfoExposesConstructorParameters() {
 		// Arrange:
 		final BlockHeight height = BlockHeight.ONE;
-		final Account account = Utils.generateRandomAccount();
-		final PoiAccountInfo info = new PoiAccountInfo(17, account, height);
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final PoiAccountInfo info = new PoiAccountInfo(17, state, height);
 
 		// Assert:
 		Assert.assertThat(info.getIndex(), IsEqual.equalTo(17));
-		Assert.assertThat(info.getAccount(), IsSame.sameInstance(account));
+		Assert.assertThat(info.getState(), IsSame.sameInstance(state));
 	}
 
 	@Test
-	public void cannotForageWhenEitherBalanceOrVestedBalanceIsLessThanMinimumBalance() {
+	public void cannotForageWhenVestedBalanceIsLessThanMinimumBalance() {
 		// Arrange:
-		final Amount minBalance = Amount.fromNem(1000);
 		final Amount minBalanceMinusOne = Amount.fromMicroNem(999999999);
 
 		// Assert:
-		Assert.assertThat(canForage(Amount.ZERO, minBalance), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(minBalanceMinusOne, minBalance), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(minBalance, Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(minBalance, minBalanceMinusOne), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(Amount.ZERO, Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(minBalanceMinusOne, minBalanceMinusOne), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(Amount.ZERO), IsEqual.equalTo(false));
+		Assert.assertThat(canForage(minBalanceMinusOne), IsEqual.equalTo(false));
 	}
 
 	@Test
-	public void canForageWhenBothBalanceAndVestedBalanceAreAtLeastMinimumBalance() {
+	public void canForageWhenVestedBalanceIsAtLeastMinimumBalance() {
 		// Arrange:
 		final Amount minBalance = Amount.fromNem(1000);
 		final Amount twiceMinBalance = Amount.fromNem(2000);
 
 		// Assert:
-		Assert.assertThat(canForage(minBalance, minBalance), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(minBalance, twiceMinBalance), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(twiceMinBalance, minBalance), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(twiceMinBalance, twiceMinBalance), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(minBalance), IsEqual.equalTo(true));
+		Assert.assertThat(canForage(twiceMinBalance), IsEqual.equalTo(true));
 	}
 
-	private static boolean canForage(final Amount balance, final Amount vestedBalance) {
+	private static boolean canForage(final Amount vestedBalance) {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(33);
-		final MockAccount account = new MockAccount();
-		account.incrementBalance(balance);
-		account.setVestedBalanceAt(vestedBalance, height);
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		state.getWeightedBalances().addFullyVested(height, vestedBalance);
 
 		// Act:
-		return new PoiAccountInfo(11, account, height).canForage();
+		return new PoiAccountInfo(11, state, height).canForage();
 	}
 
 	//region getOutlinks
@@ -241,9 +233,9 @@ public class PoiAccountInfoTest {
 
 	private static PoiAccountInfo createAccountInfoWithOutlinks(final List<AccountLink> outlinks) {
 		final BlockHeight height = BlockHeight.ONE;
-		final Account account = Utils.generateRandomAccount();
-		addAllOutlinks(account, outlinks);
-		return new PoiAccountInfo(11, account, height);
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		addAllOutlinks(state, outlinks);
+		return new PoiAccountInfo(11, state, height);
 	}
 
 	private static PoiAccountInfo createAccountInfoWithOutlinks(final int... amounts) {
@@ -261,8 +253,6 @@ public class PoiAccountInfoTest {
 		if (amounts.length != heights.length)
 			throw new IllegalArgumentException("amounts and heights must have same length");
 
-		final Account account = Utils.generateRandomAccount();
-
 		final List<AccountLink> outlinks = new ArrayList<>();
 		for (int i = 0; i < amounts.length; ++i) {
 			final Account otherAccount = Mockito.mock(Account.class);
@@ -275,15 +265,16 @@ public class PoiAccountInfoTest {
 			outlinks.add(link);
 		}
 
-		addAllOutlinks(account, outlinks);
-		return new PoiAccountInfo(11, account, new BlockHeight(referenceHeight));
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		addAllOutlinks(state, outlinks);
+		return new PoiAccountInfo(11, state, new BlockHeight(referenceHeight));
 	}
 
-	private static void addAllOutlinks(final Account account, final List<AccountLink> outlinks) {
+	private static void addAllOutlinks(final PoiAccountState state, final List<AccountLink> outlinks) {
 		if (null == outlinks)
 			return;
 
 		for (final AccountLink link : outlinks)
-			account.getImportanceInfo().addOutlink(link);
+			state.getImportanceInfo().addOutlink(link);
 	}
 }

@@ -7,7 +7,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.poi.PoiAlphaImportanceGeneratorImpl;
+import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -95,12 +95,26 @@ public class NisAppConfig {
 
 	@Bean
 	public Foraging foraging() {
-		return new Foraging(this.accountAnalyzer(), this.blockDao, this.blockChainLastBlockLayer, this.transferDao);
+		return new Foraging(
+				this.accountCache(),
+				this.poiFacade(),
+				this.blockDao,
+				this.blockChainLastBlockLayer,
+				this.transferDao);
 	}
 
 	@Bean
+	public AccountCache accountCache() {
+		return new AccountCache();
+	}
+
+	@Bean
+	public PoiFacade poiFacade() {
+		return new PoiFacade(new PoiAlphaImportanceGeneratorImpl());
+	}
+
 	public AccountAnalyzer accountAnalyzer() {
-		return new AccountAnalyzer(new PoiAlphaImportanceGeneratorImpl());
+		return new AccountAnalyzer(this.accountCache(), this.poiFacade());
 	}
 
 	@Bean
@@ -122,7 +136,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain(), this.nisConfiguration());
+		return new NisPeerNetworkHost(this.accountCache(), this.blockChain(), this.nisConfiguration());
 	}
 
 	@Bean

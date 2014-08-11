@@ -13,25 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
 // TODO: add tests
 @RestController
 public class TransactionController {
-	private static final Logger LOGGER = Logger.getLogger(TransactionController.class.getName());
-
-	private final AccountAnalyzer accountAnalyzer;
+	private final AccountLookup accountLookup;
 	private final PushService pushService;
 	private final Foraging foraging;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	TransactionController(
-			final AccountAnalyzer accountAnalyzer,
+			final AccountLookup accountLookup,
 			final PushService pushService,
 			final Foraging foraging,
 			final NisPeerNetworkHost host) {
-		this.accountAnalyzer = accountAnalyzer;
+		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.foraging = foraging;
 		this.host = host;
@@ -39,6 +36,7 @@ public class TransactionController {
 
 	@RequestMapping(value = "/transaction/prepare", method = RequestMethod.POST)
 	@ClientApi
+	@Deprecated
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
@@ -80,7 +78,7 @@ public class TransactionController {
 	}
 
 	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
-		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountAnalyzer)) {
+		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
 			return deserializeTransaction(dataDeserializer);
 		}
 	}
