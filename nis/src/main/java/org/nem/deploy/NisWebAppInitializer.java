@@ -11,6 +11,9 @@ import org.springframework.web.servlet.config.annotation.*;
 
 import java.util.List;
 
+/**
+ * Class supplying Spring MVC configuration.
+ */
 @Configuration
 @ComponentScan(basePackages={"org.nem.nis.controller", "org.nem.nis.a"})
 //@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport

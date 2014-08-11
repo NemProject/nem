@@ -1,24 +1,19 @@
 package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
-import org.nem.core.deploy.CommonStarter;
-import org.nem.core.utils.ExceptionUtils;
+import org.nem.core.deploy.CommonConfiguration;
 
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
  * Class responsible for holding all NIS configuration settings.
  * A NIS reboot is required for configuration changes to take effect.
- *
- * TODO: does it make more sense to expose functions like readIntegerOrDefault, readBooleanOrDefault ... ?
  */
-public class NisConfiguration {
+public class NisConfiguration extends CommonConfiguration {
 	private final int nodeLimit;
 	private final PrivateKey bootKey;
-	private final boolean shouldBootWithoutAck;
-	private final boolean shouldUseBinaryTransport;
-	private final String nemFolder;
+	private final boolean bootWithoutAck;
+	private final boolean useBinaryTransport;
 	private final String bootName;
 
 	/**
@@ -28,41 +23,20 @@ public class NisConfiguration {
 		this(loadDefaultProperties());
 	}
 
-	private static Properties loadDefaultProperties() {
-		return ExceptionUtils.propagate(() -> {
-			try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("config.properties")) {
-				final Properties properties = new Properties();
-				properties.load(inputStream);
-				return properties;
-			}
-		}, IllegalStateException::new);
-	}
-
 	/**
 	 * Creates a new configuration object around the specified properties.
 	 *
 	 * @param properties The specified properties.
 	 */
-	public NisConfiguration(final Properties properties) {
-		final String autoBootKey = properties.getProperty("nis.bootkey");
-		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
-		final String autoBootName = properties.getProperty("nis.bootname");
-		this.bootName = null == autoBootName ? null : autoBootName.trim();
-
-		this.nodeLimit = getOptionalInteger(properties, "nis.nodelimit", 20);
-		this.shouldBootWithoutAck = getOptionalBoolean(properties, "nis.shouldBootWithoutAck", false);
-		this.shouldUseBinaryTransport = getOptionalBoolean(properties, "nis.shouldUseBinaryTransport", false);
-		this.nemFolder = properties.getProperty("nem.folder", getDefaultFolder()).replace("%h", getDefaultFolder());
-	}
-
-	private static int getOptionalInteger(final Properties properties, final String name, final Integer defaultValue) {
-		final String value = properties.getProperty(name);
-		return null == value ? defaultValue : Integer.valueOf(value);
-	}
-
-	private static boolean getOptionalBoolean(final Properties properties, final String name, final Boolean defaultValue) {
-		final String value = properties.getProperty(name);
-		return null == value ? defaultValue : Boolean.valueOf(value);
+	public NisConfiguration(Properties properties) {
+		super(properties);
+		final String autoBootKey = getString(properties, "nis.bootKey");
+		this.bootKey = null == autoBootKey? null : PrivateKey.fromHexString(autoBootKey);
+		final String autoBootName = getString(properties, "nis.bootName");
+		this.bootName = null == autoBootName? null : autoBootName.trim();
+		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 20);
+		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
+		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
 	}
 
 	/**
@@ -99,8 +73,8 @@ public class NisConfiguration {
 	 *
 	 * @return true if remote peer acknowledgement is optional.
 	 */
-	public boolean shouldBootWithoutAck() {
-		return this.shouldBootWithoutAck;
+	public boolean bootWithoutAck() {
+		return this.bootWithoutAck;
 	}
 
 	/**
@@ -108,26 +82,7 @@ public class NisConfiguration {
 	 *
 	 * @return true if this node should send binary payloads.
 	 */
-	public boolean shouldUseBinaryTransport() {
-		return this.shouldUseBinaryTransport;
-	}
-	
-	/**
-	 * Gets the path to the folder where database and log files should be located
-	 *
-	 * @return The path to the folder
-	 */
-	public String getNemFolder() {
-		return this.nemFolder;
-	}
-
-
-	/**
-	 * Get the default folder for database and log files.
-	 *  
-	 * @return path to the folder location.
-	 */
-	private String getDefaultFolder() {
-		return System.getProperty("user.home");
+	public boolean useBinaryTransport() {
+		return this.useBinaryTransport;
 	}
 }
