@@ -59,22 +59,26 @@ public class CommonConfiguration {
 		this.webContext = getString(properties, "nem.webContext");
 		this.apiContext = getString(properties, "nem.apiContext");
 		this.home = getString(properties, "nem.homePath");
-		this.shutdown = getOptionalString(properties, "nem.shutdownPath", "shutdown");
+		this.shutdown = getOptionalString(properties, "nem.shutdownPath", "/shutdown");
 		this.useDosFilter = getOptionalBoolean(properties, "nem.useDosFilter", false);
 		this.isWebStart = getOptionalBoolean(properties, "nem.isWebStart", false);
-		this.nisJnlpUrl = getOptionalString(properties, "nem.nisJnlpUrl", "");
+		this.nisJnlpUrl = getOptionalString(properties, "nem.nisJnlpUrl", "http://bob.nem.ninja/webstart/nem-server.jnlp");
 	}
 
 	protected static String getString(final Properties properties, final String name) {
-		return properties.getProperty(name);
+		final String value = properties.getProperty(name);
+		if (null == value) {
+			throw new RuntimeException(String.format("property %s must not be null", name));
+		}
+		return value;
 	}
 
 	protected static int getInteger(final Properties properties, final String name) {
+		final String value = properties.getProperty(name);
+		if (null == value) {
+			throw new RuntimeException(String.format("property %s must not be null", name));
+		}
 		return Integer.valueOf(properties.getProperty(name));
-	}
-
-	protected static boolean getBoolean(final Properties properties, final String name) {
-		return Boolean.valueOf(properties.getProperty(name));
 	}
 
 	protected static String getOptionalString(final Properties properties, final String name, final String defaultValue) {

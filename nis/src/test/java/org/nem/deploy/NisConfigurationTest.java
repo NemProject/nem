@@ -169,17 +169,17 @@ public class NisConfigurationTest {
 
 	private Properties getCommonProperties() {
 		final Properties properties = new Properties();
-		properties.setProperty("nem.shortServerName", "server");
-		properties.setProperty("nem.nemFolder", "folder");
+		properties.setProperty("nem.shortServerName", "Ncc");
+		properties.setProperty("nem.folder", "folder");
 		properties.setProperty("nem.maxThreads", "1");
 		properties.setProperty("nem.protocol", "ftp");
 		properties.setProperty("nem.host", "10.0.0.1");
 		properties.setProperty("nem.httpPort", "100");
 		properties.setProperty("nem.httpsPort", "101");
-		properties.setProperty("nem.webContext", "web");
-		properties.setProperty("nem.apiContext", "api");
-		properties.setProperty("nem.home", "home");
-		properties.setProperty("nem.shutdown", "shutdown");
+		properties.setProperty("nem.webContext", "/web");
+		properties.setProperty("nem.apiContext", "/api");
+		properties.setProperty("nem.homePath", "/home");
+		properties.setProperty("nem.shutdownPath", "/shutdown");
 		properties.setProperty("nem.useDosFilter", "true");
 		properties.setProperty("nem.isWebStart", "false");
 		properties.setProperty("nem.nisJnlpUrl", "url");

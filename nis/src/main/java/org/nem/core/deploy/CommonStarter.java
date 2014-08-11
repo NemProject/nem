@@ -47,7 +47,6 @@ public class CommonStarter implements ServletContextListener {
 	public static final CommonStarter INSTANCE = new CommonStarter();
 	private Server server;
 	private static CommonConfiguration configuration;
-	private long startTime;
 
 	static {
 		// initialize logging before anything is logged; otherwise not all
@@ -56,16 +55,10 @@ public class CommonStarter implements ServletContextListener {
 		initializeLogging();
 	}
 
-	private static String getDefaultFolder() {
-		return System.getProperty("user.home");
-	}
-
 	private static void loadConfigurationProperties() {
 		ExceptionUtils.propagate(() -> {
-			try (final InputStream inputStream = org.nem.core.deploy.CommonStarter.class.getClassLoader().getResourceAsStream("config.properties")) {
-				INSTANCE.configuration = new CommonConfiguration();
-				return configuration;
-			}
+			INSTANCE.configuration = new CommonConfiguration();
+			return configuration;
 		}, IllegalStateException::new);
 	}
 
@@ -180,7 +173,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private void startServer(final Server server, final URL stopURL) throws Exception {
 		try {
-			this.server.start();
+			server.start();
 		} catch (final MultiException e) {
 			final long bindExceptions = e.getThrowables().stream().filter(t -> t instanceof BindException).count();
 
@@ -192,7 +185,7 @@ public class CommonStarter implements ServletContextListener {
 
 				// One more try
 				LOGGER.log(Level.WARNING, "Re-trying to start server.");
-				this.server.start();
+				server.start();
 			} else {
 				LOGGER.log(Level.SEVERE, "Could not start server.", e);
 				return;
@@ -201,7 +194,6 @@ public class CommonStarter implements ServletContextListener {
 		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".",
 				CommonStarter.META_DATA.getAppName(),
 				this.configuration.getBaseUrl()));
-		this.startTime = System.currentTimeMillis();
 	}
 
 	public void stopServer() {
@@ -267,7 +259,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
 		handlers.setHandlers(new Handler[]{ servletContext });
-		this.server.setHandler(handlers);
+		server.setHandler(handlers);
 	}
 
 	@Override
@@ -292,14 +284,14 @@ public class CommonStarter implements ServletContextListener {
 			final ServletContext context = event.getServletContext();
 			ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
 			dispatcher.setLoadOnStartup(1);
-			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "*"));
+			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
 			if (this.configuration.isNcc()) {
 				ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", "org.nem.ncc.web.servlet.JarFileServlet");
 				servlet.setInitParameter("maxCacheSize", "0");
-				servlet.addMapping(String.format("%s%s", this.configuration.getWebContext(), "*"));
+				servlet.addMapping(String.format("%s%s", this.configuration.getWebContext(), "/*"));
 				servlet.setLoadOnStartup(1);
 
 				servlet = context.addServlet("DefaultServlet", "org.nem.ncc.web.servlet.NccDefaultServlet");
