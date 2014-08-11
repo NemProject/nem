@@ -256,7 +256,7 @@
 				<include>org/nem/core/time/*</include> <include>org/nem/core/transactions/*</include> 
 				<include>org/nem/core/utils/*</include> </includes> </configuration> </execution> 
 				</executions> <configuration> <archive> <manifest> <addClasspath>true</addClasspath> 
-				<mainClass>org.nem.deploy.CommonStarter</mainClass> </manifest> </archive> 
+				<mainClass>org.nem.core.deploy.CommonStarter</mainClass> </manifest> </archive>
 				</configuration> </plugin> -->
 			<plugin>
 				<groupId>org.jacoco</groupId>

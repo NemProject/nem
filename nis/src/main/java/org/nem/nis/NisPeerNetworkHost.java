@@ -1,9 +1,10 @@
 package org.nem.nis;
 
 import net.minidev.json.*;
+import org.nem.core.deploy.CommonStarter;
 import org.nem.core.node.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.deploy.*;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
 import org.nem.peer.*;
@@ -130,7 +131,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
-		final CommunicationMode communicationMode = this.nisConfiguration.shouldUseBinaryTransport()
+		final CommunicationMode communicationMode = this.nisConfiguration.useBinaryTransport()
 				? CommunicationMode.BINARY
 				: CommunicationMode.JSON;
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
@@ -148,7 +149,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				networkState,
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
-				!this.nisConfiguration.shouldBootWithoutAck());
+				!this.nisConfiguration.bootWithoutAck());
 	}
 
 	private static AuditCollection createAuditCollection() {
