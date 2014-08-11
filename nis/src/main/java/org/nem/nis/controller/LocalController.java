@@ -80,7 +80,7 @@ public class LocalController {
 					.map(tx -> new ExplorerTransferView(
 							tx.getType(),
 							Amount.fromMicroNem(tx.getFee()),
-							tx.getDeadline(),
+							tx.getTimestamp(),
 							Address.fromPublicKey(tx.getSender().getPublicKey()),
 							tx.getSenderProof(),
 							tx.getTransferHash(),
