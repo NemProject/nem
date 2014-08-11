@@ -63,7 +63,7 @@ public class NisMain {
 			LOGGER.severe("couldn't find nemesis block, did you remove OLD database?");
 			System.exit(-1);
 		}
-		LOGGER.info(String.format("hex: %s", dbBlock.getGenerationHash()));
+		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8"))) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
