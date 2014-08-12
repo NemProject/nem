@@ -3,8 +3,7 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class KeyPairTest {
 

@@ -1,7 +1,7 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.crypto.*;
-import org.nem.core.model.*;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 

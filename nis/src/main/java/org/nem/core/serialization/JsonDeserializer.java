@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.*;
 import java.util.*;

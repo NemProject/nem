@@ -1,7 +1,7 @@
 package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.BigInteger;
 

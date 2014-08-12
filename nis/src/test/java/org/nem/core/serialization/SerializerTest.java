@@ -1,11 +1,12 @@
 package org.nem.core.serialization;
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Supplier;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Supplier;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
 
