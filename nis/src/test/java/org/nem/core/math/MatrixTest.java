@@ -28,8 +28,9 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
 				final double value = values[i * cols + j];
-				if (0 == value)
+				if (0 == value) {
 					continue;
+				}
 
 				matrix.setAt(i, j, value);
 			}
@@ -640,7 +641,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	public void equalsReturnsFalseForMatrixObjectsWithDifferentDimensions() {
 		// Arrange:
 		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{ 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix2 = this.createMatrix(3, 2, new double[] { 0, 0, 7, 0, 0, 5 });
 
 		// Assert:
 		Assert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
@@ -668,8 +669,8 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	@Test
 	public void equalsReturnsTrueForEquivalentDenseMatrices() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(2, 3, new double[]{ 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix2 = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
 
 		// Assert:
 		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));

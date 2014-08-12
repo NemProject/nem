@@ -261,7 +261,7 @@ public class NodeIdentityTest {
 	}
 
 	private static NodeIdentity createRoundTrippedIdentity(final NodeIdentity originalIdentity) {
-		return NodeIdentity.deserializeWithPublicKey(Utils.roundtripSerializableEntity(originalIdentity, null)) ;
+		return NodeIdentity.deserializeWithPublicKey(Utils.roundtripSerializableEntity(originalIdentity, null));
 	}
 
 	//endregion

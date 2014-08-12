@@ -1,6 +1,5 @@
 package org.nem.core.test;
 
-
 import org.hamcrest.core.IsEqual;
 
 import java.util.*;
@@ -34,12 +33,14 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean matches(final java.lang.Object arg) {
-		if (!(arg instanceof Collection<?>))
+		if (!(arg instanceof Collection<?>)) {
 			return false;
+		}
 
 		final Collection<T> rhs = (Collection<T>)arg;
-		if (this.lhs.size() != rhs.size())
+		if (this.lhs.size() != rhs.size()) {
 			return false;
+		}
 
 		final HashSet<T> lhsSet = new HashSet<>(this.lhs);
 		final HashSet<T> rhsSet = new HashSet<>(rhs);
@@ -56,8 +57,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	 * Creates an equivalency matcher that checks equivalence to a collection.
 	 *
 	 * @param collection The collection to compare against.
-	 * @param <T>        The element type.
-	 *
+	 * @param <T> The element type.
 	 * @return The matcher.
 	 */
 	@org.hamcrest.Factory
@@ -69,8 +69,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	 * Creates an equivalency matcher that checks equivalence to an array.
 	 *
 	 * @param array The collection to compare against.
-	 * @param <T>   The element type.
-	 *
+	 * @param <T> The element type.
 	 * @return The matcher.
 	 */
 	@org.hamcrest.Factory

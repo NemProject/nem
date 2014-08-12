@@ -45,8 +45,9 @@ public class ValidationResultTest {
 		};
 
 		// Assert:
-		for (final ValidationResult result : ValidationResult.values())
+		for (final ValidationResult result : ValidationResult.values()) {
 			Assert.assertThat(result.isSuccess(), IsEqual.equalTo(successValues.contains(result)));
+		}
 	}
 
 	@Test
@@ -54,12 +55,14 @@ public class ValidationResultTest {
 		// Arrange:
 		final Set<ValidationResult> nonFailureValues = new HashSet<ValidationResult>() {
 			{ add(ValidationResult.SUCCESS); }
+
 			{ add(ValidationResult.NEUTRAL); }
 		};
 
 		// Assert:
-		for (final ValidationResult result : ValidationResult.values())
+		for (final ValidationResult result : ValidationResult.values()) {
 			Assert.assertThat(result.isFailure(), IsEqual.equalTo(!nonFailureValues.contains(result)));
+		}
 	}
 
 	//endregion

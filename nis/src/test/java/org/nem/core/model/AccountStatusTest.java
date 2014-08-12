@@ -15,10 +15,10 @@ public class AccountStatusTest {
 		// Arrange:
 		AccountStatus statusUnlocked = AccountStatus.fromString("UNLOCKED");
 		AccountStatus statusLocked = AccountStatus.fromString("LOCKED");
-		
+
 		// Assert:
 		Assert.assertThat(statusUnlocked, IsEqual.equalTo(AccountStatus.UNLOCKED));
-		Assert.assertThat(statusLocked, IsEqual.equalTo(AccountStatus.LOCKED));		
+		Assert.assertThat(statusLocked, IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

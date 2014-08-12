@@ -51,7 +51,7 @@ public class TransactionMetaDataPairTest {
 		final Transaction transaction = new TransferTransaction(
 				TimeInstant.ZERO,
 				signer,
-			    signer,
+				signer,
 				Amount.fromNem(amount),
 				null);
 		transaction.sign();

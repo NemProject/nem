@@ -49,7 +49,7 @@ public class NodeEndpointTest {
 	}
 
 	private static void assertApiUrlsAreCorrect(final URL url, final NodeEndpoint endpoint) throws Exception {
-		final Map<NodeApiId, String > apiIdToPathMap = new HashMap<>();
+		final Map<NodeApiId, String> apiIdToPathMap = new HashMap<>();
 		apiIdToPathMap.put(NodeApiId.REST_BLOCK_AT, "block/at");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, "chain/blocks-after");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, "chain/hashes-from");
@@ -66,8 +66,9 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, "transactions/unconfirmed");
 
 		for (final NodeApiId apiId : NodeApiId.values()) {
-			if (!apiIdToPathMap.containsKey(apiId))
+			if (!apiIdToPathMap.containsKey(apiId)) {
 				Assert.fail(String.format("path for '%s' is not being tested", apiId));
+			}
 
 			Assert.assertThat(endpoint.getApiUrl(apiId), IsEqual.equalTo(new URL(url, apiIdToPathMap.get(apiId))));
 		}

@@ -171,11 +171,26 @@ public class JsonErrorHandlerTest {
 			this.handler.handle("target", this.mockBaseRequest, this.mockRequest, this.mockResponse);
 		}
 
-		public JsonErrorHandler getErrorHandler() { return this.handler; }
-		public Request getBaseRequest() { return this.mockBaseRequest; }
-		public HttpServletRequest getRequest() { return this.mockRequest; }
-		public HttpServletResponse getResponse() { return this.mockResponse; }
-		public String getOutputStreamContent() { return this.outputStream.getContent(); }
+		public JsonErrorHandler getErrorHandler() {
+			return this.handler;
+		}
+
+		public Request getBaseRequest() {
+			return this.mockBaseRequest;
+		}
+
+		public HttpServletRequest getRequest() {
+			return this.mockRequest;
+		}
+
+		public HttpServletResponse getResponse() {
+			return this.mockResponse;
+		}
+
+		public String getOutputStreamContent() {
+			return this.outputStream.getContent();
+		}
+
 		public ErrorResponse getErrorResponse() {
 			final String jsonString = this.outputStream.getContent();
 			final Deserializer deserializer = new JsonDeserializer((JSONObject)JSONValue.parse(jsonString), null);

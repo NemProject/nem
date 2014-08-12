@@ -201,10 +201,10 @@ public class TransferTransactionTest {
 		accountLookup.setMockAccount(recipient);
 		JsonSerializer jsonSerializer = new JsonSerializer(true);
 		transaction.serialize(jsonSerializer);
-		JsonDeserializer deserializer =  new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+		JsonDeserializer deserializer = new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
 		deserializer.readInt("type");
 		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
-		
+
 		// Assert:
 		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
@@ -259,7 +259,6 @@ public class TransferTransactionTest {
 		Assert.assertThat(isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(expectedResult));
 		Assert.assertThat(isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(expectedResult));
 	}
-
 
 	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
 		// Arrange:

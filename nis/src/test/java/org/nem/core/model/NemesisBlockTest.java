@@ -55,8 +55,9 @@ public class NemesisBlockTest {
 		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
-		for (final Transaction transaction : block.getTransactions())
+		for (final Transaction transaction : block.getTransactions()) {
 			Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -65,8 +66,9 @@ public class NemesisBlockTest {
 		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
-		for (final Transaction transaction : block.getTransactions())
+		for (final Transaction transaction : block.getTransactions()) {
 			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+		}
 	}
 
 	@Test
@@ -96,8 +98,9 @@ public class NemesisBlockTest {
 		// Act:
 		Amount totalAmount = Amount.ZERO;
 		final Block block = NEMESIS_BLOCK;
-		for (final Transaction transaction : block.getTransactions())
+		for (final Transaction transaction : block.getTransactions()) {
 			totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
+		}
 
 		// Assert:
 		Assert.assertThat(totalAmount, IsEqual.equalTo(NemesisBlock.AMOUNT));
@@ -140,8 +143,7 @@ public class NemesisBlockTest {
 	private static JSONObject loadNemesisBlockJsonObject() {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.json")) {
 			return (JSONObject)JSONValue.parseStrict(fin);
-		}
-		catch (IOException|net.minidev.json.parser.ParseException e) {
+		} catch (IOException | net.minidev.json.parser.ParseException e) {
 			Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
 			return null;
 		}

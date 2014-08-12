@@ -41,14 +41,14 @@ public class JarFacadeTest {
 
 	@Test
 	public void canCreateFacadeAroundJarStreamWithIoException() throws IOException {
-        // Act:
-        final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", null);
-        final JarFacade facade = new JarFacade(url);
+		// Act:
+		final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", null);
+		final JarFacade facade = new JarFacade(url);
 
-        // Assert:
-        Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-        Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
-        assertFacadeHasDefaultProperties(facade);
+		// Assert:
+		Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+		Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+		assertFacadeHasDefaultProperties(facade);
 	}
 
 	@Test

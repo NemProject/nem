@@ -234,7 +234,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TSerializer serializer = this.createSerializer();
 
 		// Act:
-		final byte[] bytes = new byte[] {};
+		final byte[] bytes = new byte[] { };
 		serializer.writeBytes("bytes", bytes);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);

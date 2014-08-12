@@ -107,15 +107,17 @@ public class SignatureTest {
 	@Test
 	public void getBytesReturns64Bytes() {
 		// Assert:
-		for (final Signature signature : createRoundtripTestSignatures())
+		for (final Signature signature : createRoundtripTestSignatures()) {
 			Assert.assertThat(signature.getBytes().length, IsEqual.equalTo(64));
+		}
 	}
 
 	@Test
 	public void canRoundtripBinarySignature() {
 		// Assert:
-		for (final Signature signature : createRoundtripTestSignatures())
+		for (final Signature signature : createRoundtripTestSignatures()) {
 			Assert.assertThat(new Signature(signature.getBytes()), IsEqual.equalTo(signature));
+		}
 	}
 
 	private Signature[] createRoundtripTestSignatures() {
@@ -202,7 +204,7 @@ public class SignatureTest {
 		// Assert:
 		final String expectedSignature =
 				"0c00000000000000000000000000000000000000000000000000000000000000" +
-				"0102000000000000000000000000000000000000000000000000000000000000";
+						"0102000000000000000000000000000000000000000000000000000000000000";
 		Assert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
 	}
 

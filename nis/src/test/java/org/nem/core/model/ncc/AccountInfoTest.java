@@ -54,7 +54,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
 
-
 	//region Serialization
 
 	@Test

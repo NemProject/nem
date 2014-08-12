@@ -50,7 +50,7 @@ public class MockTransaction extends Transaction {
 	/**
 	 * Creates a mock transaction.
 	 *
-	 * @param sender      The transaction sender's account.
+	 * @param sender The transaction sender's account.
 	 * @param customField The initial custom field value.
 	 */
 	public MockTransaction(final Account sender, final int customField) {
@@ -64,7 +64,7 @@ public class MockTransaction extends Transaction {
 	 * This overload is intended to be used for comparison tests.
 	 *
 	 * @param customField The initial custom field value.
-	 * @param timeStamp   The transaction timestamp.
+	 * @param timeStamp The transaction timestamp.
 	 */
 	public MockTransaction(final int customField, final TimeInstant timeStamp) {
 		super(TYPE, VERSION, timeStamp, Utils.generateRandomAccount());
@@ -76,10 +76,10 @@ public class MockTransaction extends Transaction {
 	 * Creates a mock transaction.
 	 * This overload is intended to be used for comparison tests.
 	 *
-	 * @param type      The transaction type.
-	 * @param version   The transaction version.
+	 * @param type The transaction type.
+	 * @param version The transaction version.
 	 * @param timeStamp The transaction timestamp.
-	 * @param fee       The transaction fee.
+	 * @param fee The transaction fee.
 	 */
 	public MockTransaction(final int type, final int version, final TimeInstant timeStamp, final long fee) {
 		super(type, version, timeStamp, Utils.generateRandomAccount());
@@ -102,21 +102,27 @@ public class MockTransaction extends Transaction {
 	 *
 	 * @return The number of times executeCommit was called.
 	 */
-	public int getNumExecuteCommitCalls() { return this.numExecuteCommitCalls; }
+	public int getNumExecuteCommitCalls() {
+		return this.numExecuteCommitCalls;
+	}
 
 	/**
 	 * Gets the number undoCommit was called.
 	 *
 	 * @return The number of times undoCommit was called.
 	 */
-	public int getNumUndoCommitCalls() { return this.numUndoCommitCalls; }
+	public int getNumUndoCommitCalls() {
+		return this.numUndoCommitCalls;
+	}
 
 	/**
 	 * Gets the number of times transfer was called.
 	 *
 	 * @return The number of times transfer was called.
 	 */
-	public int getNumTransferCalls() { return this.numTransferCalls; }
+	public int getNumTransferCalls() {
+		return this.numTransferCalls;
+	}
 
 	/**
 	 * Gets the custom field value.

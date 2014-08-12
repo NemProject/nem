@@ -272,8 +272,16 @@ public class HttpMethodClientTest {
 			return "content-type/supported";
 		}
 
-		public String getRequestMethod() { return this.requestMethod; }
-		public String getRequestContentType() { return this.requestContentType; }
-		public String getRequestAcceptHeader() { return this.requestAcceptHeader; }
+		public String getRequestMethod() {
+			return this.requestMethod;
+		}
+
+		public String getRequestContentType() {
+			return this.requestContentType;
+		}
+
+		public String getRequestAcceptHeader() {
+			return this.requestAcceptHeader;
+		}
 	}
 }

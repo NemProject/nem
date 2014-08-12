@@ -468,7 +468,7 @@ public class ColumnVectorTest {
 		Assert.assertThat(new ColumnVector(-3, 2, -5, 7, -1, 8).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(-3, 2, -5, 0, -1, 8).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(0, 0, -1, 1, 0, 0).isZeroVector(), IsEqual.equalTo(false));
-		Assert.assertThat(new ColumnVector(0, 0, -1, 0, 0, 0 ).isZeroVector(), IsEqual.equalTo(false));
+		Assert.assertThat(new ColumnVector(0, 0, -1, 0, 0, 0).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(0, 0, 0, 0, 0, 0).isZeroVector(), IsEqual.equalTo(true));
 	}
 

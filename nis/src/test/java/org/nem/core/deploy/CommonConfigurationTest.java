@@ -54,7 +54,7 @@ public class CommonConfigurationTest {
 
 	//region mandatory entries
 
-    @Test(expected = RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutShortServerName() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
@@ -245,7 +245,7 @@ public class CommonConfigurationTest {
 		final Properties properties = getCommonProperties();
 		properties.remove(propName);
 
-        // Act:
+		// Act:
 		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), RuntimeException.class);
 	}
 
@@ -254,7 +254,7 @@ public class CommonConfigurationTest {
 		final Properties properties = getCommonProperties();
 		properties.setProperty(propName, "notANumber");
 
-        // Act:
+		// Act:
 		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), NumberFormatException.class);
 	}
 }

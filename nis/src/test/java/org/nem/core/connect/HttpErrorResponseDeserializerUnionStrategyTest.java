@@ -57,7 +57,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 	}
 
 	@Test(expected = FatalPeerException.class)
-	public void coerceThrowsFatalPeerExceptionOnIoError() throws IOException{
+	public void coerceThrowsFatalPeerExceptionOnIoError() throws IOException {
 		// Arrange:
 		final HttpErrorResponseDeserializerUnionStrategy strategy = new HttpErrorResponseDeserializerUnionStrategy(null);
 

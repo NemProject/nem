@@ -35,8 +35,7 @@ public class ExceptionAssert {
 			final Consumer<T> assertExceptionProperties) {
 		try {
 			consumer.accept(null);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			if (ex.getClass() == exceptionClass) {
 				assertExceptionProperties.accept((T)ex);
 				return;
@@ -58,11 +57,11 @@ public class ExceptionAssert {
 	public static void assertThrowsCompletionException(final Consumer<Void> consumer, final Class<?> exceptionClass) {
 		try {
 			consumer.accept(null);
-		}
-		catch (CompletionException completionEx) {
+		} catch (CompletionException completionEx) {
 			final Throwable ex = completionEx.getCause();
-			if (ex.getClass() == exceptionClass)
+			if (ex.getClass() == exceptionClass) {
 				return;
+			}
 
 			Assert.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
 		}

@@ -69,7 +69,7 @@ public class AsyncTimerTest {
 	public void refreshIntervalIsDerivedFromDelayStrategy() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2*TimeUnit, TimeUnit, 2*TimeUnit });
+		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2 * TimeUnit, TimeUnit, 2 * TimeUnit });
 		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy, null)) {
 			// Arrange: (should fire at 1, 2, 4, 5)
 			Thread.sleep(6 * TimeUnit);
@@ -313,7 +313,9 @@ public class AsyncTimerTest {
 					.thenCompose(v -> CompletableFuture.runAsync(runnableSupplier.get()));
 		}
 
-		public int getNumCalls() { return this.numCalls; }
+		public int getNumCalls() {
+			return this.numCalls;
+		}
 
 		private static CountableFuture sleep(int milliseconds) {
 			return new CountableFuture(() ->

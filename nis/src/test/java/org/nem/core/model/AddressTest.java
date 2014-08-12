@@ -380,6 +380,6 @@ public class AddressTest {
 	private static Address addressAsMixed(final Address address) {
 		return Address.fromEncoded(
 				addressAsLower(address).getEncoded().substring(0, 20) +
-				addressAsUpper(address).getEncoded().substring(20));
+						addressAsUpper(address).getEncoded().substring(20));
 	}
 }

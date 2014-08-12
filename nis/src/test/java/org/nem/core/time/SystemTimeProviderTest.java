@@ -77,7 +77,6 @@ public class SystemTimeProviderTest {
 			ctInfo.currentTimeFromSystemTime = SystemTimeProvider.getTime(ctInfo.systemTime);
 
 			systemTimeEnd = System.currentTimeMillis();
-
 		} while (ctInfo.systemTime != systemTimeEnd);
 
 		return ctInfo;

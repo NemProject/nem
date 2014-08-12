@@ -56,8 +56,9 @@ public class MockAccountLookup implements AccountLookup {
 		++this.numFindByIdCalls;
 
 		final Account account = this.accountMap.get(id);
-		if (null != account)
+		if (null != account) {
 			return account;
+		}
 
 		switch (unknownAccountBehavior) {
 			case NULL:
@@ -101,8 +102,9 @@ public class MockAccountLookup implements AccountLookup {
 	 */
 	public static MockAccountLookup createWithAccounts(final Account... accounts) {
 		final MockAccountLookup accountLookup = new MockAccountLookup();
-		for (final Account account : accounts)
+		for (final Account account : accounts) {
 			accountLookup.setMockAccount(account);
+		}
 
 		return accountLookup;
 	}

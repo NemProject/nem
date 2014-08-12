@@ -40,8 +40,8 @@ public class HexEncoderTest {
 	@Test
 	public void byteArrayWithLeadingZerosCanBeConvertedToString() {
 		// Assert:
-		Assert.assertThat(HexEncoder.getString(
-				new byte[] { 0x00, 0x00, 0x0d, 0x46, 0x54, 0x57 }),
+		Assert.assertThat(
+				HexEncoder.getString(new byte[] { 0x00, 0x00, 0x0d, 0x46, 0x54, 0x57 }),
 				IsEqual.equalTo("00000d465457"));
 	}
 

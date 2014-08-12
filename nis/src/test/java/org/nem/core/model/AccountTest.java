@@ -371,11 +371,13 @@ public class AccountTest {
 		Account account = new Account(kp);
 
 		// Assert:
-		for (final Account account2 : createEquivalentAccounts(kp))
+		for (final Account account2 : createEquivalentAccounts(kp)) {
 			Assert.assertThat(account2, IsEqual.equalTo(account));
+		}
 
-		for (final Account account2 : createNonEquivalentAccounts(kp))
+		for (final Account account2 : createNonEquivalentAccounts(kp)) {
 			Assert.assertThat(account2, IsNot.not(IsEqual.equalTo(account)));
+		}
 
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(account)));
 		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)account)));
@@ -389,11 +391,13 @@ public class AccountTest {
 		int hashCode = account.hashCode();
 
 		// Assert:
-		for (final Account account2 : createEquivalentAccounts(kp))
+		for (final Account account2 : createEquivalentAccounts(kp)) {
 			Assert.assertThat(account2.hashCode(), IsEqual.equalTo(hashCode));
+		}
 
-		for (final Account account2 : createNonEquivalentAccounts(kp))
+		for (final Account account2 : createNonEquivalentAccounts(kp)) {
 			Assert.assertThat(account2.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		}
 	}
 
 	private static Account[] createEquivalentAccounts(final KeyPair keyPair) {
@@ -630,8 +634,7 @@ public class AccountTest {
 	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
 		if (null == actual || null == expected) {
 			Assert.assertThat(actual, IsEqual.equalTo(expected));
-		}
-		else {
+		} else {
 			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
 			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
 		}
@@ -659,7 +662,6 @@ public class AccountTest {
 		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
 		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
 		assertShallowCopy(original, copy);
-
 	}
 
 	private static void assertShallowCopy(final Account original, final Account copy) {
