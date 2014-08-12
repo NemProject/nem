@@ -338,8 +338,9 @@ public class BlockChainComparerTest {
 
 	private static HashChain createHashChain(final byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
-		for (final byte[] hash : hashes)
+		for (final byte[] hash : hashes) {
 			chain.add(new Hash(hash));
+		}
 
 		return chain;
 	}

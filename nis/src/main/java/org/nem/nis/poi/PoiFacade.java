@@ -84,8 +84,9 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	 * @param blockHeight The block height.
 	 */
 	public void recalculateImportances(final BlockHeight blockHeight) {
-		if (null != this.lastPoiRecalculationHeight && 0 == this.lastPoiRecalculationHeight.compareTo(blockHeight))
+		if (null != this.lastPoiRecalculationHeight && 0 == this.lastPoiRecalculationHeight.compareTo(blockHeight)) {
 			return;
+		}
 
 		this.importanceGenerator.updateAccountImportances(blockHeight, this.getAccountStates(blockHeight));
 		this.lastPoiRecalculationHeight = blockHeight;

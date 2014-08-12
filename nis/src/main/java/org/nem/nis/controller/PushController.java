@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 public class PushController {
 	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
 
-
 	private final PushService pushService;
 
 	@Autowired(required = true)
@@ -44,7 +43,9 @@ public class PushController {
 		LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info("[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:"+secureEntity.getEntity().getSigner());
+		LOGGER.info(
+				"[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:" +
+						secureEntity.getEntity().getSigner());
 	}
 
 	/**
@@ -58,6 +59,6 @@ public class PushController {
 		LOGGER.info("[start] /push/block");
 		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
 		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:"+secureEntity.getEntity().getSigner());
+		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:" + secureEntity.getEntity().getSigner());
 	}
 }

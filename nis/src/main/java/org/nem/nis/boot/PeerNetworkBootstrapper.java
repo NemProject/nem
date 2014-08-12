@@ -56,8 +56,9 @@ public class PeerNetworkBootstrapper {
 	 * @return The future.
 	 */
 	public CompletableFuture<PeerNetwork> boot() {
-		if (!this.canBoot.compareAndSet(true, false))
+		if (!this.canBoot.compareAndSet(true, false)) {
 			throw new IllegalStateException("network boot was already attempted");
+		}
 
 		return this.network.refresh()
 				.thenCompose(v -> this.network.updateLocalNodeEndpoint())

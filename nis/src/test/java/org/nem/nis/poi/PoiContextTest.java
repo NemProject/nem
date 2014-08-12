@@ -297,11 +297,11 @@ public class PoiContextTest {
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * multiplier - 1, null),
-				new TestAccountInfo(multiplier - 1,     new int[] { 1 }), // 1 (insufficient balance)
-				new TestAccountInfo(5 * multiplier,     new int[] { 1, 2 }), // 3
-				new TestAccountInfo(multiplier,         null),
-				new TestAccountInfo(multiplier,         new int[] { 1, 1, 4, 3, 1 }), // 10
-				new TestAccountInfo(multiplier - 1,     new int[] { 7 })); // 7 (insufficient vested balance)
+				new TestAccountInfo(multiplier - 1, new int[] { 1 }), // 1 (insufficient balance)
+				new TestAccountInfo(5 * multiplier, new int[] { 1, 2 }), // 3
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, new int[] { 1, 1, 4, 3, 1 }), // 10
+				new TestAccountInfo(multiplier - 1, new int[] { 7 })); // 7 (insufficient vested balance)
 
 		return createTestPoiAccountStates(accountInfos, height);
 	}

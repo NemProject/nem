@@ -43,11 +43,13 @@ public class LocalNodeEndpointUpdater {
 
 		return this.connector.getLocalNodeInfo(partnerNode, this.localNode.getEndpoint())
 				.handle((endpoint, e) -> {
-					if (null == endpoint)
+					if (null == endpoint) {
 						return false;
+					}
 
-					if (this.localNode.getEndpoint().equals(endpoint))
+					if (this.localNode.getEndpoint().equals(endpoint)) {
 						return true;
+					}
 
 					LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
 							this.localNode.getEndpoint(),

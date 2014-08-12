@@ -32,7 +32,7 @@ public class NisMainTest {
 			"TCZloitrAOV4F5J2H2ACC4KXHHTKLQHN3G7HV4B4",
 			"TDHDSTFY757SELOAE3FU7U7krystoP6FFB7XXSYH",
 			"TD53NLTDK7EMSutopiAK4RSYQ523VBS3C62UMJC5");
-	
+
 	private static final List<KeyPair> KEY_PAIRS = PRIVATE_KEY_STRINGS.stream()
 			.map(s -> new KeyPair(PrivateKey.fromHexString(s)))
 			.collect(Collectors.toList());
@@ -61,8 +61,9 @@ public class NisMainTest {
 		final Address address = Address.fromPublicKey(keyPair.getPublicKey());
 
 		for (final String encodedAddress : ENCODED_ADDRESS_STRINGS) {
-			if (encodedAddress.equalsIgnoreCase(address.getEncoded()))
+			if (encodedAddress.equalsIgnoreCase(address.getEncoded())) {
 				return Address.fromEncoded(encodedAddress);
+			}
 		}
 
 		throw new IllegalArgumentException(String.format("could not find %s", address));

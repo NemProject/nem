@@ -37,6 +37,7 @@ public interface AccountIo extends Iterable<Account> {
 	 * @return The transaction information.
 	 */
 	SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final Address address, final Hash transactionHash, final ReadOnlyTransferDao.TransferType transfersType);
+
 	/**
 	 * Gets information about blocks harvested by an account.
 	 *

@@ -133,8 +133,9 @@ public class BlockExecutor {
 		// in an undo operation, the OutlinkObserver should be run before the balance is updated
 		// (so that the matching link can be found and removed)
 		final List<TransferObserver> transferObservers = Arrays.asList(aggregateObserver, outlinkObserver);
-		if (!isExecute)
+		if (!isExecute) {
 			Collections.reverse(transferObservers);
+		}
 
 		return new AggregateTransferObserver(transferObservers);
 	}

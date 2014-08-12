@@ -31,5 +31,7 @@ public class MockTrustProvider implements TrustProvider {
 	 *
 	 * @return The number of times computeTrust was called.
 	 */
-	public int getNumTrustComputations() { return this.numTrustComputations; }
+	public int getNumTrustComputations() {
+		return this.numTrustComputations;
+	}
 }

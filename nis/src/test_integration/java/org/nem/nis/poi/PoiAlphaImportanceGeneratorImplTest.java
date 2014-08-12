@@ -1,10 +1,5 @@
 package org.nem.nis.poi;
 
-import java.security.SecureRandom;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.*;
@@ -12,19 +7,25 @@ import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.secret.AccountLink;
 
+import java.security.SecureRandom;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 /**
-* If someone can manipulate their importance so that they can often or at-will
-* be chosen to forage, then things like double-spend attacks become possible.
-* Thus the tests considered here focus on verifying that a user cannot
-* arbitrarily manipulate their importance to cause them to be chosen to forage.
-* some tests we should consider: - Sybil attack (master node creates a ton of
-* other nodes and transacts with them (and maybe some other nodes) to try to
-* boost score)</br>
-* - infinite loop attack<br/>
-* - closed loop attack<br/>
-* - small transaction spam attack<br/>
-* -
-*/
+ * If someone can manipulate their importance so that they can often or at-will
+ * be chosen to forage, then things like double-spend attacks become possible.
+ * Thus the tests considered here focus on verifying that a user cannot
+ * arbitrarily manipulate their importance to cause them to be chosen to forage.
+ * some tests we should consider: - Sybil attack (master node creates a ton of
+ * other nodes and transacts with them (and maybe some other nodes) to try to
+ * boost score)</br>
+ * - infinite loop attack<br/>
+ * - closed loop attack<br/>
+ * - small transaction spam attack<br/>
+ * -
+ */
 public class PoiAlphaImportanceGeneratorImplTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
 
@@ -457,7 +458,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			if (prevTimeDiff > 0) {
 				final double ratio = prevTimeDiff * 10. / currTimeDiff;
 				System.out.println("Prev time: " + prevTimeDiff
-					+ "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
+						+ "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
 
 				Assert.assertTrue(ratio > .9);
 			}
@@ -502,7 +503,8 @@ public class PoiAlphaImportanceGeneratorImplTest {
 				}
 
 				final Amount vested = account.getWeightedBalances().getVested(new BlockHeight(blockHeight));
-				final long outlinkStrength = (vested.getNumNem() * totalOutlinkStrength) / ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
+				final long outlinkStrength =
+						(vested.getNumNem() * totalOutlinkStrength) / ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
 				this.addOutlink(account, otherAccount, BlockHeight.ONE, outlinkStrength);
 			}
 		}
@@ -518,7 +520,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		return createAccountWithBalance(1, numNEM);
 	}
 
-	private static PoiAccountState createAccountWithBalance(final long blockHeight,  final long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final long blockHeight, final long numNEM) {
 		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
 		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), Amount.fromNem(numNEM));
 		return state;
@@ -530,8 +532,8 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
 		poi.updateAccountImportances(blockHeight, accounts);
 		final List<Double> importances = accounts.stream()
-			.map(a -> a.getImportanceInfo().getImportance(blockHeight))
-			.collect(Collectors.toList());
+				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
+				.collect(Collectors.toList());
 
 		final ColumnVector importancesVector = new ColumnVector(importances.size());
 		for (int i = 0; i < importances.size(); ++i) {

@@ -80,8 +80,9 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 
 	private Account findByAddressImpl(final Address address) {
 		final Account account = this.addressToAccountMap.get(address);
-		if (null == account)
+		if (null == account) {
 			return null;
+		}
 
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
 			// earlier there was new object created and data copied into it
@@ -96,7 +97,6 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	 * Finds an account, updating it's public key if there's a need.
 	 *
 	 * @param address Address of an account
-	 *
 	 * @return Account associated with an address or new Account if address was unknown
 	 */
 	@Override

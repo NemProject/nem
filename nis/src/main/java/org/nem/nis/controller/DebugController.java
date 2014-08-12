@@ -1,7 +1,5 @@
 package org.nem.nis.controller;
 
-import java.math.BigInteger;
-import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -15,6 +13,9 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigInteger;
+import java.util.logging.Logger;
 
 /**
  * Controller that exposes debug endpoints.

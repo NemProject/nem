@@ -1,7 +1,5 @@
 package org.nem.nis.service;
 
-import java.util.function.*;
-import java.util.logging.Logger;
 import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
@@ -9,6 +7,9 @@ import org.nem.nis.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.function.*;
+import java.util.logging.Logger;
 
 // TODO: add unit tests for this
 

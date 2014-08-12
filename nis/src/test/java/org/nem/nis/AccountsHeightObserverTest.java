@@ -206,8 +206,9 @@ public class AccountsHeightObserverTest {
 			final Account account = Utils.generateRandomAccount();
 			this.setupAccount(account);
 
-			if (height > 0)
+			if (height > 0) {
 				this.poiFacade.findStateByAddress(account.getAddress()).setHeight(new BlockHeight(height));
+			}
 
 			return account;
 		}

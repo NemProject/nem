@@ -18,9 +18,8 @@ public class BlockMapper {
 	/**
 	 * Converts a Block model to a Block db-model.
 	 *
-	 * @param block      The block model.
+	 * @param block The block model.
 	 * @param accountDao The account dao lookup object.
-	 *
 	 * @return The Block db-model.
 	 */
 	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
@@ -55,14 +54,14 @@ public class BlockMapper {
 	/**
 	 * Converts a Block db-model to a Block model.
 	 *
-	 * @param dbBlock       The block db-model.
+	 * @param dbBlock The block db-model.
 	 * @param accountLookup The account lookup object.
-	 *
 	 * @return The Block model.
 	 */
 	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
-		if (1 == dbBlock.getHeight())
+		if (1 == dbBlock.getHeight()) {
 			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
+		}
 
 		final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);

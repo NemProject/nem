@@ -24,9 +24,9 @@ public class PoiScorer {
 	/**
 	 * Calculates the weighted teleporation sum of all dangling accounts.
 	 *
-	 * @param dangleIndexes       The indexes of dangling accounts.
+	 * @param dangleIndexes The indexes of dangling accounts.
 	 * @param teleportationVector The teleportation vector.
-	 * @param importanceVector    The importance (weights).
+	 * @param importanceVector The importance (weights).
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
 	public double calculateDangleSum(
@@ -35,8 +35,9 @@ public class PoiScorer {
 			final ColumnVector importanceVector) {
 
 		double dangleSum = 0;
-		for (final int i : dangleIndexes)
+		for (final int i : dangleIndexes) {
 			dangleSum += importanceVector.getAt(i) * teleportationVector.getAt(i);
+		}
 
 		return dangleSum / importanceVector.size();
 	}
@@ -45,8 +46,8 @@ public class PoiScorer {
 	 * Calculates the final score for all accounts given all POI sub-scores.
 	 *
 	 * @param importanceVector The importances sub-scores.
-	 * @param outlinkVector    The out-link sub-scores.
-	 * @param vestedBalanceVector   The coin-day sub-scores.
+	 * @param outlinkVector The out-link sub-scores.
+	 * @param vestedBalanceVector The coin-day sub-scores.
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
 	public ColumnVector calculateFinalScore(
@@ -178,7 +179,7 @@ public class PoiScorer {
 			final ColumnVector importanceVector,
 			final ColumnVector outlinkVector,
 			final ColumnVector vestedBalanceVector) {
-		
+
 		// alg is: l1norm(stakes + outlinkWeight*outlinkVector) + importanceWeight * l1norm(PR)
 		final double outlinkWeight = 1.25;
 		final double importanceWeight = 0.05;

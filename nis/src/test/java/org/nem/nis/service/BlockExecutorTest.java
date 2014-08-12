@@ -13,7 +13,6 @@ import java.util.*;
 
 public class BlockExecutorTest {
 
-
 	//region execute / undo basic updates
 
 	@Test
@@ -49,7 +48,7 @@ public class BlockExecutorTest {
 		context.execute();
 
 		// Assert:
-		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[]{ 1, 2 }));
+		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
 	}
 
 	@Test
@@ -104,8 +103,9 @@ public class BlockExecutorTest {
 		public UndoExecuteTestContext() {
 			this.account = Utils.generateRandomAccount();
 			this.account.incrementBalance(new Amount(100));
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < 3; ++i) {
 				this.account.incrementForagedBlocks();
+			}
 
 			this.transaction1 = this.createTransaction(1, 17);
 			this.transaction2 = this.createTransaction(2, 11);
@@ -370,8 +370,9 @@ public class BlockExecutorTest {
 
 			@Override
 			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
 					balanceInObserver[0] = account.getBalance();
+				}
 			}
 
 			@Override
@@ -416,8 +417,9 @@ public class BlockExecutorTest {
 
 			@Override
 			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
 					balanceInObserver[0] = account.getBalance();
+				}
 			}
 		};
 

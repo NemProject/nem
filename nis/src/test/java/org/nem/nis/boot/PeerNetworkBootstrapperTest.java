@@ -167,7 +167,7 @@ public class PeerNetworkBootstrapperTest {
 		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
 		private final PeerNetworkBootstrapper bootstrapper;
-		private final LocalNodeEndpointUpdater updater  = Mockito.mock(LocalNodeEndpointUpdater.class);
+		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 
 		public TestContext(final boolean requirePeerAck) {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);

@@ -12,7 +12,7 @@ public class TrustParameters {
 	/**
 	 * Sets a parameter.
 	 *
-	 * @param name  The name of the parameter.
+	 * @param name The name of the parameter.
 	 * @param value The value of the parameter.
 	 */
 	public void set(final String name, final String value) {
@@ -23,13 +23,13 @@ public class TrustParameters {
 	 * Gets a parameter value by its name.
 	 *
 	 * @param name The name of the parameter.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public String get(final String name) {
 		final String value = this.params.get(name);
-		if (null == value)
+		if (null == value) {
 			throw new IllegalArgumentException(name + " parameter does not exist");
+		}
 
 		return value;
 	}
@@ -37,9 +37,8 @@ public class TrustParameters {
 	/**
 	 * Gets a parameter value by its name or a default value.
 	 *
-	 * @param name         The name of the parameter.
+	 * @param name The name of the parameter.
 	 * @param defaultValue The default value.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public String get(final String name, final String defaultValue) {
@@ -51,7 +50,6 @@ public class TrustParameters {
 	 * Gets an int parameter by its name.
 	 *
 	 * @param name The name of the parameter.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public int getAsInteger(final String name) {
@@ -61,9 +59,8 @@ public class TrustParameters {
 	/**
 	 * Gets an int parameter by its name.
 	 *
-	 * @param name         The name of the parameter.
+	 * @param name The name of the parameter.
 	 * @param defaultValue The default value.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public int getAsInteger(final String name, final int defaultValue) {
@@ -75,7 +72,6 @@ public class TrustParameters {
 	 * Gets a double parameter by its name.
 	 *
 	 * @param name The name of the parameter.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public double getAsDouble(final String name) {
@@ -85,9 +81,8 @@ public class TrustParameters {
 	/**
 	 * Gets a double parameter by its name.
 	 *
-	 * @param name         The name of the parameter.
+	 * @param name The name of the parameter.
 	 * @param defaultValue The default value.
-	 *
 	 * @return The value of the parameter.
 	 */
 	public double getAsDouble(final String name, final double defaultValue) {

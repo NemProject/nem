@@ -124,7 +124,7 @@ public class WeightedBalanceTest {
 		final WeightedBalance result = advanceDays(weightedBalance, 50);
 
 		// Assert:
-		assertWeightedBalance(result, 50*1440+1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
+		assertWeightedBalance(result, 50 * 1440 + 1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class WeightedBalanceTest {
 			balance = balance.next();
 
 			// Assert:
-			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440*i + 1)));
+			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440 * i + 1)));
 			final Amount sum = balance.getVestedBalance().add(balance.getUnvestedBalance());
 			Assert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
 		}
@@ -265,8 +265,9 @@ public class WeightedBalanceTest {
 
 	private static WeightedBalance advanceDays(final WeightedBalance weightedBalance, final int numDays) {
 		WeightedBalance result = weightedBalance;
-		for (int i = 0; i < numDays; ++i)
+		for (int i = 0; i < numDays; ++i) {
 			result = result.next();
+		}
 
 		return result;
 	}

@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * Strategy for calculating block difficulties.
- *
  * TODO-CR: 20140808 - we really should test this class
  */
 public class BlockDifficultyScorer {
@@ -24,7 +23,6 @@ public class BlockDifficultyScorer {
 	 *
 	 * @param difficulties historical difficulties.
 	 * @param timestamps historical timestamps.
-	 *
 	 * @return The difficulty for the next block.
 	 */
 	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timestamps) {
@@ -48,12 +46,12 @@ public class BlockDifficultyScorer {
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();
 
-		final long oldDifficulty = difficulties.get(difficulties.size()-1).getRaw();
+		final long oldDifficulty = difficulties.get(difficulties.size() - 1).getRaw();
 		if (19L * oldDifficulty > 20L * difficulty) {
-			difficulty = (19L * oldDifficulty)/20L;
+			difficulty = (19L * oldDifficulty) / 20L;
 		} else {
 			if (21L * oldDifficulty < 20L * difficulty) {
-				difficulty = (21L * oldDifficulty)/20L;
+				difficulty = (21L * oldDifficulty) / 20L;
 			}
 		}
 

@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.deploy.CommonStarter;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -95,6 +95,4 @@ public class LocalController {
 
 		return blockList;
 	}
-
-
 }

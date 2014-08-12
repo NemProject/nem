@@ -4,9 +4,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.*;
+import org.nem.nis.AccountCache;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.TransferMapper;
@@ -95,7 +95,10 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvestInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), new TimeInstant(bl.getTimestamp()), Amount.fromMicroNem(bl.getTotalFee())))
+				.map(bl -> new HarvestInfo(bl.getBlockHash(),
+						new BlockHeight(bl.getHeight()),
+						new TimeInstant(bl.getTimestamp()),
+						Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}

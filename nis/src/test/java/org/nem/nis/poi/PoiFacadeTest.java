@@ -355,15 +355,17 @@ public class PoiFacadeTest {
 		final List<PoiAccountState> accountStates = createAccountStatesForUndoVestingTests(3, facade);
 
 		// Expect: all accounts should have two weighted balance entries
-		for (final PoiAccountState accountState : accountStates)
+		for (final PoiAccountState accountState : accountStates) {
 			Assert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(2));
+		}
 
 		// Act:
 		facade.undoVesting(new BlockHeight(7));
 
 		// Assert: one weighted balance entry should have been removed from all accounts
-		for (final PoiAccountState accountState : accountStates)
+		for (final PoiAccountState accountState : accountStates) {
 			Assert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(1));
+		}
 	}
 
 	private static List<PoiAccountState> createAccountStatesForUndoVestingTests(final int numAccounts, final PoiFacade facade) {
@@ -387,8 +389,9 @@ public class PoiFacadeTest {
 		final PoiFacade facade = createPoiFacade();
 
 		final List<PoiAccountState> accountStates = new ArrayList<>();
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 3; ++i) {
 			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
+		}
 
 		// Act:
 		final List<PoiAccountState> iteratedAccountStates = StreamSupport.stream(facade.spliterator(), false)

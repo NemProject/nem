@@ -59,8 +59,9 @@ public class MockBlockLookup implements BlockLookup {
 		this.chainScore = chainScore;
 
 		this.chain = new HashChain(numHashesToReturn);
-		for (int i = 0; i < numHashesToReturn; ++i)
+		for (int i = 0; i < numHashesToReturn; ++i) {
 			this.chain.add(Utils.generateRandomHash());
+		}
 	}
 
 	/**

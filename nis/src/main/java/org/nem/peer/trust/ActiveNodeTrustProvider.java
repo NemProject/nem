@@ -14,7 +14,7 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 	/**
 	 * Creates a new active node trust provider
 	 *
-	 * @param trustProvider  The trust provider.
+	 * @param trustProvider The trust provider.
 	 * @param nodeCollection The node collection.
 	 */
 	public ActiveNodeTrustProvider(final TrustProvider trustProvider, final NodeCollection nodeCollection) {
@@ -27,15 +27,17 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 		final ColumnVector result = this.trustProvider.computeTrust(context);
 		final boolean[] activeArray = this.getActiveArray(context.getNodes(), context.getLocalNode());
 		for (int i = 0; i < activeArray.length; ++i) {
-			if (!activeArray[i])
+			if (!activeArray[i]) {
 				result.setAt(i, 0);
+			}
 		}
 
 		if (result.isZeroVector()) {
 			// none of the active nodes have any trust, distribute the trust among untrusted active nodes
 			for (int i = 0; i < activeArray.length; ++i) {
-				if (activeArray[i])
+				if (activeArray[i]) {
 					result.setAt(i, 1);
+				}
 			}
 		}
 
@@ -47,8 +49,9 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 		final boolean[] result = new boolean[nodes.length];
 		for (int i = 0; i < nodes.length; ++i) {
 			final NodeStatus status = this.nodeCollection.getNodeStatus(nodes[i]);
-			if (NodeStatus.ACTIVE == status && !nodes[i].equals(localNode))
+			if (NodeStatus.ACTIVE == status && !nodes[i].equals(localNode)) {
 				result[i] = true;
+			}
 		}
 
 		return result;

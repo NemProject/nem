@@ -57,8 +57,9 @@ public class BlockChainComparer {
 			this.remoteLookup = remoteLookup;
 
 			this.localLastBlock = this.localLookup.getLastBlock();
-			if (null == this.localLastBlock)
+			if (null == this.localLastBlock) {
 				throw new IllegalArgumentException("Local does not have any blocks");
+			}
 		}
 
 		public ComparisonResult compare() {
@@ -66,11 +67,13 @@ public class BlockChainComparer {
 			//     only look up the last block if it is really needed.
 			ComparisonResult.Code code = this.compareChainScores();
 
-			if (ComparisonResult.Code.UNKNOWN == code)
+			if (ComparisonResult.Code.UNKNOWN == code) {
 				code = this.compareLastBlock();
+			}
 
-			if (ComparisonResult.Code.UNKNOWN == code)
+			if (ComparisonResult.Code.UNKNOWN == code) {
 				code = this.compareHashes();
+			}
 
 			if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED == code && !this.areChainsConsistent) {
 				// not to waste our time, first try to get first block and verify it
@@ -97,12 +100,13 @@ public class BlockChainComparer {
 
 		private ComparisonResult.Code compareChainScores() {
 			final int comparisonResult = this.remoteLookup.getChainScore().compareTo(this.localLookup.getChainScore());
-			if (comparisonResult > 0)
+			if (comparisonResult > 0) {
 				return ComparisonResult.Code.UNKNOWN;
+			}
 
-            return 0 == comparisonResult
-                    ? ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE
-                    : ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE;
+			return 0 == comparisonResult
+					? ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE
+					: ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE;
 		}
 
 		private ComparisonResult.Code compareHashes() {
@@ -114,8 +118,9 @@ public class BlockChainComparer {
 			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node
 			// to sync properly with the network, the remote must be allowed to return at least rewriteLimit + 1 hashes
 			// (as an optimization, getMaxNumBlocksToAnalyze is used to allow faster syncing)
-			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze())
+			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) {
 				return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
+			}
 
 			final HashChain localHashes = this.localLookup.getHashesFrom(startingBlockHeight);
 			final int firstDifferenceIndex = localHashes.findFirstDifference(remoteHashes);
@@ -142,17 +147,21 @@ public class BlockChainComparer {
 
 		private ComparisonResult.Code compareLastBlock() {
 			this.remoteLastBlock = this.remoteLookup.getLastBlock();
-			if (null == this.remoteLastBlock)
+			if (null == this.remoteLastBlock) {
 				return ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS;
+			}
 
-			if (!this.remoteLastBlock.verify())
+			if (!this.remoteLastBlock.verify()) {
 				return ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
+			}
 
-			if (areBlocksEqual(this.localLastBlock, this.remoteLastBlock))
+			if (areBlocksEqual(this.localLastBlock, this.remoteLastBlock)) {
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
+			}
 
-			if (this.isRemoteTooFarBehind())
+			if (this.isRemoteTooFarBehind()) {
 				return ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND;
+			}
 
 			return ComparisonResult.Code.UNKNOWN;
 		}

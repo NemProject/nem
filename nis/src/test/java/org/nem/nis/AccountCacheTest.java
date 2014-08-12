@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 
 import java.util.*;
@@ -243,7 +243,6 @@ public class AccountCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.isKnownAddress(address), IsEqual.equalTo(true));
-
 	}
 
 	@Test
@@ -258,7 +257,6 @@ public class AccountCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.isKnownAddress(address2), IsEqual.equalTo(false));
-
 	}
 
 	//endregion
@@ -407,8 +405,9 @@ public class AccountCacheTest {
 		final AccountCache cache = createAccountCache();
 
 		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 3; ++i) {
 			accounts.add(cache.addAccountToCache(Utils.generateRandomAddress()));
+		}
 
 		// Act:
 		final List<Account> iteratedAccounts = StreamSupport.stream(cache.spliterator(), false)

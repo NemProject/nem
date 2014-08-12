@@ -27,8 +27,9 @@ public class WeakNodeIdentity extends NodeIdentity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof WeakNodeIdentity))
+		if (!(obj instanceof WeakNodeIdentity)) {
 			return false;
+		}
 
 		final WeakNodeIdentity rhs = (WeakNodeIdentity)obj;
 		return this.name.equals(rhs.name);

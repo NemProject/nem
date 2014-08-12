@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
@@ -64,7 +64,7 @@ public class BlockChainValidatorTest {
 		final Block dummyPrevious = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
-		blocks.get(blocks.size()-1).setPrevious(dummyPrevious);
+		blocks.get(blocks.size() - 1).setPrevious(dummyPrevious);
 		signAllBlocks(blocks);
 
 		// Assert:
@@ -314,8 +314,9 @@ public class BlockChainValidatorTest {
 	}
 
 	private static void signAllBlocks(final List<Block> blocks) {
-		for (final Block block : blocks)
+		for (final Block block : blocks) {
 			block.sign();
+		}
 	}
 
 	private static Block createFutureBlock(final Block parentBlock) {
@@ -326,7 +327,7 @@ public class BlockChainValidatorTest {
 	}
 
 	private static Transaction createInvalidSignedTransaction() {
-		final Transaction transaction =  new MockTransaction();
+		final Transaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() - 1));
 		transaction.sign();
 		return transaction;
@@ -350,14 +351,14 @@ public class BlockChainValidatorTest {
 
 	private static Transaction createSignedFutureTransaction() {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction =  new MockTransaction(0, currentTime.addMinutes(2));
+		final Transaction transaction = new MockTransaction(0, currentTime.addMinutes(2));
 		transaction.setDeadline(currentTime.addHours(2));
 		transaction.sign();
 		return transaction;
 	}
 
 	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
-		final Transaction transaction =  new MockTransaction(account);
+		final Transaction transaction = new MockTransaction(account);
 		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() + 1));
 		transaction.sign();
 		return transaction;

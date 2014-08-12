@@ -43,7 +43,6 @@ public class PreTrustedNodes {
 	 * Gets a value indicating whether or not the specified node is pre-trusted.
 	 *
 	 * @param node The node.
-	 *
 	 * @return true if the node is pre-trusted.
 	 */
 	public boolean isPreTrusted(final Node node) {
@@ -54,7 +53,6 @@ public class PreTrustedNodes {
 	 * Gets a vector of pre-trust values for all specified nodes.
 	 *
 	 * @param nodes The nodes.
-	 *
 	 * @return A vector of pre-trust values.
 	 */
 	public ColumnVector getPreTrustVector(final Node[] nodes) {
@@ -65,8 +63,9 @@ public class PreTrustedNodes {
 			return preTrustVector;
 		}
 
-		for (int i = 0; i < nodes.length; i++)
+		for (int i = 0; i < nodes.length; i++) {
 			preTrustVector.setAt(i, this.isPreTrusted(nodes[i]) ? 1.0 / numPreTrustedNodes : 0.0);
+		}
 
 		preTrustVector.normalize();
 		return preTrustVector;

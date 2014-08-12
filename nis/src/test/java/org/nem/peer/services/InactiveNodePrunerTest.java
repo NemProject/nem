@@ -39,8 +39,9 @@ public class InactiveNodePrunerTest {
 
 	private static List<Node> createNodeListWithSize(final int size) {
 		final List<Node> nodes = new ArrayList<>();
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < size; ++i) {
 			nodes.add(Mockito.mock(Node.class));
+		}
 
 		return nodes;
 	}

@@ -55,9 +55,9 @@ public class TestTrustContext {
 	 * Sets the number of successful and failed calls that the local node has had with
 	 * the node at the specified index.
 	 *
-	 * @param nodeIndex          The node index.
+	 * @param nodeIndex The node index.
 	 * @param numSuccessfulCalls The number of successful calls.
-	 * @param numFailedCalls     The number of failed calls.
+	 * @param numFailedCalls The number of failed calls.
 	 */
 	public void setCallCounts(final int nodeIndex, final int numSuccessfulCalls, final int numFailedCalls) {
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, this.nodes[nodeIndex]);

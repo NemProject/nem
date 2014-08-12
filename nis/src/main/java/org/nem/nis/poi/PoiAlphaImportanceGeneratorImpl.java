@@ -8,15 +8,12 @@ import java.util.logging.Logger;
 
 /**
  * This is a first draft implementation of the POI importance calculation.
- *
  * Because a lot of the infrastructure is not yet in place, I am making the
  * following assumptions in this code:
- *
  * 1) This class's calculateImportancesImpl is called with a list of all the accounts.
- * 2) POI is calculated by the forager after processing new transactions. 
- *    This algorithm is not currently iterative, so importances are calculated from scratch every time. 
- *    I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
- *
+ * 2) POI is calculated by the forager after processing new transactions.
+ * This algorithm is not currently iterative, so importances are calculated from scratch every time.
+ * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
  */
 public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
@@ -51,7 +48,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		}
 
 		// (3) merge all sub-scores
-		final ColumnVector importanceVector =  scorer.calculateFinalScore(
+		final ColumnVector importanceVector = scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector(),

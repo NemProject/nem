@@ -24,17 +24,18 @@ public class Config {
 	private final NodeCollection nodes;
 	private final Node localNode;
 
-
 	public Config(final List<Entry> entries) {
 		this.entries = entries;
 
 		int numPreTrustedNodes = 0;
-		for (final Entry entry : this.entries)
+		for (final Entry entry : this.entries) {
 			numPreTrustedNodes += entry.isPreTrusted() ? 1 : 0;
+		}
 
 		this.nodes = new NodeCollection();
-		for (final Entry entry : this.entries)
+		for (final Entry entry : this.entries) {
 			this.nodes.update(entry.getNode(), NodeStatus.ACTIVE);
+		}
 
 		final Entry localNodeEntry = new Entry("127.0.0.1", false, false, 1.0, 1.0, false, false);
 		this.entries.add(localNodeEntry);
@@ -83,8 +84,9 @@ public class Config {
 		try (final FileReader fileReader = new FileReader(file)) {
 			try (final BufferedReader reader = new BufferedReader(fileReader)) {
 
-				while (reader.ready())
+				while (reader.ready()) {
 					entries.add(new Entry(reader.readLine()));
+				}
 			}
 		}
 
@@ -120,8 +122,9 @@ public class Config {
 
 		public Entry(final String line) {
 			final String[] nodeAttributes = line.split(";");
-			if (nodeAttributes.length != NODE_ATTRIBUTE_COUNT)
+			if (nodeAttributes.length != NODE_ATTRIBUTE_COUNT) {
 				throw new IllegalArgumentException(String.format("Malformed data in configuration file [%s]", line));
+			}
 
 			this.isPreTrusted = nodeAttributes[2].equals("1");
 

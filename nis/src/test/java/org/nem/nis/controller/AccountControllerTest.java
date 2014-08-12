@@ -1,8 +1,5 @@
 package org.nem.nis.controller;
 
-import java.util.*;
-import java.util.function.BiFunction;
-
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -18,6 +15,9 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.*;
+
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class AccountControllerTest {
 
@@ -181,7 +181,6 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
 	}
 
-
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
@@ -195,7 +194,6 @@ public class AccountControllerTest {
 		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersIncoming(accountTransactionsPageBuilder));
-
 	}
 
 	@Test

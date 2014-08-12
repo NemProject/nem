@@ -41,8 +41,9 @@ public class TransactionController {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
 		final ValidationResult validationResult = transfer.checkValidity();
-		if (ValidationResult.SUCCESS != transfer.checkValidity())
+		if (ValidationResult.SUCCESS != transfer.checkValidity()) {
 			throw new IllegalArgumentException(validationResult.toString());
+		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
 		return new RequestPrepare(transferData);

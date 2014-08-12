@@ -150,7 +150,7 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456, 0);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
@@ -171,8 +171,8 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23*i + 3)%30);
+		for (int i = 0; i < 30; i++) {
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23 * i + 3) % 30);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
@@ -185,7 +185,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entities1.size(), equalTo(25));
 		Assert.assertThat(entities2.size(), equalTo(0));
 
-		int lastTimestamp = 123+29;
+		int lastTimestamp = 123 + 29;
 		for (final Block entity : entities1) {
 			Assert.assertThat(entity.getTimestamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
@@ -254,9 +254,9 @@ public class BlockDaoTest {
 		// !!!
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
-		final ArrayList<Hash> expectedHashes= new ArrayList<>(30);
-		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i*5);
+		final ArrayList<Hash> expectedHashes = new ArrayList<>(30);
+		for (int i = 0; i < 30; i++) {
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedHashes.add(dbBlock.getBlockHash());
 
@@ -287,11 +287,11 @@ public class BlockDaoTest {
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
 		final TreeMap<Integer, Hash> expectedHashes = new TreeMap<>();
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
-			expectedHashes.put((i*23 + 3)%30, dbBlock.getBlockHash());
+			expectedHashes.put((i * 23 + 3) % 30, dbBlock.getBlockHash());
 
 			// Act:
 			this.blockDao.save(dbBlock);
@@ -319,10 +319,10 @@ public class BlockDaoTest {
 		// !!!
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
-		final ArrayList<Long> expectedDifficulties= new ArrayList<>(30);
-		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i*5);
-			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+		final ArrayList<Long> expectedDifficulties = new ArrayList<>(30);
+		for (int i = 0; i < 30; i++) {
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i * 7000)));
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedDifficulties.add(dbBlock.getDifficulty());
 
@@ -343,7 +343,6 @@ public class BlockDaoTest {
 		}
 	}
 
-
 	@Test
 	public void getDifficultiesFromReturnsDifficultiesInBlockHeightOrder() {
 		// Arrange:
@@ -353,10 +352,10 @@ public class BlockDaoTest {
 		// !!!
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
-		final TreeMap<Integer, Long> expectedDifficulties= new TreeMap<>();
-		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
-			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i*7000)));
+		final TreeMap<Integer, Long> expectedDifficulties = new TreeMap<>();
+		for (int i = 0; i < 30; i++) {
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
+			emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i * 7000)));
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedDifficulties.put((i * 23 + 3) % 30, dbBlock.getDifficulty());
 
@@ -386,9 +385,9 @@ public class BlockDaoTest {
 		// !!!
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
-		final ArrayList<Integer> expectedTimestamps= new ArrayList<>(30);
-		for (int i = 0; i<30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i*5);
+		final ArrayList<Integer> expectedTimestamps = new ArrayList<>(30);
+		for (int i = 0; i < 30; i++) {
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedTimestamps.add(dbBlock.getTimestamp());
 
@@ -419,9 +418,9 @@ public class BlockDaoTest {
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
 		final TreeMap<Integer, Integer> expectedTimestamps = new TreeMap<>();
-		for (int i = 0; i<30; i++) {
+		for (int i = 0; i < 30; i++) {
 			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i*23 + 3)%30, i*5);
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 			expectedTimestamps.put((i * 23 + 3) % 30, dbBlock.getTimestamp());
 
@@ -448,7 +447,8 @@ public class BlockDaoTest {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(), recipient.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(),
+				recipient.getKeyPair().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);
@@ -456,7 +456,11 @@ public class BlockDaoTest {
 
 	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, final long height, final int i) {
 		final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getKeyPair().getPublicKey());
-		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash, new TimeInstant(123 + i), new BlockHeight(height));
+		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer,
+				Hash.ZERO,
+				generationHash,
+				new TimeInstant(123 + i),
+				new BlockHeight(height));
 		emptyBlock.sign();
 		return emptyBlock;
 	}

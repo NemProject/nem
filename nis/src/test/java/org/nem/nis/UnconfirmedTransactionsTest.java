@@ -61,7 +61,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
- 	public void multipleTransactionsWithDifferentHashesCanBeAdded() {
+	public void multipleTransactionsWithDifferentHashesCanBeAdded() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
@@ -176,8 +176,9 @@ public class UnconfirmedTransactionsTest {
 		final ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
 
 		// Assert:
-		for (int i = 1; i < numTransactions; ++i)
+		for (int i = 1; i < numTransactions; ++i) {
 			Assert.assertThat(transactions.get(i - 1).getFee().compareTo(transactions.get(i).getFee()), IsEqual.equalTo(1));
+		}
 	}
 
 	//endregion
@@ -198,7 +199,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
- 	public void getTransactionsBeforeDoesNotRemoveTransactions() {
+	public void getTransactionsBeforeDoesNotRemoveTransactions() {
 		// Arrange:
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(10);
 
@@ -262,7 +263,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(
 				getCustomFieldValues(unconfirmedTransactions.getTransactionsBefore(new TimeInstant(101))),
-				IsEquivalent.equivalentTo(new Integer[]{ 0, 2, 3, 5, 6, 8, 9 }));
+				IsEquivalent.equivalentTo(new Integer[] { 0, 2, 3, 5, 6, 8, 9 }));
 	}
 
 	//endregion
@@ -285,7 +286,6 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactionsInstance() {
 		return new UnconfirmedTransactions();
 	}
-
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(final int numTransactions) {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();

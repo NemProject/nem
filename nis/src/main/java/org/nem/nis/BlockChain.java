@@ -44,10 +44,10 @@ public class BlockChain implements BlockSynchronizer {
 		this.foraging = foraging;
 		this.score = BlockChainScore.ZERO;
 	}
-	
+
 	/**
 	 * Returns the overall score for the chain.
-	 * 
+	 *
 	 * @return the score.
 	 */
 	public BlockChainScore getScore() {
@@ -136,15 +136,15 @@ public class BlockChain implements BlockSynchronizer {
 
 	/**
 	 * Synch algorithm:
-	 *  1. Get peer's last block compare with ours, assuming it's ok
-	 *  2. Take hashes of last blocks - at most REWRITE_LIMIT hashes, compare with proper hashes
-	 *     of peer, to find last common and first different block.
-	 *     If all peer's hashes has been checked we have nothing to do
-	 *  3. if we have some blocks left AFTER common blocks, we'll need to revert those transactions,
-	 *     but before that we'll do some simple check, to see if peer's chain is actually better
-	 *  4. Now we can get peer's chain and verify it
-	 *  5. Once we've verified it, we can apply it
-	 *     (all-or-nothing policy, if verification failed, we won't try to apply part of it)
+	 * 1. Get peer's last block compare with ours, assuming it's ok
+	 * 2. Take hashes of last blocks - at most REWRITE_LIMIT hashes, compare with proper hashes
+	 * of peer, to find last common and first different block.
+	 * If all peer's hashes has been checked we have nothing to do
+	 * 3. if we have some blocks left AFTER common blocks, we'll need to revert those transactions,
+	 * but before that we'll do some simple check, to see if peer's chain is actually better
+	 * 4. Now we can get peer's chain and verify it
+	 * 5. Once we've verified it, we can apply it
+	 * (all-or-nothing policy, if verification failed, we won't try to apply part of it)
 	 *
 	 * @param connectorPool The sync connector pool.
 	 * @param node The other node.
@@ -180,7 +180,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
-			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
+				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
 			this.foraging.processTransactions(unconfirmedTransactions);
 		}
@@ -194,7 +194,8 @@ public class BlockChain implements BlockSynchronizer {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
-			LOGGER.info("synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
+			LOGGER.info("synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (" +
+					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
@@ -213,7 +214,6 @@ public class BlockChain implements BlockSynchronizer {
 	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
 	 * @param receivedBlock - receivedBlock that's going to be processed
-	 *
 	 * @return Node experience code which indicates the status of the operation
 	 */
 	public synchronized ValidationResult processBlock(Block receivedBlock) {
@@ -253,7 +253,8 @@ public class BlockChain implements BlockSynchronizer {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (dbParent.getNextBlockId() != null) {
-			LOGGER.info("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (" + (this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
+			LOGGER.info("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (" +
+					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
@@ -338,7 +339,6 @@ public class BlockChain implements BlockSynchronizer {
 		 * Additionally calculates score.
 		 *
 		 * @param commonBlockHeight height up to which TXes should be reversed.
-		 *
 		 * @return score for iterated blocks.
 		 */
 		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
@@ -366,17 +366,17 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainScore ourScore,
 				final boolean hasOwnChain) {
 
-				final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
-						this.accountAnalyzer,
-						this.originalAnalyzer,
-						this.blockScorer,
-						this.blockChainLastBlockLayer,
-						this.blockDao,
-						foraging,
-						dbParentBlock,
-						peerChain,
-						ourScore,
-						hasOwnChain);
+			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
+					this.accountAnalyzer,
+					this.originalAnalyzer,
+					this.blockScorer,
+					this.blockChainLastBlockLayer,
+					this.blockDao,
+					foraging,
+					dbParentBlock,
+					peerChain,
+					ourScore,
+					hasOwnChain);
 
 			final UpdateChainResult result = new UpdateChainResult();
 			result.validationResult = updateContext.update();

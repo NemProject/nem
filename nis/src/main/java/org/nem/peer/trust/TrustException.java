@@ -27,7 +27,7 @@ public class TrustException extends RuntimeException {
 	 * Creates a new exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The original exception.
+	 * @param cause The original exception.
 	 */
 	public TrustException(final String message, final Throwable cause) {
 		super(message, cause);

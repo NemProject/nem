@@ -373,7 +373,7 @@ public class ForagingTest {
 	private Transaction dummyTransaction(final org.nem.core.model.Account recipient, final long amount) {
 		final Transaction transaction = new TransferTransaction(
 				(new SystemTimeProvider()).getCurrentTime(),
-				createAccountWithBalance(amount*3),
+				createAccountWithBalance(amount * 3),
 				recipient,
 				new Amount(amount),
 				null);

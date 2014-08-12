@@ -61,7 +61,11 @@ public class BlockChainLastBlockLayerTest {
 
 	private static org.nem.core.model.Block createBlock(final Account forger) {
 		// Arrange:
-		final org.nem.core.model.Block block = new org.nem.core.model.Block(forger, Utils.generateRandomHash(), Utils.generateRandomHash(), new TimeInstant(7), new BlockHeight(3));
+		final org.nem.core.model.Block block = new org.nem.core.model.Block(forger,
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				new TimeInstant(7),
+				new BlockHeight(3));
 		block.sign();
 		return block;
 	}

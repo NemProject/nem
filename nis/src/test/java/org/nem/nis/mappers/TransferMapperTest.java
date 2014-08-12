@@ -125,7 +125,7 @@ public class TransferMapperTest {
 					new Amount(144),
 					message);
 
-			this.model.setFee(Amount.fromNem(11) );
+			this.model.setFee(Amount.fromNem(11));
 			this.model.setDeadline(new TimeInstant(800));
 			this.model.sign();
 

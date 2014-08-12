@@ -26,7 +26,7 @@ public class MockAccountDao implements AccountDao {
 	/**
 	 * Adds a mapping between a model address and a db-model account.
 	 *
-	 * @param address   The model address
+	 * @param address The model address
 	 * @param dbAccount The db-model account.
 	 */
 	public void addMapping(final Address address, final org.nem.nis.dbmodel.Account dbAccount) {
@@ -36,7 +36,7 @@ public class MockAccountDao implements AccountDao {
 	/**
 	 * Adds a mapping between a model account and a db-model account.
 	 *
-	 * @param account   The model account
+	 * @param account The model account
 	 * @param dbAccount The db-model account.
 	 */
 	public void addMapping(final org.nem.core.model.Account account, final org.nem.nis.dbmodel.Account dbAccount) {

@@ -50,7 +50,7 @@ public class BlockDebugInfo implements SerializableEntity {
 		this.interBlockTime = interBlockTime;
 		this.transactionDebugInfos = new ArrayList<>();
 	}
-	
+
 	/**
 	 * Deserializes a block debug info object.
 	 *
@@ -75,7 +75,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BlockHeight getHeight() {
 		return this.height;
 	}
-	
+
 	/**
 	 * Returns the address of the forager of the block.
 	 *
@@ -84,7 +84,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public Address getForagerAddress() {
 		return this.foragerAddress;
 	}
-	
+
 	/**
 	 * Returns the timestamp of the block.
 	 *
@@ -93,7 +93,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public TimeInstant getTimestamp() {
 		return this.timestamp;
 	}
-	
+
 	/**
 	 * Returns the difficulty of the block.
 	 *
@@ -102,7 +102,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BlockDifficulty getDifficulty() {
 		return this.difficulty;
 	}
-	
+
 	/**
 	 * Returns The hit for the block
 	 *
@@ -111,7 +111,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BigInteger getHit() {
 		return this.hit;
 	}
-	
+
 	/**
 	 * Returns the forager's target for the block
 	 *
@@ -120,7 +120,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BigInteger getTarget() {
 		return this.target;
 	}
-	
+
 	/**
 	 * Returns the time span between the block and its parent block.
 	 *
@@ -129,7 +129,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public int getInterBlockTime() {
 		return this.interBlockTime;
 	}
-	
+
 	/**
 	 * Gets the transaction debug infos associated with this block debug info.
 	 *

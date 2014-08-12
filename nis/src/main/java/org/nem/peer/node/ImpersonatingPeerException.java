@@ -27,7 +27,7 @@ public class ImpersonatingPeerException extends RuntimeException {
 	 * Creates a new exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The original exception.
+	 * @param cause The original exception.
 	 */
 	public ImpersonatingPeerException(final String message, final Throwable cause) {
 		super(message, cause);

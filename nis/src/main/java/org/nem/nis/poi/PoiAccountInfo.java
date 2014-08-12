@@ -1,6 +1,6 @@
 package org.nem.nis.poi;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.secret.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
 public class PoiAccountInfo {
 
 	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1000);
-	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR/(double)WeightedBalance.DECAY_DENOMINATOR;
+	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR / (double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
 	private final PoiAccountState accountState;
@@ -57,14 +57,18 @@ public class PoiAccountInfo {
 	 *
 	 * @return The account index.
 	 */
-	public int getIndex() { return this.index; }
+	public int getIndex() {
+		return this.index;
+	}
 
 	/**
 	 * Gets the account state.
 	 *
 	 * @return The account state.
 	 */
-	public PoiAccountState getState() { return this.accountState; }
+	public PoiAccountState getState() {
+		return this.accountState;
+	}
 
 	/**
 	 * Determines whether or not the account is eligible for foraging.
@@ -101,8 +105,9 @@ public class PoiAccountInfo {
 	public List<WeightedLink> getNetOutlinks() {
 		final List<WeightedLink> links = new ArrayList<>();
 		for (final Map.Entry<Address, Double> entry : this.netOutlinks.entrySet()) {
-			if (entry.getValue() <= 0)
+			if (entry.getValue() <= 0) {
 				continue;
+			}
 
 			links.add(new WeightedLink(entry.getKey(), entry.getValue()));
 		}

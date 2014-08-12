@@ -13,7 +13,7 @@ public class NodeExperiencePair implements SerializableEntity {
 	/**
 	 * Creates a new node experience pair.
 	 *
-	 * @param node       The node.
+	 * @param node The node.
 	 * @param experience The node experience.
 	 */
 	public NodeExperiencePair(final Node node, final NodeExperience experience) {
@@ -62,8 +62,9 @@ public class NodeExperiencePair implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof NodeExperiencePair))
+		if (!(obj instanceof NodeExperiencePair)) {
 			return false;
+		}
 
 		final NodeExperiencePair rhs = (NodeExperiencePair)obj;
 		return this.node.equals(rhs.node) && this.experience.equals(rhs.experience);

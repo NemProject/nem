@@ -27,7 +27,7 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	/**
 	 * Gets the block height of this link.
-	 * 
+	 *
 	 * @return The block height.
 	 */
 	public BlockHeight getHeight() {
@@ -61,8 +61,9 @@ public class AccountLink implements Comparable<AccountLink> {
 		};
 
 		for (final int result : comparisonResults) {
-			if (0 != result)
+			if (0 != result) {
 				return result;
+			}
 		}
 
 		return 0;
@@ -77,7 +78,7 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	@Override
 	public boolean equals(final Object obj) {
-		return obj instanceof AccountLink && 0 == this.compareTo((AccountLink) obj);
+		return obj instanceof AccountLink && 0 == this.compareTo((AccountLink)obj);
 	}
 
 	@Override

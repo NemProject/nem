@@ -30,8 +30,9 @@ public class BasicNodeSelectorTest {
 		final TestContext context = new TestContext(new ColumnVector(1, 1, 1, 1, 1));
 
 		// Act:
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < 10; ++i) {
 			context.selector.selectNode();
+		}
 
 		// Assert:
 		Mockito.verify(context.trustProvider, Mockito.times(1)).computeTrust(context.context);
@@ -183,8 +184,9 @@ public class BasicNodeSelectorTest {
 			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
 
 			this.nodes = new Node[trustValues.size()];
-			for (int i = 0; i < this.nodes.length; ++i)
+			for (int i = 0; i < this.nodes.length; ++i) {
 				this.nodes[i] = new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1"));
+			}
 
 			Mockito.when(this.context.getNodes()).thenReturn(this.nodes);
 

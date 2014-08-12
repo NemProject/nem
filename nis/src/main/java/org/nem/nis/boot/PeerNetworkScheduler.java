@@ -74,8 +74,9 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		this.timers.add(new AsyncTimer(
 				this.runnableToFutureSupplier(() -> {
 					final Block block = blockChain.forageBlock();
-					if (null == block)
+					if (null == block) {
 						return;
+					}
 
 					final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
 							block,

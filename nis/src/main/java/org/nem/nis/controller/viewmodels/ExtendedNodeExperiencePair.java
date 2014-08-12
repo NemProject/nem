@@ -14,7 +14,7 @@ public class ExtendedNodeExperiencePair extends NodeExperiencePair {
 	/**
 	 * Creates a new node experience pair.
 	 *
-	 * @param node       The node.
+	 * @param node The node.
 	 * @param experience The node experience.
 	 * @param numSyncAttempts The number of sync attempts.
 	 */
@@ -58,8 +58,9 @@ public class ExtendedNodeExperiencePair extends NodeExperiencePair {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof ExtendedNodeExperiencePair))
+		if (!(obj instanceof ExtendedNodeExperiencePair)) {
 			return false;
+		}
 
 		final ExtendedNodeExperiencePair rhs = (ExtendedNodeExperiencePair)obj;
 		return super.equals(rhs) && this.numSyncAttempts == rhs.numSyncAttempts;

@@ -31,8 +31,9 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	@Override
 	public org.nem.nis.dbmodel.Block findById(final long id) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findById(id);
-		if (null == dbBlock)
+		if (null == dbBlock) {
 			throw createMissingResourceException(Long.toBinaryString(id));
+		}
 
 		return dbBlock;
 	}
@@ -40,8 +41,9 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	@Override
 	public org.nem.nis.dbmodel.Block findByHash(final Hash blockHash) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(blockHash);
-		if (null == dbBlock)
+		if (null == dbBlock) {
 			throw createMissingResourceException(blockHash.toString());
+		}
 
 		return dbBlock;
 	}
@@ -49,8 +51,9 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	@Override
 	public org.nem.nis.dbmodel.Block findByHeight(final BlockHeight height) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
-		if (null == dbBlock)
+		if (null == dbBlock) {
 			throw createMissingResourceException(height.toString());
+		}
 
 		return dbBlock;
 	}

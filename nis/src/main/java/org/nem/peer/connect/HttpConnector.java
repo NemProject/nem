@@ -62,7 +62,7 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 
 	//endregion
 
-    // region SyncConnector
+	// region SyncConnector
 
 	@Override
 	public Block getLastBlock(final Node node) {
@@ -102,8 +102,8 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node) {
 		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED);
 		return this.postAuthenticated(
-				url, 
-				node.getIdentity(), 
+				url,
+				node.getIdentity(),
 				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE)).join().asCollection();
 	}
 
@@ -138,8 +138,8 @@ public class HttpConnector implements PeerConnector, SyncConnector {
 	private static <T extends SerializableEntity> CompletableFuture<T> unwrapAuthenticatedResponse(
 			final CompletableFuture<Deserializer> future,
 			final NodeChallenge challenge,
-		   	final NodeIdentity remoteNodeIdentity,
-		   	final ObjectDeserializer<T> entityDeserializer) {
+			final NodeIdentity remoteNodeIdentity,
+			final ObjectDeserializer<T> entityDeserializer) {
 		return future
 				.thenApply(d -> new AuthenticatedResponse<>(d, entityDeserializer).getEntity(remoteNodeIdentity, challenge));
 	}

@@ -1,9 +1,9 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.AccountImportance;
 
 import java.util.*;
 
@@ -144,8 +144,9 @@ public class PoiContext {
 			int i = 0;
 			for (final PoiAccountState accountState : accountStates) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
-				if (!accountInfo.canForage())
+				if (!accountInfo.canForage()) {
 					continue;
+				}
 
 				final Address address = accountState.getAddress();
 				this.addressToAccountInfoMap.put(address, accountInfo);
@@ -155,8 +156,9 @@ public class PoiContext {
 				++i;
 			}
 
-			if (0 == i)
+			if (0 == i) {
 				throw new IllegalArgumentException("there aren't any foraging eligible accounts");
+			}
 
 			this.dangleVector = new ColumnVector(i);
 			this.dangleVector.setAll(1);
@@ -187,11 +189,13 @@ public class PoiContext {
 		public void updateImportances(
 				final ColumnVector pageRankVector,
 				final ColumnVector importanceVector) {
-			if (pageRankVector.size() != this.accountInfos.size())
+			if (pageRankVector.size() != this.accountInfos.size()) {
 				throw new IllegalArgumentException("page rank vector is an unexpected dimension");
+			}
 
-			if (importanceVector.size() != this.accountInfos.size())
+			if (importanceVector.size() != this.accountInfos.size()) {
 				throw new IllegalArgumentException("importance vector is an unexpected dimension");
+			}
 
 			int i = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
@@ -209,16 +213,16 @@ public class PoiContext {
 			//           a block and could in theory lead to an unresolvable fork. Better use a constant vector for now.
 
 			// (1) Assign the start vector to the last page rank
-//			int i = 0;
-//			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-//				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
-//				this.poiStartVector.setAt(i, importance.getLastPageRank());
-//				++i;
-//			}
-//
-//			// (2) normalize the start vector
-//			if (this.poiStartVector.isZeroVector())
-//				this.poiStartVector.setAll(1.0);
+			//			int i = 0;
+			//			for (final PoiAccountInfo accountInfo : this.accountInfos) {
+			//				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
+			//				this.poiStartVector.setAt(i, importance.getLastPageRank());
+			//				++i;
+			//			}
+			//
+			//			// (2) normalize the start vector
+			//			if (this.poiStartVector.isZeroVector())
+			//				this.poiStartVector.setAll(1.0);
 
 			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
@@ -229,8 +233,9 @@ public class PoiContext {
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 				for (final WeightedLink link : accountInfo.getOutlinks()) {
 					final PoiAccountInfo otherAccountInfo = this.addressToAccountInfoMap.get(link.getOtherAccountAddress());
-					if (null == otherAccountInfo)
+					if (null == otherAccountInfo) {
 						continue;
+					}
 
 					otherAccountInfo.addInlink(new WeightedLink(accountInfo.getState().getAddress(), link.getWeight()));
 				}
@@ -240,8 +245,9 @@ public class PoiContext {
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
 				for (final WeightedLink link : accountInfo.getNetOutlinks()) {
 					final Integer rowIndex = this.addressToIndexMap.get(link.getOtherAccountAddress());
-					if (null == rowIndex)
+					if (null == rowIndex) {
 						continue;
+					}
 
 					this.outlinkMatrix.incrementAt(rowIndex, accountInfo.getIndex(), link.getWeight());
 				}
@@ -249,10 +255,11 @@ public class PoiContext {
 				// update the outlink score
 				final int rowIndex = accountInfo.getIndex();
 				final double outlinkScore = accountInfo.getNetOutlinkScore();
-				if (0.0 == outlinkScore)
+				if (0.0 == outlinkScore) {
 					this.dangleIndexes.add(rowIndex);
-				else
+				} else {
 					this.outlinkScoreVector.setAt(rowIndex, outlinkScore);
+				}
 			}
 
 			this.outlinkMatrix.removeNegatives();
@@ -266,34 +273,34 @@ public class PoiContext {
 		private final ColumnVector inverseTeleportationVector;
 
 		public TeleportationBuilder(final ColumnVector importanceVector) {
-//			// (1) build the teleportation vector
-//			final int numAccounts = importanceVector.getSize();
-//
-//			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
-//			// TODO: After POI is up and running, we should try pruning accounts that can't forage
-//
-//			// Assign a value between .7 and .95 based on the amount of NEM in an account
-//			// It seems that more NEM = higher teleportation seems to work better
-//			// NOTE: at this point the importance vector contains normalized account balances
-//			final double maxImportance = importanceVector.max();
-//
-//			// calculate teleportation probabilities based on normalized amount of NEM owned
-//			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
-//			minProbVector.setAll(MIN_TELEPORTATION_PROB);
-//
-//			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
-//			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
-//
-//			// (2) build the inverse teleportation vector: 1 - V(teleportation)
-//			final ColumnVector onesVector = new ColumnVector(numAccounts);
-//			onesVector.setAll(1.0);
-//			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
-//			
-//			// (3) Normalize by the number of accounts (1/N)
-//			final double numAccountNorm =  1d / numAccounts;
-//			
-//			this.teleportationVector.multiply(numAccountNorm);
-//			this.inverseTeleportationVector.multiply(numAccountNorm);
+			//			// (1) build the teleportation vector
+			//			final int numAccounts = importanceVector.getSize();
+			//
+			//			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
+			//			// TODO: After POI is up and running, we should try pruning accounts that can't forage
+			//
+			//			// Assign a value between .7 and .95 based on the amount of NEM in an account
+			//			// It seems that more NEM = higher teleportation seems to work better
+			//			// NOTE: at this point the importance vector contains normalized account balances
+			//			final double maxImportance = importanceVector.max();
+			//
+			//			// calculate teleportation probabilities based on normalized amount of NEM owned
+			//			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
+			//			minProbVector.setAll(MIN_TELEPORTATION_PROB);
+			//
+			//			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
+			//			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
+			//
+			//			// (2) build the inverse teleportation vector: 1 - V(teleportation)
+			//			final ColumnVector onesVector = new ColumnVector(numAccounts);
+			//			onesVector.setAll(1.0);
+			//			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
+			//
+			//			// (3) Normalize by the number of accounts (1/N)
+			//			final double numAccountNorm =  1d / numAccounts;
+			//
+			//			this.teleportationVector.multiply(numAccountNorm);
+			//			this.inverseTeleportationVector.multiply(numAccountNorm);
 
 			ColumnVector vector = new ColumnVector(importanceVector.size());
 			vector.setAll(TELEPORTATION_PROB);

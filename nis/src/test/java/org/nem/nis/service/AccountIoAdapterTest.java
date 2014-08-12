@@ -63,7 +63,6 @@ public class AccountIoAdapterTest {
 		this.assertResultGetAccountTransfers(result);
 	}
 
-
 	@Test
 	public void getAccountTransfersReturnsEmptyListWhenTimestampIsInPast() {
 		// Arrange:
@@ -76,7 +75,6 @@ public class AccountIoAdapterTest {
 		// Assert:
 		Assert.assertThat(result.size(), equalTo(0));
 	}
-
 
 	@Test
 	public void getAccountTransfersBorderCase() {
@@ -105,18 +103,18 @@ public class AccountIoAdapterTest {
 
 		final int TX_COUNT = 5;
 		// generated and put here, to make manipulations easier
-		final int[] blockTimes = { 133, 143, 153, 163, 173,  183, 193, 203, 212, 223 };
+		final int[] blockTimes = { 133, 143, 153, 163, 173, 183, 193, 203, 212, 223 };
 		final int[][] txTimes = {
-				{123, 125, 127, 129, 131},
-				{133, 135, 137, 139, 141},
-				{143, 145, 147, 149, 151},
-				{153, 155, 157, 159, 161},
-				{163, 165, 167, 169, 171},
-				{173, 175, 177, 179, 181},
-				{183, 185, 187, 189, 191},
-				{193, 195, 197, 199, 203}, // change tx timestamps a bit
-				{201, 205, 207, 209, 213}, //
-				{211, 215, 217, 219, 221} //
+				{ 123, 125, 127, 129, 131 },
+				{ 133, 135, 137, 139, 141 },
+				{ 143, 145, 147, 149, 151 },
+				{ 153, 155, 157, 159, 161 },
+				{ 163, 165, 167, 169, 171 },
+				{ 173, 175, 177, 179, 181 },
+				{ 183, 185, 187, 189, 191 },
+				{ 193, 195, 197, 199, 203 }, // change tx timestamps a bit
+				{ 201, 205, 207, 209, 213 }, //
+				{ 211, 215, 217, 219, 221 } //
 		};
 
 		for (int blocks = 0; blocks < 10; ++blocks) {
@@ -141,7 +139,6 @@ public class AccountIoAdapterTest {
 		return new AccountIoAdapter(new RequiredTransferDaoAdapter(this.transferDao), new RequiredBlockDaoAdapter(this.blockDao), accountCache);
 	}
 
-
 	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {
 		Assert.assertThat(result.size(), equalTo(25));
 
@@ -154,7 +151,7 @@ public class AccountIoAdapterTest {
 
 		// cause TXes are sorted by timestamp this is expected order
 		final long[] expectedHeights = {
-				19,19,19,19,18,  19,18,18,18,17, 18,17,17,17,17, 16,16,16,16,16, 15,15,15,15,15
+				19, 19, 19, 19, 18, 19, 18, 18, 18, 17, 18, 17, 17, 17, 17, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15
 		};
 		i = 0;
 		for (final TransactionMetaDataPair pair : result.asCollection()) {

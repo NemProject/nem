@@ -1,6 +1,5 @@
 package org.nem.nis.dao;
 
-import java.util.*;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
@@ -9,6 +8,8 @@ import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
@@ -46,8 +47,8 @@ public class TransferDaoImpl implements TransferDao {
 		final long txId = ByteUtils.bytesToLong(txHash);
 		final List<?> userList;
 		final Query query = this.getCurrentSession()
-			.createQuery("from Transfer a where a.shortId = :id")
-			.setParameter("id", txId);
+				.createQuery("from Transfer a where a.shortId = :id")
+				.setParameter("id", txId);
 		userList = query.list();
 		for (final Object transferObject : userList) {
 			final Transfer transfer = (Transfer)transferObject;
@@ -64,12 +65,12 @@ public class TransferDaoImpl implements TransferDao {
 	public Collection<Object[]> getTransactionsForAccount(final Account address, final Integer timestamp, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
-			.createQuery("select t, t.block.height from Transfer t " +
-					"where t.timestamp <= :timestamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
-					"order by t.timestamp desc")
-			.setParameter("timestamp", timestamp)
-			.setParameter("pubkey", address.getAddress().getEncoded())
-			.setMaxResults(limit);
+				.createQuery("select t, t.block.height from Transfer t " +
+						"where t.timestamp <= :timestamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
+						"order by t.timestamp desc")
+				.setParameter("timestamp", timestamp)
+				.setParameter("pubkey", address.getAddress().getEncoded())
+				.setMaxResults(limit);
 		return listAndCast(query);
 	}
 
@@ -97,14 +98,14 @@ public class TransferDaoImpl implements TransferDao {
 
 	private Object[] getTransactionDescriptorUsingHash(final Account address, final Hash hash, final int limit, final String addressString) {
 		final Query prequery = this.getCurrentSession()
-			.createQuery("select t, t.block.height from Transfer t " +
-					"WHERE " +
-					addressString +
-					" AND t.transferHash = :hash" +
-					" ORDER BY t.timestamp desc")
-			.setParameter("hash", hash.getRaw())
-			.setParameter("pubkey", address.getAddress().getEncoded())
-			.setMaxResults(limit);
+				.createQuery("select t, t.block.height from Transfer t " +
+						"WHERE " +
+						addressString +
+						" AND t.transferHash = :hash" +
+						" ORDER BY t.timestamp desc")
+				.setParameter("hash", hash.getRaw())
+				.setParameter("pubkey", address.getAddress().getEncoded())
+				.setMaxResults(limit);
 		final List<Object[]> tempList = listAndCast(prequery);
 		if (tempList.size() < 1) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
@@ -139,12 +140,12 @@ public class TransferDaoImpl implements TransferDao {
 
 	private Collection<Object[]> getLatestTransactionsForAccount(final Account address, final int limit, final String addressString) {
 		final Query query = this.getCurrentSession()
-			.createQuery("select t, t.block.height from Transfer t " +
-					"WHERE " +
-					addressString +
-					" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
-			.setParameter("pubkey", address.getAddress().getEncoded())
-			.setMaxResults(limit);
+				.createQuery("select t, t.block.height from Transfer t " +
+						"WHERE " +
+						addressString +
+						" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
+				.setParameter("pubkey", address.getAddress().getEncoded())
+				.setMaxResults(limit);
 
 		return listAndCast(query);
 	}
@@ -173,7 +174,6 @@ public class TransferDaoImpl implements TransferDao {
 				tx.rollback();
 			}
 			e.printStackTrace();
-
 		} finally {
 			sess.close();
 		}

@@ -45,7 +45,6 @@ public class EigenTrust implements TrustProvider {
 	 * Returns the trust matrix for the specified nodes.
 	 *
 	 * @param nodes The nodes.
-	 *
 	 * @return The trust matrix
 	 */
 	public Matrix getTrustMatrix(final Node[] nodes) {
@@ -84,7 +83,7 @@ public class EigenTrust implements TrustProvider {
 	/**
 	 * Updates the local trust values for the specified node using the specified context.
 	 *
-	 * @param node    The node.
+	 * @param node The node.
 	 * @param context The trust context.
 	 */
 	public void updateTrust(final Node node, final TrustContext context) {
@@ -98,10 +97,11 @@ public class EigenTrust implements TrustProvider {
 			final double totalCalls = successfulCalls + failedCalls;
 
 			final double score;
-			if (totalCalls > 0)
+			if (totalCalls > 0) {
 				score = this.scoreProvider.calculateTrustScore(experience) / totalCalls;
-			else
+			} else {
 				score = context.getPreTrustedNodes().isPreTrusted(otherNode) || node.equals(otherNode) ? 1.0 : 0.0;
+			}
 
 			scoreVector.setAt(index++, score);
 		}
@@ -113,15 +113,15 @@ public class EigenTrust implements TrustProvider {
 	}
 
 	protected final void updateTrust(final TrustContext context) {
-		for (final Node node : context.getNodes())
+		for (final Node node : context.getNodes()) {
 			this.updateTrust(node, context);
+		}
 	}
 
 	/**
 	 * Calculates a trust score given a trust context.
 	 *
 	 * @param context The trust context.
-	 *
 	 * @return The global trust vector.
 	 */
 	@Override
@@ -142,8 +142,9 @@ public class EigenTrust implements TrustProvider {
 		policy.converge();
 
 		++this.numComputations;
-		if (policy.hasConverged())
+		if (policy.hasConverged()) {
 			++this.numConvergences;
+		}
 
 		return policy.getResult();
 	}

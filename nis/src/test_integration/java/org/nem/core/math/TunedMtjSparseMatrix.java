@@ -1,6 +1,5 @@
 package org.nem.core.math;
 
-
 import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
@@ -50,21 +49,24 @@ public class TunedMtjSparseMatrix extends Matrix {
 		final int[] colIndices = this.matrix.getColumnIndices();
 		final double[] values = this.matrix.getData();
 		final double[] colSums = new double[this.matrix.numRows()];
-		for (int i = 0; i < colIndices.length; ++i)
+		for (int i = 0; i < colIndices.length; ++i) {
 			colSums[colIndices[i]] += Math.abs(values[i]);
+		}
 
 		for (int i = 0; i < colIndices.length; ++i) {
 			final double sum = colSums[colIndices[i]];
-			if (sum > 0.0)
+			if (sum > 0.0) {
 				values[i] /= sum;
+			}
 		}
 	}
 
 	@Override
 	public ColumnVector multiply(final ColumnVector vector) {
 		final int numCols = this.getColumnCount();
-		if (numCols != vector.size())
+		if (numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
+		}
 
 		final DenseVector multiplier = new DenseVector(vector.getRaw());
 		final DenseVector result = new DenseVector(this.matrix.numRows());

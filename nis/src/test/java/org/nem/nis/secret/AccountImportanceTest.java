@@ -233,7 +233,7 @@ public class AccountImportanceTest {
 		ai.setImportance(new BlockHeight(5), 17);
 		ai.setLastPageRank(12.0);
 
-			// Act:
+		// Act:
 		final AccountImportance copy = ai.copy();
 		final double importance = copy.getImportance(new BlockHeight(5));
 
@@ -301,8 +301,9 @@ public class AccountImportanceTest {
 
 	private List<AccountLink> toList(final Iterator<AccountLink> linkIterator) {
 		final List<AccountLink> links = new ArrayList<>();
-		while (linkIterator.hasNext())
+		while (linkIterator.hasNext()) {
 			links.add(linkIterator.next());
+		}
 
 		return links;
 	}

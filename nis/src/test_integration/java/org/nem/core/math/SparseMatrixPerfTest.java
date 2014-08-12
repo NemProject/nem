@@ -57,8 +57,9 @@ public class SparseMatrixPerfTest {
 				final MatrixTestAdapter testAdapter = factory.create(numRows, numEntriesPerRow, cols);
 
 				final long start = System.currentTimeMillis();
-				for (int i = 0; i < numTries; ++i)
+				for (int i = 0; i < numTries; ++i) {
 					action.accept(testAdapter);
+				}
 
 				final long stop = System.currentTimeMillis();
 
@@ -167,13 +168,15 @@ public class SparseMatrixPerfTest {
 			final int[] colIndices = this.matrix.getColumnIndices();
 			final double[] values = this.matrix.getData();
 			final double[] colSums = new double[this.matrix.numRows()];
-			for (int i = 0; i < colIndices.length; ++i)
+			for (int i = 0; i < colIndices.length; ++i) {
 				colSums[colIndices[i]] += Math.abs(values[i]);
+			}
 
 			for (int i = 0; i < colIndices.length; ++i) {
 				final double sum = colSums[colIndices[i]];
-				if (sum > 0.0)
+				if (sum > 0.0) {
 					values[i] /= sum;
+				}
 			}
 		}
 
@@ -196,11 +199,11 @@ public class SparseMatrixPerfTest {
 					final Matrix matrix = new SparseMatrix(rows, rows, entriesPerRow);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "SparseMatrix");
 				},
-//				(rows, entriesPerRow, bytes) -> {
-//					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
-//					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
-//					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
-//				},
+				//				(rows, entriesPerRow, bytes) -> {
+				//					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
+				//					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
+				//					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
+				//				},
 				(rows, entriesPerRow, bytes) -> {
 					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
 					final Matrix matrix = new TunedMtjSparseMatrix(rows, rows, mtjMatrix);

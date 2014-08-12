@@ -4,10 +4,8 @@ import org.nem.core.math.*;
 
 /**
  * A convergence policy for the Eigen Trust algorithm based on the Taylor Series.
- *
  * Although the original papers use PowerIteration for convergence,
  * PowerIteration converges slowly because the alpha value is large.
- *
  * Taylor Series seems to work better and faster than PowerIteration.
  */
 public class EigenTrustConvergencePolicy {
@@ -24,9 +22,9 @@ public class EigenTrustConvergencePolicy {
 	 * Creates a new eigen trust power iterator.
 	 *
 	 * @param preTrustVector The pre-trust vector.
-	 * @param trustMatrix    The trust matrix.
-	 * @param maxIterations  The maximum number of iterations.
-	 * @param epsilon        The convergence epsilon value.
+	 * @param trustMatrix The trust matrix.
+	 * @param maxIterations The maximum number of iterations.
+	 * @param epsilon The convergence epsilon value.
 	 */
 	public EigenTrustConvergencePolicy(
 			final ColumnVector preTrustVector,

@@ -64,8 +64,9 @@ public class AccountController {
 		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
 		final UnlockResult result = this.foraging.addUnlockedAccount(copyOfAccount);
 
-		if (UnlockResult.SUCCESS != result)
+		if (UnlockResult.SUCCESS != result) {
 			throw new IllegalArgumentException(result.toString());
+		}
 	}
 
 	/**
@@ -156,7 +157,6 @@ public class AccountController {
 	 * Gets information about harvested blocks.
 	 *
 	 * @param builder The page builder.
-	 *
 	 * @return information about harvested blocks
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)

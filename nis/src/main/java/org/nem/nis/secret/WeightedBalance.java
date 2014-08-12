@@ -103,7 +103,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 
 		final long blocksPerDay = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 		final long originalHeight = this.blockHeight.getRaw();
-		final BlockHeight height = new BlockHeight(1 + ((originalHeight + blocksPerDay - 1)/blocksPerDay)* blocksPerDay);
+		final BlockHeight height = new BlockHeight(1 + ((originalHeight + blocksPerDay - 1) / blocksPerDay) * blocksPerDay);
 
 		return new WeightedBalance(
 				Amount.ZERO,

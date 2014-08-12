@@ -71,8 +71,9 @@ public class MockBlockScorer extends BlockScorer {
 
 		@Override
 		public boolean equals(final Object obj) {
-			if (!(obj instanceof BlockScoreKey))
+			if (!(obj instanceof BlockScoreKey)) {
 				return false;
+			}
 
 			final BlockScoreKey rhs = (BlockScoreKey)obj;
 			return this.parentBlock.equals(rhs.parentBlock)

@@ -25,8 +25,7 @@ public abstract class Scores<T extends Score> {
 	 * Gets the score source has with other.
 	 *
 	 * @param source The node reporting the score.
-	 * @param other  The node being reported about.
-	 *
+	 * @param other The node being reported about.
 	 * @return The score source has with other.
 	 */
 	public T getScore(final Node source, final Node other) {
@@ -36,9 +35,8 @@ public abstract class Scores<T extends Score> {
 	/**
 	 * Gets the scores for the specified node as a vector.
 	 *
-	 * @param node  The node.
+	 * @param node The node.
 	 * @param nodes The other nodes.
-	 *
 	 * @return The score vector.
 	 */
 	public ColumnVector getScoreVector(final Node node, final Node[] nodes) {
@@ -54,13 +52,14 @@ public abstract class Scores<T extends Score> {
 	/**
 	 * Sets the score that node has with each node in nodes using the specified vector.
 	 *
-	 * @param node        The node.
-	 * @param nodes       The other nodes.
+	 * @param node The node.
+	 * @param nodes The other nodes.
 	 * @param scoreVector The score values.
 	 */
 	public void setScoreVector(final Node node, final Node[] nodes, final ColumnVector scoreVector) {
-		if (nodes.length != scoreVector.size())
+		if (nodes.length != scoreVector.size()) {
 			throw new IllegalArgumentException("nodes and scoreVector must be same size");
+		}
 
 		for (int i = 0; i < nodes.length; ++i) {
 			final T score = this.getScore(node, nodes[i]);
@@ -73,7 +72,6 @@ public abstract class Scores<T extends Score> {
 	 * Matrix(r, c) contains the score that c has with respect to r.
 	 *
 	 * @param nodes The nodes.
-	 *
 	 * @return A transposed matrix of local score values.
 	 */
 	public Matrix getScoreMatrix(final Node[] nodes) {

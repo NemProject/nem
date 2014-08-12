@@ -181,68 +181,88 @@ public class MockBlockDao implements BlockDao {
 	 *
 	 * @return the number of times findById was called.
 	 */
-	public int getNumFindByIdCalls() { return this.numFindByIdCalls; }
+	public int getNumFindByIdCalls() {
+		return this.numFindByIdCalls;
+	}
 
 	/**
 	 * Gets the number of times findByHash was called.
 	 *
 	 * @return the number of times findByHash was called.
 	 */
-	public int getNumFindByHashCalls() { return this.numFindByHashCalls; }
+	public int getNumFindByHashCalls() {
+		return this.numFindByHashCalls;
+	}
 
 	/**
 	 * Gets the number of times findByHeight was called.
 	 *
 	 * @return the number of times findByHeight was called.
 	 */
-	public int getNumFindByHeightCalls() { return this.numFindByHeightCalls; }
+	public int getNumFindByHeightCalls() {
+		return this.numFindByHeightCalls;
+	}
 
 	/**
 	 * Gets the number of times getHashesFrom was called.
 	 *
 	 * @return the number of times getHashesFrom was called.
 	 */
-	public int getNumGetHashesFromCalls() { return this.numGetHashesFromCalls; }
+	public int getNumGetHashesFromCalls() {
+		return this.numGetHashesFromCalls;
+	}
 
 	/**
 	 * Gets the last id passed to findById.
 	 *
 	 * @return The last id passed to findById.
 	 */
-	public long getLastFindByIdId() { return this.lastFindByIdId; }
+	public long getLastFindByIdId() {
+		return this.lastFindByIdId;
+	}
 
 	/**
 	 * Gets the last hash passed to findByHash.
 	 *
 	 * @return The last hash passed to findByHash.
 	 */
-	public Hash getLastFindByHashHash() { return this.lastFindByHashHash; }
+	public Hash getLastFindByHashHash() {
+		return this.lastFindByHashHash;
+	}
 
 	/**
 	 * Gets the last height passed to findByHeight.
 	 *
 	 * @return The last height passed to findByHeight.
 	 */
-	public BlockHeight getLastFindByHeightHeight() { return this.lastFindByHeightHeight; }
+	public BlockHeight getLastFindByHeightHeight() {
+		return this.lastFindByHeightHeight;
+	}
 
 	/**
 	 * Gets the last height passed to getHashesFrom.
 	 *
 	 * @return The last height passed to getHashesFrom.
 	 */
-	public BlockHeight getLastGetHashesFromHeight() { return this.lastGetHashesFromHeight; }
+	public BlockHeight getLastGetHashesFromHeight() {
+		return this.lastGetHashesFromHeight;
+	}
 
 	/**
 	 * Gets the last limit passed to getHashesFrom.
 	 *
 	 * @return The last limit passed to getHashesFrom.
 	 */
-	public int getLastGetHashesFromLimit() { return this.lastGetHashesFromLimit; }
+	public int getLastGetHashesFromLimit() {
+		return this.lastGetHashesFromLimit;
+	}
 
 	/**
 	 * Returns last saved block.
 	 *
 	 * @return last saved block.
 	 */
-	public Block getLastSavedBlock() { return this.lastSavedBlock; }
+	public Block getLastSavedBlock() {
+		return this.lastSavedBlock;
+	}
 }

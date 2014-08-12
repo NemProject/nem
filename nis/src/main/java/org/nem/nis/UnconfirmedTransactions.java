@@ -75,13 +75,13 @@ public class UnconfirmedTransactions {
 			LOGGER.warning(String.format("Transaction from %s rejected. not enough NEM.", transaction.getSigner().getAddress()));
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
-		
+
 		if (execute) {
 			transaction.execute(this.transferObserver);
 		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
+		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
 
 	private boolean isValid(final Transaction transaction) {
@@ -91,7 +91,7 @@ public class UnconfirmedTransactions {
 
 	boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (! this.transactions.containsKey(transactionHash)) {
+		if (!this.transactions.containsKey(transactionHash)) {
 			return false;
 		}
 
@@ -118,7 +118,6 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-
 	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
 		Collections.sort(transactions, (lhs, rhs) -> {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
@@ -141,7 +140,7 @@ public class UnconfirmedTransactions {
 	 * @return The sorted list of all transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions =  this.transactions.values().stream()
+		final List<Transaction> transactions = this.transactions.values().stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 				.collect(Collectors.toList());
 
@@ -150,10 +149,11 @@ public class UnconfirmedTransactions {
 
 	/**
 	 * Gets all transactions.
+	 *
 	 * @return All transaction from this unconfirmed transactions.
 	 */
 	public List<Transaction> getAll() {
-		final List<Transaction> transactions =  this.transactions.values().stream()
+		final List<Transaction> transactions = this.transactions.values().stream()
 				.collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);
@@ -164,9 +164,9 @@ public class UnconfirmedTransactions {
 	 */
 	private void executeAll() {
 		this.getAll().stream()
-					 .forEach(tx -> tx.execute(this.transferObserver));		
+				.forEach(tx -> tx.execute(this.transferObserver));
 	}
-	
+
 	/**
 	 * There might be conflicting transactions on the list of unconfirmed transactions.
 	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.

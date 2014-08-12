@@ -54,7 +54,8 @@ public class Account {
 	}
 
 	public void setPublicKey(final PublicKey publicKey) {
-		if (null != publicKey)
+		if (null != publicKey) {
 			this.publicKey = publicKey.getRaw();
+		}
 	}
 }

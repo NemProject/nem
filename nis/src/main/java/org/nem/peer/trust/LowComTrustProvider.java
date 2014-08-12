@@ -19,7 +19,7 @@ public class LowComTrustProvider implements TrustProvider {
 	 * Creates a new low communication trust provider.
 	 *
 	 * @param trustProvider The trust provider.
-	 * @param weight        The desired percentage boost for choosing a low communication node.
+	 * @param weight The desired percentage boost for choosing a low communication node.
 	 */
 	public LowComTrustProvider(final TrustProvider trustProvider, final int weight) {
 		this.trustProvider = trustProvider;
@@ -49,8 +49,9 @@ public class LowComTrustProvider implements TrustProvider {
 		final ColumnVector lowComVector = new ColumnVector(nodes.length);
 		for (int i = 0; i < nodes.length; ++i) {
 			final NodeExperience experience = context.getNodeExperiences().getNodeExperience(localNode, nodes[i]);
-			if (experience.totalCalls() >= MIN_COMMUNICATION)
+			if (experience.totalCalls() >= MIN_COMMUNICATION) {
 				continue;
+			}
 
 			lowComVector.setAt(i, 1);
 		}

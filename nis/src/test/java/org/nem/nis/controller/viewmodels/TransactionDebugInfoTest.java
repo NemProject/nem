@@ -24,10 +24,10 @@ public class TransactionDebugInfoTest {
 		final Amount amount = Amount.fromNem(100);
 		final Amount fee = Amount.fromNem(10);
 		final String message = "Test message";
-		
+
 		// Act:
 		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(timestamp, deadline, sender, recipient, amount, fee, message);
-		
+
 		// Assert:
 		Assert.assertThat(transactionDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp));
 		Assert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
@@ -37,7 +37,7 @@ public class TransactionDebugInfoTest {
 		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
 		Assert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
-	
+
 	//endregion
 
 	//region serialization
@@ -67,6 +67,6 @@ public class TransactionDebugInfoTest {
 		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
 		Assert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
-	
+
 	//endregion
 }

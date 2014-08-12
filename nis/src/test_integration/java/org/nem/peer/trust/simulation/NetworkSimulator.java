@@ -59,13 +59,14 @@ public class NetworkSimulator {
 	/**
 	 * Creates a new network simulation.
 	 *
-	 * @param config        The simulator configuration.
+	 * @param config The simulator configuration.
 	 * @param trustProvider The trust provider to use.
-	 * @param minTrust      The minimum trust we have in every node.
+	 * @param minTrust The minimum trust we have in every node.
 	 */
 	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
-		if (minTrust <= 0.0 || minTrust > 1.0)
+		if (minTrust <= 0.0 || minTrust > 1.0) {
 			throw new IllegalArgumentException("min trust must be in the range (0, 1]");
+		}
 
 		this.config = config;
 		this.trustProvider = trustProvider;
@@ -89,9 +90,8 @@ public class NetworkSimulator {
 	 * Runs the network simulation.
 	 * After each round the global trust for the local peer is calculated.
 	 *
-	 * @param outputFile    path to the output file (contains trusts in nodes)
+	 * @param outputFile path to the output file (contains trusts in nodes)
 	 * @param numIterations number of rounds for the simulation
-	 *
 	 * @return return true if successful, false otherwise
 	 */
 	public boolean run(final String outputFile, final int numIterations) {
@@ -153,10 +153,11 @@ public class NetworkSimulator {
 						final boolean honestData = Math.random() < partnerBehavior.getHonestDataProbability();
 						final boolean honestFeedback = Math.random() < nodeBehavior.getHonestFeedbackProbability();
 						if (!nodeBehavior.isEvil()) {
-							if (honestData)
+							if (honestData) {
 								this.successfulCalls++;
-							else
+							} else {
 								this.failedCalls++;
+							}
 						}
 						if ((honestData && honestFeedback) || (!honestData && !honestFeedback)) {
 							experience.successfulCalls().increment();
@@ -173,8 +174,9 @@ public class NetworkSimulator {
 
 	private NodeBehavior getNodeBehavior(final Node node) {
 		for (final Config.Entry entry : this.config.getEntries()) {
-			if (node.equals(entry.getNode()))
+			if (node.equals(entry.getNode())) {
 				return entry.getBehavior();
+			}
 		}
 
 		throw new IllegalArgumentException(String.format("%s could not be found in the configuration", node));
@@ -191,16 +193,16 @@ public class NetworkSimulator {
 	 * When choosing from the set of already known nodes, the chance for a node to be chosen is roughly
 	 * proportional to the trust in it.
 	 *
-	 * @param node  the node that needs a partner
+	 * @param node the node that needs a partner
 	 * @param peers array of peers to choose from
-	 *
 	 * @return chosen node or null if none was chosen
 	 */
 	private Node getCommunicationPartner(final Node node, final Node[] peers) {
 
 		final NodeCollection nodeCollection = new NodeCollection();
-		for (final Node peer : peers)
+		for (final Node peer : peers) {
 			nodeCollection.update(peer, NodeStatus.ACTIVE);
+		}
 
 		final TrustContext trustContext = new TrustContext(
 				peers,
@@ -223,9 +225,8 @@ public class NetworkSimulator {
 	 * Writes trust values to an output file.
 	 * The percentage of failed calls is written too.
 	 *
-	 * @param out   writer object
+	 * @param out writer object
 	 * @param round the number of rounds already elapsed
-	 *
 	 * @throws IOException
 	 */
 	private void writeTrustValues(final BufferedWriter out, final int round) throws IOException {
@@ -236,8 +237,9 @@ public class NetworkSimulator {
 		out.write("Local node's experience with other nodes after round " + round + ":");
 		out.newLine();
 		for (final Node node : this.trustContext.getNodes()) {
-			if (node.equals(localNode))
+			if (node.equals(localNode)) {
 				continue;
+			}
 
 			final NodeExperience experience = this.getNodeExperience(localNode, node);
 			out.write("Node " + node + ": ");

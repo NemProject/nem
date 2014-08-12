@@ -7,8 +7,8 @@ import org.nem.core.test.Utils;
 
 public class NodeChallengeTest {
 
-	private final byte[] TEST_BYTES = new byte[]{ 0x22, (byte) 0xAB, 0x71 };
-	private final byte[] MODIFIED_TEST_BYTES = new byte[]{ 0x22, (byte) 0xAB, 0x72 };
+	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
+	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
 
 	//region constructors
 
@@ -53,7 +53,7 @@ public class NodeChallengeTest {
 		Assert.assertThat(new NodeChallenge(this.TEST_BYTES), IsEqual.equalTo(challenge));
 		Assert.assertThat(new NodeChallenge(this.MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(challenge)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(challenge)));
-		Assert.assertThat(this.TEST_BYTES, IsNot.not(IsEqual.equalTo((Object) challenge)));
+		Assert.assertThat(this.TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)challenge)));
 	}
 
 	@Test

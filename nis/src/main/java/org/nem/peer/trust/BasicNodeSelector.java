@@ -75,12 +75,14 @@ public class BasicNodeSelector implements NodeSelector {
 			for (int i = 0; i < nodes.length; ++i) {
 				// skip nodes with zero trust and those that have already been used
 				final double trust = this.trustVector.getAt(i);
-				if (0 == trust || usedNodes[i])
+				if (0 == trust || usedNodes[i]) {
 					continue;
+				}
 
 				sum += trust;
-				if (sum < rand)
+				if (sum < rand) {
 					continue;
+				}
 
 				usedNodes[i] = true;
 				remainingTrust -= trust;

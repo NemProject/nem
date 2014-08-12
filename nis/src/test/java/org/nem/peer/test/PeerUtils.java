@@ -55,13 +55,13 @@ public class PeerUtils {
 	 * Creates a node array of the specified size.
 	 *
 	 * @param size The size.
-	 *
 	 * @return The array.
 	 */
 	public static Node[] createNodeArray(final int size) {
 		final Node[] nodes = new Node[size];
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < size; ++i) {
 			nodes[i] = createNodeWithPort(i);
+		}
 
 		return nodes;
 	}
@@ -70,7 +70,6 @@ public class PeerUtils {
 	 * Creates a new node experience with the specified number of calls.
 	 *
 	 * @param numSuccessfulCalls The number of successful calls.
-	 *
 	 * @return The node experience.
 	 */
 	public static NodeExperience createNodeExperience(final long numSuccessfulCalls) {
@@ -87,8 +86,9 @@ public class PeerUtils {
 	 */
 	public static List<Node> createNodesWithNames(final String... names) {
 		final List<Node> nodes = new ArrayList<>();
-		for (final String name : names)
+		for (final String name : names) {
 			nodes.add(PeerUtils.createNodeWithName(name));
+		}
 
 		return nodes;
 	}

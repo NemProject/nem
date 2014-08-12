@@ -23,7 +23,6 @@ public interface ReadOnlyBlockDao {
 	 * Retrieves Block from db given it's id in the database.
 	 *
 	 * @param id id of a block.
-	 *
 	 * @return associated Block or null if there's no block with such id.
 	 */
 	public Block findById(long id);
@@ -32,7 +31,6 @@ public interface ReadOnlyBlockDao {
 	 * Retrieves Block from db given it's hash.
 	 *
 	 * @param blockHash hash of a block to retrieve.
-	 *
 	 * @return Block having given hash or null.
 	 */
 	public Block findByHash(final Hash blockHash);
@@ -41,7 +39,6 @@ public interface ReadOnlyBlockDao {
 	 * Retrieves Block from db at given height.
 	 *
 	 * @param height height of a block to retrieve.
-	 *
 	 * @return Block at given height or null.
 	 */
 	public Block findByHeight(final BlockHeight height);

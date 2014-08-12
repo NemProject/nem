@@ -43,7 +43,7 @@ public class Block {
 
 	private Long nextBlockId;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval=true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("blkIndex")
 	private List<Transfer> blockTransfers;
 
@@ -196,6 +196,4 @@ public class Block {
 	public void setBlockTransfers(final List<Transfer> blockTransfers) {
 		this.blockTransfers = blockTransfers;
 	}
-
-
 }

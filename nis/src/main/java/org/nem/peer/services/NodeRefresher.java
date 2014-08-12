@@ -61,8 +61,9 @@ public class NodeRefresher {
 
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.whenComplete((o, e) -> {
-					for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet())
+					for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet()) {
 						this.nodes.update(entry.getKey(), entry.getValue());
+					}
 				});
 	}
 
@@ -75,11 +76,13 @@ public class NodeRefresher {
 		CompletableFuture<NodeStatus> future = this.connector.getInfo(node)
 				.thenApply(n -> {
 					// if the node returned inconsistent information, drop it for this round
-					if (!node.equals(n))
+					if (!node.equals(n)) {
 						throw new FatalPeerException("node response is not compatible with node identity");
+					}
 
-					if (!this.versionCheck.check(this.localNode.getMetaData().getVersion(), n.getMetaData().getVersion()))
+					if (!this.versionCheck.check(this.localNode.getMetaData().getVersion(), n.getMetaData().getVersion())) {
 						throw new FatalPeerException("the local and remote nodes are not compatible");
+					}
 
 					node.setEndpoint(n.getEndpoint());
 					node.setMetaData(n.getMetaData());
@@ -102,8 +105,9 @@ public class NodeRefresher {
 		return future
 				.exceptionally(e -> {
 					final NodeStatus status = this.getNodeStatusFromException(e);
-					if (NodeStatus.FAILURE == status)
+					if (NodeStatus.FAILURE == status) {
 						LOGGER.severe(String.format("Fatal error encountered while communicating with <%s>: %s", node, e));
+					}
 
 					return status;
 				})
@@ -116,8 +120,9 @@ public class NodeRefresher {
 	}
 
 	private void update(final Node node, final NodeStatus status) {
-		if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node))
+		if (status == this.nodes.getNodeStatus(node) || this.localNode.equals(node)) {
 			return;
+		}
 
 		LOGGER.info(String.format("Updating \"%s\" -> %s", node, status));
 		this.nodesToUpdate.put(node, status);

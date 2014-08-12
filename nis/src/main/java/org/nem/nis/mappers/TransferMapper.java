@@ -17,10 +17,9 @@ public class TransferMapper {
 	/**
 	 * Converts a TransferTransaction model to a Transfer db-model.
 	 *
-	 * @param transfer         The transfer transaction model.
-	 * @param blockIndex       The index of the transfer within the owning block.
+	 * @param transfer The transfer transaction model.
+	 * @param blockIndex The index of the transfer within the owning block.
 	 * @param accountDaoLookup The account dao lookup object.
-	 *
 	 * @return The Transfer db-model.
 	 */
 	public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
@@ -55,9 +54,8 @@ public class TransferMapper {
 	/**
 	 * Converts a Transfer db-model to a TransferTransaction model.
 	 *
-	 * @param dbTransfer    The transfer db-model.
+	 * @param dbTransfer The transfer db-model.
 	 * @param accountLookup The account lookup object.
-	 *
 	 * @return The TransferTransaction model.
 	 */
 	public static TransferTransaction toModel(final Transfer dbTransfer, final AccountLookup accountLookup) {
@@ -87,8 +85,9 @@ public class TransferMapper {
 	}
 
 	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {
-		if (null == payload)
+		if (null == payload) {
 			return null;
+		}
 
 		switch (messageType) {
 			case MessageTypes.PLAIN:

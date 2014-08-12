@@ -38,7 +38,7 @@ public class BasicNodeSelectorITCase {
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED)/(double)NUM_NODES;
+		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED) / (double)NUM_NODES;
 		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
@@ -60,7 +60,7 @@ public class BasicNodeSelectorITCase {
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)NUM_TRIES/(double)NUM_NODES;
+		final double expectedValue = (double)NUM_TRIES / (double)NUM_NODES;
 		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
@@ -96,8 +96,9 @@ public class BasicNodeSelectorITCase {
 			}
 		}
 
-		if (0 == probability)
-			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0]*100) + "% certainty.");
+		if (0 == probability) {
+			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0] * 100) + "% certainty.");
+		}
 
 		Assert.assertThat(probability <= 75.0, IsEqual.equalTo(true));
 	}

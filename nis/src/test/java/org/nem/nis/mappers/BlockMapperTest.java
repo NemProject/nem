@@ -194,8 +194,9 @@ public class BlockMapperTest {
 			this.model.addTransaction(new TransferTransaction(
 					new TimeInstant(300), this.account3, this.account1, new Amount(4), null));
 
-			for (final Transaction transaction : this.model.getTransactions())
+			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();
+			}
 
 			this.signModel();
 		}

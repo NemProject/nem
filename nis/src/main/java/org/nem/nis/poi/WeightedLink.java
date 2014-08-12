@@ -47,8 +47,9 @@ public class WeightedLink {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof WeightedLink))
+		if (!(obj instanceof WeightedLink)) {
 			return false;
+		}
 
 		final WeightedLink rhs = (WeightedLink)obj;
 		return this.weight == rhs.weight && this.otherAccountAddress.equals(rhs.otherAccountAddress);
