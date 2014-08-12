@@ -113,12 +113,11 @@ public class CommonStarter implements ServletContextListener {
 		final Properties props = new Properties();
 		props.load(inputStream);
 		String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
-		final String nemFolder = INSTANCE.configuration.getNemFolder();
+		final String nemFolder = configuration.getNemFolder();
 		tmpStr = tmpStr.replace("${nemFolder}", nemFolder);
 		props.setProperty("java.util.logging.FileHandler.pattern", tmpStr);
 		final StringWriter stringWriter = new StringWriter();
 		props.store(stringWriter, null);
-
 		return new ByteArrayInputStream(StringEncoder.getBytes(stringWriter.toString()));
 	}
 
