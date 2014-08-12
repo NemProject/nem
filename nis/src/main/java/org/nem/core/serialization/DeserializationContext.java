@@ -22,7 +22,6 @@ public class DeserializationContext {
 	 * Looks up an account by its id.
 	 *
 	 * @param id The account id.
-	 *
 	 * @return The account with the specified id.
 	 */
 	public Account findAccountByAddress(final Address id) {

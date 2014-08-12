@@ -40,8 +40,9 @@ public abstract class AbstractDelayStrategy {
 	 * @return The next delay.
 	 */
 	public final int next() {
-		if (this.shouldStop())
+		if (this.shouldStop()) {
 			throw new IllegalStateException("the delay strategy is exhausted");
+		}
 
 		return this.nextInternal(++this.numDelays);
 	}

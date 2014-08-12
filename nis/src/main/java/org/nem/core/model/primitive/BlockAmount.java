@@ -20,8 +20,9 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	public BlockAmount(long amount) {
 		super(amount, BlockAmount.class);
 
-		if (this.getRaw() < 0)
+		if (this.getRaw() < 0) {
 			throw new IllegalArgumentException("amount must be non-negative");
+		}
 	}
 
 	/**
@@ -47,14 +48,16 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	 *
 	 * @return The underlying amount.
 	 */
-	public long getRaw() { return this.getValue(); }
+	public long getRaw() {
+		return this.getValue();
+	}
 
 	/**
 	 * Writes a block amount object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param amount     The object.
+	 * @param label The optional label.
+	 * @param amount The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final BlockAmount amount) {
 		serializer.writeLong(label, amount.getRaw());
@@ -64,8 +67,7 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	 * Reads a block amount object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static BlockAmount readFrom(final Deserializer deserializer, final String label) {

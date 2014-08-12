@@ -20,7 +20,6 @@ public class Address {
 	 * Creates an Address from a public key.
 	 *
 	 * @param publicKey The public key.
-	 *
 	 * @return An address object.
 	 */
 	public static Address fromPublicKey(final PublicKey publicKey) {
@@ -31,7 +30,6 @@ public class Address {
 	 * Creates an Address from an encoded address string.
 	 *
 	 * @param encoded The encoded address string.
-	 *
 	 * @return An address object.
 	 */
 	public static Address fromEncoded(final String encoded) {
@@ -51,7 +49,7 @@ public class Address {
 	/**
 	 * Creates an address object from a version and public key.
 	 *
-	 * @param version   The address version.
+	 * @param version The address version.
 	 * @param publicKey The address public key.
 	 */
 	private Address(final byte version, final PublicKey publicKey) {
@@ -115,8 +113,8 @@ public class Address {
 		// TODO: we can't release this change now, as there is a bug in current nemesis block,
 		// quote: "I've added such (invalid) account by mistake to nemesis block"
 		// you can check it by un-commenting and running test added to NemesisBlockTest
-//		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
-//			return false;
+		//		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
+		//			return false;
 
 		byte[] encodedBytes;
 
@@ -125,11 +123,13 @@ public class Address {
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
-		if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length)
+		if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length) {
 			return false;
+		}
 
-		if (NetworkInfo.getDefault().getVersion() != encodedBytes[0])
+		if (NetworkInfo.getDefault().getVersion() != encodedBytes[0]) {
 			return false;
+		}
 
 		int checksumStartIndex = NUM_ENCODED_BYTES_LENGTH - NUM_CHECKSUM_BYTES;
 		byte[] versionPrefixedHash = Arrays.copyOfRange(encodedBytes, 0, checksumStartIndex);
@@ -145,8 +145,9 @@ public class Address {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Address))
+		if (obj == null || !(obj instanceof Address)) {
 			return false;
+		}
 
 		Address rhs = (Address)obj;
 		return this.encoded.equals(rhs.encoded);
@@ -161,8 +162,8 @@ public class Address {
 	 * Writes an address object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param address    The object.
+	 * @param label The optional label.
+	 * @param address The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Address address) {
 		writeTo(serializer, label, address, AddressEncoding.COMPRESSED);

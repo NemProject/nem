@@ -55,8 +55,9 @@ public class KeyPair {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 
-		if (!publicKey.isCompressed())
+		if (!publicKey.isCompressed()) {
 			throw new IllegalArgumentException("publicKey must be in compressed form");
+		}
 	}
 
 	private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {

@@ -30,11 +30,11 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Creates a new block.
 	 *
-	 * @param forger         The forger.
-	 * @param prevBlockHash  The hash of the previous block.
+	 * @param forger The forger.
+	 * @param prevBlockHash The hash of the previous block.
 	 * @param generationHash The generation hash.
-	 * @param timestamp      The block timestamp.
-	 * @param height         The block height.
+	 * @param timestamp The block timestamp.
+	 * @param height The block height.
 	 */
 	public Block(
 			final Account forger,
@@ -54,7 +54,7 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Creates a new block.
 	 *
-	 * @param forger    The forger.
+	 * @param forger The forger.
 	 * @param prevBlock The previous block.
 	 * @param timestamp The block timestamp.
 	 */
@@ -66,7 +66,7 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Deserializes a new block.
 	 *
-	 * @param type         The block type.
+	 * @param type The block type.
 	 * @param deserializer The deserializer to use.
 	 */
 	public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {
@@ -98,8 +98,8 @@ public class Block extends VerifiableEntity {
 	 */
 	public Amount getTotalFee() {
 		final long rawTotalFee = this.transactions.stream()
-                .map(tx -> tx.getFee().getNumMicroNem())
-                .reduce(0L, Long::sum);
+				.map(tx -> tx.getFee().getNumMicroNem())
+				.reduce(0L, Long::sum);
 		return Amount.fromMicroNem(rawTotalFee);
 	}
 
@@ -135,7 +135,9 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return Generation hash of this block.
 	 */
-	public Hash getGenerationHash() { return this.generationHash; }
+	public Hash getGenerationHash() {
+		return this.generationHash;
+	}
 
 	//endregion
 

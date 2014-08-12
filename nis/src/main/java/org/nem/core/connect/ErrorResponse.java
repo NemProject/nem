@@ -62,28 +62,36 @@ public class ErrorResponse implements SerializableEntity {
 	 *
 	 * @return The timestamp.
 	 */
-	public TimeInstant getTimeStamp() { return this.timeStamp; }
+	public TimeInstant getTimeStamp() {
+		return this.timeStamp;
+	}
 
 	/**
 	 * Gets the error reason phrase.
 	 *
 	 * @return The error reason phrase.
 	 */
-	public String getError() { return this.error; }
+	public String getError() {
+		return this.error;
+	}
 
 	/**
 	 * Gets the error message.
 	 *
 	 * @return The error message.
 	 */
-	public String getMessage() { return this.message; }
+	public String getMessage() {
+		return this.message;
+	}
 
 	/**
 	 * Gets the raw HTTP status.
 	 *
 	 * @return The raw HTTP status.
 	 */
-	public int getStatus() { return this.status; }
+	public int getStatus() {
+		return this.status;
+	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
@@ -97,8 +105,7 @@ public class ErrorResponse implements SerializableEntity {
 		try {
 			final HttpStatus status = HttpStatus.valueOf(rawStatus);
 			return status.getReasonPhrase();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			return null;
 		}
 	}

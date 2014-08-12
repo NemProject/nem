@@ -21,8 +21,8 @@ public class NodeEndpoint implements SerializableEntity {
 	 * Creates a new node endpoint.
 	 *
 	 * @param protocol The protocol.
-	 * @param host     The host.
-	 * @param port     The port.
+	 * @param host The host.
+	 * @param port The port.
 	 */
 	public NodeEndpoint(final String protocol, final String host, final int port) {
 		this.protocol = protocol;
@@ -81,8 +81,9 @@ public class NodeEndpoint implements SerializableEntity {
 	}
 
 	private static String normalizeHost(String host) {
-		if (null == host || 0 == host.length())
+		if (null == host || 0 == host.length()) {
 			host = "localhost";
+		}
 
 		try {
 			final InetAddress address = InetAddress.getByName(host);
@@ -118,7 +119,6 @@ public class NodeEndpoint implements SerializableEntity {
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
 			return nodeApiToUrlMap;
-
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("url is malformed");
 		}
@@ -131,8 +131,9 @@ public class NodeEndpoint implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof NodeEndpoint))
+		if (obj == null || !(obj instanceof NodeEndpoint)) {
 			return false;
+		}
 
 		NodeEndpoint rhs = (NodeEndpoint)obj;
 		return this.url.equals(rhs.url);

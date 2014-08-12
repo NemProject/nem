@@ -86,8 +86,9 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @param item The item.
 	 */
 	public final void add(final T item) {
-		if (null == item)
+		if (null == item) {
 			throw new IllegalArgumentException("cannot add null item");
+		}
 
 		this.list.add(item);
 	}
@@ -106,7 +107,9 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 *
 	 * @return The label associated with this list.
 	 */
-	public String getLabel() { return this.label; }
+	public String getLabel() {
+		return this.label;
+	}
 
 	/**
 	 * Gets the element in this list at the specified index.
@@ -157,8 +160,9 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof SerializableList<?>))
+		if (!(obj instanceof SerializableList<?>)) {
 			return false;
+		}
 
 		final SerializableList<?> rhs = (SerializableList<?>)obj;
 		return this.size() == rhs.size() && this.size() == this.findFirstDifferenceInternal(rhs);

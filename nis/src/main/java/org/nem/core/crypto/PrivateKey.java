@@ -51,8 +51,9 @@ public class PrivateKey implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof PrivateKey))
+		if (!(obj instanceof PrivateKey)) {
 			return false;
+		}
 
 		final PrivateKey rhs = (PrivateKey)obj;
 		return this.value.equals(rhs.value);
@@ -67,7 +68,6 @@ public class PrivateKey implements SerializableEntity {
 	 * Creates a private key from a hex string.
 	 *
 	 * @param hex The hex string.
-	 *
 	 * @return The new private key.
 	 */
 	public static PrivateKey fromHexString(final String hex) {
@@ -82,7 +82,6 @@ public class PrivateKey implements SerializableEntity {
 	 * Creates a private key from a decimal string.
 	 *
 	 * @param decimal The decimal string.
-	 *
 	 * @return The new private key.
 	 */
 	public static PrivateKey fromDecimalString(final String decimal) {

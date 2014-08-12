@@ -20,8 +20,9 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * @param time The number of seconds passed since the epoch.
 	 */
 	public TimeInstant(int time) {
-		if (time < 0)
+		if (time < 0) {
 			throw new IllegalArgumentException("time must be non-negative");
+		}
 
 		this.time = time;
 	}
@@ -30,7 +31,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Creates a new TimeInstant by adding the specified number of seconds to this instant.
 	 *
 	 * @param seconds The number of seconds to add.
-	 *
 	 * @return The new instant.
 	 */
 	public TimeInstant addSeconds(final int seconds) {
@@ -41,7 +41,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Creates a new TimeInstant by adding the specified number of minutes to this instant.
 	 *
 	 * @param minutes The number of minutes to add.
-	 *
 	 * @return The new instant.
 	 */
 	public TimeInstant addMinutes(final int minutes) {
@@ -52,7 +51,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Creates a new TimeInstant by adding the specified number of hours to this instant.
 	 *
 	 * @param hours The number of hours to add.
-	 *
 	 * @return The new instant.
 	 */
 	public TimeInstant addHours(final int hours) {
@@ -63,7 +61,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Creates a new TimeInstant by adding the specified number of days to this instant.
 	 *
 	 * @param hours The number of days to add.
-	 *
 	 * @return The new instant.
 	 */
 	public TimeInstant addDays(final int hours) {
@@ -74,7 +71,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Returns the number of seconds between this TimeInstant and rhs.
 	 *
 	 * @param rhs The value to subtract.
-	 *
 	 * @return The subtraction result in seconds.
 	 */
 	public int subtract(final TimeInstant rhs) {
@@ -85,7 +81,6 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Compares this instant to another TimeInstant.
 	 *
 	 * @param rhs The instant to compare against.
-	 *
 	 * @return -1, 0 or 1 as this TimeInstant is numerically less than, equal to, or greater than rhs.
 	 */
 	@Override
@@ -109,8 +104,9 @@ public class TimeInstant implements Comparable<TimeInstant> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof TimeInstant))
+		if (obj == null || !(obj instanceof TimeInstant)) {
 			return false;
+		}
 
 		TimeInstant rhs = (TimeInstant)obj;
 		return this.time == rhs.time;
@@ -127,8 +123,8 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Writes a time instant object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param instant    The object.
+	 * @param label The optional label.
+	 * @param instant The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final TimeInstant instant) {
 		serializer.writeInt(label, instant.getRawTime());
@@ -138,8 +134,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 * Reads a time instant object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static TimeInstant readFrom(final Deserializer deserializer, final String label) {

@@ -125,6 +125,6 @@ public class ApplicationMetaData implements SerializableEntity {
 		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
 		return this.appName.equals(rhs.appName) &&
 				this.version.equals(rhs.version) &&
-                Objects.equals(this.certificateSigner, rhs.certificateSigner);
+				Objects.equals(this.certificateSigner, rhs.certificateSigner);
 	}
 }

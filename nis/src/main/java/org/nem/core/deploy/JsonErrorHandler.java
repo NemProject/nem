@@ -47,8 +47,9 @@ public class JsonErrorHandler extends ErrorHandler {
 
 		baseRequest.setHandled(true);
 		response.setContentType(MimeTypes.Type.APPLICATION_JSON.asString());
-		if (null != this.getCacheControl())
+		if (null != this.getCacheControl()) {
 			response.setHeader(HttpHeader.CACHE_CONTROL.asString(), this.getCacheControl());
+		}
 
 		try (final ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer(4096)) {
 			final String reason = (response instanceof Response) ? ((Response)response).getReason() : null;

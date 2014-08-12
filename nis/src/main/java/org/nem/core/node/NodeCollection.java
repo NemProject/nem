@@ -79,8 +79,9 @@ public class NodeCollection implements SerializableEntity {
 	 */
 	public Node findNodeByEndpoint(final NodeEndpoint endpoint) {
 		for (final Node node : this.getAllNodes()) {
-			if (node.getEndpoint().equals(endpoint))
+			if (node.getEndpoint().equals(endpoint)) {
 				return node;
+			}
 		}
 
 		return null;
@@ -94,8 +95,9 @@ public class NodeCollection implements SerializableEntity {
 	 */
 	public Node findNodeByIdentity(final NodeIdentity identity) {
 		for (final Node node : this.getAllNodes()) {
-			if (node.getIdentity().equals(identity))
+			if (node.getIdentity().equals(identity)) {
 				return node;
+			}
 		}
 
 		return null;
@@ -105,15 +107,16 @@ public class NodeCollection implements SerializableEntity {
 	 * Gets the status of the specified node.
 	 *
 	 * @param node The node.
-	 *
 	 * @return The node's status.
 	 */
 	public NodeStatus getNodeStatus(final Node node) {
-		if (this.activeNodes.contains(node))
+		if (this.activeNodes.contains(node)) {
 			return NodeStatus.ACTIVE;
+		}
 
-		if (this.inactiveNodes.contains(node))
+		if (this.inactiveNodes.contains(node)) {
 			return NodeStatus.INACTIVE;
+		}
 
 		return NodeStatus.FAILURE;
 	}
@@ -122,12 +125,13 @@ public class NodeCollection implements SerializableEntity {
 	 * Updates this collection to include the specified node with the associated status.
 	 * The new node information will replace any previous node information.
 	 *
-	 * @param node   The node.
+	 * @param node The node.
 	 * @param status The node status.
 	 */
 	public void update(final Node node, final NodeStatus status) {
-		if (null == node)
+		if (null == node) {
 			throw new NullPointerException("node cannot be null");
+		}
 
 		this.activeNodes.remove(node);
 		this.inactiveNodes.remove(node);
@@ -177,8 +181,9 @@ public class NodeCollection implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof NodeCollection))
+		if (!(obj instanceof NodeCollection)) {
 			return false;
+		}
 
 		final NodeCollection rhs = (NodeCollection)obj;
 		return this.activeNodes.equals(rhs.activeNodes) && this.inactiveNodes.equals(rhs.inactiveNodes);

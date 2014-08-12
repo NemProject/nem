@@ -136,7 +136,7 @@ public class SparseMatrix extends Matrix {
 
 	/**
 	 * Remove an entries at a specific position
-	 * 
+	 *
 	 * @param row The row.
 	 * @param colIndex The column index.
 	 */
@@ -150,10 +150,10 @@ public class SparseMatrix extends Matrix {
 
 		--this.maxIndices[row];
 	}
-	
+
 	/**
 	 * Reallocate the value and column arrays of a row
-	 * 
+	 *
 	 * @param row The row.
 	 */
 	private void reallocate(int row) {

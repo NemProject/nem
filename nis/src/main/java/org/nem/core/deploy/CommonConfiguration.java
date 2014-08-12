@@ -82,17 +82,17 @@ public class CommonConfiguration {
 
 	protected static String getOptionalString(final Properties properties, final String name, final String defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : value;
+		return null == value ? defaultValue : value;
 	}
 
 	protected static int getOptionalInteger(final Properties properties, final String name, final Integer defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : Integer.valueOf(value);
+		return null == value ? defaultValue : Integer.valueOf(value);
 	}
 
 	protected static boolean getOptionalBoolean(final Properties properties, final String name, final Boolean defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : Boolean.valueOf(value);
+		return null == value ? defaultValue : Boolean.valueOf(value);
 	}
 
 	/**
@@ -250,7 +250,7 @@ public class CommonConfiguration {
 				.append("://")
 				.append(this.getHost())
 				.append(":")
-				.append(this.getProtocol().equals("https")? this.getHttpsPort() : this.getHttpPort())
+				.append(this.getProtocol().equals("https") ? this.getHttpsPort() : this.getHttpPort())
 				.toString();
 	}
 

@@ -40,7 +40,9 @@ public abstract class AbstractPrimitive<
 	 *
 	 * @return The underlying value.
 	 */
-	protected TValue getValue() { return this.value; }
+	protected TValue getValue() {
+		return this.value;
+	}
 
 	@Override
 	public int hashCode() {
@@ -50,8 +52,9 @@ public abstract class AbstractPrimitive<
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!this.derivedClass.isInstance(obj))
+		if (!this.derivedClass.isInstance(obj)) {
 			return false;
+		}
 
 		final TDerived rhs = this.derivedClass.cast(obj);
 		return 0 == this.compareTo(rhs);

@@ -25,7 +25,7 @@ public class NodeMetaData implements SerializableEntity {
 			final NodeVersion version) {
 		this.platform = platform;
 		this.application = application;
-		this.version = null == version? NodeVersion.ZERO : version;
+		this.version = null == version ? NodeVersion.ZERO : version;
 	}
 
 	/**
@@ -80,8 +80,9 @@ public class NodeMetaData implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof NodeMetaData))
+		if (!(obj instanceof NodeMetaData)) {
 			return false;
+		}
 
 		final NodeMetaData rhs = (NodeMetaData)obj;
 		return Arrays.equals(this.getParts(), rhs.getParts());
@@ -89,9 +90,9 @@ public class NodeMetaData implements SerializableEntity {
 
 	private Object[] getParts() {
 		return new Object[] {
-			this.platform,
-			this.application,
-			this.version
+				this.platform,
+				this.application,
+				this.version
 		};
 	}
 }

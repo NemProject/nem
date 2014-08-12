@@ -53,7 +53,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private static AnnotationConfigApplicationContext appCtx;
 	private static NemConfigurationPolicy configurationPolicy;
-    private static CommonConfiguration configuration;
+	private static CommonConfiguration configuration;
 	private Server server;
 
 	static {
@@ -138,7 +138,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[]{ servletContext });
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
 
 		return handlers;
 	}
@@ -264,7 +264,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new Handler[]{ servletContext });
+		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
 	}
 
@@ -288,41 +288,41 @@ public class CommonStarter implements ServletContextListener {
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
-            if (configuration.isNcc()) {
-                createServlets(context);
-            }
+			if (configuration.isNcc()) {
+				createServlets(context);
+			}
 
-            if (configuration.useDosFilter()) {
-                createDosFilter(context);
-            }
+			if (configuration.useDosFilter()) {
+				createDosFilter(context);
+			}
 		} catch (final Exception e) {
 			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
 		}
 	}
 
 	private void createServlets(final ServletContext context) {
-        ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
-        servlet.setInitParameter("maxCacheSize", "0");
-        servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
-        servlet.setLoadOnStartup(1);
+		ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
+		servlet.setInitParameter("maxCacheSize", "0");
+		servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
+		servlet.setLoadOnStartup(1);
 
-        servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
-        servlet.addMapping("/");
-        servlet.setLoadOnStartup(1);
+		servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
+		servlet.addMapping("/");
+		servlet.setLoadOnStartup(1);
 	}
 
 	private void createDosFilter(final ServletContext context) {
-        javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-        dosFilter.setInitParameter("delayMs", "1000");
-        dosFilter.setInitParameter("trackSessions", "false");
-        dosFilter.setInitParameter("maxRequestMs", "120000");
-        dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
-        dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
+		dosFilter.setInitParameter("delayMs", "1000");
+		dosFilter.setInitParameter("trackSessions", "false");
+		dosFilter.setInitParameter("maxRequestMs", "120000");
+		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
-        // GZIP filter
-        dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-        // Zipping following MimeTypes
-        dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
-        dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		// GZIP filter
+		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
+		// Zipping following MimeTypes
+		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 }

@@ -56,8 +56,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	public void writeBytes(final String label, final byte[] bytes) {
 		if (null == bytes) {
 			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
-		}
-		else {
+		} else {
 			this.writeInt(null, bytes.length);
 			this.writeBytesInternal(bytes);
 		}
@@ -81,8 +80,9 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 		}
 
 		this.writeInt(null, objects.size());
-		for (final SerializableEntity object : objects)
+		for (final SerializableEntity object : objects) {
 			this.writeBytes(null, serializeObject(object));
+		}
 	}
 
 	@Override
@@ -91,8 +91,9 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	}
 
 	private static byte[] serializeObject(final SerializableEntity object) {
-		if (null == object)
+		if (null == object) {
 			return new byte[0];
+		}
 
 		try {
 			try (BinarySerializer serializer = new BinarySerializer()) {
@@ -121,7 +122,6 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	 * Helper function that serializes a SerializableEntity to a byte array.
 	 *
 	 * @param entity The entity to serialize.
-	 *
 	 * @return The resulting byte array.
 	 */
 	public static byte[] serializeToBytes(final SerializableEntity entity) {

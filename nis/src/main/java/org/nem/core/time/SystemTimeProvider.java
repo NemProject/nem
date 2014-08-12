@@ -48,7 +48,6 @@ public class SystemTimeProvider implements TimeProvider {
 	 * Returns the normalized time for the specified time.
 	 *
 	 * @param millis The system time in milliseconds.
-	 *
 	 * @return The normalized time in seconds.
 	 */
 	public static int getTime(long millis) {

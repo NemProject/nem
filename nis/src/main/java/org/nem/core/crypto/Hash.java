@@ -49,7 +49,6 @@ public class Hash implements SerializableEntity {
 	 * Creates a hash from a hex string.
 	 *
 	 * @param hex The hex string.
-	 *
 	 * @return The new public key.
 	 */
 	public static Hash fromHexString(final String hex) {
@@ -59,19 +58,24 @@ public class Hash implements SerializableEntity {
 			throw new CryptoException(e);
 		}
 	}
+
 	/**
 	 * Gets the raw hash.
 	 *
 	 * @return The raw hash.
 	 */
-	public byte[] getRaw() { return this.data; }
+	public byte[] getRaw() {
+		return this.data;
+	}
 
 	/**
 	 * Gets the short id of this hash.
 	 *
 	 * @return The short id.
 	 */
-	public long getShortId() { return ByteUtils.bytesToLong(this.data); }
+	public long getShortId() {
+		return ByteUtils.bytesToLong(this.data);
+	}
 
 	@Override
 	public void serialize(Serializer serializer) {
@@ -85,8 +89,9 @@ public class Hash implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Hash))
+		if (obj == null || !(obj instanceof Hash)) {
 			return false;
+		}
 
 		Hash rhs = (Hash)obj;
 		return Arrays.equals(this.data, rhs.data);

@@ -132,8 +132,9 @@ public class AccountInfo implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof AccountInfo))
+		if (!(obj instanceof AccountInfo)) {
 			return false;
+		}
 
 		final AccountInfo rhs = (AccountInfo)obj;
 		return this.address.equals(rhs.address);

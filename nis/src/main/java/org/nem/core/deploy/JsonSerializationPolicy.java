@@ -42,8 +42,9 @@ public class JsonSerializationPolicy implements SerializationPolicy {
 		final DeserializationContext context = new DeserializationContext(this.accountLookup);
 
 		final Object result = JSONValue.parse(stream);
-		if (result instanceof JSONObject)
+		if (result instanceof JSONObject) {
 			return new JsonDeserializer((JSONObject)result, context);
+		}
 
 		throw new IllegalArgumentException("JSON Object was expected");
 	}

@@ -120,15 +120,15 @@ public class HttpMethodClient<T> {
 					.thenApply(response -> responseStrategy.coerce(request, response));
 
 			SleepFuture.create(this.requestTimeout).thenAccept(v -> {
-				if (responseFuture.isDone())
+				if (responseFuture.isDone()) {
 					return;
+				}
 
-                LOGGER.warning(String.format("forcibly aborting request to %s", url));
+				LOGGER.warning(String.format("forcibly aborting request to %s", url));
 				request.abort();
 			});
 
 			return new AsyncToken<>(request, responseFuture);
-
 		} catch (URISyntaxException e) {
 			throw new FatalPeerException(e);
 		}
@@ -169,7 +169,7 @@ public class HttpMethodClient<T> {
 		 *
 		 * @return The result value.
 		 */
-		public T get()  {
+		public T get() {
 			return ExceptionUtils.propagate(() -> this.getFuture().get());
 		}
 
@@ -185,7 +185,9 @@ public class HttpMethodClient<T> {
 
 		private final CompletableFuture<HttpResponse> future = new CompletableFuture<>();
 
-		public CompletableFuture<HttpResponse> getFuture() { return this.future; }
+		public CompletableFuture<HttpResponse> getFuture() {
+			return this.future;
+		}
 
 		@Override
 		public void completed(final HttpResponse httpResponse) {

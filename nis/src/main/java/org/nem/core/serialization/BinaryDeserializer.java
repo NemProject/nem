@@ -16,7 +16,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	/**
 	 * Creates a new binary deserializer.
 	 *
-	 * @param bytes   The byte array from which to read.
+	 * @param bytes The byte array from which to read.
 	 * @param context The deserialization context.
 	 */
 	public BinaryDeserializer(final byte[] bytes, final DeserializationContext context) {
@@ -72,12 +72,14 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	@Override
 	public <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator) {
 		int numObjects = this.readInt(null);
-		if (BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numObjects)
+		if (BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numObjects) {
 			return null;
+		}
 
 		List<T> objects = new ArrayList<>();
-		for (int i = 0; i < numObjects; ++i)
+		for (int i = 0; i < numObjects; ++i) {
 			objects.add(deserializeObject(activator));
+		}
 
 		return objects;
 	}
@@ -90,8 +92,9 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	private <T> T deserializeObject(final ObjectDeserializer<T> activator) {
 		try {
 			byte[] bytes = this.readBytes(null);
-			if (0 == bytes.length)
+			if (0 == bytes.length) {
 				return null;
+			}
 
 			try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes, this.getContext())) {
 				return activator.deserialize(deserializer);
@@ -111,17 +114,20 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	}
 
 	private byte[] readBytes(int numBytes) {
-		if (this.stream.available() < numBytes)
+		if (this.stream.available() < numBytes) {
 			throw new SerializationException("unexpected end of stream reached");
+		}
 
-		if (0 == numBytes)
+		if (0 == numBytes) {
 			return new byte[0];
+		}
 
 		try {
 			byte[] bytes = new byte[numBytes];
 			int numBytesRead = this.stream.read(bytes);
-			if (numBytesRead != numBytes)
+			if (numBytesRead != numBytes) {
 				throw new SerializationException("unexpected end of stream reached");
+			}
 
 			return bytes;
 		} catch (IOException e) {

@@ -36,7 +36,6 @@ public class PublicKey implements SerializableEntity {
 	 * Creates a public key from a hex string.
 	 *
 	 * @param hex The hex string.
-	 *
 	 * @return The new public key.
 	 */
 	public static PublicKey fromHexString(final String hex) {
@@ -62,8 +61,9 @@ public class PublicKey implements SerializableEntity {
 	 * @return true if the public key is in compressed form.
 	 */
 	public boolean isCompressed() {
-		if (COMPRESSED_KEY_SIZE != this.value.length)
+		if (COMPRESSED_KEY_SIZE != this.value.length) {
 			return false;
+		}
 
 		switch (this.value[0]) {
 			case 0x02:
@@ -86,8 +86,9 @@ public class PublicKey implements SerializableEntity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PublicKey))
+		if (obj == null || !(obj instanceof PublicKey)) {
 			return false;
+		}
 
 		final PublicKey rhs = (PublicKey)obj;
 		return Arrays.equals(this.value, rhs.value);

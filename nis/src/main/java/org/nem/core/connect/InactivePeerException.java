@@ -27,7 +27,7 @@ public class InactivePeerException extends RuntimeException {
 	 * Creates a new exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The original exception.
+	 * @param cause The original exception.
 	 */
 	public InactivePeerException(final String message, Throwable cause) {
 		super(message, cause);

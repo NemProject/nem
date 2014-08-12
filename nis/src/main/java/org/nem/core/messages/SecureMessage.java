@@ -21,13 +21,14 @@ public class SecureMessage extends Message {
 	/**
 	 * Creates a new secure message around a decoded payload that should be encrypted.
 	 *
-	 * @param sender    The message sender.
+	 * @param sender The message sender.
 	 * @param recipient The message recipient.
-	 * @param payload   The unencrypted payload.
+	 * @param payload The unencrypted payload.
 	 */
 	public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
-		if (!sender.getKeyPair().hasPrivateKey())
+		if (!sender.getKeyPair().hasPrivateKey()) {
 			throw new IllegalArgumentException("sender private key is required for creating secure message");
+		}
 
 		final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
 		return new SecureMessage(sender, recipient, cipher.encrypt(payload));
@@ -36,9 +37,9 @@ public class SecureMessage extends Message {
 	/**
 	 * Creates a new secure message around an encoded payload that is already encrypted.
 	 *
-	 * @param sender    The message sender.
+	 * @param sender The message sender.
 	 * @param recipient The message recipient.
-	 * @param payload   The encrypted payload.
+	 * @param payload The encrypted payload.
 	 */
 	public static SecureMessage fromEncodedPayload(final Account sender, final Account recipient, final byte[] payload) {
 		return new SecureMessage(sender, recipient, payload);
@@ -84,8 +85,9 @@ public class SecureMessage extends Message {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof SecureMessage))
+		if (!(obj instanceof SecureMessage)) {
 			return false;
+		}
 
 		final SecureMessage rhs = (SecureMessage)obj;
 		return this.payload.equals(rhs.payload);
@@ -113,8 +115,9 @@ public class SecureMessage extends Message {
 		public boolean canDecode() {
 			final KeyPair senderKeyPair = this.getSenderKeyPair();
 			final KeyPair recipientKeyPair = this.getRecipientKeyPair();
-			if (null == senderKeyPair || null == recipientKeyPair)
+			if (null == senderKeyPair || null == recipientKeyPair) {
 				return false;
+			}
 
 			return (senderKeyPair.hasPrivateKey() && recipientKeyPair.hasPublicKey()) ||
 					(recipientKeyPair.hasPrivateKey() && senderKeyPair.hasPublicKey());
@@ -125,8 +128,9 @@ public class SecureMessage extends Message {
 		}
 
 		public byte[] getDecoded() {
-			if (!this.canDecode())
+			if (!this.canDecode()) {
 				return null;
+			}
 
 			final Cipher cipher =
 					this.getRecipientKeyPair().hasPrivateKey()
@@ -161,8 +165,9 @@ public class SecureMessage extends Message {
 
 		@Override
 		public boolean equals(final Object obj) {
-			if (!(obj instanceof SecureMessagePayload))
+			if (!(obj instanceof SecureMessagePayload)) {
 				return false;
+			}
 
 			final SecureMessagePayload rhs = (SecureMessagePayload)obj;
 			return Arrays.equals(this.payload, rhs.payload)

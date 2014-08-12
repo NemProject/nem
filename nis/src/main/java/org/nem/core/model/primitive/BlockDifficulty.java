@@ -43,7 +43,9 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 *
 	 * @return The underlying difficulty.
 	 */
-	public long getRaw() { return this.getValue(); }
+	public long getRaw() {
+		return this.getValue();
+	}
 
 	/**
 	 * Returns the underlying difficulty as a BigInteger.
@@ -64,8 +66,8 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 * Writes a block difficulty object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param difficulty     The object.
+	 * @param label The optional label.
+	 * @param difficulty The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final BlockDifficulty difficulty) {
 		serializer.writeLong(label, difficulty.getRaw());
@@ -75,7 +77,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 * Reads a block difficulty object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static BlockDifficulty readFrom(final Deserializer deserializer, final String label) {

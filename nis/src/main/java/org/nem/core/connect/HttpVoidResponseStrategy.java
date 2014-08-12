@@ -9,8 +9,9 @@ public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	@Override
 	protected Deserializer coerce(final byte[] responseBytes) {
-		if (0 == responseBytes.length)
+		if (0 == responseBytes.length) {
 			return null;
+		}
 
 		throw new FatalPeerException(String.format("Peer returned unexpected data (length %d)", responseBytes.length));
 	}

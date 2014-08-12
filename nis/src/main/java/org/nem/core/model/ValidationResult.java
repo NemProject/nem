@@ -19,7 +19,7 @@ public enum ValidationResult {
 	 * Validation failed for an unknown reason.
 	 */
 	FAILURE_UNKNOWN(2),
-	
+
 	/**
 	 * Validation failed because the deadline passed.
 	 */
@@ -44,32 +44,32 @@ public enum ValidationResult {
 	 * Validation failed because the transaction hash is already known.
 	 */
 	FAILURE_HASH_EXISTS(7),
-	
+
 	/**
 	 * Validation failed because the verification of the signature failed.
 	 */
 	FAILURE_SIGNATURE_NOT_VERIFIABLE(8),
-	
+
 	/**
 	 * Validation failed because the time stamp is too far in the past.
 	 */
 	FAILURE_TIMESTAMP_TOO_FAR_IN_PAST(9),
-	
+
 	/**
 	 * Validation failed because the time stamp is too far in the future.
 	 */
 	FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE(10),
-		
+
 	/**
 	 * Validation failed because the entity cannot be used for some reason.
 	 */
 	FAILURE_ENTITY_UNUSABLE(11),
-	
+
 	/**
 	 * Validation failed because the chain score is inferior to our score.
 	 */
 	FAILURE_CHAIN_SCORE_INFERIOR(12),
-		
+
 	/**
 	 * Validation failed because the chain could not be validated.
 	 */
@@ -89,10 +89,11 @@ public enum ValidationResult {
 	 * @throws IllegalArgumentException if the value is unknown.
 	 */
 	public static ValidationResult fromValue(int value) {
-        for (final ValidationResult result : values()) {
-            if (result.getValue() == value)
-                return result;
-        }
+		for (final ValidationResult result : values()) {
+			if (result.getValue() == value) {
+				return result;
+			}
+		}
 
 		throw new IllegalArgumentException("Invalid validation result: " + value);
 	}
@@ -119,13 +120,13 @@ public enum ValidationResult {
 
 		return !this.isSuccess();
 	}
-	
+
 	/**
 	 * Gets the underlying integer representation of the result.
 	 *
 	 * @return The underlying value.
 	 */
-    public int getValue() {
-        return this.value;
-    }
+	public int getValue() {
+		return this.value;
+	}
 }

@@ -20,20 +20,20 @@ public enum AccountStatus {
 	 * The account is unlocked.
 	 */
 	UNLOCKED("UNLOCKED");
-	
+
 	private final String status;
 
 	private AccountStatus(final String status) {
-		this.status = status;  
+		this.status = status;
 	}
 
-	public static AccountStatus fromString(String status) {  
-		if (status != null) {  
-			for (AccountStatus accountStatus : values()) {  
-				if (accountStatus.status.equals(status)) {  
-					return accountStatus;  
-				}  
-			}  
+	public static AccountStatus fromString(String status) {
+		if (status != null) {
+			for (AccountStatus accountStatus : values()) {
+				if (accountStatus.status.equals(status)) {
+					return accountStatus;
+				}
+			}
 		}
 		throw new IllegalArgumentException("Invalid account status: " + status);
 	}
@@ -44,8 +44,8 @@ public enum AccountStatus {
 	 * Writes an account status.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param status     The account status.
+	 * @param label The optional label.
+	 * @param status The account status.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final AccountStatus status) {
 		serializer.writeString(label, status.toString());
@@ -55,8 +55,7 @@ public enum AccountStatus {
 	 * Reads an account status.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read account status.
 	 */
 	public static AccountStatus readFrom(final Deserializer deserializer, final String label) {

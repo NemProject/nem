@@ -4,7 +4,7 @@ import java.util.function.*;
 
 /**
  * Abstract matrix class.
- *
+ * <br/>
  * This class provides default implementations of most matrix functions
  * but they should be optimized in derived classes when performance is important.
  */
@@ -132,8 +132,9 @@ public abstract class Matrix {
 			@Override
 			public void visit(int row, int col, double value, DoubleConsumer setter) {
 				final double sum = columnSums[col];
-				if (0 == sum)
+				if (0 == sum) {
 					return;
+				}
 
 				setter.accept(value / sum);
 			}
@@ -147,8 +148,9 @@ public abstract class Matrix {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
 			public void visit(int row, int col, double value, DoubleConsumer setter) {
-				if (value < 0)
+				if (value < 0) {
 					setter.accept(0.0);
+				}
 			}
 		});
 	}
@@ -194,14 +196,16 @@ public abstract class Matrix {
 	}
 
 	private Matrix join(final Matrix matrix, boolean isTwoWay, final DoubleBinaryOperator op) {
-		if (!this.isSameSize(matrix))
+		if (!this.isSameSize(matrix)) {
 			throw new IllegalArgumentException("matrix sizes must be equal");
+		}
 
 		final Matrix result = this.create(this.getRowCount(), this.getColumnCount());
 		this.forEach((r, c, v) -> result.setAtUnchecked(r, c, op.applyAsDouble(v, matrix.getAtUnchecked(r, c))));
 
-		if (isTwoWay)
+		if (isTwoWay) {
 			matrix.forEach((r, c, v) -> result.setAtUnchecked(r, c, op.applyAsDouble(v, this.getAtUnchecked(r, c))));
+		}
 
 		return result;
 	}
@@ -246,8 +250,9 @@ public abstract class Matrix {
 	 * @return The resulting vector.
 	 */
 	public ColumnVector multiply(final ColumnVector vector) {
-		if (this.numCols != vector.size())
+		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
+		}
 
 		double[] rawResult = new double[this.numRows];
 		double[] rawVector = vector.getRaw();
@@ -331,11 +336,13 @@ public abstract class Matrix {
 	}
 
 	private void checkBounds(final int row, final int col) {
-		if (row < 0 || row >= this.numRows)
+		if (row < 0 || row >= this.numRows) {
 			throw new IndexOutOfBoundsException("Row index out of bounds");
+		}
 
-		if (col < 0 || col >= this.numCols)
+		if (col < 0 || col >= this.numCols) {
 			throw new IndexOutOfBoundsException("Column index out of bounds");
+		}
 	}
 
 	/**
@@ -358,12 +365,14 @@ public abstract class Matrix {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof Matrix))
+		if (!(obj instanceof Matrix)) {
 			return false;
+		}
 
 		final Matrix rhs = (Matrix)obj;
-		if (!this.isSameSize(rhs))
+		if (!this.isSameSize(rhs)) {
 			return false;
+		}
 
 		final Matrix inequalityMatrix = this.join(rhs, true, (l, r) -> l == r ? 0 : 1);
 		return 0 == inequalityMatrix.sum();

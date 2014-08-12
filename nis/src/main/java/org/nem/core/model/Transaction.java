@@ -18,10 +18,10 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	/**
 	 * Creates a new transaction.
 	 *
-	 * @param type      The transaction type.
-	 * @param version   The transaction version.
+	 * @param type The transaction type.
+	 * @param version The transaction version.
 	 * @param timestamp The transaction timestamp.
-	 * @param sender    The transaction sender.
+	 * @param sender The transaction sender.
 	 */
 	public Transaction(final int type, final int version, final TimeInstant timestamp, final Account sender) {
 		super(type, version, timestamp, sender);
@@ -30,7 +30,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	/**
 	 * Deserializes a new transaction.
 	 *
-	 * @param type         The transaction type.
+	 * @param type The transaction type.
 	 * @param deserializer The deserializer to use.
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
@@ -91,8 +91,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		};
 
 		for (int result : comparisonResults) {
-			if (result != 0)
+			if (result != 0) {
 				return result;
+			}
 		}
 
 		return 0;
@@ -125,7 +126,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Performs any other actions required to commit the transaction.
 	 */
 	protected abstract void executeCommit();
-
 
 	/**
 	 * Undoes the transaction.
@@ -162,15 +162,17 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Determines if this transaction is valid using a custom can-debit predicate.
 	 *
 	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
-	 *                          has a balance of at least the second parameter (amount).
+	 * has a balance of at least the second parameter (amount).
 	 * @return true if this transaction is valid.
 	 */
 	public final ValidationResult checkValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (this.getTimeStamp().compareTo(this.deadline) >= 0)
+		if (this.getTimeStamp().compareTo(this.deadline) >= 0) {
 			return ValidationResult.FAILURE_PAST_DEADLINE;
+		}
 
-		if (this.deadline.compareTo(this.getTimeStamp().addDays(1)) > 0)
+		if (this.deadline.compareTo(this.getTimeStamp().addDays(1)) > 0) {
 			return ValidationResult.FAILURE_FUTURE_DEADLINE;
+		}
 
 		return this.checkDerivedValidity(canDebitPredicate);
 	}
@@ -189,7 +191,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * by performing custom, implementation-specific validation checks.
 	 *
 	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
-	 *                          has a balance of at least the second parameter (amount).
+	 * has a balance of at least the second parameter (amount).
 	 * @return true if this transaction is valid.
 	 */
 	protected abstract ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate);
@@ -267,8 +269,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 		public void commit() {
 			// apply the transfers in reverse order because order might be important for some observers
-			for (int i = this.pendingTransfers.size() - 1; i >= 0; --i)
+			for (int i = this.pendingTransfers.size() - 1; i >= 0; --i) {
 				this.pendingTransfers.get(i).commit(this.observer);
+			}
 		}
 	}
 

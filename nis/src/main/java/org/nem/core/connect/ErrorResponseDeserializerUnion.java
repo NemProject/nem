@@ -5,8 +5,8 @@ import org.nem.core.serialization.*;
 import org.springframework.http.HttpStatus;
 
 /**
-* A union that will either contain an error response or a deserializer.
-*/
+ * A union that will either contain an error response or a deserializer.
+ */
 public class ErrorResponseDeserializerUnion {
 
 	private final int status;
@@ -34,7 +34,9 @@ public class ErrorResponseDeserializerUnion {
 	 *
 	 * @return The http status.
 	 */
-	public int getStatus() { return this.status; }
+	public int getStatus() {
+		return this.status;
+	}
 
 	/**
 	 * Gets a value indicating whether or not the current instance contains an error.
@@ -60,8 +62,9 @@ public class ErrorResponseDeserializerUnion {
 	 * @return The response body as an ErrorResponse.
 	 */
 	public ErrorResponse getError() {
-		if (!this.hasError())
+		if (!this.hasError()) {
 			throw new IllegalStateException("cannot retrieve error when there is no error");
+		}
 
 		return new ErrorResponse(this.getDeserializerUnchecked());
 	}
@@ -72,15 +75,17 @@ public class ErrorResponseDeserializerUnion {
 	 * @return The response body as a Deserializer.
 	 */
 	public Deserializer getDeserializer() {
-		if (this.hasError())
+		if (this.hasError()) {
 			throw new IllegalStateException("cannot retrieve deserializer when an error has occurred");
+		}
 
 		return this.getDeserializerUnchecked();
 	}
 
 	private Deserializer getDeserializerUnchecked() {
-		if (!this.hasBody() || !(this.body instanceof JSONObject))
+		if (!this.hasBody() || !(this.body instanceof JSONObject)) {
 			throw new IllegalStateException("body must be a JSONObject");
+		}
 
 		return new JsonDeserializer((JSONObject)this.body, this.context);
 	}

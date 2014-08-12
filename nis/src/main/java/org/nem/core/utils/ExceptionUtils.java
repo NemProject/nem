@@ -72,16 +72,16 @@ public class ExceptionUtils {
 		try {
 			return callable.call();
 		} catch (ExecutionException e) {
-			if (RuntimeException.class.isAssignableFrom(e.getCause().getClass()))
+			if (RuntimeException.class.isAssignableFrom(e.getCause().getClass())) {
 				throw (RuntimeException)e.getCause();
+			}
 			throw wrap.apply(e);
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new IllegalStateException(e);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw wrap.apply(e);
 		}
 	}

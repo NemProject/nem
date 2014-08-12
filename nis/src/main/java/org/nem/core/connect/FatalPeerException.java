@@ -27,7 +27,7 @@ public class FatalPeerException extends RuntimeException {
 	 * Creates a new exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The original exception.
+	 * @param cause The original exception.
 	 */
 	public FatalPeerException(final String message, Throwable cause) {
 		super(message, cause);
