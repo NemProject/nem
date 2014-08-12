@@ -21,7 +21,6 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 import java.io.*;
-import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
 import java.util.logging.*;
@@ -37,6 +36,7 @@ import java.util.logging.*;
  *     Ncc specific stuff like WebStartProxy, JarFileServlet, NccDefaultServlet, NisController, and NccWebAppInitializer. So how would I do that without
  *     explicitly mention the class (e.g. a CommonStarterPolicy can't have a method public WebStartProxy getWebStartProxy();
  *     because Nis doesn't know the class).
+ *     UPDATE: ok, there is a way ;) I had to hard code only one string: "org.nem.deploy.appconfig"
  */
 @WebListener
 public class CommonStarter implements ServletContextListener {
@@ -63,6 +63,8 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 
+	private static AnnotationConfigApplicationContext appCtx;
+	private static NemConfigurationPolicy configurationPolicy;
 	private Server server;
 	private static CommonConfiguration configuration;
 
@@ -84,7 +86,7 @@ public class CommonStarter implements ServletContextListener {
 
 	public static void main(final String[] args) {
 		LOGGER.info("Starting embedded Jetty Server.");
-
+		initializeConfigurationPolicy();
 		try {
 			INSTANCE.boot();
 			INSTANCE.server.join();
@@ -98,6 +100,11 @@ public class CommonStarter implements ServletContextListener {
 		}
 
 		System.exit(1);
+	}
+
+	private static void initializeConfigurationPolicy() {
+		appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
+		configurationPolicy = appCtx.getBean(NemConfigurationPolicy.class);
 	}
 
 	private static void initializeLogging() {
@@ -148,7 +155,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[]{ servletContext });
 
 		return handlers;
 	}
@@ -257,12 +264,10 @@ public class CommonStarter implements ServletContextListener {
 		startServer(this.server, new URL(configuration.getShutdownUrl()));
 
 		if (configuration.isNcc()) {
-			this.getMethod("org.nem.deploy.WebStartProxy", "openWebBrowser", new Class[]{ String.class })
-					.invoke(null, configuration.getHomeUrl());
+			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
 
 			if (configuration.isWebStart()) {
-				this.getMethod("org.nem.ncc.connector.NISController", "startNISViaWebStart", new Class[]{ String.class })
-						.invoke(null, configuration.getNisJnlpUrl());
+				configurationPolicy.startNISViaWebStart(configuration.getNisJnlpUrl());
 			}
 		}
 	}
@@ -289,13 +294,8 @@ public class CommonStarter implements ServletContextListener {
 	public void contextInitialized(final ServletContextEvent event) {
 		// This is the replacement for the web.xml (new with Servlet 3.0)
 		try {
-			final String appConfigClassName = String.format("%s%s%s", "org.nem.deploy.", configuration.getShortServerName(), "AppConfig");
-			final String webAppInitializerClassName = String.format("%s%s%s", "org.nem.deploy.", configuration.getShortServerName(), "WebAppInitializer");
-			final Class appConfigClass = getClass(appConfigClassName);
-			final Class appWebAppInitializerClass = getClass(webAppInitializerClassName);
-			final AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext(appConfigClass);
 			final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
-			webCtx.register(appWebAppInitializerClass);
+			webCtx.register(configurationPolicy.getWebAppInitializerClass());
 			webCtx.setParent(appCtx);
 
 			final ServletContext context = event.getServletContext();
@@ -307,6 +307,7 @@ public class CommonStarter implements ServletContextListener {
 
 			// TODO-CR - can you move this to separate function
 			// BR: Done. Not sure about naming. Is it better to put "Optional" in the method name like createOptionalServlets?
+			//     Do it if you like it better.
 			createServlets(context);
 
 			// TODO-CR - can you move this to separate function
@@ -321,12 +322,12 @@ public class CommonStarter implements ServletContextListener {
 
 	private void createServlets(final ServletContext context) {
 		if (configuration.isNcc()) {
-			ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", "org.nem.ncc.web.servlet.JarFileServlet");
+			ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
 			servlet.setLoadOnStartup(1);
 
-			servlet = context.addServlet("DefaultServlet", "org.nem.ncc.web.servlet.NccDefaultServlet");
+			servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
 			servlet.addMapping("/");
 			servlet.setLoadOnStartup(1);
 		}
@@ -346,27 +347,6 @@ public class CommonStarter implements ServletContextListener {
 			// Zipping following MimeTypes
 			dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
 			dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-		}
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Class getClass(String className) {
-		try {
-			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(String.format("Class %s not found", className));
-		}
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Method getMethod(String className, String methodName, Class<?>[] parameterTypes) {
-		try {
-			Class cls = Class.forName(className);
-			return cls.getMethod(methodName, parameterTypes);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(String.format("Class %s not found", className));
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(String.format("Method %s not found", methodName));
 		}
 	}
 }
