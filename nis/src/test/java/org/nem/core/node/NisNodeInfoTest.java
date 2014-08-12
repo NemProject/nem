@@ -38,56 +38,53 @@ public class NisNodeInfoTest {
 		Assert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
 	}
 
-	// TODO-CR 20140809 - minor - might want to consider constants for the indexes { ORIGINAL, DIFFERENT, EQUIVALENT } ->
-	// new NisNodeInfo(nodes.get(ORIGINAL), appMetaData.get(DIFFERENT)); --> just makes it easier to read the tests, imo
+    //region equals / hashCode
+
+    private static Map<String, NisNodeInfo> createNisNodeInfosForEqualityTests(final KeyPair keyPair) {
+        final NodeEndpoint endpoint = NodeEndpoint.fromHost("localhost");
+        return new HashMap<String, NisNodeInfo>() {
+            {
+                put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
+                put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
+                put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
+            }
+        };
+    }
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
-		final List<Node> nodes = createThreeTestNodes(keyPair);
-		final List<ApplicationMetaData> appMetaData = createThreeAppMetaData();
-
-		// Act:
-		final NisNodeInfo nodeInfo1 = new NisNodeInfo(nodes.get(0), appMetaData.get(0));
-		final NisNodeInfo nodeInfo2 = new NisNodeInfo(nodes.get(0), appMetaData.get(2));
-		final NisNodeInfo nodeInfo3 = new NisNodeInfo(nodes.get(2), appMetaData.get(0));
-		final NisNodeInfo nodeInfo4 = new NisNodeInfo(nodes.get(0), appMetaData.get(1));
-		final NisNodeInfo nodeInfo5 = new NisNodeInfo(nodes.get(1), appMetaData.get(0));
+        final NisNodeInfo info = new NisNodeInfo(
+                new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
+                createAppMetaData("nem", "1.0"));
+		final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
 		// Assert:
-		Assert.assertThat(nodeInfo1, IsEqual.equalTo(nodeInfo2));
-		Assert.assertThat(nodeInfo1, IsEqual.equalTo(nodeInfo3));
-		Assert.assertThat(nodeInfo1, IsNot.not(IsEqual.equalTo(nodeInfo4)));
-		Assert.assertThat(nodeInfo1, IsNot.not(IsEqual.equalTo(nodeInfo5)));
+		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(info));
+		Assert.assertThat(infoMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(info)));
+		Assert.assertThat(infoMap.get("diff-metadata"), IsNot.not(IsEqual.equalTo(info)));
+        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
+        Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
-		final KeyPair keyPair = new KeyPair();
-		final List<Node> nodes = createThreeTestNodes(keyPair);
-		final List<ApplicationMetaData> appMetaData = createThreeAppMetaData();
+        // Arrange:
+        final KeyPair keyPair = new KeyPair();
+        final NisNodeInfo info = new NisNodeInfo(
+                new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
+                createAppMetaData("nem", "1.0"));
+        final int hashCode = info.hashCode();
+        final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
-		// Act:
-		final NisNodeInfo nodeInfo1 = new NisNodeInfo(nodes.get(0), appMetaData.get(0));
-		final NisNodeInfo nodeInfo2 = new NisNodeInfo(nodes.get(0), appMetaData.get(2));
-		final NisNodeInfo nodeInfo3 = new NisNodeInfo(nodes.get(2), appMetaData.get(0));
-		final NisNodeInfo nodeInfo4 = new NisNodeInfo(nodes.get(0), appMetaData.get(1));
-		final NisNodeInfo nodeInfo5 = new NisNodeInfo(nodes.get(1), appMetaData.get(0));
-
-		// Assert:
-		Assert.assertThat(nodeInfo1.hashCode(), IsEqual.equalTo(nodeInfo2.hashCode()));
-		Assert.assertThat(nodeInfo1.hashCode(), IsEqual.equalTo(nodeInfo3.hashCode()));
-		Assert.assertThat(nodeInfo1.hashCode(), IsNot.not(IsEqual.equalTo(nodeInfo4.hashCode())));
-		Assert.assertThat(nodeInfo1.hashCode(), IsNot.not(IsEqual.equalTo(nodeInfo5.hashCode())));
+        // Assert:
+        Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
+        Assert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-metadata").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	private static List<Node> createThreeTestNodes(final KeyPair keyPair) {
-		return Arrays.asList(
-				new Node(new NodeIdentity(keyPair, "a"), NodeEndpoint.fromHost("localhost")),
-				new Node(new NodeIdentity(new KeyPair(), "b"), NodeEndpoint.fromHost("localhost")),
-				new Node(new NodeIdentity(keyPair, "a"), NodeEndpoint.fromHost("localhost")));
-	}
+    //endregion
 
 	private static Node createNodeWithName(final String name) {
 		return new Node(
@@ -97,14 +94,6 @@ public class NisNodeInfoTest {
 
 	private static NisNodeInfo roundtripNodeInfo(final NisNodeInfo nodeInfo) {
 		return new NisNodeInfo(org.nem.core.test.Utils.roundtripSerializableEntity(nodeInfo, null));
-	}
-
-	// TODO-CR 20140809 - minor (group this closer to the tests using it (e.g. right after createThreeTestNodes)
-	private static List<ApplicationMetaData> createThreeAppMetaData() {
-		return Arrays.asList(
-				createAppMetaData("nem", "1.0"),
-				createAppMetaData("nis", "1.0"),
-				createAppMetaData("nem", "1.0"));
 	}
 
 	private static ApplicationMetaData createAppMetaData(final String name, final String version) {

@@ -1,6 +1,8 @@
 package org.nem.core.metadata;
 
 import java.security.cert.X509Certificate;
+import java.util.*;
+
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -83,52 +85,59 @@ public class ApplicationMetaDataTest {
 
 	//region equals / hashCode
 
+    private static Map<String, ApplicationMetaData> createApplicationMetaDataForEqualityTests(final X509Certificate certificate) {
+        final X509Certificate otherCertificate = MetaDataTestUtils.createMockCertificateWithName("CN=SomeoneElse,O=NemSoft");
+        return new HashMap<String, ApplicationMetaData>() {
+            {
+                put("default", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(17)));
+                put("diff-name", new ApplicationMetaData("bar", "12.0", certificate, createTimeProvider(17)));
+                put("diff-version", new ApplicationMetaData("foo", "11.0", certificate, createTimeProvider(17)));
+                put("diff-cert", new ApplicationMetaData("foo", "12.0", otherCertificate, createTimeProvider(17)));
+                put("diff-null-cert", new ApplicationMetaData("foo", "12.0", null, createTimeProvider(17)));
+                put("diff-time", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(22))); // not significant
+            }
+        };
+    }
+
+    private static TimeProvider createTimeProvider(final int time) {
+        final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+        Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(time));
+        return timeProvider;
+    }
+
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
-		// Arrange:
-		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-		Mockito.when(timeProvider.getCurrentTime()).thenReturn(
-				new TimeInstant(100),
-				new TimeInstant(100),
-				new TimeInstant(100),
-				new TimeInstant(125));
+        // Arrange:
+        final X509Certificate certificate = MetaDataTestUtils.createMockCertificateWithName("CN=Someone,O=NemSoft");
+        final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(17));
+        final Map<String, ApplicationMetaData> infoMap = createApplicationMetaDataForEqualityTests(certificate);
 
-		// Act:
-		final ApplicationMetaData metaData1 = new ApplicationMetaData("foo", "12.0", null, timeProvider);
-		final ApplicationMetaData metaData2 = new ApplicationMetaData("bar", "12.0", null, timeProvider);
-		final ApplicationMetaData metaData3 = new ApplicationMetaData("foo", "13.0", null, timeProvider);
-		final ApplicationMetaData metaData4 = new ApplicationMetaData("foo", "12.0", null, timeProvider);
-
-		// Assert:
-		Assert.assertThat(metaData1, IsEqual.equalTo(metaData4));
-		Assert.assertThat(metaData1, IsNot.not(IsEqual.equalTo(metaData2)));
-		Assert.assertThat(metaData1, IsNot.not(IsEqual.equalTo(metaData3)));
-
-		// TODO-CR 20140809 - missing comparison with metaData4
-		// TODO-CR 20140809 - also, should consider testing comparison with a different certificate
-		// TODO-CR 20140809 - also, a good idea to test inequality against null and an object of a different type for completeness
+        // Assert:
+        Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(metaData));
+        Assert.assertThat(infoMap.get("diff-name"), IsNot.not(IsEqual.equalTo(metaData)));
+        Assert.assertThat(infoMap.get("diff-version"), IsNot.not(IsEqual.equalTo(metaData)));
+        Assert.assertThat(infoMap.get("diff-cert"), IsNot.not(IsEqual.equalTo(metaData)));
+        Assert.assertThat(infoMap.get("diff-null-cert"), IsNot.not(IsEqual.equalTo(metaData)));
+        Assert.assertThat(infoMap.get("diff-time"), IsEqual.equalTo(metaData));
+        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
+        Assert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)metaData)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
-		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-		Mockito.when(timeProvider.getCurrentTime()).thenReturn(
-				new TimeInstant(100),
-				new TimeInstant(100),
-				new TimeInstant(125));
+        // Arrange:
+        final X509Certificate certificate = MetaDataTestUtils.createMockCertificateWithName("CN=Someone,O=NemSoft");
+        final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(17));
+        final int hashCode = metaData.hashCode();
+        final Map<String, ApplicationMetaData> infoMap = createApplicationMetaDataForEqualityTests(certificate);
 
-		// Act:
-		final ApplicationMetaData metaData1 = new ApplicationMetaData("foo", "12.0", null, timeProvider);
-		final ApplicationMetaData metaData2 = new ApplicationMetaData("bar", "12.0", null, timeProvider);
-		final ApplicationMetaData metaData3 = new ApplicationMetaData("foo", "13.0", null, timeProvider);
-		final ApplicationMetaData metaData4 = new ApplicationMetaData("foo", "12.0", null, timeProvider);
-
-		// Assert:
-		Assert.assertThat(metaData1.hashCode(), IsEqual.equalTo(metaData4.hashCode()));
-		Assert.assertThat(metaData1.hashCode(), IsNot.not(IsEqual.equalTo(metaData2.hashCode())));
-		Assert.assertThat(metaData1.hashCode(), IsNot.not(IsEqual.equalTo(metaData3.hashCode())));
-
-		// TODO-CR 20140809 - same comments as equals
+        // Assert:
+        Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
+        Assert.assertThat(infoMap.get("diff-name").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-version").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-null-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-time").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion

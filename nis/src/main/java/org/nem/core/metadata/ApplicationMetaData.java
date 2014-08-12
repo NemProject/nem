@@ -1,6 +1,8 @@
 package org.nem.core.metadata;
 
 import java.security.cert.X509Certificate;
+import java.util.Objects;
+
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 
@@ -120,11 +122,9 @@ public class ApplicationMetaData implements SerializableEntity {
 			return false;
 		}
 
-		// TODO-CR: 20140809 - instead of null checks here, we can use Objects.equals(...)
 		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
 		return this.appName.equals(rhs.appName) &&
 				this.version.equals(rhs.version) &&
-				((this.certificateSigner == null && rhs.certificateSigner == null) ||
-				this.certificateSigner.equals(rhs.certificateSigner));
+                Objects.equals(this.certificateSigner, rhs.certificateSigner);
 	}
 }
