@@ -8,7 +8,6 @@ import java.util.Properties;
 /**
  * Class responsible for holding all common configuration settings.
  * A reboot is required for configuration changes to take effect.
- * TODO: does it make more sense to expose functions like readIntegerOrDefault, readBooleanOrDefault ... ?
  */
 public class CommonConfiguration {
 	private final String shortServerName;
