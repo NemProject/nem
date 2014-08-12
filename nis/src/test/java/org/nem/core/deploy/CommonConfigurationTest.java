@@ -54,24 +54,15 @@ public class CommonConfigurationTest {
 
 	//region mandatory entries
 
-	// TODO-CR 20140811 J-B annotation spacing is off; elsewhere I've been formating as
-	// @Test(expected = RuntimeException.class)
-	// BR: ok
-	@Test(expected = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutShortServerName() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.remove("nem.shortServerName");
 
 		// Act:
-		// TODO-CR 2014081 J-B in the mandatory tests, you don't need to declare the local config
-		// BR: ok
 		new CommonConfiguration(properties);
 	}
-
-	// TODO-CR 2014081 J-B for all of the integer tests, consider adding a helper function like assertIntPropertyIsRequired(propName)
-	// inside that function, you can use ExceptionAssert
-	// BR: ok
 
 	@Test
 	public void cannotReadConfigurationWithoutMaxThreads() {
@@ -82,20 +73,19 @@ public class CommonConfigurationTest {
 	@Test
 	public void cannotReadConfigurationWithUnparsableMaxThreads() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.maxThreads", "notANumber");
+		assertIntPropertyMustBeParsable("nem.maxThreads");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithoutHttpPort() {
 		// Act:
 		assertIntPropertyIsRequired("nem.httpPort");
-
 	}
 
 	@Test
 	public void cannotReadConfigurationWithUnparsableHttpPort() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.httpPort", "notANumber");
+		assertIntPropertyMustBeParsable("nem.httpPort");
 	}
 
 	@Test
@@ -107,7 +97,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void cannotReadConfigurationWithUnparsableHttpsPort() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.httpsPort", "notANumber");
+		assertIntPropertyMustBeParsable("nem.httpsPort");
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -250,19 +240,21 @@ public class CommonConfigurationTest {
 		return properties;
 	}
 
-	private void assertIntPropertyIsRequired(String propName) {
+	private void assertIntPropertyIsRequired(final String propName) {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.remove(propName);
 
+        // Act:
 		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), RuntimeException.class);
 	}
 
-	private void assertIntPropertyMustBeParsable(String propName, String propValue) {
+	private void assertIntPropertyMustBeParsable(final String propName) {
 		// Arrange:
 		final Properties properties = getCommonProperties();
-		properties.setProperty(propName, propValue);
+		properties.setProperty(propName, "notANumber");
 
+        // Act:
 		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), NumberFormatException.class);
 	}
 }

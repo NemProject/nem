@@ -27,23 +27,11 @@ import java.util.logging.*;
 
 /**
  * Simple jetty bootstrapper using the Servlet API 3.x with programmatic configuration.
- *
- * TODO-CR 20140811 - is spring able to inject dependencies into the CommonStarter (instance) constructor?
- * if so, we can inject a NIS / NCC policy class (that exposes the classes for instance) and avoid string -> class transformations
- * if not, what is here is fine
- * BR: I can define a bean "CommonStarter" in the Application config (would have to rename Nis/NccAppConfig -> NemAppConfig for both Nis/Ncc),
- *     and then auto wire a private field of type CommonStarterPolicy. But in the CommonStarterPolicy class, I would need to construct or auto wire
- *     Ncc specific stuff like WebStartProxy, JarFileServlet, NccDefaultServlet, NisController, and NccWebAppInitializer. So how would I do that without
- *     explicitly mention the class (e.g. a CommonStarterPolicy can't have a method public WebStartProxy getWebStartProxy();
- *     because Nis doesn't know the class).
- *     UPDATE: ok, there is a way ;) I had to hard code only one string: "org.nem.deploy.appconfig"
  */
 @WebListener
 public class CommonStarter implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 
-	// TODO-CR 20140811: comment publics
-	// BR: Done, though i didn't know how to comment CommonStarter in a meaningful way..
 	/**
 	 * The publicly available system time provider.
 	 */
@@ -65,8 +53,8 @@ public class CommonStarter implements ServletContextListener {
 
 	private static AnnotationConfigApplicationContext appCtx;
 	private static NemConfigurationPolicy configurationPolicy;
+    private static CommonConfiguration configuration;
 	private Server server;
-	private static CommonConfiguration configuration;
 
 	static {
 		// initialize logging before anything is logged; otherwise not all
@@ -77,8 +65,6 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void loadCommonConfiguration() {
 		ExceptionUtils.propagate(() -> {
-			// TODO-CR 20140811: don't access static member via instance
-			// BR: Done
 			configuration = new CommonConfiguration();
 			return configuration;
 		}, IllegalStateException::new);
@@ -110,9 +96,6 @@ public class CommonStarter implements ServletContextListener {
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
 			 final InputStream inputStringStream = adaptFileLocation(inputStream)) {
-
-			// TODO-CR - should this stream be in a try block?
-			// BR: Done. Unless you wanted it in a separate try block...
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);
 			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
