@@ -232,11 +232,11 @@ public class WeightedBalancesTest {
 
 	//endregion
 
-	private static void assertUnvested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertUnvested(final WeightedBalances weightedBalances, final long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
-	private static void assertVested(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertVested(final WeightedBalances weightedBalances, final long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getVested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
@@ -248,7 +248,7 @@ public class WeightedBalancesTest {
 		assertVested(actualBalances, height.getRaw(), expectedBalances.getVested(height));
 	}
 
-	private static void assertSum(final WeightedBalances weightedBalances, long height, final Amount amount) {
+	private static void assertSum(final WeightedBalances weightedBalances, final long height, final Amount amount) {
 		final BlockHeight blockHeight = new BlockHeight(height);
 		final Amount actualSum = weightedBalances.getUnvested(blockHeight).add(weightedBalances.getVested(blockHeight));
 		Assert.assertThat(actualSum, IsEqual.equalTo(amount));

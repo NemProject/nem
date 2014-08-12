@@ -24,7 +24,7 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 
 	@Override
 	protected int nextInternal(final int iteration) {
-		return this.minDelay + (int)(delayStep * (iteration - 1));
+		return this.minDelay + (int)(this.delayStep * (iteration - 1));
 	}
 
 	/**

@@ -58,6 +58,6 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 
 	@Override
 	public HashChain getHashesFrom(final BlockHeight height) {
-		return blockDao.getHashesFrom(height, this.maxHashesToReturn);
+		return this.blockDao.getHashesFrom(height, this.maxHashesToReturn);
 	}
 }

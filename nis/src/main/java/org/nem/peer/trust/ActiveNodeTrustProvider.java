@@ -25,7 +25,7 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 	@Override
 	public ColumnVector computeTrust(final TrustContext context) {
 		final ColumnVector result = this.trustProvider.computeTrust(context);
-		final boolean[] activeArray = getActiveArray(context.getNodes(), context.getLocalNode());
+		final boolean[] activeArray = this.getActiveArray(context.getNodes(), context.getLocalNode());
 		for (int i = 0; i < activeArray.length; ++i) {
 			if (!activeArray[i])
 				result.setAt(i, 0);

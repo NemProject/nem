@@ -26,13 +26,13 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Session getCurrentSession() {
-		return sessionFactory.getCurrentSession();
+		return this.sessionFactory.getCurrentSession();
 	}
 
 	@Override
 	@Transactional
-	public void save(Block block) {
-		getCurrentSession().saveOrUpdate(block);
+	public void save(final Block block) {
+		this.getCurrentSession().saveOrUpdate(block);
 	}
 
 	/*
@@ -45,8 +45,8 @@ public class BlockDaoImpl implements BlockDao {
 	 */
 	@Override
 	@Transactional
-	public void updateLastBlockId(Block block) {
-		Query updateId = getCurrentSession().createQuery("UPDATE Block " +
+	public void updateLastBlockId(final Block block) {
+		final Query updateId = this.getCurrentSession().createQuery("UPDATE Block " +
 				"set nextBlockId = :nextBlockId " +
 				"where id = :blockId");
 		updateId.setParameter("nextBlockId", block.getNextBlockId());
@@ -57,26 +57,26 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Long count() {
-		return (Long)getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
+		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
-	public Block findById(long id) {
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+	public Block findById(final long id) {
+		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("id", id));
-		return executeSingleQuery(criteria);
+		return this.executeSingleQuery(criteria);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Block findByHeight(final BlockHeight height) {
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("height", height.getRaw()));
-		return executeSingleQuery(criteria);
+		return this.executeSingleQuery(criteria);
 	}
 
 	/**
@@ -87,9 +87,9 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public Block findByHash(final Hash blockHash) {
 		final byte[] blockHashBytes = blockHash.getRaw();
-		long blockId = ByteUtils.bytesToLong(blockHashBytes);
+		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
 
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("shortId", blockId));
 		final  List<Block> blockList = listAndCast(criteria);
@@ -106,15 +106,15 @@ public class BlockDaoImpl implements BlockDao {
 
     @Override
 	@Transactional(readOnly = true)
-    public HashChain getHashesFrom(final BlockHeight height, int limit) {
-		final List<byte[]> blockList = prepareCriteriaGetFor("blockHash", height, limit);
+    public HashChain getHashesFrom(final BlockHeight height, final int limit) {
+		final List<byte[]> blockList = this.prepareCriteriaGetFor("blockHash", height, limit);
         return HashChain.fromRawHashes(blockList);
     }
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
-		final List<Long> rawDifficulties = prepareCriteriaGetFor("difficulty", height, limit);
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
+		final List<Long> rawDifficulties = this.prepareCriteriaGetFor("difficulty", height, limit);
 		final List<BlockDifficulty> result = new ArrayList<>(rawDifficulties.size());
 		for (final Long elem : rawDifficulties) {
 			result.add(new BlockDifficulty(elem));
@@ -125,15 +125,15 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
-		final List<Integer> rawTimestamps = prepareCriteriaGetFor("timestamp", height, limit);
+	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, final int limit) {
+		final List<Integer> rawTimestamps = this.prepareCriteriaGetFor("timestamp", height, limit);
 		return rawTimestamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, final int limit) {
+		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
 				.add(Restrictions.le("timestamp", timestamp))
@@ -148,9 +148,9 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public Collection<Block> getBlocksAfter(long blockHeight, int blocksCount) {
+	public Collection<Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
 		// whatever it takes : DO NOT ADD setMaxResults here!
-        final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+        final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
                 .setFetchMode("forger", FetchMode.JOIN)
                 .setFetchMode("blockTransfers", FetchMode.JOIN)
                 .add(Restrictions.gt("height", blockHeight))
@@ -168,18 +168,18 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		Query getTxes = getCurrentSession()
+		final Query getTxes = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
-		List<Long> txToDelete = listAndCast(getTxes);
+		final List<Long> txToDelete = listAndCast(getTxes);
 
-		Query query = getCurrentSession()
+		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 
 		if (! txToDelete.isEmpty()) {
-			Query dropTxes = getCurrentSession()
+			final Query dropTxes = this.getCurrentSession()
 					.createQuery("delete from Transfer t where t.id in (:ids)")
 					.setParameterList("ids", txToDelete);
 			dropTxes.executeUpdate();
@@ -188,11 +188,11 @@ public class BlockDaoImpl implements BlockDao {
 
 	private <T> T executeSingleQuery(final Criteria criteria) {
 		final List<T> blockList = listAndCast(criteria);
-		return blockList.size() > 0 ? blockList.get(0) : null;
+		return !blockList.isEmpty() ? blockList.get(0) : null;
 	}
 
-	private <T> List<T> prepareCriteriaGetFor(String name, BlockHeight height, int limit) {
-		final Criteria criteria =  getCurrentSession().createCriteria(Block.class)
+	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
+		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setMaxResults(limit)
 				.add(Restrictions.ge("height", height.getRaw())) // >=
 				.setProjection(Projections.property(name))

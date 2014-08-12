@@ -164,7 +164,7 @@ public class CommonStarter implements ServletContextListener {
 		return server;
 	}
 
-	private Connector createConnector(Server server) {
+	private Connector createConnector(final Server server) {
 		final HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
 		http_config.setSecurePort(configuration.getHttpsPort());
@@ -231,10 +231,10 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void boot() throws Exception {
-		this.server = createServer();
+		this.server = this.createServer();
 		this.server.addBean(new ScheduledExecutorScheduler());
-		this.server.addConnector(createConnector(server));
-		this.server.setHandler(createHandlers());
+		this.server.addConnector(this.createConnector(this.server));
+		this.server.setHandler(this.createHandlers());
 		this.server.setDumpAfterStart(false);
 		this.server.setDumpBeforeStop(false);
 		this.server.setStopAtShutdown(true);
@@ -244,7 +244,7 @@ public class CommonStarter implements ServletContextListener {
 		}
 
 		LOGGER.info("Calling start().");
-		startServer(this.server, new URL(configuration.getShutdownUrl()));
+		this.startServer(this.server, new URL(configuration.getShutdownUrl()));
 
 		if (configuration.isNcc()) {
 			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
@@ -282,18 +282,18 @@ public class CommonStarter implements ServletContextListener {
 			webCtx.setParent(appCtx);
 
 			final ServletContext context = event.getServletContext();
-			ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
 			dispatcher.setLoadOnStartup(1);
 			dispatcher.addMapping(String.format("%s%s", configuration.getApiContext(), "/*"));
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
 			if (configuration.isNcc()) {
-				createServlets(context);
+				this.createServlets(context);
 			}
 
 			if (configuration.useDosFilter()) {
-				createDosFilter(context);
+				this.createDosFilter(context);
 			}
 		} catch (final Exception e) {
 			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);

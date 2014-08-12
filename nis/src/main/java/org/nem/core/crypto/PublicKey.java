@@ -85,7 +85,7 @@ public class PublicKey implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof PublicKey)) {
 			return false;
 		}

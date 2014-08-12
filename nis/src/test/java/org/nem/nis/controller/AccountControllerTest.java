@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -161,7 +160,7 @@ public class AccountControllerTest {
 
 	// TODO-CR 20140809 -(minor) probably clearer to drop each param to its own line (also use final and remove the unused imports,
 	// and following double blank lines) ... will be much easier when we run our "code cleanup"
-	private void accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType transferType, BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+	private void accountTransfersMethodsDelegatesToIo(final ReadOnlyTransferDao.TransferType transferType, final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
@@ -186,14 +185,14 @@ public class AccountControllerTest {
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersAll(accountTransactionsPageBuilder));
 	}
 
 	@Test
 	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersIncoming(accountTransactionsPageBuilder));
 
@@ -201,7 +200,7 @@ public class AccountControllerTest {
 
 	@Test
 	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersOutgoing(accountTransactionsPageBuilder));
 	}

@@ -26,7 +26,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public Integer readOptionalInt(final String label) {
-		byte[] bytes = this.readBytes(4);
+		final byte[] bytes = this.readBytes(4);
 		return bytes[0] & 0x000000FF
 				| (bytes[1] << 8) & 0x0000FF00
 				| (bytes[2] << 16) & 0x00FF0000
@@ -35,8 +35,8 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public Long readOptionalLong(final String label) {
-		long lowPart = this.readInt(null);
-		long highPart = this.readInt(null);
+		final long lowPart = this.readInt(null);
+		final long highPart = this.readInt(null);
 		return lowPart & 0x00000000FFFFFFFFL
 				| (highPart << 32) & 0xFFFFFFFF00000000L;
 	}
@@ -48,19 +48,19 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public BigInteger readOptionalBigInteger(final String label) {
-		byte[] bytes = this.readOptionalBytes(null);
+		final byte[] bytes = this.readOptionalBytes(null);
 		return null == bytes ? null : new BigInteger(1, bytes);
 	}
 
 	@Override
 	public byte[] readOptionalBytes(final String label) {
-		int numBytes = this.readInt(null);
+		final int numBytes = this.readInt(null);
 		return BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numBytes ? null : this.readBytes(numBytes);
 	}
 
 	@Override
 	public String readOptionalString(final String label) {
-		byte[] bytes = this.readOptionalBytes(null);
+		final byte[] bytes = this.readOptionalBytes(null);
 		return null == bytes ? null : StringEncoder.getString(bytes);
 	}
 
@@ -71,14 +71,14 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator) {
-		int numObjects = this.readInt(null);
+		final int numObjects = this.readInt(null);
 		if (BinarySerializer.NULL_BYTES_SENTINEL_VALUE == numObjects) {
 			return null;
 		}
 
-		List<T> objects = new ArrayList<>();
+		final List<T> objects = new ArrayList<>();
 		for (int i = 0; i < numObjects; ++i) {
-			objects.add(deserializeObject(activator));
+			objects.add(this.deserializeObject(activator));
 		}
 
 		return objects;
@@ -91,7 +91,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	private <T> T deserializeObject(final ObjectDeserializer<T> activator) {
 		try {
-			byte[] bytes = this.readBytes(null);
+			final byte[] bytes = this.readBytes(null);
 			if (0 == bytes.length) {
 				return null;
 			}
@@ -99,7 +99,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 			try (BinaryDeserializer deserializer = new BinaryDeserializer(bytes, this.getContext())) {
 				return activator.deserialize(deserializer);
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new SerializationException(ex);
 		}
 	}
@@ -113,7 +113,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 		return 0 != this.stream.available();
 	}
 
-	private byte[] readBytes(int numBytes) {
+	private byte[] readBytes(final int numBytes) {
 		if (this.stream.available() < numBytes) {
 			throw new SerializationException("unexpected end of stream reached");
 		}
@@ -123,14 +123,14 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 		}
 
 		try {
-			byte[] bytes = new byte[numBytes];
-			int numBytesRead = this.stream.read(bytes);
+			final byte[] bytes = new byte[numBytes];
+			final int numBytesRead = this.stream.read(bytes);
 			if (numBytesRead != numBytes) {
 				throw new SerializationException("unexpected end of stream reached");
 			}
 
 			return bytes;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new SerializationException(e);
 		}
 	}

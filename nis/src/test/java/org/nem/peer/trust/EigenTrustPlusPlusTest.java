@@ -138,15 +138,15 @@ public class EigenTrustPlusPlusTest {
 		}
 
 		@Override
-		public double calculateTrustScore(NodeExperience experience) {
+		public double calculateTrustScore(final NodeExperience experience) {
 			return 0;
 		}
 
 		@Override
 		public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3) {
-			final NodeExperience experience1 = nodeExperiences.getNodeExperience(node1, node3);
-			final NodeExperience experience2 = nodeExperiences.getNodeExperience(node2, node3);
-			long numSuccessfulCalls = experience1.successfulCalls().get() + experience2.successfulCalls().get();
+			final NodeExperience experience1 = this.nodeExperiences.getNodeExperience(node1, node3);
+			final NodeExperience experience2 = this.nodeExperiences.getNodeExperience(node2, node3);
+			final long numSuccessfulCalls = experience1.successfulCalls().get() + experience2.successfulCalls().get();
 			return 0 == numSuccessfulCalls ? 100 : numSuccessfulCalls;
 		}
 	}

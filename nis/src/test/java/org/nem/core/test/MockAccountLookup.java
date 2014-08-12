@@ -12,7 +12,7 @@ public class MockAccountLookup implements AccountLookup {
 
 	private final UnknownAccountBehavior unknownAccountBehavior;
 	private int numFindByIdCalls;
-	private HashMap<Address, Account> accountMap = new HashMap<>();
+	private final HashMap<Address, Account> accountMap = new HashMap<>();
 
 	/**
 	 * The default behavior of findByAddress if the address is unknown.
@@ -60,7 +60,7 @@ public class MockAccountLookup implements AccountLookup {
 			return account;
 		}
 
-		switch (unknownAccountBehavior) {
+		switch (this.unknownAccountBehavior) {
 			case NULL:
 				return null;
 
@@ -72,7 +72,7 @@ public class MockAccountLookup implements AccountLookup {
 	}
 
 	@Override
-	public boolean isKnownAddress(Address id) {
+	public boolean isKnownAddress(final Address id) {
 		return this.accountMap.containsKey(id);
 	}
 

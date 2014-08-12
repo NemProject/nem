@@ -51,7 +51,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NisRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
-		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
+		final TransferTransaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
 		return new NisRequestResult(result);

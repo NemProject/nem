@@ -7,9 +7,9 @@ import org.nem.core.serialization.*;
  */
 public class MockSerializableEntity implements SerializableEntity {
 
-	private int intValue;
-	private String stringValue;
-	private long longValue;
+	private final int intValue;
+	private final String stringValue;
+	private final long longValue;
 
 	/**
 	 * Creates a new MockSerializableEntity object.

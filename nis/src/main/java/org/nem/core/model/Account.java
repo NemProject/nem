@@ -192,7 +192,7 @@ public class Account {
 	 * @return Number of blocks foraged by this account.
 	 */
 	public BlockAmount getForagedBlocks() {
-		return foragedBlocks;
+		return this.foragedBlocks;
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class Account {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof Account)) {
 			return false;
 		}

@@ -39,7 +39,7 @@ public class BasicNodeSelectorITCase {
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
 		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED)/(double)NUM_NODES;
-		double chiSquare = calculateChiSquare(observed, expectedValue);
+		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
 		assertRandomness(chiSquare);
@@ -61,7 +61,7 @@ public class BasicNodeSelectorITCase {
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
 		final double expectedValue = (double)NUM_TRIES/(double)NUM_NODES;
-		double chiSquare = calculateChiSquare(observed, expectedValue);
+		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
 		assertRandomness(chiSquare);
@@ -116,7 +116,7 @@ public class BasicNodeSelectorITCase {
 		}
 
 		public TestContext(final ColumnVector trustValues, final Random random) {
-			Mockito.when(context.getLocalNode()).thenReturn(this.localNode);
+			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
 
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {

@@ -302,7 +302,7 @@ public class VerifiableEntityTest {
 			final MockVerifiableEntity originalEntity,
 			final Account deserializedSigner) {
 		// Act:
-		Deserializer deserializer = Utils.roundtripVerifiableEntity(originalEntity, deserializedSigner);
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalEntity, deserializedSigner);
 		return new MockVerifiableEntity(deserializer);
 	}
 
@@ -315,7 +315,7 @@ public class VerifiableEntityTest {
 		originalEntity.sign();
 
 		// Act:
-		Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, accountLookup);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, accountLookup);
 		return new MockVerifiableEntity(deserializer);
 	}
 
@@ -327,7 +327,7 @@ public class VerifiableEntityTest {
 		accountLookup.setMockAccount(deserializedSigner);
 
 		// Act:
-		Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity.asNonVerifiable(), accountLookup);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity.asNonVerifiable(), accountLookup);
 		return new MockVerifiableEntity(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 	}
 }

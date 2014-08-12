@@ -31,7 +31,7 @@ public class InactiveNodePrunerTest {
 		Mockito.when(nodes.getInactiveNodes()).thenReturn(createNodeListWithSize(17), createNodeListWithSize(9));
 
 		// Act:
-		int result = pruner.prune(nodes);
+		final int result = pruner.prune(nodes);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(8));

@@ -107,13 +107,13 @@ public class ArrayUtils {
 	 * @param vector - non-empty array of doubles
 	 * @return double in <code>vector</code> that has the largest value.
 	 */
-	public static double max(double[] vector) {
+	public static double max(final double[] vector) {
 		if (vector == null || vector.length < 1) {
 			throw new IllegalArgumentException("input vector is empty");
 		}
 		double max = Double.MIN_VALUE;
 
-		for (double val : vector) {
+		for (final double val : vector) {
 			if (max < val) {
 				max = val;
 			}
@@ -128,13 +128,13 @@ public class ArrayUtils {
 	 * @param vector - non-empty array of longs
 	 * @return double in <code>vector</code> that has the largest value.
 	 */
-	public static long max(long[] vector) {
+	public static long max(final long[] vector) {
 		if (vector == null || vector.length < 1) {
 			throw new IllegalArgumentException("input vector is empty");
 		}
 		long max = Long.MIN_VALUE;
 
-		for (long val : vector) {
+		for (final long val : vector) {
 			if (max < val) {
 				max = val;
 			}

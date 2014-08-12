@@ -19,13 +19,13 @@ public class AccountDaoImpl implements AccountDao {
 	}
 
 	private Session getCurrentSession() {
-		return sessionFactory.getCurrentSession();
+		return this.sessionFactory.getCurrentSession();
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Account getAccount(Long id) {
-		Query query = getCurrentSession()
+	public Account getAccount(final Long id) {
+		final Query query = this.getCurrentSession()
 				.createQuery("from Account a where a.id = :id")
 				.setParameter("id", id);
 		return firstFromQuery(query);
@@ -33,8 +33,8 @@ public class AccountDaoImpl implements AccountDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Account getAccountByPrintableAddress(String printableAddress) {
-		Query query = getCurrentSession()
+	public Account getAccountByPrintableAddress(final String printableAddress) {
+		final Query query = this.getCurrentSession()
 				.createQuery("from Account a where a.printableKey = :key")
 				.setParameter("key", printableAddress);
 		return firstFromQuery(query);
@@ -42,12 +42,12 @@ public class AccountDaoImpl implements AccountDao {
 
 	@Override
 	@Transactional
-	public void save(Account account) {
-		getCurrentSession().saveOrUpdate(account);
+	public void save(final Account account) {
+		this.getCurrentSession().saveOrUpdate(account);
 	}
 
 	private static Account firstFromQuery(final Query query) {
 		final List<?> userList = query.list();
-		return userList.size() > 0 ? (Account)userList.get(0) : null;
+		return !userList.isEmpty() ? (Account)userList.get(0) : null;
 	}
 }

@@ -114,7 +114,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	//endregion
 
 	@Override
-	protected SparseMatrix createMatrix(int rows, int cols) {
+	protected SparseMatrix createMatrix(final int rows, final int cols) {
 		return new SparseMatrix(rows, cols, 100);
 	}
 }

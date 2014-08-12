@@ -10,7 +10,7 @@ public abstract class Scores<T extends Score> {
 
 		@Override
 		protected T createValue() {
-			return createScore();
+			return Scores.this.createScore();
 		}
 	};
 

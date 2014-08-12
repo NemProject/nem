@@ -81,7 +81,7 @@ public class WeightedBalancesObserverTest {
 		public TestContext() {
 			final Address address = Utils.generateRandomAddress();
 			this.account = Mockito.mock(Account.class);
-			Mockito.when(account.getAddress()).thenReturn(address);
+			Mockito.when(this.account.getAddress()).thenReturn(address);
 
 			this.balances = Mockito.mock(WeightedBalances.class);
 

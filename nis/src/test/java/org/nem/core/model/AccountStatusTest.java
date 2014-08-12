@@ -13,8 +13,8 @@ public class AccountStatusTest {
 	@Test
 	public void accountStatusCanBeCreatedFromCorrectStatusString() {
 		// Arrange:
-		AccountStatus statusUnlocked = AccountStatus.fromString("UNLOCKED");
-		AccountStatus statusLocked = AccountStatus.fromString("LOCKED");
+		final AccountStatus statusUnlocked = AccountStatus.fromString("UNLOCKED");
+		final AccountStatus statusLocked = AccountStatus.fromString("LOCKED");
 
 		// Assert:
 		Assert.assertThat(statusUnlocked, IsEqual.equalTo(AccountStatus.UNLOCKED));
@@ -24,7 +24,7 @@ public class AccountStatusTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void accountStatusCannotBeCreatedFromIncorrectStatusString() {
 		// Arrange:
-		AccountStatus statusUnlocked = AccountStatus.fromString("TEST");
+		final AccountStatus statusUnlocked = AccountStatus.fromString("TEST");
 	}
 
 	//endregion

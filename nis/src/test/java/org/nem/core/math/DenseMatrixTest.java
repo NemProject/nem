@@ -47,7 +47,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 		final DenseMatrix matrix = this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
 
 		// Act:
-		boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
 
 		// Assert:
 		Assert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -60,7 +60,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 
 		// Act:
 		matrix.setAt(0, 1, 12.1);
-		boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 12.1, 5.4, 1.2, 4.3, 7.6 });
+		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 12.1, 5.4, 1.2, 4.3, 7.6 });
 
 		// Assert:
 		Assert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -88,7 +88,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 	//endregion
 
 	@Override
-	protected DenseMatrix createMatrix(int rows, int cols) {
+	protected DenseMatrix createMatrix(final int rows, final int cols) {
 		return new DenseMatrix(rows, cols);
 	}
 }

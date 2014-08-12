@@ -38,7 +38,7 @@ public class JarFacade {
 			try (final JarInputStream jarInputStream = new JarInputStream(jarStream, true)) {
 				attributes = loadAttributes(jarInputStream, this.name);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.warning(String.format("Analyzing meta data not possible <%s>", e.getMessage()));
 		}
 

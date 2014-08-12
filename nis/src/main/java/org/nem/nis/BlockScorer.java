@@ -61,7 +61,7 @@ public class BlockScorer {
 	 */
 	public BigInteger calculateHit(final Block block) {
 		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
-		double tmp = Math.abs(Math.log(val.doubleValue()/TWO_TO_THE_POWER_OF_256));
+		final double tmp = Math.abs(Math.log(val.doubleValue()/TWO_TO_THE_POWER_OF_256));
 		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
 		return val;
 	}
@@ -74,11 +74,11 @@ public class BlockScorer {
 	 * @return The target score.
 	 */
 	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
-		int timeStampDifference = block.getTimeStamp().subtract(prevBlock.getTimeStamp());
+		final int timeStampDifference = block.getTimeStamp().subtract(prevBlock.getTimeStamp());
 		if (timeStampDifference < 0)
 			return BigInteger.ZERO;
 
-		long forgerBalance = calculateForgerBalance(block);
+		final long forgerBalance = this.calculateForgerBalance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				 .multiply(BigInteger.valueOf(forgerBalance))
 				 .multiply(TWO_TO_THE_POWER_OF_64)
@@ -122,10 +122,10 @@ public class BlockScorer {
 	 */
 	public long calculateBlockScore(final Block parentBlock, final Block currentBlock) {
 		final int timeDiff = currentBlock.getTimeStamp().subtract(parentBlock.getTimeStamp());
-		return calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
+		return this.calculateBlockScoreImpl(timeDiff, currentBlock.getDifficulty().getRaw());
 	}
 
-	private long calculateBlockScoreImpl(int timeDiff, long difficulty) {
+	private long calculateBlockScoreImpl(final int timeDiff, final long difficulty) {
 		return difficulty - timeDiff;
 	}
 

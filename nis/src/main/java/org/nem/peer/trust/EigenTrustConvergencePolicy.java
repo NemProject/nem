@@ -31,8 +31,8 @@ public class EigenTrustConvergencePolicy {
 	public EigenTrustConvergencePolicy(
 			final ColumnVector preTrustVector,
 			final Matrix trustMatrix,
-			int maxIterations,
-			double epsilon) {
+			final int maxIterations,
+			final double epsilon) {
 		this.preTrustVector = preTrustVector;
 		this.trustMatrix = trustMatrix;
 		this.maxIterations = maxIterations;

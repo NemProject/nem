@@ -58,7 +58,7 @@ public class PeerUtils {
 	 *
 	 * @return The array.
 	 */
-	public static Node[] createNodeArray(int size) {
+	public static Node[] createNodeArray(final int size) {
 		final Node[] nodes = new Node[size];
 		for (int i = 0; i < size; ++i)
 			nodes[i] = createNodeWithPort(i);

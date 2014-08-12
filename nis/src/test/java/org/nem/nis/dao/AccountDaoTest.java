@@ -24,10 +24,10 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canSaveAccount() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		org.nem.nis.dbmodel.Account entity = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final org.nem.nis.dbmodel.Account entity = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 
 		// Act:
-		accountDao.save(entity);
+		this.accountDao.save(entity);
 
 		// Assert:
 		Assert.assertThat(entity.getId(), not(nullValue()));
@@ -37,11 +37,11 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canRetrieveSavedAccount() {
 		// Arrange
 		final Account account = Utils.generateRandomAccount();
-		org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 
 		// Act:
-		accountDao.save(dbAccount);
-		org.nem.nis.dbmodel.Account entity = accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
+		this.accountDao.save(dbAccount);
+		final org.nem.nis.dbmodel.Account entity = this.accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());

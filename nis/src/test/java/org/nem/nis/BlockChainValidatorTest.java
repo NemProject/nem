@@ -43,7 +43,7 @@ public class BlockChainValidatorTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = new ArrayList<>();
-		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		final Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
 		signAllBlocks(blocks);
@@ -60,8 +60,8 @@ public class BlockChainValidatorTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = new ArrayList<>();
-		Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
-		Block dummyPrevious = createBlock(Utils.generateRandomAccount(), parentBlock);
+		final Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
+		final Block dummyPrevious = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
 		blocks.get(blocks.size()-1).setPrevious(dummyPrevious);
@@ -144,7 +144,7 @@ public class BlockChainValidatorTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = createBlockList(parentBlock, 3);
-		Block block = createFutureBlock(blocks.get(2));
+		final Block block = createFutureBlock(blocks.get(2));
 		blocks.add(block);
 
 		// Assert:
@@ -300,7 +300,7 @@ public class BlockChainValidatorTest {
 
 	//region helper functions
 
-	private static List<Block> createBlockList(Block parent, int numBlocks) {
+	private static List<Block> createBlockList(Block parent, final int numBlocks) {
 		final List<Block> blocks = new ArrayList<>();
 		final Account account = Utils.generateRandomAccount();
 		for (int i = 0; i < numBlocks; ++i) {

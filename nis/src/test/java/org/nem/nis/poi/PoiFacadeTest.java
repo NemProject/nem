@@ -120,7 +120,7 @@ public class PoiFacadeTest {
 		assertEquivalentButNotSame(copyState3, state3);
 	}
 
-	private static void assertEquivalentButNotSame(final PoiAccountState lhs, PoiAccountState rhs) {
+	private static void assertEquivalentButNotSame(final PoiAccountState lhs, final PoiAccountState rhs) {
 		Assert.assertThat(lhs, IsNot.not(IsSame.sameInstance(rhs)));
 		Assert.assertThat(lhs.getAddress(), IsEqual.equalTo(rhs.getAddress()));
 	}
@@ -251,7 +251,7 @@ public class PoiFacadeTest {
 		// Assert: the generator was called once and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
-		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
 	@Test
@@ -268,7 +268,7 @@ public class PoiFacadeTest {
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
-		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L)));
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L)));
 	}
 
 	@Test
@@ -286,7 +286,7 @@ public class PoiFacadeTest {
 		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
-		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
 	@Test
@@ -320,7 +320,7 @@ public class PoiFacadeTest {
 		// Assert: the generator was called twice and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceGenerator, Mockito.times(2)).updateAccountImportances(Mockito.any(), argument.capture());
-		Assert.assertThat(heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
 	private static List<PoiAccountState> createAccountStatesForRecalculateTests(final int numAccounts, final PoiFacade facade) {

@@ -25,7 +25,7 @@ public class StringEncoder {
 	 * @param bytes The input byte array.
 	 * @return The output string.
 	 */
-	public static String getString(byte[] bytes) {
+	public static String getString(final byte[] bytes) {
 		return new String(bytes, ENCODING_CHARSET);
 	}
 }

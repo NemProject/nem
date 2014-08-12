@@ -34,7 +34,7 @@ public class OutlinkObserver implements TransferObserver {
 			return;
 		}
 
-		final Amount linkWeight = calculateLinkWeight(this.isExecute ? sender : recipient, amount);
+		final Amount linkWeight = this.calculateLinkWeight(this.isExecute ? sender : recipient, amount);
 
 		if (this.isExecute) {
 			final AccountLink link = new AccountLink(this.height, linkWeight, recipient.getAddress());

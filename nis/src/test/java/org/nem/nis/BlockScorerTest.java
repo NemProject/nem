@@ -147,13 +147,13 @@ public class BlockScorerTest {
 
 	private static final Map<Integer, Integer> HEIGHT_TO_GROUPED_HEIGHT_MAP = new HashMap<Integer, Integer>() {
 		{
-			put(1, 1);
-			put(30, 1);
-			put(31, 1);
-			put(32, 31);
-			put(33, 31);
-			put(90, 62);
-			put(111, 93);
+			this.put(1, 1);
+			this.put(30, 1);
+			this.put(31, 1);
+			this.put(32, 31);
+			this.put(33, 31);
+			this.put(90, 62);
+			this.put(111, 93);
 		}
 	};
 
@@ -220,11 +220,11 @@ public class BlockScorerTest {
 
 	//endregion
 
-	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
+	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(block, accountLookup);
-		Block b = new Block(deserializer.readInt("type"), options, deserializer);
+		final Block b = new Block(deserializer.readInt("type"), options, deserializer);
 
 		Field field = b.getClass().getDeclaredField("generationHash");
 		field.setAccessible(true);
@@ -237,7 +237,7 @@ public class BlockScorerTest {
 		return b;
 	}
 
-	private static Block createBlock(final Account account, int timeStamp, long height) throws NoSuchFieldException, IllegalAccessException {
+	private static Block createBlock(final Account account, final int timeStamp, final long height) throws NoSuchFieldException, IllegalAccessException {
 		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 		block.sign();
 

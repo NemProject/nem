@@ -29,7 +29,7 @@ public class JsonSerializer extends Serializer {
 	 *
 	 * @param enforceReadWriteOrder true if forward-only reads should be enforced.
 	 */
-	public JsonSerializer(boolean enforceReadWriteOrder) {
+	public JsonSerializer(final boolean enforceReadWriteOrder) {
 		this.object = new JSONObject();
 		this.propertyOrderArray = enforceReadWriteOrder ? new JSONArray() : null;
 	}
@@ -90,7 +90,7 @@ public class JsonSerializer extends Serializer {
 	}
 
 	private static JSONObject serializeObject(final SerializableEntity object) {
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		if (null != object) {
 			object.serialize(serializer);
 		}
@@ -125,7 +125,7 @@ public class JsonSerializer extends Serializer {
 	 * @return The resulting JSON object.
 	 */
 	public static JSONObject serializeToJson(final SerializableEntity entity) {
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		entity.serialize(serializer);
 		return serializer.getObject();
 	}

@@ -287,7 +287,7 @@ public class NodeIdentityTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final NodeIdentity identity = new NodeIdentity(keyPair);
-		int hashCode = identity.hashCode();
+		final int hashCode = identity.hashCode();
 
 		// Assert:
 		Assert.assertThat(new NodeIdentity(keyPair).hashCode(), IsEqual.equalTo(hashCode));
@@ -305,7 +305,7 @@ public class NodeIdentityTest {
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsPresent() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair(PUBLIC_KEY_FOR_TO_STRING_TESTS);
+		final KeyPair keyPair = new KeyPair(this.PUBLIC_KEY_FOR_TO_STRING_TESTS);
 		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
 
 		// Assert:
@@ -315,7 +315,7 @@ public class NodeIdentityTest {
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsNotPresent() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair(PUBLIC_KEY_FOR_TO_STRING_TESTS);
+		final KeyPair keyPair = new KeyPair(this.PUBLIC_KEY_FOR_TO_STRING_TESTS);
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:

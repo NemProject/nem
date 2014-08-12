@@ -20,22 +20,22 @@ public class MtjSparseMatrix extends Matrix {
 	}
 
 	@Override
-	protected Matrix create(int numRows, int numCols) {
+	protected Matrix create(final int numRows, final int numCols) {
 		throw new UnsupportedOperationException("this operation is not currently supported");
 	}
 
 	@Override
-	protected double getAtUnchecked(int row, int col) {
+	protected double getAtUnchecked(final int row, final int col) {
 		return this.matrix.get(row, col);
 	}
 
 	@Override
-	protected void setAtUnchecked(int row, int col, double val) {
+	protected void setAtUnchecked(final int row, final int col, final double val) {
 		this.matrix.set(row, col, val);
 	}
 
 	@Override
-	protected void forEach(ElementVisitorFunction func) {
+	protected void forEach(final ElementVisitorFunction func) {
 		for (final MatrixEntry entry : this.matrix) {
 			func.visit(
 					entry.row(),

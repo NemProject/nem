@@ -49,7 +49,7 @@ public class CommonConfiguration {
 	 */
 	public CommonConfiguration(final Properties properties) {
 		this.shortServerName = getString(properties, "nem.shortServerName");
-		this.nemFolder = getOptionalString(properties, "nem.folder", getDefaultFolder()).replace("%h", getDefaultFolder());
+		this.nemFolder = getOptionalString(properties, "nem.folder", this.getDefaultFolder()).replace("%h", this.getDefaultFolder());
 		this.maxThreads = getInteger(properties, "nem.maxThreads");
 		this.protocol = getOptionalString(properties, "nem.protocol", "http");
 		this.host = getOptionalString(properties, "nem.host", "localhost");
@@ -245,7 +245,7 @@ public class CommonConfiguration {
 	 * @return The base url as string.
 	 */
 	public String getBaseUrl() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		return builder.append(this.getProtocol())
 				.append("://")
 				.append(this.getHost())

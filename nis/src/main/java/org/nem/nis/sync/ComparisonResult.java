@@ -73,9 +73,9 @@ public class ComparisonResult {
 		 */
 		REMOTE_LIED_ABOUT_CHAIN_SCORE(REMOTE_IS_EVIL | 4);
 
-		private int value;
+		private final int value;
 
-		private Code(int value) {
+		private Code(final int value) {
 			this.value = value;
 		}
 

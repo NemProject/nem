@@ -52,7 +52,7 @@ public class SecureMessage extends Message {
 	 */
 	public SecureMessage(final Deserializer deserializer) {
 		super(MessageTypes.SECURE);
-		byte[] payload = deserializer.readBytes("payload");
+		final byte[] payload = deserializer.readBytes("payload");
 		final Deserializer payloadDeserializer = new BinaryDeserializer(payload, deserializer.getContext());
 		this.payload = new DeserializedSecureMessagePayload(payloadDeserializer);
 	}

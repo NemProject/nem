@@ -73,7 +73,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	}
 
 	@Override
-	protected void serializeImpl(Serializer serializer) {
+	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeInt("customField", this.customField);
 	}
 }

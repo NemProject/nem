@@ -27,9 +27,9 @@ public enum AccountStatus {
 		this.status = status;
 	}
 
-	public static AccountStatus fromString(String status) {
+	public static AccountStatus fromString(final String status) {
 		if (status != null) {
-			for (AccountStatus accountStatus : values()) {
+			for (final AccountStatus accountStatus : values()) {
 				if (accountStatus.status.equals(status)) {
 					return accountStatus;
 				}

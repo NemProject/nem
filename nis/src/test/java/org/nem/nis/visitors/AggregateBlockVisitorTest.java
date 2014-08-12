@@ -53,8 +53,8 @@ public class AggregateBlockVisitorTest {
 			this.visitor2 = new MockVisitor(2, this.visitList);
 
 			final List<BlockVisitor> mockVisitors = new ArrayList<>();
-			mockVisitors.add(visitor1);
-			mockVisitors.add(visitor2);
+			mockVisitors.add(this.visitor1);
+			mockVisitors.add(this.visitor2);
 
 			this.visitor = new AggregateBlockVisitor(mockVisitors);
 		}
@@ -67,7 +67,7 @@ public class AggregateBlockVisitorTest {
 		private Block lastBlock;
 		private Block lastParentBlock;
 
-		public MockVisitor(int id, final List<Integer> visitList) {
+		public MockVisitor(final int id, final List<Integer> visitList) {
 			this.id = id;
 			this.visitList = visitList;
 		}

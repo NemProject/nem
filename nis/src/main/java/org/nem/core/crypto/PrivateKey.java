@@ -50,7 +50,7 @@ public class PrivateKey implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof PrivateKey)) {
 			return false;
 		}
@@ -87,7 +87,7 @@ public class PrivateKey implements SerializableEntity {
 	public static PrivateKey fromDecimalString(final String decimal) {
 		try {
 			return new PrivateKey(new BigInteger(decimal, 10));
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			throw new CryptoException(e);
 		}
 	}

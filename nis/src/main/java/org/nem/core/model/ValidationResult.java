@@ -75,9 +75,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_CHAIN_INVALID(13);
 
-	private int value;
+	private final int value;
 
-	private ValidationResult(int value) {
+	private ValidationResult(final int value) {
 		this.value = value;
 	}
 
@@ -88,7 +88,7 @@ public enum ValidationResult {
 	 * @return The validation result if the value is known.
 	 * @throws IllegalArgumentException if the value is unknown.
 	 */
-	public static ValidationResult fromValue(int value) {
+	public static ValidationResult fromValue(final int value) {
 		for (final ValidationResult result : values()) {
 			if (result.getValue() == value) {
 				return result;

@@ -48,7 +48,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 	private List<Node> getAdditionalPreTrustedNodes() {
 		final List<Node> onlinePreTrustedNodes = this.getOnlinePreTrustedNodes();
 		// BR: if all pre-trusted nodes are offline, include all of them because the network is starving
-		if (0 == onlinePreTrustedNodes.size())
+		if (onlinePreTrustedNodes.isEmpty())
 			return new ArrayList<>(this.context.getPreTrustedNodes().getNodes());
 
 		if (this.isPreTrusted())

@@ -139,7 +139,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.serialize(serializer, true);
 	}
 
-	private void serialize(final Serializer serializer, boolean includeSignature) {
+	private void serialize(final Serializer serializer, final boolean includeSignature) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
 		TimeInstant.writeTo(serializer, "timestamp", this.getTimeStamp());
@@ -175,10 +175,10 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		}
 
 		// (1) serialize the entire transaction to a buffer
-		byte[] transactionBytes = this.getBytes();
+		final byte[] transactionBytes = this.getBytes();
 
 		// (2) sign the buffer
-		Signer signer = new Signer(account.getKeyPair());
+		final Signer signer = new Signer(account.getKeyPair());
 		this.signature = signer.sign(transactionBytes);
 	}
 
@@ -190,7 +190,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 			throw new CryptoException("cannot verify because signature does not exist");
 		}
 
-		Signer signer = new Signer(this.signer.getKeyPair());
+		final Signer signer = new Signer(this.signer.getKeyPair());
 		return signer.verify(this.getBytes(), this.signature);
 	}
 

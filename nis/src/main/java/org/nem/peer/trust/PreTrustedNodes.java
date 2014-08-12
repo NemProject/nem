@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class PreTrustedNodes {
 
-	private Set<Node> nodes;
+	private final Set<Node> nodes;
 
 	/**
 	 * Creates a pre-trusted nodes object.

@@ -73,7 +73,7 @@ public class OutlinkObserverTest {
 		assertNotifyCreditDoesNotChangeOutlinks(false);
 	}
 
-	private static void assertNotifyCreditDoesNotChangeOutlinks(boolean isExecute) {
+	private static void assertNotifyCreditDoesNotChangeOutlinks(final boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final OutlinkObserver observer = context.createObserver(isExecute);
@@ -101,7 +101,7 @@ public class OutlinkObserverTest {
 		assertNotifyDebitDoesNotChangeOutlinks(false);
 	}
 
-	private static void assertNotifyDebitDoesNotChangeOutlinks(boolean isExecute) {
+	private static void assertNotifyDebitDoesNotChangeOutlinks(final boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final OutlinkObserver observer = context.createObserver(isExecute);

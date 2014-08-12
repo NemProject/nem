@@ -117,7 +117,7 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @param i the index.
 	 * @return The element.
 	 */
-	public T get(int i) {
+	public T get(final int i) {
 		return this.list.get(i);
 	}
 
@@ -129,7 +129,7 @@ public class SerializableList<T extends SerializableEntity> implements Serializa
 	 * @return The index of the first difference.
 	 */
 	public int findFirstDifference(final SerializableList<T> rhs) {
-		return findFirstDifferenceInternal(rhs);
+		return this.findFirstDifferenceInternal(rhs);
 	}
 
 	private int findFirstDifferenceInternal(final SerializableList<?> rhs) {

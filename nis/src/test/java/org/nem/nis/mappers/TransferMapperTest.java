@@ -151,7 +151,7 @@ public class TransferMapperTest {
 			return this.model;
 		}
 
-		public Transfer toDbModel(int blockIndex) {
+		public Transfer toDbModel(final int blockIndex) {
 			return TransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
 		}
 
@@ -196,7 +196,7 @@ public class TransferMapperTest {
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
 			Assert.assertThat(rhs.getRecipient(), IsEqual.equalTo(this.model.getRecipient()));
 			Assert.assertThat(rhs.getAmount(), IsEqual.equalTo(this.model.getAmount()));
-			assertAreEqual(this.model.getMessage(), rhs.getMessage());
+			this.assertAreEqual(this.model.getMessage(), rhs.getMessage());
 		}
 
 		private void assertAreEqual(final Message lhs, final Message rhs) {

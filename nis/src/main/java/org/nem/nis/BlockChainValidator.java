@@ -60,7 +60,7 @@ public class BlockChainValidator {
 				return false;
 			}
 			
-			if (!isBlockHit(parentBlock, block)) {
+			if (!this.isBlockHit(parentBlock, block)) {
 				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
 			}

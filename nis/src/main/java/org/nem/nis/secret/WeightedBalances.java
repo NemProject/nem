@@ -34,7 +34,7 @@ public class WeightedBalances {
 	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
-				balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()));
+				this.balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()));
 	}
 
 	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
@@ -62,16 +62,16 @@ public class WeightedBalances {
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
 		if (! this.balances.isEmpty()) {
-			int idx = this.balances.size() - 1;
+			final int idx = this.balances.size() - 1;
 			final WeightedBalance last = this.balances.get(idx);
 			if (height.compareTo(last.getBlockHeight()) < 0) {
 				throw new IllegalArgumentException("invalid height passed to addReceive");
 			}
-			iterateBalances(height);
+			this.iterateBalances(height);
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(createReceive(prev, height, amount));
+		this.balances.add(this.createReceive(prev, height, amount));
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class WeightedBalances {
 	 */
 	public void undoReceive(final BlockHeight height, final Amount amount) {
 		this.undoChain(height);
-		int idx = this.balances.size() - 1;
+		final int idx = this.balances.size() - 1;
 		final WeightedBalance last = this.balances.get(idx);
 
 		if (last.getBlockHeight().equals(height) && last.getAmount().equals(amount)) {
@@ -101,16 +101,16 @@ public class WeightedBalances {
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
 		if (! this.balances.isEmpty()) {
-			int idx = this.balances.size() - 1;
+			final int idx = this.balances.size() - 1;
 			final WeightedBalance last = this.balances.get(idx);
 			if (height.compareTo(last.getBlockHeight()) < 0) {
 				throw new IllegalArgumentException("invalid height passed to addSend");
 			}
-			iterateBalances(height);
+			this.iterateBalances(height);
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(createSend(prev, height, amount));
+		this.balances.add(this.createSend(prev, height, amount));
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class WeightedBalances {
 	 */
 	public void undoSend(final BlockHeight height, final Amount amount) {
 		this.undoChain(height);
-		int idx = this.balances.size() - 1;
+		final int idx = this.balances.size() - 1;
 		final WeightedBalance last = this.balances.get(idx);
 
 		if (last.getBlockHeight().equals(height) && last.getAmount().equals(amount)) {
@@ -141,7 +141,7 @@ public class WeightedBalances {
 			index=-2-index;
 			// if index is negative here it's probably wrong anyway,
 		} else {
-			index = findLast(this.balances, index);
+			index = this.findLast(this.balances, index);
 		}
 		return index;
 	}
@@ -152,10 +152,10 @@ public class WeightedBalances {
 	 * @return The vested amount.
 	 */
 	public Amount getVested(final BlockHeight height) {
-		if (balances.size() == 0) {
+		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
 		}
-		final int index = findElement(height);
+		final int index = this.findElement(height);
 		return this.balances.get(index).getVestedBalance();
 	}
 
@@ -166,10 +166,10 @@ public class WeightedBalances {
 	 * @return The unvested amount.
 	 */
 	public Amount getUnvested(final BlockHeight height) {
-		if (balances.size() == 0) {
+		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
 		}
-		final int index = findElement(height);
+		final int index = this.findElement(height);
 		return this.balances.get(index).getUnvestedBalance();
 	}
 
@@ -183,7 +183,7 @@ public class WeightedBalances {
 		}
 		final WeightedBalance weightedBalance =  this.balances.get(0);
 		this.undoReceive(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
-		addFullyVested(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
+		this.addFullyVested(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
 	}
 
 	private int findLast(final List<WeightedBalance> balances, int index) {
@@ -200,8 +200,8 @@ public class WeightedBalances {
 
 	// requires non-empty balances list
 	private void iterateBalances(final BlockHeight height) {
-		int idx = this.balances.size() - 1;
-		long h = this.balances.get(idx).getBlockHeight().getRaw();
+		final int idx = this.balances.size() - 1;
+		final long h = this.balances.get(idx).getBlockHeight().getRaw();
 		long multiple = ((h + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1)/BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)* BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 		while (height.getRaw() > multiple) {
@@ -220,7 +220,7 @@ public class WeightedBalances {
 	public void undoChain(final BlockHeight height) {
 		while (this.balances.size() > 1) {
 			if (this.balances.get(this.balances.size()-1).getBlockHeight().compareTo(height) > 0) {
-				balances.remove(this.balances.size()-1);
+				this.balances.remove(this.balances.size() - 1);
 			} else {
 				break;
 			}

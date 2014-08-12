@@ -138,19 +138,19 @@ public class AddressTest {
 	@Test
 	public void addressWithIncorrectVersionIsNotValid() {
 		// Assert:
-		assertAddressIsNotValidIfChangedAtIndex(0);
+		this.assertAddressIsNotValidIfChangedAtIndex(0);
 	}
 
 	@Test
 	public void addressWithIncorrectHashIsNotValid() {
 		// Assert:
-		assertAddressIsNotValidIfChangedAtIndex(5);
+		this.assertAddressIsNotValidIfChangedAtIndex(5);
 	}
 
 	@Test
 	public void addressWithIncorrectChecksumIsNotValid() {
 		// Assert:
-		assertAddressIsNotValidIfChangedAtIndex(39);
+		this.assertAddressIsNotValidIfChangedAtIndex(39);
 	}
 
 	private void assertAddressIsNotValidIfChangedAtIndex(final int index) {
@@ -323,13 +323,13 @@ public class AddressTest {
 	@Test
 	public void canRoundtripAddressWithAddressEncoding() {
 		// Assert:
-		assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false);
+		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false);
 	}
 
 	@Test
 	public void canRoundtripAddressWithPublicKeyEncoding() {
 		// Assert:
-		assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true);
+		this.assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true);
 	}
 
 	private void assertAddressRoundTripInMode(final AddressEncoding encoding, final boolean isPublicKeyPreserved) {

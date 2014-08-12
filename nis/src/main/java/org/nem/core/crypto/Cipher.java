@@ -16,8 +16,8 @@ public class Cipher {
 	private final static IESParameters IES_PARAMETERS;
 
 	static {
-		byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-		byte[] e = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
+		final byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+		final byte[] e = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
 		IES_PARAMETERS = new IESParameters(d, e, 64);
 	}
 
@@ -64,7 +64,7 @@ public class Cipher {
 	public byte[] encrypt(final byte[] input) {
 		try {
 			return this.iesEncryptEngine.processBlock(input, 0, input.length);
-		} catch (InvalidCipherTextException e) {
+		} catch (final InvalidCipherTextException e) {
 			throw new CryptoException(e);
 		}
 	}
@@ -78,7 +78,7 @@ public class Cipher {
 	public byte[] decrypt(final byte[] input) {
 		try {
 			return this.iesDecryptEngine.processBlock(input, 0, input.length);
-		} catch (InvalidCipherTextException e) {
+		} catch (final InvalidCipherTextException e) {
 			return null;
 		}
 	}

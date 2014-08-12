@@ -122,7 +122,7 @@ public class NodeEndpointTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
 		// Assert:
 		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12), IsEqual.equalTo(endpoint));
@@ -136,8 +136,8 @@ public class NodeEndpointTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
-		int hashCode = endpoint.hashCode();
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
+		final int hashCode = endpoint.hashCode();
 
 		// Assert:
 		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12).hashCode(), IsEqual.equalTo(hashCode));
@@ -149,8 +149,8 @@ public class NodeEndpointTest {
 	@Test
 	public void endpointCreatedAroundHostNameIsEquivalentToEndpointCreatedAroundResolvedAddress() {
 		// Arrange:
-		NodeEndpoint endpoint1 = new NodeEndpoint("ftp", "localhost", 12);
-		NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
+		final NodeEndpoint endpoint1 = new NodeEndpoint("ftp", "localhost", 12);
+		final NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
 
 		// Assert:
 		Assert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));

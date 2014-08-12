@@ -48,7 +48,7 @@ public class Config {
 			final TrustParameters trustParameters,
 			final TrustProvider trustProvider,
 			final String applicationVersion) {
-		updateLocalNodeMetaData(localNode, applicationVersion);
+		this.updateLocalNodeMetaData(localNode, applicationVersion);
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = trustParameters;

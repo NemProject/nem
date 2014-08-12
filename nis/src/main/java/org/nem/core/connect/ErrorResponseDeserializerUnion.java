@@ -21,7 +21,7 @@ public class ErrorResponseDeserializerUnion {
 	 * @param context The deserialization context.
 	 */
 	public ErrorResponseDeserializerUnion(
-			int status,
+			final int status,
 			final Object body,
 			final DeserializationContext context) {
 		this.status = status;
@@ -53,7 +53,7 @@ public class ErrorResponseDeserializerUnion {
 	 * @return true if this instance has a body.
 	 */
 	public boolean hasBody() {
-		return !(this.body instanceof String) || 0 != ((String)this.body).length();
+		return !(this.body instanceof String) || !((String)this.body).isEmpty();
 	}
 
 	/**

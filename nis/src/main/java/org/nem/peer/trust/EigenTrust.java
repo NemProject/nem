@@ -97,7 +97,7 @@ public class EigenTrust implements TrustProvider {
 			final long failedCalls = experience.failedCalls().get();
 			final double totalCalls = successfulCalls + failedCalls;
 
-			double score;
+			final double score;
 			if (totalCalls > 0)
 				score = this.scoreProvider.calculateTrustScore(experience) / totalCalls;
 			else
@@ -106,7 +106,7 @@ public class EigenTrust implements TrustProvider {
 			scoreVector.setAt(index++, score);
 		}
 
-		double scoreWeight = scoreVector.sum();
+		final double scoreWeight = scoreVector.sum();
 		scoreVector.normalize();
 		this.trustScores.setScoreVector(node, nodes, scoreVector);
 		this.trustScores.getScoreWeight(node).set(scoreWeight);
@@ -130,7 +130,7 @@ public class EigenTrust implements TrustProvider {
 		this.updateTrust(context);
 
 		// (2) Compute the global trust
-		return computeGlobalTrust(context);
+		return this.computeGlobalTrust(context);
 	}
 
 	protected ColumnVector computeGlobalTrust(final TrustContext context) {

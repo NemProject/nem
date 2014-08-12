@@ -54,13 +54,13 @@ public class AccountIoAdapterTest {
 	public void getAccountTransfersReturnsTransfersSortedByTimestamp() {
 		// Arrange:
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountIoAdapter accountIoAdapter = prepareAccountIoAdapter(recipient);
+		final AccountIoAdapter accountIoAdapter = this.prepareAccountIoAdapter(recipient);
 
 		// Act:
-		SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "223");
+		final SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "223");
 
 		// Assert:
-		assertResultGetAccountTransfers(result);
+		this.assertResultGetAccountTransfers(result);
 	}
 
 
@@ -68,10 +68,10 @@ public class AccountIoAdapterTest {
 	public void getAccountTransfersReturnsEmptyListWhenTimestampIsInPast() {
 		// Arrange:
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountIoAdapter accountIoAdapter = prepareAccountIoAdapter(recipient);
+		final AccountIoAdapter accountIoAdapter = this.prepareAccountIoAdapter(recipient);
 
 		// Act:
-		SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "0");
+		final SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "0");
 
 		// Assert:
 		Assert.assertThat(result.size(), equalTo(0));
@@ -82,10 +82,10 @@ public class AccountIoAdapterTest {
 	public void getAccountTransfersBorderCase() {
 		// Arrange:
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountIoAdapter accountIoAdapter = prepareAccountIoAdapter(recipient);
+		final AccountIoAdapter accountIoAdapter = this.prepareAccountIoAdapter(recipient);
 
 		// Act:
-		SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "123");
+		final SerializableList<TransactionMetaDataPair> result = accountIoAdapter.getAccountTransfers(recipient.getAddress(), "123");
 
 		// Assert:
 		Assert.assertThat(result.size(), equalTo(1));
@@ -99,9 +99,9 @@ public class AccountIoAdapterTest {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		final AccountCache accountCache = mock(AccountCache.class);
-		addMapping(accountCache, mockAccountDao, harvester);
+		this.addMapping(accountCache, mockAccountDao, harvester);
 
-		blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
 		final int TX_COUNT = 5;
 		// generated and put here, to make manipulations easier
@@ -122,11 +122,11 @@ public class AccountIoAdapterTest {
 		for (int blocks = 0; blocks < 10; ++blocks) {
 			final Block dummyBlock = new Block(harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTimes[blocks]), new BlockHeight(10 + blocks));
 
-			addMapping(accountCache, mockAccountDao, recipient);
+			this.addMapping(accountCache, mockAccountDao, recipient);
 			for (int i = 0; i < TX_COUNT; i++) {
 				final Account randomSender = Utils.generateRandomAccount();
-				addMapping(accountCache, mockAccountDao, randomSender);
-				final TransferTransaction transferTransaction = prepareTransferTransaction(randomSender, recipient, 10, txTimes[blocks][i]);
+				this.addMapping(accountCache, mockAccountDao, randomSender);
+				final TransferTransaction transferTransaction = this.prepareTransferTransaction(randomSender, recipient, 10, txTimes[blocks][i]);
 
 				// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 				dummyBlock.addTransaction(transferTransaction);
@@ -138,11 +138,11 @@ public class AccountIoAdapterTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		return new AccountIoAdapter(new RequiredTransferDaoAdapter(transferDao), new RequiredBlockDaoAdapter(blockDao), accountCache);
+		return new AccountIoAdapter(new RequiredTransferDaoAdapter(this.transferDao), new RequiredBlockDaoAdapter(this.blockDao), accountCache);
 	}
 
 
-	private void assertResultGetAccountTransfers(SerializableList<TransactionMetaDataPair> result) {
+	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {
 		Assert.assertThat(result.size(), equalTo(25));
 
 		// sorted by time...
@@ -153,7 +153,7 @@ public class AccountIoAdapterTest {
 		}
 
 		// cause TXes are sorted by timestamp this is expected order
-		long[] expectedHeights = {
+		final long[] expectedHeights = {
 				19,19,19,19,18,  19,18,18,18,17, 18,17,17,17,17, 16,16,16,16,16, 15,15,15,15,15
 		};
 		i = 0;
@@ -175,7 +175,7 @@ public class AccountIoAdapterTest {
 		return transferTransaction;
 	}
 
-	private void addMapping(AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
+	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
 		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);

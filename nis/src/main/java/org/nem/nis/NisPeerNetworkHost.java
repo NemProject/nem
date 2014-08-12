@@ -71,7 +71,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 				return (JSONObject)JSONValue.parse(fin);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new FatalConfigException("Exception encountered while loading config", e);
 		}
 	}

@@ -11,21 +11,21 @@ import org.nem.core.utils.HexEncoder;
 // TODO-CR: add basic tests
 
 public class ExplorerTransferView implements SerializableEntity {
-	private int type;
-	private Amount fee;
-	private long deadline;
-	private Address signerAddress;
-	private String signature;
-	private Hash hash;
+	private final int type;
+	private final Amount fee;
+	private final long deadline;
+	private final Address signerAddress;
+	private final String signature;
+	private final Hash hash;
 
 	// TODO: split it into two
 
-	private Address recipient;
-	private Amount amount;
-	private int msgType;
-	private byte[] message;
+	private final Address recipient;
+	private final Amount amount;
+	private final int msgType;
+	private final byte[] message;
 
-	public ExplorerTransferView(int type, final Amount fee, final int deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient, final Amount amount, final int msgType, final byte[] encodedPayload) {
+	public ExplorerTransferView(final int type, final Amount fee, final int deadline, final Address signer, final byte[] signature, final Hash transactionHash, final Address recipient, final Amount amount, final int msgType, final byte[] encodedPayload) {
 		this.type = type;
 		this.fee = fee;
 		this.deadline = UnixTime.fromTimeInstant(new TimeInstant(deadline)).getMillis();

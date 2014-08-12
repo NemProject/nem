@@ -17,7 +17,7 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements
 	 *
 	 * @param height The block height.
 	 */
-	public BlockHeight(long height) {
+	public BlockHeight(final long height) {
 		super(height, BlockHeight.class);
 
 		if (this.getRaw() <= 0) {

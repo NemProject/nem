@@ -48,7 +48,7 @@ public class BlockDifficultyScorer {
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();
 
-		long oldDifficulty = difficulties.get(difficulties.size()-1).getRaw();
+		final long oldDifficulty = difficulties.get(difficulties.size()-1).getRaw();
 		if (19L * oldDifficulty > 20L * difficulty) {
 			difficulty = (19L * oldDifficulty)/20L;
 		} else {

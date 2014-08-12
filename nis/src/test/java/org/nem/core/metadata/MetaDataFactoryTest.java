@@ -23,7 +23,7 @@ public class MetaDataFactoryTest {
 		attributes.putValue("Implementation-Version", "test-version");
 		attributes.putValue("Implementation-Title", "test-title");
 
-		byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 

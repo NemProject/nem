@@ -180,7 +180,7 @@ public class BasicNodeSelectorTest {
 		}
 
 		public TestContext(final int maxNodes, final ColumnVector trustValues, final Random random) {
-			Mockito.when(context.getLocalNode()).thenReturn(this.localNode);
+			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
 
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i)

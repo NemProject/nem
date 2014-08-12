@@ -35,7 +35,7 @@ public class BlockChainLastBlockLayer {
 	 * @return last block from db.
 	 */
 	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		return lastBlock;
+		return this.lastBlock;
 	}
 
 	/**
@@ -43,16 +43,16 @@ public class BlockChainLastBlockLayer {
 	 * @return height of last block in the db.
 	 */
 	public Long getLastBlockHeight() {
-		return lastBlock.getHeight();
+		return this.lastBlock.getHeight();
 	}
 
 	/**
 	 * Analyzes last block, used during initial initialization of blocks in blockchain.
 	 * @param curBlock lastBlock in db.
 	 */
-	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
+	public void analyzeLastBlock(final org.nem.nis.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-		lastBlock = curBlock;
+		this.lastBlock = curBlock;
 	}
 
 	/**
@@ -61,18 +61,18 @@ public class BlockChainLastBlockLayer {
 	 * @param block block to be added to db
 	 * @return always true
 	 */
-	public boolean addBlockToDb(Block block) {
+	public boolean addBlockToDb(final Block block) {
 			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
 
 			// hibernate will save both block AND transactions
 			// as there is cascade in Block
 			// mind that there is NO cascade in transaction (near block field)
-			blockDao.save(dbBlock);
+		this.blockDao.save(dbBlock);
 
-			lastBlock.setNextBlockId(dbBlock.getId());
-			blockDao.updateLastBlockId(lastBlock);
+		this.lastBlock.setNextBlockId(dbBlock.getId());
+		this.blockDao.updateLastBlockId(this.lastBlock);
 
-			lastBlock = dbBlock;
+		this.lastBlock = dbBlock;
 
 		return true;
 	}
@@ -81,8 +81,8 @@ public class BlockChainLastBlockLayer {
 	 * Removes block from the db after specified height
 	 */
 	public void dropDbBlocksAfter(final BlockHeight height) {
-		blockDao.deleteBlocksAfterHeight(height);
-		lastBlock = blockDao.findByHeight(height);
+		this.blockDao.deleteBlocksAfterHeight(height);
+		this.lastBlock = this.blockDao.findByHeight(height);
 	}
 
 }

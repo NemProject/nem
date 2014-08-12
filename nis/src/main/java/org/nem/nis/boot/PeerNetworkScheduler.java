@@ -70,9 +70,9 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	}
 
 	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain) {
-		final AsyncTimerVisitor timerVisitor = createNamedVisitor("FORAGING");
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
 		this.timers.add(new AsyncTimer(
-				runnableToFutureSupplier(() -> {
+				this.runnableToFutureSupplier(() -> {
 					final Block block = blockChain.forageBlock();
 					if (null == block)
 						return;
@@ -109,7 +109,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	}
 
 	private void addRefreshTask(final PeerNetwork network) {
-		final AsyncTimerVisitor timerVisitor = createNamedVisitor("REFRESH");
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("REFRESH");
 		this.timers.add(new AsyncTimer(
 				() -> network.refresh(),
 				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
@@ -121,7 +121,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int delay,
 			final String name) {
-		final AsyncTimerVisitor timerVisitor = createNamedVisitor(name);
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor(name);
 
 		this.timers.add(new AsyncTimer(
 				recurringFutureSupplier,

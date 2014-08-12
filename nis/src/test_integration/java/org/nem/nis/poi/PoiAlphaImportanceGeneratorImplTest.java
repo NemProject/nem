@@ -514,11 +514,11 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		Assert.assertTrue(1.0 - tolerance < ratio && ratio < 1.0 + tolerance);
 	}
 
-	private static PoiAccountState createAccountWithBalance(long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final long numNEM) {
 		return createAccountWithBalance(1, numNEM);
 	}
 
-	private static PoiAccountState createAccountWithBalance(final long blockHeight,  long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final long blockHeight,  final long numNEM) {
 		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
 		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), Amount.fromNem(numNEM));
 		return state;

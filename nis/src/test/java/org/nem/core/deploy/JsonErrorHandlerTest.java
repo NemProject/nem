@@ -125,7 +125,7 @@ public class JsonErrorHandlerTest {
 		private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
 		@Override
-		public void write(int i) throws IOException {
+		public void write(final int i) throws IOException {
 			this.stream.write(i);
 		}
 
@@ -135,7 +135,7 @@ public class JsonErrorHandlerTest {
 		}
 
 		@Override
-		public void setWriteListener(WriteListener writeListener) {
+		public void setWriteListener(final WriteListener writeListener) {
 		}
 
 		public String getContent() {

@@ -38,9 +38,9 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accountStates.size());
 
-		long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 		iterator.run();
-		long stop = System.currentTimeMillis();
+		final long stop = System.currentTimeMillis();
 		LOGGER.info("POI iterator needed " + (stop - start) + "ms.");
 
 		if (!iterator.hasConverged()) {
@@ -73,7 +73,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		@Override
 		protected ColumnVector stepImpl(final ColumnVector prevIterImportances) {
 
-			double dangleSum = this.scorer.calculateDangleSum(
+			final double dangleSum = this.scorer.calculateDangleSum(
 					this.context.getDangleIndexes(),
 					this.context.getTeleportationVector(),
 					prevIterImportances);

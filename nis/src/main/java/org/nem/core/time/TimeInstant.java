@@ -19,7 +19,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	 *
 	 * @param time The number of seconds passed since the epoch.
 	 */
-	public TimeInstant(int time) {
+	public TimeInstant(final int time) {
 		if (time < 0) {
 			throw new IllegalArgumentException("time must be non-negative");
 		}
@@ -103,12 +103,12 @@ public class TimeInstant implements Comparable<TimeInstant> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof TimeInstant)) {
 			return false;
 		}
 
-		TimeInstant rhs = (TimeInstant)obj;
+		final TimeInstant rhs = (TimeInstant)obj;
 		return this.time == rhs.time;
 	}
 

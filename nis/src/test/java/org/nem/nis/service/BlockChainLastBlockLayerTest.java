@@ -15,7 +15,7 @@ public class BlockChainLastBlockLayerTest {
 	@Test
 	public void unintializedLastBlockLayerReturnsNull() {
 		// Act:
-		final BlockChainLastBlockLayer lastBlockLayer = createBlockChainLastBlockLayer();
+		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
 		// Assert:
 		Assert.assertNull(lastBlockLayer.getLastDbBlock());
@@ -24,8 +24,8 @@ public class BlockChainLastBlockLayerTest {
 	@Test
 	public void afterAnalyzeLastBlockLayerReturnsBlock() {
 		// Arrange:
-		final BlockChainLastBlockLayer lastBlockLayer = createBlockChainLastBlockLayer();
-		final Block block = createDbBlock(1);
+		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
+		final Block block = this.createDbBlock(1);
 
 		// Act:
 		lastBlockLayer.analyzeLastBlock(block);
@@ -38,7 +38,7 @@ public class BlockChainLastBlockLayerTest {
 	public void foo() {
 		// Arrange:
 		final MockAccountDao accountDao = new MockAccountDao();
-		MockBlockDao mockBlockDao = new MockBlockDao(null);
+		final MockBlockDao mockBlockDao = new MockBlockDao(null);
 		final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final org.nem.core.model.Block lastBlock = createBlock();
 		final Block lastDbBlock = BlockMapper.toDbModel(lastBlock, new AccountDaoLookupAdapter(accountDao));
@@ -52,7 +52,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(result1, IsSame.sameInstance(lastDbBlock));
-		Block last = mockBlockDao.getLastSavedBlock();
+		final Block last = mockBlockDao.getLastSavedBlock();
 		Assert.assertThat(last.getId(), IsEqual.equalTo(1L));
 		Assert.assertThat(new Signature(last.getForgerProof()), IsEqual.equalTo(nextBlock.getSignature()));
 		Assert.assertThat(lastDbBlock.getNextBlockId(), IsEqual.equalTo(last.getId()));
@@ -61,7 +61,7 @@ public class BlockChainLastBlockLayerTest {
 
 	private static org.nem.core.model.Block createBlock(final Account forger) {
 		// Arrange:
-		org.nem.core.model.Block block = new org.nem.core.model.Block(forger, Utils.generateRandomHash(), Utils.generateRandomHash(), new TimeInstant(7), new BlockHeight(3));
+		final org.nem.core.model.Block block = new org.nem.core.model.Block(forger, Utils.generateRandomHash(), Utils.generateRandomHash(), new TimeInstant(7), new BlockHeight(3));
 		block.sign();
 		return block;
 	}
@@ -71,15 +71,15 @@ public class BlockChainLastBlockLayerTest {
 		return createBlock(Utils.generateRandomAccount());
 	}
 
-	private Block createDbBlock(long i) {
-		Block block = new Block();
+	private Block createDbBlock(final long i) {
+		final Block block = new Block();
 		block.setShortId(i);
 		return block;
 	}
 
 	private BlockChainLastBlockLayer createBlockChainLastBlockLayer() {
 		final MockAccountDao accountDao = new MockAccountDao();
-		MockBlockDao mockBlockDao = new MockBlockDao(null);
+		final MockBlockDao mockBlockDao = new MockBlockDao(null);
 		return new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 	}
 }

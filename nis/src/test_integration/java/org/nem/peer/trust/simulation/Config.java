@@ -125,11 +125,11 @@ public class Config {
 
 			this.isPreTrusted = nodeAttributes[2].equals("1");
 
-			boolean isEvil = nodeAttributes[1].equals("1");
-			double honestDataProbability = Double.parseDouble(nodeAttributes[3]);
-			double honestFeedbackProbability = Double.parseDouble(nodeAttributes[4]);
-			boolean isLeech = nodeAttributes[5].equals("1");
-			boolean isCollusive = nodeAttributes[6].equals("1");
+			final boolean isEvil = nodeAttributes[1].equals("1");
+			final double honestDataProbability = Double.parseDouble(nodeAttributes[3]);
+			final double honestFeedbackProbability = Double.parseDouble(nodeAttributes[4]);
+			final boolean isLeech = nodeAttributes[5].equals("1");
+			final boolean isCollusive = nodeAttributes[6].equals("1");
 			this.behavior = new NodeBehavior(
 					isEvil,
 					honestDataProbability,

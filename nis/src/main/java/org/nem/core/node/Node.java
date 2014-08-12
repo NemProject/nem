@@ -132,7 +132,7 @@ public class Node implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof Node)) {
 			return false;
 		}

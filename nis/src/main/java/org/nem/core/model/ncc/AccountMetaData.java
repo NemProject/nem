@@ -38,7 +38,7 @@ public class AccountMetaData implements SerializableEntity {
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		AccountStatus.writeTo(serializer, "status", this.status);
 	}
 }

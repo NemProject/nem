@@ -20,7 +20,7 @@ public class Hash implements SerializableEntity {
 	 */
 	public static final ObjectDeserializer<Hash> DESERIALIZER = new ObjectDeserializer<Hash>() {
 		@Override
-		public Hash deserialize(Deserializer deserializer) {
+		public Hash deserialize(final Deserializer deserializer) {
 			return new Hash(deserializer);
 		}
 	};
@@ -32,7 +32,7 @@ public class Hash implements SerializableEntity {
 	 *
 	 * @param data The raw hash.
 	 */
-	public Hash(byte[] data) {
+	public Hash(final byte[] data) {
 		this.data = data;
 	}
 
@@ -78,7 +78,7 @@ public class Hash implements SerializableEntity {
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		serializer.writeBytes("data", this.getRaw());
 	}
 
@@ -88,12 +88,12 @@ public class Hash implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof Hash)) {
 			return false;
 		}
 
-		Hash rhs = (Hash)obj;
+		final Hash rhs = (Hash)obj;
 		return Arrays.equals(this.data, rhs.data);
 	}
 

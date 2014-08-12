@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
 	public static TransferTransaction createTransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount) {
-		TransferTransaction transferTransaction = new TransferTransaction(timestamp, sender, recipient, amount, null);
+		final TransferTransaction transferTransaction = new TransferTransaction(timestamp, sender, recipient, amount, null);
 		transferTransaction.setDeadline(timestamp.addSeconds(1));
 		return transferTransaction;
 	}
@@ -110,7 +110,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void canRemoveTransaction() {
 		// Arrange:
-		final Account sender = createSenderWithAmount(100);
+		final Account sender = this.createSenderWithAmount(100);
 		final Account recipient = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 
@@ -118,11 +118,11 @@ public class UnconfirmedTransactionsTest {
 		final SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
 		final TimeInstant txTime = systemTimeProvider.getCurrentTime();
 		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
-		Transaction toRemove = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(8));
+		final Transaction toRemove = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(8));
 		transactions.add(toRemove);
 		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
 
-		boolean result = transactions.remove(toRemove);
+		final boolean result = transactions.remove(toRemove);
 		final List<Amount> amountList = getAmountsBeforeAsList(transactions, txTime.addMinutes(5));
 
 		// Assert:
@@ -135,7 +135,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void canDropTransactions() {
 		// Arrange:
-		final Account sender = createSenderWithAmount(100);
+		final Account sender = this.createSenderWithAmount(100);
 		final Account recipient = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
@@ -214,8 +214,8 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void filteringOutConflictingTransactions() {
 		// Arrange:
-		final Account sender = createSenderWithAmount(3);
-		final Account recipient = createSenderWithAmount(0);
+		final Account sender = this.createSenderWithAmount(3);
+		final Account recipient = this.createSenderWithAmount(0);
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		final TimeInstant currentTime = (new SystemTimeProvider()).getCurrentTime();
 
@@ -273,7 +273,7 @@ public class UnconfirmedTransactionsTest {
 				.collect(Collectors.toList());
 	}
 
-	private static UnconfirmedTransactions createUnconfirmedTransactions(int numTransactions) {
+	private static UnconfirmedTransactions createUnconfirmedTransactions(final int numTransactions) {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			transactions.add(new MockTransaction(i, new TimeInstant(i * 10)));
@@ -287,7 +287,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 
-	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(int numTransactions) {
+	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(final int numTransactions) {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsInstance();
 		for (int i = 0; i < numTransactions; ++i) {
 			final MockTransaction mockTransaction = new MockTransaction(i, new TimeInstant(i * 10));
@@ -298,7 +298,7 @@ public class UnconfirmedTransactionsTest {
 		return transactions;
 	}
 
-	private Account createSenderWithAmount(long nems) {
+	private Account createSenderWithAmount(final long nems) {
 		final Account sender = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(nems);
 		sender.incrementBalance(amount);

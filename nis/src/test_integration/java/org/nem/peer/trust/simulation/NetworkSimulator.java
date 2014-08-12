@@ -96,26 +96,26 @@ public class NetworkSimulator {
 	 */
 	public boolean run(final String outputFile, final int numIterations) {
 		try {
-			File file = new File(outputFile);
-			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			final File file = new File(outputFile);
+			final BufferedWriter out = new BufferedWriter(new FileWriter(file));
 			this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
-			writeTrustValues(out, 0);
+			this.writeTrustValues(out, 0);
 
-			successfulCalls = 0;
-			failedCalls = 0;
+			this.successfulCalls = 0;
+			this.failedCalls = 0;
 			// We convert the peers in the network to an array since having a special node like localNode
 			// sucks when it comes to simulations.
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i = 0; i < numIterations; i++) {
-				doCommunications(peers);
+				this.doCommunications(peers);
 				this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
 				if (i % 100 == 99) {
-					writeTrustValues(out, i + 1);
+					this.writeTrustValues(out, i + 1);
 				}
 			}
 
 			out.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.warning("IO-Exception while writing to file <" + outputFile + ">. Reason: " + e.toString());
 			return false;
 		}
@@ -137,12 +137,12 @@ public class NetworkSimulator {
 
 				// Communicate with other nodes
 				for (int i = 0; i < COMMUNICATION_PARTNERS; i++) {
-					Node partner = getCommunicationPartner(node, peers);
+					final Node partner = this.getCommunicationPartner(node, peers);
 					if (partner == null) {
 						continue;
 					}
 
-					final NodeExperience experience = getNodeExperience(node, partner);
+					final NodeExperience experience = this.getNodeExperience(node, partner);
 					final NodeBehavior partnerBehavior = this.getNodeBehavior(partner);
 					if (nodeBehavior.isCollusive() && partnerBehavior.isCollusive()) {
 						// Communication between collusive evil nodes
@@ -150,13 +150,13 @@ public class NetworkSimulator {
 					} else {
 						// Nodes might fake data and feedback. Depending on the probability to give honest/dishonest feedback,
 						// the node inverts his behavior with this probability.
-						boolean honestData = Math.random() < partnerBehavior.getHonestDataProbability();
-						boolean honestFeedback = Math.random() < nodeBehavior.getHonestFeedbackProbability();
+						final boolean honestData = Math.random() < partnerBehavior.getHonestDataProbability();
+						final boolean honestFeedback = Math.random() < nodeBehavior.getHonestFeedbackProbability();
 						if (!nodeBehavior.isEvil()) {
 							if (honestData)
-								successfulCalls++;
+								this.successfulCalls++;
 							else
-								failedCalls++;
+								this.failedCalls++;
 						}
 						if ((honestData && honestFeedback) || (!honestData && !honestFeedback)) {
 							experience.successfulCalls().increment();
@@ -165,7 +165,7 @@ public class NetworkSimulator {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOGGER.warning("Exception in doCommunications, reason: " + e.toString());
 			}
 		}

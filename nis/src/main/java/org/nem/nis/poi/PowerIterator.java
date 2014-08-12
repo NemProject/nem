@@ -23,8 +23,8 @@ public abstract class PowerIterator {
 	 */
 	public PowerIterator(
 			final ColumnVector startVector,
-			int maxIterations,
-			double epsilon) {
+			final int maxIterations,
+			final double epsilon) {
 		this.startVector = startVector;
 		this.maxIterations = maxIterations;
 		this.epsilon = epsilon;

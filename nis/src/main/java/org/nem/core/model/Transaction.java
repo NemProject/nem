@@ -82,15 +82,15 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	//endregion
 
 	@Override
-	public int compareTo(Transaction rhs) {
-		int[] comparisonResults = new int[] {
+	public int compareTo(final Transaction rhs) {
+		final int[] comparisonResults = new int[] {
 				Integer.compare(this.getType(), rhs.getType()),
 				Integer.compare(this.getVersion(), rhs.getVersion()),
 				this.getTimeStamp().compareTo(rhs.getTimeStamp()),
 				this.getFee().compareTo(rhs.getFee())
 		};
 
-		for (int result : comparisonResults) {
+		for (final int result : comparisonResults) {
 			if (result != 0) {
 				return result;
 			}

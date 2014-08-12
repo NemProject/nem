@@ -20,13 +20,13 @@ public class DbBlockIoAdapter implements BlockIo {
 	}
 
 	@Override
-	public Block getBlock(Hash blockHash) {
+	public Block getBlock(final Hash blockHash) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(blockHash);
 		return BlockMapper.toModel(dbBlock, this.accountLookup);
 	}
 
 	@Override
-	public Block getBlockAt(BlockHeight blockHeight) {
+	public Block getBlockAt(final BlockHeight blockHeight) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
 		return BlockMapper.toModel(dbBlock, this.accountLookup);
 	}

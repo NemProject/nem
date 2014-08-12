@@ -39,9 +39,9 @@ public class Hashes {
 
 	private static byte[] hash(final String algorithm, final byte[]... inputs) {
 		try {
-			MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
+			final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
 
-			for (byte[] input : inputs) {
+			for (final byte[] input : inputs) {
 				digest.update(input);
 			}
 

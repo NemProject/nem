@@ -105,7 +105,7 @@ public class ErrorResponse implements SerializableEntity {
 		try {
 			final HttpStatus status = HttpStatus.valueOf(rawStatus);
 			return status.getReasonPhrase();
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			return null;
 		}
 	}

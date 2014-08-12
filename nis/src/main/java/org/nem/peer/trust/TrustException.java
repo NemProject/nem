@@ -19,7 +19,7 @@ public class TrustException extends RuntimeException {
 	 *
 	 * @param cause The exception message.
 	 */
-	public TrustException(Throwable cause) {
+	public TrustException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -29,7 +29,7 @@ public class TrustException extends RuntimeException {
 	 * @param message The exception message.
 	 * @param cause   The original exception.
 	 */
-	public TrustException(final String message, Throwable cause) {
+	public TrustException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

@@ -41,7 +41,7 @@ public class ValidationResultTest {
 	public void isSuccessOnlyReturnsTrueForSuccessValues() {
 		// Arrange:
 		final Set<ValidationResult> successValues = new HashSet<ValidationResult>() {
-			{ add(ValidationResult.SUCCESS); }
+			{ this.add(ValidationResult.SUCCESS); }
 		};
 
 		// Assert:
@@ -54,9 +54,9 @@ public class ValidationResultTest {
 	public void isFailureOnlyReturnsTrueForFailureValues() {
 		// Arrange:
 		final Set<ValidationResult> nonFailureValues = new HashSet<ValidationResult>() {
-			{ add(ValidationResult.SUCCESS); }
+			{ this.add(ValidationResult.SUCCESS); }
 
-			{ add(ValidationResult.NEUTRAL); }
+			{ this.add(ValidationResult.NEUTRAL); }
 		};
 
 		// Assert:

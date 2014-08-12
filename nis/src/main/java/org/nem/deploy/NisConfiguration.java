@@ -28,7 +28,7 @@ public class NisConfiguration extends CommonConfiguration {
 	 *
 	 * @param properties The specified properties.
 	 */
-	public NisConfiguration(Properties properties) {
+	public NisConfiguration(final Properties properties) {
 		super(properties);
 		final String autoBootKey = getOptionalString(properties, "nis.bootKey", null);
 		this.bootKey = null == autoBootKey? null : PrivateKey.fromHexString(autoBootKey);

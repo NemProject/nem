@@ -125,7 +125,7 @@ public class NodeController {
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
 		for (final NodeExperiencePair nexp : pair.getExperiences())
 		{
-			nodeExperiencePairs.add(extend(nexp));
+			nodeExperiencePairs.add(this.extend(nexp));
 		}
 //		pair.getExperiences().stream()
 //				.map(() -> this.extend())

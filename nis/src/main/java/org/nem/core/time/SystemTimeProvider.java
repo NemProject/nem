@@ -11,7 +11,7 @@ public class SystemTimeProvider implements TimeProvider {
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
 
 	static {
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.ERA, GregorianCalendar.AD);
 		calendar.set(Calendar.YEAR, 2014);
 		calendar.set(Calendar.MONTH, Calendar.AUGUST);
@@ -31,7 +31,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	@Override
 	public TimeInstant getCurrentTime() {
-		long time = System.currentTimeMillis();
+		final long time = System.currentTimeMillis();
 		return new TimeInstant(getTime(time));
 	}
 
@@ -50,7 +50,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 * @param millis The system time in milliseconds.
 	 * @return The normalized time in seconds.
 	 */
-	public static int getTime(long millis) {
+	public static int getTime(final long millis) {
 		return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);
 	}
 }

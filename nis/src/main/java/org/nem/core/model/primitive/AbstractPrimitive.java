@@ -51,7 +51,7 @@ public abstract class AbstractPrimitive<
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!this.derivedClass.isInstance(obj)) {
 			return false;
 		}

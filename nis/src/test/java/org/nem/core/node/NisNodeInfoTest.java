@@ -45,9 +45,9 @@ public class NisNodeInfoTest {
 		final NodeEndpoint endpoint = NodeEndpoint.fromHost("localhost");
 		return new HashMap<String, NisNodeInfo>() {
 			{
-				put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
-				put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
-				put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
+				this.put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
+				this.put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
+				this.put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
 			}
 		};
 	}

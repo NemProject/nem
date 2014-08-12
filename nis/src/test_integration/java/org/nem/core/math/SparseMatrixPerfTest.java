@@ -50,7 +50,7 @@ public class SparseMatrixPerfTest {
 		final MatrixTestAdapterFactory[] factories = createTestAdapterFactories();
 		for (int numEntriesPerRow = 1; numEntriesPerRow <= maxEntriesPerRow; numEntriesPerRow++) {
 			final SecureRandom sr = new SecureRandom();
-			byte[] cols = new byte[3 * numEntriesPerRow * numRows];
+			final byte[] cols = new byte[3 * numEntriesPerRow * numRows];
 			sr.nextBytes(cols);
 
 			for (final MatrixTestAdapterFactory factory : factories) {
@@ -131,7 +131,7 @@ public class SparseMatrixPerfTest {
 			final int numRows = matrix.getRowCount();
 			for (int i = 0; i < numRows; ++i) {
 				for (int j = 0; j < numEntriesPerRow; ++j) {
-					int col = getCol(i, j, numRows, numEntriesPerRow, bytes);
+					final int col = getCol(i, j, numRows, numEntriesPerRow, bytes);
 					matrix.setAt(i, col, NONZERO_ELEMENT_VALUE);
 				}
 			}
@@ -164,14 +164,14 @@ public class SparseMatrixPerfTest {
 
 		@Override
 		public void normalizeColumns() {
-			int[] colIndices = this.matrix.getColumnIndices();
-			double[] values = this.matrix.getData();
-			double[] colSums = new double[this.matrix.numRows()];
+			final int[] colIndices = this.matrix.getColumnIndices();
+			final double[] values = this.matrix.getData();
+			final double[] colSums = new double[this.matrix.numRows()];
 			for (int i = 0; i < colIndices.length; ++i)
 				colSums[colIndices[i]] += Math.abs(values[i]);
 
 			for (int i = 0; i < colIndices.length; ++i) {
-				double sum = colSums[colIndices[i]];
+				final double sum = colSums[colIndices[i]];
 				if (sum > 0.0)
 					values[i] /= sum;
 			}
@@ -221,7 +221,7 @@ public class SparseMatrixPerfTest {
 		for (int i = 0; i < numRows; ++i) {
 			rows[i] = new int[numEntriesPerRow];
 			for (int j = 0; j < numEntriesPerRow; ++j) {
-				int col = getCol(i, j, numRows, numEntriesPerRow, bytes);
+				final int col = getCol(i, j, numRows, numEntriesPerRow, bytes);
 				rows[i][j] = col;
 			}
 		}

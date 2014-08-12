@@ -29,7 +29,7 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Block findById(long id) {
+	public org.nem.nis.dbmodel.Block findById(final long id) {
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findById(id);
 		if (null == dbBlock)
 			throw createMissingResourceException(Long.toBinaryString(id));
@@ -56,18 +56,18 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	}
 
 	@Override
-	public HashChain getHashesFrom(final BlockHeight height, int limit) {
+	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
 		// TODO: throw exception?
 		return this.blockDao.getHashesFrom(height, limit);
 	}
 
 	@Override
-	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
+	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Integer timestamp, final int limit) {
 		return this.blockDao.getBlocksForAccount(account, timestamp, limit);
 	}
 
 	@Override
-	public Collection<org.nem.nis.dbmodel.Block> getBlocksAfter(long blockHeight, int blocksCount) {
+	public Collection<org.nem.nis.dbmodel.Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
 		// TODO: throw exception?
 		return this.blockDao.getBlocksAfter(blockHeight, blocksCount);
 	}

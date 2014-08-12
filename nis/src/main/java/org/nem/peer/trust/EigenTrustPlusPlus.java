@@ -80,7 +80,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 				if (0 == sharedExperiencesMatrix.getAt(i, j))
 					continue;
 
-				double score = this.getScoreProvider().calculateCredibilityScore(node, nodes[i], nodes[j]);
+				final double score = this.getScoreProvider().calculateCredibilityScore(node, nodes[i], nodes[j]);
 				sum += score * score;
 				++numCommonPartners;
 			}
@@ -113,7 +113,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 		this.updateFeedback(context);
 
 		// (3) Compute the global trust
-		return computeGlobalTrust(context);
+		return this.computeGlobalTrust(context);
 	}
 
 	/**

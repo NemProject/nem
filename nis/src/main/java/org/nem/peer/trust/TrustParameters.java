@@ -16,7 +16,7 @@ public class TrustParameters {
 	 * @param value The value of the parameter.
 	 */
 	public void set(final String name, final String value) {
-		params.put(name, value);
+		this.params.put(name, value);
 	}
 
 	/**

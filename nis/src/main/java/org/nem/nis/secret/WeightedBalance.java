@@ -11,13 +11,13 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
 
 	private final BlockHeight blockHeight;
-	private long unvestedBalance;
-	private long vestedBalance;
-	private Amount balance;
+	private final long unvestedBalance;
+	private final long vestedBalance;
+	private final Amount balance;
 
 	// TODO: do why do we need amount? we seem to only be using it as a id, which seems odd
 	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
-	private Amount amount;
+	private final Amount amount;
 
 	//region createUnvested / createVested
 
@@ -119,7 +119,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The block height.
 	 */
 	public BlockHeight getBlockHeight() {
-		return blockHeight;
+		return this.blockHeight;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The unvested balance.
 	 */
 	public Amount getUnvestedBalance() {
-		return this.balance.subtract(getVestedBalance());
+		return this.balance.subtract(this.getVestedBalance());
 	}
 
 	/**

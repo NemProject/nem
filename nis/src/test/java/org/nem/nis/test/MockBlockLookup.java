@@ -43,7 +43,7 @@ public class MockBlockLookup implements BlockLookup {
 	 * @param lastBlock The last block.
 	 * @param numHashesToReturn The number of hashes to return from getHashesFrom.
 	 */
-	public MockBlockLookup(final Block lastBlock, int numHashesToReturn) {
+	public MockBlockLookup(final Block lastBlock, final int numHashesToReturn) {
 		this(lastBlock, new BlockChainScore(1), numHashesToReturn);
 	}
 
@@ -54,7 +54,7 @@ public class MockBlockLookup implements BlockLookup {
 	 * @param chainScore The chain score.
 	 * @param numHashesToReturn The number of hashes to return from getHashesFrom.
 	 */
-	public MockBlockLookup(final Block lastBlock, final BlockChainScore chainScore, int numHashesToReturn) {
+	public MockBlockLookup(final Block lastBlock, final BlockChainScore chainScore, final int numHashesToReturn) {
 		this.lastBlock = lastBlock;
 		this.chainScore = chainScore;
 

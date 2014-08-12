@@ -32,7 +32,7 @@ public class Signer {
 			throw new CryptoException("cannot sign without private key");
 		}
 
-		final ECDSASigner signer = createECDSASigner();
+		final ECDSASigner signer = this.createECDSASigner();
 		signer.init(true, this.keyPair.getPrivateKeyParameters());
 		final byte[] hash = Hashes.sha3(data);
 		final BigInteger[] components = signer.generateSignature(hash);
@@ -53,7 +53,7 @@ public class Signer {
 			return false;
 		}
 
-		ECDSASigner signer = createECDSASigner();
+		final ECDSASigner signer = this.createECDSASigner();
 		signer.init(false, this.keyPair.getPublicKeyParameters());
 		final byte[] hash = Hashes.sha3(data);
 		return signer.verifySignature(hash, signature.getR(), signature.getS());

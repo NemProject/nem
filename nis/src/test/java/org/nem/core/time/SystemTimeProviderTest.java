@@ -8,7 +8,7 @@ public class SystemTimeProviderTest {
 	@Test
 	public void getEpochTimeReturnsZero() {
 		// Arrange:
-		TimeProvider provider = new SystemTimeProvider();
+		final TimeProvider provider = new SystemTimeProvider();
 
 		// Assert:
 		Assert.assertThat(provider.getEpochTime(), IsEqual.equalTo(TimeInstant.ZERO));
@@ -17,7 +17,7 @@ public class SystemTimeProviderTest {
 	@Test
 	public void getCurrentTimeIsPositive() {
 		// Arrange:
-		TimeProvider provider = new SystemTimeProvider();
+		final TimeProvider provider = new SystemTimeProvider();
 
 		// Assert:
 		Assert.assertThat(provider.getCurrentTime().compareTo(TimeInstant.ZERO), IsEqual.equalTo(1));
@@ -26,17 +26,17 @@ public class SystemTimeProviderTest {
 	@Test
 	public void getCurrentTimeReturnsExpectedTime() {
 		// Act:
-		CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
+		final CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
 
 		// Assert:
-		int expectedTime = (int)((ctInfo.systemTime - SystemTimeProvider.getEpochTimeMillis() + 500L) / 1000);
+		final int expectedTime = (int)((ctInfo.systemTime - SystemTimeProvider.getEpochTimeMillis() + 500L) / 1000);
 		Assert.assertThat(ctInfo.currentTime, IsEqual.equalTo(expectedTime));
 	}
 
 	@Test
 	public void getCurrentTimeIsConsistentWithSystemTime() {
 		// Act:
-		CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
+		final CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
 
 		// Assert:
 		Assert.assertThat(ctInfo.currentTime, IsEqual.equalTo(ctInfo.currentTimeFromSystemTime));
@@ -53,7 +53,7 @@ public class SystemTimeProviderTest {
 		Assert.assertThat(getTimeRelativeToEpoch(2000), IsEqual.equalTo(2));
 	}
 
-	private static int getTimeRelativeToEpoch(int millis) {
+	private static int getTimeRelativeToEpoch(final int millis) {
 		return SystemTimeProvider.getTime(SystemTimeProvider.getEpochTimeMillis() + millis);
 	}
 

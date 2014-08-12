@@ -50,9 +50,9 @@ public class Utils {
 	 * @param numBytes The number of bytes to generate.
 	 * @return A byte array containing random data.
 	 */
-	public static byte[] generateRandomBytes(int numBytes) {
-		SecureRandom rand = new SecureRandom();
-		byte[] input = new byte[numBytes];
+	public static byte[] generateRandomBytes(final int numBytes) {
+		final SecureRandom rand = new SecureRandom();
+		final byte[] input = new byte[numBytes];
 		rand.nextBytes(input);
 		return input;
 	}
@@ -111,7 +111,7 @@ public class Utils {
 	 * @return The resulting string
 	 */
 	public static String incrementAtIndex(final String s, final int index) {
-		char[] chars = s.toCharArray();
+		final char[] chars = s.toCharArray();
 		chars[index] = (char)(chars[index] + 1);
 		return new String(chars);
 	}
@@ -146,7 +146,7 @@ public class Utils {
 	 * @return The resulting byte array
 	 */
 	public static byte[] incrementAtIndex(final byte[] bytes, final int index) {
-		byte[] copy = new byte[bytes.length];
+		final byte[] copy = new byte[bytes.length];
 		System.arraycopy(bytes, 0, copy, 0, bytes.length);
 		++copy[index];
 		return copy;
@@ -160,7 +160,7 @@ public class Utils {
 	 * @return A string of length numChars initialized to ch.
 	 */
 	public static String createString(final char ch, final int numChars) {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < numChars; ++i) {
 			builder.append(ch);
 		}
@@ -204,7 +204,7 @@ public class Utils {
 		originalEntity.sign();
 
 		// Act:
-		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
 	}
@@ -222,7 +222,7 @@ public class Utils {
 			final T originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
-		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
 	}

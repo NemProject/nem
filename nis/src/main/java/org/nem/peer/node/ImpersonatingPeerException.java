@@ -19,7 +19,7 @@ public class ImpersonatingPeerException extends RuntimeException {
 	 *
 	 * @param cause The exception message.
 	 */
-	public ImpersonatingPeerException(Throwable cause) {
+	public ImpersonatingPeerException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -29,7 +29,7 @@ public class ImpersonatingPeerException extends RuntimeException {
 	 * @param message The exception message.
 	 * @param cause   The original exception.
 	 */
-	public ImpersonatingPeerException(final String message, Throwable cause) {
+	public ImpersonatingPeerException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

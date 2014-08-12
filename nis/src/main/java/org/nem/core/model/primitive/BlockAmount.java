@@ -17,7 +17,7 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	 *
 	 * @param amount The block height.
 	 */
-	public BlockAmount(long amount) {
+	public BlockAmount(final long amount) {
 		super(amount, BlockAmount.class);
 
 		if (this.getRaw() < 0) {
@@ -31,7 +31,7 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	 * @return The new amount.
 	 */
 	public BlockAmount increment() {
-		return new BlockAmount(getValue() + 1);
+		return new BlockAmount(this.getValue() + 1);
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 	 * @return The new amount.
 	 */
 	public BlockAmount decrement() {
-		return new BlockAmount(getValue() - 1);
+		return new BlockAmount(this.getValue() - 1);
 	}
 
 	/**

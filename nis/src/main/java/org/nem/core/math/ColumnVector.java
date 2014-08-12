@@ -82,7 +82,7 @@ public class ColumnVector {
 	 * @param index The index.
 	 * @param val The value.
 	 */
-	public void setAt(final int index, double val) {
+	public void setAt(final int index, final double val) {
 		this.matrix.setAt(index, 0, val);
 	}
 
@@ -92,7 +92,7 @@ public class ColumnVector {
 	 * @param index The index.
 	 * @param val The value.
 	 */
-	public void incrementAt(final int index, double val) {
+	public void incrementAt(final int index, final double val) {
 		this.matrix.incrementAt(index, 0, val);
 	}
 
@@ -135,7 +135,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.multiplyElementWise(vector.matrix);
+				return ColumnVector.this.matrix.multiplyElementWise(vector.matrix);
 			}
 		});
 	}
@@ -150,7 +150,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.addElementWise(vector.matrix);
+				return ColumnVector.this.matrix.addElementWise(vector.matrix);
 			}
 		});
 	}
@@ -191,7 +191,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.roundTo(numPlaces);
+				return ColumnVector.this.matrix.roundTo(numPlaces);
 			}
 		});
 	}
@@ -206,7 +206,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.multiply(scalar);
+				return ColumnVector.this.matrix.multiply(scalar);
 			}
 		});
 	}
@@ -220,7 +220,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.sqrt();
+				return ColumnVector.this.matrix.sqrt();
 			}
 		});
 	}
@@ -234,7 +234,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.abs();
+				return ColumnVector.this.matrix.abs();
 			}
 		});
 	}
@@ -277,7 +277,7 @@ public class ColumnVector {
 	 *
 	 * @param val The value.
 	 */
-	public void setAll(double val) {
+	public void setAll(final double val) {
 		for (int i = 0; i < this.vector.length; ++i) {
 			this.vector[i] = val;
 		}
@@ -314,7 +314,7 @@ public class ColumnVector {
 	 */
 	public double max() {
 		double maxVal = this.vector[0];
-		for (double val : this.vector) {
+		for (final double val : this.vector) {
 			maxVal = Math.max(maxVal, val);
 		}
 
@@ -362,7 +362,7 @@ public class ColumnVector {
 	 * @return The Euclidean distance.
 	 */
 	public double l2Distance(final ColumnVector vector) {
-		double distance = this.distance(vector, d -> d * d);
+		final double distance = this.distance(vector, d -> d * d);
 		return Math.sqrt(distance);
 	}
 
@@ -373,7 +373,7 @@ public class ColumnVector {
 
 		double distance = 0;
 		for (int i = 0; i < this.size; ++i) {
-			double difference = this.vector[i] - vector.vector[i];
+			final double difference = this.vector[i] - vector.vector[i];
 			distance += aggregate.apply(difference);
 		}
 

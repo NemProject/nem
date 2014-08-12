@@ -247,7 +247,7 @@ public class PoiContext {
 				}
 
 				// update the outlink score
-				int rowIndex = accountInfo.getIndex();
+				final int rowIndex = accountInfo.getIndex();
 				final double outlinkScore = accountInfo.getNetOutlinkScore();
 				if (0.0 == outlinkScore)
 					this.dangleIndexes.add(rowIndex);

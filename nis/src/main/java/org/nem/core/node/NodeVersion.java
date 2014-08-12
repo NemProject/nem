@@ -14,7 +14,7 @@ public class NodeVersion {
 	 */
 	public static NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
 
-	private static Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
+	private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
 
 	private final int majorVersion;
 	private final int minorVersion;

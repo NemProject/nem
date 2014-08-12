@@ -49,7 +49,7 @@ public class NemesisBlock extends Block {
 	public static NemesisBlock fromResource(final DeserializationContext context) {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_FILE)) {
 			return fromStream(fin, context);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new IllegalStateException("unable to parse nemesis block stream");
 		}
 	}

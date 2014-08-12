@@ -26,12 +26,12 @@ public class TestTrustContext {
 				PeerUtils.createNodeWithName("alice"),
 				PeerUtils.createNodeWithName("trudy"),
 				PeerUtils.createNodeWithName("peggy"),
-				localNode
+				this.localNode
 		};
 
 		this.nodeExperiences = new NodeExperiences();
 
-		Set<Node> preTrustedNodeSet = new HashSet<>();
+		final Set<Node> preTrustedNodeSet = new HashSet<>();
 		preTrustedNodeSet.add(this.nodes[0]);
 		preTrustedNodeSet.add(this.nodes[3]);
 		this.preTrustedNodes = new PreTrustedNodes(preTrustedNodeSet);

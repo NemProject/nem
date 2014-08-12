@@ -44,7 +44,7 @@ public class TransferDaoImpl implements TransferDao {
 	@Transactional(readOnly = true)
 	public Transfer findByHash(final byte[] txHash) {
 		final long txId = ByteUtils.bytesToLong(txHash);
-		List<?> userList;
+		final List<?> userList;
 		final Query query = this.getCurrentSession()
 			.createQuery("from Transfer a where a.shortId = :id")
 			.setParameter("id", txId);
@@ -88,14 +88,14 @@ public class TransferDaoImpl implements TransferDao {
 	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account address, final Hash hash, final TransferType transferType, final int limit) {
 		final String addressString = this.buildAddressQuery(transferType);
 		if (hash == null) {
-			return getLatestTransactionsForAccount(address, limit, addressString);
+			return this.getLatestTransactionsForAccount(address, limit, addressString);
 		} else {
-			final Object[] tx = getTransactionDescriptorUsingHash(address, hash, limit, addressString);
-			return getTransactionsForAccountUptoTransaction(address, limit, addressString, tx);
+			final Object[] tx = this.getTransactionDescriptorUsingHash(address, hash, limit, addressString);
+			return this.getTransactionsForAccountUptoTransaction(address, limit, addressString, tx);
 		}
 	}
 
-	private Object[] getTransactionDescriptorUsingHash(Account address, Hash hash, int limit, String addressString) {
+	private Object[] getTransactionDescriptorUsingHash(final Account address, final Hash hash, final int limit, final String addressString) {
 		final Query prequery = this.getCurrentSession()
 			.createQuery("select t, t.block.height from Transfer t " +
 					"WHERE " +
@@ -113,7 +113,7 @@ public class TransferDaoImpl implements TransferDao {
 		return tempList.get(0);
 	}
 
-	private Collection<Object[]> getTransactionsForAccountUptoTransaction(Account address, int limit, String addressString, Object[] tx) {
+	private Collection<Object[]> getTransactionsForAccountUptoTransaction(final Account address, final int limit, final String addressString, final Object[] tx) {
 		final Query query;
 		final Transfer topMostTranser = (Transfer)tx[0];
 
@@ -137,7 +137,7 @@ public class TransferDaoImpl implements TransferDao {
 		return listAndCast(query);
 	}
 
-	private Collection<Object[]> getLatestTransactionsForAccount(Account address, int limit, String addressString) {
+	private Collection<Object[]> getLatestTransactionsForAccount(final Account address, final int limit, final String addressString) {
 		final Query query = this.getCurrentSession()
 			.createQuery("select t, t.block.height from Transfer t " +
 					"WHERE " +

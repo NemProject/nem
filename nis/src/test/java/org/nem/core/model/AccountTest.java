@@ -367,8 +367,8 @@ public class AccountTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		KeyPair kp = new KeyPair();
-		Account account = new Account(kp);
+		final KeyPair kp = new KeyPair();
+		final Account account = new Account(kp);
 
 		// Assert:
 		for (final Account account2 : createEquivalentAccounts(kp)) {
@@ -386,9 +386,9 @@ public class AccountTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		KeyPair kp = new KeyPair();
-		Account account = new Account(kp);
-		int hashCode = account.hashCode();
+		final KeyPair kp = new KeyPair();
+		final Account account = new Account(kp);
+		final int hashCode = account.hashCode();
 
 		// Assert:
 		for (final Account account2 : createEquivalentAccounts(kp)) {
@@ -510,13 +510,13 @@ public class AccountTest {
 	@Test
 	public void canRoundtripAccountWithAddressEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
+		this.assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
 	}
 
 	@Test
 	public void canRoundtripAccountWithPublicKeyEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
+		this.assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
 	}
 
 	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {

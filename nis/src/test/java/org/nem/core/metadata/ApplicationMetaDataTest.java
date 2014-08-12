@@ -89,12 +89,12 @@ public class ApplicationMetaDataTest {
 		final X509Certificate otherCertificate = MetaDataTestUtils.createMockCertificateWithName("CN=SomeoneElse,O=NemSoft");
 		return new HashMap<String, ApplicationMetaData>() {
 			{
-				put("default", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(17)));
-				put("diff-name", new ApplicationMetaData("bar", "12.0", certificate, createTimeProvider(17)));
-				put("diff-version", new ApplicationMetaData("foo", "11.0", certificate, createTimeProvider(17)));
-				put("diff-cert", new ApplicationMetaData("foo", "12.0", otherCertificate, createTimeProvider(17)));
-				put("diff-null-cert", new ApplicationMetaData("foo", "12.0", null, createTimeProvider(17)));
-				put("diff-time", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(22))); // not significant
+				this.put("default", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(17)));
+				this.put("diff-name", new ApplicationMetaData("bar", "12.0", certificate, createTimeProvider(17)));
+				this.put("diff-version", new ApplicationMetaData("foo", "11.0", certificate, createTimeProvider(17)));
+				this.put("diff-cert", new ApplicationMetaData("foo", "12.0", otherCertificate, createTimeProvider(17)));
+				this.put("diff-null-cert", new ApplicationMetaData("foo", "12.0", null, createTimeProvider(17)));
+				this.put("diff-time", new ApplicationMetaData("foo", "12.0", certificate, createTimeProvider(22))); // not significant
 			}
 		};
 	}

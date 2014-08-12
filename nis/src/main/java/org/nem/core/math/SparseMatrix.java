@@ -65,12 +65,12 @@ public class SparseMatrix extends Matrix {
 		if (val == 0.0) {
 			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
-					remove(row, i);
+					this.remove(row, i);
 					return;
 				}
 			}
 		} else {
-			int size = this.cols[row].length;
+			final int size = this.cols[row].length;
 			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
 					this.values[row][i] = val;
@@ -80,7 +80,7 @@ public class SparseMatrix extends Matrix {
 
 			// New column
 			if (this.maxIndices[row] == size) {
-				reallocate(row);
+				this.reallocate(row);
 			}
 
 			this.cols[row][this.maxIndices[row]] = col;
@@ -121,7 +121,7 @@ public class SparseMatrix extends Matrix {
 	 *
 	 * @return The number of non zero columns.
 	 */
-	public int getNonZeroColumnCount(int row) {
+	public int getNonZeroColumnCount(final int row) {
 		return this.maxIndices[row];
 	}
 
@@ -130,7 +130,7 @@ public class SparseMatrix extends Matrix {
 	 *
 	 * @return The capacity of the row.
 	 */
-	public int getRowCapacity(int row) {
+	public int getRowCapacity(final int row) {
 		return this.cols[row].length;
 	}
 
@@ -140,7 +140,7 @@ public class SparseMatrix extends Matrix {
 	 * @param row The row.
 	 * @param colIndex The column index.
 	 */
-	private void remove(int row, int colIndex) {
+	private void remove(final int row, final int colIndex) {
 		// Shrink arrays
 		final int lastIndex = this.maxIndices[row] - 1;
 		if (lastIndex > 0) {
@@ -156,7 +156,7 @@ public class SparseMatrix extends Matrix {
 	 *
 	 * @param row The row.
 	 */
-	private void reallocate(int row) {
+	private void reallocate(final int row) {
 		// Hopefully doesn't happen too often
 		final int size = this.cols[row].length;
 		final int newSize = (int)Math.ceil(REALLOC_MULTIPLIER * size);
@@ -177,7 +177,7 @@ public class SparseMatrix extends Matrix {
 		return builder.toString();
 	}
 
-	private static String formatEntry(int row, int col, double value) {
+	private static String formatEntry(final int row, final int col, final double value) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		return String.format(
 				"%s(%d, %d) -> %s",

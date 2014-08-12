@@ -26,7 +26,7 @@ public class AccountMetaDataTest {
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
-	private static AccountMetaData createAccountMetaData(AccountStatus status) {
+	private static AccountMetaData createAccountMetaData(final AccountStatus status) {
 		return new AccountMetaData(status);
 	}
 

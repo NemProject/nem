@@ -40,15 +40,15 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-			long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			final double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
 			this.increment(outlink.getOtherAccountAddress(), weight);
 		}
 	}
 
-	private void increment(final Address address, double amount) {
+	private void increment(final Address address, final double amount) {
 		this.netOutlinks.put(address, this.netOutlinks.getOrDefault(address, 0.0) + amount);
 	}
 

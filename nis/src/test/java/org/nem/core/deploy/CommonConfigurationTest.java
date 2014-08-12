@@ -13,7 +13,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void allPropertiesAreSetInConstructor() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
@@ -38,7 +38,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void additionalInformationCanBeRetrieved() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
@@ -57,7 +57,7 @@ public class CommonConfigurationTest {
 	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutShortServerName() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.shortServerName");
 
 		// Act:
@@ -67,43 +67,43 @@ public class CommonConfigurationTest {
 	@Test
 	public void cannotReadConfigurationWithoutMaxThreads() {
 		// Act:
-		assertIntPropertyIsRequired("nem.maxThreads");
+		this.assertIntPropertyIsRequired("nem.maxThreads");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithUnparsableMaxThreads() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.maxThreads");
+		this.assertIntPropertyMustBeParsable("nem.maxThreads");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithoutHttpPort() {
 		// Act:
-		assertIntPropertyIsRequired("nem.httpPort");
+		this.assertIntPropertyIsRequired("nem.httpPort");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithUnparsableHttpPort() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.httpPort");
+		this.assertIntPropertyMustBeParsable("nem.httpPort");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithoutHttpsPort() {
 		// Act:
-		assertIntPropertyIsRequired("nem.httpsPort");
+		this.assertIntPropertyIsRequired("nem.httpsPort");
 	}
 
 	@Test
 	public void cannotReadConfigurationWithUnparsableHttpsPort() {
 		// Act:
-		assertIntPropertyMustBeParsable("nem.httpsPort");
+		this.assertIntPropertyMustBeParsable("nem.httpsPort");
 	}
 
 	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutWebContext() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.webContext");
 
 		// Act:
@@ -113,7 +113,7 @@ public class CommonConfigurationTest {
 	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutApiContext() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.apiContext");
 
 		// Act:
@@ -123,7 +123,7 @@ public class CommonConfigurationTest {
 	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutHomePath() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.homePath");
 
 		// Act:
@@ -137,7 +137,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutFolder() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.folder");
 
 		// Act:
@@ -149,7 +149,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutProtocol() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.protocol");
 
 		// Act:
@@ -161,7 +161,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutHost() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.host");
 
 		// Act:
@@ -173,7 +173,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutShutdownPath() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.shutdownPath");
 
 		// Act:
@@ -185,7 +185,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutUseDosFilter() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.useDosFilter");
 
 		// Act:
@@ -197,7 +197,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutIsWebStart() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.isWebStart");
 
 		// Act:
@@ -209,7 +209,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutNisJnlpUrl() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove("nem.nisJnlpUrl");
 
 		// Act:
@@ -242,7 +242,7 @@ public class CommonConfigurationTest {
 
 	private void assertIntPropertyIsRequired(final String propName) {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.remove(propName);
 
 		// Act:
@@ -251,7 +251,7 @@ public class CommonConfigurationTest {
 
 	private void assertIntPropertyMustBeParsable(final String propName) {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty(propName, "notANumber");
 
 		// Act:

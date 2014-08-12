@@ -114,7 +114,7 @@ public class JsonDeserializer extends Deserializer {
 		}
 
 		final List<T> objects = new ArrayList<>();
-		for (Object jsonObject : jsonArray) {
+		for (final Object jsonObject : jsonArray) {
 			objects.add(this.deserializeObject((JSONObject)jsonObject, activator));
 		}
 
@@ -123,7 +123,7 @@ public class JsonDeserializer extends Deserializer {
 
 	public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
 		final JsonDeserializer deserializer = new JsonDeserializer(object, this.getContext());
-		return 0 == object.size() ? null : activator.deserialize(deserializer);
+		return object.isEmpty() ? null : activator.deserialize(deserializer);
 	}
 
 	private void checkLabel(final String label) {

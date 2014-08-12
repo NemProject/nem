@@ -399,7 +399,7 @@ public class NodeRefresherTest {
 			this.setInactiveGetInfoForNode(name, 0);
 		}
 
-		public void setInactiveGetInfoForNode(final String name, int sleep) {
+		public void setInactiveGetInfoForNode(final String name, final int sleep) {
 			final Node node = PeerUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> {

@@ -32,9 +32,9 @@ public class LowComTrustProvider implements TrustProvider {
 		final double lowComVectorSum = lowComVector.sum();
 
 		ColumnVector trustVector = this.trustProvider.computeTrust(context);
-		if (0 != lowComVectorSum && 0 != weight) {
+		if (0 != lowComVectorSum && 0 != this.weight) {
 			trustVector.normalize();
-			lowComVector.scale(lowComVectorSum / weight * 100.0);
+			lowComVector.scale(lowComVectorSum / this.weight * 100.0);
 			trustVector = trustVector.add(lowComVector);
 		}
 

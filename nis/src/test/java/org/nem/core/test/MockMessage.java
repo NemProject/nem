@@ -10,7 +10,7 @@ public class MockMessage extends Message {
 
 	public static final int TYPE = 19;
 
-	private int customField;
+	private final int customField;
 	private byte[] encodedPayload;
 	private byte[] decodedPayload;
 

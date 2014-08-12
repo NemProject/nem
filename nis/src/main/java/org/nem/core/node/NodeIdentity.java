@@ -35,13 +35,13 @@ public class NodeIdentity implements SerializableEntity {
 		this.name = name;
 	}
 
-	private NodeIdentity(final Deserializer deserializer, boolean containsPrivateKey) {
+	private NodeIdentity(final Deserializer deserializer, final boolean containsPrivateKey) {
 		this.keyPair = deserializeKeyPair(deserializer, containsPrivateKey);
 		this.address = Address.fromPublicKey(this.keyPair.getPublicKey());
 		this.name = deserializer.readOptionalString("name");
 	}
 
-	private static KeyPair deserializeKeyPair(final Deserializer deserializer, boolean containsPrivateKey) {
+	private static KeyPair deserializeKeyPair(final Deserializer deserializer, final boolean containsPrivateKey) {
 		if (containsPrivateKey) {
 			return new KeyPair(new PrivateKey(deserializer.readBigInteger("private-key")));
 		}
@@ -113,7 +113,7 @@ public class NodeIdentity implements SerializableEntity {
 	 */
 	public Signature sign(final byte[] salt) {
 		final Signer signer = new Signer(this.keyPair);
-		return signer.sign(getPayload(salt));
+		return signer.sign(this.getPayload(salt));
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class NodeIdentity implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof NodeIdentity)) {
 			return false;
 		}

@@ -14,9 +14,9 @@ import java.util.function.BiPredicate;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 512;
 
-	private Amount amount;
-	private Message message;
-	private Account recipient;
+	private final Amount amount;
+	private final Message message;
+	private final Account recipient;
 
 	/**
 	 * Creates a transfer transaction.
@@ -104,7 +104,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	private long getMinimumTransferFee() {
-		double microNemAmount = this.amount.getNumNem();
+		final double microNemAmount = this.amount.getNumNem();
 		return Math.max(1, (long)Math.ceil(microNemAmount / 25000 + Math.log(microNemAmount) / 5));
 	}
 

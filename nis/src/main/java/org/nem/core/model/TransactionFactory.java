@@ -24,7 +24,7 @@ public class TransactionFactory {
 	 * @return The deserialized transaction.
 	 */
 	private static Transaction deserialize(final VerifiableEntity.DeserializationOptions options, final Deserializer deserializer) {
-		int type = deserializer.readInt("type");
+		final int type = deserializer.readInt("type");
 
 		switch (type) {
 			case TransactionTypes.TRANSFER:

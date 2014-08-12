@@ -20,17 +20,17 @@ public class TunedMtjSparseMatrix extends Matrix {
 	}
 
 	@Override
-	protected Matrix create(int numRows, int numCols) {
+	protected Matrix create(final int numRows, final int numCols) {
 		throw new UnsupportedOperationException("this operation is not currently supported");
 	}
 
 	@Override
-	protected double getAtUnchecked(int row, int col) {
+	protected double getAtUnchecked(final int row, final int col) {
 		return this.matrix.get(row, col);
 	}
 
 	@Override
-	protected void setAtUnchecked(int row, int col, double val) {
+	protected void setAtUnchecked(final int row, final int col, final double val) {
 		this.matrix.set(row, col, val);
 	}
 
@@ -47,14 +47,14 @@ public class TunedMtjSparseMatrix extends Matrix {
 
 	@Override
 	public void normalizeColumns() {
-		int[] colIndices = this.matrix.getColumnIndices();
-		double[] values = this.matrix.getData();
-		double[] colSums = new double[this.matrix.numRows()];
+		final int[] colIndices = this.matrix.getColumnIndices();
+		final double[] values = this.matrix.getData();
+		final double[] colSums = new double[this.matrix.numRows()];
 		for (int i = 0; i < colIndices.length; ++i)
 			colSums[colIndices[i]] += Math.abs(values[i]);
 
 		for (int i = 0; i < colIndices.length; ++i) {
-			double sum = colSums[colIndices[i]];
+			final double sum = colSums[colIndices[i]];
 			if (sum > 0.0)
 				values[i] /= sum;
 		}

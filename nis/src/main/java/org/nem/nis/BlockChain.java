@@ -81,8 +81,8 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return true if block can be next in chain
 	 */
 	private boolean isLastBlockParent(final Block block) {
-		boolean result;
-		synchronized (blockChainLastBlockLayer) {
+		final boolean result;
+		synchronized (this.blockChainLastBlockLayer) {
 			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
 			LOGGER.info("isLastBlockParent result: " + result);
 			LOGGER.info("last block height: " + this.blockChainLastBlockLayer.getLastDbBlock().getHeight());
@@ -97,8 +97,8 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return true if block is a sibling of the last block in the chain.
 	 */
 	private boolean isLastBlockSibling(final Block block) {
-		boolean result;
-		synchronized (blockChainLastBlockLayer) {
+		final boolean result;
+		synchronized (this.blockChainLastBlockLayer) {
 			// it's better to base it on hash of previous block instead of height
 			result = this.blockChainLastBlockLayer.getLastDbBlock().getPrevBlockHash().equals(block.getPreviousBlockHash());
 		}
@@ -177,11 +177,11 @@ public class BlockChain implements BlockSynchronizer {
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.getAccountCache().asAutoCache());
-		final ComparisonResult result = compareChains(connector, context.createLocalBlockLookup(), node);
+		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 			ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
-			Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
 			this.foraging.processTransactions(unconfirmedTransactions);
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
@@ -201,7 +201,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		//region verify peer's chain
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
-		final ValidationResult validationResult = updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 	}
 
@@ -223,14 +223,14 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block dbParent;
 
 		// receivedBlock already seen
-		synchronized (blockChainLastBlockLayer) {
-			if (blockDao.findByHash(blockHash) != null) {
+		synchronized (this.blockChainLastBlockLayer) {
+			if (this.blockDao.findByHash(blockHash) != null) {
 				// This will happen frequently and is ok
 				return ValidationResult.NEUTRAL;
 			}
 
 			// check if we know previous receivedBlock
-			dbParent = blockDao.findByHash(parentHash);
+			dbParent = this.blockDao.findByHash(parentHash);
 		}
 
 		// if we don't have parent, we can't do anything with this receivedBlock
@@ -241,11 +241,11 @@ public class BlockChain implements BlockSynchronizer {
 
 		final BlockChainSyncContext context = this.createSyncContext();
 
-		fixGenerationHash(receivedBlock, dbParent);
+		this.fixGenerationHash(receivedBlock, dbParent);
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
 		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.getAccountCache().asAutoCache());
 		// EVIL hack end
 
@@ -261,7 +261,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
-		return updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
 	}
 
 	private BlockChainSyncContext createSyncContext() {
@@ -500,7 +500,7 @@ public class BlockChain implements BlockSynchronizer {
 			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
 			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
 
-			int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+			final int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
@@ -558,7 +558,7 @@ public class BlockChain implements BlockSynchronizer {
 			long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
 			while (currentHeight != wantedHeight) {
-				org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
+				final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
 				// if the transaction is in DB it means at some point
 				// isValid and verify had to be called on it, so we can safely add it

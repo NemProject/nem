@@ -54,7 +54,7 @@ public class JarFacadeTest {
 	@Test
 	public void canCreateFacadeAroundJarStreamWithoutManifest() throws IOException {
 		// Arrange:
-		byte[] bytes = MetaDataTestUtils.createJarBytes(null);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(null);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			// Act:
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
@@ -77,7 +77,7 @@ public class JarFacadeTest {
 		attributes.putValue("Implementation-Version", "test-version");
 		attributes.putValue("Implementation-Title", "test-title");
 
-		byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 			final JarFacade facade = new JarFacade(url);
@@ -110,7 +110,7 @@ public class JarFacadeTest {
 		attributes.putValue("Implementation-Version", "test-version");
 		attributes.putValue("Implementation-Title", "test-title");
 
-		byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 			final JarFacade facade = new JarFacade(url);

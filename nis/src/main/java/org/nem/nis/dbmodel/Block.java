@@ -51,17 +51,17 @@ public class Block {
 	}
 
 	public Block(
-			Hash hash,
-			Integer version,
-			Hash generationHash,
-			Hash prevBlockHash,
-			Integer timestamp,
-			Account forger,
-			byte[] forgerProof,
-			Long height,
-			Long totalAmount,
-			Long totalFee,
-			Long difficulty) {
+			final Hash hash,
+			final Integer version,
+			final Hash generationHash,
+			final Hash prevBlockHash,
+			final Integer timestamp,
+			final Account forger,
+			final byte[] forgerProof,
+			final Long height,
+			final Long totalAmount,
+			final Long totalFee,
+			final Long difficulty) {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
@@ -78,26 +78,26 @@ public class Block {
 	}
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
 	public Long getShortId() {
-		return shortId;
+		return this.shortId;
 	}
 
-	public void setShortId(Long shortId) {
+	public void setShortId(final Long shortId) {
 		this.shortId = shortId;
 	}
 
 	public Integer getVersion() {
-		return version;
+		return this.version;
 	}
 
-	public void setVersion(Integer version) {
+	public void setVersion(final Integer version) {
 		this.version = version;
 	}
 
@@ -105,7 +105,7 @@ public class Block {
 		return new Hash(this.prevBlockHash);
 	}
 
-	public void setPrevBlockHash(byte[] prevBlockHash) {
+	public void setPrevBlockHash(final byte[] prevBlockHash) {
 		this.prevBlockHash = prevBlockHash;
 	}
 
@@ -113,7 +113,7 @@ public class Block {
 		return new Hash(this.blockHash);
 	}
 
-	public void setBlockHash(byte[] blockHash) {
+	public void setBlockHash(final byte[] blockHash) {
 		this.blockHash = blockHash;
 	}
 
@@ -121,55 +121,55 @@ public class Block {
 		return new Hash(this.generationHash);
 	}
 
-	public void setGenerationHash(byte[] generationHash) {
+	public void setGenerationHash(final byte[] generationHash) {
 		this.generationHash = generationHash;
 	}
 
 	public Integer getTimestamp() {
-		return timestamp;
+		return this.timestamp;
 	}
 
-	public void setTimestamp(Integer timestamp) {
+	public void setTimestamp(final Integer timestamp) {
 		this.timestamp = timestamp;
 	}
 
 	public Account getForger() {
-		return forger;
+		return this.forger;
 	}
 
-	public void setForgerId(Account forger) {
+	public void setForgerId(final Account forger) {
 		this.forger = forger;
 	}
 
 	public byte[] getForgerProof() {
-		return forgerProof;
+		return this.forgerProof;
 	}
 
-	public void setForgerProof(byte[] forgerProof) {
+	public void setForgerProof(final byte[] forgerProof) {
 		this.forgerProof = forgerProof;
 	}
 
 	public Long getHeight() {
-		return height;
+		return this.height;
 	}
 
-	public void setHeight(Long height) {
+	public void setHeight(final Long height) {
 		this.height = height;
 	}
 
 	public Long getTotalAmount() {
-		return totalAmount;
+		return this.totalAmount;
 	}
 
-	public void setTotalAmount(Long totalAmount) {
+	public void setTotalAmount(final Long totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 
 	public Long getTotalFee() {
-		return totalFee;
+		return this.totalFee;
 	}
 
-	public void setTotalFee(Long totalFee) {
+	public void setTotalFee(final Long totalFee) {
 		this.totalFee = totalFee;
 	}
 
@@ -177,23 +177,23 @@ public class Block {
 		return this.difficulty;
 	}
 
-	public void setDifficulty(Long difficulty) {
+	public void setDifficulty(final Long difficulty) {
 		this.difficulty = difficulty;
 	}
 
 	public Long getNextBlockId() {
-		return nextBlockId;
+		return this.nextBlockId;
 	}
 
-	public void setNextBlockId(Long nextBlockId) {
+	public void setNextBlockId(final Long nextBlockId) {
 		this.nextBlockId = nextBlockId;
 	}
 
 	public List<Transfer> getBlockTransfers() {
-		return blockTransfers;
+		return this.blockTransfers;
 	}
 
-	public void setBlockTransfers(List<Transfer> blockTransfers) {
+	public void setBlockTransfers(final List<Transfer> blockTransfers) {
 		this.blockTransfers = blockTransfers;
 	}
 

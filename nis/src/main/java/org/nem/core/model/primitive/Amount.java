@@ -20,7 +20,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * @param amount The amount of NEM.
 	 * @return The new amount.
 	 */
-	public static Amount fromNem(long amount) {
+	public static Amount fromNem(final long amount) {
 		return new Amount(amount * MICRONEMS_IN_NEM);
 	}
 
@@ -30,7 +30,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * @param amount The amount of micro NEM.
 	 * @return The new amount.
 	 */
-	public static Amount fromMicroNem(long amount) {
+	public static Amount fromMicroNem(final long amount) {
 		return new Amount(amount);
 	}
 
@@ -39,7 +39,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 *
 	 * @param amount The number of micro NEM.
 	 */
-	public Amount(long amount) {
+	public Amount(final long amount) {
 		super(amount, Amount.class);
 
 		if (amount < 0) {

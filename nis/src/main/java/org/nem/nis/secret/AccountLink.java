@@ -54,13 +54,13 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	@Override
 	public int compareTo(final AccountLink rhs) {
-		int[] comparisonResults = new int[] {
+		final int[] comparisonResults = new int[] {
 				this.getHeight().compareTo(rhs.getHeight()),
 				this.getAmount().compareTo(rhs.getAmount()),
 				this.otherAccountAddress.getEncoded().compareTo(rhs.otherAccountAddress.getEncoded()),
 		};
 
-		for (int result : comparisonResults) {
+		for (final int result : comparisonResults) {
 			if (0 != result)
 				return result;
 		}

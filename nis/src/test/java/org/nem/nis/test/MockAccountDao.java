@@ -44,18 +44,18 @@ public class MockAccountDao implements AccountDao {
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Account getAccount(Long id) {
+	public org.nem.nis.dbmodel.Account getAccount(final Long id) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public org.nem.nis.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
-		++numGetAccountByPrintableAddressCalls;
+		++this.numGetAccountByPrintableAddressCalls;
 		return this.knownAccounts.get(printableAddress);
 	}
 
 	@Override
-	public void save(org.nem.nis.dbmodel.Account account) {
+	public void save(final org.nem.nis.dbmodel.Account account) {
 		throw new UnsupportedOperationException();
 	}
 }

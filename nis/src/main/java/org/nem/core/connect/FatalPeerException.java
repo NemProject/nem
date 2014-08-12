@@ -19,7 +19,7 @@ public class FatalPeerException extends RuntimeException {
 	 *
 	 * @param cause The exception message.
 	 */
-	public FatalPeerException(Throwable cause) {
+	public FatalPeerException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -29,7 +29,7 @@ public class FatalPeerException extends RuntimeException {
 	 * @param message The exception message.
 	 * @param cause The original exception.
 	 */
-	public FatalPeerException(final String message, Throwable cause) {
+	public FatalPeerException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

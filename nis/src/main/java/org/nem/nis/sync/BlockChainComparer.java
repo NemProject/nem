@@ -118,7 +118,7 @@ public class BlockChainComparer {
 				return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
 
 			final HashChain localHashes = this.localLookup.getHashesFrom(startingBlockHeight);
-			int firstDifferenceIndex = localHashes.findFirstDifference(remoteHashes);
+			final int firstDifferenceIndex = localHashes.findFirstDifference(remoteHashes);
 			if (0 == firstDifferenceIndex) {
 				// at least first compared block should be the same, if not, the remote is a liar or on a fork
 				return ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES;

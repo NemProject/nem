@@ -53,7 +53,7 @@ public class RealDoubleTest {
 		assertInvalidValue(Double.NaN);
 	}
 
-	private static void assertInvalidValue(double invalidValue) {
+	private static void assertInvalidValue(final double invalidValue) {
 		// Arrange:
 		final RealDouble value = new RealDouble(1.2);
 

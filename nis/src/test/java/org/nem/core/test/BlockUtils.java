@@ -39,8 +39,8 @@ public class BlockUtils {
 	 */
 	public static MockTransaction createTransactionWithFee(final int customField, final long fee) {
 		// Arrange:
-		Account sender = Utils.generateRandomAccount();
-		MockTransaction transaction = new MockTransaction(sender, customField);
+		final Account sender = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(sender, customField);
 		transaction.setFee(new Amount(fee));
 		return transaction;
 	}
@@ -53,8 +53,8 @@ public class BlockUtils {
 	 */
 	public static MockTransaction createTransactionWithFee(final Amount fee) {
 		// Arrange:
-		Account sender = Utils.generateRandomAccount();
-		MockTransaction transaction = new MockTransaction(sender, 7);
+		final Account sender = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(sender, 7);
 		transaction.setFee(fee);
 		return transaction;
 	}

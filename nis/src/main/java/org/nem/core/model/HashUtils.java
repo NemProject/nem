@@ -25,7 +25,7 @@ public abstract class HashUtils {
 	 * @return The calculated hash.
 	 */
 	public static Hash calculateHash(final SerializableEntity entity) {
-		byte[] data = BinarySerializer.serializeToBytes(entity);
+		final byte[] data = BinarySerializer.serializeToBytes(entity);
 		return new Hash(Hashes.sha3(data));
 	}
 

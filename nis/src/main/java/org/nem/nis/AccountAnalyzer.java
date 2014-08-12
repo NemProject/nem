@@ -7,8 +7,8 @@ import org.nem.nis.poi.*;
  * Account analyzer that is the central point for accessing all NIS-related account information.
  */
 public class AccountAnalyzer {
-	private AccountCache accountCache;
-	private PoiFacade poiFacade;
+	private final AccountCache accountCache;
+	private final PoiFacade poiFacade;
 
 	/**
 	 * Creates a new account analyzer.

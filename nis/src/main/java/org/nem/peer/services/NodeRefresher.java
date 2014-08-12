@@ -66,7 +66,7 @@ public class NodeRefresher {
 				});
 	}
 
-	private CompletableFuture<Void> getNodeInfo(final Node node, boolean isDirectContact) {
+	private CompletableFuture<Void> getNodeInfo(final Node node, final boolean isDirectContact) {
 		// never sync with the local node or an indirect node that has already been communicated with
 		if (this.localNode.equals(node) || (!isDirectContact && !this.connectedNodes.add(node))) {
 			return CompletableFuture.completedFuture(null);

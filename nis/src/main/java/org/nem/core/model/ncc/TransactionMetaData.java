@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
  */
 public class TransactionMetaData implements SerializableEntity {
 
-	private BlockHeight height;
+	private final BlockHeight height;
 
 	/**
 	 * Creates a new meta data.
@@ -38,7 +38,7 @@ public class TransactionMetaData implements SerializableEntity {
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
 	}
 }

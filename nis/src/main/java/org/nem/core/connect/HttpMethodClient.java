@@ -70,7 +70,7 @@ public class HttpMethodClient<T> {
 	 * @return The response from the server.
 	 */
 	public AsyncToken<T> get(final URL url, final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, obj -> new HttpGet(obj), responseStrategy);
+		return this.sendRequest(url, obj -> new HttpGet(obj), responseStrategy);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class HttpMethodClient<T> {
 			final URL url,
 			final HttpPostRequest request,
 			final HttpResponseStrategy<T> responseStrategy) {
-		return sendRequest(url, uri -> createPostRequest(uri, request), responseStrategy);
+		return this.sendRequest(url, uri -> createPostRequest(uri, request), responseStrategy);
 	}
 
 	private static HttpPost createPostRequest(final URI uri, final HttpPostRequest request) {
@@ -129,7 +129,7 @@ public class HttpMethodClient<T> {
 			});
 
 			return new AsyncToken<>(request, responseFuture);
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			throw new FatalPeerException(e);
 		}
 	}

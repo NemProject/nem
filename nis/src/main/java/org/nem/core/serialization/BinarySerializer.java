@@ -27,7 +27,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	@Override
 	public void writeInt(final String label, final int i) {
-		byte[] bytes = {
+		final byte[] bytes = {
 				(byte)(i & 0xFF),
 				(byte)((i >> 8) & 0xFF),
 				(byte)((i >> 16) & 0xFF),
@@ -100,7 +100,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 				object.serialize(serializer);
 				return serializer.getBytes();
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new SerializationException(ex);
 		}
 	}
@@ -130,7 +130,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 				entity.serialize(binarySerializer);
 				return binarySerializer.getBytes();
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new SerializationException(e);
 		}
 	}

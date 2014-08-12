@@ -23,7 +23,7 @@ public class DeserializableEntityMessageConverter extends AbstractHttpMessageCon
 	}
 
 	@Override
-	protected boolean supports(Class<?> clazz) {
+	protected boolean supports(final Class<?> clazz) {
 		return null != this.getConstructor(clazz);
 	}
 
@@ -53,7 +53,7 @@ public class DeserializableEntityMessageConverter extends AbstractHttpMessageCon
 	private Constructor<?> getConstructor(final Class<?> aClass) {
 		try {
 			return aClass.getConstructor(Deserializer.class);
-		} catch (NoSuchMethodException e) {
+		} catch (final NoSuchMethodException e) {
 			return null;
 		}
 	}

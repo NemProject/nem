@@ -30,11 +30,11 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 *
 	 * @param difficulty The block difficulty.
 	 */
-	public BlockDifficulty(long difficulty) {
+	public BlockDifficulty(final long difficulty) {
 		this(difficulty, true);
 	}
 
-	private BlockDifficulty(long difficulty, boolean clamp) {
+	private BlockDifficulty(final long difficulty, final boolean clamp) {
 		super(clamp ? Clamp(difficulty) : difficulty, BlockDifficulty.class);
 	}
 
@@ -56,7 +56,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 		return BigInteger.valueOf(this.getValue());
 	}
 
-	private static long Clamp(long difficulty) {
+	private static long Clamp(final long difficulty) {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));
 	}
 

@@ -130,7 +130,7 @@ public abstract class Matrix {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				final double sum = columnSums[col];
 				if (0 == sum) {
 					return;
@@ -147,7 +147,7 @@ public abstract class Matrix {
 	public void removeNegatives() {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				if (value < 0) {
 					setter.accept(0.0);
 				}
@@ -163,7 +163,7 @@ public abstract class Matrix {
 	public final void scale(final double scale) {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				setter.accept(value / scale);
 			}
 		});
@@ -195,7 +195,7 @@ public abstract class Matrix {
 		return this.join(matrix, true, (l, r) -> l + r);
 	}
 
-	private Matrix join(final Matrix matrix, boolean isTwoWay, final DoubleBinaryOperator op) {
+	private Matrix join(final Matrix matrix, final boolean isTwoWay, final DoubleBinaryOperator op) {
 		if (!this.isSameSize(matrix)) {
 			throw new IllegalArgumentException("matrix sizes must be equal");
 		}
@@ -234,7 +234,7 @@ public abstract class Matrix {
 
 	private double aggregate(final DoubleUnaryOperator op) {
 		// use a double[1] instead of a double so that the sum can be updated by the lambda
-		double[] sum = new double[] { 0.0 };
+		final double[] sum = new double[] { 0.0 };
 		this.forEach((r, c, v) -> sum[0] += op.applyAsDouble(v));
 		return sum[0];
 	}
@@ -254,8 +254,8 @@ public abstract class Matrix {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
 
-		double[] rawResult = new double[this.numRows];
-		double[] rawVector = vector.getRaw();
+		final double[] rawResult = new double[this.numRows];
+		final double[] rawVector = vector.getRaw();
 
 		this.forEach((r, c, v) -> rawResult[r] += v * rawVector[c]);
 		return new ColumnVector(rawResult);
@@ -390,7 +390,7 @@ public abstract class Matrix {
 	protected void forEach(final ReadOnlyElementVisitorFunction func) {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				func.visit(row, col, value);
 			}
 		});

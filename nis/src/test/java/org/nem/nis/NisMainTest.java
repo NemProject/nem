@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class NisMainTest {
 
-	private static List<String> PRIVATE_KEY_STRINGS = Arrays.asList(
+	private static final List<String> PRIVATE_KEY_STRINGS = Arrays.asList(
 			"308b13a47a241084aac7112aae5552a8227477ab6c6e2b5b3a996c9cd60da387",
 			"00c9658e78146a62ee0bc222a25ca79667b7a7e5225b839fce1d4aa20e64aecf1a",
 			"37c5c01c109d58a0d5f7fd48ec11507866808dddf72d4b5baeae6d3c7f506150",
@@ -22,7 +22,7 @@ public class NisMainTest {
 			"5b193f29962d9a821479ef335c6a24b2e83bec9942c01d46333f9aa1b3cf2a64",
 			"00924d2e6740e223139e89a416ee9cad110c68744bdf27788c4ffe0e00447bf6db");
 
-	private static List<String> ENCODED_ADDRESS_STRINGS = Arrays.asList(
+	private static final List<String> ENCODED_ADDRESS_STRINGS = Arrays.asList(
 			"TbloodZW6W4DUVL4NGAQXHZXFQJLNHPDXHULLHZW",
 			"TAthiesMY6QO6XKPCBZFEVVVFVL2UT3ESDHAVGL7",
 			"TDmakotEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT",
@@ -33,7 +33,7 @@ public class NisMainTest {
 			"TDHDSTFY757SELOAE3FU7U7krystoP6FFB7XXSYH",
 			"TD53NLTDK7EMSutopiAK4RSYQ523VBS3C62UMJC5");
 	
-	private static List<KeyPair> KEY_PAIRS = PRIVATE_KEY_STRINGS.stream()
+	private static final List<KeyPair> KEY_PAIRS = PRIVATE_KEY_STRINGS.stream()
 			.map(s -> new KeyPair(PrivateKey.fromHexString(s)))
 			.collect(Collectors.toList());
 

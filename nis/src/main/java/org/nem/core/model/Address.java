@@ -13,8 +13,8 @@ public class Address {
 	private static final int NUM_CHECKSUM_BYTES = 4;
 	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
-	private String encoded; // base-32 encoded address
-	private PublicKey publicKey;
+	private final String encoded; // base-32 encoded address
+	private final PublicKey publicKey;
 
 	/**
 	 * Creates an Address from a public key.
@@ -59,19 +59,19 @@ public class Address {
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {
 		// step 1: sha3 hash of the public key
-		byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
+		final byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
 
 		// step 2: ripemd160 hash of (1)
-		byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
+		final byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
 
 		// step 3: add version byte in front of (2)
-		byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
+		final byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
 
 		// step 4: get the checksum of (3)
-		byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
+		final byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
 
 		// step 5: concatenate (3) and (4)
-		byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
+		final byte[] concatStepThreeAndStepSix = ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
 		// step 6: base32 encode (5)
 		return Base32Encoder.getString(concatStepThreeAndStepSix);
@@ -79,7 +79,7 @@ public class Address {
 
 	private static byte[] generateChecksum(final byte[] input) {
 		// step 1: sha3 hash of (input
-		byte[] sha3StepThreeHash = Hashes.sha3(input);
+		final byte[] sha3StepThreeHash = Hashes.sha3(input);
 
 		// step 2: get the first X bytes of (1)
 		return Arrays.copyOfRange(sha3StepThreeHash, 0, NUM_CHECKSUM_BYTES);
@@ -116,11 +116,11 @@ public class Address {
 		//		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
 		//			return false;
 
-		byte[] encodedBytes;
+		final byte[] encodedBytes;
 
 		try {
 			encodedBytes = Base32Encoder.getBytes(this.encoded);
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			return false;
 		}
 		if (NUM_ENCODED_BYTES_LENGTH != encodedBytes.length) {
@@ -131,10 +131,10 @@ public class Address {
 			return false;
 		}
 
-		int checksumStartIndex = NUM_ENCODED_BYTES_LENGTH - NUM_CHECKSUM_BYTES;
-		byte[] versionPrefixedHash = Arrays.copyOfRange(encodedBytes, 0, checksumStartIndex);
-		byte[] addressChecksum = Arrays.copyOfRange(encodedBytes, checksumStartIndex, checksumStartIndex + NUM_CHECKSUM_BYTES);
-		byte[] calculatedChecksum = generateChecksum(versionPrefixedHash);
+		final int checksumStartIndex = NUM_ENCODED_BYTES_LENGTH - NUM_CHECKSUM_BYTES;
+		final byte[] versionPrefixedHash = Arrays.copyOfRange(encodedBytes, 0, checksumStartIndex);
+		final byte[] addressChecksum = Arrays.copyOfRange(encodedBytes, checksumStartIndex, checksumStartIndex + NUM_CHECKSUM_BYTES);
+		final byte[] calculatedChecksum = generateChecksum(versionPrefixedHash);
 		return Arrays.equals(addressChecksum, calculatedChecksum);
 	}
 
@@ -144,12 +144,12 @@ public class Address {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof Address)) {
 			return false;
 		}
 
-		Address rhs = (Address)obj;
+		final Address rhs = (Address)obj;
 		return this.encoded.equals(rhs.encoded);
 	}
 

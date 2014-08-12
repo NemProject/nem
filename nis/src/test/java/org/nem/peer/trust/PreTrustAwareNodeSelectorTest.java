@@ -132,8 +132,8 @@ public class PreTrustAwareNodeSelectorTest {
 		}
 
 		public TestContext(final List<Node> preTrustedNodes, final Random random) {
-			Mockito.when(context.getLocalNode()).thenReturn(this.localNode);
-			Mockito.when(context.getPreTrustedNodes())
+			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
+			Mockito.when(this.context.getPreTrustedNodes())
 					.thenReturn(new PreTrustedNodes(new LinkedHashSet<>(preTrustedNodes)));
 
 			this.selector = new PreTrustAwareNodeSelector(this.innerSelector, this.nodes, this.context, random);

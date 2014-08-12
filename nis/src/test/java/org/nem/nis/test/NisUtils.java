@@ -49,7 +49,7 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified height.
 	 */
-	public static Block createRandomBlockWithHeight(long height) {
+	public static Block createRandomBlockWithHeight(final long height) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
@@ -61,7 +61,7 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified timestamp.
 	 */
-	public static Block createRandomBlockWithTimeStamp(int timestamp) {
+	public static Block createRandomBlockWithTimeStamp(final int timestamp) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),

@@ -10,7 +10,7 @@ import java.math.BigInteger;
  */
 public class Signature {
 
-	private BigInteger r;
+	private final BigInteger r;
 	private BigInteger s;
 
 	/**
@@ -34,7 +34,7 @@ public class Signature {
 			throw new IllegalArgumentException("binary signature representation must be 64 bytes");
 		}
 
-		byte[][] parts = ArrayUtils.split(bytes, 32);
+		final byte[][] parts = ArrayUtils.split(bytes, 32);
 		this.r = ArrayUtils.toBigInteger(parts[0]);
 		this.s = ArrayUtils.toBigInteger(parts[1]);
 	}
@@ -92,12 +92,12 @@ public class Signature {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof Signature)) {
 			return false;
 		}
 
-		Signature rhs = (Signature)obj;
+		final Signature rhs = (Signature)obj;
 		return 0 == this.r.compareTo(rhs.r) && 0 == this.s.compareTo(rhs.s);
 	}
 
