@@ -164,6 +164,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 	/**
 	 * Signs this entity using private key of specified account.
+	 *
+	 * @param account The account to use for signing.
 	 */
 	public void signBy(final Account account) {
 		if (!account.getKeyPair().hasPrivateKey())
@@ -179,6 +181,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 	/**
 	 * Verifies that this transaction has been signed by the owner's public key.
+	 *
+	 * @return True if verification succeeded, false otherwise.
 	 */
 	public boolean verify() {
 		if (null == this.signature)

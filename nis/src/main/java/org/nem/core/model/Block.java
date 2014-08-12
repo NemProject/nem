@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * A NEM block.
- * <p/>
+ *
  * The forger is an alias for the signer.
  * The forger proof is the signature.
  */
@@ -67,6 +67,7 @@ public class Block extends VerifiableEntity {
 	 * Deserializes a new block.
 	 *
 	 * @param type         The block type.
+	 * @param options      The deserialization options to use.
 	 * @param deserializer The deserializer to use.
 	 */
 	public Block(final int type, final DeserializationOptions options, final Deserializer deserializer) {

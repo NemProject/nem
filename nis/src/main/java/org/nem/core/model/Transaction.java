@@ -31,6 +31,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Deserializes a new transaction.
 	 *
 	 * @param type         The transaction type.
+	 * @param options      The deserialization options to use.
 	 * @param deserializer The deserializer to use.
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {

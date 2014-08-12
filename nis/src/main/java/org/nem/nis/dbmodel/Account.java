@@ -6,10 +6,10 @@ import javax.persistence.*;
 
 /**
  * Db Account entity.
- * <p/>
+ *
  * Probably it should be called Address, as it's main purpose is to associate
  * printableKey with publicKey.
- * <p/>
+ *
  * In future it should probably also two 'heights' of an Account,
  * marking at what blockchain height has network 'learned' about
  * Account NEM address (printableKey) and public key respectively.
