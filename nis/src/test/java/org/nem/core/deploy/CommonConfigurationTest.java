@@ -2,6 +2,7 @@ package org.nem.core.deploy;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.Properties;
 
@@ -55,7 +56,8 @@ public class CommonConfigurationTest {
 
 	// TODO-CR 20140811 J-B annotation spacing is off; elsewhere I've been formating as
 	// @Test(expected = RuntimeException.class)
-	@Test (expected=RuntimeException.class)
+	// BR: ok
+	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutShortServerName() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
@@ -63,100 +65,79 @@ public class CommonConfigurationTest {
 
 		// Act:
 		// TODO-CR 2014081 J-B in the mandatory tests, you don't need to declare the local config
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		// BR: ok
+		new CommonConfiguration(properties);
 	}
 
 	// TODO-CR 2014081 J-B for all of the integer tests, consider adding a helper function like assertIntPropertyIsRequired(propName)
 	// inside that function, you can use ExceptionAssert
+	// BR: ok
 
-	@Test (expected=RuntimeException.class)
+	@Test
 	public void cannotReadConfigurationWithoutMaxThreads() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.remove("nem.maxThreads");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyIsRequired("nem.maxThreads");
 	}
 
-	@Test (expected=NumberFormatException.class)
+	@Test
 	public void cannotReadConfigurationWithUnparsableMaxThreads() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.setProperty("nem.maxThreads", "notANumber");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyMustBeParsable("nem.maxThreads", "notANumber");
 	}
 
-	@Test (expected=RuntimeException.class)
+	@Test
 	public void cannotReadConfigurationWithoutHttpPort() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.remove("nem.httpPort");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyIsRequired("nem.httpPort");
+
 	}
 
-	@Test (expected=NumberFormatException.class)
+	@Test
 	public void cannotReadConfigurationWithUnparsableHttpPort() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.setProperty("nem.httpPort", "notANumber");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyMustBeParsable("nem.httpPort", "notANumber");
 	}
 
-	@Test (expected=RuntimeException.class)
+	@Test
 	public void cannotReadConfigurationWithoutHttpsPort() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.remove("nem.httpsPort");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyIsRequired("nem.httpsPort");
 	}
 
-	@Test (expected=NumberFormatException.class)
+	@Test
 	public void cannotReadConfigurationWithUnparsableHttpsPort() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.setProperty("nem.httpsPort", "notANumber");
-
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		assertIntPropertyMustBeParsable("nem.httpsPort", "notANumber");
 	}
 
-	@Test (expected=RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutWebContext() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.remove("nem.webContext");
 
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		new CommonConfiguration(properties);
 	}
 
-	@Test (expected=RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutApiContext() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.remove("nem.apiContext");
 
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		new CommonConfiguration(properties);
 	}
 
-	@Test (expected=RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void cannotReadConfigurationWithoutHomePath() {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.remove("nem.homePath");
 
 		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
+		new CommonConfiguration(properties);
 	}
 
 	//endregion
@@ -267,5 +248,21 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.nisJnlpUrl", "url");
 
 		return properties;
+	}
+
+	private void assertIntPropertyIsRequired(String propName) {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.remove(propName);
+
+		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), RuntimeException.class);
+	}
+
+	private void assertIntPropertyMustBeParsable(String propName, String propValue) {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty(propName, propValue);
+
+		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), NumberFormatException.class);
 	}
 }
