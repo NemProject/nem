@@ -17,9 +17,10 @@ public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {
 	 */
 	public ReferenceCount(final long refCount) {
 		super(refCount, ReferenceCount.class);
-		
-		if (this.getRaw() < 0)
+
+		if (this.getRaw() < 0) {
 			throw new IllegalArgumentException("reference counter can't be negative");
+		}
 	}
 
 	/**
@@ -27,22 +28,22 @@ public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {
 	 *
 	 * @return The underlying reference counter.
 	 */
-	public long getRaw() { 
-		return this.getValue(); 
+	public long getRaw() {
+		return this.getValue();
 	}
 
 	/**
 	 * Increments the reference counter
-	 * 
+	 *
 	 * @return The incremented reference counter
 	 */
 	public ReferenceCount increment() {
 		return new ReferenceCount(this.getRaw() + 1);
 	}
-	
+
 	/**
 	 * Decrements the reference counter
-	 * 
+	 *
 	 * @return The decremented reference counter
 	 */
 	public ReferenceCount decrement() {

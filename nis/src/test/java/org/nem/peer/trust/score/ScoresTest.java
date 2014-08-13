@@ -195,8 +195,9 @@ public class ScoresTest {
 			this.scores = scores;
 
 			this.nodes = new Node[numNodes];
-			for (int i = 0; i < numNodes; ++i)
+			for (int i = 0; i < numNodes; ++i) {
 				this.nodes[i] = PeerUtils.createNodeWithName(String.format("bob #%d", i));
+			}
 		}
 	}
 }

@@ -74,14 +74,15 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 			throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
 		}
 
-		final Account account = findByAddressImpl(address);
+		final Account account = this.findByAddressImpl(address);
 		return null != account ? account : notFoundHandler.get();
 	}
 
 	private Account findByAddressImpl(final Address address) {
-		Account account = this.addressToAccountMap.get(address);
-		if (null == account)
+		final Account account = this.addressToAccountMap.get(address);
+		if (null == account) {
 			return null;
+		}
 
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
 			// earlier there was new object created and data copied into it
@@ -96,7 +97,6 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	 * Finds an account, updating it's public key if there's a need.
 	 *
 	 * @param address Address of an account
-	 *
 	 * @return Account associated with an address or new Account if address was unknown
 	 */
 	@Override

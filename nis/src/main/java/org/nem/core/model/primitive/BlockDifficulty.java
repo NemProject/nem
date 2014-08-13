@@ -30,11 +30,11 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 *
 	 * @param difficulty The block difficulty.
 	 */
-	public BlockDifficulty(long difficulty) {
+	public BlockDifficulty(final long difficulty) {
 		this(difficulty, true);
 	}
 
-	private BlockDifficulty(long difficulty, boolean clamp) {
+	private BlockDifficulty(final long difficulty, final boolean clamp) {
 		super(clamp ? Clamp(difficulty) : difficulty, BlockDifficulty.class);
 	}
 
@@ -43,7 +43,9 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 *
 	 * @return The underlying difficulty.
 	 */
-	public long getRaw() { return this.getValue(); }
+	public long getRaw() {
+		return this.getValue();
+	}
 
 	/**
 	 * Returns the underlying difficulty as a BigInteger.
@@ -54,7 +56,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 		return BigInteger.valueOf(this.getValue());
 	}
 
-	private static long Clamp(long difficulty) {
+	private static long Clamp(final long difficulty) {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));
 	}
 
@@ -64,8 +66,8 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 * Writes a block difficulty object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param difficulty     The object.
+	 * @param label The optional label.
+	 * @param difficulty The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final BlockDifficulty difficulty) {
 		serializer.writeLong(label, difficulty.getRaw());
@@ -75,7 +77,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 * Reads a block difficulty object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static BlockDifficulty readFrom(final Deserializer deserializer, final String label) {

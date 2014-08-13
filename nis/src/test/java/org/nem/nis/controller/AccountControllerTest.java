@@ -1,9 +1,5 @@
 package org.nem.nis.controller;
 
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,6 +15,9 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.*;
+
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class AccountControllerTest {
 
@@ -161,7 +160,7 @@ public class AccountControllerTest {
 
 	// TODO-CR 20140809 -(minor) probably clearer to drop each param to its own line (also use final and remove the unused imports,
 	// and following double blank lines) ... will be much easier when we run our "code cleanup"
-	private void accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType transferType, BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+	private void accountTransfersMethodsDelegatesToIo(final ReadOnlyTransferDao.TransferType transferType, final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
@@ -182,26 +181,24 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
 	}
 
-
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
 		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersAll(accountTransactionsPageBuilder));
 	}
 
 	@Test
 	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersIncoming(accountTransactionsPageBuilder));
-
 	}
 
 	@Test
 	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
 				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
 						accountController.accountTransfersOutgoing(accountTransactionsPageBuilder));
 	}

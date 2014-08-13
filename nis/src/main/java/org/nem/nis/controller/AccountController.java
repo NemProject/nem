@@ -64,8 +64,9 @@ public class AccountController {
 		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
 		final UnlockResult result = this.foraging.addUnlockedAccount(copyOfAccount);
 
-		if (UnlockResult.SUCCESS != result)
+		if (UnlockResult.SUCCESS != result) {
 			throw new IllegalArgumentException(result.toString());
+		}
 	}
 
 	/**
@@ -97,7 +98,7 @@ public class AccountController {
 	// G-J: noone, account/transfers, should finally be removed and replaced by calls to methods below
 	// J-G: so, why don't we remove it?
 
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(AccountTransactionsPageBuilder builder, ReadOnlyTransferDao.TransferType transferType) {
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
 		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
 	}
@@ -111,7 +112,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
-		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.ALL);
+		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
-		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.INCOMING);
+		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
@@ -135,7 +136,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
-		return getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
+		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	/**
@@ -156,7 +157,6 @@ public class AccountController {
 	 * Gets information about harvested blocks.
 	 *
 	 * @param builder The page builder.
-	 *
 	 * @return information about harvested blocks
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
@@ -167,7 +167,7 @@ public class AccountController {
 	}
 
 	private Address getAddress(final String nemAddress) {
-		Address address = Address.fromEncoded(nemAddress);
+		final Address address = Address.fromEncoded(nemAddress);
 		if (!address.isValid()) {
 			throw new IllegalArgumentException("address is not valid");
 		}

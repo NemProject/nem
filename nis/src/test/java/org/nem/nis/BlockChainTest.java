@@ -27,22 +27,23 @@ import static org.mockito.Mockito.when;
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
 	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;
-	private static org.nem.core.model.Account SENDER = Utils.generateRandomAccount();
-	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.nis.dbmodel.Account DB_SENDER = new org.nem.nis.dbmodel.Account(SENDER.getAddress().getEncoded(), SENDER.getKeyPair().getPublicKey());
-	private static org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
-	private static org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
+	private static final org.nem.core.model.Account SENDER = Utils.generateRandomAccount();
+	private static final org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static final org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static final org.nem.nis.dbmodel.Account DB_SENDER = new org.nem.nis.dbmodel.Account(SENDER.getAddress().getEncoded(),
+			SENDER.getKeyPair().getPublicKey());
+	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
+	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
 
 	final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 
-	static void setFinalStatic(Field field, Object newValue) throws Exception {
+	static void setFinalStatic(final Field field, final Object newValue) throws Exception {
 		field.setAccessible(true);
 
 		// remove final modifier from field
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		final Field modifiersField = Field.class.getDeclaredField("modifiers");
 		modifiersField.setAccessible(true);
 		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
@@ -58,8 +59,8 @@ public class BlockChainTest {
 	@Test
 	public void analyzeSavesResults() {
 		// Arrange:
-		org.nem.nis.dbmodel.Block block = createDummyDbBlock();
-		BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(new MockAccountDao(), new MockBlockDao(null));
+		final org.nem.nis.dbmodel.Block block = this.createDummyDbBlock();
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(new MockAccountDao(), new MockBlockDao(null));
 
 		// Act:
 		blockChainLastBlockLayer.analyzeLastBlock(block);
@@ -68,7 +69,7 @@ public class BlockChainTest {
 		Assert.assertThat(blockChainLastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
-	private Vector<Account> prepareSigners(AccountAnalyzer accountAnalyzer) {
+	private Vector<Account> prepareSigners(final AccountAnalyzer accountAnalyzer) {
 		final AccountCache accountCache = accountAnalyzer.getAccountCache();
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final Vector<Account> accounts = new Vector<>();
@@ -135,7 +136,7 @@ public class BlockChainTest {
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
-		final List<Account> accounts = prepareSigners(accountAnalyzer);
+		final List<Account> accounts = this.prepareSigners(accountAnalyzer);
 		for (final Account account : accounts) {
 			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
@@ -146,14 +147,14 @@ public class BlockChainTest {
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
-		final Block block = createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
+		final Block block = this.createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
-				retrieveAccount(1, parentBlock.getSigner())
+				this.retrieveAccount(1, parentBlock.getSigner())
 		);
 		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
-		org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
+		final org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
 
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
@@ -162,9 +163,9 @@ public class BlockChainTest {
 		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, foraging);
 
 		// Act:
-		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not( IsNull.nullValue() ));
+		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
 		final ValidationResult result = blockChain.processBlock(block);
-		Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
 		TransferTransaction transaction;
 
 		// Assert:
@@ -178,33 +179,33 @@ public class BlockChainTest {
 
 		// siblings with same score must be rejected
 		// Act:
-		Block sibling = createBlockSiblingWithSameScore(block, parentBlock, accounts);
+		final Block sibling = this.createBlockSiblingWithSameScore(block, parentBlock, accounts);
 		final ValidationResult siblingResult = blockChain.processBlock(sibling);
 
 		// Assert:
 		Assert.assertTrue(siblingResult == ValidationResult.NEUTRAL);
 	}
 
-	private org.nem.nis.dbmodel.Account retrieveAccount(long i, Account signer) {
-		org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getKeyPair().getPublicKey());
+	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {
+		final org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getKeyPair().getPublicKey());
 		ret.setId(i);
 		return ret;
 	}
 
 	private static Block createBlock(final Account forger, final AccountLookup accountLookup) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime().addHours(-1), new BlockHeight(3));
+		final Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime().addHours(-1), new BlockHeight(3));
 		block.sign();
 
 		return roundTripBlock(accountLookup, block);
 	}
 
-	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
+	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {
 		final SerializableEntity entity = block;
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, accountLookup);
-		Block b = new Block(deserializer.readInt("type"), options, deserializer);
+		final Block b = new Block(deserializer.readInt("type"), options, deserializer);
 
 		Field field = b.getClass().getDeclaredField("generationHash");
 		field.setAccessible(true);
@@ -217,7 +218,7 @@ public class BlockChainTest {
 		return b;
 	}
 
-	private TransferTransaction createSignedTransactionWithAmount(List<Account> accounts, int i, long amount, TimeInstant timeInstant) {
+	private TransferTransaction createSignedTransactionWithAmount(final List<Account> accounts, final int i, final long amount, final TimeInstant timeInstant) {
 		final TransferTransaction transaction = new TransferTransaction(
 				timeInstant,
 				accounts.get(i),
@@ -230,38 +231,39 @@ public class BlockChainTest {
 		return transaction;
 	}
 
-	private List<BlockDifficulty> createDifficultiesList(List<Block> blocks) {
+	private List<BlockDifficulty> createDifficultiesList(final List<Block> blocks) {
 		return blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 	}
 
-	private List<TimeInstant> createTimestampsList(List<Block> blocks) {
+	private List<TimeInstant> createTimestampsList(final List<Block> blocks) {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block createBlockForTests(List<Account> accounts, final AccountAnalyzer accountAnalyzer, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
+	private Block createBlockForTests(final List<Account> accounts, final AccountAnalyzer accountAnalyzer, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final Block lastBlock = blocks.get(blocks.size()-1);
+		final Block lastBlock = blocks.get(blocks.size() - 1);
 		final Account forger = accounts.get(0);
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
-		List<Block> historicalBlocks = blocks.subList(Math.max(0, blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), blocks.size());
-		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(createDifficultiesList(historicalBlocks), createTimestampsList(historicalBlocks));
+		final List<Block> historicalBlocks = blocks.subList(Math.max(0, blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), blocks.size());
+		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
+				this.createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
-		BigInteger hit = scorer.calculateHit(block);
+		final BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
 				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
 				.divide(BigInteger.valueOf(800000000L)) // this is value of calculateForgerBalance() for current forager
 				.intValue();
 		seconds += 1;
 
-		TimeInstant blockTime = new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds);
+		final TimeInstant blockTime = new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds);
 		block = new Block(forger, lastBlock, blockTime);
 		block.setDifficulty(difficulty);
 
-		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, 17, blockTime.addMinutes(-2));
+		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(accounts, 1, 17, blockTime.addMinutes(-2));
 		block.addTransaction(transaction1);
 
-		final TransferTransaction transaction2 = createSignedTransactionWithAmount(accounts, 3, 290, blockTime.addMinutes(-5));
+		final TransferTransaction transaction2 = this.createSignedTransactionWithAmount(accounts, 3, 290, blockTime.addMinutes(-5));
 		block.addTransaction(transaction2);
 		block.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		block.sign();
@@ -269,28 +271,28 @@ public class BlockChainTest {
 		return roundTripBlock(accountAnalyzer.getAccountCache(), block);
 	}
 
-	private Block createBlockSiblingWithSameScore(Block block, Block parentBlock, List<Account> accounts) {
-		Account signer = accounts.get(accounts.indexOf(block.getSigner()));
-		Block sibling = new Block(signer, parentBlock, block.getTimeStamp());
+	private Block createBlockSiblingWithSameScore(final Block block, final Block parentBlock, final List<Account> accounts) {
+		final Account signer = accounts.get(accounts.indexOf(block.getSigner()));
+		final Block sibling = new Block(signer, parentBlock, block.getTimeStamp());
 		sibling.setDifficulty(block.getDifficulty());
-		final TransferTransaction transaction1 = createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
+		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
 		sibling.addTransaction(transaction1);
 		sibling.sign();
 
 		return sibling;
 	}
 
-	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
+	private Transaction dummyTransaction(final org.nem.core.model.Account recipient, final long amount) {
 		return new TransferTransaction((new SystemTimeProvider()).getCurrentTime(), SENDER, recipient, new Amount(amount), null);
 	}
 
 	private org.nem.nis.dbmodel.Block createDummyDbBlock() {
-		Transaction tx1 = dummyTransaction(RECIPIENT1, RECIPIENT1_AMOUNT);
-		Transaction tx2 = dummyTransaction(RECIPIENT2, RECIPIENT2_AMOUNT);
+		final Transaction tx1 = this.dummyTransaction(RECIPIENT1, RECIPIENT1_AMOUNT);
+		final Transaction tx2 = this.dummyTransaction(RECIPIENT2, RECIPIENT2_AMOUNT);
 		tx1.sign();
 		tx2.sign();
 
-		org.nem.core.model.Block b = new org.nem.core.model.Block(
+		final org.nem.core.model.Block b = new org.nem.core.model.Block(
 				SENDER,
 				Hash.ZERO,
 				Hash.ZERO,
@@ -302,7 +304,7 @@ public class BlockChainTest {
 
 		b.sign();
 
-		org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
+		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
 				HashUtils.calculateHash(b),
 				1,
 				// generation hash
@@ -319,7 +321,7 @@ public class BlockChainTest {
 				123L
 		);
 
-		Transfer dbTransaction1 = new Transfer(
+		final Transfer dbTransaction1 = new Transfer(
 				HashUtils.calculateHash(tx1),
 				tx1.getVersion(),
 				tx1.getType(),
@@ -335,7 +337,7 @@ public class BlockChainTest {
 				0L // referenced tx
 		);
 
-		Transfer dbTransaction2 = new Transfer(
+		final Transfer dbTransaction2 = new Transfer(
 				HashUtils.calculateHash(tx2),
 				tx2.getVersion(),
 				tx2.getType(),

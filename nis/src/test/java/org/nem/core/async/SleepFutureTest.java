@@ -7,8 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class SleepFutureTest {
 
-	private static int TimeUnit = 30;
-	private static int Delta = 10;
+	private static final int TimeUnit = 30;
+	private static final int Delta = 10;
 
 	@Test
 	public void sleepFutureIsInitiallyNotCompleted() throws InterruptedException {
@@ -34,13 +34,15 @@ public class SleepFutureTest {
 	public void sleepFuturesAreExecutedConcurrently() throws InterruptedException {
 		// Arrange:
 		final CompletableFuture<?>[] futures = new CompletableFuture[100];
-		for (int i = 0; i < futures.length; ++i)
+		for (int i = 0; i < futures.length; ++i) {
 			futures[i] = SleepFuture.create(TimeUnit);
+		}
 
 		Thread.sleep(TimeUnit + Delta);
 
 		// Assert:
-		for (CompletableFuture<?> future : futures)
+		for (final CompletableFuture<?> future : futures) {
 			Assert.assertThat(future.isDone(), IsEqual.equalTo(true));
+		}
 	}
 }

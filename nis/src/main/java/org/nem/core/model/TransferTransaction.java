@@ -14,18 +14,18 @@ import java.util.function.BiPredicate;
 public class TransferTransaction extends Transaction {
 	private static final int MAX_MESSAGE_SIZE = 512;
 
-	private Amount amount;
-	private Message message;
-	private Account recipient;
+	private final Amount amount;
+	private final Message message;
+	private final Account recipient;
 
 	/**
 	 * Creates a transfer transaction.
 	 *
 	 * @param timestamp The transaction timestamp.
-	 * @param sender    The transaction sender.
+	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
-	 * @param amount    The transaction amount.
-	 * @param message   The transaction message.
+	 * @param amount The transaction amount.
+	 * @param message The transaction message.
 	 */
 	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
 		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
@@ -33,8 +33,9 @@ public class TransferTransaction extends Transaction {
 		this.amount = amount;
 		this.message = message;
 
-		if (null == this.recipient)
+		if (null == this.recipient) {
 			throw new IllegalArgumentException("recipient is required");
+		}
 	}
 
 	/**
@@ -80,28 +81,30 @@ public class TransferTransaction extends Transaction {
 		return null == this.message ? 0 : this.message.getEncodedPayload().length;
 	}
 
-
 	@Override
 	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (!canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee())))
+		if (!canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee()))) {
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+		}
 
-		if (this.getMessageLength() > MAX_MESSAGE_SIZE)
+		if (this.getMessageLength() > MAX_MESSAGE_SIZE) {
 			return ValidationResult.FAILURE_MESSAGE_TOO_LARGE;
+		}
 
 		return ValidationResult.SUCCESS;
 	}
 
 	@Override
 	protected Amount getMinimumFee() {
-		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress()))
+		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress())) {
 			return Amount.ZERO;
+		}
 
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
 
 	private long getMinimumTransferFee() {
-		double microNemAmount = this.amount.getNumNem();
+		final double microNemAmount = this.amount.getNumNem();
 		return Math.max(1, (long)Math.ceil(microNemAmount / 25000 + Math.log(microNemAmount) / 5));
 	}
 
@@ -121,14 +124,16 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected void executeCommit() {
-		if (0 != this.getMessageLength())
+		if (0 != this.getMessageLength()) {
 			this.recipient.addMessage(this.message);
+		}
 	}
 
 	@Override
 	protected void undoCommit() {
-		if (0 != this.getMessageLength())
+		if (0 != this.getMessageLength()) {
 			this.recipient.removeMessage(this.message);
+		}
 	}
 
 	@Override

@@ -13,7 +13,6 @@ public class StringEncoder {
 	 * Converts a string to a UTF-8 byte array.
 	 *
 	 * @param s The input string.
-	 *
 	 * @return The output byte array.
 	 */
 	public static byte[] getBytes(final String s) {
@@ -24,10 +23,9 @@ public class StringEncoder {
 	 * Converts a UTF-8 byte array to a string.
 	 *
 	 * @param bytes The input byte array.
-	 *
 	 * @return The output string.
 	 */
-	public static String getString(byte[] bytes) {
+	public static String getString(final byte[] bytes) {
 		return new String(bytes, ENCODING_CHARSET);
 	}
 }

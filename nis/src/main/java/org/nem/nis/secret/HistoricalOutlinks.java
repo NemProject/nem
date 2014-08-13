@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class HistoricalOutlinks {
 
 	private final LinkedList<HistoricalOutlink> outlinks = new LinkedList<>();
-	
+
 	/**
 	 * Add an outlink at a given block height.
 	 *
@@ -21,7 +21,7 @@ public class HistoricalOutlinks {
 	 * @param amount link strength
 	 */
 	public void add(final BlockHeight height, final Address otherAccountAddress, final Amount amount) {
-		if (this.outlinks.size() == 0 || this.outlinks.getLast().getHeight().compareTo(height) < 0) {
+		if (this.outlinks.isEmpty() || this.outlinks.getLast().getHeight().compareTo(height) < 0) {
 			this.outlinks.addLast(new HistoricalOutlink(height));
 		}
 
@@ -36,7 +36,7 @@ public class HistoricalOutlinks {
 	 * @param amount link strength
 	 */
 	public void remove(final BlockHeight height, final Address otherAccountAddress, final Amount amount) {
-		if (this.outlinks.size() == 0 || this.outlinks.getLast().getHeight().compareTo(height) != 0) {
+		if (this.outlinks.isEmpty() || this.outlinks.getLast().getHeight().compareTo(height) != 0) {
 			throw new IllegalArgumentException("unexpected height, add/remove must be 'paired'.");
 		}
 
@@ -99,8 +99,7 @@ public class HistoricalOutlinks {
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();
 		// looks ugly, but obfuscation does not like forEach :/
-		for (final HistoricalOutlink temp : this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList()) )
-		{
+		for (final HistoricalOutlink temp : this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList())) {
 			copy.outlinks.add(temp);
 		}
 		return copy;

@@ -14,9 +14,9 @@ public class NodeInteractionResultTest {
 		// Arrange:
 		final Map<ValidationResult, NodeInteractionResult> expectedMappings = new HashMap<ValidationResult, NodeInteractionResult>() {
 			{
-				put(ValidationResult.SUCCESS, NodeInteractionResult.SUCCESS);
-				put(ValidationResult.NEUTRAL, NodeInteractionResult.NEUTRAL);
-				put(ValidationResult.FAILURE_ENTITY_UNUSABLE, NodeInteractionResult.NEUTRAL);
+				this.put(ValidationResult.SUCCESS, NodeInteractionResult.SUCCESS);
+				this.put(ValidationResult.NEUTRAL, NodeInteractionResult.NEUTRAL);
+				this.put(ValidationResult.FAILURE_ENTITY_UNUSABLE, NodeInteractionResult.NEUTRAL);
 			}
 		};
 

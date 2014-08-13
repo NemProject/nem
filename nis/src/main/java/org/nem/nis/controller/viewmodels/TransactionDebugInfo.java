@@ -45,7 +45,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 		this.fee = fee;
 		this.message = message;
 	}
-	
+
 	/**
 	 * Deserializes a transaction debug info object.
 	 *
@@ -60,7 +60,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 		this.fee = Amount.readFrom(deserializer, "fee");
 		this.message = deserializer.readString("message");
 	}
-	
+
 	/**
 	 * Returns the timestamp of the transaction.
 	 *
@@ -69,7 +69,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public TimeInstant getTimestamp() {
 		return this.timestamp;
 	}
-	
+
 	/**
 	 * Returns the deadline of the transaction.
 	 *
@@ -78,7 +78,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public TimeInstant getDeadline() {
 		return this.deadline;
 	}
-	
+
 	/**
 	 * Returns the address of the sender of the transaction.
 	 *
@@ -87,7 +87,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public Address getSender() {
 		return this.sender;
 	}
-	
+
 	/**
 	 * Returns the address of the recipient of the transaction.
 	 *
@@ -96,7 +96,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public Address getRecipient() {
 		return this.recipient;
 	}
-	
+
 	/**
 	 * Returns the transferred amount of the transaction.
 	 *
@@ -105,7 +105,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public Amount getAmount() {
 		return this.amount;
 	}
-	
+
 	/**
 	 * Returns the fee of the transaction.
 	 *
@@ -114,7 +114,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public Amount getFee() {
 		return this.fee;
 	}
-	
+
 	/**
 	 * Returns the message of the transaction.
 	 *
@@ -123,7 +123,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	public String getMessage() {
 		return this.message;
 	}
-	
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		writeTimeInstantAsTimeString(serializer, "timestamp", this.timestamp);

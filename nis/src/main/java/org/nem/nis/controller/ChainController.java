@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
@@ -29,8 +29,8 @@ public class ChainController {
 
 	@Autowired(required = true)
 	public ChainController(
-			final RequiredBlockDao blockDao, 
-			final AccountLookup accountLookup, 
+			final RequiredBlockDao blockDao,
+			final AccountLookup accountLookup,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockChain blockChain,
 			final NisPeerNetworkHost host) {

@@ -49,7 +49,7 @@ public class NodeEndpointTest {
 	}
 
 	private static void assertApiUrlsAreCorrect(final URL url, final NodeEndpoint endpoint) throws Exception {
-		final Map<NodeApiId, String > apiIdToPathMap = new HashMap<>();
+		final Map<NodeApiId, String> apiIdToPathMap = new HashMap<>();
 		apiIdToPathMap.put(NodeApiId.REST_BLOCK_AT, "block/at");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, "chain/blocks-after");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, "chain/hashes-from");
@@ -66,8 +66,9 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, "transactions/unconfirmed");
 
 		for (final NodeApiId apiId : NodeApiId.values()) {
-			if (!apiIdToPathMap.containsKey(apiId))
+			if (!apiIdToPathMap.containsKey(apiId)) {
 				Assert.fail(String.format("path for '%s' is not being tested", apiId));
+			}
 
 			Assert.assertThat(endpoint.getApiUrl(apiId), IsEqual.equalTo(new URL(url, apiIdToPathMap.get(apiId))));
 		}
@@ -121,7 +122,7 @@ public class NodeEndpointTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
 		// Assert:
 		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12), IsEqual.equalTo(endpoint));
@@ -135,8 +136,8 @@ public class NodeEndpointTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
-		int hashCode = endpoint.hashCode();
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
+		final int hashCode = endpoint.hashCode();
 
 		// Assert:
 		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12).hashCode(), IsEqual.equalTo(hashCode));
@@ -148,8 +149,8 @@ public class NodeEndpointTest {
 	@Test
 	public void endpointCreatedAroundHostNameIsEquivalentToEndpointCreatedAroundResolvedAddress() {
 		// Arrange:
-		NodeEndpoint endpoint1 = new NodeEndpoint("ftp", "localhost", 12);
-		NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
+		final NodeEndpoint endpoint1 = new NodeEndpoint("ftp", "localhost", 12);
+		final NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
 
 		// Assert:
 		Assert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));

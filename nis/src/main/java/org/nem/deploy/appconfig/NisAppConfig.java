@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 @ComponentScan(
 		basePackages = { "org.nem.nis" },
 		excludeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
-})
+		})
 @EnableTransactionManagement
 public class NisAppConfig {
 
@@ -77,7 +77,7 @@ public class NisAppConfig {
 
 		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
 		// BR: like this?
-		localSessionFactoryBuilder.addProperties(getDbProperties(entry -> entry.startsWith("hibernate")));
+		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
@@ -85,7 +85,7 @@ public class NisAppConfig {
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 
-	private Properties getDbProperties(Predicate<String> filter) throws IOException {
+	private Properties getDbProperties(final Predicate<String> filter) throws IOException {
 		final Properties dbProperties = new Properties();
 		final Properties properties = new Properties();
 		dbProperties.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));

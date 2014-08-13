@@ -21,7 +21,6 @@ public class TrustScores extends Scores<TrustScore> {
 	 * Gets the local trust weight for the specified node.
 	 *
 	 * @param node The node.
-	 *
 	 * @return The local trust weight.
 	 */
 	public RealDouble getScoreWeight(final Node node) {

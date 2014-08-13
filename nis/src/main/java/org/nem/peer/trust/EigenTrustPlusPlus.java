@@ -59,8 +59,8 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	 * Updates the feedback credibility values for the specified node given the specified nodes
 	 * and experiences.
 	 *
-	 * @param node            The node.
-	 * @param nodes           The nodes.
+	 * @param node The node.
+	 * @param nodes The nodes.
 	 * @param nodeExperiences The node experiences.
 	 */
 	public void updateFeedback(final Node node, final Node[] nodes, final NodeExperiences nodeExperiences) {
@@ -77,16 +77,18 @@ public class EigenTrustPlusPlus extends EigenTrust {
 			double sum = 0.0;
 			int numCommonPartners = 0;
 			for (int j = 0; j < nodes.length; ++j) {
-				if (0 == sharedExperiencesMatrix.getAt(i, j))
+				if (0 == sharedExperiencesMatrix.getAt(i, j)) {
 					continue;
+				}
 
-				double score = this.getScoreProvider().calculateCredibilityScore(node, nodes[i], nodes[j]);
+				final double score = this.getScoreProvider().calculateCredibilityScore(node, nodes[i], nodes[j]);
 				sum += score * score;
 				++numCommonPartners;
 			}
 
-			if (0 == numCommonPartners)
+			if (0 == numCommonPartners) {
 				continue;
+			}
 
 			// Original paper suggests sim = 1 - Math.sqrt(sum).
 			// This leads to values of around 0.5 for evil nodes and almost 1 for honest nodes.
@@ -100,8 +102,9 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	}
 
 	private void updateFeedback(final TrustContext context) {
-		for (final Node node : context.getNodes())
+		for (final Node node : context.getNodes()) {
 			this.updateFeedback(node, context.getNodes(), context.getNodeExperiences());
+		}
 	}
 
 	@Override
@@ -113,7 +116,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 		this.updateFeedback(context);
 
 		// (3) Compute the global trust
-		return computeGlobalTrust(context);
+		return this.computeGlobalTrust(context);
 	}
 
 	/**

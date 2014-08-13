@@ -17,10 +17,10 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		// Assert:
 		final String expectedString =
 				"[3 x 2]" + System.lineSeparator()
-				+ "(0, 0) -> 2.123" + System.lineSeparator()
-				+ "(0, 1) -> 11.123" + System.lineSeparator()
-				+ "(1, 1) -> 1.000" + System.lineSeparator()
-				+ "(2, 0) -> 5012.013";
+						+ "(0, 0) -> 2.123" + System.lineSeparator()
+						+ "(0, 1) -> 11.123" + System.lineSeparator()
+						+ "(1, 1) -> 1.000" + System.lineSeparator()
+						+ "(2, 0) -> 5012.013";
 		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedString));
 	}
 
@@ -114,7 +114,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	//endregion
 
 	@Override
-	protected SparseMatrix createMatrix(int rows, int cols) {
+	protected SparseMatrix createMatrix(final int rows, final int cols) {
 		return new SparseMatrix(rows, cols, 100);
 	}
 }

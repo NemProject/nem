@@ -28,12 +28,12 @@ public class NisConfiguration extends CommonConfiguration {
 	 *
 	 * @param properties The specified properties.
 	 */
-	public NisConfiguration(Properties properties) {
+	public NisConfiguration(final Properties properties) {
 		super(properties);
 		final String autoBootKey = getOptionalString(properties, "nis.bootKey", null);
-		this.bootKey = null == autoBootKey? null : PrivateKey.fromHexString(autoBootKey);
+		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
 		final String autoBootName = getOptionalString(properties, "nis.bootName", null);
-		this.bootName = null == autoBootName? null : autoBootName.trim();
+		this.bootName = null == autoBootName ? null : autoBootName.trim();
 		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 20);
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);

@@ -21,8 +21,8 @@ public class NodeEndpoint implements SerializableEntity {
 	 * Creates a new node endpoint.
 	 *
 	 * @param protocol The protocol.
-	 * @param host     The host.
-	 * @param port     The port.
+	 * @param host The host.
+	 * @param port The port.
 	 */
 	public NodeEndpoint(final String protocol, final String host, final int port) {
 		this.protocol = protocol;
@@ -81,13 +81,14 @@ public class NodeEndpoint implements SerializableEntity {
 	}
 
 	private static String normalizeHost(String host) {
-		if (null == host || 0 == host.length())
+		if (null == host || host.isEmpty()) {
 			host = "localhost";
+		}
 
 		try {
 			final InetAddress address = InetAddress.getByName(host);
 			return address.getHostAddress();
-		} catch (UnknownHostException e) {
+		} catch (final UnknownHostException e) {
 			throw new IllegalArgumentException("host is unknown");
 		}
 	}
@@ -95,14 +96,14 @@ public class NodeEndpoint implements SerializableEntity {
 	private URL createUrl() {
 		try {
 			return new URL(this.protocol, this.host, this.port, "/");
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			throw new IllegalArgumentException("url is malformed");
 		}
 	}
 
 	private Dictionary<NodeApiId, URL> createUrlMap() {
 		try {
-			Dictionary<NodeApiId, URL> nodeApiToUrlMap = new Hashtable<>();
+			final Dictionary<NodeApiId, URL> nodeApiToUrlMap = new Hashtable<>();
 			nodeApiToUrlMap.put(NodeApiId.REST_BLOCK_AT, new URL(this.url, "block/at"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, new URL(this.url, "chain/blocks-after"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, new URL(this.url, "chain/hashes-from"));
@@ -118,8 +119,7 @@ public class NodeEndpoint implements SerializableEntity {
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
 			return nodeApiToUrlMap;
-
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			throw new IllegalArgumentException("url is malformed");
 		}
 	}
@@ -130,11 +130,12 @@ public class NodeEndpoint implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof NodeEndpoint))
+	public boolean equals(final Object obj) {
+		if (obj == null || !(obj instanceof NodeEndpoint)) {
 			return false;
+		}
 
-		NodeEndpoint rhs = (NodeEndpoint)obj;
+		final NodeEndpoint rhs = (NodeEndpoint)obj;
 		return this.url.equals(rhs.url);
 	}
 

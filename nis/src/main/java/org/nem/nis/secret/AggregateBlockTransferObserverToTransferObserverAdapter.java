@@ -39,20 +39,22 @@ public class AggregateBlockTransferObserverToTransferObserverAdapter implements 
 	@Override
 	public void notifyCredit(final Account account, final Amount amount) {
 		for (final BlockTransferObserver o : this.blockTransferObservers) {
-			if (this.isExecute)
+			if (this.isExecute) {
 				o.notifyReceive(this.height, account, amount);
-			else
+			} else {
 				o.notifySendUndo(this.height, account, amount);
+			}
 		}
 	}
 
 	@Override
 	public void notifyDebit(final Account account, final Amount amount) {
 		for (final BlockTransferObserver o : this.blockTransferObservers) {
-			if (this.isExecute)
+			if (this.isExecute) {
 				o.notifySend(this.height, account, amount);
-			else
+			} else {
 				o.notifyReceiveUndo(this.height, account, amount);
+			}
 		}
 	}
 }

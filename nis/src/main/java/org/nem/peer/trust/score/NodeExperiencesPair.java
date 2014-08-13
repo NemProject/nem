@@ -16,7 +16,7 @@ public class NodeExperiencesPair implements SerializableEntity {
 	/**
 	 * Creates a new node experiences pair.
 	 *
-	 * @param node        The node.
+	 * @param node The node.
 	 * @param experiences The node experiences.
 	 */
 	public NodeExperiencesPair(final Node node, final List<NodeExperiencePair> experiences) {

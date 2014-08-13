@@ -11,7 +11,6 @@ public interface AccountLookup {
 	 * Looks up an account by its id.
 	 *
 	 * @param id The account id.
-	 *
 	 * @return The account with the specified id.
 	 */
 	public Account findByAddress(final Address id);
@@ -20,7 +19,6 @@ public interface AccountLookup {
 	 * Checks if an account is known.
 	 *
 	 * @param id The account id.
-	 *
 	 * @return true if the account is known, false if unknown.
 	 */
 	public boolean isKnownAddress(final Address id);

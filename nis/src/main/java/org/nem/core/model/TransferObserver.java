@@ -14,7 +14,7 @@ public interface TransferObserver {
 	 * @param recipient The recipient.
 	 * @param amount The amount.
 	 */
-	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) ;
+	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount);
 
 	/**
 	 * The account has been credited the specified amount.

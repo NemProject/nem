@@ -101,12 +101,12 @@ public class SecureMessageTest {
 		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
 		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		originalMessage.serialize(serializer);
-		JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
+		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 
 		// Act:
-		byte[] payload = deserializer.readBytes("payload");
+		final byte[] payload = deserializer.readBytes("payload");
 
 		// Assert:
 		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));

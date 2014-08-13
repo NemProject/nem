@@ -1,11 +1,11 @@
 package org.nem.nis;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
-import org.mockito.*;
-import org.nem.core.model.*;
-import org.nem.core.test.*;
-import org.nem.nis.poi.*;
+import org.mockito.Mockito;
+import org.nem.core.model.Address;
+import org.nem.core.test.Utils;
+import org.nem.nis.poi.PoiFacade;
 
 public class AccountAnalyzerTest {
 

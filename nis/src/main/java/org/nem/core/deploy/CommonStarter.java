@@ -53,7 +53,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private static AnnotationConfigApplicationContext appCtx;
 	private static NemConfigurationPolicy configurationPolicy;
-    private static CommonConfiguration configuration;
+	private static CommonConfiguration configuration;
 	private Server server;
 
 	static {
@@ -138,7 +138,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[]{ servletContext });
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
 
 		return handlers;
 	}
@@ -164,7 +164,7 @@ public class CommonStarter implements ServletContextListener {
 		return server;
 	}
 
-	private Connector createConnector(Server server) {
+	private Connector createConnector(final Server server) {
 		final HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
 		http_config.setSecurePort(configuration.getHttpsPort());
@@ -231,10 +231,10 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void boot() throws Exception {
-		this.server = createServer();
+		this.server = this.createServer();
 		this.server.addBean(new ScheduledExecutorScheduler());
-		this.server.addConnector(createConnector(server));
-		this.server.setHandler(createHandlers());
+		this.server.addConnector(this.createConnector(this.server));
+		this.server.setHandler(this.createHandlers());
 		this.server.setDumpAfterStart(false);
 		this.server.setDumpBeforeStop(false);
 		this.server.setStopAtShutdown(true);
@@ -244,7 +244,7 @@ public class CommonStarter implements ServletContextListener {
 		}
 
 		LOGGER.info("Calling start().");
-		startServer(this.server, new URL(configuration.getShutdownUrl()));
+		this.startServer(this.server, new URL(configuration.getShutdownUrl()));
 
 		if (configuration.isNcc()) {
 			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
@@ -264,7 +264,7 @@ public class CommonStarter implements ServletContextListener {
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
-		handlers.setHandlers(new Handler[]{ servletContext });
+		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
 	}
 
@@ -282,47 +282,47 @@ public class CommonStarter implements ServletContextListener {
 			webCtx.setParent(appCtx);
 
 			final ServletContext context = event.getServletContext();
-			ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
 			dispatcher.setLoadOnStartup(1);
 			dispatcher.addMapping(String.format("%s%s", configuration.getApiContext(), "/*"));
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
 
-            if (configuration.isNcc()) {
-                createServlets(context);
-            }
+			if (configuration.isNcc()) {
+				this.createServlets(context);
+			}
 
-            if (configuration.useDosFilter()) {
-                createDosFilter(context);
-            }
+			if (configuration.useDosFilter()) {
+				this.createDosFilter(context);
+			}
 		} catch (final Exception e) {
 			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
 		}
 	}
 
 	private void createServlets(final ServletContext context) {
-        ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
-        servlet.setInitParameter("maxCacheSize", "0");
-        servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
-        servlet.setLoadOnStartup(1);
+		ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
+		servlet.setInitParameter("maxCacheSize", "0");
+		servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
+		servlet.setLoadOnStartup(1);
 
-        servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
-        servlet.addMapping("/");
-        servlet.setLoadOnStartup(1);
+		servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
+		servlet.addMapping("/");
+		servlet.setLoadOnStartup(1);
 	}
 
 	private void createDosFilter(final ServletContext context) {
-        javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-        dosFilter.setInitParameter("delayMs", "1000");
-        dosFilter.setInitParameter("trackSessions", "false");
-        dosFilter.setInitParameter("maxRequestMs", "120000");
-        dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
-        dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
+		dosFilter.setInitParameter("delayMs", "1000");
+		dosFilter.setInitParameter("trackSessions", "false");
+		dosFilter.setInitParameter("maxRequestMs", "120000");
+		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
-        // GZIP filter
-        dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-        // Zipping following MimeTypes
-        dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
-        dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		// GZIP filter
+		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
+		// Zipping following MimeTypes
+		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
+		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 }

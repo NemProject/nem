@@ -6,7 +6,6 @@ import org.nem.peer.node.*;
 
 /**
  * An authenticated request that has a block height parameter.
- *
  * TODO: This is glue that allows the automatic deserialization to work without hydrating multiple constructor parameters.
  * (The problem is that the base class doesn't have a constructor that accepts a single deserializer parameter)
  */

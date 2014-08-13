@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * This controller will handle data propagation:
  * * /push/transaction - for what is now model.Transaction
  * * /push/block - for model.Block
- *
+ * <p>
  * It would probably fit better in TransferController, but this is
  * part of p2p API, so I think it should be kept separated.
  * (I think it might pay off in future, if we'd like to add restrictions to client APIs)
@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 @RestController
 public class PushController {
 	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
-
 
 	private final PushService pushService;
 
@@ -44,7 +43,9 @@ public class PushController {
 		LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info("[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:"+secureEntity.getEntity().getSigner());
+		LOGGER.info(
+				"[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:" +
+						secureEntity.getEntity().getSigner());
 	}
 
 	/**
@@ -58,6 +59,6 @@ public class PushController {
 		LOGGER.info("[start] /push/block");
 		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
 		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:"+secureEntity.getEntity().getSigner());
+		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:" + secureEntity.getEntity().getSigner());
 	}
 }

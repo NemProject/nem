@@ -36,14 +36,15 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	/**
 	 * Creates a new verifiable entity.
 	 *
-	 * @param type      The entity type.
-	 * @param version   The entity version.
+	 * @param type The entity type.
+	 * @param version The entity version.
 	 * @param timestamp The entity timestamp.
-	 * @param signer    The entity signer.
+	 * @param signer The entity signer.
 	 */
 	public VerifiableEntity(final int type, final int version, final TimeInstant timestamp, final Account signer) {
-		if (null == signer.getKeyPair())
+		if (null == signer.getKeyPair()) {
 			throw new IllegalArgumentException("signer key pair is required to create a verifiable entity ");
+		}
 
 		this.type = type;
 		this.version = version;
@@ -54,8 +55,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	/**
 	 * Deserializes a new transaction.
 	 *
-	 * @param type         The transaction type.
-	 * @param options      Deserialization options.
+	 * @param type The transaction type.
+	 * @param options Deserialization options.
 	 * @param deserializer The deserializer to use.
 	 */
 	public VerifiableEntity(final int type, final DeserializationOptions options, final Deserializer deserializer) {
@@ -64,8 +65,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");
 		this.signer = Account.readFrom(deserializer, "signer", AddressEncoding.PUBLIC_KEY);
 
-		if (DeserializationOptions.VERIFIABLE == options)
+		if (DeserializationOptions.VERIFIABLE == options) {
 			this.signature = Signature.readFrom(deserializer, "signature");
+		}
 	}
 
 	//endregion
@@ -130,20 +132,22 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		if (null == this.signature)
+		if (null == this.signature) {
 			throw new SerializationException("cannot serialize a entity without a signature");
+		}
 
 		this.serialize(serializer, true);
 	}
 
-	private void serialize(final Serializer serializer, boolean includeSignature) {
+	private void serialize(final Serializer serializer, final boolean includeSignature) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
 		TimeInstant.writeTo(serializer, "timestamp", this.getTimeStamp());
 		Account.writeTo(serializer, "signer", this.getSigner(), AddressEncoding.PUBLIC_KEY);
 
-		if (includeSignature)
+		if (includeSignature) {
 			Signature.writeTo(serializer, "signature", this.getSignature());
+		}
 
 		this.serializeImpl(serializer);
 	}
@@ -168,14 +172,15 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param account The account to use for signing.
 	 */
 	public void signBy(final Account account) {
-		if (!account.getKeyPair().hasPrivateKey())
+		if (!account.getKeyPair().hasPrivateKey()) {
 			throw new IllegalArgumentException("cannot sign because signer does not have private key");
+		}
 
 		// (1) serialize the entire transaction to a buffer
-		byte[] transactionBytes = this.getBytes();
+		final byte[] transactionBytes = this.getBytes();
 
 		// (2) sign the buffer
-		Signer signer = new Signer(account.getKeyPair());
+		final Signer signer = new Signer(account.getKeyPair());
 		this.signature = signer.sign(transactionBytes);
 	}
 
@@ -185,10 +190,11 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @return True if verification succeeded, false otherwise.
 	 */
 	public boolean verify() {
-		if (null == this.signature)
+		if (null == this.signature) {
 			throw new CryptoException("cannot verify because signature does not exist");
+		}
 
-		Signer signer = new Signer(this.signer.getKeyPair());
+		final Signer signer = new Signer(this.signer.getKeyPair());
 		return signer.verify(this.getBytes(), this.signature);
 	}
 

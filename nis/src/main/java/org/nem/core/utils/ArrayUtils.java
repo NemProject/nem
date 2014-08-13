@@ -10,7 +10,6 @@ public class ArrayUtils {
 	 * Creates duplicate of given array
 	 *
 	 * @param src - array to duplicate
-	 *
 	 * @return copy of an array
 	 */
 	public static byte[] duplicate(final byte[] src) {
@@ -23,13 +22,13 @@ public class ArrayUtils {
 	 * Concatenates byte arrays and returns the result.
 	 *
 	 * @param arrays The arrays.
-	 *
 	 * @return A single array containing all elements in all arrays.
 	 */
 	public static byte[] concat(final byte[]... arrays) {
 		int totalSize = 0;
-		for (final byte[] array : arrays)
+		for (final byte[] array : arrays) {
 			totalSize += array.length;
+		}
 
 		int startIndex = 0;
 		final byte[] result = new byte[totalSize];
@@ -44,16 +43,16 @@ public class ArrayUtils {
 	/**
 	 * Splits a single array into two arrays.
 	 *
-	 * @param bytes      The input array.
+	 * @param bytes The input array.
 	 * @param splitIndex The index at which the array should be split.
-	 *
 	 * @return Two arrays split at the splitIndex.
 	 * The first array will contain the first splitIndex elements.
 	 * The second array will contain all trailing elements.
 	 */
 	public static byte[][] split(final byte[] bytes, final int splitIndex) {
-		if (splitIndex < 0 || bytes.length < splitIndex)
+		if (splitIndex < 0 || bytes.length < splitIndex) {
 			throw new IllegalArgumentException("split index is out of range");
+		}
 
 		final byte[] lhs = new byte[splitIndex];
 		final byte[] rhs = new byte[bytes.length - splitIndex];
@@ -67,7 +66,6 @@ public class ArrayUtils {
 	 * Converts a BigInteger to a little endian byte array.
 	 *
 	 * @param value The value to convert.
-	 *
 	 * @return The resulting little endian byte array.
 	 */
 	public static byte[] toByteArray(final BigInteger value, final int numBytes) {
@@ -81,8 +79,9 @@ public class ArrayUtils {
 			numBytesToCopy = numBytes;
 		}
 
-		for (int i = 0; i < numBytesToCopy; ++i)
+		for (int i = 0; i < numBytesToCopy; ++i) {
 			outputBytes[i] = bigIntegerBytes[copyStartIndex + numBytesToCopy - i - 1];
+		}
 
 		return outputBytes;
 	}
@@ -91,56 +90,56 @@ public class ArrayUtils {
 	 * Converts a little endian byte array to a BigInteger.
 	 *
 	 * @param bytes The bytes to convert.
-	 *
 	 * @return The resulting BigInteger.
 	 */
 	public static BigInteger toBigInteger(final byte[] bytes) {
 		final byte[] bigEndianBytes = new byte[bytes.length + 1];
-		for (int i = 0; i < bytes.length; ++i)
+		for (int i = 0; i < bytes.length; ++i) {
 			bigEndianBytes[i + 1] = bytes[bytes.length - i - 1];
+		}
 
 		return new BigInteger(bigEndianBytes);
 	}
-	
+
 	/**
 	 * Utility method to find the maximum value in an array.
-	 * 
+	 *
 	 * @param vector - non-empty array of doubles
 	 * @return double in <code>vector</code> that has the largest value.
 	 */
-	public static double max(double[] vector) {
+	public static double max(final double[] vector) {
 		if (vector == null || vector.length < 1) {
 			throw new IllegalArgumentException("input vector is empty");
 		}
 		double max = Double.MIN_VALUE;
-		
-		for (double val : vector) {
+
+		for (final double val : vector) {
 			if (max < val) {
 				max = val;
 			}
 		}
-		
+
 		return max;
 	}
-	
+
 	/**
 	 * Utility method to find the maximum value in an array.
-	 * 
+	 *
 	 * @param vector - non-empty array of longs
 	 * @return double in <code>vector</code> that has the largest value.
 	 */
-	public static long max(long[] vector) {
+	public static long max(final long[] vector) {
 		if (vector == null || vector.length < 1) {
 			throw new IllegalArgumentException("input vector is empty");
 		}
 		long max = Long.MIN_VALUE;
-		
-		for (long val : vector) {
+
+		for (final long val : vector) {
 			if (max < val) {
 				max = val;
 			}
 		}
-		
+
 		return max;
 	}
 }

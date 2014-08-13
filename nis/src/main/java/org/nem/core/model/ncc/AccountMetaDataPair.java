@@ -26,8 +26,8 @@ public class AccountMetaDataPair implements SerializableEntity {
 	 * @param deserializer The deserializer
 	 */
 	public AccountMetaDataPair(final Deserializer deserializer) {
-		this(deserializer.readObject("account", obj -> new AccountInfo(obj)),
-			 deserializer.readObject("meta", obj -> new AccountMetaData(obj)));
+		this.account = deserializer.readObject("account", obj -> new AccountInfo(obj));
+		this.metaData = deserializer.readObject("meta", obj -> new AccountMetaData(obj));
 	}
 
 	@Override

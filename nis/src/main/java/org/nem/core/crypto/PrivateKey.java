@@ -1,7 +1,7 @@
 package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.BigInteger;
 
@@ -50,9 +50,10 @@ public class PrivateKey implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof PrivateKey))
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof PrivateKey)) {
 			return false;
+		}
 
 		final PrivateKey rhs = (PrivateKey)obj;
 		return this.value.equals(rhs.value);
@@ -67,7 +68,6 @@ public class PrivateKey implements SerializableEntity {
 	 * Creates a private key from a hex string.
 	 *
 	 * @param hex The hex string.
-	 *
 	 * @return The new private key.
 	 */
 	public static PrivateKey fromHexString(final String hex) {
@@ -82,13 +82,12 @@ public class PrivateKey implements SerializableEntity {
 	 * Creates a private key from a decimal string.
 	 *
 	 * @param decimal The decimal string.
-	 *
 	 * @return The new private key.
 	 */
 	public static PrivateKey fromDecimalString(final String decimal) {
 		try {
 			return new PrivateKey(new BigInteger(decimal, 10));
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			throw new CryptoException(e);
 		}
 	}

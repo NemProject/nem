@@ -4,7 +4,7 @@ import java.util.function.*;
 
 /**
  * Abstract matrix class.
- *
+ * <br/>
  * This class provides default implementations of most matrix functions
  * but they should be optimized in derived classes when performance is important.
  */
@@ -130,10 +130,11 @@ public abstract class Matrix {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				final double sum = columnSums[col];
-				if (0 == sum)
+				if (0 == sum) {
 					return;
+				}
 
 				setter.accept(value / sum);
 			}
@@ -146,9 +147,10 @@ public abstract class Matrix {
 	public void removeNegatives() {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
-				if (value < 0)
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
+				if (value < 0) {
 					setter.accept(0.0);
+				}
 			}
 		});
 	}
@@ -161,7 +163,7 @@ public abstract class Matrix {
 	public final void scale(final double scale) {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				setter.accept(value / scale);
 			}
 		});
@@ -193,15 +195,17 @@ public abstract class Matrix {
 		return this.join(matrix, true, (l, r) -> l + r);
 	}
 
-	private Matrix join(final Matrix matrix, boolean isTwoWay, final DoubleBinaryOperator op) {
-		if (!this.isSameSize(matrix))
+	private Matrix join(final Matrix matrix, final boolean isTwoWay, final DoubleBinaryOperator op) {
+		if (!this.isSameSize(matrix)) {
 			throw new IllegalArgumentException("matrix sizes must be equal");
+		}
 
 		final Matrix result = this.create(this.getRowCount(), this.getColumnCount());
 		this.forEach((r, c, v) -> result.setAtUnchecked(r, c, op.applyAsDouble(v, matrix.getAtUnchecked(r, c))));
 
-		if (isTwoWay)
+		if (isTwoWay) {
 			matrix.forEach((r, c, v) -> result.setAtUnchecked(r, c, op.applyAsDouble(v, this.getAtUnchecked(r, c))));
+		}
 
 		return result;
 	}
@@ -230,7 +234,7 @@ public abstract class Matrix {
 
 	private double aggregate(final DoubleUnaryOperator op) {
 		// use a double[1] instead of a double so that the sum can be updated by the lambda
-		double[] sum = new double[] { 0.0 };
+		final double[] sum = new double[] { 0.0 };
 		this.forEach((r, c, v) -> sum[0] += op.applyAsDouble(v));
 		return sum[0];
 	}
@@ -246,11 +250,12 @@ public abstract class Matrix {
 	 * @return The resulting vector.
 	 */
 	public ColumnVector multiply(final ColumnVector vector) {
-		if (this.numCols != vector.size())
+		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
+		}
 
-		double[] rawResult = new double[this.numRows];
-		double[] rawVector = vector.getRaw();
+		final double[] rawResult = new double[this.numRows];
+		final double[] rawVector = vector.getRaw();
 
 		this.forEach((r, c, v) -> rawResult[r] += v * rawVector[c]);
 		return new ColumnVector(rawResult);
@@ -331,11 +336,13 @@ public abstract class Matrix {
 	}
 
 	private void checkBounds(final int row, final int col) {
-		if (row < 0 || row >= this.numRows)
+		if (row < 0 || row >= this.numRows) {
 			throw new IndexOutOfBoundsException("Row index out of bounds");
+		}
 
-		if (col < 0 || col >= this.numCols)
+		if (col < 0 || col >= this.numCols) {
 			throw new IndexOutOfBoundsException("Column index out of bounds");
+		}
 	}
 
 	/**
@@ -358,12 +365,14 @@ public abstract class Matrix {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof Matrix))
+		if (!(obj instanceof Matrix)) {
 			return false;
+		}
 
 		final Matrix rhs = (Matrix)obj;
-		if (!this.isSameSize(rhs))
+		if (!this.isSameSize(rhs)) {
 			return false;
+		}
 
 		final Matrix inequalityMatrix = this.join(rhs, true, (l, r) -> l == r ? 0 : 1);
 		return 0 == inequalityMatrix.sum();
@@ -381,7 +390,7 @@ public abstract class Matrix {
 	protected void forEach(final ReadOnlyElementVisitorFunction func) {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
-			public void visit(int row, int col, double value, DoubleConsumer setter) {
+			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
 				func.visit(row, col, value);
 			}
 		});

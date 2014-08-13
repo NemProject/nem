@@ -157,7 +157,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	public void canWriteObjectArray() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		List<SerializableEntity> originalObjects = new ArrayList<>();
+		final List<SerializableEntity> originalObjects = new ArrayList<>();
 		originalObjects.add(new MockSerializableEntity(17, "foo", 42));
 		originalObjects.add(new MockSerializableEntity(111, "bar", 22));
 		originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
@@ -177,10 +177,10 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	private static void assertMockSerializableJsonObject(
-			JSONObject object,
-			int expectedIntValue,
-			String expectedStringValue,
-			long expectedLongValue) {
+			final JSONObject object,
+			final int expectedIntValue,
+			final String expectedStringValue,
+			final long expectedLongValue) {
 		// Assert:
 		Assert.assertThat(object.get("int"), IsEqual.equalTo(expectedIntValue));
 		Assert.assertThat(object.get("s"), IsEqual.equalTo(expectedStringValue));
@@ -267,7 +267,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	@Test
 	public void canRoundtripMultipleValuesWithOrderingChecksEnabled() {
 		// Assert:
-		assertRoundtripMultipleValues(new JsonSerializer(true));
+		this.assertRoundtripMultipleValues(new JsonSerializer(true));
 	}
 
 	//endregion
@@ -282,7 +282,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Act:
 		serializer.writeInt("Foo", 17);
 		serializer.writeInt("Bar", 11);
-		JSONObject object = serializer.getObject();
+		final JSONObject object = serializer.getObject();
 
 		// Assert:
 		Assert.assertThat(object.containsKey("_order"), IsEqual.equalTo(false));
@@ -312,8 +312,8 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Act:
 		serializer.writeInt("Foo", 17);
 		serializer.writeInt("Bar", 11);
-		JSONObject object = serializer.getObject();
-		JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONObject object = serializer.getObject();
+		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
 		Assert.assertThat(orderArray, IsNull.notNullValue());

@@ -75,7 +75,7 @@ public class NodeController {
 	 * running node.
 	 *
 	 * @return A list of the active and inactive nodes currently known by the
-	 *         running node.
+	 * running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/all", method = RequestMethod.GET)
 	@PublicApi
@@ -123,13 +123,12 @@ public class NodeController {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
 
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
-		for (final NodeExperiencePair nexp : pair.getExperiences())
-		{
-			nodeExperiencePairs.add(extend(nexp));
+		for (final NodeExperiencePair nexp : pair.getExperiences()) {
+			nodeExperiencePairs.add(this.extend(nexp));
 		}
-//		pair.getExperiences().stream()
-//				.map(() -> this.extend())
-//				.collect(Collectors.toList());
+		//		pair.getExperiences().stream()
+		//				.map(() -> this.extend())
+		//				.collect(Collectors.toList());
 
 		return new SerializableList<>(nodeExperiencePairs);
 	}
@@ -144,9 +143,8 @@ public class NodeController {
 	/**
 	 * Ping that means the pinging node is part of the NEM P2P network.
 	 *
-	 * @param nodeExperiencesPair
-	 *            Information about the experiences the pinging node has had
-	 *            with other nodes.
+	 * @param nodeExperiencesPair Information about the experiences the pinging node has had
+	 * with other nodes.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi

@@ -27,7 +27,7 @@ public class CryptoException extends RuntimeException {
 	 * Creates a new crypto exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The exception cause.
+	 * @param cause The exception cause.
 	 */
 	public CryptoException(final String message, final Throwable cause) {
 		super(message, cause);

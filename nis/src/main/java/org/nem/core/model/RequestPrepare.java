@@ -6,7 +6,7 @@ import org.nem.core.serialization.*;
  * Represents a prepare request.
  */
 public class RequestPrepare implements SerializableEntity {
-	private byte[] data;
+	private final byte[] data;
 
 	/**
 	 * Creates a new request.
@@ -22,7 +22,7 @@ public class RequestPrepare implements SerializableEntity {
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public RequestPrepare(Deserializer deserializer) {
+	public RequestPrepare(final Deserializer deserializer) {
 		this.data = deserializer.readBytes("data");
 	}
 
@@ -32,7 +32,7 @@ public class RequestPrepare implements SerializableEntity {
 	 * @return The request data.
 	 */
 	public byte[] getData() {
-		return data;
+		return this.data;
 	}
 
 	@Override

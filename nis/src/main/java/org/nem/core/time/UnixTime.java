@@ -44,8 +44,7 @@ public class UnixTime {
 		try {
 			final Date date = createDateFormat().parse(dateString);
 			return new UnixTime(new TimeInstant(SystemTimeProvider.getTime(date.getTime())));
-		}
-		catch (ParseException e) {
+		} catch (final ParseException e) {
 			return new UnixTime(defaultValue);
 		}
 	}

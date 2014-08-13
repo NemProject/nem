@@ -6,10 +6,10 @@ import javax.persistence.*;
 
 /**
  * Db Account entity.
- *
+ * <p>
  * Probably it should be called Address, as it's main purpose is to associate
  * printableKey with publicKey.
- *
+ * <p>
  * In future it should probably also two 'heights' of an Account,
  * marking at what blockchain height has network 'learned' about
  * Account NEM address (printableKey) and public key respectively.
@@ -34,7 +34,7 @@ public class Account {
 	}
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Long id) {
@@ -42,7 +42,7 @@ public class Account {
 	}
 
 	public String getPrintableKey() {
-		return printableKey;
+		return this.printableKey;
 	}
 
 	public void setPrintableKey(final String printableKey) {
@@ -54,7 +54,8 @@ public class Account {
 	}
 
 	public void setPublicKey(final PublicKey publicKey) {
-		if (null != publicKey)
+		if (null != publicKey) {
 			this.publicKey = publicKey.getRaw();
+		}
 	}
 }

@@ -11,7 +11,7 @@ public class PlainMessageTest {
 	@Test
 	public void ctorCanCreateMessage() {
 		// Act:
-		byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
 		final PlainMessage message = new PlainMessage(input);
 
 		// Assert:
@@ -24,7 +24,7 @@ public class PlainMessageTest {
 	@Test
 	public void messageCanBeRoundTripped() {
 		// Arrange:
-		byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
 		final PlainMessage originalMessage = new PlainMessage(input);
 
 		// Act:
@@ -55,7 +55,7 @@ public class PlainMessageTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PlainMessage message = new PlainMessage(new byte[] { 12, 77, 56 });
-		int hashCode = message.hashCode();
+		final int hashCode = message.hashCode();
 
 		// Assert:
 		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }).hashCode(), IsEqual.equalTo(hashCode));
@@ -66,7 +66,7 @@ public class PlainMessageTest {
 
 	private static PlainMessage createRoundTrippedMessage(final PlainMessage originalMessage) {
 		// Act:
-		Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, null);
 		deserializer.readInt("type");
 		return new PlainMessage(deserializer);
 	}

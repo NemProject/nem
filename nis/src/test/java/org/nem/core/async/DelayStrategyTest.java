@@ -100,7 +100,7 @@ public class DelayStrategyTest {
 	//endregion
 
 	private static void assertStrategy(final AbstractDelayStrategy strategy, final int[] expectedDelays) {
-		for (int expectedDelay : expectedDelays) {
+		for (final int expectedDelay : expectedDelays) {
 			Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
 			Assert.assertThat(strategy.next(), IsEqual.equalTo(expectedDelay));
 		}

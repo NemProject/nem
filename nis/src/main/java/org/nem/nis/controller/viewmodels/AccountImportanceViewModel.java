@@ -1,6 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.nis.secret.AccountImportance;
 
@@ -9,7 +9,7 @@ import org.nem.nis.secret.AccountImportance;
  */
 public class AccountImportanceViewModel implements SerializableEntity {
 
-	private final Address address ;
+	private final Address address;
 	private final AccountImportance importance;
 
 	/**
@@ -68,19 +68,22 @@ public class AccountImportanceViewModel implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof AccountImportanceViewModel))
+		if (!(obj instanceof AccountImportanceViewModel)) {
 			return false;
+		}
 
 		final AccountImportanceViewModel rhs = (AccountImportanceViewModel)obj;
 		return this.address.equals(rhs.address) && areImportancesEqual(this.importance, rhs.importance);
 	}
 
 	private static boolean areImportancesEqual(final AccountImportance lhs, final AccountImportance rhs) {
-		if (!lhs.isSet() && !rhs.isSet())
+		if (!lhs.isSet() && !rhs.isSet()) {
 			return true;
+		}
 
-		if (!lhs.isSet() || !rhs.isSet())
+		if (!lhs.isSet() || !rhs.isSet()) {
 			return false;
+		}
 
 		return lhs.getHeight().equals(rhs.getHeight())
 				&& lhs.getImportance(lhs.getHeight()) == rhs.getImportance(rhs.getHeight());

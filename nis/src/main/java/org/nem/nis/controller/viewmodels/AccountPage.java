@@ -17,12 +17,14 @@ public class AccountPage {
 	 * @param timestamp The timestamp.
 	 */
 	public AccountPage(final String address, final String timestamp) {
-		if (null == address)
+		if (null == address) {
 			throw new IllegalArgumentException("address is required");
+		}
 
 		this.address = Address.fromEncoded(address);
-		if (!this.address.isValid())
+		if (!this.address.isValid()) {
 			throw new IllegalArgumentException("address must be valid");
+		}
 
 		this.timestamp = timestamp;
 	}

@@ -4,8 +4,8 @@ package org.nem.core.model;
  * Represents information about a current network.
  */
 public class NetworkInfo {
-	private static NetworkInfo mainNetworkInfo = createMainNetworkInfo();
-	private static NetworkInfo testNetworkInfo = createTestNetworkInfo();
+	private static final NetworkInfo mainNetworkInfo = createMainNetworkInfo();
+	private static final NetworkInfo testNetworkInfo = createTestNetworkInfo();
 
 	private byte version;
 	private char addressStartChar;

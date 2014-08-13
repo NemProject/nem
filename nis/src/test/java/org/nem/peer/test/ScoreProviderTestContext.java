@@ -25,7 +25,7 @@ public class ScoreProviderTestContext {
 	 * Creates a new test ScoreProvider context.
 	 *
 	 * @param scoreProvider The score provider.
-	 * @param trustScores   The trust scores associated with the provider.
+	 * @param trustScores The trust scores associated with the provider.
 	 */
 	public ScoreProviderTestContext(final ScoreProvider scoreProvider, final TrustScores trustScores) {
 		this.scoreProvider = scoreProvider;
@@ -36,8 +36,7 @@ public class ScoreProviderTestContext {
 	 * Calculates a trust score given the call counts.
 	 *
 	 * @param successfulCalls The number of successful calls.
-	 * @param failedCalls     The number of failed calls.
-	 *
+	 * @param failedCalls The number of failed calls.
 	 * @return The trust score.
 	 */
 	public double calculateTrustScore(final long successfulCalls, final long failedCalls) {
@@ -53,11 +52,10 @@ public class ScoreProviderTestContext {
 	/**
 	 * Calculates a credibility score.
 	 *
-	 * @param localTrust1    The local trust of the first node.
+	 * @param localTrust1 The local trust of the first node.
 	 * @param localTrustSum1 The local trust sum of the first node.
-	 * @param localTrust2    The local trust of the second node.
+	 * @param localTrust2 The local trust of the second node.
 	 * @param localTrustSum2 The local trust sum of the second node.
-	 *
 	 * @return The credibility score.
 	 */
 	public double calculateCredibilityScore(

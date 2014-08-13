@@ -1,6 +1,6 @@
 package org.nem.nis.visitors;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.nis.secret.BlockTransferObserver;
 import org.nem.nis.service.BlockExecutor;
 
@@ -23,7 +23,7 @@ public class UndoBlockVisitor implements BlockVisitor {
 		this.observer = observer;
 		this.executor = executor;
 	}
-	
+
 	@Override
 	public void visit(final Block parentBlock, final Block block) {
 		this.executor.undo(block, this.observer);

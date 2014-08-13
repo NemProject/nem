@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 
 public class AsyncTimerTest {
 
-	private static int TimeUnit = 60;
-	private static int TimeHalfUnit = TimeUnit / 2;
+	private static final int TimeUnit = 60;
+	private static final int TimeHalfUnit = TimeUnit / 2;
 
 	@Test
 	public void initialDelayIsRespected() throws InterruptedException {
@@ -69,7 +69,7 @@ public class AsyncTimerTest {
 	public void refreshIntervalIsDerivedFromDelayStrategy() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2*TimeUnit, TimeUnit, 2*TimeUnit });
+		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2 * TimeUnit, TimeUnit, 2 * TimeUnit });
 		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy, null)) {
 			// Arrange: (should fire at 1, 2, 4, 5)
 			Thread.sleep(6 * TimeUnit);
@@ -310,12 +310,14 @@ public class AsyncTimerTest {
 
 		private CompletableFuture<?> getFuture() {
 			return CompletableFuture.runAsync(() -> ++this.numCalls)
-					.thenCompose(v -> CompletableFuture.runAsync(runnableSupplier.get()));
+					.thenCompose(v -> CompletableFuture.runAsync(this.runnableSupplier.get()));
 		}
 
-		public int getNumCalls() { return this.numCalls; }
+		public int getNumCalls() {
+			return this.numCalls;
+		}
 
-		private static CountableFuture sleep(int milliseconds) {
+		private static CountableFuture sleep(final int milliseconds) {
 			return new CountableFuture(() ->
 					() -> ExceptionUtils.propagateVoid(() -> Thread.sleep(milliseconds)));
 		}
@@ -335,7 +337,7 @@ public class AsyncTimerTest {
 		}
 
 		@Override
-		protected int nextInternal(int iteration) {
+		protected int nextInternal(final int iteration) {
 			this.numNextCalls = iteration;
 			return this.delays[iteration - 1];
 		}

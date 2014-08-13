@@ -52,7 +52,7 @@ public class BasicNodeSelector implements NodeSelector {
 	@Override
 	public Node selectNode() {
 		final List<Node> nodes = this.selectNodes(1);
-		return nodes.size() > 0 ? nodes.get(0) : null;
+		return !nodes.isEmpty() ? nodes.get(0) : null;
 	}
 
 	@Override
@@ -71,16 +71,18 @@ public class BasicNodeSelector implements NodeSelector {
 			numSelectedNodes = partnerNodes.size();
 
 			double sum = 0;
-			double rand = this.random.nextDouble() * remainingTrust;
+			final double rand = this.random.nextDouble() * remainingTrust;
 			for (int i = 0; i < nodes.length; ++i) {
 				// skip nodes with zero trust and those that have already been used
-				double trust = this.trustVector.getAt(i);
-				if (0 == trust || usedNodes[i])
+				final double trust = this.trustVector.getAt(i);
+				if (0 == trust || usedNodes[i]) {
 					continue;
+				}
 
 				sum += trust;
-				if (sum < rand)
+				if (sum < rand) {
 					continue;
+				}
 
 				usedNodes[i] = true;
 				remainingTrust -= trust;

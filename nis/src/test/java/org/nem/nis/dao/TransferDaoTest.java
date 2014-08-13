@@ -2,10 +2,6 @@ package org.nem.nis.dao;
 
 // TODO: i configured intellij to collapse imports when there are at least two imports from the same package
 // BR: Should be fixed with auto formatting..
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import java.util.*;
-import java.util.stream.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -19,6 +15,12 @@ import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.*;
+import java.util.stream.*;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -122,8 +124,14 @@ public class TransferDaoTest {
 
 		// Act
 		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
-		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccountUsingHash(sender, dbBlock.getBlockTransfers().get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.ALL, 25);
-		final Collection<Object[]> entities3 = this.transferDao.getTransactionsForAccountUsingHash(sender, dbBlock.getBlockTransfers().get(29).getTransferHash(), ReadOnlyTransferDao.TransferType.ALL, 25);
+		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccountUsingHash(sender,
+				dbBlock.getBlockTransfers().get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
+		final Collection<Object[]> entities3 = this.transferDao.getTransactionsForAccountUsingHash(sender,
+				dbBlock.getBlockTransfers().get(29).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -191,7 +199,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> incomingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.INCOMING, 25).stream()
+		final List<Transfer> incomingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				null,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -199,7 +210,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimestamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> incomingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, incomingEntities1.get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.INCOMING, 25).stream()
+		final List<Transfer> incomingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				incomingEntities1.get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -207,7 +221,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimestamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> incomingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, incomingEntities2.get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.INCOMING, 25).stream()
+		final List<Transfer> incomingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				incomingEntities2.get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -230,7 +247,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> outgoingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.OUTGOING, 25).stream()
+		final List<Transfer> outgoingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				null,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -238,7 +258,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimestamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> outgoingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, outgoingEntities1.get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.OUTGOING, 25).stream()
+		final List<Transfer> outgoingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				outgoingEntities1.get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -246,7 +269,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimestamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> outgoingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, outgoingEntities2.get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.OUTGOING, 25).stream()
+		final List<Transfer> outgoingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				outgoingEntities2.get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -269,7 +295,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> allEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, null, ReadOnlyTransferDao.TransferType.ALL, 25).stream()
+		final List<Transfer> allEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				null,
+				ReadOnlyTransferDao.TransferType.ALL,
+				25).stream()
 				.map(obj -> (Transfer)obj[0])
 				.collect(Collectors.toList());
 
@@ -277,7 +306,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimestamp())
 				.collect(Collectors.toList());
 
-		final List<Integer> allTimeStamps2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount, allEntities1.get(24).getTransferHash(), ReadOnlyTransferDao.TransferType.ALL, 25).stream()
+		final List<Integer> allTimeStamps2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+				allEntities1.get(24).getTransferHash(),
+				ReadOnlyTransferDao.TransferType.ALL,
+				25).stream()
 				.map(obj -> ((Transfer)obj[0]).getTimestamp())
 				.collect(Collectors.toList());
 
@@ -431,7 +463,8 @@ public class TransferDaoTest {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(), recipient.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(),
+				recipient.getKeyPair().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);

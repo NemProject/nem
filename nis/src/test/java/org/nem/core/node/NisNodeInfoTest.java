@@ -1,12 +1,13 @@
 package org.nem.core.node;
 
-import java.util.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.time.*;
+
+import java.util.*;
 
 public class NisNodeInfoTest {
 
@@ -38,53 +39,53 @@ public class NisNodeInfoTest {
 		Assert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
 	}
 
-    //region equals / hashCode
+	//region equals / hashCode
 
-    private static Map<String, NisNodeInfo> createNisNodeInfosForEqualityTests(final KeyPair keyPair) {
-        final NodeEndpoint endpoint = NodeEndpoint.fromHost("localhost");
-        return new HashMap<String, NisNodeInfo>() {
-            {
-                put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
-                put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
-                put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
-            }
-        };
-    }
+	private static Map<String, NisNodeInfo> createNisNodeInfosForEqualityTests(final KeyPair keyPair) {
+		final NodeEndpoint endpoint = NodeEndpoint.fromHost("localhost");
+		return new HashMap<String, NisNodeInfo>() {
+			{
+				this.put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
+				this.put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
+				this.put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
+			}
+		};
+	}
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
-        final NisNodeInfo info = new NisNodeInfo(
-                new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
-                createAppMetaData("nem", "1.0"));
+		final NisNodeInfo info = new NisNodeInfo(
+				new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
+				createAppMetaData("nem", "1.0"));
 		final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
 		// Assert:
 		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(info));
 		Assert.assertThat(infoMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(info)));
 		Assert.assertThat(infoMap.get("diff-metadata"), IsNot.not(IsEqual.equalTo(info)));
-        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
-        Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
+		Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
-        // Arrange:
-        final KeyPair keyPair = new KeyPair();
-        final NisNodeInfo info = new NisNodeInfo(
-                new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
-                createAppMetaData("nem", "1.0"));
-        final int hashCode = info.hashCode();
-        final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final NisNodeInfo info = new NisNodeInfo(
+				new Node(new NodeIdentity(keyPair), NodeEndpoint.fromHost("localhost")),
+				createAppMetaData("nem", "1.0"));
+		final int hashCode = info.hashCode();
+		final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
-        // Assert:
-        Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
-        Assert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-        Assert.assertThat(infoMap.get("diff-metadata").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		// Assert:
+		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(infoMap.get("diff-metadata").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-    //endregion
+	//endregion
 
 	private static Node createNodeWithName(final String name) {
 		return new Node(

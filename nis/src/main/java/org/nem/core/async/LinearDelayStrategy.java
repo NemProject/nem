@@ -19,12 +19,12 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 	public LinearDelayStrategy(final int minDelay, final int maxDelay, final int iterations) {
 		super(iterations);
 		this.minDelay = minDelay;
-		this.delayStep = (float)(maxDelay - minDelay)/(iterations - 1);
+		this.delayStep = (float)(maxDelay - minDelay) / (iterations - 1);
 	}
 
 	@Override
 	protected int nextInternal(final int iteration) {
-		return this.minDelay + (int)(delayStep * (iteration - 1));
+		return this.minDelay + (int)(this.delayStep * (iteration - 1));
 	}
 
 	/**
@@ -36,8 +36,9 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 	 * @return A new strategy.
 	 */
 	public static LinearDelayStrategy withDuration(final int minDelay, final int maxDelay, final int duration) {
-		if (duration < minDelay + maxDelay)
+		if (duration < minDelay + maxDelay) {
 			throw new IllegalArgumentException("duration must be at least minDelay + maxDelay");
+		}
 
 		final int iterations = 2 * duration / (minDelay + maxDelay);
 		return new LinearDelayStrategy(minDelay, maxDelay, iterations);

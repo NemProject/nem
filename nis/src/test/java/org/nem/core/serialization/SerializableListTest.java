@@ -224,9 +224,9 @@ public class SerializableListTest {
 	public void asCollectionReturnsRawCollection() {
 		// Arrange:
 		final List<MockSerializableEntity> rawList = Arrays.asList(
-			new MockSerializableEntity(12, "a", 12),
-			new MockSerializableEntity(4, "b", 4),
-			new MockSerializableEntity(122, "c", 122));
+				new MockSerializableEntity(12, "a", 12),
+				new MockSerializableEntity(4, "b", 4),
+				new MockSerializableEntity(122, "c", 122));
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList);
 
 		// Assert:
@@ -370,8 +370,7 @@ public class SerializableListTest {
 		if (expectedEquals) {
 			Assert.assertThat(list1, IsEqual.equalTo(list2));
 			Assert.assertThat(list2, IsEqual.equalTo(list1));
-		}
-		else {
+		} else {
 			Assert.assertThat(list1, IsNot.not(IsEqual.equalTo(list2)));
 			Assert.assertThat(list2, IsNot.not(IsEqual.equalTo(list1)));
 		}

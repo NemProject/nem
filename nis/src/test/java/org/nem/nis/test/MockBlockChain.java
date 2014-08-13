@@ -33,5 +33,7 @@ public class MockBlockChain extends BlockChain {
 	 *
 	 * @return The number of times getLastDbBlock was called.
 	 */
-	public int getNumGetLastDbBlockCalls() { return this.numGetLastDbBlockCalls; }
+	public int getNumGetLastDbBlockCalls() {
+		return this.numGetLastDbBlockCalls;
+	}
 }

@@ -34,13 +34,12 @@ public class OutlinkObserver implements TransferObserver {
 			return;
 		}
 
-		final Amount linkWeight = calculateLinkWeight(this.isExecute ? sender : recipient, amount);
+		final Amount linkWeight = this.calculateLinkWeight(this.isExecute ? sender : recipient, amount);
 
 		if (this.isExecute) {
 			final AccountLink link = new AccountLink(this.height, linkWeight, recipient.getAddress());
 			this.getState(sender).getImportanceInfo().addOutlink(link);
-		}
-		else {
+		} else {
 			final AccountLink link = new AccountLink(this.height, linkWeight, sender.getAddress());
 			this.getState(recipient).getImportanceInfo().removeOutlink(link);
 		}
@@ -58,15 +57,16 @@ public class OutlinkObserver implements TransferObserver {
 		final WeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
 		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(this.height)));
 		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(this.height)));
-		if (unvested.compareTo(BigInteger.ZERO) <= 0)
+		if (unvested.compareTo(BigInteger.ZERO) <= 0) {
 			return amount;
+		}
 
 		// only use the vested portion of an account's balance in outlink determination
-        final long rawAdjustedWeight = BigInteger.valueOf(amount.getNumMicroNem())
-                .multiply(vested)
-                .divide(vested.add(unvested))
-                .longValue();
-        return Amount.fromMicroNem(rawAdjustedWeight);
+		final long rawAdjustedWeight = BigInteger.valueOf(amount.getNumMicroNem())
+				.multiply(vested)
+				.divide(vested.add(unvested))
+				.longValue();
+		return Amount.fromMicroNem(rawAdjustedWeight);
 	}
 
 	private PoiAccountState getState(final Account account) {

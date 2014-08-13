@@ -25,8 +25,9 @@ public class NetworkSimulatorITCase {
 
 	private static void runTest(final EigenTrust trust) {
 		final URL url = NetworkSimulator.class.getClassLoader().getResource("");
-		if (null == url || null == url.getFile())
+		if (null == url || null == url.getFile()) {
 			throw new IllegalArgumentException("could not find output file");
+		}
 
 		final StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < 10; ++i) {
@@ -36,7 +37,7 @@ public class NetworkSimulatorITCase {
 			final String outputFileName = url.getFile() + String.format("%s_%d.txt", trust.getClass().getSimpleName(), i);
 
 			final long startTime = System.currentTimeMillis();
-			boolean result = simulator.run(outputFileName, 200);
+			final boolean result = simulator.run(outputFileName, 200);
 			final long stopTime = System.currentTimeMillis();
 
 			Assert.assertThat(result, IsEqual.equalTo(true));
@@ -53,7 +54,7 @@ public class NetworkSimulatorITCase {
 		LOGGER.log(Level.INFO, builder.toString());
 	}
 
-	private static Config getConfig(double evilNodeHonestDataProbability) {
+	private static Config getConfig(final double evilNodeHonestDataProbability) {
 		// address;evil;pre-trusted;honest data probability;honest feedback probability;leech;collusive
 
 		final List<Config.Entry> entries = new ArrayList<>();

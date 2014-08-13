@@ -16,8 +16,8 @@ public class Node implements SerializableEntity {
 	/**
 	 * Creates a new node without meta data.
 	 *
-	 * @param identity    The identity.
-	 * @param endpoint    The endpoint.
+	 * @param identity The identity.
+	 * @param endpoint The endpoint.
 	 */
 	public Node(final NodeIdentity identity, final NodeEndpoint endpoint) {
 		this(identity, endpoint, null);
@@ -26,9 +26,9 @@ public class Node implements SerializableEntity {
 	/**
 	 * Creates a new node with meta data.
 	 *
-	 * @param identity    The identity.
-	 * @param endpoint    The endpoint.
-	 * @param metaData    The meta data.
+	 * @param identity The identity.
+	 * @param endpoint The endpoint.
+	 * @param metaData The meta data.
 	 */
 	public Node(
 			final NodeIdentity identity,
@@ -98,8 +98,9 @@ public class Node implements SerializableEntity {
 	 * @param endpoint The endpoint.
 	 */
 	public void setEndpoint(final NodeEndpoint endpoint) {
-		if (null == endpoint)
+		if (null == endpoint) {
 			throw new IllegalArgumentException("endpoint must be non-null");
+		}
 
 		this.endpoint = endpoint;
 	}
@@ -110,8 +111,9 @@ public class Node implements SerializableEntity {
 	 * @param metaData The meta data.
 	 */
 	public void setMetaData(final NodeMetaData metaData) {
-		if (null == metaData)
+		if (null == metaData) {
 			throw new IllegalArgumentException("metaData must be non-null");
+		}
 
 		this.metaData = metaData;
 	}
@@ -119,8 +121,9 @@ public class Node implements SerializableEntity {
 	//endregion
 
 	private void ensureValidity() {
-		if (null == this.identity)
+		if (null == this.identity) {
 			throw new IllegalArgumentException("identity must be non-null");
+		}
 	}
 
 	@Override
@@ -129,9 +132,10 @@ public class Node implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Node))
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Node)) {
 			return false;
+		}
 
 		final Node rhs = (Node)obj;
 		return this.identity.equals(rhs.identity);

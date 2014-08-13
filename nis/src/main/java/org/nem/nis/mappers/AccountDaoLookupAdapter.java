@@ -28,19 +28,23 @@ public class AccountDaoLookupAdapter implements AccountDaoLookup {
 	public Account findByAddress(final Address id) {
 		final String encodedAddress = id.getEncoded();
 		Account dbAccount = this.accountCache.get(encodedAddress);
-		boolean isInCache = null != dbAccount;
+		final boolean isInCache = null != dbAccount;
 
-		if (!isInCache)
+		if (!isInCache) {
 			dbAccount = this.accountDao.getAccountByPrintableAddress(encodedAddress);
+		}
 
-		if (null == dbAccount)
+		if (null == dbAccount) {
 			dbAccount = new Account(encodedAddress, null);
+		}
 
-		if (null == dbAccount.getPublicKey())
+		if (null == dbAccount.getPublicKey()) {
 			dbAccount.setPublicKey(id.getPublicKey());
+		}
 
-		if (!isInCache)
+		if (!isInCache) {
 			this.accountCache.put(encodedAddress, dbAccount);
+		}
 
 		return dbAccount;
 	}

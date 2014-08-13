@@ -48,7 +48,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult add(final Transaction transaction, final Predicate<Hash> exists) {
-		return add(transaction, exists, true);
+		return this.add(transaction, exists, true);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class UnconfirmedTransactions {
 	 * @param execute determines if the transaction should be executed if valid.
 	 * @return true if the transaction was added.
 	 */
-	private ValidationResult add(final Transaction transaction, final Predicate<Hash> exists, boolean execute) {
+	private ValidationResult add(final Transaction transaction, final Predicate<Hash> exists, final boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (exists.test(transactionHash)) {
 			return ValidationResult.NEUTRAL;
@@ -70,18 +70,18 @@ public class UnconfirmedTransactions {
 		}
 
 		// not sure if adding to cache here is a good idea...
-		addToCache(transaction.getSigner());
-		if (!isValid(transaction)) {
+		this.addToCache(transaction.getSigner());
+		if (!this.isValid(transaction)) {
 			LOGGER.warning(String.format("Transaction from %s rejected. not enough NEM.", transaction.getSigner().getAddress()));
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
-		
+
 		if (execute) {
 			transaction.execute(this.transferObserver);
 		}
 
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
+		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
 
 	private boolean isValid(final Transaction transaction) {
@@ -91,7 +91,7 @@ public class UnconfirmedTransactions {
 
 	boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (! this.transactions.containsKey(transactionHash)) {
+		if (!this.transactions.containsKey(transactionHash)) {
 			return false;
 		}
 
@@ -101,7 +101,7 @@ public class UnconfirmedTransactions {
 		return true;
 	}
 
-	private void addToCache(Account account) {
+	private void addToCache(final Account account) {
 		// it's ok to put reference here, thanks to Account being non-mutable
 		this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
 	}
@@ -118,8 +118,7 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-
-	private List<Transaction> sortTransactions(List<Transaction> transactions) {
+	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
 		Collections.sort(transactions, (lhs, rhs) -> {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
 			// maybe we should change Transaction.compare? also it
@@ -141,22 +140,23 @@ public class UnconfirmedTransactions {
 	 * @return The sorted list of all transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions =  this.transactions.values().stream()
+		final List<Transaction> transactions = this.transactions.values().stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 				.collect(Collectors.toList());
 
-		return sortTransactions(transactions);
+		return this.sortTransactions(transactions);
 	}
 
 	/**
 	 * Gets all transactions.
+	 *
 	 * @return All transaction from this unconfirmed transactions.
 	 */
 	public List<Transaction> getAll() {
-		final List<Transaction> transactions =  this.transactions.values().stream()
+		final List<Transaction> transactions = this.transactions.values().stream()
 				.collect(Collectors.toList());
 
-		return sortTransactions(transactions);
+		return this.sortTransactions(transactions);
 	}
 
 	/**
@@ -164,9 +164,9 @@ public class UnconfirmedTransactions {
 	 */
 	private void executeAll() {
 		this.getAll().stream()
-					 .forEach(tx -> tx.execute(this.transferObserver));		
+				.forEach(tx -> tx.execute(this.transferObserver));
 	}
-	
+
 	/**
 	 * There might be conflicting transactions on the list of unconfirmed transactions.
 	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.
@@ -175,7 +175,7 @@ public class UnconfirmedTransactions {
 	 * @param unconfirmedTransactions sorted list of unconfirmed transactions.
 	 * @return filtered out list of unconfirmed transactions.
 	 */
-	public List<Transaction> removeConflictingTransactions(List<Transaction> unconfirmedTransactions) {
+	public List<Transaction> removeConflictingTransactions(final List<Transaction> unconfirmedTransactions) {
 		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions();
 
 		// TODO: should we remove those that .add() failed?
@@ -191,7 +191,7 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param time
 	 */
-	public void dropExpiredTransactions(TimeInstant time) {
+	public void dropExpiredTransactions(final TimeInstant time) {
 		this.transactions.values().stream()
 				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
 				.forEach(obj -> this.remove(obj));
@@ -206,16 +206,16 @@ public class UnconfirmedTransactions {
 
 		@Override
 		public void notifyCredit(final Account account, final Amount amount) {
-			addToCache(account);
-			final Amount newBalance = unconfirmedBalances.get(account).add(amount);
-			unconfirmedBalances.replace(account, newBalance);
+			UnconfirmedTransactions.this.addToCache(account);
+			final Amount newBalance = UnconfirmedTransactions.this.unconfirmedBalances.get(account).add(amount);
+			UnconfirmedTransactions.this.unconfirmedBalances.replace(account, newBalance);
 		}
 
 		@Override
 		public void notifyDebit(final Account account, final Amount amount) {
-			addToCache(account);
-			final Amount newBalance = unconfirmedBalances.get(account).subtract(amount);
-			unconfirmedBalances.replace(account, newBalance);
+			UnconfirmedTransactions.this.addToCache(account);
+			final Amount newBalance = UnconfirmedTransactions.this.unconfirmedBalances.get(account).subtract(amount);
+			UnconfirmedTransactions.this.unconfirmedBalances.replace(account, newBalance);
 		}
 	}
 }

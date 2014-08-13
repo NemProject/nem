@@ -12,7 +12,7 @@ public abstract class Score {
 	 *
 	 * @param initialScore The initial score value.
 	 */
-	public Score(double initialScore) {
+	public Score(final double initialScore) {
 		this.score = new RealDouble(initialScore);
 	}
 

@@ -1,11 +1,12 @@
 package org.nem.core.serialization;
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Supplier;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Supplier;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
 
@@ -233,7 +234,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TSerializer serializer = this.createSerializer();
 
 		// Act:
-		final byte[] bytes = new byte[] {};
+		final byte[] bytes = new byte[] { };
 		serializer.writeBytes("bytes", bytes);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);

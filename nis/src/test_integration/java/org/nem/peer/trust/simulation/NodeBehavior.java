@@ -7,29 +7,29 @@ public class NodeBehavior {
 	/**
 	 * Evil node?
 	 */
-	private boolean evil;
+	private final boolean evil;
 
 	/**
 	 * Probability of node returning honest data
 	 */
-	private double honestDataProbability;
+	private final double honestDataProbability;
 
 	/**
 	 * Probability of node returning honest feedback about other nodes
 	 */
-	private double honestFeedbackProbability;
+	private final double honestFeedbackProbability;
 
 	/**
 	 * Excessive downloading?
 	 */
-	private boolean leech;
+	private final boolean leech;
 
 	/**
 	 * Colluding with other nodes?
 	 */
-	private boolean collusive;
+	private final boolean collusive;
 
-	public NodeBehavior(boolean evil, double honestDataProbability, double honestFeedbackProbability, boolean leech, boolean collusive) {
+	public NodeBehavior(final boolean evil, final double honestDataProbability, final double honestFeedbackProbability, final boolean leech, final boolean collusive) {
 		this.evil = evil;
 		this.honestDataProbability = honestDataProbability;
 		this.honestFeedbackProbability = honestFeedbackProbability;
@@ -38,22 +38,22 @@ public class NodeBehavior {
 	}
 
 	public boolean isEvil() {
-		return evil;
+		return this.evil;
 	}
 
 	public double getHonestDataProbability() {
-		return honestDataProbability;
+		return this.honestDataProbability;
 	}
 
 	public double getHonestFeedbackProbability() {
-		return honestFeedbackProbability;
+		return this.honestFeedbackProbability;
 	}
 
 	public boolean isLeech() {
-		return leech;
+		return this.leech;
 	}
 
 	public boolean isCollusive() {
-		return collusive;
+		return this.collusive;
 	}
 }

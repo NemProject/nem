@@ -38,8 +38,9 @@ public class MetaDataTestUtils {
 		final URLStreamHandler urlStreamHandler = new URLStreamHandler() {
 			@Override
 			protected URLConnection openConnection(final URL url) throws IOException {
-				if (null == inputStream)
+				if (null == inputStream) {
 					throw new IOException();
+				}
 
 				final URLConnection urlConnection = Mockito.mock(URLConnection.class);
 				Mockito.when(urlConnection.getInputStream()).thenReturn(inputStream);

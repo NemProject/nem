@@ -15,10 +15,10 @@ public class PublicKeyTest {
 	@Test
 	public void canCreateFromBytes() {
 		// Arrange:
-		final PublicKey key = new PublicKey(TEST_BYTES);
+		final PublicKey key = new PublicKey(this.TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(this.TEST_BYTES));
 	}
 
 	@Test
@@ -43,10 +43,10 @@ public class PublicKeyTest {
 	@Test
 	public void keyCanBeRoundTripped() {
 		// Act:
-		final PublicKey key = createRoundTrippedKey(new PublicKey(TEST_BYTES));
+		final PublicKey key = createRoundTrippedKey(new PublicKey(this.TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(TEST_BYTES)));
+		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(this.TEST_BYTES)));
 	}
 
 	public static PublicKey createRoundTrippedKey(final PublicKey originalKey) {
@@ -65,9 +65,9 @@ public class PublicKeyTest {
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
 
 		// Assert:
-		Assert.assertThat(createKeyWithLengthDelta(publicKey, -1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(createKeyWithLengthDelta(publicKey, 0).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(createKeyWithLengthDelta(publicKey, 1).isCompressed(), IsEqual.equalTo(false));
+		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, -1).isCompressed(), IsEqual.equalTo(false));
+		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 0).isCompressed(), IsEqual.equalTo(true));
+		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 1).isCompressed(), IsEqual.equalTo(false));
 	}
 
 	private PublicKey createKeyWithLengthDelta(final PublicKey key, final int lengthDelta) {
@@ -84,10 +84,10 @@ public class PublicKeyTest {
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
 
 		// Assert:
-		Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)2).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)3).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(createKeyWithFirstByte(publicKey, (byte)4).isCompressed(), IsEqual.equalTo(false));
+		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)1).isCompressed(), IsEqual.equalTo(false));
+		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)2).isCompressed(), IsEqual.equalTo(true));
+		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)3).isCompressed(), IsEqual.equalTo(true));
+		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)4).isCompressed(), IsEqual.equalTo(false));
 	}
 
 	private PublicKey createKeyWithFirstByte(final PublicKey key, final byte firstByte) {
@@ -105,24 +105,24 @@ public class PublicKeyTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final PublicKey key = new PublicKey(TEST_BYTES);
+		final PublicKey key = new PublicKey(this.TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
-		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+		Assert.assertThat(new PublicKey(this.TEST_BYTES), IsEqual.equalTo(key));
+		Assert.assertThat(new PublicKey(this.MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
+		Assert.assertThat(this.TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final PublicKey key = new PublicKey(TEST_BYTES);
-		int hashCode = key.hashCode();
+		final PublicKey key = new PublicKey(this.TEST_BYTES);
+		final int hashCode = key.hashCode();
 
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new PublicKey(this.TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new PublicKey(this.MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -132,7 +132,7 @@ public class PublicKeyTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		Assert.assertThat(new PublicKey(this.TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion

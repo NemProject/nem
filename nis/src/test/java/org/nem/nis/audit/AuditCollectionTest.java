@@ -107,7 +107,6 @@ public class AuditCollectionTest {
 		collection.add("1", "1");
 		collection.add("3", "3");
 
-
 		// Assert:
 		Assert.assertThat(collection.getOutstandingEntries(), IsEqual.equalTo(createEntries(1, 2, 1, 3)));
 		Assert.assertThat(new ArrayList<>(collection.getMostRecentEntries()), IsEqual.equalTo(createEntries(3, 1, 2, 1)));
@@ -210,8 +209,9 @@ public class AuditCollectionTest {
 
 	private static List<AuditEntry> createEntries(final int... ids) {
 		final List<AuditEntry> entries = new ArrayList<>();
-		for (final int id : ids)
+		for (final int id : ids) {
 			entries.add(createEntry(id));
+		}
 
 		return entries;
 	}

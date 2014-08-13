@@ -13,7 +13,6 @@ import java.util.*;
 
 public class BlockExecutorTest {
 
-
 	//region execute / undo basic updates
 
 	@Test
@@ -49,7 +48,7 @@ public class BlockExecutorTest {
 		context.execute();
 
 		// Assert:
-		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[]{ 1, 2 }));
+		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
 	}
 
 	@Test
@@ -104,11 +103,12 @@ public class BlockExecutorTest {
 		public UndoExecuteTestContext() {
 			this.account = Utils.generateRandomAccount();
 			this.account.incrementBalance(new Amount(100));
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < 3; ++i) {
 				this.account.incrementForagedBlocks();
+			}
 
-			this.transaction1 = createTransaction(1, 17);
-			this.transaction2 = createTransaction(2, 11);
+			this.transaction1 = this.createTransaction(1, 17);
+			this.transaction2 = this.createTransaction(2, 11);
 
 			this.block = BlockUtils.createBlock(this.account);
 			this.block.addTransaction(this.transaction1);
@@ -116,7 +116,7 @@ public class BlockExecutorTest {
 
 			final PoiAccountState accountState = new PoiAccountState(this.account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-			Mockito.when(poiFacade.findStateByAddress(this.account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.poiFacade.findStateByAddress(this.account.getAddress())).thenReturn(accountState);
 		}
 
 		private void execute() {
@@ -206,7 +206,7 @@ public class BlockExecutorTest {
 		}
 
 		// Assert:
-		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
+		Assert.assertThat(!observers.isEmpty(), IsEqual.equalTo(true));
 		for (final BlockTransferObserver observer : observers) {
 			// transaction transfer action
 			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
@@ -244,7 +244,7 @@ public class BlockExecutorTest {
 		context.executor.undo(block, observers);
 
 		// Assert:
-		Assert.assertThat(observers.size() > 0, IsEqual.equalTo(true));
+		Assert.assertThat(!observers.isEmpty(), IsEqual.equalTo(true));
 		for (final BlockTransferObserver observer : observers) {
 			// transaction transfer action
 			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(12));
@@ -370,8 +370,9 @@ public class BlockExecutorTest {
 
 			@Override
 			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
 					balanceInObserver[0] = account.getBalance();
+				}
 			}
 
 			@Override
@@ -416,8 +417,9 @@ public class BlockExecutorTest {
 
 			@Override
 			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress()))
+				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
 					balanceInObserver[0] = account.getBalance();
+				}
 			}
 		};
 
@@ -471,7 +473,7 @@ public class BlockExecutorTest {
 			PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 			if (null == accountState) {
 				accountState = new PoiAccountState(address);
-				Mockito.when(poiFacade.findStateByAddress(address)).thenReturn(accountState);
+				Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(accountState);
 			}
 
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, amount);

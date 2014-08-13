@@ -6,13 +6,13 @@ import org.nem.core.serialization.*;
  * Represents an announce request.
  */
 public class RequestAnnounce implements SerializableEntity {
-	private byte[] data;
-	private byte[] signature;
+	private final byte[] data;
+	private final byte[] signature;
 
 	/**
 	 * Creates a new request.
 	 *
-	 * @param data      The data.
+	 * @param data The data.
 	 * @param signature The signature.
 	 */
 	public RequestAnnounce(final byte[] data, final byte[] signature) {

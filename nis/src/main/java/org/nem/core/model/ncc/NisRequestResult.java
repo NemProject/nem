@@ -30,10 +30,10 @@ public class NisRequestResult implements SerializableEntity {
 	private final int type;
 	private final int code;
 	private final String message;
-	
+
 	/**
 	 * Creates a NIS request result.
-	 * 
+	 *
 	 * @param type The result type.
 	 * @param code The result code.
 	 * @param message The message.
@@ -63,7 +63,7 @@ public class NisRequestResult implements SerializableEntity {
 		this.code = deserializer.readInt("code");
 		this.message = deserializer.readString("message");
 	}
-	
+
 	/**
 	 * Gets the result type.
 	 *
@@ -72,7 +72,7 @@ public class NisRequestResult implements SerializableEntity {
 	public int getType() {
 		return this.type;
 	}
-	
+
 	/**
 	 * Gets the result code.
 	 *
@@ -81,7 +81,7 @@ public class NisRequestResult implements SerializableEntity {
 	public int getCode() {
 		return this.code;
 	}
-	
+
 	/**
 	 * Gets the message.
 	 *
@@ -99,7 +99,7 @@ public class NisRequestResult implements SerializableEntity {
 	public boolean isError() {
 		return CODE_NEUTRAL != this.code && CODE_SUCCESS != this.code;
 	}
-	
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("type", this.type);

@@ -240,8 +240,9 @@ public class PoiAccountInfoTest {
 
 	private static PoiAccountInfo createAccountInfoWithOutlinks(final int... amounts) {
 		final int[] heights = new int[amounts.length];
-		for (int i = 0; i < amounts.length; ++i)
+		for (int i = 0; i < amounts.length; ++i) {
 			heights[i] = 1;
+		}
 
 		return createAccountInfoWithOutlinks(1, amounts, heights);
 	}
@@ -250,8 +251,9 @@ public class PoiAccountInfoTest {
 			final int referenceHeight,
 			final int[] amounts,
 			final int[] heights) {
-		if (amounts.length != heights.length)
+		if (amounts.length != heights.length) {
 			throw new IllegalArgumentException("amounts and heights must have same length");
+		}
 
 		final List<AccountLink> outlinks = new ArrayList<>();
 		for (int i = 0; i < amounts.length; ++i) {
@@ -271,10 +273,12 @@ public class PoiAccountInfoTest {
 	}
 
 	private static void addAllOutlinks(final PoiAccountState state, final List<AccountLink> outlinks) {
-		if (null == outlinks)
+		if (null == outlinks) {
 			return;
+		}
 
-		for (final AccountLink link : outlinks)
+		for (final AccountLink link : outlinks) {
 			state.getImportanceInfo().addOutlink(link);
+		}
 	}
 }

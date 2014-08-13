@@ -9,8 +9,8 @@ import org.nem.core.serialization.*;
 public class TransactionMetaDataPair implements SerializableEntity {
 	public static ObjectDeserializer<TransactionMetaDataPair> DESERIALIZER =
 			deserializer -> new TransactionMetaDataPair(deserializer);
-	private Transaction transaction;
-	private TransactionMetaData metaData;
+	private final Transaction transaction;
+	private final TransactionMetaData metaData;
 
 	/**
 	 * Creates a new pair.

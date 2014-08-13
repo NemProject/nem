@@ -2,7 +2,7 @@ package org.nem.nis.visitors;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.nis.secret.BlockTransferObserver;
 import org.nem.nis.service.BlockExecutor;
 

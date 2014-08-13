@@ -8,17 +8,17 @@ public class AbstractPrimitiveBigIntegerTest extends AbstractPrimitiveTest<
 		BigInteger> {
 
 	@Override
-	protected FooPrimitive createFoo(long value) {
+	protected FooPrimitive createFoo(final long value) {
 		return new FooPrimitive(this.longToValue(value));
 	}
 
 	@Override
-	protected BarPrimitive createBar(long value) {
+	protected BarPrimitive createBar(final long value) {
 		return new BarPrimitive(this.longToValue(value));
 	}
 
 	@Override
-	protected BigInteger longToValue(long value) {
+	protected BigInteger longToValue(final long value) {
 		return BigInteger.valueOf(value);
 	}
 

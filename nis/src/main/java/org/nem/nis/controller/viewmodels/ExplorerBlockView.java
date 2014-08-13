@@ -16,7 +16,7 @@ public class ExplorerBlockView implements SerializableEntity {
 	private final Hash blockHash;
 	private final List<ExplorerTransferView> transactions;
 
-	public ExplorerBlockView(final Long height, final Address foragerAddress, final long timestamp, final Hash blockHash, int txCount) {
+	public ExplorerBlockView(final Long height, final Address foragerAddress, final long timestamp, final Hash blockHash, final int txCount) {
 		this.height = height;
 		this.foragerAddress = foragerAddress;
 		this.timestamp = timestamp;

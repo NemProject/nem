@@ -9,7 +9,6 @@ public interface ObjectDeserializer<T> {
 	 * Deserializes and creates an object of type T.
 	 *
 	 * @param deserializer The deserializer.
-	 *
 	 * @return The activated object.
 	 */
 	public T deserialize(final Deserializer deserializer);

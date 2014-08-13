@@ -17,14 +17,14 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class ForagingTest {
-	private static org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
-	private static org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static final org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
+	private static final org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 
-	static void setFinalStatic(Field field, Object newValue) throws Exception {
+	static void setFinalStatic(final Field field, final Object newValue) throws Exception {
 		field.setAccessible(true);
 
 		// remove final modifier from field
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		final Field modifiersField = Field.class.getDeclaredField("modifiers");
 		modifiersField.setAccessible(true);
 		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
@@ -125,7 +125,7 @@ public class ForagingTest {
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
 		// Arrange:
-		final Transaction tx = dummyTransaction(RECIPIENT1, 12345);
+		final Transaction tx = this.dummyTransaction(RECIPIENT1, 12345);
 		final Foraging foraging = createMockForaging();
 		tx.sign();
 
@@ -139,7 +139,7 @@ public class ForagingTest {
 	@Test
 	public void processTransactionsDoesNotSaveDuplicates() throws InterruptedException {
 		// Arrange:
-		final Transaction tx = dummyTransaction(RECIPIENT1, 12345);
+		final Transaction tx = this.dummyTransaction(RECIPIENT1, 12345);
 		final Foraging foraging = createMockForaging();
 		tx.sign();
 
@@ -186,7 +186,7 @@ public class ForagingTest {
 		final Foraging foraging = createMockForaging();
 
 		// Act:
-		Transaction transaction = dummyTransaction(recipient, 123);
+		final Transaction transaction = this.dummyTransaction(recipient, 123);
 		transaction.sign();
 		final ValidationResult result = foraging.processTransaction(transaction);
 
@@ -204,7 +204,7 @@ public class ForagingTest {
 		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		final TransferTransaction transaction = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
 
 		final ValidationResult result1 = foraging.processTransaction(transaction);
 		final ValidationResult result2 = foraging.processTransaction(transaction);
@@ -224,13 +224,13 @@ public class ForagingTest {
 		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		TransferTransaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now);
-		TransferTransaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(20));
+		final TransferTransaction transaction1 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now);
+		final TransferTransaction transaction2 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(20));
 
 		final ValidationResult result1 = foraging.processTransaction(transaction1);
 		final ValidationResult result2 = foraging.processTransaction(transaction2);
 
-		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(10));
+		final List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(10));
 
 		// Assert
 		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
@@ -249,8 +249,8 @@ public class ForagingTest {
 		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
-		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(10), now.addSeconds(2));
+		final Transaction transaction1 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		final Transaction transaction2 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(10), now.addSeconds(2));
 
 		final Hash transactionHash1 = HashUtils.calculateHash(transaction1);
 		final Hash transactionHash2 = HashUtils.calculateHash(transaction2);
@@ -258,7 +258,7 @@ public class ForagingTest {
 		final ValidationResult result1 = foraging.processTransaction(transaction1);
 		final ValidationResult result2 = foraging.processTransaction(transaction2);
 
-		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+		final List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
 
 		// Assert
 		// this indicates wrong amounts or fees
@@ -281,13 +281,13 @@ public class ForagingTest {
 		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
-		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
+		final Transaction transaction1 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		final Transaction transaction2 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
 
 		final ValidationResult result1 = foraging.processTransaction(transaction1);
 		final ValidationResult result2 = foraging.processTransaction(transaction2);
 
-		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+		final List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
 
 		// Assert
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -308,15 +308,15 @@ public class ForagingTest {
 		final TimeInstant now = (new SystemTimeProvider()).getCurrentTime();
 
 		// Act:
-		Transaction transaction1 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
-		Transaction transaction2 = createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
-		Transaction transaction3 = createSignedTransactionWithTime(harvester, recipient, Amount.fromNem(5), now.addSeconds(5));
+		final Transaction transaction1 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(2));
+		final Transaction transaction2 = this.createSignedTransactionWithTime(signer, recipient, Amount.fromNem(5), now.addSeconds(-2));
+		final Transaction transaction3 = this.createSignedTransactionWithTime(harvester, recipient, Amount.fromNem(5), now.addSeconds(5));
 		final ValidationResult result1 = foraging.processTransaction(transaction1);
 		final ValidationResult result2 = foraging.processTransaction(transaction2);
 		final ValidationResult result3 = foraging.processTransaction(transaction3);
-		List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
-		List<Transaction> filteredTransactionsList = foraging.filterTransactionsForHarvester(transactionsList, harvester);
-		List<Transaction> filteredTransactionsList2 = foraging.filterTransactionsForHarvester(transactionsList, Utils.generateRandomAccount());
+		final List<Transaction> transactionsList = foraging.getUnconfirmedTransactionsForNewBlock(now.addSeconds(20));
+		final List<Transaction> filteredTransactionsList = foraging.filterTransactionsForHarvester(transactionsList, harvester);
+		final List<Transaction> filteredTransactionsList2 = foraging.filterTransactionsForHarvester(transactionsList, Utils.generateRandomAccount());
 
 		// Assert
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -327,8 +327,8 @@ public class ForagingTest {
 		Assert.assertThat(filteredTransactionsList2.size(), IsEqual.equalTo(3));
 	}
 
-	private TransferTransaction createSignedTransactionWithTime(Account signer, Account recipient, Amount fee, TimeInstant now) {
-		TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
+	private TransferTransaction createSignedTransactionWithTime(final Account signer, final Account recipient, final Amount fee, final TimeInstant now) {
+		final TransferTransaction transaction1 = new TransferTransaction(now, signer, recipient, Amount.fromNem(123), null);
 		transaction1.setDeadline(now.addHours(1));
 		transaction1.setFee(fee);
 		transaction1.sign();
@@ -370,10 +370,10 @@ public class ForagingTest {
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(accountWithoutSecret));
 	}
 
-	private Transaction dummyTransaction(org.nem.core.model.Account recipient, long amount) {
-		Transaction transaction = new TransferTransaction(
+	private Transaction dummyTransaction(final org.nem.core.model.Account recipient, final long amount) {
+		final Transaction transaction = new TransferTransaction(
 				(new SystemTimeProvider()).getCurrentTime(),
-				createAccountWithBalance(amount*3),
+				createAccountWithBalance(amount * 3),
 				recipient,
 				new Amount(amount),
 				null);
@@ -381,7 +381,7 @@ public class ForagingTest {
 		return transaction;
 	}
 
-	private static Account createAccountWithBalance(long balance) {
+	private static Account createAccountWithBalance(final long balance) {
 		final Account account = Utils.generateRandomAccount();
 		account.incrementBalance(Amount.fromNem(balance));
 		return account;

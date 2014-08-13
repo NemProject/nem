@@ -131,9 +131,9 @@ public class EigenTrustTest {
 
 	private static class MockScoreProvider implements ScoreProvider {
 		@Override
-		public double calculateTrustScore(NodeExperience experience) {
-			long numSuccessfulCalls = experience.successfulCalls().get();
-			long numFailedCalls = experience.failedCalls().get();
+		public double calculateTrustScore(final NodeExperience experience) {
+			final long numSuccessfulCalls = experience.successfulCalls().get();
+			final long numFailedCalls = experience.failedCalls().get();
 			return (numFailedCalls * numSuccessfulCalls) * (numSuccessfulCalls + numFailedCalls);
 		}
 

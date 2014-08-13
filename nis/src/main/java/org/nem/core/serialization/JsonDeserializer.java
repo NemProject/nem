@@ -1,7 +1,7 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.*;
 import java.util.*;
@@ -18,7 +18,7 @@ public class JsonDeserializer extends Deserializer {
 	/**
 	 * Creates a new json deserializer.
 	 *
-	 * @param object  The json object from which to read.
+	 * @param object The json object from which to read.
 	 * @param context The deserialization context.
 	 */
 	public JsonDeserializer(final JSONObject object, final DeserializationContext context) {
@@ -44,11 +44,13 @@ public class JsonDeserializer extends Deserializer {
 		// additionally, readInt above, would have to be changed to:
 		// ((Long)this.object.get(label)).intValue();
 		final Object object = this.object.get(label);
-		if (null == object)
+		if (null == object) {
 			return null;
+		}
 
-		if (object instanceof Integer)
+		if (object instanceof Integer) {
 			return ((Integer)object).longValue();
+		}
 
 		return (Long)object;
 	}
@@ -58,11 +60,13 @@ public class JsonDeserializer extends Deserializer {
 		this.checkLabel(label);
 
 		final Object object = this.object.get(label);
-		if (null == object)
+		if (null == object) {
 			return null;
+		}
 
-		if (object instanceof BigDecimal)
+		if (object instanceof BigDecimal) {
 			return ((BigDecimal)object).doubleValue();
+		}
 
 		return (Double)object;
 	}
@@ -76,8 +80,9 @@ public class JsonDeserializer extends Deserializer {
 	@Override
 	public byte[] readOptionalBytes(final String label) {
 		final String s = this.readOptionalString(label);
-		if (null == s)
+		if (null == s) {
 			return null;
+		}
 
 		return s.isEmpty() ? new byte[] { } : HexEncoder.getBytes(s);
 	}
@@ -92,8 +97,9 @@ public class JsonDeserializer extends Deserializer {
 	public <T> T readOptionalObject(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
 		final JSONObject childObject = (JSONObject)this.object.get(label);
-		if (null == childObject)
+		if (null == childObject) {
 			return null;
+		}
 
 		return this.deserializeObject(childObject, activator);
 	}
@@ -103,28 +109,32 @@ public class JsonDeserializer extends Deserializer {
 		this.checkLabel(label);
 		final JSONArray jsonArray = (JSONArray)this.object.get(label);
 
-		if (null == jsonArray)
+		if (null == jsonArray) {
 			return null;
+		}
 
 		final List<T> objects = new ArrayList<>();
-		for (Object jsonObject : jsonArray)
+		for (final Object jsonObject : jsonArray) {
 			objects.add(this.deserializeObject((JSONObject)jsonObject, activator));
+		}
 
 		return objects;
 	}
 
 	public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
 		final JsonDeserializer deserializer = new JsonDeserializer(object, this.getContext());
-		return 0 == object.size() ? null : activator.deserialize(deserializer);
+		return object.isEmpty() ? null : activator.deserialize(deserializer);
 	}
 
 	private void checkLabel(final String label) {
-		if (null == this.propertyOrderArray)
+		if (null == this.propertyOrderArray) {
 			return;
+		}
 
 		final String expectedLabel = (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
-		if (label.equals(expectedLabel))
+		if (label.equals(expectedLabel)) {
 			return;
+		}
 
 		final String message = String.format(
 				"expected property '%s' but request was for property '%s'",

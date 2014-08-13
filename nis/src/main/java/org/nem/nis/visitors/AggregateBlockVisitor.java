@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class AggregateBlockVisitor implements BlockVisitor {
 
-	private List<BlockVisitor> visitors;
+	private final List<BlockVisitor> visitors;
 
 	/**
 	 * Creates a new aggregate block visitor.
@@ -22,7 +22,7 @@ public class AggregateBlockVisitor implements BlockVisitor {
 
 	@Override
 	public void visit(final Block parentBlock, final Block block) {
-		for (final BlockVisitor visitor : visitors) {
+		for (final BlockVisitor visitor : this.visitors) {
 			visitor.visit(parentBlock, block);
 		}
 	}

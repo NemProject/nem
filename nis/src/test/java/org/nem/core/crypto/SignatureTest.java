@@ -15,11 +15,11 @@ public class SignatureTest {
 	@Test
 	public void bigIntegerCtorInitializesFields() {
 		// Arrange:
-		BigInteger r = new BigInteger("99512345");
-		BigInteger s = new BigInteger("12351234");
+		final BigInteger r = new BigInteger("99512345");
+		final BigInteger s = new BigInteger("12351234");
 
 		// Act:
-		Signature signature = new Signature(r, s);
+		final Signature signature = new Signature(r, s);
 
 		// Assert:
 		Assert.assertThat(signature.getR(), IsEqual.equalTo(r));
@@ -32,7 +32,7 @@ public class SignatureTest {
 		final Signature originalSignature = createSignature("99512345", "12351234");
 
 		// Act:
-		Signature signature = new Signature(originalSignature.getBytes());
+		final Signature signature = new Signature(originalSignature.getBytes());
 
 		// Assert:
 		Assert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
@@ -54,7 +54,7 @@ public class SignatureTest {
 	@Test
 	public void byteArrayCtorSucceedsIfByteArrayIsCorrectLength() {
 		// Act:
-		Signature signature = new Signature(new byte[64]);
+		final Signature signature = new Signature(new byte[64]);
 
 		// Assert:
 		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
@@ -68,7 +68,7 @@ public class SignatureTest {
 	@Test
 	public void isCanonicalReturnsTrueForCanonicalSignature() {
 		// Arrange:
-		Signature signature = createCanonicalSignature();
+		final Signature signature = createCanonicalSignature();
 
 		// Assert:
 		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(true));
@@ -77,7 +77,7 @@ public class SignatureTest {
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		Signature signature = makeNonCanonical(createCanonicalSignature());
+		final Signature signature = makeNonCanonical(createCanonicalSignature());
 
 		// Assert:
 		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(false));
@@ -86,8 +86,8 @@ public class SignatureTest {
 	@Test
 	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
 		// Arrange:
-		Signature signature = createCanonicalSignature();
-		Signature nonCanonicalSignature = makeNonCanonical(signature);
+		final Signature signature = createCanonicalSignature();
+		final Signature nonCanonicalSignature = makeNonCanonical(signature);
 
 		Assert.assertThat(nonCanonicalSignature.isCanonical(), IsEqual.equalTo(false));
 
@@ -107,15 +107,17 @@ public class SignatureTest {
 	@Test
 	public void getBytesReturns64Bytes() {
 		// Assert:
-		for (final Signature signature : createRoundtripTestSignatures())
+		for (final Signature signature : this.createRoundtripTestSignatures()) {
 			Assert.assertThat(signature.getBytes().length, IsEqual.equalTo(64));
+		}
 	}
 
 	@Test
 	public void canRoundtripBinarySignature() {
 		// Assert:
-		for (final Signature signature : createRoundtripTestSignatures())
+		for (final Signature signature : this.createRoundtripTestSignatures()) {
 			Assert.assertThat(new Signature(signature.getBytes()), IsEqual.equalTo(signature));
+		}
 	}
 
 	private Signature[] createRoundtripTestSignatures() {
@@ -133,7 +135,7 @@ public class SignatureTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		Signature signature = createSignature(1235, 7789);
+		final Signature signature = createSignature(1235, 7789);
 
 		// Assert:
 		Assert.assertThat(createSignature(1235, 7789), IsEqual.equalTo(signature));
@@ -146,8 +148,8 @@ public class SignatureTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		Signature signature = createSignature(1235, 7789);
-		int hashCode = signature.hashCode();
+		final Signature signature = createSignature(1235, 7789);
+		final int hashCode = signature.hashCode();
 
 		// Assert:
 		Assert.assertThat(createSignature(1235, 7789).hashCode(), IsEqual.equalTo(hashCode));
@@ -202,7 +204,7 @@ public class SignatureTest {
 		// Assert:
 		final String expectedSignature =
 				"0c00000000000000000000000000000000000000000000000000000000000000" +
-				"0102000000000000000000000000000000000000000000000000000000000000";
+						"0102000000000000000000000000000000000000000000000000000000000000";
 		Assert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
 	}
 
@@ -218,17 +220,17 @@ public class SignatureTest {
 
 	private static Signature createCanonicalSignature() {
 		// Arrange:
-		KeyPair kp = new KeyPair();
-		Signer signer = new Signer(kp);
-		byte[] input = Utils.generateRandomBytes();
+		final KeyPair kp = new KeyPair();
+		final Signer signer = new Signer(kp);
+		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
 		return signer.sign(input);
 	}
 
-	private static Signature makeNonCanonical(Signature signature) {
+	private static Signature makeNonCanonical(final Signature signature) {
 		// Act:
-		BigInteger nonCanonicalS = Curves.secp256k1().getParams().getN().subtract(signature.getS());
+		final BigInteger nonCanonicalS = Curves.secp256k1().getParams().getN().subtract(signature.getS());
 		return new Signature(signature.getR(), nonCanonicalS);
 	}
 }

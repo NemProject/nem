@@ -73,8 +73,8 @@ public class PowerIteratorTest {
 		 *
 		 * @param startVector The start vector.
 		 * @param matrix The matrix.
-		 *               This matrix must be a multiple of a left stochastic matrix.
-		 *               (i.e. all the matrix columns must sum to the same value).
+		 * This matrix must be a multiple of a left stochastic matrix.
+		 * (i.e. all the matrix columns must sum to the same value).
 		 * @param maxIterations The maximum number of iterations.
 		 * @param epsilon The convergence epsilon value.
 		 */

@@ -21,7 +21,7 @@ public interface ReadOnlyTransferDao {
 
 	/**
 	 * Returns number of transfers in the database.
-	 *
+	 * <p>
 	 * Note: this  will return number of transactions of Transfer type only.
 	 *
 	 * @return number of transfers in the database.
@@ -32,7 +32,6 @@ public interface ReadOnlyTransferDao {
 	 * Retrieves Transfer from db given it's hash.
 	 *
 	 * @param txHash hash of a transfer to retrieve.
-	 *
 	 * @return Transfer having given hash or null.
 	 */
 	public Transfer findByHash(byte[] txHash);
@@ -47,7 +46,7 @@ public interface ReadOnlyTransferDao {
 	 * Each Object array will contain two elements:
 	 * { [0] - Transfer (Transfer), [1] Block Height (long) }
 	 */
-	public Collection<Object[]> getTransactionsForAccount(final Account account, final  Integer timestamp, final int limit);
+	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, final int limit);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.

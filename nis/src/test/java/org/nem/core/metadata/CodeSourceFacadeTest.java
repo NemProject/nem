@@ -56,6 +56,5 @@ public class CodeSourceFacadeTest {
 		// Assert:
 		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
 		Assert.assertThat(facade.getFirstCertificate(), IsSame.sameInstance(c1));
-
 	}
 }

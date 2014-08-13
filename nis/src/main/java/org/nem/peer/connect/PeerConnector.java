@@ -14,7 +14,6 @@ public interface PeerConnector {
 	 * Gets information about the specified node.
 	 *
 	 * @param node The remote node.
-	 *
 	 * @return Information about the specified node.
 	 */
 	public CompletableFuture<Node> getInfo(final Node node);
@@ -23,7 +22,6 @@ public interface PeerConnector {
 	 * Requests information about all known active peers from the specified node.
 	 *
 	 * @param node The remote node.
-	 *
 	 * @return A collection of all known active peers.
 	 */
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node);
@@ -35,7 +33,6 @@ public interface PeerConnector {
 	 *
 	 * @param node The remote node.
 	 * @param localEndpoint The local endpoint (what the local node knows about itself).
-	 *
 	 * @return Information about the requesting node.
 	 */
 	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(
@@ -47,7 +44,7 @@ public interface PeerConnector {
 	 *
 	 * @param node The remote node.
 	 * @param announceId The type of announcement.
-	 * @param entity     The entity to announce.
+	 * @param entity The entity to announce.
 	 */
 	public CompletableFuture announce(
 			final Node node,

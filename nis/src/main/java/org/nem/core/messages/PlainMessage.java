@@ -60,8 +60,9 @@ public class PlainMessage extends Message {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof PlainMessage))
+		if (!(obj instanceof PlainMessage)) {
 			return false;
+		}
 
 		final PlainMessage rhs = (PlainMessage)obj;
 		return Arrays.equals(this.payload, rhs.payload);

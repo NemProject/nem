@@ -1,10 +1,10 @@
 package org.nem.core.metadata;
 
-import java.security.cert.X509Certificate;
-import java.util.Objects;
-
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
+
+import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 /**
  * Meta data information about the application.
@@ -125,6 +125,6 @@ public class ApplicationMetaData implements SerializableEntity {
 		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
 		return this.appName.equals(rhs.appName) &&
 				this.version.equals(rhs.version) &&
-                Objects.equals(this.certificateSigner, rhs.certificateSigner);
+				Objects.equals(this.certificateSigner, rhs.certificateSigner);
 	}
 }

@@ -100,7 +100,7 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
 
 		// Act:
-		boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 3.2, 5.4 });
+		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 3.2, 5.4 });
 
 		// Assert:
 		Assert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -113,7 +113,7 @@ public class ColumnVectorTest {
 
 		// Act:
 		vector.setAt(1, 7.1);
-		boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 7.1, 5.4 });
+		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 7.1, 5.4 });
 
 		// Assert:
 		Assert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -189,7 +189,7 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(0, -6, 14);
 
 		// Act:
-		boolean result = vector.align();
+		final boolean result = vector.align();
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
@@ -202,7 +202,7 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(-4, -6, 14);
 
 		// Act:
-		boolean result = vector.align();
+		final boolean result = vector.align();
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -468,7 +468,7 @@ public class ColumnVectorTest {
 		Assert.assertThat(new ColumnVector(-3, 2, -5, 7, -1, 8).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(-3, 2, -5, 0, -1, 8).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(0, 0, -1, 1, 0, 0).isZeroVector(), IsEqual.equalTo(false));
-		Assert.assertThat(new ColumnVector(0, 0, -1, 0, 0, 0 ).isZeroVector(), IsEqual.equalTo(false));
+		Assert.assertThat(new ColumnVector(0, 0, -1, 0, 0, 0).isZeroVector(), IsEqual.equalTo(false));
 		Assert.assertThat(new ColumnVector(0, 0, 0, 0, 0, 0).isZeroVector(), IsEqual.equalTo(true));
 	}
 
@@ -510,7 +510,7 @@ public class ColumnVectorTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final ColumnVector vector = new ColumnVector(2, -4, 1);
-		int hashCode = vector.hashCode();
+		final int hashCode = vector.hashCode();
 
 		// Assert:
 		Assert.assertThat(new ColumnVector(2, -4, 1).hashCode(), IsEqual.equalTo(hashCode));

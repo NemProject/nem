@@ -66,12 +66,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private static JSONObject loadJsonObject(final String configFileName) {
 		try {
 			try (final InputStream fin = NisPeerNetworkHost.class.getClassLoader().getResourceAsStream(configFileName)) {
-				if (null == fin)
+				if (null == fin) {
 					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
+				}
 
 				return (JSONObject)JSONValue.parse(fin);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new FatalConfigException("Exception encountered while loading config", e);
 		}
 	}
@@ -82,8 +83,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return The hosted network.
 	 */
 	public PeerNetwork getNetwork() {
-		if (null == this.network)
+		if (null == this.network) {
 			throw new IllegalStateException("network has not been booted yet");
+		}
 
 		return this.network;
 	}

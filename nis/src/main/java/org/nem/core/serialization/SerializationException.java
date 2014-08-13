@@ -27,7 +27,7 @@ public class SerializationException extends RuntimeException {
 	 * Creates a new serialization exception.
 	 *
 	 * @param message The exception message.
-	 * @param cause   The original exception.
+	 * @param cause The original exception.
 	 */
 	public SerializationException(final String message, final Throwable cause) {
 		super(message, cause);
