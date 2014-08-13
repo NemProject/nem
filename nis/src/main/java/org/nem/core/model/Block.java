@@ -99,8 +99,8 @@ public class Block extends VerifiableEntity {
 	 */
 	public Amount getTotalFee() {
 		final long rawTotalFee = this.transactions.stream()
-                .map(tx -> tx.getFee().getNumMicroNem())
-                .reduce(0L, Long::sum);
+				.map(tx -> tx.getFee().getNumMicroNem())
+				.reduce(0L, Long::sum);
 		return Amount.fromMicroNem(rawTotalFee);
 	}
 
@@ -136,7 +136,9 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @return Generation hash of this block.
 	 */
-	public Hash getGenerationHash() { return this.generationHash; }
+	public Hash getGenerationHash() {
+		return this.generationHash;
+	}
 
 	//endregion
 

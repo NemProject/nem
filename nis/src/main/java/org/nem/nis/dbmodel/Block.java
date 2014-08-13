@@ -8,9 +8,9 @@ import java.util.List;
 
 /**
  * Db Block entity.
- *
+ * <p>
  * Holds all the important information related to block data.
- *
+ * <p>
  * Associated forger and transactions are obtained automatically (by BlockDao)
  * thanks to @Cascade annotations.
  */

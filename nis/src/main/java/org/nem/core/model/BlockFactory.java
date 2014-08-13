@@ -4,7 +4,7 @@ import org.nem.core.serialization.*;
 
 /**
  * similar to transaction factory, but for the blocks
- *F
+ * <p>
  * I doubt there is need for this now or in future, but let's have similar API
  * for both transactions and blocks
  */

@@ -62,7 +62,7 @@ public class Config {
 
 	/**
 	 * Loads configuration from a file.
-	 *
+	 * <p>
 	 * The file contains one node description per line.
 	 * Each description contains multiple node attributes that are semicolon delimited.
 	 * address:                     the ip of the node
