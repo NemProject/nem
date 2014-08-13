@@ -27,7 +27,7 @@ public class TransferControllerTest {
 		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
@@ -53,7 +53,7 @@ public class TransferControllerTest {
 		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
@@ -79,7 +79,7 @@ public class TransferControllerTest {
 		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", -13L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
@@ -105,7 +105,7 @@ public class TransferControllerTest {
 		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", 66);
@@ -131,7 +131,7 @@ public class TransferControllerTest {
 		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
@@ -157,7 +157,7 @@ public class TransferControllerTest {
 		obj.put("signer", "4202a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
@@ -189,7 +189,7 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 		final JSONObject obj = createValidTransaction();
-		obj.put("timestamp", 100);
+		obj.put("timeStamp", 100);
 
 		// Act:
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
@@ -207,7 +207,7 @@ public class TransferControllerTest {
 		obj.put("signer", "0350f94f8c3a04a4f47356ba749b74418a55511d88a56d180998130d8c26b28bfd");
 		obj.put("amount", 42L);
 		obj.put("fee", 1L);
-		obj.put("timestamp", 0);
+		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);

@@ -125,19 +125,19 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, final int limit) {
-		final List<Integer> rawTimestamps = this.prepareCriteriaGetFor("timestamp", height, limit);
-		return rawTimestamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
+		final List<Integer> rawTimeStamps = this.prepareCriteriaGetFor("timeStamp", height, limit);
+		return rawTimeStamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, final int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Integer timeStamp, final int limit) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
-				.add(Restrictions.le("timestamp", timestamp))
-				.addOrder(Order.desc("timestamp"))
+				.add(Restrictions.le("timeStamp", timeStamp))
+				.addOrder(Order.desc("timeStamp"))
 						// here we were lucky cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria

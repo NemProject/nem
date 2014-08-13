@@ -22,17 +22,17 @@ public class BlockDifficultyScorer {
 	 * Calculates the difficulty based the last n blocks.
 	 *
 	 * @param difficulties historical difficulties.
-	 * @param timestamps historical timestamps.
+	 * @param timeStamps historical timestamps.
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timestamps) {
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
 
-		final TimeInstant newestTimestamp = timestamps.get(timestamps.size() - 1);
-		final TimeInstant oldestTimestamp = timestamps.get(0);
-		final long timeDiff = newestTimestamp.subtract(oldestTimestamp);
+		final TimeInstant newestTimeStamp = timeStamps.get(timeStamps.size() - 1);
+		final TimeInstant oldestTimeStamp = timeStamps.get(0);
+		final long timeDiff = newestTimeStamp.subtract(oldestTimeStamp);
 		final long heightDiff = difficulties.size();
 		long averageDifficulty = 0;
 		for (final BlockDifficulty diff : difficulties) {

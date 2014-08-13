@@ -169,7 +169,7 @@ public class TransferMapperTest {
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
 			Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(Amount.fromNem(11L).getNumMicroNem()));
-			Assert.assertThat(dbModel.getTimestamp(), IsEqual.equalTo(721));
+			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 			Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));

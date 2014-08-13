@@ -15,7 +15,7 @@ public class AccountPageTest {
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getTimestamp(), IsNull.nullValue());
+		Assert.assertThat(page.getTimeStamp(), IsNull.nullValue());
 	}
 
 	@Test
@@ -26,7 +26,7 @@ public class AccountPageTest {
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getTimestamp(), IsEqual.equalTo("2452"));
+		Assert.assertThat(page.getTimeStamp(), IsEqual.equalTo("2452"));
 	}
 
 	@Test

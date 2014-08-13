@@ -29,7 +29,7 @@ public class MockTransferDaoImpl implements TransferDao {
 	}
 
 	@Override
-	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, final int limit) {
+	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timeStamp, final int limit) {
 		return null;
 	}
 

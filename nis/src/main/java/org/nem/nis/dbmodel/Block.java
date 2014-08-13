@@ -26,7 +26,7 @@ public class Block {
 	private byte[] prevBlockHash;
 	private byte[] blockHash;
 	private byte[] generationHash;
-	private Integer timestamp;
+	private Integer timeStamp;
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
@@ -55,7 +55,7 @@ public class Block {
 			final Integer version,
 			final Hash generationHash,
 			final Hash prevBlockHash,
-			final Integer timestamp,
+			final Integer timeStamp,
 			final Account forger,
 			final byte[] forgerProof,
 			final Long height,
@@ -68,7 +68,7 @@ public class Block {
 		this.generationHash = generationHash.getRaw();
 		this.prevBlockHash = prevBlockHash.getRaw();
 		this.blockHash = hash.getRaw();
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.forger = forger;
 		this.forgerProof = forgerProof;
 		this.height = height;
@@ -125,12 +125,12 @@ public class Block {
 		this.generationHash = generationHash;
 	}
 
-	public Integer getTimestamp() {
-		return this.timestamp;
+	public Integer getTimeStamp() {
+		return timeStamp;
 	}
 
-	public void setTimestamp(final Integer timestamp) {
-		this.timestamp = timestamp;
+	public void setTimeStamp(final Integer timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 	public Account getForger() {

@@ -12,14 +12,14 @@ import java.util.*;
 public class ExplorerBlockView implements SerializableEntity {
 	private final Long height;
 	private final Address foragerAddress;
-	private final long timestamp;
+	private final long timeStamp;
 	private final Hash blockHash;
 	private final List<ExplorerTransferView> transactions;
 
-	public ExplorerBlockView(final Long height, final Address foragerAddress, final long timestamp, final Hash blockHash, final int txCount) {
+	public ExplorerBlockView(final Long height, final Address foragerAddress, final long timeStamp, final Hash blockHash, final int txCount) {
 		this.height = height;
 		this.foragerAddress = foragerAddress;
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.blockHash = blockHash;
 		this.transactions = new ArrayList<>(txCount);
 	}
@@ -29,7 +29,7 @@ public class ExplorerBlockView implements SerializableEntity {
 		serializer.writeLong("height", this.height);
 		Address.writeTo(serializer, "harvester", this.foragerAddress);
 		serializer.writeBytes("harvesterPk", this.foragerAddress.getPublicKey().getRaw());
-		serializer.writeLong("timestamp", this.timestamp);
+		serializer.writeLong("timeStamp", this.timeStamp);
 		serializer.writeBytes("hash", this.blockHash.getRaw());
 		serializer.writeObjectArray("txes", this.transactions);
 	}

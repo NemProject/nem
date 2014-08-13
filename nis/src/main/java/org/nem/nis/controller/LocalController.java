@@ -68,11 +68,11 @@ public class LocalController {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			final long timestamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimestamp())).getMillis();
+			final long timeStamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimeStamp())).getMillis();
 			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
 					dbBlock.getHeight(),
 					Address.fromPublicKey(dbBlock.getForger().getPublicKey()),
-					timestamp,
+					timeStamp,
 					dbBlock.getBlockHash(),
 					dbBlock.getBlockTransfers().size()
 			);
@@ -80,7 +80,7 @@ public class LocalController {
 					.map(tx -> new ExplorerTransferView(
 							tx.getType(),
 							Amount.fromMicroNem(tx.getFee()),
-							tx.getTimestamp(),
+							tx.getTimeStamp(),
 							Address.fromPublicKey(tx.getSender().getPublicKey()),
 							tx.getSenderProof(),
 							tx.getTransferHash(),

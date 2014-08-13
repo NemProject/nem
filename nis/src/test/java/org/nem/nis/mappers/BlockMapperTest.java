@@ -212,7 +212,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
-			Assert.assertThat(dbModel.getTimestamp(), IsEqual.equalTo(721));
+			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForager));
 			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));

@@ -62,13 +62,13 @@ public class TransferDaoImpl implements TransferDao {
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Object[]> getTransactionsForAccount(final Account address, final Integer timestamp, final int limit) {
+	public Collection<Object[]> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
 				.createQuery("select t, t.block.height from Transfer t " +
-						"where t.timestamp <= :timestamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
-						"order by t.timestamp desc")
-				.setParameter("timestamp", timestamp)
+					"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
+					"order by t.timeStamp desc")
+			.setParameter("timeStamp", timeStamp)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
 		return listAndCast(query);
@@ -102,7 +102,7 @@ public class TransferDaoImpl implements TransferDao {
 						"WHERE " +
 						addressString +
 						" AND t.transferHash = :hash" +
-						" ORDER BY t.timestamp desc")
+					" ORDER BY t.timeStamp desc")
 				.setParameter("hash", hash.getRaw())
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
@@ -119,7 +119,7 @@ public class TransferDaoImpl implements TransferDao {
 		final Transfer topMostTranser = (Transfer)tx[0];
 
 		final long blockHeight = (long)tx[1];
-		final int timestamp = topMostTranser.getTimestamp();
+		final int timeStamp = topMostTranser.getTimeStamp();
 		final int indexInsideBlock = topMostTranser.getBlkIndex();
 
 		query = this.getCurrentSession()
@@ -127,11 +127,11 @@ public class TransferDaoImpl implements TransferDao {
 						"WHERE " +
 						addressString +
 						" AND ((t.block.height < :height)" +
-						" OR (t.block.height = :height AND t.timestamp < :timestamp)" +
-						" OR (t.block.height = :height AND t.timestamp = :timestamp AND t.blkIndex > :blockIndex))" +
-						" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC")
+						" OR (t.block.height = :height AND t.timeStamp < :timeStamp)" +
+						" OR (t.block.height = :height AND t.timeStamp = :timeStamp AND t.blkIndex > :blockIndex))" +
+						" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC")
 				.setParameter("height", blockHeight)
-				.setParameter("timestamp", timestamp)
+				.setParameter("timeStamp", timeStamp)
 				.setParameter("blockIndex", indexInsideBlock)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
@@ -143,7 +143,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						addressString +
-						" ORDER BY t.block.height DESC, t.timestamp DESC, t.blkIndex ASC, t.transferHash ASC")
+					" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC, t.transferHash ASC")
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
 

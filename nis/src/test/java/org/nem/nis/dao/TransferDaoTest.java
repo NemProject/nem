@@ -207,7 +207,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		final Collection<Integer> incomingTimeStamps1 = incomingEntities1.stream()
-				.map(obj -> obj.getTimestamp())
+				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
 		final List<Transfer> incomingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
@@ -218,7 +218,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		final Collection<Integer> incomingTimeStamps2 = incomingEntities2.stream()
-				.map(obj -> obj.getTimestamp())
+				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
 		final List<Transfer> incomingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
@@ -255,7 +255,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		final Collection<Integer> outgoingTimeStamps1 = outgoingEntities1.stream()
-				.map(obj -> obj.getTimestamp())
+				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
 		final List<Transfer> outgoingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
@@ -266,7 +266,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		final Collection<Integer> outgoingTimeStamps2 = outgoingEntities2.stream()
-				.map(obj -> obj.getTimestamp())
+				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
 		final List<Transfer> outgoingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
@@ -303,14 +303,14 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		final Collection<Integer> allTimeStamps1 = allEntities1.stream()
-				.map(obj -> obj.getTimestamp())
+				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
 		final List<Integer> allTimeStamps2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
 				allEntities1.get(24).getTransferHash(),
 				ReadOnlyTransferDao.TransferType.ALL,
 				25).stream()
-				.map(obj -> ((Transfer)obj[0]).getTimestamp())
+				.map(obj -> ((Transfer)obj[0]).getTimeStamp())
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -364,7 +364,7 @@ public class TransferDaoTest {
 		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
 
 		final List<Long> resultHeights = entities1.stream().map(obj -> (Long)obj[1]).collect(Collectors.toList());
-		final List<Integer> resultTimestamps = entities1.stream().map(obj -> ((Transfer)obj[0]).getTimestamp()).collect(Collectors.toList());
+		final List<Integer> resultTimestamps = entities1.stream().map(obj -> ((Transfer)obj[0]).getTimeStamp()).collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(9));
@@ -437,7 +437,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities2.size(), equalTo(0));
 		int lastTimestamp = 100 + 29;
 		for (final Object[] entity : entities1) {
-			Assert.assertThat(((Transfer)entity[0]).getTimestamp(), equalTo(lastTimestamp));
+			Assert.assertThat(((Transfer)entity[0]).getTimeStamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
 		}
 	}

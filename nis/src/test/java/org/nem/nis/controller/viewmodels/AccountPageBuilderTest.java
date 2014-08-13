@@ -15,11 +15,11 @@ public class AccountPageBuilderTest {
 
 		// Act:
 		builder.setAddress(address.getEncoded());
-		builder.setTimestamp("12345");
+		builder.setTimeStamp("12345");
 		final AccountPage page = builder.build();
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getTimestamp(), IsEqual.equalTo("12345"));
+		Assert.assertThat(page.getTimeStamp(), IsEqual.equalTo("12345"));
 	}
 }

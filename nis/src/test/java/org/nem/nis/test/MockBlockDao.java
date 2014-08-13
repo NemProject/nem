@@ -146,7 +146,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, final int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Integer timeStamp, final int limit) {
 		return null;
 	}
 
@@ -164,10 +164,10 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, final int limit) {
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
-				.map(bl -> new TimeInstant(bl.getTimestamp()))
+				.map(bl -> new TimeInstant(bl.getTimeStamp()))
 				.collect(Collectors.toList());
 	}
 

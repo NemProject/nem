@@ -187,7 +187,7 @@ public class BlockDaoTest {
 
 		int lastTimestamp = 123 + 29;
 		for (final Block entity : entities1) {
-			Assert.assertThat(entity.getTimestamp(), equalTo(lastTimestamp));
+			Assert.assertThat(entity.getTimeStamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
 		}
 	}
@@ -377,7 +377,7 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void getTimestampsFromReturnsProperTimestamps() {
+	public void getTimeStampsFromReturnsProperTimestamps() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
@@ -389,13 +389,13 @@ public class BlockDaoTest {
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
-			expectedTimestamps.add(dbBlock.getTimestamp());
+			expectedTimestamps.add(dbBlock.getTimeStamp());
 
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final List<TimeInstant> entities1 = this.blockDao.getTimestampsFrom(new BlockHeight(456), 25);
-		final List<TimeInstant> entities2 = this.blockDao.getTimestampsFrom(new BlockHeight(456 + 20), 25);
+		final List<TimeInstant> entities1 = this.blockDao.getTimeStampsFrom(new BlockHeight(456), 25);
+		final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -409,7 +409,7 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void getTimestampsFromReturnsTimestampsInBlockHeightOrder() {
+	public void getTimeStampsFromReturnsTimeStampsInBlockHeightOrder() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
@@ -417,18 +417,18 @@ public class BlockDaoTest {
 		// !!!
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
-		final TreeMap<Integer, Integer> expectedTimestamps = new TreeMap<>();
+		final TreeMap<Integer, Integer> expectedTimeStamps = new TreeMap<>();
 		for (int i = 0; i < 30; i++) {
 			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
-			expectedTimestamps.put((i * 23 + 3) % 30, dbBlock.getTimestamp());
+			expectedTimeStamps.put((i * 23 + 3) % 30, dbBlock.getTimeStamp());
 
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final List<TimeInstant> entities1 = this.blockDao.getTimestampsFrom(new BlockHeight(456), 25);
-		final List<TimeInstant> entities2 = this.blockDao.getTimestampsFrom(new BlockHeight(456 + 20), 25);
+		final List<TimeInstant> entities1 = this.blockDao.getTimeStampsFrom(new BlockHeight(456), 25);
+		final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -436,7 +436,7 @@ public class BlockDaoTest {
 
 		int i = 0;
 		for (final TimeInstant entity : entities1) {
-			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimestamps.get(i)));
+			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimeStamps.get(i)));
 			i = i + 1;
 		}
 	}

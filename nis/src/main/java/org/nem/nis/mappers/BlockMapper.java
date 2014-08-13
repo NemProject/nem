@@ -70,7 +70,7 @@ public class BlockMapper {
 				forager,
 				dbBlock.getPrevBlockHash(),
 				dbBlock.getGenerationHash(),
-				new TimeInstant(dbBlock.getTimestamp()),
+				new TimeInstant(dbBlock.getTimeStamp()),
 				new BlockHeight(dbBlock.getHeight()));
 
 		final Long difficulty = dbBlock.getDifficulty();

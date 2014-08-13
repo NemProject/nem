@@ -12,9 +12,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	public static TransferTransaction createTransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timestamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timestamp.addSeconds(1));
+	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
+		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
+		transferTransaction.setDeadline(timeStamp.addSeconds(1));
 		return transferTransaction;
 	}
 

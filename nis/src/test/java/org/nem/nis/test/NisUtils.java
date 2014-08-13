@@ -27,7 +27,7 @@ public class NisUtils {
 
 		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
 		block.setForgerId(account);
-		block.setTimestamp(timeStamp);
+		block.setTimeStamp(timeStamp);
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
 		block.setBlockTransfers(new ArrayList<>());
@@ -61,12 +61,12 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified timestamp.
 	 */
-	public static Block createRandomBlockWithTimeStamp(final int timestamp) {
+	public static Block createRandomBlockWithTimeStamp(final int timeStamp) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
-				new TimeInstant(timestamp),
+				new TimeInstant(timeStamp),
 				BlockHeight.ONE);
 	}
 

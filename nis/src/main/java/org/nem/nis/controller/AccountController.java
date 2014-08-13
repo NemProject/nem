@@ -91,7 +91,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
-		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimestamp());
+		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimeStamp());
 	}
 
 	// TODO-CR, with this change, who do we expect to call account/transfers?
@@ -163,7 +163,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<HarvestInfo> accountHarvests(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
-		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimestamp());
+		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimeStamp());
 	}
 
 	private Address getAddress(final String nemAddress) {

@@ -145,7 +145,7 @@ public class AccountControllerTest {
 
 		final AccountPageBuilder pageBuilder = new AccountPageBuilder();
 		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setTimestamp("12345");
+		pageBuilder.setTimeStamp("12345");
 
 		Mockito.when(accountIoAdapter.getAccountTransfers(address, "12345")).thenReturn(expectedList);
 

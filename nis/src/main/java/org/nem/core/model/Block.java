@@ -33,16 +33,16 @@ public class Block extends VerifiableEntity {
 	 * @param forger The forger.
 	 * @param prevBlockHash The hash of the previous block.
 	 * @param generationHash The generation hash.
-	 * @param timestamp The block timestamp.
+	 * @param timeStamp The block timestamp.
 	 * @param height The block height.
 	 */
 	public Block(
 			final Account forger,
 			final Hash prevBlockHash,
 			final Hash generationHash,
-			final TimeInstant timestamp,
+			final TimeInstant timeStamp,
 			final BlockHeight height) {
-		super(BlockTypes.REGULAR, BLOCK_VERSION, timestamp, forger);
+		super(BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, forger);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.generationHash = generationHash;
@@ -56,10 +56,10 @@ public class Block extends VerifiableEntity {
 	 *
 	 * @param forger The forger.
 	 * @param prevBlock The previous block.
-	 * @param timestamp The block timestamp.
+	 * @param timeStamp The block timestamp.
 	 */
-	public Block(final Account forger, final Block prevBlock, final TimeInstant timestamp) {
-		this(forger, Hash.ZERO, Hash.ZERO, timestamp, prevBlock.getHeight().next());
+	public Block(final Account forger, final Block prevBlock, final TimeInstant timeStamp) {
+		this(forger, Hash.ZERO, Hash.ZERO, timeStamp, prevBlock.getHeight().next());
 		this.setPrevious(prevBlock);
 	}
 

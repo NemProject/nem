@@ -36,30 +36,30 @@ public class AccountIoAdapter implements AccountIo {
 		return this.accountCache.findByAddress(address);
 	}
 
-	private Integer intOrMaxInt(final String timestamp) {
-		Integer intTimestamp;
-		if (timestamp == null) {
+	private Integer intOrMaxInt(String timeStamp) {
+		Integer intTimeStamp;
+		if (timeStamp == null) {
 			return Integer.MAX_VALUE;
 		}
 		try {
-			intTimestamp = Integer.valueOf(timestamp, 10);
+			intTimeStamp = Integer.valueOf(timeStamp, 10);
 		} catch (final NumberFormatException e) {
-			intTimestamp = Integer.MAX_VALUE;
+			intTimeStamp = Integer.MAX_VALUE;
 		}
-		return intTimestamp;
+		return intTimeStamp;
 	}
 
 	// TODO-CR: might make sense to add a test for at least the new code
 
 	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timestamp) {
+	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timeStamp) {
 
 		// TODO: probably it'll be better to a) ask accountDao about account
 		// TODO: b) pass obtained db-account to getTransactionsForAccount
 
 		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimestamp = this.intOrMaxInt(timestamp);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimestamp, 25);
+		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimeStamp, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
@@ -87,9 +87,9 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timestamp) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timeStamp) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimestamp = this.intOrMaxInt(timestamp);
+		final Integer intTimestamp = this.intOrMaxInt(timeStamp);
 		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, intTimestamp, 25);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
