@@ -250,7 +250,7 @@ public class CommonStarter implements ServletContextListener {
 			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
 
 			if (configuration.isWebStart()) {
-				configurationPolicy.startNISViaWebStart(configuration.getNisJnlpUrl());
+				configurationPolicy.startNisViaWebStart(configuration.getNisJnlpUrl());
 			}
 		}
 	}

@@ -44,5 +44,5 @@ public interface NemConfigurationPolicy {
 	/**
 	 * Starts the NIS server via web start.
 	 */
-	public void startNISViaWebStart(final String nisJnlpUrl);
+	public void startNisViaWebStart(final String nisJnlpUrl);
 }

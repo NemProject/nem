@@ -35,7 +35,7 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	}
 
 	@Override
-	public void startNISViaWebStart(final String nisJnlpUrl) {
+	public void startNisViaWebStart(final String nisJnlpUrl) {
 		throw new RuntimeException("startNISViaWebStart is not supposed to be called from NIS server.");
 	}
 }

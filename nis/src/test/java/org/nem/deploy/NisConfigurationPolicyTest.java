@@ -57,12 +57,12 @@ public class NisConfigurationPolicyTest {
 	}
 
 	@Test(expected = RuntimeException.class)
-	public void startNISViaWebStartRaisesException() {
+	public void startNisViaWebStartRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.startNISViaWebStart("http://bob.nem.ninja/webstart/nem-server.jnlp");
+		policy.startNisViaWebStart("http://bob.nem.ninja/webstart/nem-server.jnlp");
 	}
 
 	//endregion
