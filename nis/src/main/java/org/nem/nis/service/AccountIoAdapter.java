@@ -97,7 +97,7 @@ public class AccountIoAdapter implements AccountIo {
 		blocks.stream()
 				.map(bl -> new HarvestInfo(bl.getBlockHash(),
 						new BlockHeight(bl.getHeight()),
-						new TimeInstant(bl.getTimestamp()),
+						new TimeInstant(bl.getTimeStamp()),
 						Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
