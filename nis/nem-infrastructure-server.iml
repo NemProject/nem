@@ -69,7 +69,7 @@
     <orderEntry type="module-library">
       <library name="Maven: javax.jnlp:jnlp-api:7.0">
         <CLASSES>
-          <root url="jar://C:/Program Files/Java/jdk1.8.0_05/jre/lib/javaws.jar!/" />
+          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/jre/lib/javaws.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
