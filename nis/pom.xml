@@ -425,7 +425,7 @@
 					<jnlp>
 						<inputTemplate>nem-server.vm</inputTemplate>
 						<outputFile>nem-server.jnlp</outputFile>
-						<mainClass>org.nem.deploy.CommonStarter</mainClass>
+						<mainClass>org.nem.core.deploy.CommonStarter</mainClass>
 						<allPermissions />
 					</jnlp>
 					<libPath>serverjars</libPath>
