@@ -66,9 +66,9 @@ public class TransferDaoImpl implements TransferDao {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
 				.createQuery("select t, t.block.height from Transfer t " +
-					"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
-					"order by t.timeStamp desc")
-			.setParameter("timeStamp", timeStamp)
+						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
+						"order by t.timeStamp desc")
+				.setParameter("timeStamp", timeStamp)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
 		return listAndCast(query);
@@ -102,7 +102,7 @@ public class TransferDaoImpl implements TransferDao {
 						"WHERE " +
 						addressString +
 						" AND t.transferHash = :hash" +
-					" ORDER BY t.timeStamp desc")
+						" ORDER BY t.timeStamp desc")
 				.setParameter("hash", hash.getRaw())
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
@@ -143,7 +143,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						addressString +
-					" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC, t.transferHash ASC")
+						" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC, t.transferHash ASC")
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
 
