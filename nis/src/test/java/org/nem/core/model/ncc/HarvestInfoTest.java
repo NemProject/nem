@@ -21,7 +21,7 @@ public class HarvestInfoTest {
 		// Assert:
 		Assert.assertThat(result.getHash(), IsEqual.equalTo(Hash.fromHexString("aabbcc")));
 		Assert.assertThat(result.getBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(result.getTimestamp(), IsEqual.equalTo(new TimeInstant(654)));
+		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(654)));
 		Assert.assertThat(result.getTotalFee(), IsEqual.equalTo(Amount.fromMicroNem(45678)));
 	}
 
@@ -41,7 +41,7 @@ public class HarvestInfoTest {
 		// Assera:
 		Assert.assertThat(result.getHash(), IsEqual.equalTo(Hash.fromHexString("aabbcc")));
 		Assert.assertThat(result.getBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(result.getTimestamp(), IsEqual.equalTo(new TimeInstant(654)));
+		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(654)));
 		Assert.assertThat(result.getTotalFee(), IsEqual.equalTo(Amount.fromMicroNem(45678)));
 	}
 }

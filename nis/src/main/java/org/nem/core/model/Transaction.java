@@ -20,11 +20,11 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param type      The transaction type.
 	 * @param version   The transaction version.
-	 * @param timestamp The transaction timestamp.
+	 * @param timeStamp The transaction timestamp.
 	 * @param sender    The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final TimeInstant timestamp, final Account sender) {
-		super(type, version, timestamp, sender);
+	public Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
+		super(type, version, timeStamp, sender);
 	}
 
 	/**

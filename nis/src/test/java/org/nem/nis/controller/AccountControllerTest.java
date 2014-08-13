@@ -1,9 +1,5 @@
 package org.nem.nis.controller;
 
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,6 +15,9 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.*;
+
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class AccountControllerTest {
 
@@ -146,7 +145,7 @@ public class AccountControllerTest {
 
 		final AccountPageBuilder pageBuilder = new AccountPageBuilder();
 		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setTimestamp("12345");
+		pageBuilder.setTimeStamp("12345");
 
 		Mockito.when(accountIoAdapter.getAccountTransfers(address, "12345")).thenReturn(expectedList);
 

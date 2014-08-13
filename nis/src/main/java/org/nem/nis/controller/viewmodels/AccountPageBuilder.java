@@ -6,7 +6,7 @@ package org.nem.nis.controller.viewmodels;
 public class AccountPageBuilder {
 
 	private String address;
-	private String timestamp;
+	private String timeStamp;
 
 	/**
 	 * Sets the address.
@@ -20,10 +20,10 @@ public class AccountPageBuilder {
 	/**
 	 * Sets the timestamp.
 	 *
-	 * @param timestamp The timestamp.
+	 * @param timeStamp The timestamp.
 	 */
-	public void setTimestamp(final String timestamp) {
-		this.timestamp = timestamp;
+	public void setTimeStamp(final String timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 	/**
@@ -32,6 +32,6 @@ public class AccountPageBuilder {
 	 * @return The account page.
 	 */
 	public AccountPage build() {
-		return new AccountPage(this.address, this.timestamp);
+		return new AccountPage(this.address, this.timeStamp);
 	}
 }

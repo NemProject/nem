@@ -1,12 +1,13 @@
 package org.nem.core.node;
 
-import java.util.*;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.time.*;
+
+import java.util.*;
 
 public class NisNodeInfoTest {
 
@@ -46,7 +47,7 @@ public class NisNodeInfoTest {
             {
                 put("default", new NisNodeInfo(new Node(new NodeIdentity(keyPair), endpoint), createAppMetaData("nem", "1.0")));
                 put("diff-identity", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.0")));
-                put("diff-metadata", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
+                put("diff-metaData", new NisNodeInfo(new Node(new NodeIdentity(new KeyPair()), endpoint), createAppMetaData("nem", "1.1")));
             }
         };
     }
@@ -63,7 +64,7 @@ public class NisNodeInfoTest {
 		// Assert:
 		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(info));
 		Assert.assertThat(infoMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(infoMap.get("diff-metadata"), IsNot.not(IsEqual.equalTo(info)));
+		Assert.assertThat(infoMap.get("diff-metaData"), IsNot.not(IsEqual.equalTo(info)));
         Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
         Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
 	}
@@ -81,7 +82,7 @@ public class NisNodeInfoTest {
         // Assert:
         Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
         Assert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-        Assert.assertThat(infoMap.get("diff-metadata").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+        Assert.assertThat(infoMap.get("diff-metaData").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
     //endregion

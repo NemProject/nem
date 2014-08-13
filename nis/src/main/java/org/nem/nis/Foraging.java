@@ -1,9 +1,5 @@
 package org.nem.nis;
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -14,6 +10,11 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 //
 // Initial logic is as follows:
@@ -289,9 +290,9 @@ public class Foraging {
 	private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final Block lastBlock) {
 		final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
 		final int limit = (int)Math.min(lastBlock.getHeight().getRaw(), (BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION));
-		final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+		final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timestamps);
+		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);
 	}
 
 	public Block createSignedBlock(

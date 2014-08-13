@@ -43,7 +43,7 @@ public class ExplorerTransferView implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("type", this.type);
 		Amount.writeTo(serializer, "fee", this.fee);
-		serializer.writeLong("timestamp", this.deadline);
+		serializer.writeLong("timeStamp", this.deadline);
 		Address.writeTo(serializer, "sender", this.signerAddress);
 		serializer.writeBytes("senderPk", this.signerAddress.getPublicKey().getRaw());
 		serializer.writeString("signature", this.signature);

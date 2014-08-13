@@ -15,7 +15,7 @@ public class BlockDebugInfo implements SerializableEntity {
 
 	private final BlockHeight height;
 	private final Address foragerAddress;
-	private final TimeInstant timestamp;
+	private final TimeInstant timeStamp;
 	private final BlockDifficulty difficulty;
 	private final BigInteger hit;
 	private final BigInteger target;
@@ -26,7 +26,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	 * Creates a new block debug info.
 	 *
 	 * @param blockHeight The block height.
-	 * @param timestamp The block timestamp.
+	 * @param timeStamp The block timestamp.
 	 * @param foragerAddress The address of the forager of the block.
 	 * @param difficulty The block difficulty.
 	 * @param hit The block hit.
@@ -35,7 +35,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	 */
 	public BlockDebugInfo(
 			final BlockHeight blockHeight,
-			final TimeInstant timestamp,
+			final TimeInstant timeStamp,
 			final Address foragerAddress,
 			final BlockDifficulty difficulty,
 			final BigInteger hit,
@@ -43,7 +43,7 @@ public class BlockDebugInfo implements SerializableEntity {
 			final int interBlockTime) {
 		this.height = blockHeight;
 		this.foragerAddress = foragerAddress;
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.difficulty = difficulty;
 		this.hit = hit;
 		this.target = target;
@@ -58,7 +58,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	 */
 	public BlockDebugInfo(final Deserializer deserializer) {
 		this.height = BlockHeight.readFrom(deserializer, "height");
-		this.timestamp = readTimeStringAsTimeInstant(deserializer, "timestamp");
+		this.timeStamp = readTimeStringAsTimeInstant(deserializer, "timeStamp");
 		this.foragerAddress = Address.readFrom(deserializer, "forager");
 		this.difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
 		this.hit = new BigInteger(deserializer.readString("hit"));
@@ -90,8 +90,8 @@ public class BlockDebugInfo implements SerializableEntity {
 	 *
 	 * @return The timestamp.
 	 */
-	public TimeInstant getTimestamp() {
-		return this.timestamp;
+	public TimeInstant getTimeStamp() {
+		return this.timeStamp;
 	}
 	
 	/**
@@ -151,7 +151,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	@Override
 	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
-		writeTimeInstantAsTimeString(serializer, "timestamp", this.timestamp);
+		writeTimeInstantAsTimeString(serializer, "timeStamp", this.timeStamp);
 		Address.writeTo(serializer, "forager", this.foragerAddress);
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());

@@ -30,7 +30,7 @@ public class DebugControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final BlockHeight height = new BlockHeight(10);
-		final TimeInstant timestamp = new TimeInstant(1000);
+		final TimeInstant timeStamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
 				new AccountCache(),
@@ -42,7 +42,7 @@ public class DebugControllerTest {
 				signer1,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
-				timestamp.addSeconds(60),
+				timeStamp.addSeconds(60),
 				height);
 		blockDaoBlock.setDifficulty(difficulty);
 
@@ -50,7 +50,7 @@ public class DebugControllerTest {
 				signer2,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
-				timestamp,
+				timeStamp,
 				height.prev());
 		blockDaoParent.setDifficulty(difficulty);
 
@@ -65,7 +65,7 @@ public class DebugControllerTest {
 		dbBlock.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
 		dbBlock.setDifficulty(blockDaoBlock.getDifficulty().getRaw());
 		dbBlock.setHeight(blockDaoBlock.getHeight().getRaw());
-		dbBlock.setTimestamp(blockDaoBlock.getTimeStamp().getRawTime());
+		dbBlock.setTimeStamp(blockDaoBlock.getTimeStamp().getRawTime());
 		dbBlock.setForgerProof(new byte[64]);
 		dbBlock.setBlockTransfers(new ArrayList<>());
 
@@ -75,7 +75,7 @@ public class DebugControllerTest {
 		dbParent.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
 		dbParent.setDifficulty(blockDaoParent.getDifficulty().getRaw());
 		dbParent.setHeight(blockDaoParent.getHeight().getRaw());
-		dbParent.setTimestamp(blockDaoParent.getTimeStamp().getRawTime());
+		dbParent.setTimeStamp(blockDaoParent.getTimeStamp().getRawTime());
 		dbParent.setForgerProof(new byte[64]);
 		dbParent.setBlockTransfers(new ArrayList<>());
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
@@ -89,7 +89,7 @@ public class DebugControllerTest {
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
 		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(signer1.getAddress()));
-		Assert.assertThat(blockDebugInfo.getTimestamp(), IsEqual.equalTo(timestamp.addSeconds(60)));
+		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp.addSeconds(60)));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));

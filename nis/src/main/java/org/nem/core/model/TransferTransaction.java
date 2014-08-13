@@ -21,14 +21,14 @@ public class TransferTransaction extends Transaction {
 	/**
 	 * Creates a transfer transaction.
 	 *
-	 * @param timestamp The transaction timestamp.
+	 * @param timeStamp The transaction timestamp.
 	 * @param sender    The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount    The transaction amount.
 	 * @param message   The transaction message.
 	 */
-	public TransferTransaction(final TimeInstant timestamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
-		super(TransactionTypes.TRANSFER, 1, timestamp, sender);
+	public TransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
+		super(TransactionTypes.TRANSFER, 1, timeStamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;
 		this.message = message;

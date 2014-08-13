@@ -28,7 +28,7 @@ public class Transfer {
 	private Integer version;
 	private Integer type;
 	private Long fee;
-	private Integer timestamp;
+	private Integer timeStamp;
 	private Integer deadline;
 
 	@ManyToOne
@@ -65,7 +65,7 @@ public class Transfer {
 			Integer version,
 			Integer type,
 			Long fee,
-			Integer timestamp,
+			Integer timeStamp,
 			Integer deadline,
 			Account sender,
 			byte[] senderProof,
@@ -79,7 +79,7 @@ public class Transfer {
 		this.version = version;
 		this.type = type;
 		this.fee = fee;
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.deadline = deadline;
 		this.sender = sender;
 		this.senderProof = senderProof;
@@ -137,12 +137,12 @@ public class Transfer {
 		this.fee = fee;
 	}
 
-	public Integer getTimestamp() {
-		return timestamp;
+	public Integer getTimeStamp() {
+		return timeStamp;
 	}
 
-	public void setTimestamp(Integer timestamp) {
-		this.timestamp = timestamp;
+	public void setTimeStamp(Integer timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 	public Integer getDeadline() {

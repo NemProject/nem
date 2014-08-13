@@ -10,7 +10,7 @@ import org.nem.core.time.*;
  */
 public class TransactionDebugInfo implements SerializableEntity {
 
-	private final TimeInstant timestamp;
+	private final TimeInstant timeStamp;
 	private final TimeInstant deadline;
 	private final Address sender;
 	private final Address recipient;
@@ -21,7 +21,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	/**
 	 * Creates a new transaction debug info.
 	 *
-	 * @param timestamp The transaction timestamp.
+	 * @param timeStamp The transaction timestamp.
 	 * @param deadline The transaction deadline.
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
@@ -30,14 +30,14 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 * @param message The transaction message.
 	 */
 	public TransactionDebugInfo(
-			final TimeInstant timestamp,
+			final TimeInstant timeStamp,
 			final TimeInstant deadline,
 			final Address sender,
 			final Address recipient,
 			final Amount amount,
 			final Amount fee,
 			final String message) {
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.deadline = deadline;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -52,7 +52,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public TransactionDebugInfo(final Deserializer deserializer) {
-		this.timestamp = readTimeStringAsTimeInstant(deserializer, "timestamp");
+		this.timeStamp = readTimeStringAsTimeInstant(deserializer, "timeStamp");
 		this.deadline = readTimeStringAsTimeInstant(deserializer, "deadline");
 		this.sender = Address.readFrom(deserializer, "sender");
 		this.recipient = Address.readFrom(deserializer, "recipient");
@@ -66,8 +66,8 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 *
 	 * @return The timestamp.
 	 */
-	public TimeInstant getTimestamp() {
-		return this.timestamp;
+	public TimeInstant getTimeStamp() {
+		return this.timeStamp;
 	}
 	
 	/**
@@ -126,7 +126,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 	
 	@Override
 	public void serialize(final Serializer serializer) {
-		writeTimeInstantAsTimeString(serializer, "timestamp", this.timestamp);
+		writeTimeInstantAsTimeString(serializer, "timeStamp", this.timeStamp);
 		writeTimeInstantAsTimeString(serializer, "deadline", this.deadline);
 		Address.writeTo(serializer, "sender", this.sender);
 		Address.writeTo(serializer, "recipient", this.recipient);

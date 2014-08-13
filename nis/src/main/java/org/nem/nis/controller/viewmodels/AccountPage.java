@@ -8,15 +8,15 @@ import org.nem.core.model.Address;
 public class AccountPage {
 
 	private final Address address;
-	private final String timestamp;
+	private final String timeStamp;
 
 	/**
 	 * Creates a new account page.
 	 *
 	 * @param address The address.
-	 * @param timestamp The timestamp.
+	 * @param timeStamp The timestamp.
 	 */
-	public AccountPage(final String address, final String timestamp) {
+	public AccountPage(final String address, final String timeStamp) {
 		if (null == address)
 			throw new IllegalArgumentException("address is required");
 
@@ -24,7 +24,7 @@ public class AccountPage {
 		if (!this.address.isValid())
 			throw new IllegalArgumentException("address must be valid");
 
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class AccountPage {
 	 *
 	 * @return The timestamp.
 	 */
-	public String getTimestamp() {
-		return this.timestamp;
+	public String getTimeStamp() {
+		return this.timeStamp;
 	}
 }

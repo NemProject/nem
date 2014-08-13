@@ -2,7 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,8 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation
 
 	@Override
-	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timestamp, int limit) {
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, timestamp, limit);
+	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timeStamp, int limit) {
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, timeStamp, limit);
 		// TODO: throw exception
 		return transfers;
 	}

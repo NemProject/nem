@@ -41,7 +41,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 * @param limit maximal number of elements to return.
 	 * @return list of block's timestamps.
 	 */
-	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, int limit);
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Deletes blocks after given block.

@@ -74,7 +74,7 @@ public class TransferMapper {
 				recipient);
 
 		final TransferTransaction transfer = new TransferTransaction(
-				new TimeInstant(dbTransfer.getTimestamp()),
+				new TimeInstant(dbTransfer.getTimeStamp()),
 				sender,
 				recipient,
 				new Amount(dbTransfer.getAmount()),

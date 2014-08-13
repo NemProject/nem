@@ -28,7 +28,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	private final int version;
 	private final int type;
 	private final Account signer;
-	private final TimeInstant timestamp;
+	private final TimeInstant timeStamp;
 	private Signature signature;
 
 	//region Constructors
@@ -38,16 +38,16 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 *
 	 * @param type      The entity type.
 	 * @param version   The entity version.
-	 * @param timestamp The entity timestamp.
+	 * @param timeStamp The entity timestamp.
 	 * @param signer    The entity signer.
 	 */
-	public VerifiableEntity(final int type, final int version, final TimeInstant timestamp, final Account signer) {
+	public VerifiableEntity(final int type, final int version, final TimeInstant timeStamp, final Account signer) {
 		if (null == signer.getKeyPair())
 			throw new IllegalArgumentException("signer key pair is required to create a verifiable entity ");
 
 		this.type = type;
 		this.version = version;
-		this.timestamp = timestamp;
+		this.timeStamp = timeStamp;
 		this.signer = signer;
 	}
 
@@ -61,7 +61,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	public VerifiableEntity(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		this.type = type;
 		this.version = deserializer.readInt("version");
-		this.timestamp = TimeInstant.readFrom(deserializer, "timestamp");
+		this.timeStamp = TimeInstant.readFrom(deserializer, "timeStamp");
 		this.signer = Account.readFrom(deserializer, "signer", AddressEncoding.PUBLIC_KEY);
 
 		if (DeserializationOptions.VERIFIABLE == options)
@@ -105,7 +105,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @return The timestamp.
 	 */
 	public TimeInstant getTimeStamp() {
-		return this.timestamp;
+		return this.timeStamp;
 	}
 
 	/**
@@ -139,7 +139,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	private void serialize(final Serializer serializer, boolean includeSignature) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
-		TimeInstant.writeTo(serializer, "timestamp", this.getTimeStamp());
+		TimeInstant.writeTo(serializer, "timeStamp", this.getTimeStamp());
 		Account.writeTo(serializer, "signer", this.getSigner(), AddressEncoding.PUBLIC_KEY);
 
 		if (includeSignature)

@@ -501,19 +501,19 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
 
 			int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-			final List<TimeInstant> timestamps = this.blockDao.getTimestampsFrom(blockHeight, limit);
+			final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
 			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timestamps);
+				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);
 				block.setDifficulty(difficulty);
 
 				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
 				difficulties.add(difficulty);
-				timestamps.add(block.getTimeStamp());
+				timeStamps.add(block.getTimeStamp());
 				if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
 					difficulties.remove(0);
-					timestamps.remove(0);
+					timeStamps.remove(0);
 				}
 			}
 		}
