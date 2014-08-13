@@ -156,10 +156,10 @@ public class NodeTest {
 
 	private static final Map<String, Node> DESC_TO_NODE_MAP = new HashMap<String, Node>() {
 		{
-			put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));
-			put("diff-identity", new Node(new WeakNodeIdentity("alice"), DEFAULT_ENDPOINT, DEFAULT_META_DATA));
-			put("diff-endpoint", new Node(DEFAULT_IDENTITY, new NodeEndpoint("http", "localhost", 8080), DEFAULT_META_DATA));
-			put("diff-meta-data", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, new NodeMetaData("p", "a", NodeVersion.parse("9.0.0"))));
+			this.put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));
+			this.put("diff-identity", new Node(new WeakNodeIdentity("alice"), DEFAULT_ENDPOINT, DEFAULT_META_DATA));
+			this.put("diff-endpoint", new Node(DEFAULT_IDENTITY, new NodeEndpoint("http", "localhost", 8080), DEFAULT_META_DATA));
+			this.put("diff-meta-data", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, new NodeMetaData("p", "a", NodeVersion.parse("9.0.0"))));
 		}
 	};
 

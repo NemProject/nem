@@ -29,7 +29,7 @@ public class JsonSerializer extends Serializer {
 	 *
 	 * @param enforceReadWriteOrder true if forward-only reads should be enforced.
 	 */
-	public JsonSerializer(boolean enforceReadWriteOrder) {
+	public JsonSerializer(final boolean enforceReadWriteOrder) {
 		this.object = new JSONObject();
 		this.propertyOrderArray = enforceReadWriteOrder ? new JSONArray() : null;
 	}
@@ -78,8 +78,9 @@ public class JsonSerializer extends Serializer {
 	@Override
 	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects) {
 		this.pushLabel(label);
-		if (null == objects)
+		if (null == objects) {
 			return;
+		}
 
 		final JSONArray jsonObjects = objects.stream()
 				.map(obj -> JsonSerializer.serializeObject(obj))
@@ -89,9 +90,10 @@ public class JsonSerializer extends Serializer {
 	}
 
 	private static JSONObject serializeObject(final SerializableEntity object) {
-		JsonSerializer serializer = new JsonSerializer();
-		if (null != object)
+		final JsonSerializer serializer = new JsonSerializer();
+		if (null != object) {
 			object.serialize(serializer);
+		}
 		return serializer.getObject();
 	}
 
@@ -101,15 +103,17 @@ public class JsonSerializer extends Serializer {
 	 * @return The underlying JSON object.
 	 */
 	public JSONObject getObject() {
-		if (null != this.propertyOrderArray)
+		if (null != this.propertyOrderArray) {
 			this.object.put(PROPERTY_ORDER_ARRAY_NAME, this.propertyOrderArray);
+		}
 
 		return this.object;
 	}
 
 	private void pushLabel(final String label) {
-		if (null == this.propertyOrderArray)
+		if (null == this.propertyOrderArray) {
 			return;
+		}
 
 		this.propertyOrderArray.add(label);
 	}
@@ -118,11 +122,10 @@ public class JsonSerializer extends Serializer {
 	 * Helper function that serializes a SerializableEntity to a JSON object.
 	 *
 	 * @param entity The entity to serialize.
-	 *
 	 * @return The resulting JSON object.
 	 */
 	public static JSONObject serializeToJson(final SerializableEntity entity) {
-		JsonSerializer serializer = new JsonSerializer();
+		final JsonSerializer serializer = new JsonSerializer();
 		entity.serialize(serializer);
 		return serializer.getObject();
 	}
@@ -131,7 +134,6 @@ public class JsonSerializer extends Serializer {
 	 * Helper function that serializes a SerializableEntity to a byte array.
 	 *
 	 * @param entity The entity to serialize.
-	 *
 	 * @return The resulting byte array.
 	 */
 	public static byte[] serializeToBytes(final SerializableEntity entity) {

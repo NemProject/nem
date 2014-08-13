@@ -147,13 +147,13 @@ public class BlockMapperTest {
 			this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
 			this.account1 = Utils.generateRandomAccount();
-			this.dbAccount1 = createDbAccount(this.account1);
+			this.dbAccount1 = this.createDbAccount(this.account1);
 
 			this.account2 = Utils.generateRandomAccount();
-			this.dbAccount2 = createDbAccount(this.account2);
+			this.dbAccount2 = this.createDbAccount(this.account2);
 
 			this.account3 = Utils.generateRandomAccount();
-			this.dbAccount3 = createDbAccount(this.account3);
+			this.dbAccount3 = this.createDbAccount(this.account3);
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbForager);
@@ -194,8 +194,9 @@ public class BlockMapperTest {
 			this.model.addTransaction(new TransferTransaction(
 					new TimeInstant(300), this.account3, this.account1, new Amount(4), null));
 
-			for (final Transaction transaction : this.model.getTransactions())
+			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();
+			}
 
 			this.signModel();
 		}
@@ -226,17 +227,17 @@ public class BlockMapperTest {
 		}
 
 		public void assertModel(final Block rhs) {
-			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(hash));
-			Assert.assertThat(rhs.getType(), IsEqual.equalTo(model.getType()));
-			Assert.assertThat(rhs.getVersion(), IsEqual.equalTo(model.getVersion()));
-			Assert.assertThat(rhs.getPreviousBlockHash(), IsEqual.equalTo(model.getPreviousBlockHash()));
-			Assert.assertThat(rhs.getTimeStamp(), IsEqual.equalTo(model.getTimeStamp()));
-			Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(model.getSigner()));
-			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(model.getSignature()));
-			Assert.assertThat(rhs.getHeight(), IsEqual.equalTo(model.getHeight()));
-			Assert.assertThat(rhs.getTotalFee(), IsEqual.equalTo(model.getTotalFee()));
-			Assert.assertThat(rhs.getDifficulty(), IsEqual.equalTo(model.getDifficulty()));
-			Assert.assertThat(rhs.getGenerationHash(), IsEqual.equalTo(model.getGenerationHash()));
+			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
+			Assert.assertThat(rhs.getType(), IsEqual.equalTo(this.model.getType()));
+			Assert.assertThat(rhs.getVersion(), IsEqual.equalTo(this.model.getVersion()));
+			Assert.assertThat(rhs.getPreviousBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
+			Assert.assertThat(rhs.getTimeStamp(), IsEqual.equalTo(this.model.getTimeStamp()));
+			Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(this.model.getSigner()));
+			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
+			Assert.assertThat(rhs.getHeight(), IsEqual.equalTo(this.model.getHeight()));
+			Assert.assertThat(rhs.getTotalFee(), IsEqual.equalTo(this.model.getTotalFee()));
+			Assert.assertThat(rhs.getDifficulty(), IsEqual.equalTo(this.model.getDifficulty()));
+			Assert.assertThat(rhs.getGenerationHash(), IsEqual.equalTo(this.model.getGenerationHash()));
 		}
 	}
 }

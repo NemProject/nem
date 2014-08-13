@@ -2,11 +2,11 @@ package org.nem.core.model.ncc;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
-import org.nem.core.model.*;
+import org.nem.core.crypto.PublicKey;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
 import java.util.function.Function;
@@ -53,7 +53,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
-
 
 	//region Serialization
 
@@ -167,18 +166,18 @@ public class AccountInfoTest {
 
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountInfo info = createAccountInfo(address, 17, 5, "foo", 2.3);
+		final AccountInfo info = this.createAccountInfo(address, 17, 5, "foo", 2.3);
 
 		// Assert:
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(address, 17, 5, "foo", 2.3)));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(Address.fromEncoded(address.getEncoded()), 17, 5, "foo", 2.3)));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(Address.fromPublicKey(address.getPublicKey()), 17, 5, "foo", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(Address.fromEncoded(address.getEncoded()), 17, 5, "foo", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(Address.fromPublicKey(address.getPublicKey()), 17, 5, "foo", 2.3)));
 
-		Assert.assertThat(info, IsNot.not(IsEqual.equalTo(createAccountInfo(Utils.generateRandomAddress(), 17, 5, "foo", 2.3))));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(address, 22, 5, "foo", 2.3)));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(address, 17, 9, "foo", 2.3)));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(address, 17, 5, "bar", 2.3)));
-		Assert.assertThat(info, IsEqual.equalTo(createAccountInfo(address, 17, 5, "foo", 3.3)));
+		Assert.assertThat(info, IsNot.not(IsEqual.equalTo(this.createAccountInfo(Utils.generateRandomAddress(), 17, 5, "foo", 2.3))));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 22, 5, "foo", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3)));
+		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3)));
 
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
 		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
@@ -188,19 +187,19 @@ public class AccountInfoTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountInfo info = createAccountInfo(address, 17, 5, "foo", 2.3);
+		final AccountInfo info = this.createAccountInfo(address, 17, 5, "foo", 2.3);
 		final int hashCode = info.hashCode();
 
 		// Assert:
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(address, 17, 5, "foo", 2.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(Address.fromEncoded(address.getEncoded()), 17, 5, "foo", 2.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(Address.fromPublicKey(address.getPublicKey()), 17, 5, "foo", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(Address.fromEncoded(address.getEncoded()), 17, 5, "foo", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(Address.fromPublicKey(address.getPublicKey()), 17, 5, "foo", 2.3).hashCode()));
 
-		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(createAccountInfo(Utils.generateRandomAddress(), 17, 5, "foo", 2.3).hashCode())));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(address, 22, 5, "foo", 2.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(address, 17, 9, "foo", 2.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(address, 17, 5, "bar", 2.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(createAccountInfo(address, 17, 5, "foo", 3.3).hashCode()));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(this.createAccountInfo(Utils.generateRandomAddress(), 17, 5, "foo", 2.3).hashCode())));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 22, 5, "foo", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3).hashCode()));
 	}
 
 	private AccountInfo createAccountInfo(final Address address, final long balance, final int blockAmount, final String label, final double importance) {

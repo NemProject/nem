@@ -12,7 +12,6 @@ public abstract class HashUtils {
 	 * Calculates the hash of the specified entity, excluding its signature.
 	 *
 	 * @param entity The entity.
-	 *
 	 * @return The calculated hash.
 	 */
 	public static Hash calculateHash(final VerifiableEntity entity) {
@@ -23,11 +22,10 @@ public abstract class HashUtils {
 	 * Calculates the hash of the specified entity.
 	 *
 	 * @param entity The entity.
-	 *
 	 * @return The calculated hash.
 	 */
 	public static Hash calculateHash(final SerializableEntity entity) {
-		byte[] data = BinarySerializer.serializeToBytes(entity);
+		final byte[] data = BinarySerializer.serializeToBytes(entity);
 		return new Hash(Hashes.sha3(data));
 	}
 

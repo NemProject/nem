@@ -1,6 +1,5 @@
 package org.nem.peer.services;
 
-
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -26,8 +25,9 @@ public class NodeBroadcasterTest {
 		context.broadcaster.broadcast(context.broadcastNodes, NodeApiId.REST_PUSH_TRANSACTION, entity).join();
 
 		// Assert:
-		for (final Node node : context.broadcastNodes)
+		for (final Node node : context.broadcastNodes) {
 			Mockito.verify(context.connector, Mockito.times(1)).announce(node, NodeApiId.REST_PUSH_TRANSACTION, entity);
+		}
 	}
 
 	@Test

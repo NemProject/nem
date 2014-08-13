@@ -60,7 +60,7 @@ public class TransactionControllerTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = new TransferTransaction(new TimeInstant(321), sender, recipient, Amount.fromNem(100), null);
-		List<Transaction> transactions = new ArrayList<>();
+		final List<Transaction> transactions = new ArrayList<>();
 		transactions.add(transaction);
 		return transactions;
 	}

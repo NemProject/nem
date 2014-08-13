@@ -18,16 +18,16 @@ public class KeyPair {
 	 * Creates a random key pair.
 	 */
 	public KeyPair() {
-		ECKeyPairGenerator generator = new ECKeyPairGenerator();
-		ECKeyGenerationParameters keyGenParams = new ECKeyGenerationParameters(Curves.secp256k1().getParams(), RANDOM);
+		final ECKeyPairGenerator generator = new ECKeyPairGenerator();
+		final ECKeyGenerationParameters keyGenParams = new ECKeyGenerationParameters(Curves.secp256k1().getParams(), RANDOM);
 		generator.init(keyGenParams);
 
-		AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
-		ECPrivateKeyParameters privateKeyParams = (ECPrivateKeyParameters)keyPair.getPrivate();
-		ECPublicKeyParameters publicKeyParams = (ECPublicKeyParameters)keyPair.getPublic();
+		final AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
+		final ECPrivateKeyParameters privateKeyParams = (ECPrivateKeyParameters)keyPair.getPrivate();
+		final ECPublicKeyParameters publicKeyParams = (ECPublicKeyParameters)keyPair.getPublic();
 		this.privateKey = new PrivateKey(privateKeyParams.getD());
 
-		ECPoint point = publicKeyParams.getQ();
+		final ECPoint point = publicKeyParams.getQ();
 		this.publicKey = new PublicKey(point.getEncoded(true));
 	}
 
@@ -55,12 +55,13 @@ public class KeyPair {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 
-		if (!publicKey.isCompressed())
+		if (!publicKey.isCompressed()) {
 			throw new IllegalArgumentException("publicKey must be in compressed form");
+		}
 	}
 
 	private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {
-		ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
+		final ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
 		return new PublicKey(point.getEncoded(true));
 	}
 
@@ -115,7 +116,7 @@ public class KeyPair {
 	 * @return The EC public key parameters.
 	 */
 	public ECPublicKeyParameters getPublicKeyParameters() {
-		ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
+		final ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
 		return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
 	}
 }

@@ -13,7 +13,7 @@ public abstract class Serializer {
 	 * Writes a 32-bit integer value.
 	 *
 	 * @param label The optional name of the value.
-	 * @param i     The value.
+	 * @param i The value.
 	 */
 	public abstract void writeInt(final String label, final int i);
 
@@ -21,7 +21,7 @@ public abstract class Serializer {
 	 * Writes a 64-bit long value.
 	 *
 	 * @param label The optional name of the value.
-	 * @param l     The value.
+	 * @param l The value.
 	 */
 	public abstract void writeLong(final String label, final long l);
 
@@ -37,7 +37,7 @@ public abstract class Serializer {
 	 * Writes a BigInteger value.
 	 *
 	 * @param label The optional name of the value.
-	 * @param i     The value.
+	 * @param i The value.
 	 */
 	public abstract void writeBigInteger(final String label, final BigInteger i);
 
@@ -53,14 +53,14 @@ public abstract class Serializer {
 	 * Writes a String value.
 	 *
 	 * @param label The optional name of the value.
-	 * @param s     The value.
+	 * @param s The value.
 	 */
 	public abstract void writeString(final String label, final String s);
 
 	/**
 	 * Writes an object value.
 	 *
-	 * @param label  The optional name of the value.
+	 * @param label The optional name of the value.
 	 * @param object The value.
 	 */
 	public abstract void writeObject(final String label, final SerializableEntity object);
@@ -68,7 +68,7 @@ public abstract class Serializer {
 	/**
 	 * Writes an array of object values.
 	 *
-	 * @param label   The optional name of the value.
+	 * @param label The optional name of the value.
 	 * @param objects The array.
 	 */
 	public abstract void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects);

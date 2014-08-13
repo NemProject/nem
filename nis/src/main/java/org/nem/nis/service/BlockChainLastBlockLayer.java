@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 /**
  * This is intermediate layer between blocchain or foraging and actual Dao
- *
  * TODO: not sure if other dau functions should be moved here, probably not
  */
 @Service
@@ -32,27 +31,30 @@ public class BlockChainLastBlockLayer {
 
 	/**
 	 * Returns last block in the db.
+	 *
 	 * @return last block from db.
 	 */
 	public org.nem.nis.dbmodel.Block getLastDbBlock() {
-		return lastBlock;
+		return this.lastBlock;
 	}
 
 	/**
 	 * Returns height of last block in the db.
+	 *
 	 * @return height of last block in the db.
 	 */
 	public Long getLastBlockHeight() {
-		return lastBlock.getHeight();
+		return this.lastBlock.getHeight();
 	}
 
 	/**
 	 * Analyzes last block, used during initial initialization of blocks in blockchain.
+	 *
 	 * @param curBlock lastBlock in db.
 	 */
-	public void analyzeLastBlock(org.nem.nis.dbmodel.Block curBlock) {
+	public void analyzeLastBlock(final org.nem.nis.dbmodel.Block curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
-		lastBlock = curBlock;
+		this.lastBlock = curBlock;
 	}
 
 	/**
@@ -61,18 +63,18 @@ public class BlockChainLastBlockLayer {
 	 * @param block block to be added to db
 	 * @return always true
 	 */
-	public boolean addBlockToDb(Block block) {
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+	public boolean addBlockToDb(final Block block) {
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
 
-			// hibernate will save both block AND transactions
-			// as there is cascade in Block
-			// mind that there is NO cascade in transaction (near block field)
-			blockDao.save(dbBlock);
+		// hibernate will save both block AND transactions
+		// as there is cascade in Block
+		// mind that there is NO cascade in transaction (near block field)
+		this.blockDao.save(dbBlock);
 
-			lastBlock.setNextBlockId(dbBlock.getId());
-			blockDao.updateLastBlockId(lastBlock);
+		this.lastBlock.setNextBlockId(dbBlock.getId());
+		this.blockDao.updateLastBlockId(this.lastBlock);
 
-			lastBlock = dbBlock;
+		this.lastBlock = dbBlock;
 
 		return true;
 	}
@@ -81,8 +83,7 @@ public class BlockChainLastBlockLayer {
 	 * Removes block from the db after specified height
 	 */
 	public void dropDbBlocksAfter(final BlockHeight height) {
-		blockDao.deleteBlocksAfterHeight(height);
-		lastBlock = blockDao.findByHeight(height);
+		this.blockDao.deleteBlocksAfterHeight(height);
+		this.lastBlock = this.blockDao.findByHeight(height);
 	}
-
 }

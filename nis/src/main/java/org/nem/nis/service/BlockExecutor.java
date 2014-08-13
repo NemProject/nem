@@ -54,7 +54,7 @@ public class BlockExecutor {
 	 * @param observers The observers.
 	 */
 	public void execute(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = createTransferObserver(block, true, observers);
+		final TransferObserver observer = this.createTransferObserver(block, true, observers);
 
 		for (final Transaction transaction : block.getTransactions()) {
 			transaction.execute();
@@ -97,7 +97,7 @@ public class BlockExecutor {
 	 * @param observers The observers.
 	 */
 	public void undo(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = createTransferObserver(block, false, observers);
+		final TransferObserver observer = this.createTransferObserver(block, false, observers);
 
 		final Account signer = block.getSigner();
 		observer.notifyDebit(block.getSigner(), block.getTotalFee());
@@ -133,8 +133,9 @@ public class BlockExecutor {
 		// in an undo operation, the OutlinkObserver should be run before the balance is updated
 		// (so that the matching link can be found and removed)
 		final List<TransferObserver> transferObservers = Arrays.asList(aggregateObserver, outlinkObserver);
-		if (!isExecute)
+		if (!isExecute) {
 			Collections.reverse(transferObservers);
+		}
 
 		return new AggregateTransferObserver(transferObservers);
 	}

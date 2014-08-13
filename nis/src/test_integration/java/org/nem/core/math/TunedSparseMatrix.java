@@ -31,7 +31,7 @@ public class TunedSparseMatrix extends Matrix {
 		this.values = new double[numRows][];
 		this.cols = new int[numRows][];
 		this.maxIndices = new int[numRows];
-		for (int i=0; i<numRows; i++) {
+		for (int i = 0; i < numRows; i++) {
 			this.values[i] = new double[initialCapacityPerRow];
 			this.cols[i] = new int[initialCapacityPerRow];
 			this.maxIndices[i] = 0;
@@ -47,7 +47,7 @@ public class TunedSparseMatrix extends Matrix {
 
 	@Override
 	protected final double getAtUnchecked(final int row, final int col) {
-		for (int i=0; i<this.maxIndices[row]; i++) {
+		for (int i = 0; i < this.maxIndices[row]; i++) {
 			if (this.cols[row][i] == col) {
 				return this.values[row][i];
 			}
@@ -59,15 +59,15 @@ public class TunedSparseMatrix extends Matrix {
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
 		if (val == 0.0) {
-			for (int i=0; i<this.maxIndices[row]; i++) {
+			for (int i = 0; i < this.maxIndices[row]; i++) {
 				if (this.cols[row][i] == col) {
-					remove(row, col);
+					this.remove(row, col);
 					return;
 				}
 			}
 		} else {
-			int size = this.cols[row].length;
-			for (int i=0; i<this.maxIndices[row]; i++) {
+			final int size = this.cols[row].length;
+			for (int i = 0; i < this.maxIndices[row]; i++) {
 				if (this.cols[row][i] == col) {
 					this.values[row][i] = val;
 					return;
@@ -76,7 +76,7 @@ public class TunedSparseMatrix extends Matrix {
 
 			// New column
 			if (this.maxIndices[row] == size) {
-				reallocate(row);
+				this.reallocate(row);
 			}
 
 			this.cols[row][this.maxIndices[row]] = col;
@@ -117,7 +117,7 @@ public class TunedSparseMatrix extends Matrix {
 	 *
 	 * @return The number of non zero columns.
 	 */
-	public int getNonZeroColumnCount(int row) {
+	public int getNonZeroColumnCount(final int row) {
 		return this.maxIndices[row];
 	}
 
@@ -126,27 +126,27 @@ public class TunedSparseMatrix extends Matrix {
 	 *
 	 * @return The capacity of the row.
 	 */
-	public int getRowCapacity(int row) {
+	public int getRowCapacity(final int row) {
 		return this.cols[row].length;
 	}
 
 	@Override
 	public void normalizeColumns() {
-		double[] vector = new double[this.numRows];
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			for (int j=0; j<size; j++) {
+		final double[] vector = new double[this.numRows];
+		for (int i = 0; i < this.numRows; i++) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			for (int j = 0; j < size; j++) {
 				vector[rowCols[j]] += Math.abs(rowValues[j]);
 			}
 		}
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			for (int j=0; j<size; j++) {
-				double norm =  vector[rowCols[j]];
+		for (int i = 0; i < this.numRows; i++) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			for (int j = 0; j < size; j++) {
+				final double norm = vector[rowCols[j]];
 				if (norm > 0) {
 					rowValues[j] /= norm;
 				}
@@ -158,21 +158,20 @@ public class TunedSparseMatrix extends Matrix {
 	 * Multiplies this sparse matrix by a vector.
 	 *
 	 * @param vector The vector.
-	 *
 	 * @return The resulting vector.
 	 */
 	public ColumnVector multiply(final ColumnVector vector) {
 		if (this.numCols != vector.size()) {
 			throw new IllegalArgumentException("vector size and matrix column count must be equal");
 		}
-		double[] result = new double[this.numRows];
-		double[] rawVector = vector.getRaw();
-		for (int i=0; i<numRows; i++) {
-			double[] rowValues = this.values[i];
-			int[] rowCols = this.cols[i];
-			int size = this.maxIndices[i];
-			double dot=0.0;
-			for (int j=0; j<size; j++) {
+		final double[] result = new double[this.numRows];
+		final double[] rawVector = vector.getRaw();
+		for (int i = 0; i < this.numRows; i++) {
+			final double[] rowValues = this.values[i];
+			final int[] rowCols = this.cols[i];
+			final int size = this.maxIndices[i];
+			double dot = 0.0;
+			for (int j = 0; j < size; j++) {
 				dot += rowValues[j] * rawVector[rowCols[j]];
 			}
 			result[i] = dot;
@@ -187,10 +186,10 @@ public class TunedSparseMatrix extends Matrix {
 	 * @param row The row.
 	 * @param col The column.
 	 */
-	private void remove(int row, int col) {
+	private void remove(final int row, final int col) {
 		// Shrink arrays
-		System.arraycopy(this.cols[row], col+1, this.cols[row], col, this.cols[row].length-1-col);
-		System.arraycopy(this.values[row], col+1, this.values[row], col, this.values[row].length-1-col);
+		System.arraycopy(this.cols[row], col + 1, this.cols[row], col, this.cols[row].length - 1 - col);
+		System.arraycopy(this.values[row], col + 1, this.values[row], col, this.values[row].length - 1 - col);
 		this.maxIndices[row] -= 1;
 	}
 
@@ -199,11 +198,11 @@ public class TunedSparseMatrix extends Matrix {
 	 *
 	 * @param row The row.
 	 */
-	private void reallocate(int row) {
+	private void reallocate(final int row) {
 		// Hopefully doesn't happen too often
-		int size = this.cols[row].length;
-		int[] newCols = new int[size*2];
-		double[] newValues = new double[size*2];
+		final int size = this.cols[row].length;
+		final int[] newCols = new int[size * 2];
+		final double[] newValues = new double[size * 2];
 		System.arraycopy(this.cols[row], 0, newCols, 0, size);
 		System.arraycopy(this.values[row], 0, newValues, 0, size);
 		this.cols[row] = newCols;

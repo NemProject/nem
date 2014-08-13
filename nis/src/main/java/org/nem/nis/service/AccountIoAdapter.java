@@ -4,9 +4,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.*;
+import org.nem.nis.AccountCache;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.TransferMapper;
@@ -32,18 +32,18 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public Account findByAddress(Address address) {
+	public Account findByAddress(final Address address) {
 		return this.accountCache.findByAddress(address);
 	}
 
-	private Integer intOrMaxInt(String timestamp) {
+	private Integer intOrMaxInt(final String timestamp) {
 		Integer intTimestamp;
 		if (timestamp == null) {
 			return Integer.MAX_VALUE;
 		}
 		try {
 			intTimestamp = Integer.valueOf(timestamp, 10);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			intTimestamp = Integer.MAX_VALUE;
 		}
 		return intTimestamp;
@@ -58,7 +58,7 @@ public class AccountIoAdapter implements AccountIo {
 		// TODO: b) pass obtained db-account to getTransactionsForAccount
 
 		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimestamp = intOrMaxInt(timestamp);
+		final Integer intTimestamp = this.intOrMaxInt(timestamp);
 		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimestamp, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
@@ -87,15 +87,18 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(Address address, String timestamp) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timestamp) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimestamp = intOrMaxInt(timestamp);
-		Collection<org.nem.nis.dbmodel.Block> blocks = blockDao.getBlocksForAccount(account, intTimestamp, 25);
+		final Integer intTimestamp = this.intOrMaxInt(timestamp);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, intTimestamp, 25);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvestInfo(bl.getBlockHash(), new BlockHeight(bl.getHeight()), new TimeInstant(bl.getTimestamp()), Amount.fromMicroNem(bl.getTotalFee())))
+				.map(bl -> new HarvestInfo(bl.getBlockHash(),
+						new BlockHeight(bl.getHeight()),
+						new TimeInstant(bl.getTimestamp()),
+						Amount.fromMicroNem(bl.getTotalFee())))
 				.forEach(obj -> blockList.add(obj));
 		return blockList;
 	}

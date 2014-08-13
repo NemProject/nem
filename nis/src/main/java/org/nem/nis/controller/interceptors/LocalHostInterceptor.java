@@ -38,13 +38,15 @@ public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 		final boolean isClientApi = method.isAnnotationPresent(ClientApi.class);
 		final boolean isPublicApi = method.isAnnotationPresent(PublicApi.class);
 
-		if (!isClientApi || isPublicApi)
+		if (!isClientApi || isPublicApi) {
 			return true;
+		}
 
 		final InetAddress remoteAddress = parseAddress(request.getRemoteAddr());
 		for (final InetAddress localAddress : this.localAddresses) {
-			if (localAddress.equals(remoteAddress))
+			if (localAddress.equals(remoteAddress)) {
 				return true;
+			}
 		}
 
 		LOGGER.warning(String.format("remote %s attempted to call local %s", request.getRemoteAddr(), request.getServletPath()));

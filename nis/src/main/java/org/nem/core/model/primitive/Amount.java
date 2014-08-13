@@ -18,10 +18,9 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * Creates a new amount given a quantity of NEM.
 	 *
 	 * @param amount The amount of NEM.
-	 *
 	 * @return The new amount.
 	 */
-	public static Amount fromNem(long amount) {
+	public static Amount fromNem(final long amount) {
 		return new Amount(amount * MICRONEMS_IN_NEM);
 	}
 
@@ -29,10 +28,9 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * Creates a new amount given a quantity of micro NEM.
 	 *
 	 * @param amount The amount of micro NEM.
-	 *
 	 * @return The new amount.
 	 */
-	public static Amount fromMicroNem(long amount) {
+	public static Amount fromMicroNem(final long amount) {
 		return new Amount(amount);
 	}
 
@@ -41,18 +39,18 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 *
 	 * @param amount The number of micro NEM.
 	 */
-	public Amount(long amount) {
+	public Amount(final long amount) {
 		super(amount, Amount.class);
 
-		if (amount < 0)
+		if (amount < 0) {
 			throw new IllegalArgumentException("amount must be non-negative");
+		}
 	}
 
 	/**
 	 * Creates a new Amount by adding the specified amount to this amount.
 	 *
 	 * @param amount The specified amount.
-	 *
 	 * @return The new amount.
 	 */
 	public Amount add(final Amount amount) {
@@ -63,7 +61,6 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * Creates a new Amount by subtracting the specified amount from this amount.
 	 *
 	 * @param amount The specified amount.
-	 *
 	 * @return The new amount.
 	 */
 	public Amount subtract(final Amount amount) {
@@ -94,8 +91,8 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * Writes an amount object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param amount     The object.
+	 * @param label The optional label.
+	 * @param amount The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Amount amount) {
 		serializer.writeLong(label, amount.getNumMicroNem());
@@ -105,8 +102,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	 * Reads an amount object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static Amount readFrom(final Deserializer deserializer, final String label) {

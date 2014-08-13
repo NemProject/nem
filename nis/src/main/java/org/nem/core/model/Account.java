@@ -132,9 +132,8 @@ public class Account {
 	}
 
 	/**
-	 * 
 	 * Creates a shallow copy of this account the the specified key pair.
-	 * 
+	 *
 	 * @param keyPair The desired key pair of the new account.
 	 * @return The shallow copy.
 	 */
@@ -193,7 +192,7 @@ public class Account {
 	 * @return Number of blocks foraged by this account.
 	 */
 	public BlockAmount getForagedBlocks() {
-		return foragedBlocks;
+		return this.foragedBlocks;
 	}
 
 	/**
@@ -262,13 +261,13 @@ public class Account {
 
 	/**
 	 * Returns the reference count.
-	 * 
+	 *
 	 * @return The reference count.
 	 */
 	public ReferenceCount getReferenceCount() {
 		return this.refCount;
 	}
-	
+
 	/**
 	 * Increments the reference count.
 	 *
@@ -278,7 +277,7 @@ public class Account {
 		this.refCount = this.refCount.increment();
 		return this.refCount;
 	}
-	
+
 	/**
 	 * Decrements the reference count.
 	 *
@@ -295,9 +294,10 @@ public class Account {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Account))
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Account)) {
 			return false;
+		}
 
 		final Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
@@ -337,7 +337,6 @@ public class Account {
 	 *
 	 * @param deserializer The deserializer to use.
 	 * @param label The optional label.
-	 *
 	 * @return The read object.
 	 */
 	public static Account readFrom(final Deserializer deserializer, final String label) {
@@ -350,7 +349,6 @@ public class Account {
 	 * @param deserializer The deserializer to use.
 	 * @param encoding The account encoding.
 	 * @param label The optional label.
-	 *
 	 * @return The read object.
 	 */
 	public static Account readFrom(

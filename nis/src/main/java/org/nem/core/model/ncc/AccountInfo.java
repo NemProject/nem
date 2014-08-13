@@ -1,7 +1,7 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.crypto.*;
-import org.nem.core.model.*;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
@@ -132,8 +132,9 @@ public class AccountInfo implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof AccountInfo))
+		if (!(obj instanceof AccountInfo)) {
 			return false;
+		}
 
 		final AccountInfo rhs = (AccountInfo)obj;
 		return this.address.equals(rhs.address);

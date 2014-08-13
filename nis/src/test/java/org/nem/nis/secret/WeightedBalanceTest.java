@@ -124,7 +124,7 @@ public class WeightedBalanceTest {
 		final WeightedBalance result = advanceDays(weightedBalance, 50);
 
 		// Assert:
-		assertWeightedBalance(result, 50*1440+1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
+		assertWeightedBalance(result, 50 * 1440 + 1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class WeightedBalanceTest {
 			balance = balance.next();
 
 			// Assert:
-			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440*i + 1)));
+			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440 * i + 1)));
 			final Amount sum = balance.getVestedBalance().add(balance.getUnvestedBalance());
 			Assert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
 		}
@@ -213,12 +213,12 @@ public class WeightedBalanceTest {
 
 		// Act:
 		final Amount vested1 = weightedBalance.getVestedBalance();
-		double ratio1 = calculateRatio(weightedBalance);
+		final double ratio1 = calculateRatio(weightedBalance);
 
 		final WeightedBalance result = weightedBalance.createSend(weightedBalance.getBlockHeight(), Amount.fromMicroNem(2_000));
 
 		final Amount vested2 = result.getVestedBalance();
-		double ratio2 = calculateRatio(result);
+		final double ratio2 = calculateRatio(result);
 
 		// Assert:
 		Assert.assertTrue((ratio1 - ratio2) <= 0.0001);
@@ -227,8 +227,8 @@ public class WeightedBalanceTest {
 	}
 
 	private static double calculateRatio(final WeightedBalance balance) {
-		long vestedBalance = balance.getVestedBalance().getNumMicroNem();
-		long unvestedBalance = balance.getUnvestedBalance().getNumMicroNem();
+		final long vestedBalance = balance.getVestedBalance().getNumMicroNem();
+		final long unvestedBalance = balance.getUnvestedBalance().getNumMicroNem();
 		return vestedBalance / (0d + vestedBalance + unvestedBalance);
 	}
 
@@ -263,17 +263,18 @@ public class WeightedBalanceTest {
 
 	//endregion
 
-	private static WeightedBalance advanceDays(final WeightedBalance weightedBalance, int numDays) {
+	private static WeightedBalance advanceDays(final WeightedBalance weightedBalance, final int numDays) {
 		WeightedBalance result = weightedBalance;
-		for (int i = 0; i < numDays; ++i)
+		for (int i = 0; i < numDays; ++i) {
 			result = result.next();
+		}
 
 		return result;
 	}
 
 	private static void assertWeightedBalance(
 			final WeightedBalance balance,
-			int blockHeight,
+			final int blockHeight,
 			final Amount vestedAmount,
 			final Amount unvestedAmount) {
 		// Assert

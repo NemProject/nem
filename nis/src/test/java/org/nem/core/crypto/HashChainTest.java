@@ -41,7 +41,7 @@ public class HashChainTest {
 		final HashChain hashChain1 = new HashChain(hashes);
 
 		// Act:
-		final HashChain hashChain2 = createRoundTrippedHashChain(hashChain1);
+		final HashChain hashChain2 = this.createRoundTrippedHashChain(hashChain1);
 
 		// Assert:
 		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(3));
@@ -49,9 +49,9 @@ public class HashChainTest {
 		Assert.assertThat(hashChain1, IsEqual.equalTo(hashChain2));
 	}
 
-	private HashChain createRoundTrippedHashChain(HashChain originalTransaction) {
+	private HashChain createRoundTrippedHashChain(final HashChain originalTransaction) {
 		// Act:
-		Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction, null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction, null);
 		return new HashChain(deserializer);
 	}
 }

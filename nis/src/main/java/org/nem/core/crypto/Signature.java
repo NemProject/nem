@@ -10,7 +10,7 @@ import java.math.BigInteger;
  */
 public class Signature {
 
-	private BigInteger r;
+	private final BigInteger r;
 	private BigInteger s;
 
 	/**
@@ -30,10 +30,11 @@ public class Signature {
 	 * @param bytes The binary representation of the signature.
 	 */
 	public Signature(final byte[] bytes) {
-		if (64 != bytes.length)
+		if (64 != bytes.length) {
 			throw new IllegalArgumentException("binary signature representation must be 64 bytes");
+		}
 
-		byte[][] parts = ArrayUtils.split(bytes, 32);
+		final byte[][] parts = ArrayUtils.split(bytes, 32);
 		this.r = ArrayUtils.toBigInteger(parts[0]);
 		this.s = ArrayUtils.toBigInteger(parts[1]);
 	}
@@ -69,8 +70,9 @@ public class Signature {
 	 * Makes this signature canonical.
 	 */
 	public void makeCanonical() {
-		if (!this.isCanonical())
+		if (!this.isCanonical()) {
 			this.s = Curves.secp256k1().getParams().getN().subtract(this.s);
+		}
 	}
 
 	/**
@@ -90,11 +92,12 @@ public class Signature {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Signature))
+	public boolean equals(final Object obj) {
+		if (obj == null || !(obj instanceof Signature)) {
 			return false;
+		}
 
-		Signature rhs = (Signature)obj;
+		final Signature rhs = (Signature)obj;
 		return 0 == this.r.compareTo(rhs.r) && 0 == this.s.compareTo(rhs.s);
 	}
 
@@ -104,8 +107,8 @@ public class Signature {
 	 * Writes a signature object.
 	 *
 	 * @param serializer The serializer to use.
-	 * @param label      The optional label.
-	 * @param signature  The object.
+	 * @param label The optional label.
+	 * @param signature The object.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final Signature signature) {
 		serializer.writeBytes(label, signature.getBytes());
@@ -115,8 +118,7 @@ public class Signature {
 	 * Reads a signature object.
 	 *
 	 * @param deserializer The deserializer to use.
-	 * @param label        The optional label.
-	 *
+	 * @param label The optional label.
 	 * @return The read object.
 	 */
 	public static Signature readFrom(final Deserializer deserializer, final String label) {

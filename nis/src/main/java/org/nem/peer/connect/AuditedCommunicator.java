@@ -40,8 +40,9 @@ public class AuditedCommunicator implements Communicator {
 		return future
 				.handle((d, e) -> {
 					this.auditCollection.remove(url.getHost(), url.getPath());
-					if (null != e)
+					if (null != e) {
 						ExceptionUtils.propagateVoid(() -> { throw (Exception)e; });
+					}
 
 					return d;
 				});

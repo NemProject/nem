@@ -23,8 +23,9 @@ public class BlockIterator {
 		Block currentBlock = lookup.getLastBlock();
 
 		BlockHeight currentHeight = currentBlock.getHeight();
-		if (currentHeight.equals(desiredHeight))
+		if (currentHeight.equals(desiredHeight)) {
 			return;
+		}
 
 		Block parentBlock = lookup.getBlockAt(currentHeight.prev());
 		while (true) {
@@ -32,8 +33,9 @@ public class BlockIterator {
 			currentBlock = parentBlock;
 			currentHeight = currentBlock.getHeight();
 
-			if (currentHeight.equals(desiredHeight))
+			if (currentHeight.equals(desiredHeight)) {
 				return;
+			}
 
 			parentBlock = lookup.getBlockAt(currentHeight.prev());
 		}

@@ -48,8 +48,9 @@ public class SecureSerializableEntity<T extends SerializableEntity> implements S
 	 */
 	public T getEntity() {
 		final Hash hash = HashUtils.calculateHash(this.entity);
-		if (!identity.verify(hash.getRaw(), this.signature))
+		if (!this.identity.verify(hash.getRaw(), this.signature)) {
 			throw new ImpersonatingPeerException("entity source cannot be verified");
+		}
 
 		return this.entity;
 	}

@@ -1,6 +1,5 @@
 package org.nem.nis.controller.interceptors;
 
-
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;

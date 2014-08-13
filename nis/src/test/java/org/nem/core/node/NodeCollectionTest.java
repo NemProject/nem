@@ -232,7 +232,7 @@ public class NodeCollectionTest {
 	public void getActiveNodesIsConcurrencySafe() {
 		// Arrange: partially iterate the set
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
-		Iterator<Node> it = nodes.getActiveNodes().iterator();
+		final Iterator<Node> it = nodes.getActiveNodes().iterator();
 		it.next();
 
 		// Act: update the set and resume the iteration
@@ -246,7 +246,7 @@ public class NodeCollectionTest {
 	public void getInactiveNodesIsConcurrencySafe() {
 		// Arrange: partially iterate the set
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
-		Iterator<Node> it = nodes.getInactiveNodes().iterator();
+		final Iterator<Node> it = nodes.getInactiveNodes().iterator();
 		it.next();
 
 		// Act: update the set and resume the iteration
@@ -460,10 +460,10 @@ public class NodeCollectionTest {
 
 	private static final Map<String, NodeCollection> DESC_TO_NODES_MAP = new HashMap<String, NodeCollection>() {
 		{
-			put("default", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" }));
-			put("diff-active", createNodeCollection(new String[] { "A", "F", "P", "Z" }, new String[] { "B", "Y" }));
-			put("diff-inactive", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B" }));
-			put("diff-status", createNodeCollection(new String[] { "A", "F", "Y" }, new String[] { "B", "P" }));
+			this.put("default", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" }));
+			this.put("diff-active", createNodeCollection(new String[] { "A", "F", "P", "Z" }, new String[] { "B", "Y" }));
+			this.put("diff-inactive", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B" }));
+			this.put("diff-status", createNodeCollection(new String[] { "A", "F", "Y" }, new String[] { "B", "P" }));
 		}
 	};
 

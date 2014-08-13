@@ -5,7 +5,7 @@ import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
@@ -15,7 +15,7 @@ import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 public class NisMain {
@@ -142,7 +142,7 @@ public class NisMain {
 			org.nem.nis.dbmodel.Block dbBlock = null;
 			do {
 				if (null == this.iterator || !this.iterator.hasNext()) {
-					this.iterator = this.blockDao.getBlocksAfter(curHeight, 2345).iterator();
+					this.iterator = this.blockDao.getBlocksAfter(this.curHeight, 2345).iterator();
 				}
 
 				// in most cases this won't make any loops
@@ -230,8 +230,9 @@ public class NisMain {
 	}
 
 	private void populateDb() {
-		if (0 != this.blockDao.count())
+		if (0 != this.blockDao.count()) {
 			return;
+		}
 
 		this.saveBlock(this.nemesisBlock);
 	}

@@ -37,7 +37,7 @@ public class TransactionTest {
 		final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
 		final MockTransaction originalTransaction = new MockTransaction(signer, 7);
 		originalTransaction.setFee(new Amount(130));
-		final MockTransaction transaction = createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
+		final MockTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
@@ -188,11 +188,11 @@ public class TransactionTest {
 	@Test
 	public void feeIsMaximumOfMinimumFeeAndCurrentFee() {
 		// Assert:
-		Assert.assertThat(getFee(15L, 50L), IsEqual.equalTo(50L));
-		Assert.assertThat(getFee(130L, 50L), IsEqual.equalTo(130L));
+		Assert.assertThat(this.getFee(15L, 50L), IsEqual.equalTo(50L));
+		Assert.assertThat(this.getFee(130L, 50L), IsEqual.equalTo(130L));
 	}
 
-	private long getFee(long minimumFee, long fee) {
+	private long getFee(final long minimumFee, final long fee) {
 		// Arrange:
 		final KeyPair publicPrivateKeyPair = new KeyPair();
 		final Account signer = new Account(publicPrivateKeyPair);
@@ -341,10 +341,10 @@ public class TransactionTest {
 	//endregion
 
 	private MockTransaction createRoundTrippedTransaction(
-			Transaction originalTransaction,
+			final Transaction originalTransaction,
 			final Account deserializedSigner) {
 		// Act:
-		Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, deserializedSigner);
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, deserializedSigner);
 		return new MockTransaction(deserializer);
 	}
 }

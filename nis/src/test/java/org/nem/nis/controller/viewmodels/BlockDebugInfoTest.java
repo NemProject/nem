@@ -24,10 +24,10 @@ public class BlockDebugInfoTest {
 		final BigInteger hit = BigInteger.valueOf(1234);
 		final BigInteger target = BigInteger.valueOf(4321);
 		final int interBlockTime = 45;
-		
+
 		// Act:
 		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(height, timestamp, address, difficulty, hit, target, interBlockTime);
-		
+
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
 		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
@@ -37,7 +37,7 @@ public class BlockDebugInfoTest {
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
 	}
-	
+
 	//endregion
 
 	//region serialization
@@ -63,7 +63,7 @@ public class BlockDebugInfoTest {
 		final String message = "Test message";
 		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timestamp2, deadline, sender, recipient, amount, fee, message);
 		originalBlockDebugInfo.addTransactionDebugInfo(originalTransactionDebugInfo);
-		
+
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalBlockDebugInfo, null);
 		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(deserializer);
@@ -87,6 +87,6 @@ public class BlockDebugInfoTest {
 		Assert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
 		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
 	}
-	
+
 	//endregion
 }

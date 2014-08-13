@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;

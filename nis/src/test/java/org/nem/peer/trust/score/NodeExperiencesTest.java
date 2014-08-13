@@ -103,9 +103,11 @@ public class NodeExperiencesTest {
 		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
-		for (final Node nodeI : nodes)
-			for (final Node nodeJ : nodes)
+		for (final Node nodeI : nodes) {
+			for (final Node nodeJ : nodes) {
 				experiences.getNodeExperience(nodeI, nodeJ).successfulCalls().set(1);
+			}
+		}
 
 		// Act:
 		return experiences.getSharedExperienceMatrix(nodes[1], nodes);
@@ -117,8 +119,9 @@ public class NodeExperiencesTest {
 		final Node[] nodes = PeerUtils.createNodeArray(3);
 		final NodeExperiences experiences = new NodeExperiences();
 
-		for (final Node nodeI : nodes)
+		for (final Node nodeI : nodes) {
 			experiences.getNodeExperience(nodes[1], nodeI).successfulCalls().set(1);
+		}
 
 		// Act:
 		final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);

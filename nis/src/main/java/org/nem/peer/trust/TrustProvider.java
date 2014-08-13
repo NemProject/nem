@@ -11,7 +11,6 @@ public interface TrustProvider {
 	 * Calculates a trust vector given a trust context.
 	 *
 	 * @param context The trust context.
-	 *
 	 * @return The trust vector.
 	 */
 	public ColumnVector computeTrust(final TrustContext context);

@@ -16,12 +16,14 @@ public class AccountTransactionsPage {
 	 * @param hash The hash.
 	 */
 	public AccountTransactionsPage(final String address, final String hash) {
-		if (null == address)
+		if (null == address) {
 			throw new IllegalArgumentException("address is required");
+		}
 
 		this.address = Address.fromEncoded(address);
-		if (!this.address.isValid())
+		if (!this.address.isValid()) {
 			throw new IllegalArgumentException("address must be valid");
+		}
 
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
 	}

@@ -48,7 +48,7 @@ public class Config {
 			final TrustParameters trustParameters,
 			final TrustProvider trustProvider,
 			final String applicationVersion) {
-		updateLocalNodeMetaData(localNode, applicationVersion);
+		this.updateLocalNodeMetaData(localNode, applicationVersion);
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = trustParameters;
@@ -120,8 +120,9 @@ public class Config {
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
 		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", obj -> new Node(obj));
 		final Set<Node> preTrustedNodes = new HashSet<>();
-		if (null != wellKnownNodes)
+		if (null != wellKnownNodes) {
 			preTrustedNodes.addAll(wellKnownNodes);
+		}
 
 		return new PreTrustedNodes(preTrustedNodes);
 	}

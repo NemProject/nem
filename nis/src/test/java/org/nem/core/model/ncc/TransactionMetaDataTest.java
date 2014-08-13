@@ -25,11 +25,11 @@ public class TransactionMetaDataTest {
 		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
 	}
 
-	private static TransactionMetaData createTransactionMetaData(long height) {
+	private static TransactionMetaData createTransactionMetaData(final long height) {
 		return new TransactionMetaData(new BlockHeight(height));
 	}
 
-	private static TransactionMetaData createRoundTrippedTransactionMetaData(long height) {
+	private static TransactionMetaData createRoundTrippedTransactionMetaData(final long height) {
 		// Arrange:
 		final TransactionMetaData metaData = createTransactionMetaData(height);
 

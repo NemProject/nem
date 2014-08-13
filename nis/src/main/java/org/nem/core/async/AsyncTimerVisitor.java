@@ -34,5 +34,4 @@ public interface AsyncTimerVisitor {
 	 * Called to indicate that the timer has stopped.
 	 */
 	void notifyStop();
-
 }

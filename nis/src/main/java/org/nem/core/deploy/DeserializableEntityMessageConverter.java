@@ -23,7 +23,7 @@ public class DeserializableEntityMessageConverter extends AbstractHttpMessageCon
 	}
 
 	@Override
-	protected boolean supports(Class<?> clazz) {
+	protected boolean supports(final Class<?> clazz) {
 		return null != this.getConstructor(clazz);
 	}
 
@@ -53,7 +53,7 @@ public class DeserializableEntityMessageConverter extends AbstractHttpMessageCon
 	private Constructor<?> getConstructor(final Class<?> aClass) {
 		try {
 			return aClass.getConstructor(Deserializer.class);
-		} catch (NoSuchMethodException e) {
+		} catch (final NoSuchMethodException e) {
 			return null;
 		}
 	}
@@ -63,13 +63,15 @@ public class DeserializableEntityMessageConverter extends AbstractHttpMessageCon
 			final Deserializer deserializer) {
 		try {
 			final Constructor<?> constructor = this.getConstructor(aClass);
-			if (null == constructor)
+			if (null == constructor) {
 				throw new UnsupportedOperationException("could not find compatible constructor");
+			}
 
 			return constructor.newInstance(deserializer);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			if (e.getCause() instanceof RuntimeException)
+			if (e.getCause() instanceof RuntimeException) {
 				throw (RuntimeException)e.getCause();
+			}
 
 			throw new UnsupportedOperationException("could not instantiate object");
 		}

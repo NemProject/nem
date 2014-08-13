@@ -1,9 +1,5 @@
 package org.nem.nis;
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -14,6 +10,11 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 //
 // Initial logic is as follows:
@@ -277,7 +278,6 @@ public class Foraging {
 					}
 				}
 			} // synchronized
-
 		} catch (final RuntimeException e) {
 			LOGGER.warning("exception occurred during generation of a block");
 			LOGGER.warning(e.toString());

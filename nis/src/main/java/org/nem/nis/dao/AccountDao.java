@@ -10,7 +10,6 @@ public interface AccountDao {
 	 * Retrieves Account from db given it's id in the database.
 	 *
 	 * @param id id of a record.
-	 *
 	 * @return associated Account or null if there isn't Account with such id.
 	 */
 	public Account getAccount(Long id);
@@ -19,7 +18,6 @@ public interface AccountDao {
 	 * Retrieves Account from db given it's printable (encoded) address.
 	 *
 	 * @param printableAddress NEM address
-	 *
 	 * @return Account associated with given printableAddress or null.
 	 */
 	public Account getAccountByPrintableAddress(String printableAddress);

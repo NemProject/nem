@@ -88,7 +88,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void save(Block block) {
+	public void save(final Block block) {
 		if (block.getId() == null) {
 			block.setId(this.lastId);
 			this.lastId++;
@@ -97,7 +97,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void updateLastBlockId(Block block) {
+	public void updateLastBlockId(final Block block) {
 
 	}
 
@@ -107,24 +107,24 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Block findById(long id) {
+	public Block findById(final long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		return find(block -> block.getId() == id);
+		return this.find(block -> block.getId() == id);
 	}
 
 	@Override
-	public Block findByHash(Hash blockHash) {
+	public Block findByHash(final Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;
-		return find(block -> block.getBlockHash().equals(blockHash));
+		return this.find(block -> block.getBlockHash().equals(blockHash));
 	}
 
 	@Override
 	public Block findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
-		return find(block -> block.getHeight() == height.getRaw());
+		return this.find(block -> block.getHeight() == height.getRaw());
 	}
 
 	private Block find(final Predicate<Block> findPredicate) {
@@ -132,13 +132,13 @@ public class MockBlockDao implements BlockDao {
 			return MockBlockDaoMode.SingleBlock == this.mockMode
 					? this.blocks.get(0)
 					: this.blocks.stream().filter(findPredicate).findFirst().get();
-		} catch (NoSuchElementException e) {
+		} catch (final NoSuchElementException e) {
 			return null;
 		}
 	}
 
 	@Override
-	public HashChain getHashesFrom(final BlockHeight height, int limit) {
+	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
 		++this.numGetHashesFromCalls;
 		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
@@ -146,17 +146,17 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Integer timestamp, final int limit) {
 		return null;
 	}
 
 	@Override
-	public List<Block> getBlocksAfter(long blockHeight, int blocksCount) {
+	public List<Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
 		return null;
 	}
 
 	@Override
-	public List<BlockDifficulty> getDifficultiesFrom(BlockHeight height, int limit) {
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
 				.map(bl -> new BlockDifficulty(bl.getDifficulty()))
@@ -164,7 +164,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<TimeInstant> getTimestampsFrom(BlockHeight height, int limit) {
+	public List<TimeInstant> getTimestampsFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
 				.map(bl -> new TimeInstant(bl.getTimestamp()))
@@ -181,68 +181,88 @@ public class MockBlockDao implements BlockDao {
 	 *
 	 * @return the number of times findById was called.
 	 */
-	public int getNumFindByIdCalls() { return this.numFindByIdCalls; }
+	public int getNumFindByIdCalls() {
+		return this.numFindByIdCalls;
+	}
 
 	/**
 	 * Gets the number of times findByHash was called.
 	 *
 	 * @return the number of times findByHash was called.
 	 */
-	public int getNumFindByHashCalls() { return this.numFindByHashCalls; }
+	public int getNumFindByHashCalls() {
+		return this.numFindByHashCalls;
+	}
 
 	/**
 	 * Gets the number of times findByHeight was called.
 	 *
 	 * @return the number of times findByHeight was called.
 	 */
-	public int getNumFindByHeightCalls() { return this.numFindByHeightCalls; }
+	public int getNumFindByHeightCalls() {
+		return this.numFindByHeightCalls;
+	}
 
 	/**
 	 * Gets the number of times getHashesFrom was called.
 	 *
 	 * @return the number of times getHashesFrom was called.
 	 */
-	public int getNumGetHashesFromCalls() { return this.numGetHashesFromCalls; }
+	public int getNumGetHashesFromCalls() {
+		return this.numGetHashesFromCalls;
+	}
 
 	/**
 	 * Gets the last id passed to findById.
 	 *
 	 * @return The last id passed to findById.
 	 */
-	public long getLastFindByIdId() { return this.lastFindByIdId; }
+	public long getLastFindByIdId() {
+		return this.lastFindByIdId;
+	}
 
 	/**
 	 * Gets the last hash passed to findByHash.
 	 *
 	 * @return The last hash passed to findByHash.
 	 */
-	public Hash getLastFindByHashHash() { return this.lastFindByHashHash; }
+	public Hash getLastFindByHashHash() {
+		return this.lastFindByHashHash;
+	}
 
 	/**
 	 * Gets the last height passed to findByHeight.
 	 *
 	 * @return The last height passed to findByHeight.
 	 */
-	public BlockHeight getLastFindByHeightHeight() { return this.lastFindByHeightHeight; }
+	public BlockHeight getLastFindByHeightHeight() {
+		return this.lastFindByHeightHeight;
+	}
 
 	/**
 	 * Gets the last height passed to getHashesFrom.
 	 *
 	 * @return The last height passed to getHashesFrom.
 	 */
-	public BlockHeight getLastGetHashesFromHeight() { return this.lastGetHashesFromHeight; }
+	public BlockHeight getLastGetHashesFromHeight() {
+		return this.lastGetHashesFromHeight;
+	}
 
 	/**
 	 * Gets the last limit passed to getHashesFrom.
 	 *
 	 * @return The last limit passed to getHashesFrom.
 	 */
-	public int getLastGetHashesFromLimit() { return this.lastGetHashesFromLimit; }
+	public int getLastGetHashesFromLimit() {
+		return this.lastGetHashesFromLimit;
+	}
 
 	/**
 	 * Returns last saved block.
 	 *
 	 * @return last saved block.
 	 */
-	public Block getLastSavedBlock() { return lastSavedBlock; }
+	public Block getLastSavedBlock() {
+		return this.lastSavedBlock;
+	}
 }

@@ -76,8 +76,9 @@ public class NodeExperience implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof NodeExperience))
+		if (!(obj instanceof NodeExperience)) {
 			return false;
+		}
 
 		final NodeExperience rhs = (NodeExperience)obj;
 		return this.successfulCalls.get() == rhs.successfulCalls().get() &&

@@ -27,7 +27,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	/**
 	 * Creates a mock verifiable entity.
 	 *
-	 * @param signer      The owner's account.
+	 * @param signer The owner's account.
 	 * @param customField The initial custom field value.
 	 */
 	public MockVerifiableEntity(final Account signer, final int customField) {
@@ -73,7 +73,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	}
 
 	@Override
-	protected void serializeImpl(Serializer serializer) {
+	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeInt("customField", this.customField);
 	}
 }

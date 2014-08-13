@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -44,8 +44,9 @@ public class BlockChainValidator {
 	 * @return true if the blocks are valid.
 	 */
 	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
-		if (blocks.size() > this.maxChainSize)
+		if (blocks.size() > this.maxChainSize) {
 			return false;
+		}
 
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -59,8 +60,8 @@ public class BlockChainValidator {
 			if (block.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
 				return false;
 			}
-			
-			if (!isBlockHit(parentBlock, block)) {
+
+			if (!this.isBlockHit(parentBlock, block)) {
 				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
 			}

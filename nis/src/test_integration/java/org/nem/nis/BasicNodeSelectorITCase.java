@@ -38,8 +38,8 @@ public class BasicNodeSelectorITCase {
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED)/(double)NUM_NODES;
-		double chiSquare = calculateChiSquare(observed, expectedValue);
+		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED) / (double)NUM_NODES;
+		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
 		assertRandomness(chiSquare);
@@ -60,8 +60,8 @@ public class BasicNodeSelectorITCase {
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)NUM_TRIES/(double)NUM_NODES;
-		double chiSquare = calculateChiSquare(observed, expectedValue);
+		final double expectedValue = (double)NUM_TRIES / (double)NUM_NODES;
+		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
 		assertRandomness(chiSquare);
@@ -96,8 +96,9 @@ public class BasicNodeSelectorITCase {
 			}
 		}
 
-		if (0 == probability)
-			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0]*100) + "% certainty.");
+		if (0 == probability) {
+			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0] * 100) + "% certainty.");
+		}
 
 		Assert.assertThat(probability <= 75.0, IsEqual.equalTo(true));
 	}
@@ -116,7 +117,7 @@ public class BasicNodeSelectorITCase {
 		}
 
 		public TestContext(final ColumnVector trustValues, final Random random) {
-			Mockito.when(context.getLocalNode()).thenReturn(this.localNode);
+			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
 
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {

@@ -14,7 +14,7 @@ public class NodeVersion {
 	 */
 	public static NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
 
-	private static Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
+	private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
 
 	private final int majorVersion;
 	private final int minorVersion;
@@ -62,8 +62,9 @@ public class NodeVersion {
 	 */
 	public static NodeVersion parse(final String s) {
 		final Matcher matcher = VERSION_PATTERN.matcher(s);
-		if (!matcher.matches())
-			throw new IllegalArgumentException("pattern could not be parsed") ;
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException("pattern could not be parsed");
+		}
 
 		return new NodeVersion(
 				Integer.parseInt(matcher.group(1)),
@@ -115,8 +116,9 @@ public class NodeVersion {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof NodeVersion))
+		if (!(obj instanceof NodeVersion)) {
 			return false;
+		}
 
 		final NodeVersion rhs = (NodeVersion)obj;
 		return this.majorVersion == rhs.majorVersion &&
@@ -153,7 +155,6 @@ public class NodeVersion {
 	 *
 	 * @param deserializer The deserializer to use.
 	 * @param label The optional label.
-	 *
 	 * @return The read object.
 	 */
 	public static NodeVersion readFrom(final Deserializer deserializer, final String label) {

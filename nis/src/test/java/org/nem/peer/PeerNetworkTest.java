@@ -208,7 +208,7 @@ public class PeerNetworkTest {
 			Mockito.when(selector.selectNodes()).thenReturn(new ArrayList<>());
 			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
 
-		 	this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory);
+			this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory);
 		}
 	}
 }

@@ -19,7 +19,6 @@ public class Hashes {
 	 * Performs a SHA3-256 hash of the concatenated inputs.
 	 *
 	 * @param inputs The byte arrays to concatenate and hash.
-	 *
 	 * @return The hash of the concatenated inputs.
 	 * @throws CryptoException if the hash operation failed.
 	 */
@@ -31,7 +30,6 @@ public class Hashes {
 	 * Performs a RIPEMD160 hash of the concatenated inputs.
 	 *
 	 * @param inputs The byte arrays to concatenate and hash.
-	 *
 	 * @return The hash of the concatenated inputs.
 	 * @throws CryptoException if the hash operation failed.
 	 */
@@ -41,14 +39,14 @@ public class Hashes {
 
 	private static byte[] hash(final String algorithm, final byte[]... inputs) {
 		try {
-			MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
+			final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
 
-			for (byte[] input : inputs)
+			for (final byte[] input : inputs) {
 				digest.update(input);
+			}
 
 			return digest.digest();
-
-		} catch (NoSuchAlgorithmException|NoSuchProviderException e) {
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new CryptoException(e);
 		}
 	}

@@ -9,7 +9,6 @@ public class MockScores extends Scores<MockScore> {
 
 	private final double defaultScoreValue;
 
-
 	/**
 	 * Creates a new mock scores collection.
 	 */

@@ -27,8 +27,9 @@ public class FormatUtils {
 	 * @return The desired decimal format.
 	 */
 	public static DecimalFormat getDecimalFormat(final int decimalPlaces) {
-		if (decimalPlaces < 0)
+		if (decimalPlaces < 0) {
 			throw new IllegalArgumentException("decimalPlaces must be non-negative");
+		}
 
 		final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
 		decimalFormatSymbols.setDecimalSeparator('.');

@@ -49,7 +49,7 @@ public class CommonConfiguration {
 	 */
 	public CommonConfiguration(final Properties properties) {
 		this.shortServerName = getString(properties, "nem.shortServerName");
-		this.nemFolder = getOptionalString(properties, "nem.folder", getDefaultFolder()).replace("%h", getDefaultFolder());
+		this.nemFolder = getOptionalString(properties, "nem.folder", this.getDefaultFolder()).replace("%h", this.getDefaultFolder());
 		this.maxThreads = getInteger(properties, "nem.maxThreads");
 		this.protocol = getOptionalString(properties, "nem.protocol", "http");
 		this.host = getOptionalString(properties, "nem.host", "localhost");
@@ -82,17 +82,17 @@ public class CommonConfiguration {
 
 	protected static String getOptionalString(final Properties properties, final String name, final String defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : value;
+		return null == value ? defaultValue : value;
 	}
 
 	protected static int getOptionalInteger(final Properties properties, final String name, final Integer defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : Integer.valueOf(value);
+		return null == value ? defaultValue : Integer.valueOf(value);
 	}
 
 	protected static boolean getOptionalBoolean(final Properties properties, final String name, final Boolean defaultValue) {
 		final String value = properties.getProperty(name);
-		return null == value? defaultValue : Boolean.valueOf(value);
+		return null == value ? defaultValue : Boolean.valueOf(value);
 	}
 
 	/**
@@ -245,12 +245,12 @@ public class CommonConfiguration {
 	 * @return The base url as string.
 	 */
 	public String getBaseUrl() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		return builder.append(this.getProtocol())
 				.append("://")
 				.append(this.getHost())
 				.append(":")
-				.append(this.getProtocol().equals("https")? this.getHttpsPort() : this.getHttpPort())
+				.append(this.getProtocol().equals("https") ? this.getHttpsPort() : this.getHttpPort())
 				.toString();
 	}
 

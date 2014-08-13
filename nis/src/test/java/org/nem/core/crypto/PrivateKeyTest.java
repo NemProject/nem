@@ -117,7 +117,7 @@ public class PrivateKeyTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final PrivateKey key = new PrivateKey(new BigInteger("2275"));
-		int hashCode = key.hashCode();
+		final int hashCode = key.hashCode();
 
 		// Assert:
 		Assert.assertThat(PrivateKey.fromDecimalString("2275").hashCode(), IsEqual.equalTo(hashCode));

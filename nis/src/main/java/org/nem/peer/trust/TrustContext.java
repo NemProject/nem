@@ -17,11 +17,11 @@ public class TrustContext {
 	/**
 	 * Creates a new trust context.
 	 *
-	 * @param nodes           The known nodes (including the local node).
-	 * @param localNode       The local node.
+	 * @param nodes The known nodes (including the local node).
+	 * @param localNode The local node.
 	 * @param nodeExperiences Node experiences information.
 	 * @param preTrustedNodes Pre-trusted node information.
-	 * @param params          Additional parameters associated with the trust context.
+	 * @param params Additional parameters associated with the trust context.
 	 */
 	public TrustContext(
 			final Node[] nodes,

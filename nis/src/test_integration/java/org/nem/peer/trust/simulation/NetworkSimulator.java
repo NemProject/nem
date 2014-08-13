@@ -59,13 +59,14 @@ public class NetworkSimulator {
 	/**
 	 * Creates a new network simulation.
 	 *
-	 * @param config        The simulator configuration.
+	 * @param config The simulator configuration.
 	 * @param trustProvider The trust provider to use.
-	 * @param minTrust      The minimum trust we have in every node.
+	 * @param minTrust The minimum trust we have in every node.
 	 */
 	public NetworkSimulator(final Config config, final TrustProvider trustProvider, final double minTrust) {
-		if (minTrust <= 0.0 || minTrust > 1.0)
+		if (minTrust <= 0.0 || minTrust > 1.0) {
 			throw new IllegalArgumentException("min trust must be in the range (0, 1]");
+		}
 
 		this.config = config;
 		this.trustProvider = trustProvider;
@@ -89,33 +90,32 @@ public class NetworkSimulator {
 	 * Runs the network simulation.
 	 * After each round the global trust for the local peer is calculated.
 	 *
-	 * @param outputFile    path to the output file (contains trusts in nodes)
+	 * @param outputFile path to the output file (contains trusts in nodes)
 	 * @param numIterations number of rounds for the simulation
-	 *
 	 * @return return true if successful, false otherwise
 	 */
 	public boolean run(final String outputFile, final int numIterations) {
 		try {
-			File file = new File(outputFile);
-			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			final File file = new File(outputFile);
+			final BufferedWriter out = new BufferedWriter(new FileWriter(file));
 			this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
-			writeTrustValues(out, 0);
+			this.writeTrustValues(out, 0);
 
-			successfulCalls = 0;
-			failedCalls = 0;
+			this.successfulCalls = 0;
+			this.failedCalls = 0;
 			// We convert the peers in the network to an array since having a special node like localNode
 			// sucks when it comes to simulations.
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i = 0; i < numIterations; i++) {
-				doCommunications(peers);
+				this.doCommunications(peers);
 				this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
 				if (i % 100 == 99) {
-					writeTrustValues(out, i + 1);
+					this.writeTrustValues(out, i + 1);
 				}
 			}
 
 			out.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.warning("IO-Exception while writing to file <" + outputFile + ">. Reason: " + e.toString());
 			return false;
 		}
@@ -137,12 +137,12 @@ public class NetworkSimulator {
 
 				// Communicate with other nodes
 				for (int i = 0; i < COMMUNICATION_PARTNERS; i++) {
-					Node partner = getCommunicationPartner(node, peers);
+					final Node partner = this.getCommunicationPartner(node, peers);
 					if (partner == null) {
 						continue;
 					}
 
-					final NodeExperience experience = getNodeExperience(node, partner);
+					final NodeExperience experience = this.getNodeExperience(node, partner);
 					final NodeBehavior partnerBehavior = this.getNodeBehavior(partner);
 					if (nodeBehavior.isCollusive() && partnerBehavior.isCollusive()) {
 						// Communication between collusive evil nodes
@@ -150,13 +150,14 @@ public class NetworkSimulator {
 					} else {
 						// Nodes might fake data and feedback. Depending on the probability to give honest/dishonest feedback,
 						// the node inverts his behavior with this probability.
-						boolean honestData = Math.random() < partnerBehavior.getHonestDataProbability();
-						boolean honestFeedback = Math.random() < nodeBehavior.getHonestFeedbackProbability();
+						final boolean honestData = Math.random() < partnerBehavior.getHonestDataProbability();
+						final boolean honestFeedback = Math.random() < nodeBehavior.getHonestFeedbackProbability();
 						if (!nodeBehavior.isEvil()) {
-							if (honestData)
-								successfulCalls++;
-							else
-								failedCalls++;
+							if (honestData) {
+								this.successfulCalls++;
+							} else {
+								this.failedCalls++;
+							}
 						}
 						if ((honestData && honestFeedback) || (!honestData && !honestFeedback)) {
 							experience.successfulCalls().increment();
@@ -165,7 +166,7 @@ public class NetworkSimulator {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOGGER.warning("Exception in doCommunications, reason: " + e.toString());
 			}
 		}
@@ -173,8 +174,9 @@ public class NetworkSimulator {
 
 	private NodeBehavior getNodeBehavior(final Node node) {
 		for (final Config.Entry entry : this.config.getEntries()) {
-			if (node.equals(entry.getNode()))
+			if (node.equals(entry.getNode())) {
 				return entry.getBehavior();
+			}
 		}
 
 		throw new IllegalArgumentException(String.format("%s could not be found in the configuration", node));
@@ -191,16 +193,16 @@ public class NetworkSimulator {
 	 * When choosing from the set of already known nodes, the chance for a node to be chosen is roughly
 	 * proportional to the trust in it.
 	 *
-	 * @param node  the node that needs a partner
+	 * @param node the node that needs a partner
 	 * @param peers array of peers to choose from
-	 *
 	 * @return chosen node or null if none was chosen
 	 */
 	private Node getCommunicationPartner(final Node node, final Node[] peers) {
 
 		final NodeCollection nodeCollection = new NodeCollection();
-		for (final Node peer : peers)
+		for (final Node peer : peers) {
 			nodeCollection.update(peer, NodeStatus.ACTIVE);
+		}
 
 		final TrustContext trustContext = new TrustContext(
 				peers,
@@ -223,9 +225,8 @@ public class NetworkSimulator {
 	 * Writes trust values to an output file.
 	 * The percentage of failed calls is written too.
 	 *
-	 * @param out   writer object
+	 * @param out writer object
 	 * @param round the number of rounds already elapsed
-	 *
 	 * @throws IOException
 	 */
 	private void writeTrustValues(final BufferedWriter out, final int round) throws IOException {
@@ -236,8 +237,9 @@ public class NetworkSimulator {
 		out.write("Local node's experience with other nodes after round " + round + ":");
 		out.newLine();
 		for (final Node node : this.trustContext.getNodes()) {
-			if (node.equals(localNode))
+			if (node.equals(localNode)) {
 				continue;
+			}
 
 			final NodeExperience experience = this.getNodeExperience(localNode, node);
 			out.write("Node " + node + ": ");

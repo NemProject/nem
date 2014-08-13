@@ -13,13 +13,13 @@ public class MessageFactory {
 	 */
 	public static final ObjectDeserializer<Message> DESERIALIZER = new ObjectDeserializer<Message>() {
 		@Override
-		public Message deserialize(Deserializer deserializer) {
+		public Message deserialize(final Deserializer deserializer) {
 			return MessageFactory.deserialize(deserializer);
 		}
 	};
 
 	private static Message deserialize(final Deserializer deserializer) {
-		int type = deserializer.readInt("type");
+		final int type = deserializer.readInt("type");
 
 		switch (type) {
 			case MessageTypes.PLAIN:

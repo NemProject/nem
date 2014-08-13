@@ -186,7 +186,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 		try (final BinarySerializer serializer = new BinarySerializer()) {
 
 			// Act:
-			List<SerializableEntity> originalObjects = new ArrayList<>();
+			final List<SerializableEntity> originalObjects = new ArrayList<>();
 			originalObjects.add(new MockSerializableEntity(17, "foo", 42));
 			originalObjects.add(new MockSerializableEntity(111, "bar", 22));
 			originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
@@ -223,7 +223,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 			// Act:
 			serializer.writeInt("int", 0x09513510);
 
-			try (BinaryDeserializer deserializer = createBinaryDeserializer(serializer.getBytes())) {
+			try (BinaryDeserializer deserializer = this.createBinaryDeserializer(serializer.getBytes())) {
 				// Assert:
 				Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(true));
 			}
@@ -236,8 +236,8 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 	@Test(expected = SerializationException.class)
 	public void readOfPrimitiveTypeFailsIfStreamIsTooSmall() throws Exception {
-		byte[] bytes = new byte[] { 1, 2, 4 };
-		try (BinaryDeserializer deserializer = createBinaryDeserializer(bytes)) {
+		final byte[] bytes = new byte[] { 1, 2, 4 };
+		try (BinaryDeserializer deserializer = this.createBinaryDeserializer(bytes)) {
 			// Assert:
 			deserializer.readInt("int");
 		}
@@ -245,8 +245,8 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 	@Test(expected = SerializationException.class)
 	public void readOfVariableSizedTypeFailsIfStreamIsTooSmall() throws Exception {
-		byte[] bytes = new byte[] { 0x02, 0x00, 0x00, 0x00, 0x01 };
-		try (BinaryDeserializer deserializer = createBinaryDeserializer(bytes)) {
+		final byte[] bytes = new byte[] { 0x02, 0x00, 0x00, 0x00, 0x01 };
+		try (BinaryDeserializer deserializer = this.createBinaryDeserializer(bytes)) {
 			// Assert:
 			deserializer.readBytes("bytes");
 		}
@@ -268,7 +268,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 			// Act:
 			final SerializableEntity entity = new MockSerializableEntity(17, "foo", 42);
 			entity.serialize(serializer);
-			byte[] writeObjectBytes = serializer.getBytes();
+			final byte[] writeObjectBytes = serializer.getBytes();
 
 			// Assert:
 			Assert.assertThat(BinarySerializer.serializeToBytes(entity), IsEqual.equalTo(writeObjectBytes));

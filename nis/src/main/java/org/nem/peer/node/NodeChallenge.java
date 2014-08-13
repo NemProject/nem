@@ -50,9 +50,10 @@ public class NodeChallenge implements SerializableEntity {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof NodeChallenge))
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof NodeChallenge)) {
 			return false;
+		}
 
 		final NodeChallenge rhs = (NodeChallenge)obj;
 		return Arrays.equals(this.data, rhs.data);

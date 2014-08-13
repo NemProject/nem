@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
@@ -82,7 +82,6 @@ public class HistoricalOutlinksTest {
 		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(1));
 		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
 	}
-
 
 	@Test(expected = IllegalArgumentException.class)
 	public void removingAmountNotInOrderThrowsException() {

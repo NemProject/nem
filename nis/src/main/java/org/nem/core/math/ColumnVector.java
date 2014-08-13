@@ -22,8 +22,9 @@ public class ColumnVector {
 	 * @param size The desired size.
 	 */
 	public ColumnVector(final int size) {
-		if (0 == size)
+		if (0 == size) {
 			throw new IllegalArgumentException("cannot create a vector of zero size");
+		}
 
 		this.size = size;
 		this.vector = new double[this.size];
@@ -36,8 +37,9 @@ public class ColumnVector {
 	 * @param vector The vector of data.
 	 */
 	public ColumnVector(final double... vector) {
-		if (null == vector || 0 == vector.length)
+		if (null == vector || 0 == vector.length) {
 			throw new IllegalArgumentException("vector must not be null and have a non-zero size");
+		}
 
 		this.size = vector.length;
 		this.vector = vector;
@@ -68,7 +70,6 @@ public class ColumnVector {
 	 * Gets the value at the specified index.
 	 *
 	 * @param index The index.
-	 *
 	 * @return The value.
 	 */
 	public double getAt(final int index) {
@@ -79,9 +80,9 @@ public class ColumnVector {
 	 * Sets a value at the specified index.
 	 *
 	 * @param index The index.
-	 * @param val   The value.
+	 * @param val The value.
 	 */
-	public void setAt(final int index, double val) {
+	public void setAt(final int index, final double val) {
 		this.matrix.setAt(index, 0, val);
 	}
 
@@ -89,9 +90,9 @@ public class ColumnVector {
 	 * Increments at the specified index by a value.
 	 *
 	 * @param index The index.
-	 * @param val   The value.
+	 * @param val The value.
 	 */
-	public void incrementAt(final int index, double val) {
+	public void incrementAt(final int index, final double val) {
 		this.matrix.incrementAt(index, 0, val);
 	}
 
@@ -102,7 +103,7 @@ public class ColumnVector {
 	/**
 	 * Normalizes this vector's elements so that the absolute value of all
 	 * elements sums to 1.0.
-	 *
+	 * <br/>
 	 * This method has the side effect of modifying the implicit context
 	 * object, so be careful.
 	 */
@@ -128,14 +129,13 @@ public class ColumnVector {
 	 * another vector.
 	 *
 	 * @param vector The vector.
-	 *
 	 * @return The new vector.
 	 */
 	public ColumnVector multiplyElementWise(final ColumnVector vector) {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.multiplyElementWise(vector.matrix);
+				return ColumnVector.this.matrix.multiplyElementWise(vector.matrix);
 			}
 		});
 	}
@@ -144,14 +144,13 @@ public class ColumnVector {
 	 * Creates a new ColumnVector by adding the specified vector to this vector.
 	 *
 	 * @param vector The specified vector.
-	 *
 	 * @return The new vector.
 	 */
 	public ColumnVector add(final ColumnVector vector) {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.addElementWise(vector.matrix);
+				return ColumnVector.this.matrix.addElementWise(vector.matrix);
 			}
 		});
 	}
@@ -192,7 +191,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.roundTo(numPlaces);
+				return ColumnVector.this.matrix.roundTo(numPlaces);
 			}
 		});
 	}
@@ -207,7 +206,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.multiply(scalar);
+				return ColumnVector.this.matrix.multiply(scalar);
 			}
 		});
 	}
@@ -221,7 +220,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.sqrt();
+				return ColumnVector.this.matrix.sqrt();
 			}
 		});
 	}
@@ -235,7 +234,7 @@ public class ColumnVector {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
-				return matrix.abs();
+				return ColumnVector.this.matrix.abs();
 			}
 		});
 	}
@@ -278,9 +277,10 @@ public class ColumnVector {
 	 *
 	 * @param val The value.
 	 */
-	public void setAll(double val) {
-		for (int i = 0; i < this.vector.length; ++i)
+	public void setAll(final double val) {
+		for (int i = 0; i < this.vector.length; ++i) {
 			this.vector[i] = val;
+		}
 	}
 
 	//endregion
@@ -295,8 +295,9 @@ public class ColumnVector {
 	 * @return true if the alignment was successful; false otherwise.
 	 */
 	public boolean align() {
-		if (0.0 == this.vector[0])
+		if (0.0 == this.vector[0]) {
 			return false;
+		}
 
 		this.scale(this.vector[0]);
 		return true;
@@ -305,7 +306,7 @@ public class ColumnVector {
 	//endregion
 
 	//region max / median
-	
+
 	/**
 	 * Gets the maximum value for an individual element in this vector.
 	 *
@@ -313,9 +314,10 @@ public class ColumnVector {
 	 */
 	public double max() {
 		double maxVal = this.vector[0];
-		for (double val : this.vector)
+		for (final double val : this.vector) {
 			maxVal = Math.max(maxVal, val);
-		
+		}
+
 		return maxVal;
 	}
 
@@ -347,13 +349,12 @@ public class ColumnVector {
 	 * Calculates the Manhattan distance (L1-norm) between the specified vector and this vector.
 	 *
 	 * @param vector The specified vector.
-	 *
 	 * @return The Manhattan distance (L1-norm).
 	 */
 	public double l1Distance(final ColumnVector vector) {
 		return this.distance(vector, Math::abs);
 	}
-	
+
 	/**
 	 * Calculates the Euclidean distance (L2-norm) between the specified vector and this vector.
 	 *
@@ -361,17 +362,18 @@ public class ColumnVector {
 	 * @return The Euclidean distance.
 	 */
 	public double l2Distance(final ColumnVector vector) {
-		double distance = this.distance(vector, d -> d * d);
+		final double distance = this.distance(vector, d -> d * d);
 		return Math.sqrt(distance);
 	}
 
 	private double distance(final ColumnVector vector, final DoubleFunction<Double> aggregate) {
-		if (this.size != vector.size)
+		if (this.size != vector.size) {
 			throw new IllegalArgumentException("cannot determine the distance between vectors with different sizes");
+		}
 
 		double distance = 0;
 		for (int i = 0; i < this.size; ++i) {
-			double difference = this.vector[i] - vector.vector[i];
+			final double difference = this.vector[i] - vector.vector[i];
 			distance += aggregate.apply(difference);
 		}
 
@@ -388,8 +390,9 @@ public class ColumnVector {
 		final StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < this.size; ++i) {
-			if (0 != i)
+			if (0 != i) {
 				builder.append(" ");
+			}
 
 			builder.append(format.format(this.vector[i]));
 		}
@@ -408,8 +411,9 @@ public class ColumnVector {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof ColumnVector))
+		if (!(obj instanceof ColumnVector)) {
 			return false;
+		}
 
 		final ColumnVector rhs = (ColumnVector)obj;
 		return Arrays.equals(this.vector, rhs.vector);

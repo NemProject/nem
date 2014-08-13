@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 @ComponentScan(
 		basePackages = { "org.nem.nis" },
 		excludeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
-})
+		})
 @EnableTransactionManagement
 public class NisAppConfig {
 

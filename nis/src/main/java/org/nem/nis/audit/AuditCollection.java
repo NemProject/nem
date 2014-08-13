@@ -55,8 +55,9 @@ public class AuditCollection implements SerializableEntity {
 		final AuditEntry entry = new AuditEntry(this.counter.incrementAndGet(), host, path, this.timeProvider);
 
 		synchronized (this.mostRecentEntries) {
-			if (this.mostRecentEntries.size() >= this.maxEntries)
+			if (this.mostRecentEntries.size() >= this.maxEntries) {
 				this.mostRecentEntries.removeLast();
+			}
 
 			this.mostRecentEntries.addFirst(entry);
 		}

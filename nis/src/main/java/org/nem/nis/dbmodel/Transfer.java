@@ -61,18 +61,18 @@ public class Transfer {
 	}
 
 	public Transfer(
-			Hash hash,
-			Integer version,
-			Integer type,
-			Long fee,
-			Integer timestamp,
-			Integer deadline,
-			Account sender,
-			byte[] senderProof,
-			Account recipient,
-			Integer blkIndex,
-			Long amount,
-			Long referencedTransaction
+			final Hash hash,
+			final Integer version,
+			final Integer type,
+			final Long fee,
+			final Integer timestamp,
+			final Integer deadline,
+			final Account sender,
+			final byte[] senderProof,
+			final Account recipient,
+			final Integer blkIndex,
+			final Long amount,
+			final Long referencedTransaction
 	) {
 		this.shortId = hash.getShortId();
 		this.transferHash = hash.getRaw();
@@ -90,18 +90,18 @@ public class Transfer {
 	}
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
 	public Long getShortId() {
-		return shortId;
+		return this.shortId;
 	}
 
-	public void setShortId(Long shortId) {
+	public void setShortId(final Long shortId) {
 		this.shortId = shortId;
 	}
 
@@ -109,119 +109,119 @@ public class Transfer {
 		return new Hash(this.transferHash);
 	}
 
-	public void setTransferHash(byte[] transferHash) {
+	public void setTransferHash(final byte[] transferHash) {
 		this.transferHash = transferHash;
 	}
 
 	public Integer getVersion() {
-		return version;
+		return this.version;
 	}
 
-	public void setVersion(Integer version) {
+	public void setVersion(final Integer version) {
 		this.version = version;
 	}
 
 	public Integer getType() {
-		return type;
+		return this.type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(final Integer type) {
 		this.type = type;
 	}
 
 	public Long getFee() {
-		return fee;
+		return this.fee;
 	}
 
-	public void setFee(Long fee) {
+	public void setFee(final Long fee) {
 		this.fee = fee;
 	}
 
 	public Integer getTimestamp() {
-		return timestamp;
+		return this.timestamp;
 	}
 
-	public void setTimestamp(Integer timestamp) {
+	public void setTimestamp(final Integer timestamp) {
 		this.timestamp = timestamp;
 	}
 
 	public Integer getDeadline() {
-		return deadline;
+		return this.deadline;
 	}
 
-	public void setDeadline(Integer deadline) {
+	public void setDeadline(final Integer deadline) {
 		this.deadline = deadline;
 	}
 
 	public Account getSender() {
-		return sender;
+		return this.sender;
 	}
 
-	public void setSender(Account sender) {
+	public void setSender(final Account sender) {
 		this.sender = sender;
 	}
 
 	public byte[] getSenderProof() {
-		return senderProof;
+		return this.senderProof;
 	}
 
-	public void setSenderProof(byte[] senderProof) {
+	public void setSenderProof(final byte[] senderProof) {
 		this.senderProof = senderProof;
 	}
 
 	public Account getRecipient() {
-		return recipient;
+		return this.recipient;
 	}
 
-	public void setRecipient(Account recipient) {
+	public void setRecipient(final Account recipient) {
 		this.recipient = recipient;
 	}
 
 	public Integer getBlkIndex() {
-		return blkIndex;
+		return this.blkIndex;
 	}
 
-	public void setBlkIndex(Integer blkIndex) {
+	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
 	}
 
 	public Long getAmount() {
-		return amount;
+		return this.amount;
 	}
 
-	public void setAmount(Long amount) {
+	public void setAmount(final Long amount) {
 		this.amount = amount;
 	}
 
 	public Long getReferencedTransaction() {
-		return referencedTransaction;
+		return this.referencedTransaction;
 	}
 
-	public void setReferencedTransaction(Long referencedTransaction) {
+	public void setReferencedTransaction(final Long referencedTransaction) {
 		this.referencedTransaction = referencedTransaction;
 	}
 
 	public Block getBlock() {
-		return block;
+		return this.block;
 	}
 
-	public void setBlock(Block block) {
+	public void setBlock(final Block block) {
 		this.block = block;
 	}
 
 	public Integer getMessageType() {
-		return messageType;
+		return this.messageType;
 	}
 
-	public void setMessageType(Integer messageType) {
+	public void setMessageType(final Integer messageType) {
 		this.messageType = messageType;
 	}
 
 	public byte[] getMessagePayload() {
-		return messagePayload;
+		return this.messagePayload;
 	}
 
-	public void setMessagePayload(byte[] messagePayload) {
+	public void setMessagePayload(final byte[] messagePayload) {
 		this.messagePayload = messagePayload;
 	}
 }

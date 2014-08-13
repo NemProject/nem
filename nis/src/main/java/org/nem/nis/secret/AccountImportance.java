@@ -38,7 +38,7 @@ public class AccountImportance implements SerializableEntity {
 	public AccountImportance(final Deserializer deserializer) {
 		this();
 
-		boolean isSet = 0 != deserializer.readInt("isSet");
+		final boolean isSet = 0 != deserializer.readInt("isSet");
 		if (isSet) {
 			this.importance = deserializer.readDouble("score");
 			this.lastPageRank = deserializer.readDouble("ev");
@@ -100,11 +100,10 @@ public class AccountImportance implements SerializableEntity {
 	 * @param blockHeight The block height.
 	 * @param importance The importance.
 	 */
-	public void setImportance(final BlockHeight blockHeight, double importance) {
-		if (null == importanceHeight || 0 != this.importanceHeight.compareTo(blockHeight)) {
+	public void setImportance(final BlockHeight blockHeight, final double importance) {
+		if (null == this.importanceHeight || 0 != this.importanceHeight.compareTo(blockHeight)) {
 			this.importanceHeight = blockHeight;
 			this.importance = importance;
-
 		} else if (this.importanceHeight.compareTo(blockHeight) != 0) {
 			throw new IllegalArgumentException("importance already set at given height");
 		}

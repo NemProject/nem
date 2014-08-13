@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class MockBlockScorer extends BlockScorer {
 
-	private Set<Block> zeroTargetBlocks = new HashSet<>();
-	private Map<BlockScoreKey, Long> blockScores = new HashMap<>();
+	private final Set<Block> zeroTargetBlocks = new HashSet<>();
+	private final Map<BlockScoreKey, Long> blockScores = new HashMap<>();
 
 	public MockBlockScorer() {
 		super(Mockito.mock(PoiFacade.class));
@@ -47,12 +47,12 @@ public class MockBlockScorer extends BlockScorer {
 
 	@Override
 	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
-		return zeroTargetBlocks.contains(block) ? BigInteger.ZERO : BigInteger.TEN;
+		return this.zeroTargetBlocks.contains(block) ? BigInteger.ZERO : BigInteger.TEN;
 	}
 
 	@Override
 	public long calculateBlockScore(final Block parentBlock, final Block block) {
-		return blockScores.get(new BlockScoreKey(parentBlock, block));
+		return this.blockScores.get(new BlockScoreKey(parentBlock, block));
 	}
 
 	private static class BlockScoreKey {
@@ -71,8 +71,9 @@ public class MockBlockScorer extends BlockScorer {
 
 		@Override
 		public boolean equals(final Object obj) {
-			if (!(obj instanceof BlockScoreKey))
+			if (!(obj instanceof BlockScoreKey)) {
 				return false;
+			}
 
 			final BlockScoreKey rhs = (BlockScoreKey)obj;
 			return this.parentBlock.equals(rhs.parentBlock)

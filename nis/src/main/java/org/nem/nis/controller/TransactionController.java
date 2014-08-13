@@ -41,8 +41,9 @@ public class TransactionController {
 		final TransferTransaction transfer = deserializeTransaction(deserializer);
 
 		final ValidationResult validationResult = transfer.checkValidity();
-		if (ValidationResult.SUCCESS != transfer.checkValidity())
+		if (ValidationResult.SUCCESS != transfer.checkValidity()) {
 			throw new IllegalArgumentException(validationResult.toString());
+		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
 		return new RequestPrepare(transferData);
@@ -51,7 +52,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NisRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
-		final TransferTransaction transfer = deserializeTransaction(requestAnnounce.getData());
+		final TransferTransaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
 		return new NisRequestResult(result);

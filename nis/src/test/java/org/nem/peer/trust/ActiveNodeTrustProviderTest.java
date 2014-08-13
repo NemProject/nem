@@ -133,8 +133,9 @@ public class ActiveNodeTrustProviderTest {
 
 	private static NodeCollection createNodeCollection(final Node[] nodes, final NodeStatus status) {
 		final NodeCollection nodeCollection = new NodeCollection();
-		for (final Node node : nodes)
+		for (final Node node : nodes) {
 			nodeCollection.update(node, status);
+		}
 
 		return nodeCollection;
 	}

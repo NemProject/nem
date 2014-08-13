@@ -14,9 +14,9 @@ public class HarvestInfoTest {
 		// Arrange + Act:
 		final HarvestInfo result = new HarvestInfo(
 				Hash.fromHexString("aabbcc"),
-                new BlockHeight(123),
-                new TimeInstant(654),
-                Amount.fromMicroNem(45678));
+				new BlockHeight(123),
+				new TimeInstant(654),
+				Amount.fromMicroNem(45678));
 
 		// Assert:
 		Assert.assertThat(result.getHash(), IsEqual.equalTo(Hash.fromHexString("aabbcc")));

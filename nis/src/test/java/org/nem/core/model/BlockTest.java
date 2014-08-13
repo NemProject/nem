@@ -124,7 +124,7 @@ public class BlockTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		final Block block = createBlockForRoundTripTests(true, signer);
+		final Block block = this.createBlockForRoundTripTests(true, signer);
 
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
@@ -150,7 +150,7 @@ public class BlockTest {
 	@Test
 	public void blockDifficultyIsNotRoundTripped() {
 		// Act:
-		final Block block = createBlockForRoundTripTests(true, null);
+		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Assert:
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
@@ -159,10 +159,10 @@ public class BlockTest {
 	@Test
 	public void changingDifficultyDoesNotInvalidateBlock() {
 		// Arrange:
-		final Block block = createBlockForRoundTripTests(true, null);
+		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Act
-		boolean originalVerifyResult = block.verify();
+		final boolean originalVerifyResult = block.verify();
 		block.setDifficulty(new BlockDifficulty(55_444_333_222_111L));
 
 		// Assert:
@@ -175,10 +175,10 @@ public class BlockTest {
 	public void changingPreviousBlockInvalidatesBlock() {
 		// Arrange:
 		final Block previousBlock = BlockUtils.createBlock(Utils.generateRandomAccount());
-		final Block block = createBlockForRoundTripTests(true, null);
+		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Act
-		boolean originalVerifyResult = block.verify();
+		final boolean originalVerifyResult = block.verify();
 		block.setPrevious(previousBlock);
 
 		// Assert:
@@ -190,7 +190,7 @@ public class BlockTest {
 	@Test
 	public void blockAndTransactionsCanBeVerifiedAfterVerifiableRoundTrip() {
 		// Act:
-		final Block block = createBlockForRoundTripTests(true, null);
+		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Assert:
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
@@ -208,7 +208,7 @@ public class BlockTest {
 	@Test
 	public void transactionsCanBeVerifiedAfterNonVerifiableRoundTrip() {
 		// Act:
-		final Block block = createBlockForRoundTripTests(false, null);
+		final Block block = this.createBlockForRoundTripTests(false, null);
 
 		// Assert:
 		Assert.assertThat(block.getSignature(), IsNull.nullValue());
@@ -223,13 +223,13 @@ public class BlockTest {
 		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
 	}
 
-	private Block createBlockForRoundTripTests(boolean verifiable, final Account signer) {
+	private Block createBlockForRoundTripTests(final boolean verifiable, final Account signer) {
 		// Arrange:
 		final Block originalBlock = BlockUtils.createBlock(null == signer ? Utils.generateRandomAccount() : signer);
-		final TransferTransaction transaction1 = createSignedTransactionWithAmount(17);
+		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(17);
 		originalBlock.addTransaction(transaction1);
 
-		final TransferTransaction transaction2 = createSignedTransactionWithAmount(290);
+		final TransferTransaction transaction2 = this.createSignedTransactionWithAmount(290);
 		originalBlock.addTransaction(transaction2);
 		originalBlock.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		originalBlock.sign();
@@ -250,7 +250,7 @@ public class BlockTest {
 		return new Block(deserializer.readInt("type"), options, deserializer);
 	}
 
-	private TransferTransaction createSignedTransactionWithAmount(long amount) {
+	private TransferTransaction createSignedTransactionWithAmount(final long amount) {
 		final TransferTransaction transaction = new TransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),

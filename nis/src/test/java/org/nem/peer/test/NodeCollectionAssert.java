@@ -15,8 +15,8 @@ public class NodeCollectionAssert {
 	/**
 	 * Asserts that nodes have matching active and inactive names.
 	 *
-	 * @param nodes                 The nodes.
-	 * @param expectedActiveNames   The expected active names.
+	 * @param nodes The nodes.
+	 * @param expectedActiveNames The expected active names.
 	 * @param expectedInactiveNames The expected inactive names.
 	 */
 	public static void areNamesEquivalent(
@@ -37,8 +37,8 @@ public class NodeCollectionAssert {
 	/**
 	 * Asserts that nodes have matching active and inactive ports.
 	 *
-	 * @param nodes                 The nodes.
-	 * @param expectedActivePorts   The expected active ports.
+	 * @param nodes The nodes.
+	 * @param expectedActivePorts The expected active ports.
 	 * @param expectedInactivePorts The expected inactive ports.
 	 */
 	public static void arePortsEquivalent(
@@ -53,7 +53,7 @@ public class NodeCollectionAssert {
 	/**
 	 * Asserts that nodes have matching ports.
 	 *
-	 * @param nodes         The nodes.
+	 * @param nodes The nodes.
 	 * @param expectedPorts The expected ports.
 	 */
 	public static void arePortsEquivalent(
@@ -74,8 +74,8 @@ public class NodeCollectionAssert {
 	/**
 	 * Asserts that nodes have matching active and inactive platforms.
 	 *
-	 * @param nodes                     The nodes.
-	 * @param expectedActivePlatforms   The expected active platforms.
+	 * @param nodes The nodes.
+	 * @param expectedActivePlatforms The expected active platforms.
 	 * @param expectedInactivePlatforms The expected inactive platforms.
 	 */
 	public static void arePlatformsEquivalent(
@@ -90,7 +90,7 @@ public class NodeCollectionAssert {
 	/**
 	 * Asserts that nodes have matching active and inactive platforms.
 	 *
-	 * @param nodes             The nodes.
+	 * @param nodes The nodes.
 	 * @param expectedPlatforms The expected platforms (both active and inactive).
 	 */
 	public static void arePlatformsEquivalent(

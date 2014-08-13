@@ -11,14 +11,14 @@ public class Base32Encoder {
 	 * Converts a string to a byte array.
 	 *
 	 * @param base32String The input Base32 string.
-	 *
 	 * @return The output byte array.
 	 */
 	public static byte[] getBytes(final String base32String) {
-		Base32 codec = new Base32();
-		byte[] encodedBytes = StringEncoder.getBytes(base32String);
-		if (!codec.isInAlphabet(encodedBytes, true))
+		final Base32 codec = new Base32();
+		final byte[] encodedBytes = StringEncoder.getBytes(base32String);
+		if (!codec.isInAlphabet(encodedBytes, true)) {
 			throw new IllegalArgumentException("malformed base32 string passed to getBytes");
+		}
 
 		return codec.decode(encodedBytes);
 	}
@@ -27,12 +27,11 @@ public class Base32Encoder {
 	 * Converts a byte array to a Base32 string.
 	 *
 	 * @param bytes The input byte array.
-	 *
 	 * @return The output Base32 string.
 	 */
-	public static String getString(byte[] bytes) {
-		Base32 codec = new Base32();
-		byte[] decodedBytes = codec.encode(bytes);
+	public static String getString(final byte[] bytes) {
+		final Base32 codec = new Base32();
+		final byte[] decodedBytes = codec.encode(bytes);
 		return StringEncoder.getString(decodedBytes);
 	}
 }

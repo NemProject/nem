@@ -14,8 +14,8 @@ public class Curves {
 	private static final Curve SECP256K1;
 
 	static {
-		X9ECParameters params = SECNamedCurves.getByName("secp256k1");
-		ECDomainParameters ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
+		final X9ECParameters params = SECNamedCurves.getByName("secp256k1");
+		final ECDomainParameters ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
 		SECP256K1 = new Curve(ecParams, ecParams.getN().shiftRight(1));
 	}
 

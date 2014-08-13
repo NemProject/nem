@@ -142,7 +142,7 @@ public class BlockChainComparerTest {
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND)));
 	}
 
-	private static ComparisonResult.Code compareBlocksWithHeight(int localHeight, int remoteHeight) {
+	private static ComparisonResult.Code compareBlocksWithHeight(final int localHeight, final int remoteHeight) {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final BlockChainComparer comparer = createBlockChainComparer();
@@ -173,7 +173,7 @@ public class BlockChainComparerTest {
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES)));
 	}
 
-	private static ComparisonResult.Code compareBlocksWithNumRemoteHashes(int numHashes) {
+	private static ComparisonResult.Code compareBlocksWithNumRemoteHashes(final int numHashes) {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final BlockChainComparer comparer = createBlockChainComparer();
@@ -336,15 +336,16 @@ public class BlockChainComparerTest {
 
 	//region utils
 
-	private static HashChain createHashChain(byte[]... hashes) {
+	private static HashChain createHashChain(final byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
-		for (final byte[] hash : hashes)
+		for (final byte[] hash : hashes) {
 			chain.add(new Hash(hash));
+		}
 
 		return chain;
 	}
 
-	private static HashChain createHashChain(byte[][] hashes, byte[] additionalHash) {
+	private static HashChain createHashChain(final byte[][] hashes, final byte[] additionalHash) {
 		final HashChain chain = createHashChain(hashes);
 		chain.add(new Hash(additionalHash));
 		return chain;

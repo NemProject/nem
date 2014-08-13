@@ -14,7 +14,7 @@ public class ComparisonContext {
 	 * @param maxNumBlocksToAnalyze The maximum number of blocks to rewrite.
 	 * @param maxNumBlocksToRewrite The maximum number of blocks to analyze.
 	 */
-	public ComparisonContext(int maxNumBlocksToAnalyze, int maxNumBlocksToRewrite) {
+	public ComparisonContext(final int maxNumBlocksToAnalyze, final int maxNumBlocksToRewrite) {
 		this.maxNumBlocksToAnalyze = maxNumBlocksToAnalyze;
 		this.maxNumBlocksToRewrite = maxNumBlocksToRewrite;
 

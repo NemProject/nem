@@ -99,7 +99,7 @@ public class PeerNetwork {
 	 * Broadcasts an entity to all active nodes.
 	 *
 	 * @param broadcastId The type of entity.
-	 * @param entity      The entity.
+	 * @param entity The entity.
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		return this.servicesFactory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);

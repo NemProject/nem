@@ -33,8 +33,9 @@ public class PeerNetworkState {
 		this.nodeExperiences = nodeExperiences;
 		this.nodes = nodeCollection;
 
-		for (final Node node : this.config.getPreTrustedNodes().getNodes())
+		for (final Node node : this.config.getPreTrustedNodes().getNodes()) {
 			this.nodes.update(node, NodeStatus.ACTIVE);
+		}
 	}
 
 	/**
@@ -82,8 +83,9 @@ public class PeerNetworkState {
 	 * @param pair A node and experiences pair for a remote node.
 	 */
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
-		if (this.getLocalNode().equals(pair.getNode()))
+		if (this.getLocalNode().equals(pair.getNode())) {
 			throw new IllegalArgumentException("cannot set local node experiences");
+		}
 
 		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
 	}
@@ -95,8 +97,9 @@ public class PeerNetworkState {
 	 * @param result The interaction result.
 	 */
 	public void updateExperience(final Node node, final NodeInteractionResult result) {
-		if (NodeInteractionResult.NEUTRAL == result || node.equals(this.localNode))
+		if (NodeInteractionResult.NEUTRAL == result || node.equals(this.localNode)) {
 			return;
+		}
 
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
 		(NodeInteractionResult.SUCCESS == result ? experience.successfulCalls() : experience.failedCalls()).increment();
@@ -124,11 +127,13 @@ public class PeerNetworkState {
 		final Node[] nodeArray = new Node[numNodes];
 
 		int index = 0;
-		for (final Node node : nodes.getActiveNodes())
+		for (final Node node : nodes.getActiveNodes()) {
 			nodeArray[index++] = node;
+		}
 
-		for (final Node node : nodes.getInactiveNodes())
+		for (final Node node : nodes.getInactiveNodes()) {
 			nodeArray[index++] = node;
+		}
 
 		nodeArray[index] = localNode;
 		return nodeArray;

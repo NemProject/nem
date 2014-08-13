@@ -15,7 +15,7 @@ public class HashChain extends SerializableList<Hash> {
 	 *
 	 * @param initialCapacity The initial capacity.
 	 */
-	public HashChain(int initialCapacity) {
+	public HashChain(final int initialCapacity) {
 		super(initialCapacity);
 	}
 
@@ -33,7 +33,7 @@ public class HashChain extends SerializableList<Hash> {
 	 *
 	 * @param deserializer The deserializer to use.
 	 */
-	public HashChain(Deserializer deserializer) {
+	public HashChain(final Deserializer deserializer) {
 		super(deserializer.readObjectArray("data", Hash.DESERIALIZER));
 	}
 

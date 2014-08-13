@@ -7,9 +7,9 @@ import org.nem.core.serialization.*;
  */
 public class MockSerializableEntity implements SerializableEntity {
 
-	private int intValue;
-	private String stringValue;
-	private long longValue;
+	private final int intValue;
+	private final String stringValue;
+	private final long longValue;
 
 	/**
 	 * Creates a new MockSerializableEntity object.
@@ -21,9 +21,9 @@ public class MockSerializableEntity implements SerializableEntity {
 	/**
 	 * Creates a new MockSerializableEntity object.
 	 *
-	 * @param intValue    The int value.
+	 * @param intValue The int value.
 	 * @param stringValue The string value.
-	 * @param longValue   The long value.
+	 * @param longValue The long value.
 	 */
 	public MockSerializableEntity(final int intValue, final String stringValue, final long longValue) {
 		this.intValue = intValue;
@@ -83,14 +83,15 @@ public class MockSerializableEntity implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof MockSerializableEntity))
+		if (!(obj instanceof MockSerializableEntity)) {
 			return false;
+		}
 
 		final MockSerializableEntity rhs = (MockSerializableEntity)obj;
 		return
 				this.intValue == rhs.intValue
-				&& this.stringValue.equals(rhs.stringValue)
-				&& this.longValue == rhs.longValue;
+						&& this.stringValue.equals(rhs.stringValue)
+						&& this.longValue == rhs.longValue;
 	}
 
 	@Override

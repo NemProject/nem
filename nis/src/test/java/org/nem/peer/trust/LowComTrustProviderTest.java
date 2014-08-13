@@ -74,8 +74,9 @@ public class LowComTrustProviderTest {
 
 		final Node localNode = context.getLocalNode();
 		final Node[] nodes = context.getNodes();
-		for (final Node node : nodes)
+		for (final Node node : nodes) {
 			context.getNodeExperiences().getNodeExperience(localNode, node).successfulCalls().set(100);
+		}
 
 		context.getNodeExperiences().getNodeExperience(localNode, nodes[1]).successfulCalls().set(nodeOneCalls);
 		context.getNodeExperiences().getNodeExperience(localNode, nodes[3]).successfulCalls().set(nodeThreeCalls);

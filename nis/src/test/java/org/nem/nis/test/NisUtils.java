@@ -49,7 +49,7 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified height.
 	 */
-	public static Block createRandomBlockWithHeight(long height) {
+	public static Block createRandomBlockWithHeight(final long height) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
@@ -61,7 +61,7 @@ public class NisUtils {
 	/**
 	 * Creates a new random Block with the specified timestamp.
 	 */
-	public static Block createRandomBlockWithTimeStamp(int timestamp) {
+	public static Block createRandomBlockWithTimeStamp(final int timestamp) {
 		return new Block(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
@@ -78,8 +78,9 @@ public class NisUtils {
 	 */
 	public static List<Hash> createHashesList(final int numHashes) {
 		final List<Hash> hashes = new ArrayList<>();
-		for (int i = 0; i < numHashes; ++i)
+		for (int i = 0; i < numHashes; ++i) {
 			hashes.add(Utils.generateRandomHash());
+		}
 
 		return hashes;
 	}
@@ -92,8 +93,9 @@ public class NisUtils {
 	 */
 	public static TimeProvider createMockTimeProvider(final int... rawInstants) {
 		final TimeInstant[] instants = new TimeInstant[rawInstants.length - 1];
-		for (int i = 1; i < rawInstants.length; ++i)
+		for (int i = 1; i < rawInstants.length; ++i) {
 			instants[i - 1] = new TimeInstant(rawInstants[i]);
+		}
 
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);

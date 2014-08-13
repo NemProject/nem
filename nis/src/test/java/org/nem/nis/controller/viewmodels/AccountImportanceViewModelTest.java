@@ -2,7 +2,7 @@ package org.nem.nis.controller.viewmodels;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.secret.AccountImportance;

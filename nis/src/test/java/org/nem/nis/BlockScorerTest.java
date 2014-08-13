@@ -11,7 +11,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
@@ -20,18 +20,18 @@ import java.util.*;
 public class BlockScorerTest {
 
 	private static final byte[] PUBKEY_BYTES = new byte[] {
-			(byte) 0x02,
-			(byte) 0xF0, (byte) 0xF1, (byte) 0xF2, (byte) 0xF3, (byte) 0xF4, (byte) 0xF5, (byte) 0xF6, (byte) 0xF7,
-			(byte) 0xE0, (byte) 0xE1, (byte) 0xE2, (byte) 0xE3, (byte) 0xE4, (byte) 0xE5, (byte) 0xE6, (byte) 0xE7,
-			(byte) 0xD0, (byte) 0xD1, (byte) 0xD2, (byte) 0xD3, (byte) 0xD4, (byte) 0xD5, (byte) 0xD6, (byte) 0xD7,
-			(byte) 0xC0, (byte) 0xC1, (byte) 0xC2, (byte) 0xC3, (byte) 0xC4, (byte) 0xC5, (byte) 0xC6, (byte) 0xC7
+			(byte)0x02,
+			(byte)0xF0, (byte)0xF1, (byte)0xF2, (byte)0xF3, (byte)0xF4, (byte)0xF5, (byte)0xF6, (byte)0xF7,
+			(byte)0xE0, (byte)0xE1, (byte)0xE2, (byte)0xE3, (byte)0xE4, (byte)0xE5, (byte)0xE6, (byte)0xE7,
+			(byte)0xD0, (byte)0xD1, (byte)0xD2, (byte)0xD3, (byte)0xD4, (byte)0xD5, (byte)0xD6, (byte)0xD7,
+			(byte)0xC0, (byte)0xC1, (byte)0xC2, (byte)0xC3, (byte)0xC4, (byte)0xC5, (byte)0xC6, (byte)0xC7
 	};
 
 	private static final byte[] HASH_BYTES = new byte[] {
-		(byte) 0xF7, (byte) 0xF6, (byte) 0xF5, (byte) 0xF4, (byte) 0xF3, (byte) 0xF2, (byte) 0xF1, (byte) 0xF0,
-		(byte) 0xE7, (byte) 0xE6, (byte) 0xE5, (byte) 0xE4, (byte) 0xE3, (byte) 0xE2, (byte) 0xE1, (byte) 0xE0,
-		(byte) 0xD7, (byte) 0xD6, (byte) 0xD5, (byte) 0xD4, (byte) 0xD3, (byte) 0xD2, (byte) 0xD1, (byte) 0xD0,
-		(byte) 0xC7, (byte) 0xC6, (byte) 0xC5, (byte) 0xC4, (byte) 0xC3, (byte) 0xC2, (byte) 0xC1, (byte) 0xC0
+			(byte)0xF7, (byte)0xF6, (byte)0xF5, (byte)0xF4, (byte)0xF3, (byte)0xF2, (byte)0xF1, (byte)0xF0,
+			(byte)0xE7, (byte)0xE6, (byte)0xE5, (byte)0xE4, (byte)0xE3, (byte)0xE2, (byte)0xE1, (byte)0xE0,
+			(byte)0xD7, (byte)0xD6, (byte)0xD5, (byte)0xD4, (byte)0xD3, (byte)0xD2, (byte)0xD1, (byte)0xD0,
+			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
 	};
 
 	@Test
@@ -147,21 +147,22 @@ public class BlockScorerTest {
 
 	private static final Map<Integer, Integer> HEIGHT_TO_GROUPED_HEIGHT_MAP = new HashMap<Integer, Integer>() {
 		{
-			put(1, 1);
-			put(30, 1);
-			put(31, 1);
-			put(32, 31);
-			put(33, 31);
-			put(90, 62);
-			put(111, 93);
+			this.put(1, 1);
+			this.put(30, 1);
+			this.put(31, 1);
+			this.put(32, 31);
+			this.put(33, 31);
+			this.put(90, 62);
+			this.put(111, 93);
 		}
 	};
 
 	@Test
 	public void getGroupedHeightReturnsGroupedBlockHeight() {
 		// Assert:
-		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet())
+		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet()) {
 			assertGroupedHeight(pair.getKey(), pair.getValue());
+		}
 	}
 
 	private static void assertGroupedHeight(final long height, final long expectedGroupedHeight) {
@@ -196,8 +197,9 @@ public class BlockScorerTest {
 	@Test
 	public void calculateForgerBalanceCallsRecalculateImportancesForGroupedBlock() {
 		// Assert:
-		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet())
+		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet()) {
 			assertRecalculateImportancesCalledForHeight(pair.getKey(), pair.getValue());
+		}
 	}
 
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {
@@ -220,11 +222,11 @@ public class BlockScorerTest {
 
 	//endregion
 
-	private static Block roundTripBlock(AccountLookup accountLookup, Block block) throws NoSuchFieldException, IllegalAccessException {
+	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(block, accountLookup);
-		Block b = new Block(deserializer.readInt("type"), options, deserializer);
+		final Block b = new Block(deserializer.readInt("type"), options, deserializer);
 
 		Field field = b.getClass().getDeclaredField("generationHash");
 		field.setAccessible(true);
@@ -237,7 +239,7 @@ public class BlockScorerTest {
 		return b;
 	}
 
-	private static Block createBlock(final Account account, int timeStamp, long height) throws NoSuchFieldException, IllegalAccessException {
+	private static Block createBlock(final Account account, final int timeStamp, final long height) throws NoSuchFieldException, IllegalAccessException {
 		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 		block.sign();
 

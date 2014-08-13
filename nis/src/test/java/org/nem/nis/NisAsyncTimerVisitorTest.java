@@ -101,7 +101,6 @@ public class NisAsyncTimerVisitorTest {
 		// Assert:
 		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(10));
 		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(20));
-
 	}
 
 	@Test
@@ -154,14 +153,15 @@ public class NisAsyncTimerVisitorTest {
 		visitor.notifyOperationComplete();
 		visitor.notifyDelay(42);
 
-		if (isExecuting)
+		if (isExecuting) {
 			visitor.notifyOperationStart();
+		}
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(visitor);
 
 		// Assert:
-		final int executingAdjustment = isExecuting ? 1 :0;
+		final int executingAdjustment = isExecuting ? 1 : 0;
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(9));
 		Assert.assertThat(jsonObject.get("name"), IsEqual.equalTo("timer a"));
 		Assert.assertThat(jsonObject.get("executions"), IsEqual.equalTo(3 + executingAdjustment));

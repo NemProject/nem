@@ -12,7 +12,7 @@ public class PoiScorerTest {
 	public void dangleSumIsCalculatedCorrectly() {
 		// Act:
 		final PoiScorer scorer = new PoiScorer();
-		double dangleSum = scorer.calculateDangleSum(
+		final double dangleSum = scorer.calculateDangleSum(
 				Arrays.asList(1, 3),
 				new ColumnVector(1, 2, 3, 4, 5, 6),
 				new ColumnVector(0.1, 0.8, 0.2, 0.5, 0.6, 0.3));

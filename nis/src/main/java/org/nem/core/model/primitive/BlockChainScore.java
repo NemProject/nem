@@ -22,8 +22,9 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteg
 	public BlockChainScore(final BigInteger score) {
 		super(score, BlockChainScore.class);
 
-		if (this.getRaw().compareTo(BigInteger.ZERO) < 0)
+		if (this.getRaw().compareTo(BigInteger.ZERO) < 0) {
 			throw new IllegalArgumentException("block chain score can't be negative");
+		}
 	}
 
 	/**
@@ -49,10 +50,10 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteg
 	 *
 	 * @return The underlying score.
 	 */
-	public BigInteger getRaw() { 
-		return this.getValue(); 
+	public BigInteger getRaw() {
+		return this.getValue();
 	}
-	
+
 	/**
 	 * Creates a new BlockChainScore by adding the given value to this score.
 	 *
@@ -62,7 +63,7 @@ public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteg
 	public BlockChainScore add(final BlockChainScore score) {
 		return new BlockChainScore(this.getRaw().add(score.getRaw()));
 	}
-	
+
 	/**
 	 * Creates a new BlockChainScore by subtracting the given value from this score.
 	 *

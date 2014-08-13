@@ -17,7 +17,7 @@ public abstract class AbstractPrimitiveTest<
 
 	/**
 	 * Creates an instance of the foo primitive type.
-	 * 
+	 *
 	 * @param value The long value.
 	 * @return The foo primitive.
 	 */
@@ -38,7 +38,6 @@ public abstract class AbstractPrimitiveTest<
 	 * @return The primitive value.
 	 */
 	protected abstract TValue longToValue(long value);
-
 
 	//region constructor
 

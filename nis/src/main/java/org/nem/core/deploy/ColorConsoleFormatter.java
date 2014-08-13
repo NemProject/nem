@@ -35,13 +35,13 @@ public class ColorConsoleFormatter extends SimpleFormatter {
 		private static final String POSTFIX = "\u001b[0m";
 		private static final Map<Level, String> LEVEL_TO_PREFIX_MAP = new HashMap<Level, String>() {
 			{
-				put(Level.SEVERE, "\u001b[0;31m");
-				put(Level.WARNING, "[0;33m");
-				put(Level.INFO, "[0;32m");
-				put(Level.CONFIG, "[0;37m");
-				put(Level.FINE, "[0;34m");
-				put(Level.FINER, "[0;34m");
-				put(Level.FINEST, "[0;34m");
+				this.put(Level.SEVERE, "\u001b[0;31m");
+				this.put(Level.WARNING, "[0;33m");
+				this.put(Level.INFO, "[0;32m");
+				this.put(Level.CONFIG, "[0;37m");
+				this.put(Level.FINE, "[0;34m");
+				this.put(Level.FINER, "[0;34m");
+				this.put(Level.FINEST, "[0;34m");
 			}
 		};
 		private static final String DEFAULT_COLOR_PREFIX = LEVEL_TO_PREFIX_MAP.get(Level.SEVERE);

@@ -110,7 +110,7 @@ public class PreTrustedNodesTest {
 
 	public static PreTrustedNodes createTestPreTrustedNodes() {
 		// Arrange:
-		Set<Node> nodeSet = new HashSet<>();
+		final Set<Node> nodeSet = new HashSet<>();
 		nodeSet.add(PeerUtils.createNodeWithName("n"));
 		nodeSet.add(PeerUtils.createNodeWithName("e"));
 		nodeSet.add(PeerUtils.createNodeWithName("m"));

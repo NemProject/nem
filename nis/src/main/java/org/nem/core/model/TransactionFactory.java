@@ -19,13 +19,12 @@ public class TransactionFactory {
 	/**
 	 * Deserializes a transaction.
 	 *
-	 * @param options      The deserialization options.
+	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.
-	 *
 	 * @return The deserialized transaction.
 	 */
 	private static Transaction deserialize(final VerifiableEntity.DeserializationOptions options, final Deserializer deserializer) {
-		int type = deserializer.readInt("type");
+		final int type = deserializer.readInt("type");
 
 		switch (type) {
 			case TransactionTypes.TRANSFER:

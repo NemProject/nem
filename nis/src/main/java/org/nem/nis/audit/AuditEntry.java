@@ -94,8 +94,9 @@ public class AuditEntry implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof AuditEntry))
+		if (!(obj instanceof AuditEntry)) {
 			return false;
+		}
 
 		final AuditEntry rhs = (AuditEntry)obj;
 		return this.host.equals(rhs.host) && this.path.equals(rhs.path);

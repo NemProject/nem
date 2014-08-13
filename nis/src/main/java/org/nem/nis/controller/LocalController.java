@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.deploy.CommonStarter;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -35,10 +35,10 @@ public class LocalController {
 	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
 	public void shutdown() {
-		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
+		LOGGER.info(String.format("Async shut-down initiated in %d msec.", this.SHUTDOWN_DELAY));
 		final Runnable r = () -> {
 			try {
-				Thread.sleep(SHUTDOWN_DELAY);
+				Thread.sleep(this.SHUTDOWN_DELAY);
 			} catch (final InterruptedException e) {
 				// We do nothing than continuing
 			}
@@ -68,7 +68,7 @@ public class LocalController {
 			}
 
 			dbBlock = this.blockDao.findById(curBlockId);
-			long timestamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimestamp())).getMillis();
+			final long timestamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimestamp())).getMillis();
 			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
 					dbBlock.getHeight(),
 					Address.fromPublicKey(dbBlock.getForger().getPublicKey()),
@@ -95,6 +95,4 @@ public class LocalController {
 
 		return blockList;
 	}
-
-
 }

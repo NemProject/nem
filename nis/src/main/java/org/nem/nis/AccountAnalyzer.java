@@ -1,14 +1,14 @@
 package org.nem.nis;
 
 import org.nem.core.model.Address;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiFacade;
 
 /**
  * Account analyzer that is the central point for accessing all NIS-related account information.
  */
 public class AccountAnalyzer {
-	private AccountCache accountCache;
-	private PoiFacade poiFacade;
+	private final AccountCache accountCache;
+	private final PoiFacade poiFacade;
 
 	/**
 	 * Creates a new account analyzer.
@@ -26,14 +26,18 @@ public class AccountAnalyzer {
 	 *
 	 * @return The account cache.
 	 */
-	public AccountCache getAccountCache() { return this.accountCache; }
+	public AccountCache getAccountCache() {
+		return this.accountCache;
+	}
 
 	/**
 	 * Gets the POI facade.
 	 *
 	 * @return The POI facade.
 	 */
-	public PoiFacade getPoiFacade() { return this.poiFacade; }
+	public PoiFacade getPoiFacade() {
+		return this.poiFacade;
+	}
 
 	/**
 	 * Creates a copy of this analyzer.

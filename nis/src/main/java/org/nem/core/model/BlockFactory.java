@@ -23,7 +23,7 @@ public class BlockFactory {
 			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 
 	private static Block deserialize(final VerifiableEntity.DeserializationOptions options, final Deserializer deserializer) {
-		int type = deserializer.readInt("type");
+		final int type = deserializer.readInt("type");
 
 		switch (type) {
 			case BlockTypes.NEMESIS:

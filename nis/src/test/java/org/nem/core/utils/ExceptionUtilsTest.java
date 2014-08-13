@@ -190,16 +190,16 @@ public class ExceptionUtilsTest {
 
 		public InterruptedExceptionTestRunner(final Supplier<Void> supplier) {
 			this.blockingThread = new Thread(() -> {
-				isInterruptedPreRun = Thread.currentThread().isInterrupted();
+				this.isInterruptedPreRun = Thread.currentThread().isInterrupted();
 
 				try {
 					supplier.get();
 				} finally {
-					isInterruptedPostRun = Thread.currentThread().isInterrupted();
+					this.isInterruptedPostRun = Thread.currentThread().isInterrupted();
 				}
 			});
 
-			this.blockingThread.setUncaughtExceptionHandler((t, e) -> unhandledException = e);
+			this.blockingThread.setUncaughtExceptionHandler((t, e) -> this.unhandledException = e);
 		}
 
 		public boolean isInterruptedPreRun() {

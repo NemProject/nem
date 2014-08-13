@@ -41,20 +41,20 @@ public class JarFacadeTest {
 
 	@Test
 	public void canCreateFacadeAroundJarStreamWithIoException() throws IOException {
-        // Act:
-        final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", null);
-        final JarFacade facade = new JarFacade(url);
+		// Act:
+		final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", null);
+		final JarFacade facade = new JarFacade(url);
 
-        // Assert:
-        Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-        Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
-        assertFacadeHasDefaultProperties(facade);
+		// Assert:
+		Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+		Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+		assertFacadeHasDefaultProperties(facade);
 	}
 
 	@Test
 	public void canCreateFacadeAroundJarStreamWithoutManifest() throws IOException {
 		// Arrange:
-		byte[] bytes = MetaDataTestUtils.createJarBytes(null);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(null);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			// Act:
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
@@ -77,7 +77,7 @@ public class JarFacadeTest {
 		attributes.putValue("Implementation-Version", "test-version");
 		attributes.putValue("Implementation-Title", "test-title");
 
-		byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 			final JarFacade facade = new JarFacade(url);
@@ -110,7 +110,7 @@ public class JarFacadeTest {
 		attributes.putValue("Implementation-Version", "test-version");
 		attributes.putValue("Implementation-Title", "test-title");
 
-		byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
+		final byte[] bytes = MetaDataTestUtils.createJarBytes(manifest);
 		try (final InputStream inputStream = new ByteArrayInputStream(bytes)) {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 			final JarFacade facade = new JarFacade(url);

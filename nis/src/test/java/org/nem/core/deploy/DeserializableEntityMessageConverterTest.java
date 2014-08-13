@@ -46,8 +46,9 @@ public class DeserializableEntityMessageConverterTest {
 		};
 
 		// Assert:
-		for (final Class type : types)
+		for (final Class type : types) {
 			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -64,8 +65,9 @@ public class DeserializableEntityMessageConverterTest {
 		};
 
 		// Assert:
-		for (final Class type : types)
+		for (final Class type : types) {
 			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
+		}
 	}
 
 	@Test
@@ -81,8 +83,9 @@ public class DeserializableEntityMessageConverterTest {
 		};
 
 		// Assert:
-		for (final Class type : types)
+		for (final Class type : types) {
 			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
+		}
 	}
 
 	@Test

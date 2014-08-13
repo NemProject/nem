@@ -18,10 +18,10 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	/**
 	 * Creates a new transaction.
 	 *
-	 * @param type      The transaction type.
-	 * @param version   The transaction version.
+	 * @param type The transaction type.
+	 * @param version The transaction version.
 	 * @param timestamp The transaction timestamp.
-	 * @param sender    The transaction sender.
+	 * @param sender The transaction sender.
 	 */
 	public Transaction(final int type, final int version, final TimeInstant timestamp, final Account sender) {
 		super(type, version, timestamp, sender);
@@ -30,8 +30,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	/**
 	 * Deserializes a new transaction.
 	 *
-	 * @param type         The transaction type.
-	 * @param options      The deserialization options to use.
+	 * @param type The transaction type.
+	 * @param options The deserializer options.
 	 * @param deserializer The deserializer to use.
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {

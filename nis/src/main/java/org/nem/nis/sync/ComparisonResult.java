@@ -4,7 +4,6 @@ import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Possible comparison results.
- *
  */
 public class ComparisonResult {
 
@@ -73,9 +72,9 @@ public class ComparisonResult {
 		 */
 		REMOTE_LIED_ABOUT_CHAIN_SCORE(REMOTE_IS_EVIL | 4);
 
-		private int value;
+		private final int value;
 
-		private Code(int value) {
+		private Code(final int value) {
 			this.value = value;
 		}
 
@@ -126,7 +125,9 @@ public class ComparisonResult {
 	 *
 	 * @return The result code.
 	 */
-	public Code getCode() { return this.code; }
+	public Code getCode() {
+		return this.code;
+	}
 
 	/**
 	 * Gets the common block height (only supported when code is REMOTE_IS_NOT_SYNCED).
@@ -134,8 +135,9 @@ public class ComparisonResult {
 	 * @return The common block height.
 	 */
 	public long getCommonBlockHeight() {
-		if (Code.REMOTE_IS_NOT_SYNCED != this.code)
+		if (Code.REMOTE_IS_NOT_SYNCED != this.code) {
 			throw new UnsupportedOperationException("unsupported when code is not REMOTE_IS_NOT_SYNCED");
+		}
 
 		return this.commonBlockHeight;
 	}
@@ -146,8 +148,9 @@ public class ComparisonResult {
 	 * @return The height of remote chain.
 	 */
 	public BlockHeight getRemoteHeight() {
-		if (Code.REMOTE_HAS_NO_BLOCKS == this.code)
+		if (Code.REMOTE_HAS_NO_BLOCKS == this.code) {
 			throw new UnsupportedOperationException("unsupported when code is not REMOTE_HAS_NO_BLOCKS");
+		}
 
 		return this.remoteHeight;
 	}
@@ -159,8 +162,9 @@ public class ComparisonResult {
 	 * @return true if the chains are consistent.
 	 */
 	public boolean areChainsConsistent() {
-		if (Code.REMOTE_IS_NOT_SYNCED != this.code)
+		if (Code.REMOTE_IS_NOT_SYNCED != this.code) {
 			throw new UnsupportedOperationException("unsupported when code is not REMOTE_IS_NOT_SYNCED");
+		}
 
 		return this.areChainsConsistent;
 	}

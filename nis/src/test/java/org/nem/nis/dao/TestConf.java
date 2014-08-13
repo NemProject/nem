@@ -25,7 +25,6 @@ public class TestConf {
 		return dataSource;
 	}
 
-
 	@Bean(initMethod = "migrate")
 	public Flyway flyway() throws IOException {
 		final Flyway flyway = new Flyway();

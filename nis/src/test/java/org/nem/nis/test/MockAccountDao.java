@@ -26,7 +26,7 @@ public class MockAccountDao implements AccountDao {
 	/**
 	 * Adds a mapping between a model address and a db-model account.
 	 *
-	 * @param address   The model address
+	 * @param address The model address
 	 * @param dbAccount The db-model account.
 	 */
 	public void addMapping(final Address address, final org.nem.nis.dbmodel.Account dbAccount) {
@@ -36,7 +36,7 @@ public class MockAccountDao implements AccountDao {
 	/**
 	 * Adds a mapping between a model account and a db-model account.
 	 *
-	 * @param account   The model account
+	 * @param account The model account
 	 * @param dbAccount The db-model account.
 	 */
 	public void addMapping(final org.nem.core.model.Account account, final org.nem.nis.dbmodel.Account dbAccount) {
@@ -44,18 +44,18 @@ public class MockAccountDao implements AccountDao {
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Account getAccount(Long id) {
+	public org.nem.nis.dbmodel.Account getAccount(final Long id) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public org.nem.nis.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
-		++numGetAccountByPrintableAddressCalls;
+		++this.numGetAccountByPrintableAddressCalls;
 		return this.knownAccounts.get(printableAddress);
 	}
 
 	@Override
-	public void save(org.nem.nis.dbmodel.Account account) {
+	public void save(final org.nem.nis.dbmodel.Account account) {
 		throw new UnsupportedOperationException();
 	}
 }

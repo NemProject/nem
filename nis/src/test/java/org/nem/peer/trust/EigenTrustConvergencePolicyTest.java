@@ -65,7 +65,7 @@ public class EigenTrustConvergencePolicyTest {
 		Assert.assertEquals(1.00, result.getAt(0) / result.getAt(1), 0.001);
 	}
 
-	private static EigenTrustConvergencePolicy createTestPolicy(int maxIterations, double epsilon) {
+	private static EigenTrustConvergencePolicy createTestPolicy(final int maxIterations, final double epsilon) {
 		// Arrange: (EigenVector for test matrix is [3, 1])
 		final ColumnVector vector = new ColumnVector(2);
 		vector.setAt(0, 1.0 / 3);
@@ -80,7 +80,7 @@ public class EigenTrustConvergencePolicyTest {
 		return new EigenTrustConvergencePolicy(vector, matrix, maxIterations, epsilon);
 	}
 
-	private static EigenTrustConvergencePolicy createTestPolicyWithOnesMatrix(int maxIterations, double epsilon) {
+	private static EigenTrustConvergencePolicy createTestPolicyWithOnesMatrix(final int maxIterations, final double epsilon) {
 		// Arrange: (EigenVector for test matrix is [3, 1])
 		final ColumnVector vector = new ColumnVector(2);
 		vector.setAt(0, 1.0 / 3);

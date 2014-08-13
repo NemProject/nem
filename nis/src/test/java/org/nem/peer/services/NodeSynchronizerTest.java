@@ -52,8 +52,9 @@ public class NodeSynchronizerTest {
 	@Test
 	public void synchronizeDelegatesToStateToUpdatesExperience() {
 		// Assert:
-		for (final NodeInteractionResult interactionResult : NodeInteractionResult.values())
+		for (final NodeInteractionResult interactionResult : NodeInteractionResult.values()) {
 			assertExperienceUpdated(interactionResult);
+		}
 	}
 
 	private static void assertExperienceUpdated(final NodeInteractionResult interactionResult) {

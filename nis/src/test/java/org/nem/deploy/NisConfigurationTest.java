@@ -14,7 +14,7 @@ public class NisConfigurationTest {
 	public void canReadConfigurationWithAutoBootKey() {
 		// Arrange:
 		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 
 		// Act:
@@ -27,7 +27,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutAutoBootKey() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -43,7 +43,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithAutoBootName() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.bootName", "my name");
 
 		// Act:
@@ -56,7 +56,7 @@ public class NisConfigurationTest {
 	@Test
 	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.bootName", " \t string with spaces\t  ");
 
 		// Act:
@@ -69,7 +69,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutAutoBootName() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -85,7 +85,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithNodeLimit() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.nodeLimit", "12");
 
 		// Act:
@@ -98,7 +98,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutNodeLimit() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -114,7 +114,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithBootWithoutAck() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.bootWithoutAck", "true");
 
 		// Act:
@@ -127,7 +127,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutBootWithoutAck() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -143,7 +143,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithUseBinaryTransport() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 		properties.setProperty("nis.useBinaryTransport", "true");
 
 		// Act:
@@ -156,7 +156,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadConfigurationWithoutUseBinaryTransport() {
 		// Arrange:
-		final Properties properties = getCommonProperties();
+		final Properties properties = this.getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);

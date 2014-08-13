@@ -12,7 +12,6 @@ public class HexEncoder {
 	 * Converts a hex string to a byte array.
 	 *
 	 * @param hexString The input hex string.
-	 *
 	 * @return The output byte array.
 	 */
 	public static byte[] getBytes(final String hexString) {
@@ -31,7 +30,6 @@ public class HexEncoder {
 	 * Converts a byte array to a hex string.
 	 *
 	 * @param bytes The input byte array.
-	 *
 	 * @return The output hex string.
 	 */
 	public static String getString(final byte[] bytes) {

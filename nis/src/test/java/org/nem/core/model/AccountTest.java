@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.messages.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -367,15 +367,17 @@ public class AccountTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		KeyPair kp = new KeyPair();
-		Account account = new Account(kp);
+		final KeyPair kp = new KeyPair();
+		final Account account = new Account(kp);
 
 		// Assert:
-		for (final Account account2 : createEquivalentAccounts(kp))
+		for (final Account account2 : createEquivalentAccounts(kp)) {
 			Assert.assertThat(account2, IsEqual.equalTo(account));
+		}
 
-		for (final Account account2 : createNonEquivalentAccounts(kp))
+		for (final Account account2 : createNonEquivalentAccounts(kp)) {
 			Assert.assertThat(account2, IsNot.not(IsEqual.equalTo(account)));
+		}
 
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(account)));
 		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)account)));
@@ -384,16 +386,18 @@ public class AccountTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		KeyPair kp = new KeyPair();
-		Account account = new Account(kp);
-		int hashCode = account.hashCode();
+		final KeyPair kp = new KeyPair();
+		final Account account = new Account(kp);
+		final int hashCode = account.hashCode();
 
 		// Assert:
-		for (final Account account2 : createEquivalentAccounts(kp))
+		for (final Account account2 : createEquivalentAccounts(kp)) {
 			Assert.assertThat(account2.hashCode(), IsEqual.equalTo(hashCode));
+		}
 
-		for (final Account account2 : createNonEquivalentAccounts(kp))
+		for (final Account account2 : createNonEquivalentAccounts(kp)) {
 			Assert.assertThat(account2.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		}
 	}
 
 	private static Account[] createEquivalentAccounts(final KeyPair keyPair) {
@@ -506,13 +510,13 @@ public class AccountTest {
 	@Test
 	public void canRoundtripAccountWithAddressEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
+		this.assertAccountRoundTripInMode(AddressEncoding.COMPRESSED);
 	}
 
 	@Test
 	public void canRoundtripAccountWithPublicKeyEncoding() {
 		// Assert:
-		assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
+		this.assertAccountRoundTripInMode(AddressEncoding.PUBLIC_KEY);
 	}
 
 	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
@@ -630,8 +634,7 @@ public class AccountTest {
 	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
 		if (null == actual || null == expected) {
 			Assert.assertThat(actual, IsEqual.equalTo(expected));
-		}
-		else {
+		} else {
 			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
 			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
 		}
@@ -659,7 +662,6 @@ public class AccountTest {
 		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
 		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
 		assertShallowCopy(original, copy);
-
 	}
 
 	private static void assertShallowCopy(final Account original, final Account copy) {

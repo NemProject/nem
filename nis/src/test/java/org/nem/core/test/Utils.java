@@ -48,12 +48,11 @@ public class Utils {
 	 * Generates a byte array containing random data.
 	 *
 	 * @param numBytes The number of bytes to generate.
-	 *
 	 * @return A byte array containing random data.
 	 */
-	public static byte[] generateRandomBytes(int numBytes) {
-		SecureRandom rand = new SecureRandom();
-		byte[] input = new byte[numBytes];
+	public static byte[] generateRandomBytes(final int numBytes) {
+		final SecureRandom rand = new SecureRandom();
+		final byte[] input = new byte[numBytes];
 		rand.nextBytes(input);
 		return input;
 	}
@@ -62,7 +61,6 @@ public class Utils {
 	 * Creates a copy of account that only contains the account public key.
 	 *
 	 * @param account The account to copy.
-	 *
 	 * @return A copy of account that only contains the account public key.
 	 */
 	public static Account createPublicOnlyKeyAccount(final Account account) {
@@ -108,13 +106,12 @@ public class Utils {
 	/**
 	 * Increments a single character in the specified string.
 	 *
-	 * @param s     The string
+	 * @param s The string
 	 * @param index The index of the character to increment
-	 *
 	 * @return The resulting string
 	 */
 	public static String incrementAtIndex(final String s, final int index) {
-		char[] chars = s.toCharArray();
+		final char[] chars = s.toCharArray();
 		chars[index] = (char)(chars[index] + 1);
 		return new String(chars);
 	}
@@ -122,9 +119,8 @@ public class Utils {
 	/**
 	 * Changes a single character in the specified base 32 string.
 	 *
-	 * @param s     A base 32 string
+	 * @param s A base 32 string
 	 * @param index The index of the character to change
-	 *
 	 * @return The resulting base 32 string
 	 */
 	public static String modifyBase32AtIndex(final String s, final int index) {
@@ -147,11 +143,10 @@ public class Utils {
 	 *
 	 * @param bytes The byte array
 	 * @param index The index of the byte to increment
-	 *
 	 * @return The resulting byte array
 	 */
 	public static byte[] incrementAtIndex(final byte[] bytes, final int index) {
-		byte[] copy = new byte[bytes.length];
+		final byte[] copy = new byte[bytes.length];
 		System.arraycopy(bytes, 0, copy, 0, bytes.length);
 		++copy[index];
 		return copy;
@@ -160,15 +155,15 @@ public class Utils {
 	/**
 	 * Creates a string initialized with a single character.
 	 *
-	 * @param ch       The character used in the string.
+	 * @param ch The character used in the string.
 	 * @param numChars The number of characters in hte string.
-	 *
 	 * @return A string of length numChars initialized to ch.
 	 */
 	public static String createString(final char ch, final int numChars) {
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < numChars; ++i)
+		final StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < numChars; ++i) {
 			builder.append(ch);
+		}
 
 		return builder.toString();
 	}
@@ -177,10 +172,9 @@ public class Utils {
 	 * Serializes originalEntity and returns an ObjectDeserializer
 	 * that can deserialize it.
 	 *
-	 * @param originalEntity     The original entity.
+	 * @param originalEntity The original entity.
 	 * @param deserializedSigner The signer that should be associated with the deserialized object.
-	 * @param <T>                The concrete VerifiableEntity type.
-	 *
+	 * @param <T> The concrete VerifiableEntity type.
 	 * @return The object deserializer.
 	 */
 	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
@@ -199,9 +193,8 @@ public class Utils {
 	 * that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
-	 * @param accountLookup  The account lookup policy to use.
-	 * @param <T>            The concrete VerifiableEntity type.
-	 *
+	 * @param accountLookup The account lookup policy to use.
+	 * @param <T> The concrete VerifiableEntity type.
 	 * @return The object deserializer.
 	 */
 	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
@@ -211,7 +204,7 @@ public class Utils {
 		originalEntity.sign();
 
 		// Act:
-		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
 	}
@@ -221,16 +214,15 @@ public class Utils {
 	 * that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
-	 * @param accountLookup  The account lookup policy to use.
-	 * @param <T>            The concrete SerializableEntity type.
-	 *
+	 * @param accountLookup The account lookup policy to use.
+	 * @param <T> The concrete SerializableEntity type.
 	 * @return The object deserializer.
 	 */
 	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntity(
 			final T originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
-		JsonSerializer jsonSerializer = new JsonSerializer(true);
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
 	}
@@ -263,7 +255,6 @@ public class Utils {
 	 * Mutates key into a slightly different key.
 	 *
 	 * @param key The original key.
-	 *
 	 * @return A slightly different key
 	 */
 	public static PublicKey mutate(final PublicKey key) {
@@ -274,7 +265,6 @@ public class Utils {
 	 * Mutates key into a slightly different key.
 	 *
 	 * @param key The original key.
-	 *
 	 * @return A slightly different key
 	 */
 	public static PrivateKey mutate(final PrivateKey key) {

@@ -17,14 +17,14 @@ public abstract class PowerIterator {
 	/**
 	 * Creates a new poi power iterator.
 	 *
-	 * @param startVector	 The start vector.
-	 * @param maxIterations  The maximum number of iterations.
-	 * @param epsilon        The convergence epsilon value.
+	 * @param startVector The start vector.
+	 * @param maxIterations The maximum number of iterations.
+	 * @param epsilon The convergence epsilon value.
 	 */
 	public PowerIterator(
 			final ColumnVector startVector,
-			int maxIterations,
-			double epsilon) {
+			final int maxIterations,
+			final double epsilon) {
 		this.startVector = startVector;
 		this.maxIterations = maxIterations;
 		this.epsilon = epsilon;

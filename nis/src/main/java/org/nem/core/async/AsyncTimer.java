@@ -79,7 +79,7 @@ public class AsyncTimer implements Closeable {
 		return this.future.isDone();
 	}
 
-	private CompletableFuture<?> chain(int delay) {
+	private CompletableFuture<?> chain(final int delay) {
 		this.visitor.notifyDelay(delay);
 		return SleepFuture.create(delay).thenCompose(v -> this.getNextChainLink());
 	}
