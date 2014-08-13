@@ -377,7 +377,7 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void getTimeStampsFromReturnsProperTimestamps() {
+	public void getTimeStampsFromReturnsProperTimeStamps() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());

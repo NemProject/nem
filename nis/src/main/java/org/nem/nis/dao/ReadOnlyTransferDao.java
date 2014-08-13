@@ -46,7 +46,7 @@ public interface ReadOnlyTransferDao {
 	 * Each Object array will contain two elements:
 	 * { [0] - Transfer (Transfer), [1] Block Height (long) }
 	 */
-	public Collection<Object[]> getTransactionsForAccount(final Account account, final  Integer timeStamp, final int limit);
+	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timeStamp, final int limit);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
