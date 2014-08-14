@@ -14,7 +14,7 @@ public class PeerUtils {
 	 * @return The new node.
 	 */
 	public static Node createNodeWithName(final String name) {
-		return createNodeWithHost("localhost", name);
+		return createNodeWithHost("127.0.0.1", name);
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class PeerUtils {
 	public static Node createNodeWithPort(final int port) {
 		return new Node(
 				new WeakNodeIdentity(String.format("%d", port)),
-				new NodeEndpoint("http", "localhost", port));
+				new NodeEndpoint("http", "127.0.0.1", port));
 	}
 
 	/**

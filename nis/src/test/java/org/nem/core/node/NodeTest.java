@@ -203,7 +203,7 @@ public class NodeTest {
 		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:
-		Assert.assertThat(node.toString(), IsEqual.equalTo("Node [(Weak Id) alice] @ [127.0.0.1]"));
+		Assert.assertThat(node.toString(), IsEqual.equalTo("Node [(Weak Id) alice] @ [localhost]"));
 	}
 
 	//endregion
