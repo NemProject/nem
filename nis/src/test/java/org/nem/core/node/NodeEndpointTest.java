@@ -95,14 +95,9 @@ public class NodeEndpointTest {
 	@Test
 	public void blankHostResolvesToLocalHost() throws Exception {
 		// Assert:
-		assertHostNameResolvesTo(null, "127.0.0.1");
-		assertHostNameResolvesTo("", "127.0.0.1");
-	}
-
-	@Test
-	public void knownHostNameIsResolvedToAddress() {
-		// Assert:
-		assertHostNameResolvesTo("localhost", "127.0.0.1");
+		assertHostNameResolvesTo(null, "localhost");
+		assertHostNameResolvesTo("", "localhost");
+		assertHostNameResolvesTo("  \t ", "localhost");
 	}
 
 	private static void assertHostNameResolvesTo(final String hostName, final String expectedHostName) {
@@ -134,6 +129,30 @@ public class NodeEndpointTest {
 	}
 
 	@Test
+	public void endpointsWithEquivalentHostNamesAreEqual() {
+		// Arrange:
+		final NodeEndpoint endpointWithHostIp = new NodeEndpoint("http", "127.0.0.1", 12);
+		final NodeEndpoint endpointWithHostName = new NodeEndpoint("http", "localhost", 12);
+
+		// Assert:
+		Assert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
+		Assert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
+	}
+
+	@Test
+	public void endpointsWithEquivalentHostNamesAreEqualAfterDeserialization() {
+		// Arrange:
+		final NodeEndpoint endpointWithHostIp =
+				new NodeEndpoint(Utils.roundtripSerializableEntity(new NodeEndpoint("http", "127.0.0.1", 12), null));
+		final NodeEndpoint endpointWithHostName =
+				new NodeEndpoint(Utils.roundtripSerializableEntity(new NodeEndpoint("http", "localhost", 12), null));
+
+		// Assert:
+		Assert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
+		Assert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
+	}
+
+	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
@@ -161,12 +180,21 @@ public class NodeEndpointTest {
 	//region toString
 
 	@Test
-	public void toStringReturnsBaseUrlStringRepresentation() {
+	public void toStringReturnsCorrectRepresentationWhenEndpointHasHostIp() {
 		// Arrange:
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "127.0.0.1", 12);
 
 		// Assert:
-		Assert.assertThat(endpoint.toString(), IsEqual.equalTo(endpoint.getBaseUrl().toString()));
+		Assert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://127.0.0.1:12/"));
+	}
+
+	@Test
+	public void toStringReturnsCorrectRepresentationWhenEndpointHasHostName() {
+		// Arrange:
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "localhost", 12);
+
+		// Assert:
+		Assert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://localhost:12/"));
 	}
 
 	//endregion
