@@ -5,12 +5,11 @@
     <vendor>NEM Community</vendor>
     <homepage href="http://www.ournem.com"/>
     <description>NEM Server</description>
-    <offline-allowed/> 
   </information>
-  <update check="always" policy="always"></update>
   <security>
       <all-permissions/>
   </security>
+  <update check="always" policy="always"></update>
   <resources>
     <java version="1.8+" java-vm-args="-esa -Xnoclassgc"/>
     $dependencies
