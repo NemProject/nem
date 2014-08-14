@@ -13,3 +13,4 @@ nis-*.log*
 /nis.temp.settings
 /data/
 /logs/
+.iml
