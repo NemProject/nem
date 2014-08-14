@@ -1,5 +1,6 @@
 package org.nem.core.deploy;
 
+import org.nem.core.node.NodeEndpoint;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.io.InputStream;
@@ -131,6 +132,8 @@ public class CommonConfiguration {
 		return this.maxThreads;
 	}
 
+	//region endpoint settings
+
 	/**
 	 * Gets the protocol used for communication.
 	 *
@@ -166,6 +169,38 @@ public class CommonConfiguration {
 	public int getHttpsPort() {
 		return this.httpsPort;
 	}
+
+	/**
+	 * Gets the port used for communication.
+	 *
+	 * @return The port.
+	 */
+	public int getPort() {
+		return this.getProtocol().equals("https") ? this.getHttpsPort() : this.getHttpPort();
+	}
+
+	/**
+	 * Gets the base url as a string.
+	 *
+	 * @return The base url as string.
+	 */
+	public String getBaseUrl() {
+		return String.format("%s://%s:%d",
+				this.getProtocol(),
+				this.getHost(),
+				this.getPort());
+	}
+
+	/**
+	 * Gets the endpoint.
+	 *
+	 * @return The endpoint.
+	 */
+	public NodeEndpoint getEndpoint() {
+		return new NodeEndpoint(this.getProtocol(), this.getHost(), this.getPort());
+	}
+
+	//endregion
 
 	/**
 	 * Gets the base path for web site paths.
@@ -237,21 +272,6 @@ public class CommonConfiguration {
 	 */
 	public boolean isNcc() {
 		return this.shortServerName.toUpperCase().equals("NCC");
-	}
-
-	/**
-	 * Get the base url as string.
-	 *
-	 * @return The base url as string.
-	 */
-	public String getBaseUrl() {
-		final StringBuilder builder = new StringBuilder();
-		return builder.append(this.getProtocol())
-				.append("://")
-				.append(this.getHost())
-				.append(":")
-				.append(this.getProtocol().equals("https") ? this.getHttpsPort() : this.getHttpPort())
-				.toString();
 	}
 
 	/**
