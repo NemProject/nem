@@ -2,8 +2,10 @@ package org.nem.core.deploy;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.ExceptionAssert;
 
+import java.net.*;
 import java.util.Properties;
 
 public class CommonConfigurationTest {
@@ -48,6 +50,50 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("ftp://10.0.0.1:100"));
 		Assert.assertThat(config.getShutdownUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/api/sd"));
 		Assert.assertThat(config.getHomeUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/web/home"));
+	}
+
+	@Test
+	public void canReadEndpointSettingsWithHttpPort() throws MalformedURLException {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nem.protocol", "http");
+		properties.setProperty("nem.host", "10.0.0.12");
+		properties.setProperty("nem.httpPort", "100");
+		properties.setProperty("nem.httpsPort", "101");
+
+		// Act:
+		final CommonConfiguration config = new CommonConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
+		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
+		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
+		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		Assert.assertThat(config.getPort(), IsEqual.equalTo(100));
+		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("http://10.0.0.12:100"));
+		Assert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.12", 100)));
+	}
+
+	@Test
+	public void canReadEndpointSettingsWithHttpsPort() throws MalformedURLException {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nem.protocol", "https");
+		properties.setProperty("nem.host", "10.0.0.12");
+		properties.setProperty("nem.httpPort", "100");
+		properties.setProperty("nem.httpsPort", "101");
+
+		// Act:
+		final CommonConfiguration config = new CommonConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("https"));
+		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
+		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
+		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		Assert.assertThat(config.getPort(), IsEqual.equalTo(101));
+		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("https://10.0.0.12:101"));
+		Assert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
 	}
 
 	//endregion
@@ -236,7 +282,6 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.useDosFilter", "true");
 		properties.setProperty("nem.isWebStart", "true");
 		properties.setProperty("nem.nisJnlpUrl", "url");
-
 		return properties;
 	}
 
