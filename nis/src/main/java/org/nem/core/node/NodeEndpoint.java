@@ -1,6 +1,7 @@
 package org.nem.core.node;
 
 import org.nem.core.serialization.*;
+import org.nem.core.utils.StringUtils;
 
 import java.net.*;
 import java.util.*;
@@ -13,6 +14,7 @@ public class NodeEndpoint implements SerializableEntity {
 
 	private final String protocol;
 	private final String host;
+	private final String normalizedHost;
 	private final int port;
 	private final URL url;
 	private final Dictionary<NodeApiId, URL> nodeApiToUrlMap;
@@ -26,7 +28,8 @@ public class NodeEndpoint implements SerializableEntity {
 	 */
 	public NodeEndpoint(final String protocol, final String host, final int port) {
 		this.protocol = protocol;
-		this.host = normalizeHost(host);
+		this.host = getNonNormalizedHost(host);
+		this.normalizedHost = getNormalizedHost(this.host);
 		this.port = port;
 		this.url = this.createUrl();
 		this.nodeApiToUrlMap = this.createUrlMap();
@@ -49,7 +52,8 @@ public class NodeEndpoint implements SerializableEntity {
 	 */
 	public NodeEndpoint(final Deserializer deserializer) {
 		this.protocol = deserializer.readString("protocol");
-		this.host = normalizeHost(deserializer.readString("host"));
+		this.host = getNonNormalizedHost(deserializer.readString("host"));
+		this.normalizedHost = getNormalizedHost(this.host);
 		this.port = deserializer.readInt("port");
 		this.url = this.createUrl();
 		this.nodeApiToUrlMap = this.createUrlMap();
@@ -80,16 +84,16 @@ public class NodeEndpoint implements SerializableEntity {
 		serializer.writeInt("port", this.port);
 	}
 
-	private static String normalizeHost(String host) {
-		if (null == host || host.isEmpty()) {
-			host = "localhost";
-		}
+	private static String getNonNormalizedHost(final String host) {
+		return StringUtils.isNullOrWhitespace(host) ? "localhost" : host;
+	}
 
+	private static String getNormalizedHost(final String host) {
 		try {
 			final InetAddress address = InetAddress.getByName(host);
 			return address.getHostAddress();
 		} catch (final UnknownHostException e) {
-			throw new IllegalArgumentException("host is unknown");
+			throw new IllegalArgumentException("host is unknown", e);
 		}
 	}
 
@@ -97,7 +101,7 @@ public class NodeEndpoint implements SerializableEntity {
 		try {
 			return new URL(this.protocol, this.host, this.port, "/");
 		} catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("url is malformed");
+			throw new IllegalArgumentException("url is malformed", e);
 		}
 	}
 
@@ -126,21 +130,23 @@ public class NodeEndpoint implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.url.hashCode();
+		return this.protocol.hashCode() ^ this.normalizedHost.hashCode() ^ this.port;
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof NodeEndpoint)) {
+		if (!(obj instanceof NodeEndpoint)) {
 			return false;
 		}
 
 		final NodeEndpoint rhs = (NodeEndpoint)obj;
-		return this.url.equals(rhs.url);
+		return this.protocol.equals(rhs.protocol)
+				&& this.normalizedHost.equals(rhs.normalizedHost)
+				&& this.port == rhs.port;
 	}
 
 	@Override
 	public String toString() {
-		return this.url.toString();
+		return String.format("%s://%s:%d/", this.protocol, this.host, this.port);
 	}
 }
