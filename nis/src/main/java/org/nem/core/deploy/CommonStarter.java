@@ -101,10 +101,10 @@ public class CommonStarter implements ServletContextListener {
 				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.NEM_FOLDER));
 			}
 			if (commandLine.hasParameter(CommonConfiguration.WEBSTART)) {
-				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.WEBSTART));
+				configuration.setWebStart("1".equals(commandLine.getParameter(CommonConfiguration.WEBSTART)));
 			}
 			if (commandLine.hasParameter(CommonConfiguration.NIS_JNLP_URL)) {
-				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.NIS_JNLP_URL));
+				configuration.setNisJnlpUrl(commandLine.getParameter(CommonConfiguration.NIS_JNLP_URL));
 			}
 		}
 	}

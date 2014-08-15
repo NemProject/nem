@@ -12,8 +12,11 @@ import java.util.Properties;
  */
 public class CommonConfiguration {
 	public static final String NEM_FOLDER = "nemFolder";
+	public static final String NEM_FOLDER_DESCRIPTION = "Path to the NEM folder.";
 	public static final String WEBSTART = "webStart";
+	public static final String WEBSTART_DESCRIPTION = "Indicates whether NIS should be started via WebStart (1) or not (0).";
 	public static final String NIS_JNLP_URL = "nisJnlpUrl";
+	public static final String NIS_JNLP_URL_DESCRIPTION = "JNLP URL for starting NIS via WebStart.";
 
 	private final String shortServerName;
 	private String nemFolder;
