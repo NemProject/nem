@@ -11,8 +11,12 @@ import java.util.Properties;
  * A reboot is required for configuration changes to take effect.
  */
 public class CommonConfiguration {
+	public static final String NEM_FOLDER = "nemFolder";
+	public static final String WEBSTART = "webStart";
+	public static final String NIS_JNLP_URL = "nisJnlpUrl";
+
 	private final String shortServerName;
-	private final String nemFolder;
+	private String nemFolder;
 	private final int maxThreads;
 	private final String protocol;
 	private final String host;
@@ -23,8 +27,8 @@ public class CommonConfiguration {
 	private final String home;
 	private final String shutdown;
 	private final Boolean useDosFilter;
-	private final Boolean isWebStart;
-	private final String nisJnlpUrl;
+	private Boolean isWebStart;
+	private String nisJnlpUrl;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -121,6 +125,15 @@ public class CommonConfiguration {
 	 */
 	public String getNemFolder() {
 		return this.nemFolder;
+	}
+
+	/**
+	 * Sets the path to the folder where database and log files should be located.
+	 *
+	 * @param nemFolder The path to the folder.
+	 */
+	public void setNemFolder(String nemFolder) {
+		this.nemFolder = nemFolder;
 	}
 
 	/**
@@ -250,10 +263,19 @@ public class CommonConfiguration {
 	/**
 	 * Get a value indicating whether or not web start is used.
 	 *
-	 * @return true if web start is used, false otherwise.
+	 * @return True if web start is used, false otherwise.
 	 */
 	public boolean isWebStart() {
 		return this.isWebStart;
+	}
+
+	/**
+	 * Sets the value indicating whether or not web start is used.
+	 *
+	 * @param isWebStart True if web start should be used, false otherwise.
+	 */
+	public void setWebStart(boolean isWebStart) {
+		this.isWebStart = isWebStart;
 	}
 
 	/**
@@ -266,9 +288,18 @@ public class CommonConfiguration {
 	}
 
 	/**
+	 * Sets the JNLP url as string.
+	 *
+	 * @param nisJnlpUrl The JNLP url as string.
+	 */
+	public void setNisJnlpUrl(String nisJnlpUrl) {
+		this.nisJnlpUrl = nisJnlpUrl;
+	}
+
+	/**
 	 * .Gets a value indicating if the underlying server is the NCC server.
 	 *
-	 * @return true if the server is NCC, false otherwise.
+	 * @return True if the server is NCC, false otherwise.
 	 */
 	public boolean isNcc() {
 		return this.shortServerName.toUpperCase().equals("NCC");

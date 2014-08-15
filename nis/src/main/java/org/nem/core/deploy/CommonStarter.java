@@ -73,6 +73,7 @@ public class CommonStarter implements ServletContextListener {
 	public static void main(final String[] args) {
 		LOGGER.info("Starting embedded Jetty Server.");
 		initializeConfigurationPolicy();
+		applyCommandLine(args);
 		try {
 			INSTANCE.boot();
 			INSTANCE.server.join();
@@ -91,6 +92,21 @@ public class CommonStarter implements ServletContextListener {
 	private static void initializeConfigurationPolicy() {
 		appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
 		configurationPolicy = appCtx.getBean(NemConfigurationPolicy.class);
+	}
+
+	private static void applyCommandLine(final String[] parameters) {
+		NemCommandLine commandLine = appCtx.getBean(NemCommandLine.class);
+		if (commandLine.parse(parameters)){
+			if (commandLine.hasParameter(CommonConfiguration.NEM_FOLDER)) {
+				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.NEM_FOLDER));
+			}
+			if (commandLine.hasParameter(CommonConfiguration.WEBSTART)) {
+				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.WEBSTART));
+			}
+			if (commandLine.hasParameter(CommonConfiguration.NIS_JNLP_URL)) {
+				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.NIS_JNLP_URL));
+			}
+		}
 	}
 
 	private static void initializeLogging() {
