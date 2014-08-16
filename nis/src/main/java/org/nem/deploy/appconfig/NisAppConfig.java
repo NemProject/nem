@@ -67,6 +67,7 @@ public class NisAppConfig {
 		flyway.setDataSource(this.dataSource());
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
+		flyway.setValidateOnMigrate(false);
 		return flyway;
 	}
 
