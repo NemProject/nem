@@ -48,7 +48,7 @@ public class NisAppConfig {
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 		//Replace ${nisFolder} with the value from configuration
-		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nemFolder}", nemFolder);
+		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder);
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
