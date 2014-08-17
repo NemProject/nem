@@ -95,7 +95,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
-				final InputStream inputStringStream = adaptFileLocation(inputStream)) {
+			 final InputStream inputStringStream = adaptFileLocation(inputStream)) {
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);
 			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));

@@ -46,7 +46,6 @@ public class AuditInterceptorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(0)).add(Mockito.any(), Mockito.any());
-
 	}
 
 	//endregion

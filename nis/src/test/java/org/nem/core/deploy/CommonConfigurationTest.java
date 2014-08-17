@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.ExceptionAssert;
 
-import java.net.*;
+import java.net.MalformedURLException;
 import java.util.Properties;
 
 public class CommonConfigurationTest {

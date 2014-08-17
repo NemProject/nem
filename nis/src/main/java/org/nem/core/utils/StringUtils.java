@@ -36,11 +36,11 @@ public class StringUtils {
 	}
 
 	/**
-	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}. 
+	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}.
 	 * This pattern is replaced by the given value.
-	 *
 	 * TODO-CR: 20140817 J->T please be consistent in documentation; each parameter documentation should
 	 * begin with a capital letter and end with a '.' (i.e. be a sentence), and no need for '-'.
+	 *
 	 * @param string - string that contains variables
 	 * @param name - name of the variable to be replaced with its value
 	 * @param value - value that will replace the variable.
