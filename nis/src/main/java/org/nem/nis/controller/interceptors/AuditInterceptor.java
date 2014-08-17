@@ -29,12 +29,13 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final HttpServletRequest request,
 			final HttpServletResponse response,
 			final Object handler) throws Exception {
-		if (request.getServletPath().equals(HEARTBEAT_PATH)) {
+		final AuditEntry entry = new AuditEntry(request);
+		if (entry.shouldIgnore()) {
 			return true;
 		}
 
-		LOGGER.info(String.format("entering %s [%s]", request.getServletPath(), request.getRemoteAddr()));
-		this.auditCollection.add(request.getRemoteAddr(), request.getServletPath());
+		LOGGER.info(String.format("entering %s [%s]", entry.path, entry.host));
+		this.auditCollection.add(entry.host, entry.path);
 		return true;
 	}
 
@@ -45,11 +46,26 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 			final Object handler,
 			final Exception ex)
 			throws Exception {
-		if (request.getServletPath().equals(HEARTBEAT_PATH)) {
+		final AuditEntry entry = new AuditEntry(request);
+		if (entry.shouldIgnore()) {
 			return;
 		}
 
-		this.auditCollection.remove(request.getRemoteAddr(), request.getServletPath());
-		LOGGER.info(String.format("exiting %s [%s]", request.getServletPath(), request.getRemoteAddr()));
+		this.auditCollection.remove(entry.host, entry.path);
+		LOGGER.info(String.format("exiting %s [%s]", entry.path, entry.host));
+	}
+
+	private static class AuditEntry {
+		private String host;
+		private String path;
+
+		private AuditEntry(final HttpServletRequest request) {
+			this.host = request.getRemoteAddr();
+			this.path = request.getRequestURI();
+		}
+
+		private boolean shouldIgnore() {
+			return this.path.equalsIgnoreCase(HEARTBEAT_PATH);
+		}
 	}
 }

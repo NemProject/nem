@@ -26,8 +26,19 @@ public class AuditInterceptorTest {
 
 	@Test
 	public void preHandleIgnoresHeartbeatRequests() throws Exception {
+		// Assert:
+		assertPreHandleIgnoresPath("/heartbeat");
+	}
+
+	@Test
+	public void preHandleIgnoresCaseInsensitiveHeartbeatRequests() throws Exception {
+		// Assert:
+		assertPreHandleIgnoresPath("/HeartBeat");
+	}
+
+	private static void assertPreHandleIgnoresPath(final String path) throws Exception {
 		// Arrange:
-		final TestContext context = new TestContext("/heartbeat");
+		final TestContext context = new TestContext(path);
 
 		// Act:
 		final boolean result = context.interceptor.preHandle(context.request, context.response, null);
@@ -35,6 +46,7 @@ public class AuditInterceptorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(0)).add(Mockito.any(), Mockito.any());
+
 	}
 
 	//endregion
@@ -55,8 +67,19 @@ public class AuditInterceptorTest {
 
 	@Test
 	public void afterCompletionIgnoresHeartbeatRequests() throws Exception {
+		// Assert:
+		assertAfterCompletionIgnoresPath("/heartbeat");
+	}
+
+	@Test
+	public void afterCompletionIgnoresCaseInsensitiveHeartbeatRequests() throws Exception {
+		// Assert:
+		assertPreHandleIgnoresPath("/HeartBeat");
+	}
+
+	private static void assertAfterCompletionIgnoresPath(final String path) throws Exception {
 		// Arrange:
-		final TestContext context = new TestContext("/heartbeat");
+		final TestContext context = new TestContext(path);
 
 		// Act:
 		context.interceptor.afterCompletion(context.request, context.response, null, null);
@@ -71,7 +94,7 @@ public class AuditInterceptorTest {
 		// Arrange:
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		Mockito.when(request.getRemoteAddr()).thenReturn(address);
-		Mockito.when(request.getServletPath()).thenReturn(path);
+		Mockito.when(request.getRequestURI()).thenReturn(path);
 		return request;
 	}
 
