@@ -67,6 +67,7 @@ public class NisAppConfig {
 		flyway.setDataSource(this.dataSource());
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
+		// TODO-CR: 20140817 J->B why are different line-endings causing validation to fail?
 		flyway.setValidateOnMigrate(false);
 		return flyway;
 	}
