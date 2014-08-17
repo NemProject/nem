@@ -7,6 +7,10 @@ import java.util.logging.Logger;
 
 /**
  * Represents the command line parameters passed to common starters main method.
+ * TODO-CR: 20140817 J -> BR did you see the commandline class that's already in NCC?
+ * I suspect that we don't want commandline options for NIS, but only for NCC?
+ * (since i think all the commandline options we would want are related to webstart)
+ * Do you disagree?
  */
 public class NemCommandLine {
 	private static final Logger LOGGER = Logger.getLogger(NemCommandLine.class.getName());
