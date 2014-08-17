@@ -110,7 +110,7 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	/**
-	 * log configuration may include a placeholder for the nem folder The method replaces the pattern ${nemFolder} with the value defined within the
+	 * log configuration may include a placeholder for the nem folder The method replaces the pattern ${nem.folder} with the value defined within the
 	 * NisConfiguration Only for "java.util.logging.FileHandler.pattern" value
 	 *
 	 * @param inputStream stream of the logging properties
