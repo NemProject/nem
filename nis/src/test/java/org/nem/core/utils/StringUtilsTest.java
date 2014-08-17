@@ -26,4 +26,18 @@ public class StringUtilsTest {
 		Assert.assertThat(StringUtils.isNullOrWhitespace("foo"), IsEqual.equalTo(false));
 		Assert.assertThat(StringUtils.isNullOrWhitespace(" foo "), IsEqual.equalTo(false));
 	}
+
+	@Test
+	public void replaceVariableReturnsCorrectResult() {
+		// Assert:
+		Assert.assertThat(StringUtils.replaceVariable("", "variable", "-"), IsEqual.equalTo(""));
+		Assert.assertThat(StringUtils.replaceVariable("§{variable}", "variable", "-"), IsEqual.equalTo("-"));
+		Assert.assertThat(StringUtils.replaceVariable("${variable}", "variable", "-"), IsEqual.equalTo("-"));
+		Assert.assertThat(StringUtils.replaceVariable("§{Variable}", "xx", "-"), IsEqual.equalTo("§{Variable}"));
+		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "xx", "-"), IsEqual.equalTo("§{Variable}"));
+		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "", "-"), IsEqual.equalTo("§{Variable}"));
+		Assert.assertThat(StringUtils.replaceVariable("${ }", " ", "-"), IsEqual.equalTo("-"));
+		Assert.assertThat(StringUtils.replaceVariable("${    }", "    ", "-"), IsEqual.equalTo("-"));
+		Assert.assertThat(StringUtils.replaceVariable("${   }", " ", "-"), IsEqual.equalTo("§{   }"));
+	}
 }

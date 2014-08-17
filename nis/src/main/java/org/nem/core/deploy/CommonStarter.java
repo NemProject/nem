@@ -95,7 +95,7 @@ public class CommonStarter implements ServletContextListener {
 
 	private static void initializeLogging() {
 		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
-			 final InputStream inputStringStream = adaptFileLocation(inputStream)) {
+				final InputStream inputStringStream = adaptFileLocation(inputStream)) {
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);
 			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
@@ -120,10 +120,9 @@ public class CommonStarter implements ServletContextListener {
 	private static InputStream adaptFileLocation(final InputStream inputStream) throws IOException {
 		final Properties props = new Properties();
 		props.load(inputStream);
-		String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
 		final String nemFolder = configuration.getNemFolder();
-		tmpStr = tmpStr.replace("${nemFolder}", nemFolder);
-		props.setProperty("java.util.logging.FileHandler.pattern", tmpStr);
+		String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
+		props.setProperty("java.util.logging.FileHandler.pattern", StringUtils.replaceVariable(tmpStr, "nem.folder", nemFolder));
 		final StringWriter stringWriter = new StringWriter();
 		props.store(stringWriter, null);
 		return new ByteArrayInputStream(StringEncoder.getBytes(stringWriter.toString()));
@@ -152,13 +151,9 @@ public class CommonStarter implements ServletContextListener {
 
 		if (configuration.isNcc()) {
 			final Configuration.ClassList classList = Configuration.ClassList.setServerDefault(server);
-			classList.addAfter(
-					"org.eclipse.jetty.webapp.FragmentConfiguration",
-					"org.eclipse.jetty.plus.webapp.EnvConfiguration",
+			classList.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration", "org.eclipse.jetty.plus.webapp.EnvConfiguration",
 					"org.eclipse.jetty.plus.webapp.PlusConfiguration");
-			classList.addBefore(
-					"org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-					"org.eclipse.jetty.annotations.AnnotationConfiguration");
+			classList.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
 		}
 
 		return server;
@@ -200,9 +195,7 @@ public class CommonStarter implements ServletContextListener {
 				return;
 			}
 		}
-		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".",
-				CommonStarter.META_DATA.getAppName(),
-				configuration.getBaseUrl()));
+		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), configuration.getBaseUrl()));
 	}
 
 	public void stopServer() {

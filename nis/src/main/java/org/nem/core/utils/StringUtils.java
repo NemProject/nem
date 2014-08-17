@@ -34,4 +34,17 @@ public class StringUtils {
 
 		return true;
 	}
+
+	/**
+	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}. 
+	 * This pattern is replaced by the given value.
+	 * 
+	 * @param string - string that contains variables
+	 * @param name - name of the variable to be replaced with its value
+	 * @param value - value that will replace the variable.
+	 * @return string with value replacing the variable with the given name
+	 */
+	public static String replaceVariable(final String string, final String name, final String value) {
+		return string.replace("$", "§").replace(String.format("§{%s}", name), value); // Did not get the regex $ escaped, so this work-around
+	}
 }
