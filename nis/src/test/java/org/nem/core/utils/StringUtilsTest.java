@@ -30,6 +30,8 @@ public class StringUtilsTest {
 	@Test
 	public void replaceVariableReturnsCorrectResult() {
 		// Assert:
+		// TODO-CR: 20140817 J->T consider tests where there are multiple variables, variables with surrounding words
+		// and matching variables with different casings (can be in multiple tests)
 		Assert.assertThat(StringUtils.replaceVariable("", "variable", "-"), IsEqual.equalTo(""));
 		Assert.assertThat(StringUtils.replaceVariable("§{variable}", "variable", "-"), IsEqual.equalTo("-"));
 		Assert.assertThat(StringUtils.replaceVariable("${variable}", "variable", "-"), IsEqual.equalTo("-"));

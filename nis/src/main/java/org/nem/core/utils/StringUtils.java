@@ -38,13 +38,16 @@ public class StringUtils {
 	/**
 	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}. 
 	 * This pattern is replaced by the given value.
-	 * 
+	 *
+	 * TODO-CR: 20140817 J->T please be consistent in documentation; each parameter documentation should
+	 * begin with a capital letter and end with a '.' (i.e. be a sentence), and no need for '-'.
 	 * @param string - string that contains variables
 	 * @param name - name of the variable to be replaced with its value
 	 * @param value - value that will replace the variable.
 	 * @return string with value replacing the variable with the given name
 	 */
 	public static String replaceVariable(final String string, final String name, final String value) {
+		// TODO-CR: 20140817 J->T why are you changing $ to §?
 		return string.replace("$", "§").replace(String.format("§{%s}", name), value); // Did not get the regex $ escaped, so this work-around
 	}
 }

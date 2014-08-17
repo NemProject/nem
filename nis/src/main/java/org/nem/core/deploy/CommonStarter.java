@@ -151,9 +151,13 @@ public class CommonStarter implements ServletContextListener {
 
 		if (configuration.isNcc()) {
 			final Configuration.ClassList classList = Configuration.ClassList.setServerDefault(server);
-			classList.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration", "org.eclipse.jetty.plus.webapp.EnvConfiguration",
+			classList.addAfter(
+					"org.eclipse.jetty.webapp.FragmentConfiguration",
+					"org.eclipse.jetty.plus.webapp.EnvConfiguration",
 					"org.eclipse.jetty.plus.webapp.PlusConfiguration");
-			classList.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
+			classList.addBefore(
+					"org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+					"org.eclipse.jetty.annotations.AnnotationConfiguration");
 		}
 
 		return server;
