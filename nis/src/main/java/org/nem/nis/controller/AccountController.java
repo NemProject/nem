@@ -38,6 +38,12 @@ public class AccountController {
 		this.poiFacade = poiFacade;
 	}
 
+	/**
+	 * Gets information about an account.
+	 *
+	 * @param nemAddress The account address.
+	 * @return The account information.
+	 */
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaDataPair accountGet(@RequestParam(value = "address") final String nemAddress) {
@@ -58,6 +64,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
+	@TrustedApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
@@ -76,6 +83,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/lock", method = RequestMethod.POST)
 	@ClientApi
+	@TrustedApi
 	public void accountLock(@RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
 		this.foraging.removeUnlockedAccount(account);
@@ -182,7 +190,6 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
 	@PublicApi
-	@ClientApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
 		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.poiFacade.spliterator(), false)
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))

@@ -52,6 +52,7 @@ public class DebugController {
 	 * @return The result of the operation.
 	 */
 	@RequestMapping(value = "/debug/fix-node", method = RequestMethod.GET)
+	@PublicApi
 	public String nodeFixer(@RequestParam(value = "data") final String signature) {
 		final byte[] data = ArrayUtils.concat(
 				StringEncoder.getBytes(this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
