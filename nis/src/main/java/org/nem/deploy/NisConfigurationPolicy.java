@@ -1,6 +1,6 @@
 package org.nem.deploy;
 
-import org.nem.core.deploy.NemConfigurationPolicy;
+import org.nem.core.deploy.*;
 import org.nem.deploy.appconfig.NisAppConfig;
 
 import javax.servlet.http.HttpServlet;
@@ -35,7 +35,12 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	}
 
 	@Override
-	public void startNisViaWebStart(final String nisJnlpUrl) {
-		throw new RuntimeException("startNisViaWebStart is not supposed to be called from NIS server.");
+	public void handleWebStart(final String[] args) {
+		throw new RuntimeException("handleWebStart is not supposed to be called from NIS server.");
+	}
+
+	@Override
+	public CommonConfiguration loadConfig(final String[] args) {
+		return new NisConfiguration();
 	}
 }

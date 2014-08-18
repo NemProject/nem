@@ -51,8 +51,8 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 
-	private static AnnotationConfigApplicationContext appCtx;
-	private static NemConfigurationPolicy configurationPolicy;
+	private AnnotationConfigApplicationContext appCtx;
+	private NemConfigurationPolicy configurationPolicy;
 	// TODO-CR: 20140817 J-B ideally i would like to make this non static and initialize it in boot
 	// I would also prefer to have the CommonConfiguration constructor to have an overloaded
 	// ctor that accepts the command-line parameters (as primitive types, e.g. string)
@@ -65,13 +65,15 @@ public class CommonStarter implements ServletContextListener {
 	// initialized before main (and will always use the default nem folder - from the properties),
 	// so i would drop that as a commandline parameter and just leave the other two.
 	//
-	// to put everything together, i think boot would look something like this (psudeocode, obviously)
+	// to put everything together, i think boot would look something like this (pseudo code, obviously)
 	//void boot2 (final String[] args) {
 	//	configurationPolicy.loadConfig(args); => {
 	//		var parsedArgs = parse (args);
 	//		return new CommonConfiguration(parsedArgs.isWebStart, parsedArgs.Whatever ...)
 	//	}
 	//}
+	// 20140818 BR -> J Done. Actually reading the property file 3 times but by induction one more time doesn't hurt ;)
+	//                  (The alternative is to have a configuration variable in the policy class.)
 
 	private static CommonConfiguration configuration;
 	private Server server;
@@ -92,10 +94,8 @@ public class CommonStarter implements ServletContextListener {
 
 	public static void main(final String[] args) {
 		LOGGER.info("Starting embedded Jetty Server.");
-		initializeConfigurationPolicy();
-		applyCommandLine(args);
 		try {
-			INSTANCE.boot();
+			INSTANCE.boot(args);
 			INSTANCE.server.join();
 		} catch (final InterruptedException e) {
 			LOGGER.log(Level.INFO, "Received signal to shutdown.");
@@ -109,24 +109,9 @@ public class CommonStarter implements ServletContextListener {
 		System.exit(1);
 	}
 
-	private static void initializeConfigurationPolicy() {
+	private void initializeConfigurationPolicy() {
 		appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
 		configurationPolicy = appCtx.getBean(NemConfigurationPolicy.class);
-	}
-
-	private static void applyCommandLine(final String[] parameters) {
-		NemCommandLine commandLine = appCtx.getBean(NemCommandLine.class);
-		if (commandLine.parse(parameters)){
-			if (commandLine.hasParameter(CommonConfiguration.NEM_FOLDER)) {
-				configuration.setNemFolder(commandLine.getParameter(CommonConfiguration.NEM_FOLDER));
-			}
-			if (commandLine.hasParameter(CommonConfiguration.WEBSTART)) {
-				configuration.setWebStart("1".equals(commandLine.getParameter(CommonConfiguration.WEBSTART)));
-			}
-			if (commandLine.hasParameter(CommonConfiguration.NIS_JNLP_URL)) {
-				configuration.setNisJnlpUrl(commandLine.getParameter(CommonConfiguration.NIS_JNLP_URL));
-			}
-		}
 	}
 
 	private static void initializeLogging() {
@@ -266,7 +251,9 @@ public class CommonStarter implements ServletContextListener {
 		}
 	}
 
-	private void boot() throws Exception {
+	private void boot(final String[] args) throws Exception {
+		initializeConfigurationPolicy();
+		configuration = configurationPolicy.loadConfig(args);
 		this.server = this.createServer();
 		this.server.addBean(new ScheduledExecutorScheduler());
 		this.server.addConnector(this.createConnector(this.server));
@@ -284,10 +271,7 @@ public class CommonStarter implements ServletContextListener {
 
 		if (configuration.isNcc()) {
 			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
-
-			if (configuration.isWebStart()) {
-				configurationPolicy.startNisViaWebStart(configuration.getNisJnlpUrl());
-			}
+			configurationPolicy.handleWebStart(args);
 		}
 	}
 

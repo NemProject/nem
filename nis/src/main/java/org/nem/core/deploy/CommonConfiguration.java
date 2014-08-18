@@ -11,13 +11,6 @@ import java.util.Properties;
  * A reboot is required for configuration changes to take effect.
  */
 public class CommonConfiguration {
-	public static final String NEM_FOLDER = "nemFolder";
-	public static final String NEM_FOLDER_DESCRIPTION = "Path to the NEM folder.";
-	public static final String WEBSTART = "webStart";
-	public static final String WEBSTART_DESCRIPTION = "Indicates whether NIS should be started via WebStart (1) or not (0).";
-	public static final String NIS_JNLP_URL = "nisJnlpUrl";
-	public static final String NIS_JNLP_URL_DESCRIPTION = "JNLP URL for starting NIS via WebStart.";
-
 	private final String shortServerName;
 	private String nemFolder;
 	private final int maxThreads;
@@ -30,8 +23,6 @@ public class CommonConfiguration {
 	private final String home;
 	private final String shutdown;
 	private final Boolean useDosFilter;
-	private Boolean isWebStart;
-	private String nisJnlpUrl;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -68,8 +59,6 @@ public class CommonConfiguration {
 		this.home = getString(properties, "nem.homePath");
 		this.shutdown = getOptionalString(properties, "nem.shutdownPath", "/shutdown");
 		this.useDosFilter = getOptionalBoolean(properties, "nem.useDosFilter", false);
-		this.isWebStart = getOptionalBoolean(properties, "nem.isWebStart", false);
-		this.nisJnlpUrl = getOptionalString(properties, "nem.nisJnlpUrl", "http://bob.nem.ninja/webstart/nem-server.jnlp");
 	}
 
 	protected static String getString(final Properties properties, final String name) {
@@ -128,15 +117,6 @@ public class CommonConfiguration {
 	 */
 	public String getNemFolder() {
 		return this.nemFolder;
-	}
-
-	/**
-	 * Sets the path to the folder where database and log files should be located.
-	 *
-	 * @param nemFolder The path to the folder.
-	 */
-	public void setNemFolder(String nemFolder) {
-		this.nemFolder = nemFolder;
 	}
 
 	/**
@@ -261,42 +241,6 @@ public class CommonConfiguration {
 	 */
 	public boolean useDosFilter() {
 		return this.useDosFilter;
-	}
-
-	/**
-	 * Get a value indicating whether or not web start is used.
-	 *
-	 * @return True if web start is used, false otherwise.
-	 */
-	public boolean isWebStart() {
-		return this.isWebStart;
-	}
-
-	/**
-	 * Sets the value indicating whether or not web start is used.
-	 *
-	 * @param isWebStart True if web start should be used, false otherwise.
-	 */
-	public void setWebStart(boolean isWebStart) {
-		this.isWebStart = isWebStart;
-	}
-
-	/**
-	 * Gets JNLP url as string.
-	 *
-	 * @return The JNLP url as string.
-	 */
-	public String getNisJnlpUrl() {
-		return this.nisJnlpUrl;
-	}
-
-	/**
-	 * Sets the JNLP url as string.
-	 *
-	 * @param nisJnlpUrl The JNLP url as string.
-	 */
-	public void setNisJnlpUrl(String nisJnlpUrl) {
-		this.nisJnlpUrl = nisJnlpUrl;
 	}
 
 	/**

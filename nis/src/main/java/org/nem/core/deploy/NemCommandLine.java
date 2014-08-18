@@ -11,6 +11,11 @@ import java.util.logging.Logger;
  * I suspect that we don't want commandline options for NIS, but only for NCC?
  * (since i think all the commandline options we would want are related to webstart)
  * Do you disagree?
+ * 20140818 BR -> J I saw the existing commandline class but I wanted to make it usable
+ * for both NIS and NCC. I don't see a disadvantage of having the option to add
+ * commandline parameters for NIS. Not everybody will be  happy putting a private key
+ * into a text file. There sure will be people asking for supplying this information
+ * as commandline parameter.
  */
 public class NemCommandLine {
 	private static final Logger LOGGER = Logger.getLogger(NemCommandLine.class.getName());

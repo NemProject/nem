@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.*;
+import java.util.Properties;
 import java.util.function.Predicate;
 
 @Configuration
@@ -160,10 +160,5 @@ public class NisAppConfig {
 	@Bean
 	public NemConfigurationPolicy configurationPolicy() {
 		return new NisConfigurationPolicy();
-	}
-
-	@Bean
-	public NemCommandLine nemCommandLine() {
-		return new NemCommandLine(new ArrayList<>());
 	}
 }

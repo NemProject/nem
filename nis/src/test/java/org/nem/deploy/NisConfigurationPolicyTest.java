@@ -62,7 +62,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.startNisViaWebStart("http://bob.nem.ninja/webstart/nem-server.jnlp");
+		policy.handleWebStart(null);
 	}
 
 	//endregion
