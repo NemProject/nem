@@ -53,27 +53,6 @@ public class CommonStarter implements ServletContextListener {
 
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
-	// TODO-CR: 20140817 J-B ideally i would like to make this non static and initialize it in boot
-	// I would also prefer to have the CommonConfiguration constructor to have an overloaded
-	// ctor that accepts the command-line parameters (as primitive types, e.g. string)
-	// instead of making the configuration mutable with setters.
-	//
-	// (doing this might require reading the property file twice on boot - once to get the folder path for logging
-	// and again in boot, but it is a one time cost i think that leads to a cleaner separation, imo)
-	//
-	// the issue with having the storage path be a command line parameters is that logging is getting
-	// initialized before main (and will always use the default nem folder - from the properties),
-	// so i would drop that as a commandline parameter and just leave the other two.
-	//
-	// to put everything together, i think boot would look something like this (pseudo code, obviously)
-	//void boot2 (final String[] args) {
-	//	configurationPolicy.loadConfig(args); => {
-	//		var parsedArgs = parse (args);
-	//		return new CommonConfiguration(parsedArgs.isWebStart, parsedArgs.Whatever ...)
-	//	}
-	//}
-	// 20140818 BR -> J Done. Actually reading the property file 3 times but by induction one more time doesn't hurt ;)
-	//                  (The alternative is to have a configuration variable in the policy class.)
 
 	private static CommonConfiguration configuration;
 	private Server server;

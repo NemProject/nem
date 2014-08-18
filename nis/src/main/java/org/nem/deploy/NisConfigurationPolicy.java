@@ -36,6 +36,7 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 
 	@Override
 	public void handleWebStart(final String[] args) {
+		// TODO-CR: 201408018 should we throw NisConfiguration here
 		throw new RuntimeException("handleWebStart is not supposed to be called from NIS server.");
 	}
 

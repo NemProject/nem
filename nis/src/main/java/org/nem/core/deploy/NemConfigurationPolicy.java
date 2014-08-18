@@ -42,7 +42,9 @@ public interface NemConfigurationPolicy {
 	public boolean openWebBrowser(final String homeUrl);
 
 	/**
-	 * Handles the web start (if configured to start NIS via web start.
+	 * Handles the web start, if configured, to start NIS via web start.
+	 *
+	 * @param args The optional array of string parameters.
 	 */
 	public void handleWebStart(final String[] args);
 

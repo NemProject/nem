@@ -56,6 +56,7 @@ public class NisConfigurationPolicyTest {
 		policy.openWebBrowser("http://127.0.0.1:7890//ncc/web/index.html");
 	}
 
+	// TODO-CR: can you update the tests to validate NisConfiguration is thrown
 	@Test(expected = RuntimeException.class)
 	public void startNisViaWebStartRaisesException() {
 		// Arrange:
