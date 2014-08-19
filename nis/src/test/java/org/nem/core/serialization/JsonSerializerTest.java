@@ -3,11 +3,12 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.*;
 import org.nem.core.utils.StringEncoder;
 
 import java.math.*;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {
 
@@ -191,6 +192,8 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//region Read
 
+	//region read[Optional]Int
+
 	@Test
 	public void canReadOptionalNullInt() {
 		// Arrange:
@@ -202,6 +205,54 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Assert:
 		Assert.assertThat(i, IsNull.nullValue());
+	}
+
+	@Test
+	public void canReadLongAsInt() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeLong("int", 447182L);
+
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		final int i = deserializer.readInt("int");
+
+		// Assert:
+		Assert.assertThat(i, IsEqual.equalTo(447182));
+	}
+
+	@Test
+	public void cannotReadStringAsInt() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeString("s", "447182");
+
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+
+		// Assert:
+		assertThrowsTypeMismatchException(
+				() -> deserializer.readInt("s"),
+				"s");
+	}
+
+	//endregion
+
+	//region read[Optional]Long
+
+	@Test
+	public void canReadOptionalNullLong() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		final Long l = deserializer.readOptionalLong("long");
+
+		// Assert:
+		Assert.assertThat(l, IsNull.nullValue());
 	}
 
 	@Test
@@ -220,16 +271,36 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadOptionalNullLong() {
+	public void cannotReadStringAsLong() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		serializer.writeString("s", "447182");
+
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+
+		// Assert:
+		assertThrowsTypeMismatchException(
+				() -> deserializer.readLong("s"),
+				"s");
+	}
+
+	//endregion
+
+	//read[Optional]Double
+
+	@Test
+	public void canReadOptionalNullDouble() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Long l = deserializer.readOptionalLong("long");
+		final Double d = deserializer.readOptionalDouble("double");
 
 		// Assert:
-		Assert.assertThat(l, IsNull.nullValue());
+		Assert.assertThat(d, IsNull.nullValue());
 	}
 
 	@Test
@@ -248,16 +319,19 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	@Test
-	public void canReadOptionalNullDouble() {
+	public void cannotReadStringAsDouble() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
+		serializer.writeString("s", "447182");
+
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Double d = deserializer.readOptionalDouble("double");
 
 		// Assert:
-		Assert.assertThat(d, IsNull.nullValue());
+		assertThrowsTypeMismatchException(
+				() -> deserializer.readDouble("s"),
+				"s");
 	}
 
 	//endregion
@@ -371,4 +445,11 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	}
 
 	//endregion
+
+	private static void assertThrowsTypeMismatchException(final Supplier<Object> consumer, final String propertyName) {
+		ExceptionAssert.assertThrows(
+				v -> consumer.get(),
+				TypeMismatchException.class,
+				ex -> Assert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
+	}
 }
