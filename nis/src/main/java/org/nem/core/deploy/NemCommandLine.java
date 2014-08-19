@@ -7,11 +7,6 @@ import java.util.logging.Logger;
 
 /**
  * Represents the command line parameters passed to common starters main method.
- *
- * TODO-CR: 20140818 - tests ;)?
- * TODO-CR: 20140818 - also, now that we have this class, we should probably delete the original NCC one, right?
- * 20140819 BR -> J there are already a few tests and the NccCommandLine doesn't exist in my branch any more.
- *                  Are you sure you pulled?
  */
 public class NemCommandLine {
 	private static final Logger LOGGER = Logger.getLogger(NemCommandLine.class.getName());

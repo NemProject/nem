@@ -29,7 +29,7 @@ public class NisConfigurationPolicyTest {
 
 	//region get raises exception
 
-	@Test(expected = RuntimeException.class)
+	@Test(expected = NisConfigurationException.class)
 	public void getJarFileServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
@@ -38,7 +38,7 @@ public class NisConfigurationPolicyTest {
 		policy.getJarFileServletClass();
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test(expected = NisConfigurationException.class)
 	public void getDefaultServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
@@ -47,7 +47,7 @@ public class NisConfigurationPolicyTest {
 		policy.getDefaultServletClass();
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test(expected = NisConfigurationException.class)
 	public void openWebBrowserRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
@@ -56,8 +56,7 @@ public class NisConfigurationPolicyTest {
 		policy.openWebBrowser("http://127.0.0.1:7890//ncc/web/index.html");
 	}
 
-	// TODO-CR: can you update the tests to validate NisConfiguration is thrown
-	@Test(expected = RuntimeException.class)
+	@Test(expected = NisConfigurationException.class)
 	public void startNisViaWebStartRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
