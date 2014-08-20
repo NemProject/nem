@@ -43,6 +43,7 @@ public class BlockDifficultyScorer {
 
 		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
 				// TODO: G->B: shouldn't it be (heightDiff-1) (changing it without blockchain restart would require some tricks
+				// 20140820: BR -> G Yes, you found a bug. We should change it right before the next blockchain restart.
 				.multiply(BigInteger.valueOf(heightDiff))
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();
