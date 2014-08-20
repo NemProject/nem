@@ -28,18 +28,45 @@ public class StringUtilsTest {
 	}
 
 	@Test
-	public void replaceVariableReturnsCorrectResult() {
+	public void replaceVariableOnStringWithoutVariablesReturnsStringItself()
+	{
 		// Assert:
-		// TODO-CR: 20140817 J->T consider tests where there are multiple variables, variables with surrounding words
-		// and matching variables with different casings (can be in multiple tests)
+		Assert.assertThat(StringUtils.replaceVariable("quick brown fox", "variable", "-"), IsEqual.equalTo("quick brown fox"));
 		Assert.assertThat(StringUtils.replaceVariable("", "variable", "-"), IsEqual.equalTo(""));
-		Assert.assertThat(StringUtils.replaceVariable("§{variable}", "variable", "-"), IsEqual.equalTo("-"));
+		Assert.assertThat(StringUtils.replaceVariable("variable", "variable", "-"), IsEqual.equalTo("variable"));
+	}
+
+	@Test
+	public void replaceVariableReplaceOnlyExactVariables()
+	{
+		Assert.assertThat(StringUtils.replaceVariable("${   }", " ", "-"), IsEqual.equalTo("${   }"));
+		Assert.assertThat(StringUtils.replaceVariable("${ foo}", "foo", "-"), IsEqual.equalTo("${ foo}"));
+	}
+
+	@Test
+	public void replaceVariableOnStringWithVariablesReturnsCorrectResults() {
 		Assert.assertThat(StringUtils.replaceVariable("${variable}", "variable", "-"), IsEqual.equalTo("-"));
-		Assert.assertThat(StringUtils.replaceVariable("§{Variable}", "xx", "-"), IsEqual.equalTo("§{Variable}"));
-		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "xx", "-"), IsEqual.equalTo("§{Variable}"));
-		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "", "-"), IsEqual.equalTo("§{Variable}"));
 		Assert.assertThat(StringUtils.replaceVariable("${ }", " ", "-"), IsEqual.equalTo("-"));
 		Assert.assertThat(StringUtils.replaceVariable("${    }", "    ", "-"), IsEqual.equalTo("-"));
-		Assert.assertThat(StringUtils.replaceVariable("${   }", " ", "-"), IsEqual.equalTo("§{   }"));
+	}
+
+	@Test
+	public void replaceVariableIsCaseSensitive() {
+		// Assert:
+		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "variable", "-"), IsEqual.equalTo("${Variable}"));
+		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "xx", "-"), IsEqual.equalTo("${Variable}"));
+		Assert.assertThat(StringUtils.replaceVariable("${Variable}", "", "-"), IsEqual.equalTo("${Variable}"));
+	}
+
+	@Test
+	public void replaceVariableBetweenText() {
+		Assert.assertThat(StringUtils.replaceVariable("quick ${color} fox", "color", "brown"), IsEqual.equalTo("quick brown fox"));
+		Assert.assertThat(StringUtils.replaceVariable("jumps over the ${adj} dog", "adj", "lazy"), IsEqual.equalTo("jumps over the lazy dog"));
+	}
+
+	@Test
+	public void replaceMultipleOccurancesOfVariable() {
+		Assert.assertThat(StringUtils.replaceVariable("quick ${color} ${color} fox", "color", "brown"), IsEqual.equalTo("quick brown brown fox"));
+		Assert.assertThat(StringUtils.replaceVariable("Buffalo ${} Buffalo ${} ${} ${} Buffalo ${}", "", "buffalo"), IsEqual.equalTo("Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"));
 	}
 }
