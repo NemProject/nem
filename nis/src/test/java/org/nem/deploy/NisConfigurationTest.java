@@ -181,8 +181,6 @@ public class NisConfigurationTest {
 		properties.setProperty("nem.homePath", "/home");
 		properties.setProperty("nem.shutdownPath", "/shutdown");
 		properties.setProperty("nem.useDosFilter", "true");
-		properties.setProperty("nem.isWebStart", "false");
-		properties.setProperty("nem.nisJnlpUrl", "url");
 		return properties;
 	}
 }

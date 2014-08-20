@@ -33,8 +33,6 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getHomePath(), IsEqual.equalTo("/home"));
 		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
-		Assert.assertThat(config.isWebStart(), IsEqual.equalTo(true));
-		Assert.assertThat(config.getNisJnlpUrl(), IsEqual.equalTo("url"));
 	}
 
 	@Test
@@ -238,30 +236,6 @@ public class CommonConfigurationTest {
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutIsWebStart() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.isWebStart");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.isWebStart(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutNisJnlpUrl() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.nisJnlpUrl");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.getNisJnlpUrl(), IsEqual.equalTo("http://bob.nem.ninja/webstart/nem-server.jnlp"));
 	}
 
 	//endregion

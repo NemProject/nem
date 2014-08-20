@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public class CommonConfiguration {
 	private final String shortServerName;
-	private final String nemFolder;
+	private String nemFolder;
 	private final int maxThreads;
 	private final String protocol;
 	private final String host;
@@ -23,8 +23,6 @@ public class CommonConfiguration {
 	private final String home;
 	private final String shutdown;
 	private final Boolean useDosFilter;
-	private final Boolean isWebStart;
-	private final String nisJnlpUrl;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -61,8 +59,6 @@ public class CommonConfiguration {
 		this.home = getString(properties, "nem.homePath");
 		this.shutdown = getOptionalString(properties, "nem.shutdownPath", "/shutdown");
 		this.useDosFilter = getOptionalBoolean(properties, "nem.useDosFilter", false);
-		this.isWebStart = getOptionalBoolean(properties, "nem.isWebStart", false);
-		this.nisJnlpUrl = getOptionalString(properties, "nem.nisJnlpUrl", "http://bob.nem.ninja/webstart/nem-server.jnlp");
 	}
 
 	protected static String getString(final Properties properties, final String name) {
@@ -248,27 +244,9 @@ public class CommonConfiguration {
 	}
 
 	/**
-	 * Get a value indicating whether or not web start is used.
-	 *
-	 * @return true if web start is used, false otherwise.
-	 */
-	public boolean isWebStart() {
-		return this.isWebStart;
-	}
-
-	/**
-	 * Gets JNLP url as string.
-	 *
-	 * @return The JNLP url as string.
-	 */
-	public String getNisJnlpUrl() {
-		return this.nisJnlpUrl;
-	}
-
-	/**
 	 * .Gets a value indicating if the underlying server is the NCC server.
 	 *
-	 * @return true if the server is NCC, false otherwise.
+	 * @return True if the server is NCC, false otherwise.
 	 */
 	public boolean isNcc() {
 		return this.shortServerName.toUpperCase().equals("NCC");
