@@ -36,7 +36,7 @@ public class AccountIoAdapter implements AccountIo {
 		return this.accountCache.findByAddress(address);
 	}
 
-	private Integer intOrMaxInt(String timeStamp) {
+	private Integer intOrMaxInt(final String timeStamp) {
 		Integer intTimeStamp;
 		if (timeStamp == null) {
 			return Integer.MAX_VALUE;

@@ -89,8 +89,8 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void initializeConfigurationPolicy() {
-		appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
-		configurationPolicy = appCtx.getBean(NemConfigurationPolicy.class);
+		this.appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
+		this.configurationPolicy = this.appCtx.getBean(NemConfigurationPolicy.class);
 	}
 
 	private static void initializeLogging() {
@@ -121,7 +121,7 @@ public class CommonStarter implements ServletContextListener {
 		final Properties props = new Properties();
 		props.load(inputStream);
 		final String nemFolder = configuration.getNemFolder();
-		String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
+		final String tmpStr = props.getProperty("java.util.logging.FileHandler.pattern");
 		props.setProperty("java.util.logging.FileHandler.pattern", StringUtils.replaceVariable(tmpStr, "nem.folder", nemFolder));
 		final StringWriter stringWriter = new StringWriter();
 		props.store(stringWriter, null);
@@ -228,8 +228,8 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void boot(final String[] args) throws Exception {
-		initializeConfigurationPolicy();
-		configuration = configurationPolicy.loadConfig(args);
+		this.initializeConfigurationPolicy();
+		configuration = this.configurationPolicy.loadConfig(args);
 		this.server = this.createServer();
 		this.server.addBean(new ScheduledExecutorScheduler());
 		this.server.addConnector(this.createConnector(this.server));
@@ -246,8 +246,8 @@ public class CommonStarter implements ServletContextListener {
 		this.startServer(this.server, new URL(configuration.getShutdownUrl()));
 
 		if (configuration.isNcc()) {
-			configurationPolicy.openWebBrowser(configuration.getHomeUrl());
-			configurationPolicy.handleWebStart(args);
+			this.configurationPolicy.openWebBrowser(configuration.getHomeUrl());
+			this.configurationPolicy.handleWebStart(args);
 		}
 	}
 
@@ -274,8 +274,8 @@ public class CommonStarter implements ServletContextListener {
 		// This is the replacement for the web.xml (new with Servlet 3.0)
 		try {
 			final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
-			webCtx.register(configurationPolicy.getWebAppInitializerClass());
-			webCtx.setParent(appCtx);
+			webCtx.register(this.configurationPolicy.getWebAppInitializerClass());
+			webCtx.setParent(this.appCtx);
 
 			final ServletContext context = event.getServletContext();
 			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
@@ -297,12 +297,12 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void createServlets(final ServletContext context) {
-		ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
+		ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", this.configurationPolicy.getJarFileServletClass());
 		servlet.setInitParameter("maxCacheSize", "0");
 		servlet.addMapping(String.format("%s%s", configuration.getWebContext(), "/*"));
 		servlet.setLoadOnStartup(1);
 
-		servlet = context.addServlet("DefaultServlet", configurationPolicy.getDefaultServletClass());
+		servlet = context.addServlet("DefaultServlet", this.configurationPolicy.getDefaultServletClass());
 		servlet.addMapping("/");
 		servlet.setLoadOnStartup(1);
 	}

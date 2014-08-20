@@ -31,7 +31,7 @@ public class BlockDifficultyScorerTest {
 	// TODO 20140820: G->B: is this test wrong or is our code wrong?
 	public void blocksWithInitialDiffAndTimeDiffOf60sShouldntChangeTheDiff() {
 		// Arrange:
-		final BlockDifficulty blockDifficulty = getBlockDifficultyVariableTime(T);
+		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(T);
 
 		// Assert:
 		Assert.assertThat(blockDifficulty, IsEqual.equalTo(D));
@@ -40,7 +40,7 @@ public class BlockDifficultyScorerTest {
 	@Test
 	public void blocksWithInitialDiffAndTimeDiffOf61sShouldDecreaseDiff() {
 		// Arrange:
-		final BlockDifficulty blockDifficulty = getBlockDifficultyVariableTime(T + 1);
+		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(T + 1);
 
 		// Assert:
 		Assert.assertThat(blockDifficulty.compareTo(D), IsEqual.equalTo(-1));
@@ -49,18 +49,18 @@ public class BlockDifficultyScorerTest {
 	@Test
 	public void blocksWithInitialDiffAndTimeDiffOf59sShouldIncreaseDiff() {
 		// Arrange:
-		final BlockDifficulty blockDifficulty = getBlockDifficultyVariableTime((T - 1));
+		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime((T - 1));
 
 		// Assert:
 		Assert.assertThat(blockDifficulty.compareTo(D), IsEqual.equalTo(1));
 	}
 
-	private BlockDifficulty getBlockDifficultyVariableTime(int time) {
+	private BlockDifficulty getBlockDifficultyVariableTime(final int time) {
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final int ELEMENTS = 10;
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(ELEMENTS);
 		final List<TimeInstant> timeInstants = new ArrayList<>(ELEMENTS);
-		int firstTime = 12345;
+		final int firstTime = 12345;
 		for (int i = 0; i < ELEMENTS; ++i) {
 			blockDifficulties.add(D);
 			timeInstants.add(new TimeInstant(firstTime + i * time));

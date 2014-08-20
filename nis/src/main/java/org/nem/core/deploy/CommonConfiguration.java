@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public class CommonConfiguration {
 	private final String shortServerName;
-	private String nemFolder;
+	private final String nemFolder;
 	private final int maxThreads;
 	private final String protocol;
 	private final String host;

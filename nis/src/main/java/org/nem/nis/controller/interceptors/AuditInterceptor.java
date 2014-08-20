@@ -56,8 +56,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 	}
 
 	private static class AuditEntry {
-		private String host;
-		private String path;
+		private final String host;
+		private final String path;
 
 		private AuditEntry(final HttpServletRequest request) {
 			this.host = request.getRemoteAddr();

@@ -126,7 +126,7 @@ public class Block {
 	}
 
 	public Integer getTimeStamp() {
-		return timeStamp;
+		return this.timeStamp;
 	}
 
 	public void setTimeStamp(final Integer timeStamp) {

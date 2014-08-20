@@ -13,7 +13,7 @@ public class NemCommandLineTest {
 	@Test
 	public void nemCommandLineWithNoOptionsCanBeConstructed() {
 		// Act:
-		NemCommandLine commandLine = new NemCommandLine(new ArrayList<>());
+		final NemCommandLine commandLine = new NemCommandLine(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(commandLine.optionsSize(), IsEqual.equalTo(0));
@@ -22,7 +22,7 @@ public class NemCommandLineTest {
 	@Test
 	public void nemCommandLineWithOptionsCanBeConstructed() {
 		// Act:
-		NemCommandLine commandLine = getTestNemCommandLine();
+		final NemCommandLine commandLine = this.getTestNemCommandLine();
 
 		// Assert:
 		Assert.assertThat(commandLine.optionsSize(), IsEqual.equalTo(3));
@@ -35,11 +35,11 @@ public class NemCommandLineTest {
 	@Test
 	public void allParametersCanBeParsed() {
 		// Arrange:
-		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = { "-foo1", "foo1Param", "-foo2", "-foo3", "foo3Param" };
+		final NemCommandLine commandLine = this.getTestNemCommandLine();
+		final String[] parameters = { "-foo1", "foo1Param", "-foo2", "-foo3", "foo3Param" };
 
 		// Act:
-		boolean result = commandLine.parse(parameters);
+		final boolean result = commandLine.parse(parameters);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -53,11 +53,11 @@ public class NemCommandLineTest {
 	@Test
 	public void partiallySuppliedParametersCanBeParsed() {
 		// Arrange:
-		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = { "-foo1", "foo1Param" };
+		final NemCommandLine commandLine = this.getTestNemCommandLine();
+		final String[] parameters = { "-foo1", "foo1Param" };
 
 		// Act:
-		boolean result = commandLine.parse(parameters);
+		final boolean result = commandLine.parse(parameters);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -68,11 +68,11 @@ public class NemCommandLineTest {
 	@Test
 	public void unknownParameterCannotBeParsed() {
 		// Arrange:
-		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = { "-foo1", "foo1Param", "-bazz", "bazzParam" };
+		final NemCommandLine commandLine = this.getTestNemCommandLine();
+		final String[] parameters = { "-foo1", "foo1Param", "-bazz", "bazzParam" };
 
 		// Act:
-		boolean result = commandLine.parse(parameters);
+		final boolean result = commandLine.parse(parameters);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));

@@ -29,7 +29,7 @@ public class NemCommandLine {
 	 * @return The number of options.
 	 */
 	public int optionsSize() {
-		return options.getOptions().size();
+		return this.options.getOptions().size();
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class NemCommandLine {
 	public boolean parse(final String[] parameters) {
 		final CommandLineParser parser = new BasicParser();
 		try {
-			commandLine = parser.parse(options, parameters);
+			this.commandLine = parser.parse(this.options, parameters);
 			return true;
 		} catch (final ParseException ex) {
 			LOGGER.warning(String.format("parameters could not be parsed: %s", ex.toString()));
@@ -55,7 +55,7 @@ public class NemCommandLine {
 	 * @return true if the parameter is available, false otherwise.
 	 */
 	public boolean hasParameter(final String paramName) {
-		return commandLine.hasOption(paramName);
+		return this.commandLine.hasOption(paramName);
 	}
 
 	/**
@@ -65,6 +65,6 @@ public class NemCommandLine {
 	 * @return The parameter if available, null otherwise.
 	 */
 	public String getParameter(final String paramName) {
-		return commandLine.getOptionValue(paramName);
+		return this.commandLine.getOptionValue(paramName);
 	}
 }
