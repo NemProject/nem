@@ -1,7 +1,7 @@
 package org.nem.nis.controller.interceptors;
 
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.annotations.TrustedApi;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 

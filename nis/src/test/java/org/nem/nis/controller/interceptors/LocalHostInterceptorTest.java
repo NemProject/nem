@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.annotations.TrustedApi;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.*;

@@ -1,14 +1,11 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class BlockDifficultyScorerTest {
 	public static final BlockDifficulty D = BlockDifficulty.INITIAL_DIFFICULTY;
@@ -43,7 +40,7 @@ public class BlockDifficultyScorerTest {
 	@Test
 	public void blocksWithInitialDiffAndTimeDiffOf61sShouldDecreaseDiff() {
 		// Arrange:
-		final BlockDifficulty blockDifficulty = getBlockDifficultyVariableTime(T+1);
+		final BlockDifficulty blockDifficulty = getBlockDifficultyVariableTime(T + 1);
 
 		// Assert:
 		Assert.assertThat(blockDifficulty.compareTo(D), IsEqual.equalTo(-1));

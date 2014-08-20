@@ -17,7 +17,6 @@ public class NemCommandLineTest {
 
 		// Assert:
 		Assert.assertThat(commandLine.optionsSize(), IsEqual.equalTo(0));
-
 	}
 
 	@Test
@@ -37,7 +36,7 @@ public class NemCommandLineTest {
 	public void allParametersCanBeParsed() {
 		// Arrange:
 		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = {"-foo1", "foo1Param", "-foo2", "-foo3", "foo3Param" };
+		String[] parameters = { "-foo1", "foo1Param", "-foo2", "-foo3", "foo3Param" };
 
 		// Act:
 		boolean result = commandLine.parse(parameters);
@@ -55,7 +54,7 @@ public class NemCommandLineTest {
 	public void partiallySuppliedParametersCanBeParsed() {
 		// Arrange:
 		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = {"-foo1", "foo1Param" };
+		String[] parameters = { "-foo1", "foo1Param" };
 
 		// Act:
 		boolean result = commandLine.parse(parameters);
@@ -70,7 +69,7 @@ public class NemCommandLineTest {
 	public void unknownParameterCannotBeParsed() {
 		// Arrange:
 		NemCommandLine commandLine = getTestNemCommandLine();
-		String[] parameters = {"-foo1", "foo1Param", "-bazz", "bazzParam" };
+		String[] parameters = { "-foo1", "foo1Param", "-bazz", "bazzParam" };
 
 		// Act:
 		boolean result = commandLine.parse(parameters);

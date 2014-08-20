@@ -6,7 +6,7 @@ import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
-import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.RequiredBlockDao;
