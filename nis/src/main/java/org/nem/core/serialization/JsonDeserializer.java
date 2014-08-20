@@ -31,18 +31,27 @@ public class JsonDeserializer extends Deserializer {
 	@Override
 	public Integer readOptionalInt(final String label) {
 		this.checkLabel(label);
-		return (Integer)this.object.get(label);
+
+		final Object object = this.object.get(label);
+		if (null == object) {
+			return null;
+		}
+
+		if (object instanceof Integer) {
+			return (Integer)object;
+		}
+
+		if (object instanceof Long) {
+			return ((Long)object).intValue();
+		}
+
+		throw new TypeMismatchException(label);
 	}
 
 	@Override
 	public Long readOptionalLong(final String label) {
 		this.checkLabel(label);
 
-		// the alternative to this ugly piece, is setting up JSONParser.DEFAULT_PERMISSIVE_MODE
-		// in CommonStarter, but I was trying, but I don't know, how to set it up before tests :/
-		//
-		// additionally, readInt above, would have to be changed to:
-		// ((Long)this.object.get(label)).intValue();
 		final Object object = this.object.get(label);
 		if (null == object) {
 			return null;
@@ -52,7 +61,11 @@ public class JsonDeserializer extends Deserializer {
 			return ((Integer)object).longValue();
 		}
 
-		return (Long)object;
+		if (object instanceof Long) {
+			return (Long)object;
+		}
+
+		throw new TypeMismatchException(label);
 	}
 
 	@Override
@@ -68,7 +81,11 @@ public class JsonDeserializer extends Deserializer {
 			return ((BigDecimal)object).doubleValue();
 		}
 
-		return (Double)object;
+		if (object instanceof Double) {
+			return (Double)object;
+		}
+
+		throw new TypeMismatchException(label);
 	}
 
 	@Override
