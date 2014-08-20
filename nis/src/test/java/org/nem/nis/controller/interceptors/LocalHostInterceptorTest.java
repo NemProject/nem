@@ -20,35 +20,23 @@ public class LocalHostInterceptorTest {
 	}
 
 	@Test
-	public void remoteAccessIsAllowedForPublicApi() {
+	public void remoteAccessIsNotAllowedForTrustedApi() {
 		// Assert:
-		assertAccessGranted("publicMethod", "194.66.82.11");
+		assertAccessDenied("trustedMethod", "194.66.82.11");
+		assertAccessDenied("trustedMethod", "127.0.0.10");
+		assertAccessDenied("trustedMethod", "0:0:0:0:0:0:0:10");
 	}
 
 	@Test
-	public void remoteAccessIsAllowedForPublicAndClientApi() {
+	public void localIpv4AccessIsAllowedForTrustedApi() {
 		// Assert:
-		assertAccessGranted("publicAndClientMethod", "194.66.82.11");
+		assertAccessGranted("trustedMethod", "127.0.0.1");
 	}
 
 	@Test
-	public void remoteAccessIsNotAllowedForClientApi() {
+	public void localIpv6AccessIsAllowedForTrustedApi() {
 		// Assert:
-		assertAccessDenied("clientMethod", "194.66.82.11");
-		assertAccessDenied("clientMethod", "127.0.0.10");
-		assertAccessDenied("clientMethod", "0:0:0:0:0:0:0:10");
-	}
-
-	@Test
-	public void localIpv4AccessIsAllowedForClientApi() {
-		// Assert:
-		assertAccessGranted("clientMethod", "127.0.0.1");
-	}
-
-	@Test
-	public void localIpv6AccessIsAllowedForClientApi() {
-		// Assert:
-		assertAccessGranted("clientMethod", "0:0:0:0:0:0:0:1");
+		assertAccessGranted("trustedMethod", "0:0:0:0:0:0:0:1");
 	}
 
 	private static void assertAccessGranted(final String methodName, final String remoteAddress) {
@@ -85,17 +73,8 @@ public class LocalHostInterceptorTest {
 	public static void unannotatedMethod() {
 	}
 
-	@PublicApi
-	public static void publicMethod() {
-	}
-
-	@PublicApi
-	@ClientApi
-	public static void publicAndClientMethod() {
-	}
-
-	@ClientApi
-	public static void clientMethod() {
+	@TrustedApi
+	public static void trustedMethod() {
 	}
 
 	//endregion

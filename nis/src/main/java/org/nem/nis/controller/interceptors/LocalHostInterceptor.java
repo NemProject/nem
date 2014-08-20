@@ -35,10 +35,9 @@ public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 			final Object handler) throws Exception {
 		final HandlerMethod handlerMethod = (HandlerMethod)handler;
 		final Method method = handlerMethod.getMethod();
-		final boolean isClientApi = method.isAnnotationPresent(ClientApi.class);
-		final boolean isPublicApi = method.isAnnotationPresent(PublicApi.class);
+		final boolean isTrustedApi = method.isAnnotationPresent(TrustedApi.class);
 
-		if (!isClientApi || isPublicApi) {
+		if (!isTrustedApi) {
 			return true;
 		}
 
@@ -49,8 +48,9 @@ public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 
-		LOGGER.warning(String.format("remote %s attempted to call local %s", request.getRemoteAddr(), request.getServletPath()));
-		throw new UnauthorizedAccessException("this api is only accessible from the local machine");
+		final String message = String.format("remote %s attempted to call local %s", request.getRemoteAddr(), request.getRequestURI());
+		LOGGER.warning(message);
+		throw new UnauthorizedAccessException(message);
 	}
 
 	private static InetAddress parseAddress(final String address) {

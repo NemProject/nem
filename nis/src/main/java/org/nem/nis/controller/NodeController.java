@@ -35,7 +35,7 @@ public class NodeController {
 	 * @return Information about the running node.
 	 */
 	@RequestMapping(value = "/node/info", method = RequestMethod.GET)
-	@PublicApi
+	@ClientApi
 	public Node getInfo() {
 		return this.host.getNetwork().getLocalNode();
 	}
@@ -61,7 +61,6 @@ public class NodeController {
 	 */
 	@RequestMapping(value = "/node/extended-info", method = RequestMethod.GET)
 	@ClientApi
-	@PublicApi
 	public NisNodeInfo getExtendedInfo() {
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
@@ -78,7 +77,7 @@ public class NodeController {
 	 * running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/all", method = RequestMethod.GET)
-	@PublicApi
+	@ClientApi
 	public NodeCollection getPeerList() {
 		return this.host.getNetwork().getNodes();
 	}
@@ -89,7 +88,7 @@ public class NodeController {
 	 * @return A list of the active nodes currently known by the running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
-	@PublicApi
+	@ClientApi
 	public SerializableList<Node> getActivePeerList() {
 		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
 	}
@@ -180,7 +179,8 @@ public class NodeController {
 	 * @param deserializer Information about the primary node including the private key.
 	 */
 	@RequestMapping(value = "/node/boot", method = RequestMethod.POST)
-	@P2PApi
+	@ClientApi
+	@TrustedApi
 	public void boot(@RequestBody final Deserializer deserializer) {
 		final Node localNode = new LocalNodeDeserializer().deserialize(deserializer);
 		this.host.boot(localNode);

@@ -44,7 +44,7 @@ public class ChainController {
 	//region blockLast
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
-	@PublicApi
+	@ClientApi
 	public Block blockLast() {
 		final Block block = BlockMapper.toModel(this.blockChainLastBlockLayer.getLastDbBlock(), this.accountLookup);
 		LOGGER.info("/chain/last-block height:" + block.getHeight() + " signer:" + block.getSigner());
@@ -107,7 +107,6 @@ public class ChainController {
 
 	@RequestMapping(value = "/chain/score", method = RequestMethod.POST)
 	@P2PApi
-	@PublicApi
 	@AuthenticatedApi
 	public AuthenticatedResponse<BlockChainScore> chainScore(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();

@@ -50,7 +50,7 @@ public class LocalController {
 	}
 
 	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
-	@PublicApi
+	@ClientApi
 	public NisRequestResult heartbeat() {
 		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
 	}
