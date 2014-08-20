@@ -42,6 +42,7 @@ public class BlockDifficultyScorer {
 		averageDifficulty /= heightDiff;
 
 		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+				// TODO: G->B: shouldn't it be (heightDiff-1) (changing it without blockchain restart would require some tricks
 				.multiply(BigInteger.valueOf(heightDiff))
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();
