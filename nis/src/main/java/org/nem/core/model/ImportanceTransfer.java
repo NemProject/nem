@@ -10,6 +10,7 @@ import java.util.function.BiPredicate;
 public class ImportanceTransfer extends Transaction {
 	private final int mode;
 	// TODO: not sure yet if this should be account or maybe just PublicKey
+	// TODO-CR: J->G how about address (it has a public key)
 	private final Account remoteAccount;
 
 	public Account getRemote() {
@@ -72,6 +73,7 @@ public class ImportanceTransfer extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
+		// TODO-CR: J->G consider adding a test that the min balance is 1 (although, 1 might be too low)
 		return Amount.fromNem(1);
 	}
 }
