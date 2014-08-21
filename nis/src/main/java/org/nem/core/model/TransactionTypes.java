@@ -7,11 +7,17 @@ public class TransactionTypes {
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;
 	private static final int SNAPSHOT_TYPE = 0x0400;
+	private static final int IMPORTANCE_TYPE = 0x0800;
 
 	/**
 	 * A transfer transaction.
 	 */
 	public static final int TRANSFER = TRANSFER_TYPE | 0x01;
+
+	/**
+	 * Importance transfer transaction.
+	 */
+	public static final int IMPORTANCE_TRANSFER = IMPORTANCE_TYPE | 0x01;
 
 	/**
 	 * A new asset transaction.
