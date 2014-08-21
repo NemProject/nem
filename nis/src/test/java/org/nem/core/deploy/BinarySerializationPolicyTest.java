@@ -3,7 +3,7 @@ package org.nem.core.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
+import org.nem.core.test.MockSerializableEntity;
 import org.springframework.http.MediaType;
 
 import java.io.*;
