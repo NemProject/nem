@@ -3,7 +3,6 @@ package org.nem.core.deploy;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.StringEncoder;
@@ -11,7 +10,7 @@ import org.springframework.http.MediaType;
 
 import java.io.*;
 
-public class JsonSerializationPolicyTest {
+public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 
 	//region getMediaType
 
@@ -76,38 +75,6 @@ public class JsonSerializationPolicyTest {
 
 	//region fromStream
 
-	@Test
-	public void fromStreamDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
-		// Arrange:
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final JsonSerializationPolicy policy = new JsonSerializationPolicy(null);
-
-		// Act:
-		final InputStream stream = getStream(originalEntity);
-		final Deserializer deserializer = policy.fromStream(stream);
-		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
-
-		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
-	}
-
-	@Test
-	public void fromStreamDeserializerIsAssociatedWithAccountLookup() throws Exception {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final JsonSerializationPolicy policy = new JsonSerializationPolicy(accountLookup);
-
-		// Act:
-		final InputStream stream = getStream(originalEntity);
-		final Deserializer deserializer = policy.fromStream(stream);
-
-		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
-
-		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-	}
-
 	@Test(expected = IllegalArgumentException.class)
 	public void fromStreamFailsIfInputStringIsNotJsonObject() throws Exception {
 		// Arrange:
@@ -119,7 +86,13 @@ public class JsonSerializationPolicyTest {
 
 	//endregion
 
-	private static InputStream getStream(final SerializableEntity entity) {
+	@Override
+	protected SerializationPolicy createPolicy(final AccountLookup accountLookup) {
+		return new JsonSerializationPolicy(accountLookup);
+	}
+
+	@Override
+	protected InputStream createStream(final SerializableEntity entity) {
 		return new ByteArrayInputStream(JsonSerializer.serializeToBytes(entity));
 	}
 }

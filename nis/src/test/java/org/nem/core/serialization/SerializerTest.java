@@ -250,17 +250,28 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	@Test
 	public void canRoundtripString() {
+		// Assert:
+		this.assertCanRoundtripString("BEta GaMMa");
+	}
+
+	@Test
+	public void canRoundtripUtf8String() {
+		// Assert:
+		this.assertCanRoundtripString("zuação danada");
+	}
+
+	private void assertCanRoundtripString(final String original) {
 		// Arrange:
 		final TSerializer serializer = this.createSerializer();
 
 		// Act:
-		serializer.writeString("String", "BEta GaMMa");
+		serializer.writeString("String", original);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
 		final String s = deserializer.readString("String");
 
 		// Assert:
-		Assert.assertThat(s, IsEqual.equalTo("BEta GaMMa"));
+		Assert.assertThat(s, IsEqual.equalTo(original));
 	}
 
 	@Test

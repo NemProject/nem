@@ -2,14 +2,13 @@ package org.nem.core.deploy;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.springframework.http.MediaType;
 
 import java.io.*;
 
-public class BinarySerializationPolicyTest {
+public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 
 	//region getMediaType
 
@@ -48,43 +47,13 @@ public class BinarySerializationPolicyTest {
 
 	//endregion
 
-	//region fromStream
-
-	@Test
-	public void fromStreamDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
-		// Arrange:
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final BinarySerializationPolicy policy = new BinarySerializationPolicy(null);
-
-		// Act:
-		final InputStream stream = getStream(originalEntity);
-		final Deserializer deserializer = policy.fromStream(stream);
-		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
-
-		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+	@Override
+	protected SerializationPolicy createPolicy(final AccountLookup accountLookup) {
+		return new BinarySerializationPolicy(accountLookup);
 	}
 
-	@Test
-	public void fromStreamDeserializerIsAssociatedWithAccountLookup() throws Exception {
-		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
-		final BinarySerializationPolicy policy = new BinarySerializationPolicy(accountLookup);
-
-		// Act:
-		final InputStream stream = getStream(originalEntity);
-		final Deserializer deserializer = policy.fromStream(stream);
-
-		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
-
-		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-	}
-
-	//endregion
-
-	private static InputStream getStream(final SerializableEntity entity) {
+	@Override
+	protected InputStream createStream(final SerializableEntity entity) {
 		return new ByteArrayInputStream(BinarySerializer.serializeToBytes(entity));
 	}
 }

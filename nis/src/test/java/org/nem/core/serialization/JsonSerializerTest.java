@@ -288,7 +288,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//endregion
 
-	//read[Optional]Double
+	//region read[Optional]Double
 
 	@Test
 	public void canReadOptionalNullDouble() {
@@ -333,6 +333,8 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 				() -> deserializer.readDouble("s"),
 				"s");
 	}
+
+	//endregion
 
 	//endregion
 

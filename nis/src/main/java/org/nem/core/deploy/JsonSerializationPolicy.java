@@ -1,8 +1,9 @@
 package org.nem.core.deploy;
 
 import net.minidev.json.*;
+import org.apache.commons.io.IOUtils;
 import org.nem.core.serialization.*;
-import org.nem.core.utils.StringEncoder;
+import org.nem.core.utils.*;
 import org.springframework.http.MediaType;
 
 import java.io.InputStream;
@@ -41,11 +42,16 @@ public class JsonSerializationPolicy implements SerializationPolicy {
 	public Deserializer fromStream(final InputStream stream) {
 		final DeserializationContext context = new DeserializationContext(this.accountLookup);
 
-		final Object result = JSONValue.parse(stream);
+		final Object result = JSONValue.parse(readAllAsString(stream));
 		if (result instanceof JSONObject) {
 			return new JsonDeserializer((JSONObject)result, context);
 		}
 
 		throw new IllegalArgumentException("JSON Object was expected");
+	}
+
+	private static String readAllAsString(final InputStream stream) {
+		final byte[] bytes = ExceptionUtils.propagate(() -> IOUtils.toByteArray(stream));
+		return StringEncoder.getString(bytes);
 	}
 }
