@@ -135,32 +135,9 @@ public class AccountControllerTest {
 		context.controller.accountGet("dummy");
 	}
 
-	@Test
-	public void accountTransfersDelegatesToIoAdapter() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		final TestContext context = new TestContext(accountIoAdapter);
-
-		final AccountPageBuilder pageBuilder = new AccountPageBuilder();
-		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setTimeStamp("12345");
-
-		Mockito.when(accountIoAdapter.getAccountTransfers(address, "12345")).thenReturn(expectedList);
-
-		// Act:
-		final SerializableList<TransactionMetaDataPair> resultList =
-				context.controller.accountTransfers(pageBuilder);
-
-		// Assert:
-		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfers(address, "12345");
-	}
-
-	// TODO-CR 20140809 -(minor) probably clearer to drop each param to its own line (also use final and remove the unused imports,
-	// and following double blank lines) ... will be much easier when we run our "code cleanup"
-	private void accountTransfersMethodsDelegatesToIo(final ReadOnlyTransferDao.TransferType transferType, final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+	private void accountTransfersMethodsDelegatesToIo(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
