@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
@@ -19,8 +20,8 @@ public class BlockDifficultyScorerTest {
 		final List<BlockDifficulty> blockDifficulties2 = Arrays.asList(new BlockDifficulty(1));
 
 		// Act:
-		final BlockDifficulty blockDifficulty1 = blockDifficultyScorer.calculateDifficulty(blockDifficulties1, null);
-		final BlockDifficulty blockDifficulty2 = blockDifficultyScorer.calculateDifficulty(blockDifficulties2, null);
+		final BlockDifficulty blockDifficulty1 = blockDifficultyScorer.calculateDifficulty(blockDifficulties1, null, 100);
+		final BlockDifficulty blockDifficulty2 = blockDifficultyScorer.calculateDifficulty(blockDifficulties2, null, 100);
 
 		// Assert:
 		Assert.assertThat(blockDifficulty1, IsEqual.equalTo(D));
@@ -28,7 +29,15 @@ public class BlockDifficultyScorerTest {
 	}
 
 	@Test
-	// TODO 20140820: G->B: is this test wrong or is our code wrong?
+	public void blocksWithInitialDiffAndTimeDiffOf60sChangesTheDiffInOldBlockScorer() {
+		// Arrange:
+		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTimeOld(T);
+
+		// Assert:
+		Assert.assertThat(blockDifficulty, IsNot.not(IsEqual.equalTo(D)));
+	}
+
+	@Test
 	public void blocksWithInitialDiffAndTimeDiffOf60sShouldntChangeTheDiff() {
 		// Arrange:
 		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(T);
@@ -56,6 +65,14 @@ public class BlockDifficultyScorerTest {
 	}
 
 	private BlockDifficulty getBlockDifficultyVariableTime(final int time) {
+		return getBlockDifficultyVariableTimeAtHeight(time, BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT + 100);
+	}
+
+	private BlockDifficulty getBlockDifficultyVariableTimeOld(final int time) {
+		return getBlockDifficultyVariableTimeAtHeight(time, 100);
+	}
+
+	private BlockDifficulty getBlockDifficultyVariableTimeAtHeight(final int time, long height) {
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final int ELEMENTS = 10;
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(ELEMENTS);
@@ -67,6 +84,6 @@ public class BlockDifficultyScorerTest {
 		}
 
 		// Act:
-		return blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
+		return blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, height);
 	}
 }

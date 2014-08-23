@@ -505,7 +505,7 @@ public class BlockChain implements BlockSynchronizer {
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
 			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);
+				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, block.getHeight().getRaw());
 				block.setDifficulty(difficulty);
 
 				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()

@@ -247,7 +247,7 @@ public class BlockChainTest {
 
 		final List<Block> historicalBlocks = blocks.subList(Math.max(0, blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), blocks.size());
 		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
-				this.createTimestampsList(historicalBlocks));
+				this.createTimestampsList(historicalBlocks), block.getHeight().getRaw());
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
