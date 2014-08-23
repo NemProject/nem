@@ -36,6 +36,15 @@ public class SystemTimeProvider implements TimeProvider {
 	}
 
 	/**
+	 * Returns the current time in milliseconds.
+	 *
+	 * @return The current time in milliseconds.
+	 */
+	public static long getCurrentTimeMillis() {
+		return System.currentTimeMillis() - EPOCH_TIME;
+	}
+
+	/**
 	 * Returns the epoch time in milliseconds.
 	 *
 	 * @return The epoch time in milliseconds.

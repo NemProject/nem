@@ -33,18 +33,18 @@ public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {
 	}
 
 	/**
-	 * Increments the reference counter
+	 * Increments the reference counter.
 	 *
-	 * @return The incremented reference counter
+	 * @return The incremented reference counter.
 	 */
 	public ReferenceCount increment() {
 		return new ReferenceCount(this.getRaw() + 1);
 	}
 
 	/**
-	 * Decrements the reference counter
+	 * Decrements the reference counter.
 	 *
-	 * @return The decremented reference counter
+	 * @return The decremented reference counter.
 	 */
 	public ReferenceCount decrement() {
 		return new ReferenceCount(this.getRaw() - 1);

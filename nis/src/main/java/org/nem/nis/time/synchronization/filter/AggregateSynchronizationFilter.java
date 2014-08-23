@@ -1,0 +1,26 @@
+package org.nem.nis.time.synchronization.filter;
+
+import org.nem.core.model.primitive.NodeAge;
+import org.nem.nis.time.synchronization.SynchronizationSample;
+
+import java.util.*;
+/**
+ * Aggregate synchronization filter.
+ */
+public class AggregateSynchronizationFilter implements SynchronizationFilter {
+	private final List<SynchronizationFilter> filters = new ArrayList<>();
+
+	public AggregateSynchronizationFilter() {
+		filters.add(new ClampingFilter());
+		filters.add(new AlphaTrimmedMeanFilter());
+	}
+
+	@Override
+	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age) {
+		// TODO 20140823 BR: this looks ugly. Any better way to do it?
+		final List<List<SynchronizationSample>> samplesList = Arrays.asList(samples);
+		filters.stream().forEach(f -> samplesList.set(0, f.filter(samplesList.get(0), age)));
+
+		return samplesList.get(0);
+	}
+}
