@@ -505,16 +505,7 @@ public class BlockChain implements BlockSynchronizer {
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 
 			for (final Block block : this.peerChain) {
-				// TODO-CR: J->G Can we hide this branch in the block scorer itself?
-				// (then we don't need the branch in two places)
-				// (we would need to pass the height as a parameter)?
-				// (it should be easier to test then too)
-				final BlockDifficulty difficulty;
-				if (block.getHeight().getRaw() >= BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT) {
-					difficulty = this.blockScorer.getDifficultyScorer().calculateDifficultyNew(difficulties, timeStamps);
-				} else {
-					difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);
-				}
+				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, block.getHeight().getRaw());
 				block.setDifficulty(difficulty);
 
 				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
