@@ -9,12 +9,11 @@ import java.net.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A default AsyncNisConnector implementation
+ * A default AsyncNemConnector implementation
  *
- * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector
- * instances can only call certain APIs).
+ * @param <TApiId> The api id type.
  */
-public class DefaultAsyncNisConnector<TApiId> implements AsyncNisConnector<TApiId> {
+public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiId> {
 	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient;
 	private final ErrorResponseStrategy errorResponseStrategy;
 	private HttpErrorResponseDeserializerUnionStrategy httpDeserializerResponseStrategy;
@@ -25,7 +24,7 @@ public class DefaultAsyncNisConnector<TApiId> implements AsyncNisConnector<TApiI
 	 * @param httpClient The HTTP client.
 	 * @param errorResponseStrategy The error response strategy.
 	 */
-	public DefaultAsyncNisConnector(
+	public DefaultAsyncNemConnector(
 			final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient,
 			final ErrorResponseStrategy errorResponseStrategy) {
 		this.httpClient = httpClient;

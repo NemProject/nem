@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
-public class DefaultAsyncNisConnectorTest {
+public class DefaultAsyncNemConnectorTest {
 
 	//region getAsync
 
@@ -207,14 +207,14 @@ public class DefaultAsyncNisConnectorTest {
 		private final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient;
 		private final ErrorResponseStrategy errorResponseStrategy;
 		private final MockAccountLookup accountLookup = new MockAccountLookup();
-		private final DefaultAsyncNisConnector<NisApiId> connector;
+		private final DefaultAsyncNemConnector<NisApiId> connector;
 
 		@SuppressWarnings("unchecked")
 		public TestContext() {
 			this.httpClient = Mockito.mock(HttpMethodClient.class);
 			this.errorResponseStrategy = Mockito.mock(ErrorResponseStrategy.class);
 			Mockito.when(this.errorResponseStrategy.mapToException(Mockito.any())).thenThrow(new TestException());
-			this.connector = new DefaultAsyncNisConnector(this.httpClient, this.errorResponseStrategy);
+			this.connector = new DefaultAsyncNemConnector(this.httpClient, this.errorResponseStrategy);
 			this.connector.setAccountLookup(this.accountLookup);
 		}
 
