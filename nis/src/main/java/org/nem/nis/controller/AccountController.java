@@ -90,28 +90,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets transaction information for the specified account starting at the specified time.
-	 *
-	 * @param builder The page builder.
-	 * @return Information about the matching transactions.
-	 */
-	@RequestMapping(value = "/account/transfers", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfers(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		return this.accountIo.getAccountTransfers(page.getAddress(), page.getTimeStamp());
-	}
-
-	// TODO-CR, with this change, who do we expect to call account/transfers?
-	// G-J: noone, account/transfers, should finally be removed and replaced by calls to methods below
-	// J-G: so, why don't we remove it?
-
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
-		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
-	}
-
-	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
 	 *
 	 * @param builder The page builder.
@@ -147,6 +125,12 @@ public class AccountController {
 		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
+	// TODO-CR J->G: sorry i can't resist having code top-down (so the calling functions are above)
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
+	}
+
 	/**
 	 * Gets unconfirmed transaction information for the specified account.
 	 * TODO: not sure if we should have an AccountPageBuilder here since there isn't paging.
@@ -171,6 +155,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<HarvestInfo> accountHarvests(final AccountPageBuilder builder) {
 		final AccountPage page = builder.build();
+		// TODO-CR J->G: should we use hash filtering for harvests too?
 		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimeStamp());
 	}
 
