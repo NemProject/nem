@@ -21,7 +21,7 @@ public class ClampingFilter implements SynchronizationFilter {
 		final long toleratedDeviation = getMaximumToleratedDeviation(age);
 
 		return samples.stream()
-				.filter(s -> (s.getTimeOffsetToRemote() <= toleratedDeviation && -toleratedDeviation <= s.getTimeOffsetToRemote()))
+				.filter(s -> (s.getTimeOffsetToRemote() > toleratedDeviation || -toleratedDeviation > s.getTimeOffsetToRemote()))
 				.collect(Collectors.toList());
 	}
 }
