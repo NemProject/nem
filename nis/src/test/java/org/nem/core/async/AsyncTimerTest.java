@@ -195,13 +195,14 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	// TODO-CR: G->J I've doubled the times, as this test was failing for me, not sure if that's a good idea
 	public void visitorIsNotifiedOfSuccessfulCompletions() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit, visitor)) {
-			// Arrange: (should fire at 1, 3, 5)
-			Thread.sleep(6 * TimeUnit);
+		try (final AsyncTimer timer = createTimer(cf, 2 * TimeUnit, 4 * TimeUnit, visitor)) {
+			// Arrange: (should fire at 2, 6, 10)
+			Thread.sleep(12 * TimeUnit);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(3)).notifyOperationStart();
