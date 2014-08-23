@@ -8,8 +8,11 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * An asynchronous NIS connector.
+ *
+ * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector
+ * instances can only call certain APIs).
  */
-public interface AsyncNisConnector {
+public interface AsyncNisConnector<TApiId> {
 
 	/**
 	 * Gets a response from the specified NIS relative url path.
@@ -21,7 +24,7 @@ public interface AsyncNisConnector {
 	 */
 	public CompletableFuture<Deserializer> getAsync(
 			final NodeEndpoint endpoint,
-			final NisApiId apiId,
+			final TApiId apiId,
 			final String query);
 
 	/**
@@ -34,7 +37,7 @@ public interface AsyncNisConnector {
 	 */
 	public CompletableFuture<Deserializer> postAsync(
 			final NodeEndpoint endpoint,
-			final NisApiId apiId,
+			final TApiId apiId,
 			final HttpPostRequest postRequest);
 
 	/**
@@ -46,6 +49,6 @@ public interface AsyncNisConnector {
 	 */
 	public CompletableFuture<Void> postVoidAsync(
 			final NodeEndpoint endpoint,
-			final NisApiId apiId,
+			final TApiId apiId,
 			final HttpPostRequest postRequest);
 }

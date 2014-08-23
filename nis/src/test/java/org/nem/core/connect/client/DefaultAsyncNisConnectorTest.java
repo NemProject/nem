@@ -207,7 +207,7 @@ public class DefaultAsyncNisConnectorTest {
 		private final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient;
 		private final ErrorResponseStrategy errorResponseStrategy;
 		private final MockAccountLookup accountLookup = new MockAccountLookup();
-		private final DefaultAsyncNisConnector connector;
+		private final DefaultAsyncNisConnector<NisApiId> connector;
 
 		@SuppressWarnings("unchecked")
 		public TestContext() {

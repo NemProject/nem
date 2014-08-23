@@ -10,8 +10,11 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * A default AsyncNisConnector implementation
+ *
+ * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector
+ * instances can only call certain APIs).
  */
-public class DefaultAsyncNisConnector implements AsyncNisConnector {
+public class DefaultAsyncNisConnector<TApiId> implements AsyncNisConnector<TApiId> {
 	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient;
 	private final ErrorResponseStrategy errorResponseStrategy;
 	private HttpErrorResponseDeserializerUnionStrategy httpDeserializerResponseStrategy;
@@ -50,7 +53,7 @@ public class DefaultAsyncNisConnector implements AsyncNisConnector {
 	}
 
 	@Override
-	public CompletableFuture<Deserializer> getAsync(final NodeEndpoint endpoint, final NisApiId apiId, final String query) {
+	public CompletableFuture<Deserializer> getAsync(final NodeEndpoint endpoint, final TApiId apiId, final String query) {
 		final String path = apiId + (null == query ? "" : "?" + query);
 		return ExceptionUtils.propagate(() ->
 				this.httpClient.get(
@@ -67,16 +70,16 @@ public class DefaultAsyncNisConnector implements AsyncNisConnector {
 	}
 
 	@Override
-	public CompletableFuture<Deserializer> postAsync(final NodeEndpoint endpoint, final NisApiId apiId, final HttpPostRequest postRequest) {
+	public CompletableFuture<Deserializer> postAsync(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest) {
 		return this.postAsyncImpl(endpoint, apiId, postRequest).thenApply(ErrorResponseDeserializerUnion::getDeserializer);
 	}
 
 	@Override
-	public CompletableFuture<Void> postVoidAsync(final NodeEndpoint endpoint, final NisApiId apiId, final HttpPostRequest postRequest) {
+	public CompletableFuture<Void> postVoidAsync(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest) {
 		return this.postAsyncImpl(endpoint, apiId, postRequest).thenApply(response -> null);
 	}
 
-	private CompletableFuture<ErrorResponseDeserializerUnion> postAsyncImpl(final NodeEndpoint endpoint, final NisApiId apiId, final HttpPostRequest postRequest) {
+	private CompletableFuture<ErrorResponseDeserializerUnion> postAsyncImpl(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest) {
 		return ExceptionUtils.propagate(() ->
 				this.httpClient.post(
 						this.createNisUrl(endpoint, apiId.toString()),
