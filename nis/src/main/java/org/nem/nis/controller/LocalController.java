@@ -6,9 +6,7 @@ import org.nem.core.model.ncc.NisRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
-import org.nem.nis.NisMain;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.controller.annotations.TrustedApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.RequiredBlockDao;
@@ -24,12 +22,10 @@ public class LocalController {
 
 	private final long SHUTDOWN_DELAY = 200;
 	private final RequiredBlockDao blockDao;
-	private final NisMain nisMain;
 
 	@Autowired(required = true)
-	public LocalController(final RequiredBlockDao blockDao, final NisMain nisMain) {
+	public LocalController(final RequiredBlockDao blockDao) {
 		this.blockDao = blockDao;
-		this.nisMain = nisMain;
 	}
 
 	/**
@@ -57,12 +53,6 @@ public class LocalController {
 	@ClientApi
 	public NisRequestResult heartbeat() {
 		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
-	}
-
-	@RequestMapping(value = "/init/start", method = RequestMethod.GET)
-	@TrustedApi
-	public NisRequestResult initialize() {
-		return new NisRequestResult(NisRequestResult.TYPE_INITIALIZE, NisRequestResult.CODE_SUCCESS, nisMain.initialize() ? "ok" : "initialize in progress");
 	}
 
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)

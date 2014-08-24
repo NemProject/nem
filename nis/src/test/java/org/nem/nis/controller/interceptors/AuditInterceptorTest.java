@@ -3,7 +3,6 @@ package org.nem.nis.controller.interceptors;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.nis.NisMain;
 import org.nem.nis.audit.AuditCollection;
 
 import javax.servlet.http.*;
@@ -100,8 +99,7 @@ public class AuditInterceptorTest {
 
 	private static class TestContext {
 		private final AuditCollection collection = Mockito.mock(AuditCollection.class);
-		private final NisMain nisMain = Mockito.mock(NisMain.class);
-		private final AuditInterceptor interceptor = new AuditInterceptor(this.collection, nisMain);
+		private final AuditInterceptor interceptor = new AuditInterceptor(this.collection);
 		private final HttpServletRequest request;
 		private final HttpServletResponse response;
 

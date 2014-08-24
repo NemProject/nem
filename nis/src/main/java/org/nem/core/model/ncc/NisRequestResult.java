@@ -18,11 +18,6 @@ public class NisRequestResult implements SerializableEntity {
 	public static final int TYPE_HEARTBEAT = 0x00000002;
 
 	/**
-	 * Result type indicating initialize
-	 */
-	public static final int TYPE_INITIALIZE = 0x00000003;
-
-	/**
 	 * Special code representing a neutral result.
 	 */
 	public static final int CODE_NEUTRAL = 0x00000000;
