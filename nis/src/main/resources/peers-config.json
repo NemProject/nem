@@ -3,17 +3,6 @@
     "knownPeers": [
         {
             "endpoint": {
-                "host": "alice.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice",
-                "public-key": "02f25538f7fbdb0dbe7d3363be67f9edac8033c777cf3fc10ededae1a990c5459f"
-            }
-        },
-        {
-            "endpoint": {
                 "host": "alice2.nem.ninja",
                 "port": 7890,
                 "protocol": "http"
