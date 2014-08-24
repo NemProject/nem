@@ -70,5 +70,4 @@ public class CommunicationTimeStamps implements SerializableEntity {
 		return this.sendTimeStamp.equals(rhs.sendTimeStamp)
 				&& this.receiveTimeStamp.equals(rhs.receiveTimeStamp);
 	}
-
 }

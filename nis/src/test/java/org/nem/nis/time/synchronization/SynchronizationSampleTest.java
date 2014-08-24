@@ -1,9 +1,11 @@
 package org.nem.nis.time.synchronization;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.NetworkTimeStamp;
 import org.nem.core.node.NodeEndpoint;
+
+import java.util.*;
 
 public class SynchronizationSampleTest {
 
@@ -56,6 +58,32 @@ public class SynchronizationSampleTest {
 
 	//endregion
 
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final List<SynchronizationSample> sampleList = createTestSynchronizationSampleList();
+
+		// Assert:
+		Assert.assertThat(sampleList.get(0), IsEqual.equalTo(sampleList.get(1)));
+		Assert.assertThat(sampleList.get(0), IsNot.not(IsEqual.equalTo(sampleList.get(2))));
+		Assert.assertThat(sampleList.get(0), IsNot.not(IsEqual.equalTo(sampleList.get(3))));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final List<SynchronizationSample> sampleList = createTestSynchronizationSampleList();
+
+		// Assert:
+		Assert.assertThat(sampleList.get(0).hashCode(), IsEqual.equalTo(sampleList.get(1).hashCode()));
+		Assert.assertThat(sampleList.get(0).hashCode(), IsNot.not(IsEqual.equalTo(sampleList.get(2).hashCode())));
+		Assert.assertThat(sampleList.get(0).hashCode(), IsNot.not(IsEqual.equalTo(sampleList.get(3).hashCode())));
+	}
+
+	//endregion
+
 	private SynchronizationSample createSynchronizationSample(
 			final long localSendTimeStamp,
 			final long localReceiveTimeStamp,
@@ -65,5 +93,13 @@ public class SynchronizationSampleTest {
 			new NodeEndpoint("ftp", "10.8.8.2", 12),
 			new CommunicationTimeStamps(new NetworkTimeStamp(localSendTimeStamp), new NetworkTimeStamp(localReceiveTimeStamp)),
 			new CommunicationTimeStamps(new NetworkTimeStamp(remoteSendTimeStamp), new NetworkTimeStamp(remoteReceiveTimeStamp)));
+	}
+
+	private List<SynchronizationSample> createTestSynchronizationSampleList() {
+		return Arrays.asList(
+				createSynchronizationSample(5, 17, 25, 23),
+				createSynchronizationSample(5, 17, 25, 23),
+				createSynchronizationSample(4, 12, 25, 23),
+				createSynchronizationSample(5, 17, 30, 28));
 	}
 }

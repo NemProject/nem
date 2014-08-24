@@ -79,4 +79,20 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 	public int compareTo(final SynchronizationSample other) {
 		return this.getTimeOffsetToRemote().compareTo(other.getTimeOffsetToRemote());
 	}
+
+	@Override
+	public int hashCode() {
+		return this.localTimeStamps.hashCode() ^ this.remoteTimeStamps.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof SynchronizationSample)) {
+			return false;
+		}
+
+		final SynchronizationSample rhs = (SynchronizationSample)obj;
+		return this.localTimeStamps.equals(rhs.localTimeStamps)
+				&& this.remoteTimeStamps.equals(rhs.remoteTimeStamps);
+	}
 }
