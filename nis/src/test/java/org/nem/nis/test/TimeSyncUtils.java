@@ -15,8 +15,8 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return the list of samples
 	 */
-	public static List<SynchronizationSample> createTolerableSamples(long startValue, int count, boolean sort) {
-		List<SynchronizationSample> samples = new ArrayList<>();
+	public static List<SynchronizationSample> createTolerableSamples(final long startValue, final int count, final boolean sort) {
+		final List<SynchronizationSample> samples = new ArrayList<>();
 		for (int i=1; i<=count; i++) {
 			samples.add(createSynchronizationSample(startValue + i));
 		}
@@ -33,8 +33,8 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return the list of samples
 	 */
-	public static List<SynchronizationSample> createIntolerableSamples(int count) {
-		List<SynchronizationSample> samples = new ArrayList<>();
+	public static List<SynchronizationSample> createIntolerableSamples(final int count) {
+		final List<SynchronizationSample> samples = new ArrayList<>();
 		for (int i=1; i<=count; i++) {
 			samples.add(createSynchronizationSample(FilterConstants.TOLERATED_DEVIATION_START + i));
 		}
@@ -48,7 +48,7 @@ public class TimeSyncUtils {
 	 * @param timeOffset The time offset in ms.
 	 * @return The synchronization sample
 	 */
-	public static SynchronizationSample createSynchronizationSample(long timeOffset) {
+	public static SynchronizationSample createSynchronizationSample(final long timeOffset) {
 		return new SynchronizationSample(
 				new NodeEndpoint("ftp", "10.8.8.2", 12),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),

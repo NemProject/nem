@@ -32,7 +32,7 @@ public class AggregateSynchronizationFilterTest {
 		final AlphaTrimmedMeanFilter filter2 = Mockito.mock(AlphaTrimmedMeanFilter.class);
 		Mockito.when(filter1.filter(Mockito.any(), Mockito.any())).thenReturn(null);
 		Mockito.when(filter1.filter(Mockito.any(), Mockito.any())).thenReturn(null);
-		InOrder inOrder = Mockito.inOrder(filter1, filter2);
+		final InOrder inOrder = Mockito.inOrder(filter1, filter2);
 		final AggregateSynchronizationFilter filter = new AggregateSynchronizationFilter(
 				Arrays.asList(filter1, filter2));
 

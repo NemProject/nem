@@ -15,7 +15,7 @@ public class AlphaTrimmedMeanFilter implements SynchronizationFilter {
 		final int samplesToDiscardAtBothEnds = (int)(samples.size() * FilterConstants.ALPHA / 2);
 		// TODO: 20140823 BR: is there a way to do this with samples.stream()?
 		Collections.sort(samples);
-		List<SynchronizationSample> trimmedSamples = new ArrayList<>();
+		final List<SynchronizationSample> trimmedSamples = new ArrayList<>();
 		for (int i=samplesToDiscardAtBothEnds; i<samples.size() - samplesToDiscardAtBothEnds; i++) {
 			trimmedSamples.add(samples.get(i));
 		}
