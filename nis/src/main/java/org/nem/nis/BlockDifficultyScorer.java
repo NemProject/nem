@@ -26,12 +26,12 @@ public class BlockDifficultyScorer {
 	 * @param height Height for which we're calculating difficulty.
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, long height) {
-		int fix = (height >= BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT) ? 1 : 0;
-		return calculateDifficultyInternal(difficulties, timeStamps, fix);
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final long height) {
+		final int fix = (height >= BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT) ? 1 : 0;
+		return this.calculateDifficultyInternal(difficulties, timeStamps, fix);
 	}
 
-	private BlockDifficulty calculateDifficultyInternal(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, int fix) {
+	private BlockDifficulty calculateDifficultyInternal(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final int fix) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
