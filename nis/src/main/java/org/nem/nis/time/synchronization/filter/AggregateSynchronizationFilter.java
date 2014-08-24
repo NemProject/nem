@@ -8,11 +8,10 @@ import java.util.*;
  * Aggregate synchronization filter.
  */
 public class AggregateSynchronizationFilter implements SynchronizationFilter {
-	private final List<SynchronizationFilter> filters = new ArrayList<>();
+	private final List<SynchronizationFilter> filters;
 
-	public AggregateSynchronizationFilter() {
-		filters.add(new ClampingFilter());
-		filters.add(new AlphaTrimmedMeanFilter());
+	public AggregateSynchronizationFilter(List<SynchronizationFilter> filters) {
+		this.filters = filters;
 	}
 
 	@Override
