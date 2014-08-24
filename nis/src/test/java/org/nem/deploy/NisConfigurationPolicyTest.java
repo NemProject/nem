@@ -1,7 +1,8 @@
 package org.nem.deploy;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.deploy.CommonConfiguration;
 import org.nem.deploy.appconfig.NisAppConfig;
 
 public class NisConfigurationPolicyTest {
@@ -47,23 +48,17 @@ public class NisConfigurationPolicyTest {
 		policy.getDefaultServletClass();
 	}
 
-	@Test(expected = NisConfigurationException.class)
-	public void openWebBrowserRaisesException() {
-		// Arrange:
-		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
-
-		// Act:
-		policy.openWebBrowser("http://127.0.0.1:7890//ncc/web/index.html");
-	}
-
-	@Test(expected = NisConfigurationException.class)
-	public void startNisViaWebStartRaisesException() {
-		// Arrange:
-		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
-
-		// Act:
-		policy.handleWebStart(null);
-	}
-
 	//endregion
+
+	@Test
+	public void loadConfigReturnsValidConfiguration() {
+		// Arrange:
+		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
+
+		// Act:
+		final CommonConfiguration configuration = policy.loadConfig(new String[] { });
+
+		// Assert:
+		Assert.assertThat(configuration, IsNull.notNullValue());
+	}
 }

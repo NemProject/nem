@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.nem.nis.NisMain;
 import org.nem.nis.audit.AuditCollection;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -12,16 +13,20 @@ import java.util.logging.Logger;
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
 	private static final String HEARTBEAT_PATH = "/heartbeat";
+	private static final String INIT_START_PATH = "/init/start";
 
 	private final AuditCollection auditCollection;
+	private final NisMain nisMain;
 
 	/**
 	 * Creates a new audit interceptor.
 	 *
 	 * @param auditCollection The audit collection.
+	 * @param nisMain
 	 */
-	public AuditInterceptor(final AuditCollection auditCollection) {
+	public AuditInterceptor(final AuditCollection auditCollection, final NisMain nisMain) {
 		this.auditCollection = auditCollection;
+		this.nisMain = nisMain;
 	}
 
 	@Override
@@ -32,6 +37,10 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 		final AuditEntry entry = new AuditEntry(request);
 		if (entry.shouldIgnore()) {
 			return true;
+		}
+
+		if (! nisMain.isInitialized() && ! entry.passThrough()) {
+			throw new NotInitializedException("Nis not initialized");
 		}
 
 		LOGGER.info(String.format("entering %s [%s]", entry.path, entry.host));
@@ -66,6 +75,10 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 
 		private boolean shouldIgnore() {
 			return this.path.equalsIgnoreCase(HEARTBEAT_PATH);
+		}
+
+		public boolean passThrough() {
+			return this.path.equalsIgnoreCase(INIT_START_PATH);
 		}
 	}
 }

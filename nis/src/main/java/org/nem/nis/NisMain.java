@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.nem.core.async.AsyncTimer;
 import org.nem.core.crypto.*;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
@@ -16,6 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.Iterator;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 public class NisMain {
@@ -37,6 +42,8 @@ public class NisMain {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final NisConfiguration nisConfiguration;
 
+	private AtomicBoolean nisInitialized;
+
 	@Autowired(required = true)
 	public NisMain(
 			final AccountDao accountDao,
@@ -53,6 +60,7 @@ public class NisMain {
 		this.networkHost = networkHost;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.nisConfiguration = nisConfiguration;
+		this.nisInitialized = new AtomicBoolean();
 	}
 
 	private void analyzeBlocks() {
@@ -179,7 +187,18 @@ public class NisMain {
 		LOGGER.info("PoI initialized");
 	}
 
-	@PostConstruct
+	public boolean isInitialized() {
+		return this.nisInitialized.get();
+	}
+
+	public boolean initialize() {
+		if (this.nisInitialized.compareAndSet(false, true)) {
+			CompletableFuture.runAsync(() -> this.init(), Executors.newSingleThreadExecutor());
+			return true;
+		}
+		return false;
+	}
+
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 

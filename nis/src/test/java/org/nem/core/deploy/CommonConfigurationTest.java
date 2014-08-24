@@ -254,8 +254,6 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.homePath", "/home");
 		properties.setProperty("nem.shutdownPath", "/sd");
 		properties.setProperty("nem.useDosFilter", "true");
-		properties.setProperty("nem.isWebStart", "true");
-		properties.setProperty("nem.nisJnlpUrl", "url");
 		return properties;
 	}
 

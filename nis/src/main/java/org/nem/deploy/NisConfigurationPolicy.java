@@ -30,16 +30,6 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	}
 
 	@Override
-	public boolean openWebBrowser(final String homeUrl) {
-		throw new NisConfigurationException("openWebBrowser is not supposed to be called from NIS server.");
-	}
-
-	@Override
-	public void handleWebStart(final String[] args) {
-		throw new NisConfigurationException("handleWebStart is not supposed to be called from NIS server.");
-	}
-
-	@Override
 	public CommonConfiguration loadConfig(final String[] args) {
 		return new NisConfiguration();
 	}
