@@ -199,11 +199,6 @@ public class CommonStarter implements ServletContextListener {
 
 		LOGGER.info("Calling start().");
 		this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
-
-		if (this.configuration.isNcc()) {
-			this.configurationPolicy.openWebBrowser(this.configuration.getHomeUrl());
-			this.configurationPolicy.handleWebStart(args);
-		}
 	}
 
 	private void startWebApplication(final Server server) {
