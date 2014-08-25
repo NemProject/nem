@@ -26,10 +26,12 @@ public class TimeAwareNode {
 	public TimeAwareNode(
 			final int id,
 			final SynchronizationStrategy syncStrategy,
+			final int startingTimeOffset,
 			final long communicationDelay) {
 		this.name = String.format("node%d", id);
 		this.endpoint = new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12);
 		this.syncStrategy = syncStrategy;
+		this.timeOffset = startingTimeOffset;
 		this.communicationDelay = communicationDelay;
 		this.age = new NodeAge(0);
 	}
@@ -67,8 +69,18 @@ public class TimeAwareNode {
 	 * @param samples The list of synchronization samples.
 	 */
 	public void updateNetworkTime(List<SynchronizationSample> samples) {
-		this.timeOffset = syncStrategy.calculateTimeOffset(samples, age);
+		final long diff = syncStrategy.calculateTimeOffset(samples, age);
+		this.timeOffset += diff;
 		this.age = this.age.increment();
+	}
+
+	/**
+	 * Gets the node's time offset value.
+	 *
+	 * @return The time offset.
+	 */
+	public long getTimeOffset() {
+		return this.timeOffset;
 	}
 
 	/**
@@ -79,14 +91,15 @@ public class TimeAwareNode {
 	public long getCommunicationDelay() {
 		return this.communicationDelay;
 	}
+
 	/**
 	 * Creates a new communication time stamps object based on current time offset and delay.
 	 *
 	 * @return The communication time stamps.
 	 */
-	public CommunicationTimeStamps createCommunicationTimeStamps() {
+	public CommunicationTimeStamps createCommunicationTimeStamps(int roundTripTime) {
 		return new CommunicationTimeStamps(
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + this.communicationDelay),
-				this.getNetworkTime());
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + roundTripTime / 2 + this.communicationDelay),
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + roundTripTime / 2));
 	}
 }
