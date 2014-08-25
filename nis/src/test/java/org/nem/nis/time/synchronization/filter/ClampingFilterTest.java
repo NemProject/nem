@@ -23,7 +23,7 @@ public class ClampingFilterTest {
 	}
 
 	@Test
-	public void getMaximumToleratedDeviationDecaysToToleratedDecayMinimumAfterStartDecayAfterRound() {
+	public void getMaximumToleratedDeviationDecaysToToleratedDeviationMinimumAfterStartDecayAfterRound() {
 		// Arrange:
 		final ClampingFilter filter = new ClampingFilter();
 
