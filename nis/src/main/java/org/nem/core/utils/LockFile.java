@@ -29,7 +29,7 @@ public class LockFile {
 			}
 
 			return null;
-		} catch (final IOException|OverlappingFileLockException e) {
+		} catch (final IOException | OverlappingFileLockException e) {
 			return null;
 		} finally {
 			if (null != handle && null == handle.lock) {

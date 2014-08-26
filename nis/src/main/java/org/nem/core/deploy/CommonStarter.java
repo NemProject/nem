@@ -12,7 +12,7 @@ import org.eclipse.jetty.util.thread.*;
 import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.LockFile;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
