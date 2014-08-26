@@ -8,12 +8,12 @@ public class FilterConstants {
 	/***
 	 * Start value for the maximum tolerated deviation in ms.
 	 */
-	public static final long TOLERATED_DEVIATION_START = 60000;
+	public static final long TOLERATED_DEVIATION_START = 300000;
 
 	/***
 	 * Minimum value for the maximum tolerated deviation in ms.
 	 */
-	public static final long TOLERATED_DEVIATION_MINIMUM = 10000;
+	public static final long TOLERATED_DEVIATION_MINIMUM = 60000;
 
 	/***
 	 * Value that indicates after which round the decay starts.

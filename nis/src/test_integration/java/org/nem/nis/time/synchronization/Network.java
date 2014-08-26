@@ -8,19 +8,20 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
-	private static final int TOLERABLE_MAX_DEVIATION_FROM_MEAN = 100;
+	private static final double TOLERABLE_MAX_STANDARD_DEVIATION = 2000;
 
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final SecureRandom random = new SecureRandom();
 	private final int viewSize;
+	private final boolean clockAdjustment;
 	private double mean;
 	private double standardDeviation;
 	private double maxDeviationFromMean;
 	private boolean hasConverged;
-	private boolean hasShifted;
 
 	/**
 	 * Creates a network for simulation purposes.
@@ -33,16 +34,25 @@ public class Network {
 			final int timeOffsetSpread,
 			final boolean delayCommunication,
 			final boolean asymmetricChannels,
-			final int viewSize) {
+			final boolean instableClock,
+			final int viewSize,
+			final boolean clockAdjustment) {
 		this.viewSize = viewSize;
+		this.clockAdjustment = clockAdjustment;
+		long cumulativeInaccuracy = 0;
 		for (int i=1; i<=numberOfNodes; i++) {
-			nodes.add(new TimeAwareNode(
+			TimeAwareNode node = new TimeAwareNode(
 					i,
 					syncStrategy,
 					random.nextInt(timeOffsetSpread) - timeOffsetSpread/2,
 					delayCommunication? random.nextInt(100) : 0,
-					asymmetricChannels? random.nextDouble() : 0.5));
+					asymmetricChannels? random.nextDouble() : 0.5,
+					instableClock? random.nextInt(21) - 10 : 0);
+			nodes.add(node);
+			cumulativeInaccuracy += node.getClockInaccuary();
 		}
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		log(String.format("network mean clock inaccuracy per round: %s ms.", format.format((double)cumulativeInaccuracy/(double)nodes.size())));
 	}
 
 	/**
@@ -61,15 +71,6 @@ public class Network {
 	 */
 	public boolean hasConverged() {
 		return this.hasConverged;
-	}
-
-	/**
-	 * Gets a value indicating if the network time mean value has shifted.
-	 *
-	 * @return true if it has shifted, false otherwise.
-	 */
-	public boolean hasShifted() {
-		return this.hasShifted;
 	}
 
 	/**
@@ -114,6 +115,22 @@ public class Network {
 	}
 
 	/**
+	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
+	 * We assume here that this happens about every 1-2 days.
+	 */
+	public void clockAdjustment() {
+		if (this.clockAdjustment) {
+			final int clocksToAdjust = nodes.size() < 500? 1 : nodes.size() / 500;
+			final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
+			for (int i = 0; i < clocksToAdjust; i++) {
+				TimeAwareNode node = nodeArray[random.nextInt(nodes.size())];
+				//log("adjusting clock of " + node.getName() + " by " + node.getCumulativeInaccuary() + "ms.");
+				node.adjustClock();
+			}
+		}
+	}
+
+	/**
 	 * Calculates the mean value for the time offsets.
 	 *
 	 * @return The mean value.
@@ -149,8 +166,7 @@ public class Network {
 		this.mean = calculateMean();
 		this.standardDeviation = calculateStandardDeviation();
 		this.maxDeviationFromMean = calculateMaxDeviationFromMean();
-		this.hasShifted = Math.abs(oldMean - this.mean) > 0;
-		this.hasConverged = Math.abs(oldMean - this.mean) == 0 && this.maxDeviationFromMean < TOLERABLE_MAX_DEVIATION_FROM_MEAN;
+		this.hasConverged = Math.abs(oldMean - this.mean) < 100 && this.standardDeviation < TOLERABLE_MAX_STANDARD_DEVIATION;
 	}
 
 	/**
@@ -166,9 +182,14 @@ public class Network {
 		this.log(entry);
 	}
 
-	public void outputNodes() {
+	public void outputOutOfRangeNodes(final long maxTolerableDeviationFromMean) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		this.nodes.stream().forEach(n -> log(String.format("%s: time offset=%s", n.getName(), format.format(n.getTimeOffset()))));
+		final List<TimeAwareNode> outOfRangeNodes = this.nodes.stream()
+				.filter(n -> Math.abs(this.mean - n.getTimeOffset()) > maxTolerableDeviationFromMean)
+				.collect(Collectors.toList());
+		if (!outOfRangeNodes.isEmpty()) {
+			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset=%s", n.getName(), format.format(n.getTimeOffset()))));
+		}
 	}
 
 	public void log(final String entry) {

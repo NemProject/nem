@@ -1,20 +1,24 @@
 package org.nem.nis.time.synchronization;
 
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.NodeEndpoint;
+import org.nem.core.node.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
- * Represents a time aware node in the network..
+ * Represents a time aware node in the network.
  */
 public class TimeAwareNode {
+	private static final Logger LOGGER = Logger.getLogger(TimeAwareNode.class.getName());
 
-	private final String name;
-	private final NodeEndpoint endpoint;
+	private final Node node;
 	private final SynchronizationStrategy syncStrategy;
 	private final long communicationDelay;
 	private final double channelAsymmetry;
+	private final long clockInaccuracy;
+	private long cumulativeInaccuracy;
 	private NodeAge age;
 	private long timeOffset = 0;
 
@@ -29,13 +33,17 @@ public class TimeAwareNode {
 			final SynchronizationStrategy syncStrategy,
 			final int startingTimeOffset,
 			final long communicationDelay,
-			final double channelAsymmetry) {
-		this.name = String.format("node%d", id);
-		this.endpoint = new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12);
+			final double channelAsymmetry,
+			final long clockInaccuracy) {
+		this.node = new Node(
+				new NodeIdentity(new KeyPair(), String.format("node%d", id)),
+				new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12),
+				null);
 		this.syncStrategy = syncStrategy;
 		this.timeOffset = startingTimeOffset;
 		this.communicationDelay = communicationDelay;
 		this.channelAsymmetry = channelAsymmetry;
+		this.clockInaccuracy = clockInaccuracy;
 		this.age = new NodeAge(0);
 	}
 
@@ -45,7 +53,7 @@ public class TimeAwareNode {
 	 * @return The node's name.
 	 */
 	public String getName() {
-		return this.name;
+		return this.node.getIdentity().getName();
 	}
 
 	/**
@@ -54,7 +62,7 @@ public class TimeAwareNode {
 	 * @return The node's endpoint.
 	 */
 	public NodeEndpoint getEndpoint() {
-		return this.endpoint;
+		return this.node.getEndpoint();
 	}
 
 	/**
@@ -72,11 +80,19 @@ public class TimeAwareNode {
 	 * @param samples The list of synchronization samples.
 	 */
 	public void updateNetworkTime(final List<SynchronizationSample> samples) {
-		final long diff = syncStrategy.calculateTimeOffset(samples, age);
-		if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff)) {
-			this.timeOffset += diff;
+		try {
+			final long diff = syncStrategy.calculateTimeOffset(samples, age);
+			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff)) {
+				this.timeOffset += diff;
+			}
+			this.timeOffset += this.clockInaccuracy;
+			this.cumulativeInaccuracy += this.clockInaccuracy;
+			this.age = this.age.increment();
+		} catch (SynchronizationException e) {
+			//LOGGER.info(e.toString());
+			LOGGER.info(String.format("Resetting age of %s.", this.getName()));
+			this.age = new NodeAge(0);
 		}
-		this.age = this.age.increment();
 	}
 
 	/**
@@ -98,6 +114,15 @@ public class TimeAwareNode {
 	}
 
 	/**
+	 * Gets the inaccuracy of the node's clock.
+	 *
+	 * @return The inaccuracy.
+	 */
+	public long getClockInaccuary() {
+		return this.clockInaccuracy;
+	}
+
+	/**
 	 * Creates a new communication time stamps object based on current time offset and delay.
 	 *
 	 * @return The communication time stamps.
@@ -106,5 +131,13 @@ public class TimeAwareNode {
 		return new CommunicationTimeStamps(
 				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry) + this.communicationDelay),
 				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry)));
+	}
+
+	/**
+	 * Adjusts the clock by subtracting the cumulative inaccuracy that the clock experienced so far.
+	 */
+	public void adjustClock() {
+		this.timeOffset -= this.cumulativeInaccuracy;
+		this.cumulativeInaccuracy = 0;
 	}
 }
