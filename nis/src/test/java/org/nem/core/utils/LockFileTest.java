@@ -5,7 +5,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.io.*;
-import java.nio.channels.FileLock;
 
 public class LockFileTest {
 
@@ -36,7 +35,7 @@ public class LockFileTest {
 	@Test
 	public void tryAcquireLockReturnsNullWhenLockFileIsInvalid() throws IOException {
 		// Act:
-		try (final FileLock lock = LockFile.tryAcquireLock(new File("foo\u0000.lock"))) {
+		try (final Closeable lock = LockFile.tryAcquireLock(new File("foo\u0000.lock"))) {
 			// Assert:
 			Assert.assertThat(lock, IsNull.nullValue());
 		}
@@ -45,7 +44,7 @@ public class LockFileTest {
 	@Test
 	public void tryAcquireLockReturnsLockWhenExistingFileIsNotLocked() throws IOException {
 		// Act:
-		try (final FileLock lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
+		try (final Closeable lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			// Assert:
 			Assert.assertThat(lock, IsNull.notNullValue());
 		}
@@ -54,7 +53,7 @@ public class LockFileTest {
 	@Test
 	public void tryAcquireLockReturnsLockWhenNewFileIsNotLocked() throws IOException {
 		// Act:
-		try (final FileLock lock = LockFile.tryAcquireLock(new File(TEST_FILE_DIRECTORY, "tryAcquireLock_new.lock"))) {
+		try (final Closeable lock = LockFile.tryAcquireLock(new File(TEST_FILE_DIRECTORY, "tryAcquireLock_new.lock"))) {
 			// Assert:
 			Assert.assertThat(lock, IsNull.notNullValue());
 		}
@@ -63,8 +62,8 @@ public class LockFileTest {
 	@Test
 	public void tryAcquireLockReturnsNullWhenExistingFileIsLocked() throws IOException {
 		// Act:
-		try (final FileLock lock1 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
-			try (final FileLock lock2 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
+		try (final Closeable lock1 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
+			try (final Closeable lock2 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 				// Assert:
 				Assert.assertThat(lock1, IsNull.notNullValue());
 				Assert.assertThat(lock2, IsNull.nullValue());
@@ -97,7 +96,7 @@ public class LockFileTest {
 	@Test
 	public void isLockedReturnsTrueWhenLockFileIsNotLocked() throws IOException {
 		// Arrange:
-		try (final FileLock ignored = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
+		try (final Closeable ignored = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			// Act:
 			final boolean isLocked = LockFile.isLocked(TEST_EXISTING_FILE);
 
@@ -111,7 +110,7 @@ public class LockFileTest {
 		// Act:
 		final boolean isLocked = LockFile.isLocked(TEST_EXISTING_FILE);
 
-		try (final FileLock lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
+		try (final Closeable lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			// Assert:
 			Assert.assertThat(isLocked, IsEqual.equalTo(false));
 			Assert.assertThat(lock, IsNull.notNullValue());

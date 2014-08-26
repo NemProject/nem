@@ -10,27 +10,34 @@ public class LockFile {
 
 	/**
 	 * Tries to acquire a file lock for the specified file.
-	 * TODO: this API is not safe and can leak a file handle, but since it is only called once on boot, it's probably ok for now
 	 *
 	 * @param lockFile The lock file.
-	 * @return The file lock if acquired, or null otherwise.
+	 * @return A handle to the file lock if acquired, or null otherwise.
 	 */
-	public static FileLock tryAcquireLock(final File lockFile) {
+	public static Closeable tryAcquireLock(final File lockFile) {
+		FileLockHandle handle = null;
 		try {
-			final RandomAccessFile file = new RandomAccessFile(lockFile, "rw");
+			handle = new FileLockHandle(lockFile);
 
 			// try to acquire the lock 5 times
 			for (int i = 0; i < 5; ++i) {
-				ExceptionUtils.propagateVoid(() -> Thread.sleep(10));
-				final FileLock lock = file.getChannel().tryLock();
-				if (null != lock) {
-					return lock;
+				if (handle.tryLock()) {
+					return handle;
 				}
+
+				ExceptionUtils.propagateVoid(() -> Thread.sleep(10));
 			}
 
 			return null;
 		} catch (final IOException|OverlappingFileLockException e) {
 			return null;
+		} finally {
+			if (null != handle && null == handle.lock) {
+				try {
+					handle.close();
+				} catch (final IOException ignored) {
+				}
+			}
 		}
 	}
 
@@ -41,13 +48,35 @@ public class LockFile {
 	 * @return true if the file is locked, false otherwise.
 	 */
 	public static boolean isLocked(final File lockFile) {
-		try (final RandomAccessFile file = new RandomAccessFile(lockFile, "rw");
-			 final FileLock lock = file.getChannel().tryLock()) {
-			return null == lock;
+		try (final FileLockHandle handle = new FileLockHandle(lockFile)) {
+			return !handle.tryLock();
 		} catch (final OverlappingFileLockException e) {
 			return true;
 		} catch (final IOException e) {
 			return false;
+		}
+	}
+
+	private static class FileLockHandle implements Closeable {
+		private final RandomAccessFile file;
+		private FileLock lock;
+
+		public FileLockHandle(final File lockFile) throws IOException {
+			this.file = new RandomAccessFile(lockFile, "rw");
+		}
+
+		private boolean tryLock() throws IOException {
+			this.lock = this.file.getChannel().tryLock();
+			return null != this.lock;
+		}
+
+		@Override
+		public void close() throws IOException {
+			if (null != this.lock) {
+				this.lock.close();
+			}
+
+			this.file.close();
 		}
 	}
 }

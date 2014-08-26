@@ -22,7 +22,6 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 import java.io.*;
 import java.net.*;
-import java.nio.channels.FileLock;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.logging.*;
@@ -53,7 +52,7 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 
-	private final static FileLock fileLock;
+	private final static Closeable fileLockHandle;
 
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
@@ -70,17 +69,15 @@ public class CommonStarter implements ServletContextListener {
 		final File lockFile = Paths.get(
 				configuration.getNemFolder(),
 				configuration.getShortServerName().toLowerCase() + ".lock").toFile();
-		fileLock = tryAcquireLock(lockFile);
-	}
-
-	private static FileLock tryAcquireLock(final File lockFile) {
-		LOGGER.info(String.format("Acquiring exclusive lock to lock file: %s", lockFile));
-		final FileLock fileLock = LockFile.tryAcquireLock(lockFile);
-		if (null == fileLock) {
+		fileLockHandle = tryAcquireLock(lockFile);
+		if (null == fileLockHandle) {
 			LOGGER.warning(String.format("Could not acquire exclusive lock to lock file"));
 		}
+	}
 
-		return fileLock;
+	private static Closeable tryAcquireLock(final File lockFile) {
+		LOGGER.info(String.format("Acquiring exclusive lock to lock file: %s", lockFile));
+		return LockFile.tryAcquireLock(lockFile);
 	}
 
 	public static void main(final String[] args) {
