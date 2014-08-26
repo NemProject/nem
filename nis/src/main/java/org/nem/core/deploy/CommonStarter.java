@@ -12,6 +12,7 @@ import org.eclipse.jetty.util.thread.*;
 import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
+import org.nem.core.utils.LockFile;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -19,7 +20,9 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
+import java.io.*;
 import java.net.*;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.logging.*;
 
@@ -49,6 +52,8 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 
+	private final static Closeable fileLockHandle;
+
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
 
@@ -58,7 +63,21 @@ public class CommonStarter implements ServletContextListener {
 	static {
 		// initialize logging before anything is logged; otherwise not all
 		// settings will take effect
-		LoggingBootstrapper.bootstrap(new CommonConfiguration().getNemFolder());
+		final CommonConfiguration configuration = new CommonConfiguration();
+		LoggingBootstrapper.bootstrap(configuration.getNemFolder());
+
+		final File lockFile = Paths.get(
+				configuration.getNemFolder(),
+				configuration.getShortServerName().toLowerCase() + ".lock").toFile();
+		fileLockHandle = tryAcquireLock(lockFile);
+		if (null == fileLockHandle) {
+			LOGGER.warning(String.format("Could not acquire exclusive lock to lock file"));
+		}
+	}
+
+	private static Closeable tryAcquireLock(final File lockFile) {
+		LOGGER.info(String.format("Acquiring exclusive lock to lock file: %s", lockFile));
+		return LockFile.tryAcquireLock(lockFile);
 	}
 
 	public static void main(final String[] args) {
