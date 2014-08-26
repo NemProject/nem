@@ -11,10 +11,16 @@ import java.util.logging.Logger;
 
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
+	private static final int TOLERABLE_MAX_DEVIATION_FROM_MEAN = 100;
 
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final SecureRandom random = new SecureRandom();
 	private final int viewSize;
+	private double mean;
+	private double standardDeviation;
+	private double maxDeviationFromMean;
+	private boolean hasConverged;
+	private boolean hasShifted;
 
 	/**
 	 * Creates a network for simulation purposes.
@@ -26,6 +32,7 @@ public class Network {
 			final SynchronizationStrategy syncStrategy,
 			final int timeOffsetSpread,
 			final boolean delayCommunication,
+			final boolean asymmetricChannels,
 			final int viewSize) {
 		this.viewSize = viewSize;
 		for (int i=1; i<=numberOfNodes; i++) {
@@ -33,7 +40,8 @@ public class Network {
 					i,
 					syncStrategy,
 					random.nextInt(timeOffsetSpread) - timeOffsetSpread/2,
-					delayCommunication? random.nextInt(100) : 0));
+					delayCommunication? random.nextInt(100) : 0,
+					asymmetricChannels? random.nextDouble() : 0.5));
 		}
 	}
 
@@ -44,6 +52,24 @@ public class Network {
 	 */
 	public Set<TimeAwareNode> getNodes() {
 		return this.nodes;
+	}
+
+	/**
+	 * Gets a value indicating if the network time of all nodes has converged.
+	 *
+	 * @return true if it has converged, false otherwise.
+	 */
+	public boolean hasConverged() {
+		return this.hasConverged;
+	}
+
+	/**
+	 * Gets a value indicating if the network time mean value has shifted.
+	 *
+	 * @return true if it has shifted, false otherwise.
+	 */
+	public boolean hasShifted() {
+		return this.hasShifted;
 	}
 
 	/**
@@ -88,46 +114,55 @@ public class Network {
 	}
 
 	/**
-	 * Calculates the mean value.
+	 * Calculates the mean value for the time offsets.
 	 *
 	 * @return The mean value.
 	 */
-	public double timeOffsetMean() {
-		return nodes.stream().mapToDouble(TimeAwareNode::getTimeOffset).sum() / nodes.size();
+	public double calculateMean() {
+		 return nodes.stream().mapToDouble(TimeAwareNode::getTimeOffset).sum() / nodes.size();
 	}
 
 	/**
-	 * Calculates the standard deviation.
+	 * Calculates the standard deviation for the time offsets.
 	 *
 	 * @return The standard deviation.
 	 */
-	public double timeOffsetStandardDeviation() {
-		final double mean = timeOffsetMean();
-		return Math.sqrt(nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset() - mean, 2)).sum() / nodes.size());
+	public double calculateStandardDeviation() {
+		return Math.sqrt(nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset() - this.mean, 2)).sum() / nodes.size());
 	}
 
 	/**
 	 * Calculates the maximum deviation from the mean value.
 	 *
-	 * @return The maximum deviation.
+	 * @return The maximum deviation from the mean value.
 	 */
-	public double timeOffsetMaxDeviationFromMean() {
-		final double mean = timeOffsetMean();
-		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset() - mean)).max();
-
+	public double calculateMaxDeviationFromMean() {
+		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset() - this.mean)).max();
 		return value.isPresent()? value.getAsDouble() : Double.NaN;
+	}
+
+	/**
+	 * Updates the statistical values.
+	 */
+	public void updateStatistics() {
+		final double oldMean = this.mean;
+		this.mean = calculateMean();
+		this.standardDeviation = calculateStandardDeviation();
+		this.maxDeviationFromMean = calculateMaxDeviationFromMean();
+		this.hasShifted = Math.abs(oldMean - this.mean) > 0;
+		this.hasConverged = Math.abs(oldMean - this.mean) == 0 && this.maxDeviationFromMean < TOLERABLE_MAX_DEVIATION_FROM_MEAN;
 	}
 
 	/**
 	 * Log mean, standard deviation and maximum deviation from mean.
 	 */
-	public void statistics() {
+	public void logStatistics() {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final String entry = String.format(
 				"mean: %s, standard deviation: %s, max. deviation from mean: %s",
-				format.format(timeOffsetMean()),
-				format.format(timeOffsetStandardDeviation()),
-				format.format(timeOffsetMaxDeviationFromMean()));
+				format.format(this.mean),
+				format.format(this.standardDeviation),
+				format.format(this.maxDeviationFromMean));
 		this.log(entry);
 	}
 
@@ -136,7 +171,7 @@ public class Network {
 		this.nodes.stream().forEach(n -> log(String.format("%s: time offset=%s", n.getName(), format.format(n.getTimeOffset()))));
 	}
 
-	public void log(String entry) {
+	public void log(final String entry) {
 		// BR: Those red logger lines are killing my eyes...
 		if (System.getProperty("os.name").toLowerCase().contains("win")) {
 			System.out.println(entry);

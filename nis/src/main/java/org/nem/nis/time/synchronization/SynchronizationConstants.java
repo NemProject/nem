@@ -24,4 +24,12 @@ public class SynchronizationConstants {
 	 * Value that indicates how fast the decay is.
 	 */
 	public static final double DECAY_STRENGTH = 0.3;
+
+	/***
+	 * Value that indicates how large the change in network time must be
+	 * in order to update the node's network time.
+	 * This constant is used to prevent slow shifts in network time.
+	 * The unit of this constant is milli seconds.
+	 */
+	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 10;
 }
