@@ -38,7 +38,7 @@ public class TransactionController {
 	@ClientApi
 	@Deprecated
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
-		final TransferTransaction transfer = deserializeTransaction(deserializer);
+		final Transaction transfer = deserializeTransaction(deserializer);
 
 		final ValidationResult validationResult = transfer.checkValidity();
 		if (ValidationResult.SUCCESS != transfer.checkValidity()) {
@@ -52,7 +52,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NisRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
-		final TransferTransaction transfer = this.deserializeTransaction(requestAnnounce.getData());
+		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
 		return new NisRequestResult(result);
@@ -78,14 +78,14 @@ public class TransactionController {
 		return this.foraging.getUnconfirmedTransactionsForNewBlock(NisMain.TIME_PROVIDER.getCurrentTime());
 	}
 
-	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
+	private Transaction deserializeTransaction(final byte[] bytes) throws Exception {
 		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
 			return deserializeTransaction(dataDeserializer);
 		}
 	}
 
-	private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
-		return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+	private static Transaction deserializeTransaction(final Deserializer deserializer) {
+		return TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 	}
 
 	private static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
