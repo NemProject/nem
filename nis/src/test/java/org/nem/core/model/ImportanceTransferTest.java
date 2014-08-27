@@ -34,7 +34,7 @@ public class ImportanceTransferTest {
 		this.createImportanceTransferTransaction(signer, 666, remote);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = SerializationException.class)
 	public void deserializationFailsWhenAddressIsMissing() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();

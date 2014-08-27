@@ -41,15 +41,7 @@ public class ImportanceTransfer extends Transaction {
 		this.mode = deserializer.readInt("mode");
 		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);
 
-		// TODO-CR: J->G consider adding a validate function or something that you call from both ctors
-		// since you probably want to validate the mode in both places too
-
-		// TODO-CR: J->G this is a note for me that Address.readFrom[AddressEncoding.PUBLIC_KEY]
-		// is named inconsistently
-
-		if (null == this.remoteAddress) {
-			throw new IllegalArgumentException("remoteAddress is required");
-		}
+		// TODO-CR: J->G do you want to validate the mode here?
 	}
 
 	@Override
