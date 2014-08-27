@@ -17,14 +17,13 @@ public class TimeSynchronizationITCase {
 	private static final int MAX_VIEW_SIZE = STANDARD_NETWORK_SIZE;
 	private static final int MEDIUM_VIEW_SIZE = 60;
 	private static final int SMALL_VIEW_SIZE = 5;
-	private static final int DEFAULT_NUMBER_OF_ROUNDS = 20;
 	private static final boolean CLOCK_ADJUSTMENT = true;
-	private static final int DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS = 10;
+	private static final int NO_EVIL_NODES = 0;
 
 	/**
-	 * Maximal tolerable shift of the mean network time per round in milli seconds.
+	 * Maximal tolerable shift of the mean network time per day in milli seconds.
 	 */
-	private static final double TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND = 0.05;
+	private static final double TOLERABLE_MEAN_TIME_SHIFT_PER_DAY = 50;
 
 	/**
 	 * Value indicating how much a node's network time is allowed to deviate
@@ -38,65 +37,45 @@ public class TimeSynchronizationITCase {
 	 */
 	private static final double TOLERABLE_CHANGE_IN_MEAN = 500;
 
-	private double meanTimeShiftPerRound = 0;
-
 	/**
-	 * Basic tests of convergence in a friendly, ideal environment.
+	 * Tests of convergence in a friendly, ideal environment.
 	 */
 	@Test
-	public void doesConvergeWithMaxViewSizeInFriendlyEnvironment() {
-		final NodeSettings settings = createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MAX_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+	public void doesConvergeWithMaxViewSizeInFriendlyAndIdealEnvironment() {
+		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(STANDARD_NETWORK_SIZE, MAX_VIEW_SIZE);
 	}
 
 	@Test
-	public void doesConvergeWithMediumViewSizeInFriendlyEnvironment() {
-		final NodeSettings settings = createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+	public void doesConvergeWithMediumViewSizeInFriendlyAndIdealEnvironment() {
+		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE);
 	}
 
 	@Test
-	public void doesConvergeWithSmallViewSizeInFriendlyEnvironment() {
-		final NodeSettings settings = createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, SMALL_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+	public void doesConvergeWithSmallViewSizeInFriendlyAndIdealEnvironment() {
+		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(STANDARD_NETWORK_SIZE, SMALL_VIEW_SIZE);
 	}
 
 	@Test
-	public void doesConvergeWithSmallViewSizeInLargeAndFriendlyEnvironment() {
+	public void doesConvergeWithSmallViewSizeInLargeAndFriendlyAndIdealEnvironment() {
+		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(10 * STANDARD_NETWORK_SIZE, SMALL_VIEW_SIZE);
+	}
+
+	private void assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(final int networkSize, final int viewSize) {
+		Network.log(String.format("Setting up network: %d nodes, each node queries %d partners.", networkSize, viewSize));
 		final NodeSettings settings = createNodeSettings(
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE * 10, SMALL_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		final Network network = setupNetwork("network", networkSize, viewSize, settings);
+		network.advanceInTime(15 * Network.MINUTE, Network.MINUTE);
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
 	}
 
 	/**
-	 * Basic tests of convergence in a friendly but more realistic environment.
+	 * Tests of convergence in a friendly but more realistic environment.
 	 */
 	@Test
 	public void asymmetricChannelsDoNotProduceShiftInFriendlyEnvironment() {
@@ -105,11 +84,9 @@ public class TimeSynchronizationITCase {
 				!REMOTE_RECEIVE_SEND_DELAY,
 				ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, 10 * DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(this.meanTimeShiftPerRound) < TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND, IsEqual.equalTo(true));
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
 	@Test
@@ -119,11 +96,9 @@ public class TimeSynchronizationITCase {
 				REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, 10 * DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(this.meanTimeShiftPerRound) < TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND, IsEqual.equalTo(true));
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
 	@Test
@@ -133,11 +108,9 @@ public class TimeSynchronizationITCase {
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, 100 * DEFAULT_NUMBER_OF_ROUNDS, 10 * DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(this.meanTimeShiftPerRound) < TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND, IsEqual.equalTo(true));
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
 	@Test
@@ -147,11 +120,9 @@ public class TimeSynchronizationITCase {
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				INSTABLE_CLOCK,
-				CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, 100 * DEFAULT_NUMBER_OF_ROUNDS, 10 * DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(this.meanTimeShiftPerRound) < TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND, IsEqual.equalTo(true));
+				CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
 	@Test
@@ -161,75 +132,77 @@ public class TimeSynchronizationITCase {
 				REMOTE_RECEIVE_SEND_DELAY,
 				ASYMMETRIC_CHANNELS,
 				INSTABLE_CLOCK,
-				CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, 100 * DEFAULT_NUMBER_OF_ROUNDS, 10 * DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
+				CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
+	}
+
+	private void assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(
+			final NodeSettings settings,
+			final long timeInterval,
+			final long loggingInterval) {
+		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
+		network.advanceInTime(timeInterval/2, loggingInterval);
+		final double mean = network.calculateMean();
+		network.advanceInTime(timeInterval/2, loggingInterval);
+		Network.log("Final state of network:");
+		network.updateStatistics();
+		network.logStatistics();
+		final double shiftPerDay = 2 * Math.abs(mean - network.calculateMean()) / timeInterval * Network.DAY;
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		Network.log(String.format("%s time shift per day %sms.", network.getName(), format.format(shiftPerDay)));
+		network.outputOutOfRangeNodes(TOLERABLE_MAX_DEVIATION_FROM_MEAN);
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(this.meanTimeShiftPerRound) < TOLERABLE_MEAN_TIME_SHIFT_PER_ROUND, IsEqual.equalTo(true));
+		Assert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
 	}
 
 	/**
-	 * Basic tests to assure new friendly nodes joining the network don't disrupt the network time.
+	 * Tests to assure new friendly nodes joining the network don't disrupt the network time.
 	 */
 	@Test
 	public void smallPercentageOfNewNodesDoesNotHaveBigInfluenceOnNetworkTime() {
-		final NodeSettings settings = createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
-		network.logStatistics();
-		final double oldMean = network.calculateMean();
-		network.grow(1);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
-		network.logStatistics();
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(oldMean - network.calculateMean()) < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
+		assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(Network.DAY, Network.HOUR, 10);
 	}
 
 	@Test
 	public void mediumPercentageOfNewNodesDoesNotHaveBigInfluenceOnNetworkTime() {
-		final NodeSettings settings = createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
-		network.logStatistics();
-		final double oldMean = network.calculateMean();
-		network.grow(10);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
-		network.logStatistics();
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(oldMean - network.calculateMean()) < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
+		assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(Network.DAY, Network.HOUR, 50);
 	}
 
 	@Test
 	public void highPercentageOfNewNodesDoesNotHaveBigInfluenceOnNetworkTime() {
+		assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(2 * Network.HOUR, 5 * Network.MINUTE, 300);
+	}
+
+	private void assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(
+			final long timeInterval,
+			final long loggingInterval,
+			final int percentageOfNewNodes) {
 		final NodeSettings settings = createNodeSettings(
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
+		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
+		network.advanceInTime(timeInterval/2, 0);
+		Network.log("Matured network statistics:");
+		network.updateStatistics();
 		network.logStatistics();
 		final double oldMean = network.calculateMean();
-		network.grow(50);
-		synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0);
+		Network.log(String.format("Adding %d%% new nodes.", percentageOfNewNodes));
+		network.grow(percentageOfNewNodes);
+		network.advanceInTime(timeInterval/2, loggingInterval);
+		Network.log("Final state of network:");
+		network.updateStatistics();
 		network.logStatistics();
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
 		Assert.assertThat(Math.abs(oldMean - network.calculateMean()) < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
 	}
 
 	/**
-	 * Basic tests to assure that if there are several sub-networks which have different network times and
+	 * Tests to assure that if there are several sub-networks which have different network times and
 	 * those networks finally join, the resulting network will converge to a common network time.
 	 */
 	@Test
@@ -239,18 +212,28 @@ public class TimeSynchronizationITCase {
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
 		final Network network1 = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		final Network network2 = setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 
 		// Make sure the two networks have very different network times.
 		network2.randomShiftNetworkTime();
-		synchronize(network1, DEFAULT_NUMBER_OF_ROUNDS, 0);
-		synchronize(network2, DEFAULT_NUMBER_OF_ROUNDS, 0);
+		network1.advanceInTime(6 * Network.HOUR, 0);
+		network2.advanceInTime(6 * Network.HOUR, 0);
+		Network.log("Matured network statistics:");
+		network1.updateStatistics();
+		network1.logStatistics();
+		network2.updateStatistics();
+		network2.logStatistics();
+		Network.log("Networks join.");
 		network1.join(network2, "global network");
 
 		// Since both networks were already mature, it needs more rounds to converge
-		synchronize(network1, 5 * DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
+		network1.advanceInTime(Network.DAY, 2 * Network.HOUR);
+		Network.log("Final state of network:");
+		network1.updateStatistics();
+		network1.logStatistics();
 		Assert.assertThat(network1.hasConverged(), IsEqual.equalTo(true));
 	}
 
@@ -261,7 +244,8 @@ public class TimeSynchronizationITCase {
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
 				!INSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT);
+				!CLOCK_ADJUSTMENT,
+				NO_EVIL_NODES);
 		final List<Network> networks = Arrays.asList(
 				setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
 				setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
@@ -271,50 +255,50 @@ public class TimeSynchronizationITCase {
 
 		// Make sure the networks have very different network times.
 		networks.stream().forEach(Network::randomShiftNetworkTime);
-		networks.stream().forEach(network -> synchronize(network, DEFAULT_NUMBER_OF_ROUNDS, 0));
+		networks.stream().forEach(network -> network.advanceInTime(6 * Network.HOUR, 0));
+		Network.log("Matured network statistics:");
+		networks.stream().forEach(network -> { network.updateStatistics(); network.logStatistics(); });
+		Network.log("Networks join.");
 		networks.stream().forEach(network -> networks.get(0).join(network, "global network"));
 
 		// Since both networks were already mature, it needs more rounds to converge
-		synchronize(networks.get(0), 5 * DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_LOG_AFTER_HOW_MANY_ROUNDS);
+		networks.get(0).advanceInTime(4 * Network.DAY, 8 * Network.HOUR);
+		Network.log("Final state of network:");
+		networks.get(0).updateStatistics();
+		networks.get(0).logStatistics();
 		Assert.assertThat(networks.get(0).hasConverged(), IsEqual.equalTo(true));
 	}
 
-	private void synchronize(
-			final Network network, 
-			final int numberOfRounds,
-			final int logAfterHowManyRounds) {
-		double meanAfterHundredRounds = 0;
-		for (int i=0; i<numberOfRounds; i++) {
-			//network.outputNodes();
-			network.updateStatistics();
-			if (logAfterHowManyRounds > 0 && i % logAfterHowManyRounds == 0) {
-				network.log(String.format("Synchronization round %d", i));
-				network.logStatistics();
-			}
-			if (i == 99) {
-				meanAfterHundredRounds = network.calculateMean();
-			}
-			synchronizationRound(network);
-		}
-		network.log(String.format("Result after %d rounds", numberOfRounds));
-		network.logStatistics();
-		meanTimeShiftPerRound = (network.calculateMean() - meanAfterHundredRounds)/(numberOfRounds - 100);
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		if (numberOfRounds > 100) {
-			network.log(String.format("%s: mean time shift per round is %s ms.", network.getName(), format.format(meanTimeShiftPerRound)));
-		}
-		network.outputOutOfRangeNodes(TOLERABLE_MAX_DEVIATION_FROM_MEAN);
+	/**
+	 * Tests to assure that the network time cannot be influenced by a reasonable amount of attackers.
+	 */
+	@Test
+	public void smallPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(5);
 	}
 
-	private void synchronizationRound(final Network network) {
-		network.getNodes().stream()
-				.forEach(n -> {
-					//network.log("Synchronizing " + n.getName());
-					Set<TimeAwareNode> partners = network.selectSyncPartnersForNode(n);
-					List<SynchronizationSample> samples = network.createSynchronizationSamples(n, partners);
-					n.updateNetworkTime(samples);
-				});
-		network.clockAdjustment();
+	@Test
+	public void mediumPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(15);
+	}
+
+	private void assertAttackersDoNotInfluenceNetworkTime(final int percentageEvilNodes) {
+		final NodeSettings settings = createNodeSettings(
+				INITIAL_TIME_SPREAD,
+				!REMOTE_RECEIVE_SEND_DELAY,
+				!ASYMMETRIC_CHANNELS,
+				!INSTABLE_CLOCK,
+				!CLOCK_ADJUSTMENT,
+				percentageEvilNodes);
+		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
+		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
+		final double mean = network.calculateMean();
+		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
+		final double shiftPerDay = Math.abs(mean - network.calculateMean());
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		Network.log(String.format("%s time shift per day %sms.", network.getName(), format.format(shiftPerDay)));
+		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+		Assert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
 	}
 
 	private Network setupNetwork(
@@ -332,12 +316,14 @@ public class TimeSynchronizationITCase {
 			final boolean delayCommunication,
 			final boolean asymmetricChannels,
 			final boolean instableClock,
-			final boolean clockAdjustment) {
+			final boolean clockAdjustment,
+			final int percentageEvilNodes) {
 		return new NodeSettings(
 				timeOffsetSpread,
 				delayCommunication,
 				asymmetricChannels,
 				instableClock,
-				clockAdjustment);
+				clockAdjustment,
+				percentageEvilNodes);
 	}
 }

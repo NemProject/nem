@@ -29,8 +29,8 @@ public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 	 * @return The coupling.
 	 */
 	public double getCoupling(final NodeAge age) {
-		final long ageToUse = Math.max(age.getRaw() - SynchronizationConstants.START_DECAY_AFTER_ROUND, 0);
-		return Math.max(Math.exp(-SynchronizationConstants.DECAY_STRENGTH * ageToUse) * SynchronizationConstants.COUPLING_START,
+		final long ageToUse = Math.max(age.getRaw() - SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND, 0);
+		return Math.max(Math.exp(-SynchronizationConstants.COUPLING_DECAY_STRENGTH * ageToUse) * SynchronizationConstants.COUPLING_START,
 				SynchronizationConstants.COUPLING_MINIMUM);
 	}
 

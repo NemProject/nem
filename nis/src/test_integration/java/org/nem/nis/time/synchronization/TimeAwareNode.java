@@ -13,14 +13,19 @@ import java.util.logging.Logger;
 public class TimeAwareNode {
 	private static final Logger LOGGER = Logger.getLogger(TimeAwareNode.class.getName());
 
+	public static final int NODE_TYPE_FRIENDLY = 1;
+	public static final int NODE_TYPE_EVIL = 2;
+
 	private final Node node;
 	private final SynchronizationStrategy syncStrategy;
 	private final long communicationDelay;
 	private final double channelAsymmetry;
 	private final long clockInaccuracy;
+	private final int type;
 	private long cumulativeInaccuracy;
 	private NodeAge age;
 	private long timeOffset = 0;
+	private long updateCounter = 0;
 
 	/**
 	 * Creates a time aware node.
@@ -34,7 +39,8 @@ public class TimeAwareNode {
 			final int initialTimeOffset,
 			final long communicationDelay,
 			final double channelAsymmetry,
-			final long clockInaccuracy) {
+			final long clockInaccuracy,
+			final int type) {
 		this.node = new Node(
 				new NodeIdentity(new KeyPair(), String.format("node%d", id)),
 				new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12),
@@ -44,6 +50,7 @@ public class TimeAwareNode {
 		this.communicationDelay = communicationDelay;
 		this.channelAsymmetry = channelAsymmetry;
 		this.clockInaccuracy = clockInaccuracy;
+		this.type = type;
 		this.age = new NodeAge(0);
 	}
 
@@ -85,14 +92,21 @@ public class TimeAwareNode {
 			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff)) {
 				this.timeOffset += diff;
 			}
-			this.timeOffset += this.clockInaccuracy;
-			this.cumulativeInaccuracy += this.clockInaccuracy;
 			this.age = this.age.increment();
 		} catch (SynchronizationException e) {
 			//LOGGER.info(e.toString());
 			LOGGER.info(String.format("Resetting age of %s.", this.getName()));
 			this.age = new NodeAge(0);
 		}
+	}
+
+	/**
+	 * Gets the node's age.
+	 *
+	 * @return The node age.
+	 */
+	public NodeAge getAge() {
+		return this.age;
 	}
 
 	/**
@@ -129,12 +143,49 @@ public class TimeAwareNode {
 		return this.clockInaccuracy;
 	}
 
+	public void applyClockInaccuracy() {
+		this.timeOffset += this.clockInaccuracy;
+		this.cumulativeInaccuracy += this.clockInaccuracy;
+	}
+
+	/**
+	 * Returns a value indicating whether or not the node is evil.
+	 *
+	 * @return true if node is evil, false otherwise.
+	 */
+	public boolean isEvil() {
+		return this.type == NODE_TYPE_EVIL;
+	}
+
+	/**
+	 * Decrements and returns the update counter.
+	 *
+	 * @param decrement The value to subtract from the update counter.
+	 *
+	 * @return The decremented update counter.
+	 */
+	public long decrementUpdateCounter(final long decrement) {
+		this.updateCounter -= decrement;
+
+		return this.updateCounter;
+	}
+
+	public void setUpdateCounter(final long initialValue) {
+		this.updateCounter = initialValue;
+	}
+
 	/**
 	 * Creates a new communication time stamps object based on current time offset and delay.
 	 *
 	 * @return The communication time stamps.
 	 */
 	public CommunicationTimeStamps createCommunicationTimeStamps(final int roundTripTime) {
+		if (isEvil()) {
+			return new CommunicationTimeStamps(
+					new NetworkTimeStamp(System.currentTimeMillis() + 30000),
+					new NetworkTimeStamp(System.currentTimeMillis() + 30000));
+		}
+
 		return new CommunicationTimeStamps(
 				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry) + this.communicationDelay),
 				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry)));

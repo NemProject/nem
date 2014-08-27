@@ -72,7 +72,7 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, new NodeAge(SynchronizationConstants.START_DECAY_AFTER_ROUND + 10));
+		final long offset = strategy.calculateTimeOffset(samples, new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 10));
 
 		// Assert:
 		Assert.assertThat(offset, IsEqual.equalTo((long)(100 * 101 / 2 * SynchronizationConstants.COUPLING_MINIMUM / 100)));
@@ -86,7 +86,7 @@ public class DefaultSynchronizationStrategyTest {
 		// Assert:
 		Assert.assertThat(strategy.getCoupling(new NodeAge(0)),
 				IsEqual.equalTo(SynchronizationConstants.COUPLING_START));
-		Assert.assertThat(strategy.getCoupling(new NodeAge(SynchronizationConstants.START_DECAY_AFTER_ROUND)),
+		Assert.assertThat(strategy.getCoupling(new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND)),
 				IsEqual.equalTo(SynchronizationConstants.COUPLING_START));
 	}
 
@@ -97,14 +97,14 @@ public class DefaultSynchronizationStrategyTest {
 
 		// Assert:
 		assertDoubleIsWithingRange(
-				strategy.getCoupling(new NodeAge(SynchronizationConstants.START_DECAY_AFTER_ROUND + 1)),
+				strategy.getCoupling(new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 1)),
 				SynchronizationConstants.COUPLING_MINIMUM,
 				SynchronizationConstants.COUPLING_START);
 		assertDoubleIsWithingRange(
-				strategy.getCoupling(new NodeAge(SynchronizationConstants.START_DECAY_AFTER_ROUND + 5)),
+				strategy.getCoupling(new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 5)),
 				SynchronizationConstants.COUPLING_MINIMUM,
 				SynchronizationConstants.COUPLING_START);
-		Assert.assertThat(strategy.getCoupling(new NodeAge(SynchronizationConstants.START_DECAY_AFTER_ROUND + 10)),
+		Assert.assertThat(strategy.getCoupling(new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 10)),
 				IsEqual.equalTo(SynchronizationConstants.COUPLING_MINIMUM));
 	}
 

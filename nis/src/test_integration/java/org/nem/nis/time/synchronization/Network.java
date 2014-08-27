@@ -1,6 +1,6 @@
 package org.nem.nis.time.synchronization;
 
-import org.nem.core.model.primitive.NetworkTimeStamp;
+import org.nem.core.model.primitive.*;
 import org.nem.core.utils.FormatUtils;
 
 import java.security.SecureRandom;
@@ -13,6 +13,12 @@ import java.util.stream.Collectors;
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
 	private static final double TOLERABLE_MAX_STANDARD_DEVIATION = 2000;
+	public static final long SECOND = 1000;
+	public static final long MINUTE = 60 * SECOND;
+	public static final long HOUR = 60 * MINUTE;
+	public static final long DAY = 24 * HOUR;
+	private static final long TICK_INTERVALL = MINUTE;
+	private static final long CLOCK_ADJUSTMENT_INTERVALL = DAY;
 
 	private String name;
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -20,6 +26,7 @@ public class Network {
 	private final int viewSize;
 	private final SynchronizationStrategy syncStrategy;
 	private final NodeSettings nodeSettings;
+	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
 	private double maxDeviationFromMean;
@@ -45,6 +52,7 @@ public class Network {
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
 		long cumulativeInaccuracy = 0;
+		int numberOfEvilNodes = 0;
 		for (int i=1; i<=numberOfNodes; i++) {
 			TimeAwareNode node = new TimeAwareNode(
 					i,
@@ -52,16 +60,23 @@ public class Network {
 					this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
 					this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
 					this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasInstableClock()? this.random.nextInt(21) - 10 : 0);
+					this.nodeSettings.hasInstableClock()? this.random.nextInt(201) - 100 : 0,
+					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary();
+			if (node.isEvil()) {
+				numberOfEvilNodes++;
+			}
 		}
 		if (this.nodeSettings.hasInstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
-					"%s: mean clock inaccuracy per round: %s ms.",
+					"%s: mean clock inaccuracy per day: %s ms.",
 					this.getName(),
-					format.format((double)cumulativeInaccuracy / (double)this.nodes.size())));
+					format.format(24.0 * (double)cumulativeInaccuracy / (double)this.nodes.size())));
+		}
+		if (numberOfEvilNodes > 0) {
+			log(String.format("%d%% of all nodes are evil.", (100 * numberOfEvilNodes) / this.nodes.size()));
 		}
 	}
 
@@ -93,6 +108,78 @@ public class Network {
 	}
 
 	/**
+	 * Advances in time doing all needed updates for the nodes.
+	 *
+	 * @param timeInterval The time interval.
+	 * @param loggingInterval The logging interval.
+	 */
+	public void advanceInTime(final long timeInterval, final long loggingInterval) {
+		final int numberOfTicks = (int)(timeInterval / TICK_INTERVALL);
+		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVALL);
+		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVALL / nodes.size() / TICK_INTERVALL);
+		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVALL);
+		for (int i=0; i<numberOfTicks; i++) {
+			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
+				updateStatistics();
+				logStatistics();
+			}
+			if (nodeSettings.hasClockAdjustment() && i % ticksUntilClockAdjustment == 0) {
+				clockAdjustment();
+			}
+			if (nodeSettings.hasInstableClock() && i % ticksUntilClockInaccuracy == 0) {
+				this.nodes.stream().forEach(TimeAwareNode::applyClockInaccuracy);
+			}
+			tick();
+		}
+	}
+
+	public void tick() {
+		this.realTime += TICK_INTERVALL;
+		final List<TimeAwareNode> nodesToUpdate = getNodesToUpdate(TICK_INTERVALL);
+		nodesToUpdate.stream().forEach(n -> {
+			Set<TimeAwareNode> partners = selectSyncPartnersForNode(n);
+			List<SynchronizationSample> samples = createSynchronizationSamples(n, partners);
+			n.updateNetworkTime(samples);
+		});
+	}
+
+	/**
+	 * Gets the list of nodes that have to update they network time.
+	 *
+	 * @param timePassed The time that has passed since the last call.
+	 * @return The list of nodes.
+	 */
+	private List<TimeAwareNode> getNodesToUpdate(final long timePassed) {
+		final List<TimeAwareNode> nodesToUpdate = new ArrayList<>();
+		this.nodes.stream().forEach(n -> {
+			if (n.decrementUpdateCounter(timePassed) < 0) {
+				n.setUpdateCounter(getUpdateInterval(n.getAge()));
+				nodesToUpdate.add(n);
+			}
+		});
+
+		return nodesToUpdate;
+	}
+
+	private void testUpdateIntervall() {
+		for (int i=0; i<20; i++) {
+			log(String.format("Age %d: %ds", i, getUpdateInterval(new NodeAge(i))/1000));
+		}
+	}
+	/**
+	 * Gets the update interval for a node based on its age.
+	 *
+	 * @param age The age of the node.
+	 * @return The update interval in milli seconds.
+	 */
+	private long getUpdateInterval(NodeAge age) {
+		final long ageToUse = Math.max(age.getRaw() - SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND, 0);
+		return (long)Math.min((1 - Math.exp(-SynchronizationConstants.UPDATE_INTERVAL_ELONGATION_STRENGTH * ageToUse)) *
+				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM + SynchronizationConstants.UPDATE_INTERVAL_START,
+				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM);
+	}
+
+	/**
 	 * Grows the network by a given percentage.
 	 *
 	 * @param percentage The percentage to grow the network.
@@ -106,7 +193,8 @@ public class Network {
 					this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2,
 					this.nodeSettings.doesDelayCommunication() ? this.random.nextInt(100) : 0,
 					this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasInstableClock() ? this.random.nextInt(21) - 10 : 0);
+					this.nodeSettings.hasInstableClock() ? this.random.nextInt(21) - 10 : 0,
+					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 			this.nodes.add(node);
 		}
 	}
@@ -137,12 +225,16 @@ public class Network {
 	 * @return The set of communication partners.
 	 */
 	public Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
+		int numberOfEvilNodes = 0;
 		final Set<TimeAwareNode> partners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
 		for (int i=0; i<this.viewSize; i++) {
 			final int index = random.nextInt(nodes.size());
 			if (!nodeArray[index].equals(node)) {
 				partners.add(nodeArray[index]);
+				if (nodeArray[index].isEvil()) {
+					numberOfEvilNodes++;
+				}
 			}
 		}
 
@@ -173,17 +265,12 @@ public class Network {
 
 	/**
 	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
-	 * We assume here that this happens about every 1-2 days.
+	 * We assume here that this happens about every 3 days.
 	 */
 	public void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {
-			final int clocksToAdjust = nodes.size() < 500? 1 : nodes.size() / 500;
 			final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
-			for (int i = 0; i < clocksToAdjust; i++) {
-				TimeAwareNode node = nodeArray[random.nextInt(nodes.size())];
-				//log("adjusting clock of " + node.getName() + " by " + node.getCumulativeInaccuary() + "ms.");
-				node.adjustClock();
-			}
+			nodeArray[random.nextInt(nodes.size())].adjustClock();
 		}
 	}
 
@@ -219,11 +306,10 @@ public class Network {
 	 * Updates the statistical values.
 	 */
 	public void updateStatistics() {
-		final double oldMean = this.mean;
 		this.mean = calculateMean();
 		this.standardDeviation = calculateStandardDeviation();
 		this.maxDeviationFromMean = calculateMaxDeviationFromMean();
-		this.hasConverged = Math.abs(oldMean - this.mean) < 100 && this.standardDeviation < TOLERABLE_MAX_STANDARD_DEVIATION;
+		this.hasConverged = this.standardDeviation < TOLERABLE_MAX_STANDARD_DEVIATION;
 	}
 
 	/**
@@ -232,12 +318,21 @@ public class Network {
 	public void logStatistics() {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final String entry = String.format(
-				"%s mean: %s, standard deviation: %s, max. deviation from mean: %s",
+				"%s : %s mean offset to real time: %sms, standard deviation: %sms, max. deviation from mean: %sms",
+				getRealTimeString(),
 				this.getName(),
 				format.format(this.mean),
 				format.format(this.standardDeviation),
 				format.format(this.maxDeviationFromMean));
-		this.log(entry);
+		log(entry);
+	}
+
+	private String getRealTimeString() {
+		final long day = this.realTime/86400000;
+		final long hour = (this.realTime - day * 86400000) / 3600000;
+		final long minute = (this.realTime - day * 86400000 - hour * 3600000) / 60000;
+		final long second = (this.realTime - day * 86400000 - hour * 3600000 - minute * 60000) / 1000;
+		return String.format("Day %d %02d:%02d:%02d", day, hour, minute, second);
 	}
 
 	public void outputOutOfRangeNodes(final long maxTolerableDeviationFromMean) {
@@ -246,11 +341,12 @@ public class Network {
 				.filter(n -> Math.abs(this.mean - n.getTimeOffset()) > maxTolerableDeviationFromMean)
 				.collect(Collectors.toList());
 		if (!outOfRangeNodes.isEmpty()) {
-			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset=%s", n.getName(), format.format(n.getTimeOffset()))));
+			log("Detected nodes with out of allowed range network time:");
+			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s", n.getName(), format.format(this.mean - n.getTimeOffset()))));
 		}
 	}
 
-	public void log(final String entry) {
+	public static void log(final String entry) {
 		// BR: Those red logger lines are killing my eyes...
 		if (System.getProperty("os.name").toLowerCase().contains("win")) {
 			System.out.println(entry);
