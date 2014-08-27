@@ -290,7 +290,7 @@ public class TimeSynchronizationITCase {
 				!INSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				percentageEvilNodes);
-		final Network network = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
+		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
 		final double mean = network.calculateMean();
 		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
