@@ -8,10 +8,10 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.function.BiPredicate;
 
+// TODO-CR: J->G please remember to comment the public api eventually
+
 public class ImportanceTransfer extends Transaction {
 	private final int mode;
-	// TODO-CR: J->G how about address (it has a public key)
-	// 20140827 G-J: y, I think Address will be ok
 	private final Address remoteAddress;
 
 	public Address getRemote() {
@@ -40,6 +40,12 @@ public class ImportanceTransfer extends Transaction {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
 		this.mode = deserializer.readInt("mode");
 		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);
+
+		// TODO-CR: J->G consider adding a validate function or something that you call from both ctors
+		// since you probably want to validate the mode in both places too
+
+		// TODO-CR: J->G this is a note for me that Address.readFrom[AddressEncoding.PUBLIC_KEY]
+		// is named inconsistently
 
 		if (null == this.remoteAddress) {
 			throw new IllegalArgumentException("remoteAddress is required");
@@ -78,7 +84,6 @@ public class ImportanceTransfer extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		// TODO-CR: J->G consider adding a test that the min balance is 1 (although, 1 might be too low)
 		return Amount.fromNem(1);
 	}
 }

@@ -51,7 +51,7 @@ public class ImportanceTransferTest {
 		jsonObject.put("remoteAddress", null);
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
 		deserializer.readInt("type");
-		final ImportanceTransfer ret = new ImportanceTransfer(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		new ImportanceTransfer(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
 	@Test
@@ -66,6 +66,7 @@ public class ImportanceTransferTest {
 
 	private void assertCtorCanCreateImportanceTransfer(int direction) {
 		// Arrange:
+		// TODO-CR: for the remote consider using Utils.generateRandomAddress();
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
