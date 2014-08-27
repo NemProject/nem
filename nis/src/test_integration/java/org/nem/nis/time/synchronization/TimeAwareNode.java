@@ -31,7 +31,7 @@ public class TimeAwareNode {
 	public TimeAwareNode(
 			final int id,
 			final SynchronizationStrategy syncStrategy,
-			final int startingTimeOffset,
+			final int initialTimeOffset,
 			final long communicationDelay,
 			final double channelAsymmetry,
 			final long clockInaccuracy) {
@@ -40,7 +40,7 @@ public class TimeAwareNode {
 				new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12),
 				null);
 		this.syncStrategy = syncStrategy;
-		this.timeOffset = startingTimeOffset;
+		this.timeOffset = initialTimeOffset;
 		this.communicationDelay = communicationDelay;
 		this.channelAsymmetry = channelAsymmetry;
 		this.clockInaccuracy = clockInaccuracy;
@@ -102,6 +102,13 @@ public class TimeAwareNode {
 	 */
 	public long getTimeOffset() {
 		return this.timeOffset;
+	}
+
+	/**
+	 * Shifts the node's time offset by adding a value to it.
+	 */
+	public void shiftTimeOffset(final long offset) {
+		this.timeOffset += offset;
 	}
 
 	/**

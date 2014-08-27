@@ -14,10 +14,12 @@ public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
 	private static final double TOLERABLE_MAX_STANDARD_DEVIATION = 2000;
 
+	private String name;
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final SecureRandom random = new SecureRandom();
 	private final int viewSize;
-	private final boolean clockAdjustment;
+	private final SynchronizationStrategy syncStrategy;
+	private final NodeSettings nodeSettings;
 	private double mean;
 	private double standardDeviation;
 	private double maxDeviationFromMean;
@@ -26,33 +28,50 @@ public class Network {
 	/**
 	 * Creates a network for simulation purposes.
 	 *
+	 * @param name The name of the network.
 	 * @param numberOfNodes The number of nodes in the network.
+	 * @param syncStrategy The synchronization strategy of the network.
+	 * @param viewSize The view size of the nodes in the network.
+	 * @param nodeSettings The node settings.
 	 */
 	public Network(
+			final String name,
 			final int numberOfNodes,
 			final SynchronizationStrategy syncStrategy,
-			final int timeOffsetSpread,
-			final boolean delayCommunication,
-			final boolean asymmetricChannels,
-			final boolean instableClock,
 			final int viewSize,
-			final boolean clockAdjustment) {
+			final NodeSettings nodeSettings) {
+		this.name = name;
+		this.syncStrategy = syncStrategy;
 		this.viewSize = viewSize;
-		this.clockAdjustment = clockAdjustment;
+		this.nodeSettings = nodeSettings;
 		long cumulativeInaccuracy = 0;
 		for (int i=1; i<=numberOfNodes; i++) {
 			TimeAwareNode node = new TimeAwareNode(
 					i,
 					syncStrategy,
-					random.nextInt(timeOffsetSpread) - timeOffsetSpread/2,
-					delayCommunication? random.nextInt(100) : 0,
-					asymmetricChannels? random.nextDouble() : 0.5,
-					instableClock? random.nextInt(21) - 10 : 0);
-			nodes.add(node);
+					this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
+					this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
+					this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
+					this.nodeSettings.hasInstableClock()? this.random.nextInt(21) - 10 : 0);
+			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary();
 		}
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		log(String.format("network mean clock inaccuracy per round: %s ms.", format.format((double)cumulativeInaccuracy/(double)nodes.size())));
+		if (this.nodeSettings.hasInstableClock()) {
+			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+			log(String.format(
+					"%s: mean clock inaccuracy per round: %s ms.",
+					this.getName(),
+					format.format((double)cumulativeInaccuracy / (double)this.nodes.size())));
+		}
+	}
+
+	/**
+	 * Gets the name of the network.
+	 *
+	 * @return The name of the network.
+	 */
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -71,6 +90,44 @@ public class Network {
 	 */
 	public boolean hasConverged() {
 		return this.hasConverged;
+	}
+
+	/**
+	 * Grows the network by a given percentage.
+	 *
+	 * @param percentage The percentage to grow the network.
+	 */
+	public void grow(final double percentage) {
+		final int numberOfNewNodes = (int)(nodes.size() * percentage / 100);
+		for (int i=1; i<=numberOfNewNodes; i++) {
+			TimeAwareNode node = new TimeAwareNode(
+					i,
+					this.syncStrategy,
+					this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2,
+					this.nodeSettings.doesDelayCommunication() ? this.random.nextInt(100) : 0,
+					this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
+					this.nodeSettings.hasInstableClock() ? this.random.nextInt(21) - 10 : 0);
+			this.nodes.add(node);
+		}
+	}
+
+	/**
+	 * Incorporates the nodes from network into this network.
+	 *
+	 * @param network The network that joins this network.
+	 * @param newName The new name for the this network.
+	 */
+	public void join(final Network network, final String newName) {
+		this.nodes.addAll(network.getNodes());
+		this.name = newName;
+	}
+
+	/**
+	 * Shifts the network time of all nodes by a common random offset.
+	 */
+	public void randomShiftNetworkTime() {
+		final int offset = random.nextInt(40001);
+		this.nodes.stream().forEach(n -> n.shiftTimeOffset(offset));
 	}
 
 	/**
@@ -119,7 +176,7 @@ public class Network {
 	 * We assume here that this happens about every 1-2 days.
 	 */
 	public void clockAdjustment() {
-		if (this.clockAdjustment) {
+		if (this.nodeSettings.hasClockAdjustment()) {
 			final int clocksToAdjust = nodes.size() < 500? 1 : nodes.size() / 500;
 			final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
 			for (int i = 0; i < clocksToAdjust; i++) {
@@ -175,7 +232,8 @@ public class Network {
 	public void logStatistics() {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final String entry = String.format(
-				"mean: %s, standard deviation: %s, max. deviation from mean: %s",
+				"%s mean: %s, standard deviation: %s, max. deviation from mean: %s",
+				this.getName(),
 				format.format(this.mean),
 				format.format(this.standardDeviation),
 				format.format(this.maxDeviationFromMean));
