@@ -230,7 +230,7 @@ public class Foraging {
 	 * @return
 	 */
 	public Block forageBlock(final BlockScorer blockScorer) {
-		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
+		if (this.blockChainLastBlockLayer.getLastDbBlock() == null || this.unlockedAccounts.size() == 0) {
 			return null;
 		}
 
