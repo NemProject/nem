@@ -56,4 +56,43 @@ public class TransactionFactoryTest {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
 		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
 	}
+
+	@Test
+	public void canDeserializeVerifiableImportanceTransferTransaction() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Transaction originalTransaction = new ImportanceTransfer(TimeInstant.ZERO, sender, ImportanceTransferDirection.Transfer, recipient.getAddress());
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
+
+		// Act:
+		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
+
+		// Assert:
+		Assert.assertThat(transaction, IsInstanceOf.instanceOf(ImportanceTransfer.class));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+		final ImportanceTransfer importanceTransfer = (ImportanceTransfer)transaction;
+		Assert.assertThat(importanceTransfer.getDirection(), IsEqual.equalTo(ImportanceTransferDirection.Transfer));
+		Assert.assertThat(importanceTransfer.getRemote(), IsEqual.equalTo(recipient.getAddress()));
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableImportanceTransferTransaction() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Transaction originalTransaction = new ImportanceTransfer(TimeInstant.ZERO, sender, ImportanceTransferDirection.Transfer, recipient.getAddress());
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(
+				originalTransaction.asNonVerifiable(),
+				new MockAccountLookup());
+
+		// Act:
+		final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+
+		// Assert:
+		Assert.assertThat(transaction, IsInstanceOf.instanceOf(ImportanceTransfer.class));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
+	}
 }
