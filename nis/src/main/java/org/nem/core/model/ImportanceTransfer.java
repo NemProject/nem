@@ -9,25 +9,25 @@ import java.util.function.BiPredicate;
 
 public class ImportanceTransfer extends Transaction {
 	private final int mode;
-	// TODO: not sure yet if this should be account or maybe just PublicKey
 	// TODO-CR: J->G how about address (it has a public key)
-	private final Account remoteAccount;
+	// 20140827 G-J: y, I think Address will be ok
+	private final Address remoteAddress;
 
-	public Account getRemote() {
-		return remoteAccount;
+	public Address getRemote() {
+		return remoteAddress;
 	}
 
 	public int getDirection() {
 		return mode;
 	}
 
-	public ImportanceTransfer(final TimeInstant timeStamp, final Account sender, final int mode, final Account remoteAccount) {
+	public ImportanceTransfer(final TimeInstant timeStamp, final Account sender, final int mode, final Address remoteAddress) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
-		this.remoteAccount = remoteAccount;
+		this.remoteAddress = remoteAddress;
 
-		if (null == this.remoteAccount) {
-			throw new IllegalArgumentException("remoteAccount is required");
+		if (null == this.remoteAddress) {
+			throw new IllegalArgumentException("remoteAddress is required");
 		}
 
 		if (this.mode != ImportanceTransferDirection.Transfer && this.mode != ImportanceTransferDirection.Revert) {
@@ -38,14 +38,14 @@ public class ImportanceTransfer extends Transaction {
 	public ImportanceTransfer(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
 		this.mode = deserializer.readInt("mode");
-		this.remoteAccount = Account.readFrom(deserializer, "remoteAccount");
+		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress");
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeInt("mode", this.mode);
-		Account.writeTo(serializer, "remoteAccount", this.remoteAccount);
+		Address.writeTo(serializer, "remoteAddress", this.remoteAddress);
 	}
 
 	@Override
