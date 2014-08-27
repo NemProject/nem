@@ -1,11 +1,11 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.serialization.AccountLookup;
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -32,6 +32,26 @@ public class ImportanceTransferTest {
 
 		// Act:
 		this.createImportanceTransferTransaction(signer, 666, remote);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void deserializationFailsWhenAddressIsMissing() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
+
+		final ImportanceTransfer originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferDirection.Transfer, remote);
+		originalEntity.sign();
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
+		originalEntity.serialize(jsonSerializer);
+		final JSONObject jsonObject = jsonSerializer.getObject();
+
+		// Act:
+		jsonObject.put("remoteAddress", null);
+		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		final ImportanceTransfer ret = new ImportanceTransfer(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
 	@Test

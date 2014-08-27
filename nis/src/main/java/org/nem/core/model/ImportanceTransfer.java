@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.serialization.AddressEncoding;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.time.TimeInstant;
@@ -38,14 +39,18 @@ public class ImportanceTransfer extends Transaction {
 	public ImportanceTransfer(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
 		this.mode = deserializer.readInt("mode");
-		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress");
+		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);
+
+		if (null == this.remoteAddress) {
+			throw new IllegalArgumentException("remoteAddress is required");
+		}
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeInt("mode", this.mode);
-		Address.writeTo(serializer, "remoteAddress", this.remoteAddress);
+		Address.writeTo(serializer, "remoteAddress", this.remoteAddress, AddressEncoding.PUBLIC_KEY);
 	}
 
 	@Override
