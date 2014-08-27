@@ -21,11 +21,17 @@ public class BlockDifficultyScorer {
 	/**
 	 * Calculates the difficulty based the last n blocks.
 	 *
-	 * @param difficulties historical difficulties.
-	 * @param timeStamps historical timestamps.
+	 * @param difficulties Historical difficulties.
+	 * @param timeStamps Historical timestamps.
+	 * @param height Height for which we're calculating difficulty.
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps) {
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final long height) {
+		final int fix = (height >= BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT) ? 1 : 0;
+		return this.calculateDifficultyInternal(difficulties, timeStamps, fix);
+	}
+
+	private BlockDifficulty calculateDifficultyInternal(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final int fix) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
@@ -44,7 +50,7 @@ public class BlockDifficultyScorer {
 		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
 				// TODO: G->B: shouldn't it be (heightDiff-1) (changing it without blockchain restart would require some tricks
 				// 20140820: BR -> G Yes, you found a bug. We should change it right before the next blockchain restart.
-				.multiply(BigInteger.valueOf(heightDiff))
+				.multiply(BigInteger.valueOf(heightDiff - fix))
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();
 

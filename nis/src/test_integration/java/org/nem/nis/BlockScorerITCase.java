@@ -66,8 +66,10 @@ public class BlockScorerITCase {
 		for (int i = 1; i < numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(foragerAccounts[0], blocks[i - 1], new TimeInstant(1));
-			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks)));
+			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(
+					this.createDifficultiesList(historicalBlocks),
+					this.createTimestampsList(historicalBlocks),
+					block.getHeight().getRaw()));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j = 0; j < numForagers; j++) {
 				final Block temporaryDummy = new Block(foragerAccounts[j], blocks[i - 1], new TimeInstant(1));
@@ -563,9 +565,11 @@ public class BlockScorerITCase {
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 		Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
-		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
-		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
-				this.createTimestampsList(historicalBlocks));
+		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
+		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
+				this.createDifficultiesList(historicalBlocks),
+				this.createTimestampsList(historicalBlocks),
+				block.getHeight().getRaw());
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
 		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
@@ -595,10 +599,12 @@ public class BlockScorerITCase {
 		for (final Account forger : forgers) {
 			Block block = new Block(forger, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
-			final List<Block> historicalBlocks = blocks.subList(Math.max(0, (int)(blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)),
+			final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)),
 					blocks.size());
-			final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks));
+			final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
+					this.createDifficultiesList(historicalBlocks),
+					this.createTimestampsList(historicalBlocks),
+					block.getHeight().getRaw());
 			block.setDifficulty(difficulty);
 			final BigInteger hit = scorer.calculateHit(block);
 			int seconds = hit.multiply(block.getDifficulty().asBigInteger())
