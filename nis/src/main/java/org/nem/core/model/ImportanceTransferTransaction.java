@@ -42,6 +42,7 @@ public class ImportanceTransferTransaction extends Transaction {
 		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);
 
 		// TODO-CR: J->G do you want to validate the mode here?
+		// G->J any reason not to? (would checkDerivedValidity be better place?)
 	}
 
 	@Override
