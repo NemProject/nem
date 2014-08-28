@@ -3,8 +3,8 @@ package org.nem.nis.dbmodel;
 import org.hibernate.annotations.*;
 import org.nem.core.crypto.Hash;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.persistence.Table;
 
 /**
