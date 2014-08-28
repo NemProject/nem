@@ -13,6 +13,11 @@ public class ClampingFilter implements SynchronizationFilter {
 
 	// TODO J-B: question - so in this filter, you are reducing the tolerated deviation over time?
 	// TODO J-B: question - i might have missed this, but how is age calculated?
+	// TODO BR -> J the node age is incremented by 1 each time the node synchronizes. Nodes that recently
+	// TODO         joined the network might be far off the already established network time. They need to
+	// TODO         accept samples that are far off its own time in order to adapt to the network's logical clock.
+	// TODO         On the other hand, matured nodes (high node age) should not be influenced by joining nodes
+	// TODO         or attackers that provide samples which are far off the network's time.
 
 	/**
 	 * Gets a value indicating maximum deviation before clamping occurs.

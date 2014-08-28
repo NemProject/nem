@@ -13,7 +13,7 @@ public class TimeSynchronizationITCase {
 	private static final int INITIAL_TIME_SPREAD = 50000;
 	private static final boolean REMOTE_RECEIVE_SEND_DELAY = true;
 	private static final boolean ASYMMETRIC_CHANNELS = true;
-	private static final boolean INSTABLE_CLOCK = true;
+	private static final boolean UNSTABLE_CLOCK = true;
 	private static final int MAX_VIEW_SIZE = STANDARD_NETWORK_SIZE;
 	private static final int MEDIUM_VIEW_SIZE = 60;
 	private static final int SMALL_VIEW_SIZE = 5;
@@ -66,7 +66,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		final Network network = setupNetwork("network", networkSize, viewSize, settings);
@@ -83,7 +83,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
@@ -95,31 +95,31 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
 	@Test
-	public void instableClockWithoutPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
+	public void unstableClockWithoutPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
 		final NodeSettings settings = createNodeSettings(
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				INSTABLE_CLOCK,
+				UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
 	@Test
-	public void instableClockTogetherWithPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
+	public void unstableClockTogetherWithPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
 		final NodeSettings settings = createNodeSettings(
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				INSTABLE_CLOCK,
+				UNSTABLE_CLOCK,
 				CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
@@ -131,7 +131,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				REMOTE_RECEIVE_SEND_DELAY,
 				ASYMMETRIC_CHANNELS,
-				INSTABLE_CLOCK,
+				UNSTABLE_CLOCK,
 				CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
@@ -182,7 +182,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
@@ -211,7 +211,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		final Network network1 = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
@@ -243,7 +243,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				NO_EVIL_NODES);
 		final List<Network> networks = Arrays.asList(
@@ -287,7 +287,7 @@ public class TimeSynchronizationITCase {
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
 				!ASYMMETRIC_CHANNELS,
-				!INSTABLE_CLOCK,
+				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
 				percentageEvilNodes);
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
@@ -315,14 +315,14 @@ public class TimeSynchronizationITCase {
 			final int timeOffsetSpread,
 			final boolean delayCommunication,
 			final boolean asymmetricChannels,
-			final boolean instableClock,
+			final boolean unstableClock,
 			final boolean clockAdjustment,
 			final int percentageEvilNodes) {
 		return new NodeSettings(
 				timeOffsetSpread,
 				delayCommunication,
 				asymmetricChannels,
-				instableClock,
+				unstableClock,
 				clockAdjustment,
 				percentageEvilNodes);
 	}

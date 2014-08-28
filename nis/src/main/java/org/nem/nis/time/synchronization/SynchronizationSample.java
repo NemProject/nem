@@ -1,39 +1,39 @@
 package org.nem.nis.time.synchronization;
 
-import org.nem.core.node.NodeEndpoint;
+import org.nem.core.node.Node;
 
 /**
  * Represents a sample in the time synchronization process.
  */
 public class SynchronizationSample implements Comparable<SynchronizationSample> {
 
-	private final NodeEndpoint endpoint;
+	private final Node node;
 	private final CommunicationTimeStamps localTimeStamps;
 	private final CommunicationTimeStamps remoteTimeStamps;
 
 	/**
 	 * Creates a SynchronizationSample.
 	 *
-	 * @param endpoint The endpoint of the communication partner.
+	 * @param node The communication partner.
 	 * @param localTimeStamps The local time stamps for the request/response.
 	 * @param remoteTimeStamps The remote time stamps for the request/response.
 	 */
 	public SynchronizationSample(
-			final NodeEndpoint endpoint,
+			final Node node,
 			final CommunicationTimeStamps localTimeStamps,
 			final CommunicationTimeStamps remoteTimeStamps) {
-		this.endpoint = endpoint;
+		this.node = node;
 		this.localTimeStamps = localTimeStamps;
 		this.remoteTimeStamps = remoteTimeStamps;
 	}
 
 	/**
-	 * Gets the endpoint of the communication partner.
+	 * Gets the communication partner.
 	 *
-	 * @return The endpoint.
+	 * @return The node.
 	 */
-	NodeEndpoint getEndpoint() {
-		return this.endpoint;
+	public Node getNode() {
+		return this.node;
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 	 *
 	 * @return The local time stamps.
 	 */
-	CommunicationTimeStamps getLocalTimeStamps() {
+	public CommunicationTimeStamps getLocalTimeStamps() {
 		return this.localTimeStamps;
 	}
 
@@ -50,7 +50,7 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 	 *
 	 * @return The remote time stamps.
 	 */
-	CommunicationTimeStamps getRemoteTimeStamps() {
+	public CommunicationTimeStamps getRemoteTimeStamps() {
 		return this.remoteTimeStamps;
 	}
 
@@ -73,6 +73,7 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 				remoteTimeStamps.getSendTimeStamp().subtract(remoteTimeStamps.getReceiveTimeStamp());
 
 		//TODO-CR J-B consider storing remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) in a variable since you're calculating it twice
+		// TODO   BR -> J nothing is calculated twice.
 		return remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) - roundTripTime/2;
 	}
 
@@ -83,7 +84,9 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 
 	@Override
 	public int hashCode() {
-		return this.localTimeStamps.hashCode() ^ this.remoteTimeStamps.hashCode();
+		return this.node.hashCode() ^
+				this.localTimeStamps.hashCode() ^
+				this.remoteTimeStamps.hashCode();
 	}
 
 	@Override
@@ -93,7 +96,8 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 		}
 
 		final SynchronizationSample rhs = (SynchronizationSample)obj;
-		return this.localTimeStamps.equals(rhs.localTimeStamps)
-				&& this.remoteTimeStamps.equals(rhs.remoteTimeStamps);
+		return this.node.equals(rhs.node) &&
+				this.localTimeStamps.equals(rhs.localTimeStamps) &&
+				this.remoteTimeStamps.equals(rhs.remoteTimeStamps);
 	}
 }

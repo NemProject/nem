@@ -39,6 +39,8 @@ public class SystemTimeProvider implements TimeProvider {
 	 * Returns the current time in milliseconds.
 	 * TODO-CR J-B: if you are using this (it doesn't look like it is being called) consider adding a test for it
 	 * TODO-CR J-B: but this seems to be a more precise version of getCurrentTime, so i'm not sure if you are
+	 * TODO    Br -> J This is unfinished, there probably will be getNetworkTime and getNetworkTimeMillis too.
+	 * TODO            I will add tests once I get to this point.
 	 *
 	 * @return The current time in milliseconds.
 	 */

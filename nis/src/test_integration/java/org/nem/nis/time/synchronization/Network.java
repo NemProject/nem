@@ -60,7 +60,7 @@ public class Network {
 					this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
 					this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
 					this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasInstableClock()? this.random.nextInt(201) - 100 : 0,
+					this.nodeSettings.hasUnstableClock()? this.random.nextInt(201) - 100 : 0,
 					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary();
@@ -68,7 +68,7 @@ public class Network {
 				numberOfEvilNodes++;
 			}
 		}
-		if (this.nodeSettings.hasInstableClock()) {
+		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
 					"%s: mean clock inaccuracy per day: %s ms.",
@@ -126,7 +126,7 @@ public class Network {
 			if (nodeSettings.hasClockAdjustment() && i % ticksUntilClockAdjustment == 0) {
 				clockAdjustment();
 			}
-			if (nodeSettings.hasInstableClock() && i % ticksUntilClockInaccuracy == 0) {
+			if (nodeSettings.hasUnstableClock() && i % ticksUntilClockInaccuracy == 0) {
 				this.nodes.stream().forEach(TimeAwareNode::applyClockInaccuracy);
 			}
 			tick();
@@ -193,7 +193,7 @@ public class Network {
 					this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2,
 					this.nodeSettings.doesDelayCommunication() ? this.random.nextInt(100) : 0,
 					this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasInstableClock() ? this.random.nextInt(21) - 10 : 0,
+					this.nodeSettings.hasUnstableClock() ? this.random.nextInt(201) - 100 : 0,
 					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 			this.nodes.add(node);
 		}
@@ -255,7 +255,7 @@ public class Network {
 			final NetworkTimeStamp localSend = node.getNetworkTime();
 			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay() + roundTripTime);
 			samples.add(new SynchronizationSample(
-					partner.getEndpoint(),
+					partner.getNode(),
 					new CommunicationTimeStamps(localSend, localReceive),
 					partner.createCommunicationTimeStamps(roundTripTime)));
 		}
@@ -265,7 +265,7 @@ public class Network {
 
 	/**
 	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
-	 * We assume here that this happens about every 3 days.
+	 * We assume here that this happens about every day.
 	 */
 	public void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {

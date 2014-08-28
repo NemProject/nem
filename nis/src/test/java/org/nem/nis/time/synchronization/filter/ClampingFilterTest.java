@@ -28,15 +28,15 @@ public class ClampingFilterTest {
 		final ClampingFilter filter = new ClampingFilter();
 
 		// Assert:
-		assertLongIsWithingRange(
-				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 1)),
-				FilterConstants.TOLERATED_DEVIATION_MINIMUM,
-				FilterConstants.TOLERATED_DEVIATION_START); //TODO-CR: J-B i think checking the range [MIN, START] is too big or at least have one test that calculates a ~exact value
-		assertLongIsWithingRange(
-				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 5)),
-				FilterConstants.TOLERATED_DEVIATION_MINIMUM,
-				FilterConstants.TOLERATED_DEVIATION_START);
-		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 10)),
+		// Assuming decay strength 0.3 for the following tests:
+		// tolerated = exp(-0.3) * 300000 = 222245
+		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 1)), IsEqual.equalTo(222245L));
+		// tolerated = exp(-0.9) * 300000 = 121970
+		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 3)), IsEqual.equalTo(121970L));
+		// tolerated = exp(-1.5) * 300000 = 66939
+		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 5)), IsEqual.equalTo(66939L));
+		// exp(-1.8) * 300000 < TOLERATED_DEVIATION_MINIMUM
+		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 6)),
 				IsEqual.equalTo(FilterConstants.TOLERATED_DEVIATION_MINIMUM));
 	}
 
@@ -44,7 +44,7 @@ public class ClampingFilterTest {
 	public void filterDoesFilterOutOnlySamplesWithIntolerableTimeOffset() {
 		// Arrange:
 		final ClampingFilter filter = new ClampingFilter();
-		final List<SynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSamples(0, 3, true);
+		final List<SynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 3);
 		originalSamples.addAll(TimeSyncUtils.createIntolerableSamples(5));
 
 		// Act:
@@ -52,11 +52,6 @@ public class ClampingFilterTest {
 
 		// Assert:
 		Assert.assertThat(samples.size(), IsEqual.equalTo(3));
-		Assert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSamples(0, 3, true)));
-	}
-
-	private void assertLongIsWithingRange(final long value, final long min, final long max) {
-		Assert.assertThat(value > min, IsEqual.equalTo(true));
-		Assert.assertThat(value < max, IsEqual.equalTo(true));
+		Assert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(0, 3)));
 	}
 }

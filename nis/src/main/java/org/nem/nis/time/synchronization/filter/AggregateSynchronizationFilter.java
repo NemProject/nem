@@ -3,7 +3,7 @@ package org.nem.nis.time.synchronization.filter;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.nis.time.synchronization.SynchronizationSample;
 
-import java.util.*;
+import java.util.List;
 /**
  * Aggregate synchronization filter.
  */
@@ -16,11 +16,11 @@ public class AggregateSynchronizationFilter implements SynchronizationFilter {
 
 	@Override
 	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age) {
-		// TODO 20140823 BR: this looks ugly. Any better way to do it?
-		// TODO J-B: sometimes a regular for loop is more readable (i think this is one of those times :))
-		final List<List<SynchronizationSample>> samplesList = Arrays.asList(samples);
-		filters.stream().forEach(f -> samplesList.set(0, f.filter(samplesList.get(0), age)));
+		List<SynchronizationSample> filteredSamples = samples;
+		for (SynchronizationFilter filter : this.filters) {
+			filteredSamples = filter.filter(filteredSamples, age);
+		}
 
-		return samplesList.get(0);
+		return filteredSamples;
 	}
 }

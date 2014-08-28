@@ -25,7 +25,10 @@ public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 	 * Gets a value indicating maximum deviation before clamping occurs.
 	 * TODO 20140825 BR: Should the coupling be dependent on the trust in a node?
 	 * TODO J-B i think a node's trust similarity should influence coupling; i was also wondering if we could piggyback on the nodes returned by the NodeSelector
-	 * question - is this function public just for the testing?
+	 * TODO BR -> J I think the only way to withstand a sybil attack is to additionally tie the coupling to the remote nodes importance.
+	 * TODO         Attacking nodes will have a low importance and thus a low coupling.
+	 * TODO J-B question - is this function public just for the testing?
+	 * TODO BR -> J yeah, didn't see another way to do testing.
 	 *
 	 * @param age The node's age.
 	 * @return The coupling.

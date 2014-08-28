@@ -2,22 +2,26 @@ package org.nem.nis.time.synchronization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.NetworkTimeStamp;
-import org.nem.core.node.NodeEndpoint;
+import org.nem.core.node.NodeIdentity;
+import org.nem.nis.test.TimeSyncUtils;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class SynchronizationSampleTest {
+
+	private static final KeyPair KEY_PAIR = new KeyPair();
 
 	//region constructor
 
 	@Test
 	public void canCreateSynchronizationSample() {
 		// Act:
-		final SynchronizationSample sample = createSynchronizationSample(5, 17, 23, 26);
+		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 23, 26);
 
 		// Assert:
-		Assert.assertThat(sample.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("ftp", "10.8.8.2", 12)));
+		Assert.assertThat(sample.getNode().getIdentity(), IsEqual.equalTo(new NodeIdentity(KEY_PAIR, "node")));
 		Assert.assertThat(sample.getLocalTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17))));
 		Assert.assertThat(sample.getRemoteTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(23), new NetworkTimeStamp(26))));
 	}
@@ -29,9 +33,9 @@ public class SynchronizationSampleTest {
 	@Test
 	public void timeOffsetIsCalculatedCorrectly() {
 		// Arrange:
-		final SynchronizationSample sample1 = createSynchronizationSample(5, 17, 25, 23);
-		final SynchronizationSample sample2 = createSynchronizationSample(8, 12, 45, 45);
-		final SynchronizationSample sample3 = createSynchronizationSample(37, 43, 15, 13);
+		final SynchronizationSample sample1 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final SynchronizationSample sample2 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
+		final SynchronizationSample sample3 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 37, 43, 15, 13);
 
 		// Assert:
 		Assert.assertThat(sample1.getTimeOffsetToRemote(), IsEqual.equalTo(13L));
@@ -46,9 +50,9 @@ public class SynchronizationSampleTest {
 	@Test
 	public void canCompareSynchronizationSamples() {
 		// Arrange:
-		final SynchronizationSample sample1 = createSynchronizationSample(5, 17, 25, 23);
-		final SynchronizationSample sample2 = createSynchronizationSample(8, 12, 45, 45);
-		final SynchronizationSample sample3 = createSynchronizationSample(5, 17, 25, 23);
+		final SynchronizationSample sample1 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final SynchronizationSample sample2 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
+		final SynchronizationSample sample3 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
 
 		// Assert:
 		Assert.assertThat(sample1.compareTo(sample2), IsEqual.equalTo(-1));
@@ -63,43 +67,41 @@ public class SynchronizationSampleTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final List<SynchronizationSample> sampleList = createTestSynchronizationSampleList();
+		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final HashMap<String, SynchronizationSample> sampleMap = createTestSynchronizationSampleList();
 
 		// Assert:
-		Assert.assertThat(sampleList.get(0), IsEqual.equalTo(sampleList.get(1)));
-		Assert.assertThat(sampleList.get(0), IsNot.not(IsEqual.equalTo(sampleList.get(2))));
-		Assert.assertThat(sampleList.get(0), IsNot.not(IsEqual.equalTo(sampleList.get(3))));
+		Assert.assertThat(sampleMap.get("default"), IsEqual.equalTo(sample));
+		Assert.assertThat(sampleMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(sample)));
+		Assert.assertThat(sampleMap.get("diff-local"), IsNot.not(IsEqual.equalTo(sample)));
+		Assert.assertThat(sampleMap.get("diff-remote"), IsNot.not(IsEqual.equalTo(sample)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(sample)));
+		Assert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)sample)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final List<SynchronizationSample> sampleList = createTestSynchronizationSampleList();
+		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final HashMap<String, SynchronizationSample> sampleMap = createTestSynchronizationSampleList();
 
 		// Assert:
-		Assert.assertThat(sampleList.get(0).hashCode(), IsEqual.equalTo(sampleList.get(1).hashCode()));
-		Assert.assertThat(sampleList.get(0).hashCode(), IsNot.not(IsEqual.equalTo(sampleList.get(2).hashCode())));
-		Assert.assertThat(sampleList.get(0).hashCode(), IsNot.not(IsEqual.equalTo(sampleList.get(3).hashCode())));
+		Assert.assertThat(sampleMap.get("default").hashCode(), IsEqual.equalTo(sample.hashCode()));
+		Assert.assertThat(sampleMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
+		Assert.assertThat(sampleMap.get("diff-local-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
+		Assert.assertThat(sampleMap.get("diff-remote-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
 	}
 
 	//endregion
 
-	private SynchronizationSample createSynchronizationSample(
-			final long localSendTimeStamp,
-			final long localReceiveTimeStamp,
-			final long remoteSendTimeStamp,
-			final long remoteReceiveTimeStamp) {
-		return new SynchronizationSample(
-			new NodeEndpoint("ftp", "10.8.8.2", 12),
-			new CommunicationTimeStamps(new NetworkTimeStamp(localSendTimeStamp), new NetworkTimeStamp(localReceiveTimeStamp)),
-			new CommunicationTimeStamps(new NetworkTimeStamp(remoteSendTimeStamp), new NetworkTimeStamp(remoteReceiveTimeStamp)));
-	}
-
-	private List<SynchronizationSample> createTestSynchronizationSampleList() {
-		return Arrays.asList(
-				createSynchronizationSample(5, 17, 25, 23),
-				createSynchronizationSample(5, 17, 25, 23),
-				createSynchronizationSample(4, 12, 25, 23),
-				createSynchronizationSample(5, 17, 30, 28));
+	private HashMap<String, SynchronizationSample> createTestSynchronizationSampleList() {
+		return new HashMap<String, SynchronizationSample>() {
+			{
+				this.put("default", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23));
+				this.put("diff-identity", TimeSyncUtils.createSynchronizationSample(new KeyPair(), 5, 17, 25, 23));
+				this.put("diff-local-timeStamp", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 4, 12, 25, 23));
+				this.put("diff-remote-timeStamp", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 30, 28));
+			}
+		};
 	}
 }

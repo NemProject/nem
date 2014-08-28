@@ -11,13 +11,14 @@ public class AlphaTrimmedMeanFilterTest {
 
 	@Test
 	public void filterDiscardsSamplesAtBothEnds() {
-		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSamples(0, 20, true));
+		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSortedSamples(0, 20));
 		// TODO-CR: J-B instead of using true/false for sorted/unsorted, consider separate functions like createTolerableUnsortedSamples
+		// TODO     BR -> J done.
 	}
 
 	@Test
 	public void filterCanHandleUnsortedList() {
-		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSamples(0, 20, false));
+		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableUnsortedSamples(0, 20));
 	}
 
 	private void assertFilterWorksAsExpected(final List<SynchronizationSample> originalSamples) {
@@ -30,6 +31,6 @@ public class AlphaTrimmedMeanFilterTest {
 		// Assert:
 		final int value = (int)(originalSamples.size() * FilterConstants.ALPHA / 2);
 		Assert.assertThat(samples.size(), IsEqual.equalTo(originalSamples.size() - 2 * value));
-		Assert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSamples(value, originalSamples.size() - 2 * value, true)));
+		Assert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(value, originalSamples.size() - 2 * value)));
 	}
 }

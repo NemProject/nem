@@ -31,7 +31,12 @@ public class TimeAwareNode {
 	 * Creates a time aware node.
 	 *
 	 * @param id The id of the node.
+	 * @param syncStrategy The synchronization strategy to use.
+	 * @param initialTimeOffset The initial time offset.
 	 * @param communicationDelay The delay to add to the communication send time stamp.
+	 * @param channelAsymmetry The channel asymmetry (must be between 0.0 and 1.0).
+	 * @param clockInaccuracy The value to add to the time offset every hour.
+	 * @param type The node's type (friendly or evil).
 	 */
 	public TimeAwareNode(
 			final int id,
@@ -64,12 +69,12 @@ public class TimeAwareNode {
 	}
 
 	/**
-	 * Gets the node's endpoint.
+	 * Gets the nem node.
 	 *
-	 * @return The node's endpoint.
+	 * @return The node.
 	 */
-	public NodeEndpoint getEndpoint() {
-		return this.node.getEndpoint();
+	public Node getNode() {
+		return this.node;
 	}
 
 	/**

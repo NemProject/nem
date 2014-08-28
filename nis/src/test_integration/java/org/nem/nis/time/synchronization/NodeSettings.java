@@ -8,7 +8,7 @@ public class NodeSettings {
 	private final int timeOffsetSpread;
 	private final boolean delayCommunication;
 	private final boolean asymmetricChannels;
-	private final boolean instableClock; //TODO-CR: J-B "unstable"
+	private final boolean unstableClock;
 	private final boolean clockAdjustment;
 	private final int percentageEvilNodes;
 
@@ -18,7 +18,7 @@ public class NodeSettings {
 	 * @param timeOffsetSpread The desired time offset spread.
 	 * @param delayCommunication Value indicating if there should be a delay between receive and send timestamps.
 	 * @param asymmetricChannels Value indicating whether the time that a packet needs to travel to/from a partner node is asymmetric.
-	 * @param instableClock Value indicating whether the node's clock is drifting with respect to real time.
+	 * @param unstableClock Value indicating whether the node's clock is drifting with respect to real time.
 	 * @param clockAdjustment Value indicating whether the node's clock is adjusted from time to time.
 	 * @param percentageEvilNodes Value indicating what percentage of all nodes is evil.
 	 */
@@ -26,13 +26,13 @@ public class NodeSettings {
 			final int timeOffsetSpread,
 			final boolean delayCommunication,
 			final boolean asymmetricChannels,
-			final boolean instableClock,
+			final boolean unstableClock,
 			final boolean clockAdjustment,
 			final int percentageEvilNodes) {
 		this.timeOffsetSpread = timeOffsetSpread;
 		this.delayCommunication = delayCommunication;
 		this.asymmetricChannels = asymmetricChannels;
-		this.instableClock = instableClock;
+		this.unstableClock = unstableClock;
 		this.clockAdjustment = clockAdjustment;
 		this.percentageEvilNodes = percentageEvilNodes;
 	}
@@ -61,8 +61,8 @@ public class NodeSettings {
 	/**
 	 * Gets the value indicating whether the node's clock is drifting with respect to real time.
 	 */
-	public boolean hasInstableClock() {
-		return this.instableClock;
+	public boolean hasUnstableClock() {
+		return this.unstableClock;
 	}
 
 	/**
