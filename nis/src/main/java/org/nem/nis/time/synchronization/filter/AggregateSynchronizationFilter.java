@@ -17,6 +17,7 @@ public class AggregateSynchronizationFilter implements SynchronizationFilter {
 	@Override
 	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age) {
 		// TODO 20140823 BR: this looks ugly. Any better way to do it?
+		// TODO J-B: sometimes a regular for loop is more readable (i think this is one of those times :))
 		final List<List<SynchronizationSample>> samplesList = Arrays.asList(samples);
 		filters.stream().forEach(f -> samplesList.set(0, f.filter(samplesList.get(0), age)));
 

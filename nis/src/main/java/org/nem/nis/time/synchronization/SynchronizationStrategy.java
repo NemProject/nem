@@ -12,7 +12,7 @@ public interface SynchronizationStrategy {
 
 	/**
 	 * Calculates the offset in time between the local computer clock and the the network time
-	 * base on the list of synchronization samples.
+	 * based on the list of synchronization samples.
 	 *
 	 * @param samples The list of synchronization samples.
 	 * @return The time offset in ms.

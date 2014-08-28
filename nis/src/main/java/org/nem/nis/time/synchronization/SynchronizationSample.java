@@ -72,6 +72,7 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 				localTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) -
 				remoteTimeStamps.getSendTimeStamp().subtract(remoteTimeStamps.getReceiveTimeStamp());
 
+		//TODO-CR J-B consider storing remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) in a variable since you're calculating it twice
 		return remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) - roundTripTime/2;
 	}
 

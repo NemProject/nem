@@ -8,7 +8,7 @@ public class NodeSettings {
 	private final int timeOffsetSpread;
 	private final boolean delayCommunication;
 	private final boolean asymmetricChannels;
-	private final boolean instableClock;
+	private final boolean instableClock; //TODO-CR: J-B "unstable"
 	private final boolean clockAdjustment;
 	private final int percentageEvilNodes;
 

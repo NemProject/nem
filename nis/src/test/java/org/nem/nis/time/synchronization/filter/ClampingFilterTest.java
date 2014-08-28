@@ -31,7 +31,7 @@ public class ClampingFilterTest {
 		assertLongIsWithingRange(
 				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 1)),
 				FilterConstants.TOLERATED_DEVIATION_MINIMUM,
-				FilterConstants.TOLERATED_DEVIATION_START);
+				FilterConstants.TOLERATED_DEVIATION_START); //TODO-CR: J-B i think checking the range [MIN, START] is too big or at least have one test that calculates a ~exact value
 		assertLongIsWithingRange(
 				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 5)),
 				FilterConstants.TOLERATED_DEVIATION_MINIMUM,

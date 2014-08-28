@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
  */
 public class ClampingFilter implements SynchronizationFilter {
 
+	// TODO J-B: question - so in this filter, you are reducing the tolerated deviation over time?
+	// TODO J-B: question - i might have missed this, but how is age calculated?
+
 	/**
 	 * Gets a value indicating maximum deviation before clamping occurs.
 	 *

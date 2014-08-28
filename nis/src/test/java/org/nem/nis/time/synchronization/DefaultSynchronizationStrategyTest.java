@@ -47,6 +47,8 @@ public class DefaultSynchronizationStrategyTest {
 		Mockito.verify(filter, Mockito.times(1)).filter(Mockito.any(), Mockito.any());
 	}
 
+	// TODO-CR: J-B question should you add a test with a coupling between min and max
+
 	@Test
 	public void calculateTimeOffsetWithMaximumCouplingReturnsCorrectValue() {
 		// Act:
@@ -96,6 +98,8 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(createAggregateFilter());
 
 		// Assert:
+		//TODO-CR: J-B i think checking the range [MIN, START] is too big or at least have one test that calculates a ~exact value
+		//TODO-CR: also, you might want to move assertDoubleIsWithingRange since you are using it in multiple tests
 		assertDoubleIsWithingRange(
 				strategy.getCoupling(new NodeAge(SynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 1)),
 				SynchronizationConstants.COUPLING_MINIMUM,
