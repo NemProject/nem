@@ -31,7 +31,7 @@ public class ImportanceTransferTransaction extends Transaction {
 			throw new IllegalArgumentException("remoteAddress is required");
 		}
 
-		if (this.mode != ImportanceTransferDirection.Transfer && this.mode != ImportanceTransferDirection.Revert) {
+		if (this.mode != ImportanceTransferTransactionDirection.Transfer && this.mode != ImportanceTransferTransactionDirection.Revert) {
 			throw new IllegalArgumentException("invalid mode");
 		}
 	}

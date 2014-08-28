@@ -31,7 +31,7 @@ public class TransactionFactory {
 				return new TransferTransaction(options, deserializer);
 
 			case TransactionTypes.IMPORTANCE_TRANSFER:
-				return new ImportanceTransfer(options, deserializer);
+				return new ImportanceTransferTransaction(options, deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown transaction type: " + type);
