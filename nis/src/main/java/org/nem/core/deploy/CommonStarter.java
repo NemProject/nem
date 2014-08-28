@@ -52,7 +52,7 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 
-	private final static Closeable fileLockHandle;
+	private static final Closeable fileLockHandle;
 
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
