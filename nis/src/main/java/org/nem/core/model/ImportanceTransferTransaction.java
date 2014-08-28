@@ -10,7 +10,7 @@ import java.util.function.BiPredicate;
 
 // TODO-CR: J->G please remember to comment the public api eventually
 
-public class ImportanceTransfer extends Transaction {
+public class ImportanceTransferTransaction extends Transaction {
 	private final int mode;
 	private final Address remoteAddress;
 
@@ -22,7 +22,7 @@ public class ImportanceTransfer extends Transaction {
 		return mode;
 	}
 
-	public ImportanceTransfer(final TimeInstant timeStamp, final Account sender, final int mode, final Address remoteAddress) {
+	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final int mode, final Address remoteAddress) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
 		this.remoteAddress = remoteAddress;
@@ -36,7 +36,7 @@ public class ImportanceTransfer extends Transaction {
 		}
 	}
 
-	public ImportanceTransfer(final DeserializationOptions options, final Deserializer deserializer) {
+	public ImportanceTransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
 		this.mode = deserializer.readInt("mode");
 		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);

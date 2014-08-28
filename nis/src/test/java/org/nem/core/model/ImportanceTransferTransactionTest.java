@@ -10,7 +10,7 @@ import org.nem.core.test.MockAccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-public class ImportanceTransferTest {
+public class ImportanceTransferTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
 
 	//region Constructor
@@ -21,7 +21,7 @@ public class ImportanceTransferTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		this.createImportanceTransferTransaction(signer, ImportanceTransferDirection.Transfer, null);
+		this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionDirection.Transfer, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -41,7 +41,7 @@ public class ImportanceTransferTest {
 		final Account remote = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
 
-		final ImportanceTransfer originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferDirection.Transfer, remote);
+		final ImportanceTransferTransaction originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionDirection.Transfer, remote);
 		originalEntity.sign();
 		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
@@ -51,17 +51,17 @@ public class ImportanceTransferTest {
 		jsonObject.put("remoteAddress", null);
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
 		deserializer.readInt("type");
-		new ImportanceTransfer(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransfer() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferDirection.Transfer);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionDirection.Transfer);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransferRevert() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferDirection.Revert);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionDirection.Revert);
 	}
 
 	private void assertCtorCanCreateImportanceTransfer(int direction) {
@@ -71,19 +71,19 @@ public class ImportanceTransferTest {
 		final Account remote = Utils.generateRandomAccount();
 
 		// Act:
-		final ImportanceTransfer importanceTransfer = this.createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction importanceTransferTransaction = this.createImportanceTransferTransaction(signer, direction, remote);
 
 		// Assert:
-		Assert.assertThat(importanceTransfer.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(importanceTransfer.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransfer.getRemote(), IsEqual.equalTo(remote.getAddress()));
-		Assert.assertThat(importanceTransfer.getDirection(), IsEqual.equalTo(direction));
-		Assert.assertThat(importanceTransfer.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote.getAddress()));
+		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
+		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 
-	private ImportanceTransfer createImportanceTransferTransaction(final Account sender, int mode, final Account remote) {
-		return new ImportanceTransfer(TIME, sender, mode, remote != null ? remote.getAddress() : null);
+	private ImportanceTransferTransaction createImportanceTransferTransaction(final Account sender, int mode, final Account remote) {
+		return new ImportanceTransferTransaction(TIME, sender, mode, remote != null ? remote.getAddress() : null);
 	}
 
 	// endregion
@@ -91,12 +91,12 @@ public class ImportanceTransferTest {
 	// region roundtrip
 	@Test
 	public void canRoundTripImportanceTransfer()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferDirection.Transfer);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionDirection.Transfer);
 	}
 
 	@Test
 	public void canRoundTripImportanceTransferRevert()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferDirection.Revert);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionDirection.Revert);
 	}
 
 	public void assertImportanceTransferCanBeRoundTripped(int direction) {
@@ -104,26 +104,26 @@ public class ImportanceTransferTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
-		final ImportanceTransfer originalTransaction = this.createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction originalTransaction = this.createImportanceTransferTransaction(signer, direction, remote);
 
 		// Act:
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
-		final ImportanceTransfer importanceTransfer = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
+		final ImportanceTransferTransaction importanceTransferTransaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
-		Assert.assertThat(importanceTransfer.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(importanceTransfer.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransfer.getRemote(), IsEqual.equalTo(remote.getAddress()));
-		Assert.assertThat(importanceTransfer.getDirection(), IsEqual.equalTo(direction));
-		Assert.assertThat(importanceTransfer.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote.getAddress()));
+		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
+		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
-	private ImportanceTransfer createRoundTrippedTransaction(
-			final ImportanceTransfer originalTransaction,
+	private ImportanceTransferTransaction createRoundTrippedTransaction(
+			final ImportanceTransferTransaction originalTransaction,
 			final AccountLookup accountLookup) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
 		deserializer.readInt("type");
-		return new ImportanceTransfer(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		return new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 	// endregion
 
@@ -140,11 +140,11 @@ public class ImportanceTransferTest {
 
 	public void assertValidateImportanceTransfer(final int amount, final ValidationResult result) {
 		// Arrange:
-		final int direction = ImportanceTransferDirection.Transfer;
+		final int direction = ImportanceTransferTransactionDirection.Transfer;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
-		final ImportanceTransfer transaction = this.createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = this.createImportanceTransferTransaction(signer, direction, remote);
 		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
 		signer.incrementBalance(Amount.fromNem(amount));
 
@@ -157,11 +157,11 @@ public class ImportanceTransferTest {
 	@Test
 	public void executeTransfersFeeFromSigner() {
 		// Arrange:
-		final int direction = ImportanceTransferDirection.Transfer;
+		final int direction = ImportanceTransferTransactionDirection.Transfer;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(100));
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransfer transaction = this.createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = this.createImportanceTransferTransaction(signer, direction, remote);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -176,11 +176,11 @@ public class ImportanceTransferTest {
 	@Test
 	public void undoTransfersFeeFromSigner() {
 		// Arrange:
-		final int direction = ImportanceTransferDirection.Transfer;
+		final int direction = ImportanceTransferTransactionDirection.Transfer;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransfer transaction = this.createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = this.createImportanceTransferTransaction(signer, direction, remote);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
