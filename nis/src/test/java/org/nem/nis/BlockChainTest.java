@@ -10,6 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
@@ -158,9 +159,10 @@ public class BlockChainTest {
 
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
+		final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final Foraging foraging = Mockito.mock(Foraging.class);
-		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, foraging);
+		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, transferDao, foraging);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
