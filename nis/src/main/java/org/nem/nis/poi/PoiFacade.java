@@ -14,6 +14,7 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	private final Map<Address, PoiAccountState> addressToStateMap = new ConcurrentHashMap<>();
 	private final PoiImportanceGenerator importanceGenerator;
 	private BlockHeight lastPoiRecalculationHeight;
+	private int lastPoiVectorSize;
 
 	/**
 	 * Creates a new poi facade.
@@ -47,6 +48,15 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	 */
 	public int size() {
 		return this.addressToStateMap.size();
+	}
+
+	/**
+	 * Gets the size of the last poi vector (needed for time synchronization).
+	 *
+	 * @return The size of the last poi vector.
+	 */
+	public int getLastPoiVectorSize() {
+		return this.lastPoiVectorSize;
 	}
 
 	/**
@@ -88,7 +98,9 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 			return;
 		}
 
-		this.importanceGenerator.updateAccountImportances(blockHeight, this.getAccountStates(blockHeight));
+		Collection<PoiAccountState> accountStates = this.getAccountStates(blockHeight);
+		this.lastPoiVectorSize = accountStates.size();
+		this.importanceGenerator.updateAccountImportances(blockHeight, accountStates);
 		this.lastPoiRecalculationHeight = blockHeight;
 	}
 

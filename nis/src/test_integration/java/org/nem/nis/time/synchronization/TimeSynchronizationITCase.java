@@ -2,7 +2,9 @@ package org.nem.nis.time.synchronization;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.utils.FormatUtils;
+import org.nem.nis.poi.*;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.text.DecimalFormat;
@@ -307,7 +309,7 @@ public class TimeSynchronizationITCase {
 			final int viewSize,
 			final NodeSettings nodeSettings) {
 		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
-		final SynchronizationStrategy syncStrategy = new DefaultSynchronizationStrategy(filter);
+		final SynchronizationStrategy syncStrategy = new DefaultSynchronizationStrategy(filter, createPoiFacade());
 		return new Network(name, numberOfNodes, syncStrategy, viewSize, nodeSettings);
 	}
 
@@ -326,4 +328,9 @@ public class TimeSynchronizationITCase {
 				clockAdjustment,
 				percentageEvilNodes);
 	}
+
+	private PoiFacade createPoiFacade() {
+		return new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+	}
+
 }

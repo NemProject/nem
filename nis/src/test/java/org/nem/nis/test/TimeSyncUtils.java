@@ -122,6 +122,58 @@ public class TimeSyncUtils {
 	}
 
 	/**
+	 * Creates a synchronization sample with a given time offset.
+	 *
+	 * @param startValue The time offset to start with.
+	 * @param count The number of samples needed.
+	 * @return The synchronization sample
+	 */
+	public static List<SynchronizationSample> createSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
+		List<SynchronizationSample> samples = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
+		}
+
+		return samples;
+	}
+
+	/**
+	 * Creates a synchronization sample with a given time offset.
+	 *
+	 * @param count The number of samples needed.
+	 * @param mean The mean time offset the samples should have.
+	 * @return The synchronization sample
+	 */
+	public static List<SynchronizationSample> createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(final int count, final long mean) {
+		final SecureRandom random = new SecureRandom();
+		final List<SynchronizationSample> samples = new ArrayList<>();
+		if (count % 2 == 1) {
+			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean));
+		}
+		for (int i = 0; i < count/2; i++) {
+			final int value = random.nextInt(1000);
+			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean + value));
+			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean - value));
+		}
+
+		return samples;
+	}
+
+	/**
+	 * Creates a synchronization sample with a given time offset.
+	 *
+	 * @param keyPair The key pair to tie the node to.
+	 * @param timeOffset The time offset in ms.
+	 * @return The synchronization sample
+	 */
+	private static SynchronizationSample createSynchronizationSampleWithKeyPair(KeyPair keyPair, final long timeOffset) {
+		return new SynchronizationSample(
+				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
+				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),
+				new CommunicationTimeStamps(new NetworkTimeStamp(5 + timeOffset), new NetworkTimeStamp(5 + timeOffset)));
+	}
+
+	/**
 	 * Creates a synchronization sample.
 	 *
 	 * @param keyPair The remote node's key pair.

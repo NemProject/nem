@@ -1,6 +1,9 @@
 package org.nem.nis.time.synchronization;
 
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.NodeAge;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
 import java.util.List;
@@ -13,16 +16,29 @@ import java.util.List;
 public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 
 	private final SynchronizationFilter filter;
+	private final PoiFacade poiFacade;
 
-	public DefaultSynchronizationStrategy(final SynchronizationFilter filter) {
+	/**
+	 * Creates the default synchronization strategy.
+	 *
+	 * @param filter The aggregate filter to use.
+	 * @param poiFacade The poi facade to query account importances.
+	 */
+	public DefaultSynchronizationStrategy(final SynchronizationFilter filter, final PoiFacade poiFacade) {
 		if (null == filter) {
 			throw new SynchronizationException("synchronization filter cannot be null.");
 		}
+		if (null == poiFacade) {
+			throw new SynchronizationException("poiFacade cannot be null.");
+		}
 		this.filter = filter;
+		this.poiFacade = poiFacade;
 	}
 
 	/**
-	 * Gets a value indicating maximum deviation before clamping occurs.
+	 * Gets a value indicating how strong the coupling should be.
+	 * Starting value should be chosen such that coupling is strong to achieve a fast convergence in the beginning.
+	 * Minimum value should be chosen such that the network time shows some inertia.
 	 * TODO 20140825 BR: Should the coupling be dependent on the trust in a node?
 	 * TODO J-B i think a node's trust similarity should influence coupling; i was also wondering if we could piggyback on the nodes returned by the NodeSelector
 	 * TODO BR -> J I think the only way to withstand a sybil attack is to additionally tie the coupling to the remote nodes importance.
@@ -39,14 +55,27 @@ public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 				SynchronizationConstants.COUPLING_MINIMUM);
 	}
 
+	private double getAccountImportance(final Address address) {
+		final AccountImportance importanceInfo = this.poiFacade.findStateByAddress(address).getImportanceInfo();
+		return importanceInfo.getImportance(importanceInfo.getHeight());
+	}
+
 	@Override
 	public long calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age) {
 		final List<SynchronizationSample> filteredSamples = this.filter.filter(samples, age);
 		if (filteredSamples.isEmpty()) {
 			throw new SynchronizationException("No synchronization samples available to calculate network time.");
 		}
-		final long sum = filteredSamples.stream().mapToLong(SynchronizationSample::getTimeOffsetToRemote).sum();
+		// TODO BR: not sure about this approach but it seems quite reasonable.
+		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
+		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
+		final double scaling = cumulativeImportance > viewSizePercentage? 1 / cumulativeImportance : 1 / viewSizePercentage;
+		final double sum = filteredSamples.stream()
+				.mapToDouble(s -> {
+					final double importance = getAccountImportance(s.getNode().getIdentity().getAddress());
+					return s.getTimeOffsetToRemote() * importance * scaling; })
+				.sum();
 
-		return (long) ((sum * this.getCoupling(age)) / filteredSamples.size());
+		return (long)(sum * this.getCoupling(age));
 	}
 }
