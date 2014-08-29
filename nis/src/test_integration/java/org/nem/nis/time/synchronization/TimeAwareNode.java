@@ -31,6 +31,7 @@ public class TimeAwareNode {
 	 * Creates a time aware node.
 	 *
 	 * @param id The id of the node.
+	 * @param nodeAge The age of the node.
 	 * @param syncStrategy The synchronization strategy to use.
 	 * @param initialTimeOffset The initial time offset.
 	 * @param communicationDelay The delay to add to the communication send time stamp.
@@ -40,8 +41,9 @@ public class TimeAwareNode {
 	 */
 	public TimeAwareNode(
 			final int id,
+			final NodeAge nodeAge,
 			final SynchronizationStrategy syncStrategy,
-			final int initialTimeOffset,
+			final long initialTimeOffset,
 			final long communicationDelay,
 			final double channelAsymmetry,
 			final long clockInaccuracy,
@@ -56,7 +58,7 @@ public class TimeAwareNode {
 		this.channelAsymmetry = channelAsymmetry;
 		this.clockInaccuracy = clockInaccuracy;
 		this.type = type;
-		this.age = new NodeAge(0);
+		this.age = nodeAge;
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class TimeAwareNode {
 	 */
 	public void updateNetworkTime(final List<SynchronizationSample> samples) {
 		try {
-			final long diff = syncStrategy.calculateTimeOffset(samples, age);
+			final long diff = this.syncStrategy.calculateTimeOffset(samples, age);
 			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff)) {
 				this.timeOffset += diff;
 			}
@@ -137,6 +139,15 @@ public class TimeAwareNode {
 	 */
 	public long getCommunicationDelay() {
 		return this.communicationDelay;
+	}
+
+	/**
+	 * Gets the node's channel asymmetry value.
+	 *
+	 * @return The channel asymmetry.
+	 */
+	public double getChannelAsymmetry() {
+		return this.channelAsymmetry;
 	}
 
 	/**
@@ -187,8 +198,8 @@ public class TimeAwareNode {
 	public CommunicationTimeStamps createCommunicationTimeStamps(final int roundTripTime) {
 		if (isEvil()) {
 			return new CommunicationTimeStamps(
-					new NetworkTimeStamp(System.currentTimeMillis() + 30000),
-					new NetworkTimeStamp(System.currentTimeMillis() + 30000));
+					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + 30000),
+					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + 30000));
 		}
 
 		return new CommunicationTimeStamps(

@@ -2,10 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.poi.*;
-import org.nem.nis.time.synchronization.filter.*;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -21,6 +18,8 @@ public class TimeSynchronizationITCase {
 	private static final int SMALL_VIEW_SIZE = 5;
 	private static final boolean CLOCK_ADJUSTMENT = true;
 	private static final int NO_EVIL_NODES = 0;
+	private static final double EVIL_NODES_ZERO_IMPORTANCE = 0.0;
+	private static final double DEFAULT_EVIL_NODES_CUMULATIVE_IMPORTANCE = 0.05;
 
 	/**
 	 * Maximal tolerable shift of the mean network time per day in milli seconds.
@@ -31,7 +30,7 @@ public class TimeSynchronizationITCase {
 	 * Value indicating how much a node's network time is allowed to deviate
 	 * from the mean network time before it is considered as faulty.
 	 */
-	private static final long TOLERABLE_MAX_DEVIATION_FROM_MEAN = 3000;
+	private static final long TOLERABLE_MAX_DEVIATION_FROM_MEAN = 5000;
 
 	/**
 	 * Value indicating how much the network time is allowed to change
@@ -70,7 +69,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = setupNetwork("network", networkSize, viewSize, settings);
 		network.advanceInTime(15 * Network.MINUTE, Network.MINUTE);
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
@@ -87,7 +87,8 @@ public class TimeSynchronizationITCase {
 				ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
@@ -99,7 +100,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
@@ -111,7 +113,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
@@ -123,7 +126,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				UNSTABLE_CLOCK,
 				CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
@@ -135,7 +139,8 @@ public class TimeSynchronizationITCase {
 				ASYMMETRIC_CHANNELS,
 				UNSTABLE_CLOCK,
 				CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
@@ -186,7 +191,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(timeInterval/2, 0);
 		Network.log("Matured network statistics:");
@@ -215,7 +221,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network1 = setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		final Network network2 = setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 
@@ -247,7 +254,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES);
+				NO_EVIL_NODES,
+				EVIL_NODES_ZERO_IMPORTANCE);
 		final List<Network> networks = Arrays.asList(
 				setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
 				setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
@@ -275,13 +283,33 @@ public class TimeSynchronizationITCase {
 	 * Tests to assure that the network time cannot be influenced by a reasonable amount of attackers.
 	 */
 	@Test
-	public void smallPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+	public void verySmallPercentageOfAttackersDoesNotInfluenceNetworkTime() {
 		assertAttackersDoNotInfluenceNetworkTime(5);
 	}
 
 	@Test
-	public void mediumPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+	public void smallPercentageOfAttackersDoesNotInfluenceNetworkTime() {
 		assertAttackersDoNotInfluenceNetworkTime(15);
+	}
+
+	@Test
+	public void mediumPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(30);
+	}
+
+	@Test
+	public void highPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(60);
+	}
+
+	@Test
+	public void veryHighPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(90);
+	}
+
+	@Test
+	public void insanelyHighPercentageOfAttackersDoesNotInfluenceNetworkTime() {
+		assertAttackersDoNotInfluenceNetworkTime(99);
 	}
 
 	private void assertAttackersDoNotInfluenceNetworkTime(final int percentageEvilNodes) {
@@ -291,7 +319,8 @@ public class TimeSynchronizationITCase {
 				!ASYMMETRIC_CHANNELS,
 				!UNSTABLE_CLOCK,
 				!CLOCK_ADJUSTMENT,
-				percentageEvilNodes);
+				percentageEvilNodes,
+				DEFAULT_EVIL_NODES_CUMULATIVE_IMPORTANCE);
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
 		final double mean = network.calculateMean();
@@ -308,9 +337,7 @@ public class TimeSynchronizationITCase {
 			final int numberOfNodes,
 			final int viewSize,
 			final NodeSettings nodeSettings) {
-		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
-		final SynchronizationStrategy syncStrategy = new DefaultSynchronizationStrategy(filter, createPoiFacade());
-		return new Network(name, numberOfNodes, syncStrategy, viewSize, nodeSettings);
+		return new Network(name, numberOfNodes, viewSize, nodeSettings);
 	}
 
 	private NodeSettings createNodeSettings(
@@ -319,18 +346,15 @@ public class TimeSynchronizationITCase {
 			final boolean asymmetricChannels,
 			final boolean unstableClock,
 			final boolean clockAdjustment,
-			final int percentageEvilNodes) {
+			final int percentageEvilNodes,
+			final double evilNodesCumulativeImportance) {
 		return new NodeSettings(
 				timeOffsetSpread,
 				delayCommunication,
 				asymmetricChannels,
 				unstableClock,
 				clockAdjustment,
-				percentageEvilNodes);
+				percentageEvilNodes,
+				evilNodesCumulativeImportance);
 	}
-
-	private PoiFacade createPoiFacade() {
-		return new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-	}
-
 }

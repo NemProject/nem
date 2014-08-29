@@ -1,8 +1,12 @@
 package org.nem.nis.time.synchronization;
 
+import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.utils.FormatUtils;
+import org.nem.nis.poi.*;
+import org.nem.nis.time.synchronization.filter.*;
 
+import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -23,9 +27,10 @@ public class Network {
 	private String name;
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final SecureRandom random = new SecureRandom();
+	private int nodeId = 1;
 	private final int viewSize;
-	private final SynchronizationStrategy syncStrategy;
 	private final NodeSettings nodeSettings;
+	private SynchronizationStrategy syncStrategy;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -36,38 +41,31 @@ public class Network {
 	 * Creates a network for simulation purposes.
 	 *
 	 * @param name The name of the network.
-	 * @param numberOfNodes The number of nodes in the network.
-	 * @param syncStrategy The synchronization strategy of the network.
+	 * @param networkSize The number of nodes in the network.
 	 * @param viewSize The view size of the nodes in the network.
 	 * @param nodeSettings The node settings.
 	 */
 	public Network(
 			final String name,
-			final int numberOfNodes,
-			final SynchronizationStrategy syncStrategy,
+			final int networkSize,
 			final int viewSize,
 			final NodeSettings nodeSettings) {
 		this.name = name;
-		this.syncStrategy = syncStrategy;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
+		final PoiFacade facade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.syncStrategy = createSynchronizationStrategy(facade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
-		for (int i=1; i<=numberOfNodes; i++) {
-			TimeAwareNode node = new TimeAwareNode(
-					i,
-					syncStrategy,
-					this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
-					this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
-					this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasUnstableClock()? this.random.nextInt(201) - 100 : 0,
-					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+		for (int i=1; i<=networkSize; i++) {
+			TimeAwareNode node = createNode();
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary();
 			if (node.isEvil()) {
 				numberOfEvilNodes++;
 			}
 		}
+		this.initializeFacade(facade);
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
@@ -105,6 +103,50 @@ public class Network {
 	 */
 	public boolean hasConverged() {
 		return this.hasConverged;
+	}
+
+	private SynchronizationStrategy createSynchronizationStrategy(final PoiFacade facade) {
+		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
+		return new DefaultSynchronizationStrategy(filter, facade);
+	}
+
+	/**
+	 * Creates a new time aware node.
+	 *
+	 * @return The node.
+	 */
+	private TimeAwareNode createNode() {
+		TimeAwareNode node = new TimeAwareNode(
+				this.nodeId++,
+				new NodeAge(0),
+				this.syncStrategy,
+				this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
+				this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
+				this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
+				this.nodeSettings.hasUnstableClock()? this.random.nextInt(201) - 100 : 0,
+				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+
+		return node;
+	}
+
+	/**
+	 * Creates a new time aware node from an existing one.
+	 *
+	 * @param oldNode The existing node.
+	 * @return The node.
+	 */
+	private TimeAwareNode createNode(TimeAwareNode oldNode) {
+		TimeAwareNode node = new TimeAwareNode(
+				this.nodeId++,
+				oldNode.getAge(),
+				this.syncStrategy,
+				oldNode.getTimeOffset(),
+				oldNode.getCommunicationDelay(),
+				oldNode.getChannelAsymmetry(),
+				oldNode.getClockInaccuary(),
+				oldNode.isEvil()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+
+		return node;
 	}
 
 	/**
@@ -179,24 +221,57 @@ public class Network {
 				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM);
 	}
 
+	private PoiFacade resetFacade() {
+		final PoiFacade facade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.syncStrategy = createSynchronizationStrategy(facade);
+		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
+		oldNodes.addAll(this.nodes);
+		this.nodes.clear();
+		this.nodeId = 1;
+		oldNodes.stream().forEach(n -> this.nodes.add(createNode(n)));
+		return facade;
+	}
+
+	/**
+	 * Updates the POI facade with the nodes importance.
+	 *
+	 * @param facade The POI facade.
+	 */
+	private void initializeFacade(final PoiFacade facade) {
+		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
+		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
+		for (TimeAwareNode node : this.nodes) {
+			final double importance = node.isEvil() ?
+					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
+					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
+			PoiAccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
+			state.getImportanceInfo().setImportance(new BlockHeight(10), importance);
+		}
+		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
+	}
+
+	private void setFacadeLastPoiVectorSize(PoiFacade facade, final int lastPoiVectorSize) {
+		try {
+			Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			field.setAccessible(true);
+			field.set(facade, lastPoiVectorSize);
+		} catch(IllegalAccessException | NoSuchFieldException e) {
+			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
+		}
+	}
+
 	/**
 	 * Grows the network by a given percentage.
 	 *
 	 * @param percentage The percentage to grow the network.
 	 */
 	public void grow(final double percentage) {
+		PoiFacade facade = this.resetFacade();
 		final int numberOfNewNodes = (int)(nodes.size() * percentage / 100);
 		for (int i=1; i<=numberOfNewNodes; i++) {
-			TimeAwareNode node = new TimeAwareNode(
-					i,
-					this.syncStrategy,
-					this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2,
-					this.nodeSettings.doesDelayCommunication() ? this.random.nextInt(100) : 0,
-					this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
-					this.nodeSettings.hasUnstableClock() ? this.random.nextInt(201) - 100 : 0,
-					random.nextInt(100) < nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
-			this.nodes.add(node);
+			this.nodes.add(createNode());
 		}
+		this.initializeFacade(facade);
 	}
 
 	/**
@@ -206,8 +281,10 @@ public class Network {
 	 * @param newName The new name for the this network.
 	 */
 	public void join(final Network network, final String newName) {
-		this.nodes.addAll(network.getNodes());
+		PoiFacade facade = this.resetFacade();
+		network.getNodes().stream().forEach(n -> this.nodes.add(createNode(n)));
 		this.name = newName;
+		this.initializeFacade(facade);
 	}
 
 	/**

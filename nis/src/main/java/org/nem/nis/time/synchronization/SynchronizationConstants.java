@@ -51,5 +51,5 @@ public class SynchronizationConstants {
 	 * This constant is used to prevent slow shifts in network time.
 	 * The unit of this constant is milli seconds.
 	 */
-	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 50;
+	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 250;
 }

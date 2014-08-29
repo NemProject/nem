@@ -11,6 +11,7 @@ public class NodeSettings {
 	private final boolean unstableClock;
 	private final boolean clockAdjustment;
 	private final int percentageEvilNodes;
+	private final double evilNodesCumulativeImportance;
 
 	/**
 	 * Creates a new node settings object.
@@ -28,13 +29,15 @@ public class NodeSettings {
 			final boolean asymmetricChannels,
 			final boolean unstableClock,
 			final boolean clockAdjustment,
-			final int percentageEvilNodes) {
+			final int percentageEvilNodes,
+			final double evilNodesCumulativeImportance) {
 		this.timeOffsetSpread = timeOffsetSpread;
 		this.delayCommunication = delayCommunication;
 		this.asymmetricChannels = asymmetricChannels;
 		this.unstableClock = unstableClock;
 		this.clockAdjustment = clockAdjustment;
 		this.percentageEvilNodes = percentageEvilNodes;
+		this.evilNodesCumulativeImportance = evilNodesCumulativeImportance;
 	}
 
 	/**
@@ -77,5 +80,12 @@ public class NodeSettings {
 	 */
 	public int getPercentageEvilNodes() {
 		return this.percentageEvilNodes;
+	}
+
+	/**
+	 * Gets the cumulative importance of all evil nodes.
+	 */
+	public double getEvilNodesCumulativeImportance() {
+		return this.evilNodesCumulativeImportance;
 	}
 }
