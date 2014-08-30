@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
@@ -7,6 +8,7 @@ import org.nem.core.time.TimeInstant;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 /**
@@ -19,6 +21,7 @@ public class BlockChainValidator {
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
+	private final Predicate<Hash> transactionExists;
 
 	/**
 	 * Creates a new block chain validator.
@@ -30,10 +33,12 @@ public class BlockChainValidator {
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
-			final int maxChainSize) {
+			final int maxChainSize,
+			final Predicate<Hash> transactionExists) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
+		this.transactionExists = transactionExists;
 	}
 
 	/**
@@ -72,6 +77,12 @@ public class BlockChainValidator {
 						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;
+				}
+				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
+					if (transactionExists.test(HashUtils.calculateHash(transaction))) {
+						LOGGER.info("received block with duplicate TX");
+						return false;
+					}
 				}
 			}
 

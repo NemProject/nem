@@ -3,10 +3,12 @@ package org.nem.nis;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.*;
@@ -26,6 +28,7 @@ public class BlockChain implements BlockSynchronizer {
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
+	private final TransferDao transferDao;
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
 	private BlockChainScore score;
@@ -36,11 +39,13 @@ public class BlockChain implements BlockSynchronizer {
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
+			final TransferDao transferDao,
 			final Foraging foraging) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
+		this.transferDao = transferDao;
 		this.foraging = foraging;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -271,6 +276,7 @@ public class BlockChain implements BlockSynchronizer {
 				this.accountAnalyzer,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
+				this.transferDao,
 				this.score);
 	}
 
@@ -318,6 +324,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
+		private final TransferDao transferDao;
 		private final BlockChainScore ourScore;
 
 		private BlockChainSyncContext(
@@ -325,12 +332,14 @@ public class BlockChain implements BlockSynchronizer {
 				final AccountAnalyzer originalAnalyzer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
+				final TransferDao transferDao,
 				final BlockChainScore ourScore) {
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
 			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
+			this.transferDao = transferDao;
 			this.ourScore = ourScore;
 		}
 
@@ -372,6 +381,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockScorer,
 					this.blockChainLastBlockLayer,
 					this.blockDao,
+					this.transferDao,
 					foraging,
 					dbParentBlock,
 					peerChain,
@@ -406,6 +416,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
+		private final TransferDao transferDao;
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
@@ -419,6 +430,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockScorer blockScorer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
+				final TransferDao transferDao,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
@@ -430,6 +442,7 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockScorer = blockScorer;
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
+			this.transferDao = transferDao;
 			this.foraging = foraging;
 
 			// do not trust peer, take first block from our db and convert it
@@ -485,7 +498,9 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainValidator validator = new BlockChainValidator(
 					block -> executor.execute(block, observer),
 					this.blockScorer,
-					BlockChainConstants.BLOCKS_LIMIT);
+					BlockChainConstants.BLOCKS_LIMIT,
+					hash -> (null != this.transferDao.findByHash(hash.getRaw()))
+					);
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
 		}

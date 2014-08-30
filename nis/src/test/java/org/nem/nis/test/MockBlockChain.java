@@ -24,7 +24,7 @@ public class MockBlockChain extends BlockChain {
 	 * @param lastBlock The last block.
 	 */
 	public MockBlockChain(final Block lastBlock) {
-		super(null, null, null, null, null);
+		super(null, null, null, null, null, null);
 		this.lastDbBlock = lastBlock;
 	}
 
