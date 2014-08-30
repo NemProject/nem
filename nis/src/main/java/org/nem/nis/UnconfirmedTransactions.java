@@ -123,9 +123,12 @@ public class UnconfirmedTransactions {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
 			// maybe we should change Transaction.compare? also it
 			// TODO: should fee or time be more important inside Transaction.compare
-			int result = -lhs.getFee().compareTo(rhs.getFee());
+			int result = -(lhs.getType() - rhs.getType());
 			if (result == 0) {
-				result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
+				result = -lhs.getFee().compareTo(rhs.getFee());
+				if (result == 0) {
+					result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
+				}
 			}
 			return result;
 		});

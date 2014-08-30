@@ -181,6 +181,23 @@ public class UnconfirmedTransactionsTest {
 		}
 	}
 
+	@Test
+	public void returnedTransactionsAreSortedByType() {
+		// Arrange
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(2);
+		final Account sender = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final MockTransaction mockTransaction = new MockTransaction(MockTransaction.TYPE + 1000, 123, new TimeInstant(10));
+		unconfirmedTransactions.add(mockTransaction);
+
+		// Act:
+		final Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
+		final ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
+
+		// Assert:
+		Assert.assertThat(transactions.get(0).getType(), IsEqual.equalTo(mockTransaction.getType()));
+	}
+
 	//endregion
 
 	//region getTransactionsBefore
