@@ -100,7 +100,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChain blockChain() {
-		return new BlockChain(this.accountAnalyzer(), this.accountDao, this.blockChainLastBlockLayer, this.blockDao, this.foraging());
+		return new BlockChain(this.accountAnalyzer(), this.accountDao, this.blockChainLastBlockLayer, this.blockDao, this.transferDao, this.foraging());
 	}
 
 	@Bean
