@@ -1,7 +1,7 @@
 package org.nem.nis.time.synchronization;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.NodeAge;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
@@ -61,7 +61,7 @@ public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 	}
 
 	@Override
-	public long calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age) {
+	public TimeOffset calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age) {
 		final List<SynchronizationSample> filteredSamples = this.filter.filter(samples, age);
 		if (filteredSamples.isEmpty()) {
 			throw new SynchronizationException("No synchronization samples available to calculate network time.");
@@ -76,6 +76,6 @@ public class DefaultSynchronizationStrategy implements SynchronizationStrategy {
 					return s.getTimeOffsetToRemote() * importance * scaling; })
 				.sum();
 
-		return (long)(sum * this.getCoupling(age));
+		return new TimeOffset((long)(sum * this.getCoupling(age)));
 	}
 }

@@ -1,5 +1,7 @@
 package org.nem.core.time;
 
+import org.nem.core.model.primitive.*;
+
 import java.util.*;
 
 /**
@@ -9,6 +11,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
+	private TimeOffset timeOffset = new TimeOffset(0);
 
 	static {
 		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -46,6 +49,22 @@ public class SystemTimeProvider implements TimeProvider {
 	 */
 	public static long getCurrentTimeMillis() {
 		return System.currentTimeMillis() - EPOCH_TIME;
+	}
+
+	/**
+	 * Returns the network time in milliseconds.
+	 *
+	 * @return The network time in milliseconds.
+	 */
+	public NetworkTimeStamp getNetworkTime() {
+		return new NetworkTimeStamp(System.currentTimeMillis() - EPOCH_TIME + timeOffset.getRaw());
+	}
+
+	/**
+	 * Updates the network time offset.
+	 */
+	public void updateTimeOffset(TimeOffset offset) {
+		this.timeOffset = this.timeOffset.add(offset);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package org.nem.nis.time.synchronization;
 
-import org.nem.core.model.primitive.NodeAge;
+import org.nem.core.model.primitive.*;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface SynchronizationStrategy {
 	 * @param samples The list of synchronization samples.
 	 * @return The time offset in ms.
 	 */
-	public long calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age);
+	public TimeOffset calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age);
 }

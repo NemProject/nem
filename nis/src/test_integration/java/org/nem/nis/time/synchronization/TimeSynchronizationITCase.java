@@ -281,7 +281,7 @@ public class TimeSynchronizationITCase {
 	}
 
 	/**
-	 * Tests to assure that the network time cannot be influenced by a attacks that control a reasonable amount of NEM.
+	 * Tests to assure that the network time cannot be influenced by attackers that control a reasonable amount of NEM.
 	 */
 	@Test
 	public void verySmallPercentageOfAttackersDoesNotInfluenceNetworkTime() {
