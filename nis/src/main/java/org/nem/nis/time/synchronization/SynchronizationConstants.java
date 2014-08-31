@@ -52,4 +52,10 @@ public class SynchronizationConstants {
 	 * The unit of this constant is milli seconds.
 	 */
 	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 250;
+
+	/**
+	 * The minimum importance a node must have in order to be considered as synchronization partner.
+	 * The value corresponds to having a vested balance 100000 NEM.
+	 */
+	public static final double REQUIRED_MINIMUM_IMPORTANCE = 0.00025;
 }

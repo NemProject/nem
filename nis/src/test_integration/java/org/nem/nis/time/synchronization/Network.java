@@ -215,6 +215,9 @@ public class Network {
 	 * @return The update interval in milli seconds.
 	 */
 	private long getUpdateInterval(NodeAge age) {
+		if (SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND < age.getRaw()) {
+			return SynchronizationConstants.UPDATE_INTERVAL_START;
+		}
 		final long ageToUse = Math.max(age.getRaw() - SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND, 0);
 		return (long)Math.min((1 - Math.exp(-SynchronizationConstants.UPDATE_INTERVAL_ELONGATION_STRENGTH * ageToUse)) *
 				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM + SynchronizationConstants.UPDATE_INTERVAL_START,

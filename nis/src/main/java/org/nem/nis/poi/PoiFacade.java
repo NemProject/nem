@@ -60,6 +60,15 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	}
 
 	/**
+	 * Gets the height at which the last recalculation was (needed for time synchronization).
+	 *
+	 * @return The the height at which the last recalculation was.
+	 */
+	public BlockHeight getLastPoiRecalculationHeight() {
+		return this.lastPoiRecalculationHeight;
+	}
+
+	/**
 	 * Removes an account state from the cache if it is in the cache.
 	 *
 	 * @param address The address of the account state to remove.
