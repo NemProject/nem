@@ -58,7 +58,7 @@ public class TimeSynchronizationITCase {
 
 	@Test
 	public void doesConvergeWithSmallViewSizeInLargeAndFriendlyAndIdealEnvironment() {
-		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(10 * STANDARD_NETWORK_SIZE, SMALL_VIEW_SIZE);
+		assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(7 * STANDARD_NETWORK_SIZE, SMALL_VIEW_SIZE);
 	}
 
 	private void assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(final int networkSize, final int viewSize) {
@@ -239,7 +239,7 @@ public class TimeSynchronizationITCase {
 		network1.join(network2, "global network");
 
 		// Since both networks were already mature, it needs more rounds to converge
-		network1.advanceInTime(Network.DAY, 2 * Network.HOUR);
+		network1.advanceInTime(2 * Network.DAY, 4 * Network.HOUR);
 		Network.log("Final state of network:");
 		network1.updateStatistics();
 		network1.logStatistics();
@@ -264,11 +264,12 @@ public class TimeSynchronizationITCase {
 				setupNetwork("network5", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings));
 
 		// Make sure the networks have very different network times.
+		Network.log("Setting up 5 networks...");
 		networks.stream().forEach(Network::randomShiftNetworkTime);
 		networks.stream().forEach(network -> network.advanceInTime(6 * Network.HOUR, 0));
 		Network.log("Matured network statistics:");
 		networks.stream().forEach(network -> { network.updateStatistics(); network.logStatistics(); });
-		Network.log("Networks join.");
+		Network.log("Networks join...");
 		networks.stream().forEach(network -> networks.get(0).join(network, "global network"));
 
 		// Since both networks were already mature, it needs more rounds to converge
@@ -280,7 +281,7 @@ public class TimeSynchronizationITCase {
 	}
 
 	/**
-	 * Tests to assure that the network time cannot be influenced by a reasonable amount of attackers.
+	 * Tests to assure that the network time cannot be influenced by a attacks that control a reasonable amount of NEM.
 	 */
 	@Test
 	public void verySmallPercentageOfAttackersDoesNotInfluenceNetworkTime() {

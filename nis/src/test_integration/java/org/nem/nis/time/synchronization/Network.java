@@ -23,6 +23,7 @@ public class Network {
 	public static final long DAY = 24 * HOUR;
 	private static final long TICK_INTERVALL = MINUTE;
 	private static final long CLOCK_ADJUSTMENT_INTERVALL = DAY;
+	private static final BlockHeight HEIGHT = new BlockHeight(10);
 
 	private String name;
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -31,6 +32,7 @@ public class Network {
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
 	private SynchronizationStrategy syncStrategy;
+	private PoiFacade poiFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -53,8 +55,8 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		final PoiFacade facade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-		this.syncStrategy = createSynchronizationStrategy(facade);
+		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.syncStrategy = createSynchronizationStrategy(poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
 		for (int i=1; i<=networkSize; i++) {
@@ -65,7 +67,7 @@ public class Network {
 				numberOfEvilNodes++;
 			}
 		}
-		this.initializeFacade(facade);
+		this.initializeFacade(poiFacade);
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
@@ -215,24 +217,24 @@ public class Network {
 	 * @return The update interval in milli seconds.
 	 */
 	private long getUpdateInterval(NodeAge age) {
-		if (SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND < age.getRaw()) {
+		if (SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND > age.getRaw()) {
 			return SynchronizationConstants.UPDATE_INTERVAL_START;
 		}
-		final long ageToUse = Math.max(age.getRaw() - SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND, 0);
-		return (long)Math.min((1 - Math.exp(-SynchronizationConstants.UPDATE_INTERVAL_ELONGATION_STRENGTH * ageToUse)) *
-				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM + SynchronizationConstants.UPDATE_INTERVAL_START,
-				SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM);
+		final long ageToUse = age.getRaw() - SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND;
+		return (long)Math.min(SynchronizationConstants.UPDATE_INTERVAL_START +
+				(SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM - SynchronizationConstants.UPDATE_INTERVAL_START) *
+						ageToUse * SynchronizationConstants.UPDATE_INTERVAL_ELONGATION_STRENGTH, SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM);
 	}
 
 	private PoiFacade resetFacade() {
-		final PoiFacade facade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-		this.syncStrategy = createSynchronizationStrategy(facade);
+		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.syncStrategy = createSynchronizationStrategy(poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
 		this.nodeId = 1;
 		oldNodes.stream().forEach(n -> this.nodes.add(createNode(n)));
-		return facade;
+		return poiFacade;
 	}
 
 	/**
@@ -248,7 +250,7 @@ public class Network {
 					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
 					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
 			PoiAccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
-			state.getImportanceInfo().setImportance(new BlockHeight(10), importance);
+			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
 		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
 	}
@@ -269,12 +271,12 @@ public class Network {
 	 * @param percentage The percentage to grow the network.
 	 */
 	public void grow(final double percentage) {
-		PoiFacade facade = this.resetFacade();
+		this.resetFacade();
 		final int numberOfNewNodes = (int)(nodes.size() * percentage / 100);
 		for (int i=1; i<=numberOfNewNodes; i++) {
 			this.nodes.add(createNode());
 		}
-		this.initializeFacade(facade);
+		this.initializeFacade(this.poiFacade);
 	}
 
 	/**
@@ -284,10 +286,10 @@ public class Network {
 	 * @param newName The new name for the this network.
 	 */
 	public void join(final Network network, final String newName) {
-		PoiFacade facade = this.resetFacade();
+		this.resetFacade();
 		network.getNodes().stream().forEach(n -> this.nodes.add(createNode(n)));
 		this.name = newName;
-		this.initializeFacade(facade);
+		this.initializeFacade(this.poiFacade);
 	}
 
 	/**
@@ -300,6 +302,8 @@ public class Network {
 
 	/**
 	 * Selects a set of nodes as communication partners  for a given node.
+	 * The algorithm is different from the one used by ImportanceAwareNodeSelector.
+	 * It does not used trust values, only importances.
 	 *
 	 * @param node The node to select partners for.
 	 * @return The set of communication partners.
@@ -307,13 +311,32 @@ public class Network {
 	public Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
 		int numberOfEvilNodes = 0;
 		final Set<TimeAwareNode> partners = Collections.newSetFromMap(new ConcurrentHashMap<>());
-		final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
-		for (int i=0; i<this.viewSize; i++) {
-			final int index = random.nextInt(nodes.size());
-			if (!nodeArray[index].equals(node)) {
+		final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
+		final int maxTries = 1000;
+		int tries = 0;
+		int hits = 0;
+		while (tries < maxTries && hits < this.viewSize) {
+			final int index = random.nextInt(this.nodes.size());
+			final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
+			if (!nodeArray[index].equals(node) &&
+				SynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+				hits++;
 				partners.add(nodeArray[index]);
 				if (nodeArray[index].isEvil()) {
 					numberOfEvilNodes++;
+				}
+			}
+			tries++;
+		}
+
+		if (partners.isEmpty()) {
+			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
+			for (int i=0; i<this.nodes.size(); i++) {
+				final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
+				if (!nodeArray[i].equals(node) &&
+					SynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+					partners.add(nodeArray[i]);
+					break;
 				}
 			}
 		}

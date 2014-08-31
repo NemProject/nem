@@ -43,7 +43,7 @@ public class SynchronizationConstants {
 	/***
 	 * Value that indicates how fast the update interval grows.
 	 */
-	public static final double UPDATE_INTERVAL_ELONGATION_STRENGTH = 0.3;
+	public static final double UPDATE_INTERVAL_ELONGATION_STRENGTH = 0.1;
 
 	/***
 	 * Value that indicates how large the change in network time must be
@@ -55,7 +55,7 @@ public class SynchronizationConstants {
 
 	/**
 	 * The minimum importance a node must have in order to be considered as synchronization partner.
-	 * The value corresponds to having a vested balance 100000 NEM.
+	 * The value corresponds to having a vested balance of 100000 NEM.
 	 */
 	public static final double REQUIRED_MINIMUM_IMPORTANCE = 0.00025;
 }
