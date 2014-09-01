@@ -17,14 +17,14 @@ public class TimeAwareNode {
 	public static final int NODE_TYPE_EVIL = 2;
 
 	private final Node node;
-	private final SynchronizationStrategy syncStrategy;
-	private final long communicationDelay;
-	private final double channelAsymmetry;
-	private final long clockInaccuracy;
-	private final int type;
-	private long cumulativeInaccuracy;
 	private NodeAge age;
-	private long timeOffset = 0;
+	private final SynchronizationStrategy syncStrategy;
+	private final TimeOffset communicationDelay;
+	private final TimeOffset clockInaccuracy;
+	private TimeOffset cumulativeInaccuracy = new TimeOffset(0);
+	private TimeOffset timeOffset = new TimeOffset(0);
+	private final double channelAsymmetry;
+	private final int type;
 	private long updateCounter = 0;
 
 	/**
@@ -43,10 +43,10 @@ public class TimeAwareNode {
 			final int id,
 			final NodeAge nodeAge,
 			final SynchronizationStrategy syncStrategy,
-			final long initialTimeOffset,
-			final long communicationDelay,
+			final TimeOffset initialTimeOffset,
+			final TimeOffset communicationDelay,
 			final double channelAsymmetry,
-			final long clockInaccuracy,
+			final TimeOffset clockInaccuracy,
 			final int type) {
 		this.node = new Node(
 				new NodeIdentity(new KeyPair(), String.format("node%d", id)),
@@ -85,7 +85,7 @@ public class TimeAwareNode {
 	 * @return The network time.
 	 */
 	public NetworkTimeStamp getNetworkTime() {
-		return new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset);
+		return new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw());
 	}
 
 	/**
@@ -95,9 +95,9 @@ public class TimeAwareNode {
 	 */
 	public void updateNetworkTime(final List<SynchronizationSample> samples) {
 		try {
-			final long diff = this.syncStrategy.calculateTimeOffset(samples, age);
-			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff)) {
-				this.timeOffset += diff;
+			final TimeOffset diff = this.syncStrategy.calculateTimeOffset(samples, age);
+			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
+				this.timeOffset = this.timeOffset.add(diff);
 			}
 			this.age = this.age.increment();
 		} catch (SynchronizationException e) {
@@ -121,15 +121,15 @@ public class TimeAwareNode {
 	 *
 	 * @return The time offset.
 	 */
-	public long getTimeOffset() {
+	public TimeOffset getTimeOffset() {
 		return this.timeOffset;
 	}
 
 	/**
 	 * Shifts the node's time offset by adding a value to it.
 	 */
-	public void shiftTimeOffset(final long offset) {
-		this.timeOffset += offset;
+	public void shiftTimeOffset(final TimeOffset offset) {
+		this.timeOffset = this.timeOffset.add(offset);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class TimeAwareNode {
 	 *
 	 * @return The delay used for delaying the communication.
 	 */
-	public long getCommunicationDelay() {
+	public TimeOffset getCommunicationDelay() {
 		return this.communicationDelay;
 	}
 
@@ -155,13 +155,13 @@ public class TimeAwareNode {
 	 *
 	 * @return The inaccuracy.
 	 */
-	public long getClockInaccuary() {
+	public TimeOffset getClockInaccuary() {
 		return this.clockInaccuracy;
 	}
 
 	public void applyClockInaccuracy() {
-		this.timeOffset += this.clockInaccuracy;
-		this.cumulativeInaccuracy += this.clockInaccuracy;
+		this.timeOffset = this.timeOffset.add(this.clockInaccuracy);
+		this.cumulativeInaccuracy = this.cumulativeInaccuracy.add(this.clockInaccuracy);
 	}
 
 	/**
@@ -198,20 +198,20 @@ public class TimeAwareNode {
 	public CommunicationTimeStamps createCommunicationTimeStamps(final int roundTripTime) {
 		if (isEvil()) {
 			return new CommunicationTimeStamps(
-					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + 30000),
-					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + 30000));
+					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000),
+					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000));
 		}
 
 		return new CommunicationTimeStamps(
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry) + this.communicationDelay),
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset + (long)(roundTripTime * this.channelAsymmetry)));
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry) + this.communicationDelay.getRaw()),
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry)));
 	}
 
 	/**
 	 * Adjusts the clock by subtracting the cumulative inaccuracy that the clock experienced so far.
 	 */
 	public void adjustClock() {
-		this.timeOffset -= this.cumulativeInaccuracy;
-		this.cumulativeInaccuracy = 0;
+		this.timeOffset = this.timeOffset.subtract(this.cumulativeInaccuracy);
+		this.cumulativeInaccuracy = new TimeOffset(0);
 	}
 }

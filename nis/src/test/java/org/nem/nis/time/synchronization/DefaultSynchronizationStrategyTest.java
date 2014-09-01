@@ -72,11 +72,11 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter, facade);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, new NodeAge(0));
+		final TimeOffset offset = strategy.calculateTimeOffset(samples, new NodeAge(0));
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, new NodeAge(0));
-		Assert.assertThat(offset, IsEqual.equalTo((long)((100000 + 99.0 * 100.0 / 2.0) * SynchronizationConstants.COUPLING_START / 100.0)));
+		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * SynchronizationConstants.COUPLING_START / 100.0))));
 	}
 
 	@Test
@@ -91,11 +91,11 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter, facade);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, age);
+		final TimeOffset offset = strategy.calculateTimeOffset(samples, age);
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo((long)(100.0 * 500.0 * strategy.getCoupling(age) / 100.0)));
+		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)(100.0 * 500.0 * strategy.getCoupling(age) / 100.0))));
 	}
 
 	@Test
@@ -110,11 +110,11 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter, facade);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, age);
+		final TimeOffset offset = strategy.calculateTimeOffset(samples, age);
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo((long)((100000 + 99.0 * 100.0 / 2.0) * SynchronizationConstants.COUPLING_MINIMUM / 100.0)));
+		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * SynchronizationConstants.COUPLING_MINIMUM / 100.0))));
 	}
 
 	@Test
@@ -130,13 +130,13 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter, facade);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, age);
+		final TimeOffset offset = strategy.calculateTimeOffset(samples, age);
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
 
 		// Second sample has offset < 1000 and is dominant.
-		Assert.assertThat(offset < 1000, IsEqual.equalTo(true));
+		Assert.assertThat(offset.getRaw() < 1000, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -152,11 +152,11 @@ public class DefaultSynchronizationStrategyTest {
 		final DefaultSynchronizationStrategy strategy = new DefaultSynchronizationStrategy(filter, facade);
 
 		// Act:
-		final long offset = strategy.calculateTimeOffset(samples, age);
+		final TimeOffset offset = strategy.calculateTimeOffset(samples, age);
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo(100L));
+		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset(100L)));
 	}
 
 	@Test

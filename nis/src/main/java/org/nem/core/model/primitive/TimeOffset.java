@@ -32,4 +32,14 @@ public class TimeOffset extends AbstractPrimitive<TimeOffset, Long> {
 	public TimeOffset add(final TimeOffset offset) {
 		return new TimeOffset(this.getRaw() + offset.getRaw());
 	}
+
+	/**
+	 * Subtracts a time offset from another time offset.
+	 *
+	 * @param offset The other time offset.
+	 * @return The resulting time offset.
+	 */
+	public TimeOffset subtract(final TimeOffset offset) {
+		return new TimeOffset(this.getRaw() - offset.getRaw());
+	}
 }

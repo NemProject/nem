@@ -62,7 +62,7 @@ public class Network {
 		for (int i=1; i<=networkSize; i++) {
 			TimeAwareNode node = createNode();
 			this.nodes.add(node);
-			cumulativeInaccuracy += node.getClockInaccuary();
+			cumulativeInaccuracy += node.getClockInaccuary().getRaw();
 			if (node.isEvil()) {
 				numberOfEvilNodes++;
 			}
@@ -122,10 +122,10 @@ public class Network {
 				this.nodeId++,
 				new NodeAge(0),
 				this.syncStrategy,
-				this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2,
-				this.nodeSettings.doesDelayCommunication()? this.random.nextInt(100) : 0,
+				new TimeOffset(this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2),
+				this.nodeSettings.doesDelayCommunication()? new TimeOffset(this.random.nextInt(100)) : new TimeOffset(0),
 				this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
-				this.nodeSettings.hasUnstableClock()? this.random.nextInt(201) - 100 : 0,
+				this.nodeSettings.hasUnstableClock()? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
 				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 
 		return node;
@@ -296,7 +296,7 @@ public class Network {
 	 * Shifts the network time of all nodes by a common random offset.
 	 */
 	public void randomShiftNetworkTime() {
-		final int offset = random.nextInt(40001);
+		final TimeOffset offset = new TimeOffset(this.random.nextInt(40001));
 		this.nodes.stream().forEach(n -> n.shiftTimeOffset(offset));
 	}
 
@@ -356,7 +356,7 @@ public class Network {
 		for (final TimeAwareNode partner : partners) {
 			final int roundTripTime = random.nextInt(1000);
 			final NetworkTimeStamp localSend = node.getNetworkTime();
-			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay() + roundTripTime);
+			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
 			samples.add(new SynchronizationSample(
 					partner.getNode(),
 					new CommunicationTimeStamps(localSend, localReceive),
@@ -383,7 +383,7 @@ public class Network {
 	 * @return The mean value.
 	 */
 	public double calculateMean() {
-		 return nodes.stream().mapToDouble(TimeAwareNode::getTimeOffset).sum() / nodes.size();
+		 return nodes.stream().mapToDouble(n -> n.getTimeOffset().getRaw()).sum() / nodes.size();
 	}
 
 	/**
@@ -392,7 +392,7 @@ public class Network {
 	 * @return The standard deviation.
 	 */
 	public double calculateStandardDeviation() {
-		return Math.sqrt(nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset() - this.mean, 2)).sum() / nodes.size());
+		return Math.sqrt(nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / nodes.size());
 	}
 
 	/**
@@ -401,7 +401,7 @@ public class Network {
 	 * @return The maximum deviation from the mean value.
 	 */
 	public double calculateMaxDeviationFromMean() {
-		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset() - this.mean)).max();
+		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
 		return value.isPresent()? value.getAsDouble() : Double.NaN;
 	}
 
@@ -441,11 +441,11 @@ public class Network {
 	public void outputOutOfRangeNodes(final long maxTolerableDeviationFromMean) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final List<TimeAwareNode> outOfRangeNodes = this.nodes.stream()
-				.filter(n -> Math.abs(this.mean - n.getTimeOffset()) > maxTolerableDeviationFromMean)
+				.filter(n -> Math.abs(this.mean - n.getTimeOffset().getRaw()) > maxTolerableDeviationFromMean)
 				.collect(Collectors.toList());
 		if (!outOfRangeNodes.isEmpty()) {
 			log("Detected nodes with out of allowed range network time:");
-			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s", n.getName(), format.format(this.mean - n.getTimeOffset()))));
+			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s", n.getName(), format.format(this.mean - n.getTimeOffset().getRaw()))));
 		}
 	}
 
