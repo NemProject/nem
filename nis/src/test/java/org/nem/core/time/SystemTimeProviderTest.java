@@ -2,6 +2,7 @@ package org.nem.core.time;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.model.primitive.*;
 
 public class SystemTimeProviderTest {
 
@@ -51,6 +52,49 @@ public class SystemTimeProviderTest {
 		Assert.assertThat(getTimeRelativeToEpoch(1500), IsEqual.equalTo(2));
 		Assert.assertThat(getTimeRelativeToEpoch(1999), IsEqual.equalTo(2));
 		Assert.assertThat(getTimeRelativeToEpoch(2000), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void updateTimeOffsetAddsOffset() {
+		// Arrange:
+		SystemTimeProvider provider = new SystemTimeProvider();
+
+		// Act:
+		provider.updateTimeOffset(new TimeOffset(123));
+		provider.updateTimeOffset(new TimeOffset(234));
+		TimeOffset offset = provider.getTimeOffset();
+
+		// Assert:
+		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset(123 + 234)));
+	}
+
+	@Test
+	public void getCurrentMillisReturnsExpectedTime() {
+		// Arrange:
+		SystemTimeProvider provider = new SystemTimeProvider();
+
+		// Act:
+		long systemCurrentMillis = System.currentTimeMillis();
+		long curMillis = provider.getCurrentTimeMillis();
+
+		// Assert:
+		Assert.assertThat(curMillis, IsEqual.equalTo(systemCurrentMillis - SystemTimeProvider.getEpochTimeMillis()));
+	}
+
+	@Test
+	public void getNetworkTimeReturnsExpectedTime() {
+		// Arrange:
+		SystemTimeProvider provider = new SystemTimeProvider();
+		provider.updateTimeOffset(new TimeOffset(123));
+
+		// Act:
+		long curMillis = provider.getCurrentTimeMillis();
+		NetworkTimeStamp nts = provider.getNetworkTime();
+
+		// TODO BR: is there another way to test this?
+		// Assert:
+		Assert.assertThat(nts.getRaw() < curMillis + 123 + 3, IsEqual.equalTo(true));
+		Assert.assertThat(nts.getRaw() > curMillis + 122, IsEqual.equalTo(true));
 	}
 
 	private static int getTimeRelativeToEpoch(final int millis) {

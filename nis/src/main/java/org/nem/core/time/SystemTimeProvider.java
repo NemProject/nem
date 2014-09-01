@@ -47,7 +47,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 *
 	 * @return The current time in milliseconds.
 	 */
-	public static long getCurrentTimeMillis() {
+	public long getCurrentTimeMillis() {
 		return System.currentTimeMillis() - EPOCH_TIME;
 	}
 
@@ -57,11 +57,20 @@ public class SystemTimeProvider implements TimeProvider {
 	 * @return The network time in milliseconds.
 	 */
 	public NetworkTimeStamp getNetworkTime() {
-		return new NetworkTimeStamp(System.currentTimeMillis() - EPOCH_TIME + timeOffset.getRaw());
+		return new NetworkTimeStamp(getCurrentTimeMillis() + timeOffset.getRaw());
 	}
 
 	/**
-	 * Updates the network time offset.
+	 * Gets the time offset.
+	 *
+	 * @return The time offset.
+	 */
+	public TimeOffset getTimeOffset() {
+		return this.timeOffset;
+	}
+
+	/**
+	 * Updates the time offset.
 	 */
 	public void updateTimeOffset(TimeOffset offset) {
 		this.timeOffset = this.timeOffset.add(offset);

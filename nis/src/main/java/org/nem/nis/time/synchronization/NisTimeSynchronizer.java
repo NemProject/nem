@@ -48,7 +48,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 				.collect(Collectors.toList());
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.whenComplete((o, e) -> {
-					final TimeOffset timeOffset = syncStrategy.calculateTimeOffset(samples,this.age);
+					final TimeOffset timeOffset = syncStrategy.calculateTimeOffset(samples, this.age);
 					systemTimeProvider.updateTimeOffset(timeOffset);
 				});
 	}
