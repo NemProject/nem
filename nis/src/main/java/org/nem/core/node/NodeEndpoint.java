@@ -122,7 +122,7 @@ public class NodeEndpoint implements SerializableEntity {
 			nodeApiToUrlMap.put(NodeApiId.REST_NODE_PING, new URL(this.url, "node/ping"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_BLOCK, new URL(this.url, "push/block"));
 			nodeApiToUrlMap.put(NodeApiId.REST_PUSH_TRANSACTION, new URL(this.url, "push/transaction"));
-			nodeApiToUrlMap.put(NodeApiId.REST_TIME_SYNC_TIME_STAMPS, new URL(this.url, "time-sync/time-stamps"));
+			nodeApiToUrlMap.put(NodeApiId.REST_TIME_SYNC_NETWORK_TIME, new URL(this.url, "time-sync/network-time"));
 			return nodeApiToUrlMap;
 		} catch (final MalformedURLException e) {
 			throw new IllegalArgumentException("url is malformed");

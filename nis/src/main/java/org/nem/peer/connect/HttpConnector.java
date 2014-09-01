@@ -113,7 +113,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSyncConn
 	// region TimeSyncConnector
 
 	public CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TIME_SYNC_TIME_STAMPS);
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TIME_SYNC_NETWORK_TIME);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new CommunicationTimeStamps(obj));
 	}
 

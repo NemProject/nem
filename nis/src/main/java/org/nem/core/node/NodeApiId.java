@@ -98,9 +98,9 @@ public enum NodeApiId {
 	//region time sync/*
 
 	/**
-	 * The time-sync/time-stamps API
+	 * The time-sync/network-time API
 	 */
-	REST_TIME_SYNC_TIME_STAMPS
+	REST_TIME_SYNC_NETWORK_TIME
 
 	//endregion
 }
