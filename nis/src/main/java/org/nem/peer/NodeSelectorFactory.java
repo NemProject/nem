@@ -3,7 +3,7 @@ package org.nem.peer;
 import org.nem.peer.trust.NodeSelector;
 
 /**
- * Factory interface for creating a node selector.
+ * Factory interface for creating node selectors.
  */
 public interface NodeSelectorFactory {
 
@@ -13,4 +13,11 @@ public interface NodeSelectorFactory {
 	 * @return A node selector.
 	 */
 	public NodeSelector createNodeSelector();
+
+	/**
+	 * Creates an importance aware node selector.
+	 *
+	 * @return An importance aware node selector.
+	 */
+	public NodeSelector createImportanceAwareNodeSelector();
 }

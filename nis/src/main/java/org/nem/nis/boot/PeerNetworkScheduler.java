@@ -35,6 +35,11 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
 
+	private static final int TIME_SYNC_INITIAL_INTERVAL = ONE_MINUTE;
+	private static final int TIME_SYNC_INITIAL_INTERVAL_ROUNDS = 15;
+	private static final int TIME_SYNC_PLATEAU_INTERVAL = ONE_HOUR;
+	private static final int TIME_SYNC_BACK_OFF_TIME = 6 * ONE_HOUR;
+
 	private final TimeProvider timeProvider;
 	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
@@ -90,6 +95,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private void addNetworkTasks(final PeerNetwork network) {
 		this.addRefreshTask(network);
+		this.addTimeSynchronizationTask(network);
 
 		this.addSimpleTask(
 				() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
@@ -118,6 +124,15 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				timerVisitor));
 	}
 
+	private void addTimeSynchronizationTask(final PeerNetwork network) {
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("TIME SYNCHRONIZATION");
+		this.timers.add(new AsyncTimer(
+				this.runnableToFutureSupplier(() -> network.synchronizeTime(this.timeProvider)),
+				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
+				getTimeSynchronizationDelayStrategy(),
+				timerVisitor));
+	}
+
 	private void addSimpleTask(
 			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
 			final int delay,
@@ -141,6 +156,20 @@ public class PeerNetworkScheduler implements AutoCloseable {
 						REFRESH_PLATEAU_INTERVAL,
 						REFRESH_BACK_OFF_TIME),
 				new UniformDelayStrategy(REFRESH_PLATEAU_INTERVAL));
+		return new AggregateDelayStrategy(subStrategies);
+	}
+
+	private static AbstractDelayStrategy getTimeSynchronizationDelayStrategy() {
+		// initially refresh at TIME_SYNC_INITIAL_INTERVAL (1min), keeping it for TIME_SYNC_INITIAL_INTERVAL_ROUNDS rounds,
+		// then gradually increasing to TIME_SYNC_PLATEAU_INTERVAL (1h) over TIME_SYNC_BACK_OFF_TIME (6 hours),
+		// and then plateau at that rate forever
+		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
+				new UniformDelayStrategy(TIME_SYNC_INITIAL_INTERVAL, TIME_SYNC_INITIAL_INTERVAL_ROUNDS),
+				LinearDelayStrategy.withDuration(
+						TIME_SYNC_INITIAL_INTERVAL,
+						TIME_SYNC_PLATEAU_INTERVAL,
+						TIME_SYNC_BACK_OFF_TIME),
+				new UniformDelayStrategy(TIME_SYNC_PLATEAU_INTERVAL));
 		return new AggregateDelayStrategy(subStrategies);
 	}
 

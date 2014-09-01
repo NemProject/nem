@@ -1,5 +1,7 @@
 package org.nem.nis.boot;
 
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 
@@ -12,6 +14,7 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 	private final int nodeLimit;
 	private final TrustProvider trustProvider;
 	private final PeerNetworkState state;
+	private final PoiFacade poiFacade;
 
 	/**
 	 * Creates a new NIS node selector factory.
@@ -23,10 +26,12 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 	public NisNodeSelectorFactory(
 			final int nodeLimit,
 			final TrustProvider trustProvider,
-			final PeerNetworkState state) {
+			final PeerNetworkState state,
+			final PoiFacade poiFacade) {
 		this.nodeLimit = nodeLimit;
 		this.trustProvider = trustProvider;
 		this.state = state;
+		this.poiFacade = poiFacade;
 	}
 
 	@Override
@@ -40,6 +45,18 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 						context,
 						random),
 				this.state.getNodes(),
+				context,
+				random);
+	}
+
+	@Override
+	public NodeSelector createImportanceAwareNodeSelector() {
+		final TrustContext context = this.state.getTrustContext();
+		final SecureRandom random = new SecureRandom();
+		return new ImportanceAwareNodeSelector(
+				this.nodeLimit,
+				this.poiFacade,
+				new ActiveNodeTrustProvider(this.trustProvider, this.state.getNodes()),
 				context,
 				random);
 	}

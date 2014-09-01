@@ -38,6 +38,16 @@ public class SystemTimeProvider implements TimeProvider {
 		return new TimeInstant(getTime(time));
 	}
 
+	@Override
+	public NetworkTimeStamp getNetworkTime() {
+		return new NetworkTimeStamp(getCurrentTimeMillis() + timeOffset.getRaw());
+	}
+
+	@Override
+	public void updateTimeOffset(TimeOffset offset) {
+		this.timeOffset = this.timeOffset.add(offset);
+	}
+
 	/**
 	 * Returns the current time in milliseconds.
 	 * TODO-CR J-B: if you are using this (it doesn't look like it is being called) consider adding a test for it
@@ -52,28 +62,12 @@ public class SystemTimeProvider implements TimeProvider {
 	}
 
 	/**
-	 * Returns the network time in milliseconds.
-	 *
-	 * @return The network time in milliseconds.
-	 */
-	public NetworkTimeStamp getNetworkTime() {
-		return new NetworkTimeStamp(getCurrentTimeMillis() + timeOffset.getRaw());
-	}
-
-	/**
 	 * Gets the time offset.
 	 *
 	 * @return The time offset.
 	 */
 	public TimeOffset getTimeOffset() {
 		return this.timeOffset;
-	}
-
-	/**
-	 * Updates the time offset.
-	 */
-	public void updateTimeOffset(TimeOffset offset) {
-		this.timeOffset = this.timeOffset.add(offset);
 	}
 
 	/**

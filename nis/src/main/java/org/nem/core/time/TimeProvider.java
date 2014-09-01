@@ -1,6 +1,6 @@
 package org.nem.core.time;
 
-import org.nem.core.model.primitive.NetworkTimeStamp;
+import org.nem.core.model.primitive.*;
 /**
  * Interface that provides time-related information.
  */
@@ -26,4 +26,9 @@ public interface TimeProvider {
 	 * @return The network time stamp.
 	 */
 	public NetworkTimeStamp getNetworkTime();
+
+	/**
+	 * Updates the time offset.
+	 */
+	public void updateTimeOffset(TimeOffset offset);
 }

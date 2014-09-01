@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
@@ -16,6 +17,7 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
+	private NodeAge nodeAge;
 
 	/**
 	 * Creates new peer network state.
@@ -32,6 +34,7 @@ public class PeerNetworkState {
 		this.localNode = config.getLocalNode();
 		this.nodeExperiences = nodeExperiences;
 		this.nodes = nodeCollection;
+		this.nodeAge = new NodeAge(0);
 
 		for (final Node node : this.config.getPreTrustedNodes().getNodes()) {
 			this.nodes.update(node, NodeStatus.ACTIVE);
@@ -137,5 +140,20 @@ public class PeerNetworkState {
 
 		nodeArray[index] = localNode;
 		return nodeArray;
+	}
+
+	/**
+	 * Gets the node's age.
+	 *
+	 * @return the node's age.
+	 */
+	public NodeAge getNodeAge() {
+		return this.nodeAge;
+	}
+	/**
+	 * Increments the node's age by one.
+	 */
+	public void incrementAge() {
+		this.nodeAge = this.nodeAge.increment();
 	}
 }

@@ -2,6 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.time.TimeProvider;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
@@ -93,6 +94,13 @@ public class PeerNetwork {
 	public CompletableFuture<Void> refresh() {
 		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
 				.whenComplete((v, e) -> this.selector = this.selectorFactory.createNodeSelector());
+	}
+
+	/**
+	 * Does one round of network time synchronization.
+	 */
+	public void synchronizeTime(TimeProvider timeProvider) {
+		this.servicesFactory.createTimeSynchronizer(this.selectorFactory.createImportanceAwareNodeSelector(), timeProvider).synchronizeTime();
 	}
 
 	/**
