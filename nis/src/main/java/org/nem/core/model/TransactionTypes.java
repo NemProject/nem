@@ -4,6 +4,8 @@ package org.nem.core.model;
  * Static class containing transaction type constants.
  */
 public class TransactionTypes {
+	// currently transactions inside blocks are sorted by size,
+	// so changing those IDs might break a LOT of things...
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;
 	private static final int SNAPSHOT_TYPE = 0x0400;

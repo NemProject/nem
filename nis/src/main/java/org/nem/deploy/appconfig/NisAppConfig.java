@@ -41,6 +41,9 @@ public class NisAppConfig {
 	@Autowired
 	private TransferDao transferDao;
 
+	@Autowired
+	private ImportanceTransferDao importanceTransferDao;
+
 	@Bean
 	public DataSource dataSource() throws IOException {
 		final NisConfiguration configuration = this.nisConfiguration();
@@ -84,6 +87,7 @@ public class NisAppConfig {
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 

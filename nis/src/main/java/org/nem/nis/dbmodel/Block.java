@@ -1,6 +1,9 @@
 package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.IndexColumn;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
@@ -45,7 +48,14 @@ public class Block {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("blkIndex")
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private List<Transfer> blockTransfers;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
+	@OrderBy("blkIndex")
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@OrderColumn(name = "blkIndex")
+	private List<ImportanceTransfer> blockImportanceTransfers;
 
 	public Block() {
 	}
@@ -195,5 +205,13 @@ public class Block {
 
 	public void setBlockTransfers(final List<Transfer> blockTransfers) {
 		this.blockTransfers = blockTransfers;
+	}
+
+	public List<ImportanceTransfer> getBlockImportanceTransfers() {
+		return this.blockImportanceTransfers;
+	}
+
+	public void setBlockImportanceTransfers(final List<ImportanceTransfer> blockImportanceTransfers) {
+		this.blockImportanceTransfers = blockImportanceTransfers;
 	}
 }

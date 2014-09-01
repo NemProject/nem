@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.dbmodel.Transfer;
 
 import java.util.*;
@@ -40,14 +41,27 @@ public class BlockMapper {
 				block.getDifficulty().getRaw());
 
 		int i = 0;
-		final List<Transfer> transactions = new ArrayList<>(block.getTransactions().size());
+		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
+		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
 		for (final Transaction transaction : block.getTransactions()) {
-			final Transfer dbTransfer = TransferMapper.toDbModel((TransferTransaction)transaction, i++, accountDao);
-			dbTransfer.setBlock(dbBlock);
-			transactions.add(dbTransfer);
+			switch (transaction.getType()) {
+				case TransactionTypes.TRANSFER: {
+					final Transfer dbTransfer = TransferMapper.toDbModel((TransferTransaction)transaction, i++, accountDao);
+					dbTransfer.setBlock(dbBlock);
+					transferTransactions.add(dbTransfer);
+				}
+				break;
+				case TransactionTypes.IMPORTANCE_TRANSFER: {
+					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel((ImportanceTransferTransaction)transaction, i++, accountDao);
+					dbTransfer.setBlock(dbBlock);
+					importanceTransferTransactions.add(dbTransfer);
+				}
+				break;
+			}
 		}
 
-		dbBlock.setBlockTransfers(transactions);
+		dbBlock.setBlockTransfers(transferTransactions);
+		dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
 		return dbBlock;
 	}
 
@@ -77,6 +91,12 @@ public class BlockMapper {
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
+
+		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
+			final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
+			block.addTransaction(importanceTransferTransaction);
+		}
+
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
 			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
 			block.addTransaction(transfer);

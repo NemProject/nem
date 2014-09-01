@@ -47,10 +47,11 @@ public class ImportanceTransfer {
 
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinTable(name = "block_importancetransfers",
-			joinColumns = { @JoinColumn(name = "importancetransfer_id", referencedColumnName = "id") },
-			inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
-	)
+	//@JoinTable(name = "block_importancetransfers",
+	//		joinColumns = { @JoinColumn(name = "importancetransfer_id", referencedColumnName = "id") },
+	//		inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
+	//)
+	@JoinColumn(name = "blockId")
 	private Block block;
 
 	public ImportanceTransfer() {

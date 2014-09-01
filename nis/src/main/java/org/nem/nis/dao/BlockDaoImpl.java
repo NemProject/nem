@@ -66,6 +66,7 @@ public class BlockDaoImpl implements BlockDao {
 	public Block findById(final long id) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("id", id));
 		return this.executeSingleQuery(criteria);
 	}
@@ -75,6 +76,7 @@ public class BlockDaoImpl implements BlockDao {
 	public Block findByHeight(final BlockHeight height) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("height", height.getRaw()));
 		return this.executeSingleQuery(criteria);
 	}
@@ -91,6 +93,7 @@ public class BlockDaoImpl implements BlockDao {
 
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.eq("shortId", blockId));
 		final List<Block> blockList = listAndCast(criteria);
 
@@ -136,6 +139,7 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.le("timeStamp", timeStamp))
 				.addOrder(Order.desc("timeStamp"))
 						// here we were lucky cause blocktransfers is set to select...
@@ -153,6 +157,7 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
 				.add(Restrictions.lt("height", blockHeight + (long)blocksCount))
 				.addOrder(Order.asc("height"));
@@ -172,6 +177,18 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> txToDelete = listAndCast(getTxes);
+
+		final Query getImportanceTxes = this.getCurrentSession()
+				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")
+				.setParameter("height", blockHeight.getRaw());
+		final List<Long> importanceTxToDelete = listAndCast(getImportanceTxes);
+
+		if (!importanceTxToDelete.isEmpty()) {
+			final Query dropTxes = this.getCurrentSession()
+					.createQuery("delete from ImportanceTransfer t where t.id in (:ids)")
+					.setParameterList("ids", importanceTxToDelete);
+			dropTxes.executeUpdate();
+		}
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
