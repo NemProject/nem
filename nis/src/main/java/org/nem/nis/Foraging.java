@@ -242,9 +242,10 @@ public class Foraging {
 
 		final TimeInstant blockTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
-		final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime);
+
 		try {
 			synchronized (this.blockChainLastBlockLayer) {
+				final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime);
 				final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);

@@ -28,6 +28,14 @@ public class MockHttpOutputMessage implements HttpOutputMessage {
 	 * @return The body as a string.
 	 */
 	public String getBodyAsString() {
-		return this.bodyStream.toString();
+		String result = null; 
+		try {
+			result = this.bodyStream.toString("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }
