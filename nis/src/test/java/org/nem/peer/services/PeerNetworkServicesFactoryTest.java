@@ -52,9 +52,9 @@ public class PeerNetworkServicesFactoryTest {
 		return new PeerNetworkServicesFactory(
 				Mockito.mock(PeerNetworkState.class),
 				Mockito.mock(PeerConnector.class),
-				Mockito.mock(TimeSyncConnector.class),
+				Mockito.mock(TimeSynchronizationConnector.class),
 				Mockito.mock(SyncConnectorPool.class),
 				Mockito.mock(BlockSynchronizer.class),
-				Mockito.mock(SynchronizationStrategy.class));
+				Mockito.mock(TimeSynchronizationStrategy.class));
 	}
 }

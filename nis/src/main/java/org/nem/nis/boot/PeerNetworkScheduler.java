@@ -69,9 +69,9 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * @param network The network.
 	 * @param blockChain The block chain.
 	 */
-	public void addTasks(final PeerNetwork network, final BlockChain blockChain) {
+	public void addTasks(final PeerNetwork network, final BlockChain blockChain, final boolean useNetworkTime) {
 		this.addForagingTask(network, blockChain);
-		this.addNetworkTasks(network);
+		this.addNetworkTasks(network, useNetworkTime);
 	}
 
 	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain) {
@@ -93,9 +93,11 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				timerVisitor));
 	}
 
-	private void addNetworkTasks(final PeerNetwork network) {
+	private void addNetworkTasks(final PeerNetwork network, final boolean useNetworkTime) {
 		this.addRefreshTask(network);
-		this.addTimeSynchronizationTask(network);
+		if (useNetworkTime) {
+			this.addTimeSynchronizationTask(network);
+		}
 
 		this.addSimpleTask(
 				() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),

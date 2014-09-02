@@ -3,7 +3,7 @@ package org.nem.nis.time.synchronization;
 /**
  * Constants used by the time synchronization classes.
  */
-public class SynchronizationConstants {
+public class TimeSynchronizationConstants {
 
 	/***
 	 * Start value for the coupling of clocks.

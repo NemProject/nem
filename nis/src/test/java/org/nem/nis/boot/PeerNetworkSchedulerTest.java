@@ -27,7 +27,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class));
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), true);
 			final List<String> taskNames = scheduler.getVisitors().stream()
 					.map(NisAsyncTimerVisitor::getTimerName)
 					.collect(Collectors.toList());
@@ -39,8 +39,24 @@ public class PeerNetworkSchedulerTest {
 					"PRUNING INACTIVE NODES",
 					"REFRESH",
 					"SYNC",
-					"UPDATING LOCAL NODE ENDPOINT");
+					"UPDATING LOCAL NODE ENDPOINT",
+					"TIME SYNCHRONIZATION");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
+		}
+	}
+
+	@Test
+	public void timeSynchronizationTaskCanBeExcluded() {
+		// Arrange:
+		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
+			// Act:
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), false);
+			final List<String> taskNames = scheduler.getVisitors().stream()
+					.map(NisAsyncTimerVisitor::getTimerName)
+					.collect(Collectors.toList());
+
+			// Assert:
+			Assert.assertThat(!taskNames.contains("TIME SYNCHRONIZATION"), IsEqual.equalTo(true));
 		}
 	}
 }

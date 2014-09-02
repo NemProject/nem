@@ -16,7 +16,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToNodeSelector() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -32,9 +32,9 @@ public class NisTimeSynchronizerTest {
 	}
 
 	@Test
-	public void synchronizeTimeDelegatesToTimeSyncConnector() throws ExecutionException, InterruptedException {
+	public void synchronizeTimeDelegatesToTimeSynchronizationConnector() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -52,9 +52,9 @@ public class NisTimeSynchronizerTest {
 	}
 
 	@Test
-	public void synchronizeTimeDelegatesToSynchronizationStrategy() throws ExecutionException, InterruptedException {
+	public void synchronizeTimeDelegatesToTimeSynchronizationStrategy() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -72,7 +72,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToSystemTimeProvider() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -90,7 +90,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeUpdatesSystemTimeProviderTimeOffset() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -108,7 +108,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeIncrementsNodeAge() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSyncContext context = new TimeSyncContext();
+		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
 				context.selector,
 				context.syncStrategy,
@@ -123,17 +123,17 @@ public class NisTimeSynchronizerTest {
 		Mockito.verify(context.networkState, Mockito.times(1)).incrementAge();
 	}
 
-	private class TimeSyncContext {
+	private class TimeSynchronizationContext {
 		final NodeSelector selector = Mockito.mock(NodeSelector.class);
-		final SynchronizationStrategy syncStrategy = Mockito.mock(SynchronizationStrategy.class);
-		final TimeSyncConnector connector = Mockito.mock(TimeSyncConnector.class);
+		final TimeSynchronizationStrategy syncStrategy = Mockito.mock(TimeSynchronizationStrategy.class);
+		final TimeSynchronizationConnector connector = Mockito.mock(TimeSynchronizationConnector.class);
 		final SystemTimeProvider systemTimeProvider = Mockito.mock(SystemTimeProvider.class);
 		final PeerNetworkState networkState;
 		final List<Node> nodes;
-		final List<SynchronizationSample> samples;
+		final List<TimeSynchronizationSample> samples;
 		NodeAge age = new NodeAge(0);
 
-		private TimeSyncContext() throws ExecutionException, InterruptedException {
+		private TimeSynchronizationContext() throws ExecutionException, InterruptedException {
 			this.networkState = Mockito.mock(PeerNetworkState.class);
 			Mockito.when(networkState.getNodeAge()).thenReturn(this.age);
 			nodes = createPartnerNodes();
@@ -170,10 +170,10 @@ public class NisTimeSynchronizerTest {
 			);
 		}
 
-		private List<SynchronizationSample> createSamples(List<Node> nodes, List<CompletableFuture<CommunicationTimeStamps>> timeStampsList) throws ExecutionException, InterruptedException {
-			final List<SynchronizationSample> samples = new ArrayList<>();
+		private List<TimeSynchronizationSample> createSamples(List<Node> nodes, List<CompletableFuture<CommunicationTimeStamps>> timeStampsList) throws ExecutionException, InterruptedException {
+			final List<TimeSynchronizationSample> samples = new ArrayList<>();
 			for (int i=0; i<3; i++) {
-				samples.add(new SynchronizationSample(
+				samples.add(new TimeSynchronizationSample(
 						nodes.get(i),
 						new CommunicationTimeStamps(new NetworkTimeStamp(10 * i), new NetworkTimeStamp(10 * i + 20)),
 						timeStampsList.get(i).get()));

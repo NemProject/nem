@@ -1,7 +1,7 @@
 package org.nem.nis.time.synchronization.filter;
 
 import org.nem.core.model.primitive.NodeAge;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface SynchronizationFilter {
 	 * @param samples The list of samples.
 	 * @return The filtered list of samples.
 	 */
-	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age);
+	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age);
 }

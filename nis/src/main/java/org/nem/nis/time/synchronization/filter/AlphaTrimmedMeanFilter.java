@@ -1,7 +1,7 @@
 package org.nem.nis.time.synchronization.filter;
 
 import org.nem.core.model.primitive.NodeAge;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +16,7 @@ public class AlphaTrimmedMeanFilter implements SynchronizationFilter {
 	// TODO       filtering will help to fight back the attack.
 
 	@Override
-	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age) {
+	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age) {
 		final int samplesToDiscardAtBothEnds = (int)(samples.size() * FilterConstants.ALPHA / 2);
 		// TODO: 20140823 BR: is there a way to do this with samples.stream()?
 		// TODO J-B: i think you can use sorted, skip, and limit

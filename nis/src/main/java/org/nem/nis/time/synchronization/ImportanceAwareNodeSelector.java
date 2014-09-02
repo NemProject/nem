@@ -81,11 +81,11 @@ public class ImportanceAwareNodeSelector implements NodeSelector {
 				// skip nodes with zero trust, insufficient importance and those that have already been used
 				final double trust = this.trustVector.getAt(i);
 				final PoiAccountState accountState = this.poiFacade.findStateByAddress(nodes[i].getIdentity().getAddress());
-				if (!accountState.getImportanceInfo().getHeight().equals(this.poiFacade.getLastPoiRecalculationHeight())) {
+				if (!this.poiFacade.getLastPoiRecalculationHeight().equals(accountState.getImportanceInfo().getHeight())) {
 					continue;
 				}
 				final double importance = accountState.getImportanceInfo().getImportance(this.poiFacade.getLastPoiRecalculationHeight());
-				if (0 == trust || SynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE > importance || usedNodes[i]) {
+				if (0 == trust || TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE > importance || usedNodes[i]) {
 					continue;
 				}
 

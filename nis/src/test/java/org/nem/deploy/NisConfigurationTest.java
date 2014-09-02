@@ -167,9 +167,38 @@ public class NisConfigurationTest {
 
 	//endregion
 
+	//region nis.useNetworkTime
+
+	@Test
+	public void canReadConfigurationWithUseNetworkTime() {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nis.useNetworkTime", "true");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canReadConfigurationWithoutUseNetworkTime() {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
 	private Properties getCommonProperties() {
 		final Properties properties = new Properties();
-		properties.setProperty("nem.shortServerName", "Ncc");
+		properties.setProperty("nem.shortServerName", "Nis");
 		properties.setProperty("nem.folder", "folder");
 		properties.setProperty("nem.maxThreads", "1");
 		properties.setProperty("nem.protocol", "ftp");

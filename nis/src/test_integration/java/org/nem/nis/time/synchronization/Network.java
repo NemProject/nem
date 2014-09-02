@@ -51,7 +51,7 @@ public class Network {
 	private int nodeId = 1;
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
-	private SynchronizationStrategy syncStrategy;
+	private TimeSynchronizationStrategy syncStrategy;
 	private PoiFacade poiFacade;
 	private long realTime = 0;
 	private double mean;
@@ -127,9 +127,9 @@ public class Network {
 		return this.hasConverged;
 	}
 
-	private SynchronizationStrategy createSynchronizationStrategy(final PoiFacade facade) {
+	private TimeSynchronizationStrategy createSynchronizationStrategy(final PoiFacade facade) {
 		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
-		return new DefaultSynchronizationStrategy(filter, facade);
+		return new DefaultTimeSynchronizationStrategy(filter, facade);
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class Network {
 		final List<TimeAwareNode> nodesToUpdate = getNodesToUpdate(TICK_INTERVALL);
 		nodesToUpdate.stream().forEach(n -> {
 			Set<TimeAwareNode> partners = selectSyncPartnersForNode(n);
-			List<SynchronizationSample> samples = createSynchronizationSamples(n, partners);
+			List<TimeSynchronizationSample> samples = createSynchronizationSamples(n, partners);
 			n.updateNetworkTime(samples);
 		});
 	}
@@ -339,7 +339,7 @@ public class Network {
 			final int index = random.nextInt(this.nodes.size());
 			final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
 			if (!nodeArray[index].equals(node) &&
-				SynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+				TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 				hits++;
 				partners.add(nodeArray[index]);
 				if (nodeArray[index].isEvil()) {
@@ -354,7 +354,7 @@ public class Network {
 			for (int i=0; i<this.nodes.size(); i++) {
 				final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
 				if (!nodeArray[i].equals(node) &&
-					SynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+					TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 					partners.add(nodeArray[i]);
 					break;
 				}
@@ -371,13 +371,13 @@ public class Network {
 	 * @param partners The node's partners.
 	 * @return The list of samples.
 	 */
-	public List<SynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
-		final List<SynchronizationSample> samples = new ArrayList<>();
+	public List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (final TimeAwareNode partner : partners) {
 			final int roundTripTime = random.nextInt(1000);
 			final NetworkTimeStamp localSend = node.getNetworkTime();
 			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
-			samples.add(new SynchronizationSample(
+			samples.add(new TimeSynchronizationSample(
 					partner.getNode(),
 					new CommunicationTimeStamps(localSend, localReceive),
 					partner.createCommunicationTimeStamps(roundTripTime)));

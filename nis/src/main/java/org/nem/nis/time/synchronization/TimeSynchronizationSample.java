@@ -5,20 +5,20 @@ import org.nem.core.node.Node;
 /**
  * Represents a sample in the time synchronization process.
  */
-public class SynchronizationSample implements Comparable<SynchronizationSample> {
+public class TimeSynchronizationSample implements Comparable<TimeSynchronizationSample> {
 
 	private final Node node;
 	private final CommunicationTimeStamps localTimeStamps;
 	private final CommunicationTimeStamps remoteTimeStamps;
 
 	/**
-	 * Creates a SynchronizationSample.
+	 * Creates a TimeSynchronizationSample.
 	 *
 	 * @param node The communication partner.
 	 * @param localTimeStamps The local time stamps for the request/response.
 	 * @param remoteTimeStamps The remote time stamps for the request/response.
 	 */
-	public SynchronizationSample(
+	public TimeSynchronizationSample(
 			final Node node,
 			final CommunicationTimeStamps localTimeStamps,
 			final CommunicationTimeStamps remoteTimeStamps) {
@@ -78,7 +78,7 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 	}
 
 	@Override
-	public int compareTo(final SynchronizationSample other) {
+	public int compareTo(final TimeSynchronizationSample other) {
 		return this.getTimeOffsetToRemote().compareTo(other.getTimeOffsetToRemote());
 	}
 
@@ -91,11 +91,11 @@ public class SynchronizationSample implements Comparable<SynchronizationSample> 
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof SynchronizationSample)) {
+		if (!(obj instanceof TimeSynchronizationSample)) {
 			return false;
 		}
 
-		final SynchronizationSample rhs = (SynchronizationSample)obj;
+		final TimeSynchronizationSample rhs = (TimeSynchronizationSample)obj;
 		return this.node.equals(rhs.node) &&
 				this.localTimeStamps.equals(rhs.localTimeStamps) &&
 				this.remoteTimeStamps.equals(rhs.remoteTimeStamps);

@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.node.*;
 
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * An HTTP-based PeerConnector and SyncConnector implementation.
  */
-public class HttpConnector implements PeerConnector, SyncConnector, TimeSyncConnector {
+public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchronizationConnector {
 
 	private final Communicator communicator;
 	private final NodeChallengeFactory challengeFactory;
@@ -110,11 +111,14 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSyncConn
 
 	//endregion
 
-	// region TimeSyncConnector
+	// region TimeSynchronizationConnector
 
 	public CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TIME_SYNC_NETWORK_TIME);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new CommunicationTimeStamps(obj));
+		return CompletableFuture.completedFuture(new CommunicationTimeStamps(
+				new NetworkTimeStamp(System.currentTimeMillis() - SystemTimeProvider.getEpochTimeMillis() + 100),
+				new NetworkTimeStamp(System.currentTimeMillis() - SystemTimeProvider.getEpochTimeMillis() + 100)));
+		//final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TIME_SYNC_NETWORK_TIME);
+		//return this.postAuthenticated(url, node.getIdentity(), obj -> new CommunicationTimeStamps(obj));
 	}
 
 	//endregion

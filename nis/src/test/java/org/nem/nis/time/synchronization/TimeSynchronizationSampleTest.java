@@ -9,16 +9,16 @@ import org.nem.nis.test.TimeSyncUtils;
 
 import java.util.HashMap;
 
-public class SynchronizationSampleTest {
+public class TimeSynchronizationSampleTest {
 
 	private static final KeyPair KEY_PAIR = new KeyPair();
 
 	//region constructor
 
 	@Test
-	public void canCreateSynchronizationSample() {
+	public void canCreateTimeSynchronizationSample() {
 		// Act:
-		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 23, 26);
+		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 23, 26);
 
 		// Assert:
 		Assert.assertThat(sample.getNode().getIdentity(), IsEqual.equalTo(new NodeIdentity(KEY_PAIR, "node")));
@@ -33,9 +33,9 @@ public class SynchronizationSampleTest {
 	@Test
 	public void timeOffsetIsCalculatedCorrectly() {
 		// Arrange:
-		final SynchronizationSample sample1 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final SynchronizationSample sample2 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
-		final SynchronizationSample sample3 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 37, 43, 15, 13);
+		final TimeSynchronizationSample sample1 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final TimeSynchronizationSample sample2 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
+		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 37, 43, 15, 13);
 
 		// Assert:
 		Assert.assertThat(sample1.getTimeOffsetToRemote(), IsEqual.equalTo(13L));
@@ -48,11 +48,11 @@ public class SynchronizationSampleTest {
 	//region compareTo
 
 	@Test
-	public void canCompareSynchronizationSamples() {
+	public void canCompareTimeSynchronizationSamples() {
 		// Arrange:
-		final SynchronizationSample sample1 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final SynchronizationSample sample2 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
-		final SynchronizationSample sample3 = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final TimeSynchronizationSample sample1 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final TimeSynchronizationSample sample2 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 8, 12, 45, 45);
+		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
 
 		// Assert:
 		Assert.assertThat(sample1.compareTo(sample2), IsEqual.equalTo(-1));
@@ -67,8 +67,8 @@ public class SynchronizationSampleTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final HashMap<String, SynchronizationSample> sampleMap = createTestSynchronizationSampleList();
+		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final HashMap<String, TimeSynchronizationSample> sampleMap = createTestTimeSynchronizationSampleList();
 
 		// Assert:
 		Assert.assertThat(sampleMap.get("default"), IsEqual.equalTo(sample));
@@ -82,8 +82,8 @@ public class SynchronizationSampleTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final SynchronizationSample sample = TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final HashMap<String, SynchronizationSample> sampleMap = createTestSynchronizationSampleList();
+		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final HashMap<String, TimeSynchronizationSample> sampleMap = createTestTimeSynchronizationSampleList();
 
 		// Assert:
 		Assert.assertThat(sampleMap.get("default").hashCode(), IsEqual.equalTo(sample.hashCode()));
@@ -94,13 +94,13 @@ public class SynchronizationSampleTest {
 
 	//endregion
 
-	private HashMap<String, SynchronizationSample> createTestSynchronizationSampleList() {
-		return new HashMap<String, SynchronizationSample>() {
+	private HashMap<String, TimeSynchronizationSample> createTestTimeSynchronizationSampleList() {
+		return new HashMap<String, TimeSynchronizationSample>() {
 			{
-				this.put("default", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 25, 23));
-				this.put("diff-identity", TimeSyncUtils.createSynchronizationSample(new KeyPair(), 5, 17, 25, 23));
-				this.put("diff-local-timeStamp", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 4, 12, 25, 23));
-				this.put("diff-remote-timeStamp", TimeSyncUtils.createSynchronizationSample(KEY_PAIR, 5, 17, 30, 28));
+				this.put("default", TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23));
+				this.put("diff-identity", TimeSyncUtils.createTimeSynchronizationSample(new KeyPair(), 5, 17, 25, 23));
+				this.put("diff-local-timeStamp", TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 4, 12, 25, 23));
+				this.put("diff-remote-timeStamp", TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 30, 28));
 			}
 		};
 	}

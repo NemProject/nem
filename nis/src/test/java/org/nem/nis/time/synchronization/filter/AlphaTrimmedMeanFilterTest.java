@@ -3,7 +3,7 @@ package org.nem.nis.time.synchronization.filter;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.nis.test.TimeSyncUtils;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 
@@ -21,12 +21,12 @@ public class AlphaTrimmedMeanFilterTest {
 		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableUnsortedSamples(0, 20));
 	}
 
-	private void assertFilterWorksAsExpected(final List<SynchronizationSample> originalSamples) {
+	private void assertFilterWorksAsExpected(final List<TimeSynchronizationSample> originalSamples) {
 		// Arrange:
 		final AlphaTrimmedMeanFilter filter = new AlphaTrimmedMeanFilter();
 
 		// Act:
-		final List<SynchronizationSample> samples = filter.filter(originalSamples, null);
+		final List<TimeSynchronizationSample> samples = filter.filter(originalSamples, null);
 
 		// Assert:
 		final int value = (int)(originalSamples.size() * FilterConstants.ALPHA / 2);

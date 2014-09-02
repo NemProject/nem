@@ -8,20 +8,22 @@ import org.nem.peer.trust.NodeSelector;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class NisTimeSynchronizer implements TimeSynchronizer {
+	private static final Logger LOGGER = Logger.getLogger(NisTimeSynchronizer.class.getName());
 
 	private final NodeSelector selector;
-	private final SynchronizationStrategy syncStrategy;
-	private final TimeSyncConnector connector;
+	private final TimeSynchronizationStrategy syncStrategy;
+	private final TimeSynchronizationConnector connector;
 	private final TimeProvider timeProvider;
 	private final PeerNetworkState networkState;
 
 	public NisTimeSynchronizer(
 			final NodeSelector selector,
-			final SynchronizationStrategy syncStrategy,
-			final TimeSyncConnector connector,
+			final TimeSynchronizationStrategy syncStrategy,
+			final TimeSynchronizationConnector connector,
 			final TimeProvider timeProvider,
 			final PeerNetworkState networkState) {
 		this.selector = selector;
@@ -33,7 +35,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 
 	@Override
 	public void synchronizeTime() {
-		List<SynchronizationSample> samples = new ArrayList<>();
+		List<TimeSynchronizationSample> samples = new ArrayList<>();
 		List<Node> nodes = this.selector.selectNodes();
 		final List<CompletableFuture> futures = nodes.stream()
 				.map(n -> {
@@ -41,7 +43,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 					return this.connector.getCommunicationTimeStamps(n)
 							.thenApply(c -> {
 								final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
-								final SynchronizationSample sample = new SynchronizationSample(n, new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp), c);
+								final TimeSynchronizationSample sample = new TimeSynchronizationSample(n, new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp), c);
 								samples.add(sample);
 								return sample;
 							});

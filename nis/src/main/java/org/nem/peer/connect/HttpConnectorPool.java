@@ -3,7 +3,7 @@ package org.nem.peer.connect;
 import org.nem.core.connect.HttpMethodClient;
 import org.nem.core.serialization.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.time.synchronization.TimeSyncConnector;
+import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 
 /**
  * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern
@@ -42,12 +42,12 @@ public class HttpConnectorPool implements SyncConnectorPool {
 	}
 
 	/**
-	 * Gets a TimeSyncConnector instance.
+	 * Gets a TimeSynchronizationConnector instance.
 	 *
 	 * @param accountLookup The account lookup to associate with the connector.
 	 * @return The connector.
 	 */
-	public TimeSyncConnector getTimeSyncConnector(final AccountLookup accountLookup) {
+	public TimeSynchronizationConnector getTimeSyncConnector(final AccountLookup accountLookup) {
 		return this.getConnector(accountLookup);
 	}
 

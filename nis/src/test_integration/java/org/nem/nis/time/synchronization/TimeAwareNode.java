@@ -18,7 +18,7 @@ public class TimeAwareNode {
 
 	private final Node node;
 	private NodeAge age;
-	private final SynchronizationStrategy syncStrategy;
+	private final TimeSynchronizationStrategy syncStrategy;
 	private final TimeOffset communicationDelay;
 	private final TimeOffset clockInaccuracy;
 	private TimeOffset cumulativeInaccuracy = new TimeOffset(0);
@@ -42,7 +42,7 @@ public class TimeAwareNode {
 	public TimeAwareNode(
 			final int id,
 			final NodeAge nodeAge,
-			final SynchronizationStrategy syncStrategy,
+			final TimeSynchronizationStrategy syncStrategy,
 			final TimeOffset initialTimeOffset,
 			final TimeOffset communicationDelay,
 			final double channelAsymmetry,
@@ -93,14 +93,14 @@ public class TimeAwareNode {
 	 *
 	 * @param samples The list of synchronization samples.
 	 */
-	public void updateNetworkTime(final List<SynchronizationSample> samples) {
+	public void updateNetworkTime(final List<TimeSynchronizationSample> samples) {
 		try {
 			final TimeOffset diff = this.syncStrategy.calculateTimeOffset(samples, age);
-			if (SynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
+			if (TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
 				this.timeOffset = this.timeOffset.add(diff);
 			}
 			this.age = this.age.increment();
-		} catch (SynchronizationException e) {
+		} catch (TimeSynchronizationException e) {
 			//LOGGER.info(e.toString());
 			LOGGER.info(String.format("Resetting age of %s.", this.getName()));
 			this.age = new NodeAge(0);

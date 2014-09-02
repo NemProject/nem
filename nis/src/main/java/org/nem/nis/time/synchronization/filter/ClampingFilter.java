@@ -1,7 +1,7 @@
 package org.nem.nis.time.synchronization.filter;
 
 import org.nem.core.model.primitive.NodeAge;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +31,7 @@ public class ClampingFilter implements SynchronizationFilter {
 	}
 
 	@Override
-	public List<SynchronizationSample> filter(final List<SynchronizationSample> samples, final NodeAge age) {
+	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age) {
 		final long toleratedDeviation = getMaximumToleratedDeviation(age);
 
 		return samples.stream()

@@ -60,7 +60,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
 			this.network = network;
-			this.scheduler.addTasks(this.network, this.blockChain);
+			this.scheduler.addTasks(this.network, this.blockChain, this.nisConfiguration.useNetworkTime());
 		});
 	}
 
@@ -133,8 +133,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.scheduler.close();
 	}
 
-	private SynchronizationStrategy createTimeSynchronizationStrategy() {
-		return new DefaultSynchronizationStrategy(
+	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
+		return new DefaultTimeSynchronizationStrategy(
 				new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter())),
 				this.accountAnalyzer.getPoiFacade());
 	}
@@ -145,11 +145,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				: CommunicationMode.JSON;
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
 		final PeerConnector peerConnector = connectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
-		final TimeSyncConnector timeSyncConnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
+		final TimeSynchronizationConnector timeSynchronizationConnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
 		return new PeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
-				timeSyncConnector,
+				timeSynchronizationConnector,
 				connectorPool,
 				this.synchronizer,
 				createTimeSynchronizationStrategy());

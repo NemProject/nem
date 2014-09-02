@@ -20,8 +20,8 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return the sorted list of samples
 	 */
-	public static List<SynchronizationSample> createTolerableSortedSamples(final long startValue, final int count) {
-		final List<SynchronizationSample> samples = createTolerableSamples(startValue, count);
+	public static List<TimeSynchronizationSample> createTolerableSortedSamples(final long startValue, final int count) {
+		final List<TimeSynchronizationSample> samples = createTolerableSamples(startValue, count);
 		Collections.sort(samples);
 
 		return samples;
@@ -34,17 +34,17 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return the unsorted list of samples
 	 */
-	public static List<SynchronizationSample> createTolerableUnsortedSamples(final long startValue, final int count) {
-		final List<SynchronizationSample> samples = createTolerableSamples(startValue, count);
+	public static List<TimeSynchronizationSample> createTolerableUnsortedSamples(final long startValue, final int count) {
+		final List<TimeSynchronizationSample> samples = createTolerableSamples(startValue, count);
 		Collections.shuffle(samples);
 
 		return samples;
 	}
 
-	private static List<SynchronizationSample> createTolerableSamples(final long startValue, final int count) {
-		final List<SynchronizationSample> samples = new ArrayList<>();
+	private static List<TimeSynchronizationSample> createTolerableSamples(final long startValue, final int count) {
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i=1; i<=count; i++) {
-			samples.add(createSynchronizationSample(startValue + i));
+			samples.add(createTimeSynchronizationSample(startValue + i));
 		}
 
 		return samples;
@@ -57,8 +57,8 @@ public class TimeSyncUtils {
 	 * @param mean The mean time offset the samples should have.
 	 * @return the sorted list of samples
 	 */
-	public static List<SynchronizationSample> createRandomTolerableSortedSamplesAroundMean(final int count, final long mean) {
-		final List<SynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
+	public static List<TimeSynchronizationSample> createRandomTolerableSortedSamplesAroundMean(final int count, final long mean) {
+		final List<TimeSynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
 		Collections.sort(samples);
 
 		return samples;
@@ -71,23 +71,23 @@ public class TimeSyncUtils {
 	 * @param mean The mean time offset the samples should have.
 	 * @return the unsorted list of samples
 	 */
-	public static List<SynchronizationSample> createRandomTolerableUnsortedSamplesAroundMean(final int count, final long mean) {
-		final List<SynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
+	public static List<TimeSynchronizationSample> createRandomTolerableUnsortedSamplesAroundMean(final int count, final long mean) {
+		final List<TimeSynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
 		Collections.shuffle(samples);
 
 		return samples;
 	}
 
-	private static List<SynchronizationSample> createRandomTolerableSamplesAroundMean(final int count, final long mean) {
+	private static List<TimeSynchronizationSample> createRandomTolerableSamplesAroundMean(final int count, final long mean) {
 		final SecureRandom random = new SecureRandom();
-		final List<SynchronizationSample> samples = new ArrayList<>();
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		if (count % 2 == 1) {
-			samples.add(createSynchronizationSample(mean));
+			samples.add(createTimeSynchronizationSample(mean));
 		}
 		for (int i = 0; i < count/2; i++) {
 			final int value = random.nextInt(1000);
-			samples.add(createSynchronizationSample(mean + value));
-			samples.add(createSynchronizationSample(mean - value));
+			samples.add(createTimeSynchronizationSample(mean + value));
+			samples.add(createTimeSynchronizationSample(mean - value));
 		}
 
 		return samples;
@@ -99,10 +99,10 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return the list of samples
 	 */
-	public static List<SynchronizationSample> createIntolerableSamples(final int count) {
-		final List<SynchronizationSample> samples = new ArrayList<>();
+	public static List<TimeSynchronizationSample> createIntolerableSamples(final int count) {
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i=1; i<=count; i++) {
-			samples.add(createSynchronizationSample(FilterConstants.TOLERATED_DEVIATION_START + i));
+			samples.add(createTimeSynchronizationSample(FilterConstants.TOLERATED_DEVIATION_START + i));
 		}
 
 		return samples;
@@ -112,10 +112,10 @@ public class TimeSyncUtils {
 	 * Creates a synchronization sample with a given time offset.
 	 *
 	 * @param timeOffset The time offset in ms.
-	 * @return The synchronization sample
+	 * @return The time synchronization sample
 	 */
-	public static SynchronizationSample createSynchronizationSample(final long timeOffset) {
-		return new SynchronizationSample(
+	public static TimeSynchronizationSample createTimeSynchronizationSample(final long timeOffset) {
+		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(KEY_PAIR, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(5 + timeOffset), new NetworkTimeStamp(5 + timeOffset)));
@@ -126,12 +126,12 @@ public class TimeSyncUtils {
 	 *
 	 * @param startValue The time offset to start with.
 	 * @param count The number of samples needed.
-	 * @return The synchronization sample
+	 * @return The time synchronization sample
 	 */
-	public static List<SynchronizationSample> createSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
-		List<SynchronizationSample> samples = new ArrayList<>();
+	public static List<TimeSynchronizationSample> createTimeSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
+		List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i=0; i<count; i++) {
-			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
+			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
 		}
 
 		return samples;
@@ -142,18 +142,18 @@ public class TimeSyncUtils {
 	 *
 	 * @param count The number of samples needed.
 	 * @param mean The mean time offset the samples should have.
-	 * @return The synchronization sample
+	 * @return The time synchronization sample
 	 */
-	public static List<SynchronizationSample> createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(final int count, final long mean) {
+	public static List<TimeSynchronizationSample> createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(final int count, final long mean) {
 		final SecureRandom random = new SecureRandom();
-		final List<SynchronizationSample> samples = new ArrayList<>();
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		if (count % 2 == 1) {
-			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean));
+			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean));
 		}
 		for (int i = 0; i < count/2; i++) {
 			final int value = random.nextInt(1000);
-			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean + value));
-			samples.add(createSynchronizationSampleWithKeyPair(new KeyPair(), mean - value));
+			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean + value));
+			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean - value));
 		}
 
 		return samples;
@@ -164,10 +164,10 @@ public class TimeSyncUtils {
 	 *
 	 * @param keyPair The key pair to tie the node to.
 	 * @param timeOffset The time offset in ms.
-	 * @return The synchronization sample
+	 * @return The time synchronization sample
 	 */
-	private static SynchronizationSample createSynchronizationSampleWithKeyPair(KeyPair keyPair, final long timeOffset) {
-		return new SynchronizationSample(
+	private static TimeSynchronizationSample createTimeSynchronizationSampleWithKeyPair(KeyPair keyPair, final long timeOffset) {
+		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(5 + timeOffset), new NetworkTimeStamp(5 + timeOffset)));
@@ -181,15 +181,15 @@ public class TimeSyncUtils {
 	 * @param localReceiveTimeStamp The local receive time stamp.
 	 * @param remoteSendTimeStamp The remote send time stamp.
 	 * @param remoteReceiveTimeStamp The remote receive time stamp.
-	 * @return The synchronization sample
+	 * @return The time synchronization sample
 	 */
-	public static SynchronizationSample createSynchronizationSample(
+	public static TimeSynchronizationSample createTimeSynchronizationSample(
 			final KeyPair keyPair,
 			final long localSendTimeStamp,
 			final long localReceiveTimeStamp,
 			final long remoteSendTimeStamp,
 			final long remoteReceiveTimeStamp) {
-		return new SynchronizationSample(
+		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(localSendTimeStamp), new NetworkTimeStamp(localReceiveTimeStamp)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(remoteSendTimeStamp), new NetworkTimeStamp(remoteReceiveTimeStamp)));

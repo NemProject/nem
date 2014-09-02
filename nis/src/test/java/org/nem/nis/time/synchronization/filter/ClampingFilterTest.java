@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.nis.test.TimeSyncUtils;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 
@@ -44,11 +44,11 @@ public class ClampingFilterTest {
 	public void filterDoesFilterOutOnlySamplesWithIntolerableTimeOffset() {
 		// Arrange:
 		final ClampingFilter filter = new ClampingFilter();
-		final List<SynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 3);
+		final List<TimeSynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 3);
 		originalSamples.addAll(TimeSyncUtils.createIntolerableSamples(5));
 
 		// Act:
-		final List<SynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
+		final List<TimeSynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
 
 		// Assert:
 		Assert.assertThat(samples.size(), IsEqual.equalTo(3));

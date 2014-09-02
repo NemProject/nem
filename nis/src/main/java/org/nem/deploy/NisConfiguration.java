@@ -15,6 +15,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final boolean bootWithoutAck;
 	private final boolean useBinaryTransport;
 	private final String bootName;
+	private final boolean useNetworkTime;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -37,6 +38,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 20);
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
+		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", false);
 	}
 
 	/**
@@ -84,5 +86,14 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean useBinaryTransport() {
 		return this.useBinaryTransport;
+	}
+
+	/**
+	 * Gets a value indicating whether or not this node should use the network time for time stamps in blocks, transactions, ...
+	 *
+	 * @return true if this node should use the network time.
+	 */
+	public boolean useNetworkTime() {
+		return this.useNetworkTime;
 	}
 }

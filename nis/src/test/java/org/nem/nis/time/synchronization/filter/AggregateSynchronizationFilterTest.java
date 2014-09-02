@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.nis.test.TimeSyncUtils;
-import org.nem.nis.time.synchronization.SynchronizationSample;
+import org.nem.nis.time.synchronization.TimeSynchronizationSample;
 
 import java.util.*;
 
@@ -53,16 +53,16 @@ public class AggregateSynchronizationFilterTest {
 		// Arrange:
 		final ClampingFilter filter1 = Mockito.mock(ClampingFilter.class);
 		final AlphaTrimmedMeanFilter filter2 = Mockito.mock(AlphaTrimmedMeanFilter.class);
-		final List<SynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 10);
-		final List<SynchronizationSample> samples1 = TimeSyncUtils.createTolerableSortedSamples(20, 10);
-		final List<SynchronizationSample> samples2 = TimeSyncUtils.createTolerableSortedSamples(40,10);
+		final List<TimeSynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 10);
+		final List<TimeSynchronizationSample> samples1 = TimeSyncUtils.createTolerableSortedSamples(20, 10);
+		final List<TimeSynchronizationSample> samples2 = TimeSyncUtils.createTolerableSortedSamples(40,10);
 		Mockito.when(filter1.filter(originalSamples, new NodeAge(0))).thenReturn(samples1);
 		Mockito.when(filter2.filter(samples1, new NodeAge(0))).thenReturn(samples2);
 		final AggregateSynchronizationFilter filter = new AggregateSynchronizationFilter(
 				Arrays.asList(filter1, filter2));
 
 		// Act:
-		List<SynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
+		List<TimeSynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
 
 		// Assert:
 		Mockito.verify(filter1, Mockito.times(1)).filter(originalSamples, new NodeAge(0));

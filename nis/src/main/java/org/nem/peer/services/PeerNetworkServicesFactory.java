@@ -14,10 +14,10 @@ public class PeerNetworkServicesFactory {
 
 	private final PeerNetworkState state;
 	private final PeerConnector peerConnector;
-	private final TimeSyncConnector timeSyncConnector;
+	private final TimeSynchronizationConnector timeSynchronizationConnector;
 	private final SyncConnectorPool syncConnectorPool;
 	private final BlockSynchronizer blockSynchronizer;
-	private final SynchronizationStrategy timeSyncStrategy;
+	private final TimeSynchronizationStrategy timeSyncStrategy;
 
 	/**
 	 * Creates a new factory.
@@ -30,13 +30,13 @@ public class PeerNetworkServicesFactory {
 	public PeerNetworkServicesFactory(
 			final PeerNetworkState state,
 			final PeerConnector peerConnector,
-			final TimeSyncConnector timeSyncConnector,
+			final TimeSynchronizationConnector timeSynchronizationConnector,
 			final SyncConnectorPool syncConnectorPool,
 			final BlockSynchronizer blockSynchronizer,
-			final SynchronizationStrategy timeSyncStrategy) {
+			final TimeSynchronizationStrategy timeSyncStrategy) {
 		this.state = state;
 		this.peerConnector = peerConnector;
-		this.timeSyncConnector = timeSyncConnector;
+		this.timeSynchronizationConnector = timeSynchronizationConnector;
 		this.syncConnectorPool = syncConnectorPool;
 		this.blockSynchronizer = blockSynchronizer;
 		this.timeSyncStrategy = timeSyncStrategy;
@@ -93,6 +93,6 @@ public class PeerNetworkServicesFactory {
 	 * @return A time synchronizer.
 	 */
 	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {
-		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSyncConnector, timeProvider, this.state);
+		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSynchronizationConnector, timeProvider, this.state);
 	}
 }

@@ -3,14 +3,14 @@ package org.nem.nis.time.synchronization;
 /**
  * A synchronization exception.
  */
-public class SynchronizationException extends RuntimeException {
+public class TimeSynchronizationException extends RuntimeException {
 
 	/**
 	 * Creates a new synchronization exception.
 	 *
 	 * @param message The exception message.
 	 */
-	public SynchronizationException(final String message) {
+	public TimeSynchronizationException(final String message) {
 		super(message);
 	}
 
@@ -20,7 +20,7 @@ public class SynchronizationException extends RuntimeException {
 	 * @param message The exception message.
 	 * @param cause The original exception.
 	 */
-	public SynchronizationException(final String message, final Throwable cause) {
+	public TimeSynchronizationException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }
