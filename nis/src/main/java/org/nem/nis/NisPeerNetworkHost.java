@@ -145,11 +145,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				: CommunicationMode.JSON;
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
 		final PeerConnector peerConnector = connectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
-		final TimeSyncConnector timeSyncconnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
+		final TimeSyncConnector timeSyncConnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
 		return new PeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
-				timeSyncconnector,
+				timeSyncConnector,
 				connectorPool,
 				this.synchronizer,
 				createTimeSynchronizationStrategy());

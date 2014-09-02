@@ -3,6 +3,8 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.time.SystemTimeProvider;
+import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 
@@ -38,11 +40,21 @@ public class PeerNetworkServicesFactoryTest {
 		Assert.assertThat(createFactory().createNodeSynchronizer(), IsNull.notNullValue());
 	}
 
+
+	@Test
+	public void createTimeSynchronizerReturnsNonNull() {
+		// Assert:
+		Assert.assertThat(createFactory().createTimeSynchronizer(Mockito.mock(ImportanceAwareNodeSelector.class), Mockito.mock(SystemTimeProvider.class)),
+				IsNull.notNullValue());
+	}
+
 	private static PeerNetworkServicesFactory createFactory() {
 		return new PeerNetworkServicesFactory(
 				Mockito.mock(PeerNetworkState.class),
 				Mockito.mock(PeerConnector.class),
+				Mockito.mock(TimeSyncConnector.class),
 				Mockito.mock(SyncConnectorPool.class),
-				Mockito.mock(BlockSynchronizer.class));
+				Mockito.mock(BlockSynchronizer.class),
+				Mockito.mock(SynchronizationStrategy.class));
 	}
 }

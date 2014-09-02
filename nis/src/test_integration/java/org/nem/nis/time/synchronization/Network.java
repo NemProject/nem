@@ -25,6 +25,26 @@ public class Network {
 	private static final long CLOCK_ADJUSTMENT_INTERVALL = DAY;
 	private static final BlockHeight HEIGHT = new BlockHeight(10);
 
+	/***
+	 * Start value for the update interval of clocks in milli seconds.
+	 */
+	private static final long UPDATE_INTERVAL_START = 60000;
+
+	/***
+	 * The maximal value for the update interval of clocks in milli seconds.
+	 */
+	private static final long UPDATE_INTERVAL_MAXIMUM = 60 * UPDATE_INTERVAL_START;
+
+	/***
+	 * Value that indicates after which round the update interval elongation starts.
+	 */
+	private static final long START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND = 5;
+
+	/***
+	 * Value that indicates how fast the update interval grows.
+	 */
+	private static final double UPDATE_INTERVAL_ELONGATION_STRENGTH = 0.1;
+
 	private String name;
 	private final Set<TimeAwareNode> nodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final SecureRandom random = new SecureRandom();
@@ -217,13 +237,13 @@ public class Network {
 	 * @return The update interval in milli seconds.
 	 */
 	private long getUpdateInterval(NodeAge age) {
-		if (SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND > age.getRaw()) {
-			return SynchronizationConstants.UPDATE_INTERVAL_START;
+		if (START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND > age.getRaw()) {
+			return UPDATE_INTERVAL_START;
 		}
-		final long ageToUse = age.getRaw() - SynchronizationConstants.START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND;
-		return (long)Math.min(SynchronizationConstants.UPDATE_INTERVAL_START +
-				(SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM - SynchronizationConstants.UPDATE_INTERVAL_START) *
-						ageToUse * SynchronizationConstants.UPDATE_INTERVAL_ELONGATION_STRENGTH, SynchronizationConstants.UPDATE_INTERVAL_MAXIMUM);
+		final long ageToUse = age.getRaw() - START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND;
+		return (long)Math.min(UPDATE_INTERVAL_START +
+				(UPDATE_INTERVAL_MAXIMUM - UPDATE_INTERVAL_START) *
+						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
 	}
 
 	private PoiFacade resetFacade() {

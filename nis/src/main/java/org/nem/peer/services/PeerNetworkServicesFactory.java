@@ -92,7 +92,7 @@ public class PeerNetworkServicesFactory {
 	 *
 	 * @return A time synchronizer.
 	 */
-	public TimeSynchronizer createTimeSynchronizer(NodeSelector selector, TimeProvider timeProvider) {
-		return new NisTimeSynchronizer(selector, timeSyncStrategy, this.timeSyncConnector, timeProvider, this.state);
+	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {
+		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSyncConnector, timeProvider, this.state);
 	}
 }

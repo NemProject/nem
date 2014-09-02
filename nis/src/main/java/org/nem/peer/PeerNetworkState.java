@@ -143,15 +143,16 @@ public class PeerNetworkState {
 	}
 
 	/**
-	 * Gets the node's age.
+	 * Gets the local node's age.
 	 *
 	 * @return the node's age.
 	 */
 	public NodeAge getNodeAge() {
 		return this.nodeAge;
 	}
+
 	/**
-	 * Increments the node's age by one.
+	 * Increments local the node's age by one.
 	 */
 	public void incrementAge() {
 		this.nodeAge = this.nodeAge.increment();

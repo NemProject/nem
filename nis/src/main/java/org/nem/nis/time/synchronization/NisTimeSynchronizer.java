@@ -16,19 +16,19 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 	private final SynchronizationStrategy syncStrategy;
 	private final TimeSyncConnector connector;
 	private final TimeProvider timeProvider;
-	private final PeerNetworkState networState;
+	private final PeerNetworkState networkState;
 
 	public NisTimeSynchronizer(
 			final NodeSelector selector,
 			final SynchronizationStrategy syncStrategy,
 			final TimeSyncConnector connector,
 			final TimeProvider timeProvider,
-			final PeerNetworkState networState) {
+			final PeerNetworkState networkState) {
 		this.selector = selector;
 		this.syncStrategy = syncStrategy;
 		this.connector = connector;
 		this.timeProvider = timeProvider;
-		this.networState = networState;
+		this.networkState = networkState;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 		final List<CompletableFuture> futures = nodes.stream()
 				.map(n -> {
 					final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();
-					return connector.getCommunicationTimeStamps(n)
+					return this.connector.getCommunicationTimeStamps(n)
 							.thenApply(c -> {
 								final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
 								final SynchronizationSample sample = new SynchronizationSample(n, new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp), c);
@@ -49,9 +49,9 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 				.collect(Collectors.toList());
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.whenComplete((o, e) -> {
-					final TimeOffset timeOffset = syncStrategy.calculateTimeOffset(samples, this.networState.getNodeAge());
-					timeProvider.updateTimeOffset(timeOffset);
-					this.networState.incrementAge();
+					final TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
+					this.timeProvider.updateTimeOffset(timeOffset);
+					this.networkState.incrementAge();
 				});
 	}
 }

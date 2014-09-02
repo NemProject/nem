@@ -5,6 +5,8 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
 import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.time.TimeProvider;
+import org.nem.nis.time.synchronization.*;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
@@ -193,6 +195,25 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.times(1)).createLocalNodeEndpointUpdater();
 		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
+	}
+
+	@Test
+	public void synchronizeTimeDelegatesToFactories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TimeSynchronizer synchronizer = Mockito.mock(TimeSynchronizer.class);
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		final ImportanceAwareNodeSelector nodeSelector = Mockito.mock(ImportanceAwareNodeSelector.class);
+		Mockito.when(context.selectorFactory.createImportanceAwareNodeSelector()).thenReturn(nodeSelector);
+		Mockito.when(context.servicesFactory.createTimeSynchronizer(nodeSelector, timeProvider)).thenReturn(synchronizer);
+
+		// Act:
+		context.network.synchronizeTime(timeProvider);
+
+		// Assert:
+		Mockito.verify(context.selectorFactory, Mockito.times(1)).createImportanceAwareNodeSelector();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createTimeSynchronizer(nodeSelector, timeProvider);
+		Mockito.verify(synchronizer, Mockito.times(1)).synchronizeTime();
 	}
 
 	//endregion

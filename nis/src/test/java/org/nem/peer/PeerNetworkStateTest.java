@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
@@ -254,6 +255,24 @@ public class PeerNetworkStateTest {
 		// Assert:
 		Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
 		Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
+	}
+
+	//endregion
+
+	//region node age
+
+	@Test
+	public void incrementAgeAddsOneToNodeAge() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.incrementAge();
+		state.incrementAge();
+		state.incrementAge();
+
+		// Assert:
+		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(3)));
 	}
 
 	//endregion
