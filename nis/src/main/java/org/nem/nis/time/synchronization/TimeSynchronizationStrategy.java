@@ -8,7 +8,7 @@ import java.util.List;
  * Calculates the offset in time between the local computer clock and the the network time
  * base on the list of synchronization samples.
  */
-public interface SynchronizationStrategy {
+public interface TimeSynchronizationStrategy {
 
 	/**
 	 * Calculates the offset in time between the local computer clock and the the network time
@@ -17,5 +17,5 @@ public interface SynchronizationStrategy {
 	 * @param samples The list of synchronization samples.
 	 * @return The time offset in ms.
 	 */
-	public TimeOffset calculateTimeOffset(final List<SynchronizationSample> samples, final NodeAge age);
+	public TimeOffset calculateTimeOffset(final List<TimeSynchronizationSample> samples, final NodeAge age);
 }
