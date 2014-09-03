@@ -12,23 +12,23 @@ import java.util.function.BiPredicate;
 
 public class ImportanceTransferTransaction extends Transaction {
 	private final int mode;
-	private final Address remoteAddress;
+	private final Account remoteAccount;
 
-	public Address getRemote() {
-		return remoteAddress;
+	public Account getRemote() {
+		return remoteAccount;
 	}
 
 	public int getDirection() {
 		return mode;
 	}
 
-	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final int mode, final Address remoteAddress) {
+	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final int mode, final Account remoteAccount) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
-		this.remoteAddress = remoteAddress;
+		this.remoteAccount = remoteAccount;
 
-		if (null == this.remoteAddress) {
-			throw new IllegalArgumentException("remoteAddress is required");
+		if (null == this.remoteAccount) {
+			throw new IllegalArgumentException("remoteAccount is required");
 		}
 
 		if (this.mode != ImportanceTransferTransactionDirection.Transfer && this.mode != ImportanceTransferTransactionDirection.Revert) {
@@ -39,7 +39,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	public ImportanceTransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
 		this.mode = deserializer.readInt("mode");
-		this.remoteAddress = Address.readFrom(deserializer, "remoteAddress", AddressEncoding.PUBLIC_KEY);
+		this.remoteAccount = Account.readFrom(deserializer, "remoteAccount", AddressEncoding.PUBLIC_KEY);
 
 		// TODO-CR: J->G do you want to validate the mode here?
 		// G->J any reason not to? (would checkDerivedValidity be better place?)
@@ -49,7 +49,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeInt("mode", this.mode);
-		Address.writeTo(serializer, "remoteAddress", this.remoteAddress, AddressEncoding.PUBLIC_KEY);
+		Account.writeTo(serializer, "remoteAccount", this.remoteAccount, AddressEncoding.PUBLIC_KEY);
 	}
 
 	@Override

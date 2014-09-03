@@ -2,14 +2,20 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class ImportanceTransferMapperTest {
 
@@ -75,7 +81,7 @@ public class ImportanceTransferMapperTest {
 					new TimeInstant(721),
 					sender,
 					direction,
-					remote.getAddress());
+					remote);
 
 			this.model.setFee(Amount.fromNem(11));
 			this.model.setDeadline(new TimeInstant(800));
@@ -90,7 +96,7 @@ public class ImportanceTransferMapperTest {
 			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
 			this.dbRemote = new org.nem.nis.dbmodel.Account();
-			this.dbRemote.setPrintableKey(this.model.getRemote().getEncoded());
+			this.dbRemote.setPrintableKey(this.model.getRemote().getAddress().getEncoded());
 			this.dbRemote.setPublicKey(this.remote.getKeyPair().getPublicKey());
 
 			this.accountDao = new MockAccountDao();
@@ -109,7 +115,16 @@ public class ImportanceTransferMapperTest {
 		}
 
 		public ImportanceTransfer toDbModel(final int blockIndex) {
-			return ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
+			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
+
+			// hackery
+			final org.nem.nis.dbmodel.Block b = Mockito.mock(org.nem.nis.dbmodel.Block.class);
+			final List<ImportanceTransfer> l = (List<ImportanceTransfer>)Mockito.mock(List.class);
+			Mockito.when(l.indexOf(ret)).thenReturn(new Integer(blockIndex));
+			Mockito.when(b.getBlockImportanceTransfers()).thenReturn(l);
+			ret.setBlock(b);
+
+			return ret;
 		}
 
 		public ImportanceTransferTransaction toModel(final ImportanceTransfer dbTransfer) {
@@ -134,11 +149,11 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.direction));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
+			//Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
-			final PublicKey remotePublicKey = this.model.getRemote().getPublicKey();
+			final PublicKey remotePublicKey = this.model.getRemote().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getRemote().getPublicKey(), IsEqual.equalTo(remotePublicKey));
 		}
 
@@ -150,7 +165,8 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(rhs.getDeadline(), IsEqual.equalTo(this.model.getDeadline()));
 			Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(this.model.getSigner()));
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
-			Assert.assertThat(rhs.getRemote().getPublicKey(), IsEqual.equalTo(this.model.getRemote().getPublicKey()));
+			Assert.assertThat(rhs.getRemote(), IsEqual.equalTo(this.model.getRemote()));
+			Assert.assertThat(rhs.getRemote().getAddress().getPublicKey(), IsEqual.equalTo(this.model.getRemote().getAddress().getPublicKey()));
 			Assert.assertThat(rhs.getDirection(), IsEqual.equalTo(this.model.getDirection()));
 			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
 		}

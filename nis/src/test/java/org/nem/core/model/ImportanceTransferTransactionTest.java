@@ -76,14 +76,14 @@ public class ImportanceTransferTransactionTest {
 		// Assert:
 		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote.getAddress()));
+		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
 		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 
 	private ImportanceTransferTransaction createImportanceTransferTransaction(final Account sender, int mode, final Account remote) {
-		return new ImportanceTransferTransaction(TIME, sender, mode, remote != null ? remote.getAddress() : null);
+		return new ImportanceTransferTransaction(TIME, sender, mode, remote);
 	}
 
 	// endregion
@@ -112,7 +112,7 @@ public class ImportanceTransferTransactionTest {
 
 		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote.getAddress()));
+		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
 		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}

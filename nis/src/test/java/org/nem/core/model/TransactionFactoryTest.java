@@ -62,7 +62,7 @@ public class TransactionFactoryTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionDirection.Transfer, recipient.getAddress());
+		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionDirection.Transfer, recipient);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 
 		// Act:
@@ -74,7 +74,7 @@ public class TransactionFactoryTest {
 		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
 		final ImportanceTransferTransaction importanceTransferTransaction = (ImportanceTransferTransaction)transaction;
 		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(ImportanceTransferTransactionDirection.Transfer));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(recipient.getAddress()));
+		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(recipient));
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class TransactionFactoryTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionDirection.Transfer, recipient.getAddress());
+		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionDirection.Transfer, recipient);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				originalTransaction.asNonVerifiable(),
 				new MockAccountLookup());

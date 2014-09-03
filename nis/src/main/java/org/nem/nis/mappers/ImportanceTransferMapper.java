@@ -20,7 +20,7 @@ public class ImportanceTransferMapper {
 	 */
 	public static ImportanceTransfer toDbModel(final ImportanceTransferTransaction importanceTransferTransaction, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
-		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote());
+		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
 
 		final Hash txHash = HashUtils.calculateHash(importanceTransferTransaction);
 		final ImportanceTransfer dbTransfer = new ImportanceTransfer(
@@ -53,12 +53,13 @@ public class ImportanceTransferMapper {
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
 		final Address remoteAddress = Address.fromPublicKey(dbImportanceTransfer.getRemote().getPublicKey());
+		final Account remote = accountLookup.findByAddress(remoteAddress);
 
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
 				new TimeInstant(dbImportanceTransfer.getTimeStamp()),
 				sender,
 				dbImportanceTransfer.getDirection(),
-				remoteAddress);
+				remote);
 
 		transfer.setFee(new Amount(dbImportanceTransfer.getFee()));
 		transfer.setDeadline(new TimeInstant(dbImportanceTransfer.getDeadline()));

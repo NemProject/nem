@@ -657,7 +657,7 @@ public class BlockDaoTest {
 				new TimeInstant(0),
 				sender,
 				isTransfer ? ImportanceTransferTransactionDirection.Transfer : ImportanceTransferTransactionDirection.Revert,
-				remote.getAddress()
+				remote
 		);
 		importanceTransferTransaction.sign();
 		return importanceTransferTransaction;
