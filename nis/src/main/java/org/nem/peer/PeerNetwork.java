@@ -3,11 +3,12 @@ package org.nem.peer;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -82,6 +83,10 @@ public class PeerNetwork {
 	 */
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		this.state.setRemoteNodeExperiences(pair);
+	}
+
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.state.getTimeSynchronizationResults();
 	}
 
 	//endregion

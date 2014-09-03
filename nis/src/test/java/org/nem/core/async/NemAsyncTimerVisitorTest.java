@@ -1,19 +1,19 @@
-package org.nem.nis;
+package org.nem.core.async;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.test.NisUtils;
 
-public class NisAsyncTimerVisitorTest {
+public class NemAsyncTimerVisitorTest {
 
 	@Test
 	public void visitorIsInitializedWithDefaultValues() {
 		// Arrange:
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
 
 		// Assert:
 		assertDefaultValuesWithLastDelayTime(visitor, 0);
@@ -22,8 +22,8 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationStartUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(71, 101);
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
 		visitor.notifyOperationStart();
@@ -43,8 +43,8 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationCompleteUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(71, 101);
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
 		visitor.notifyOperationStart();
@@ -65,8 +65,8 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyOperationCompleteExceptionallyUpdatesVisitorStateCorrectly() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101);
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(71, 101);
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
 		visitor.notifyOperationStart();
@@ -87,8 +87,8 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void averageOperationTimeIsCalculatedCorrectlyWhenThereAreMultipleCompletions() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101, 101, 121, 121, 131);
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(71, 101, 101, 121, 121, 131);
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", timeProvider);
 
 		// Act:
 		visitor.notifyOperationStart();
@@ -106,7 +106,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyDelayUpdatesLastDelayTime() {
 		// Arrange:
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
 
 		// Act:
 		visitor.notifyDelay(12);
@@ -119,7 +119,7 @@ public class NisAsyncTimerVisitorTest {
 	@Test
 	public void notifyStopUpdatesNothing() {
 		// Arrange:
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", Mockito.mock(TimeProvider.class));
 
 		// Act:
 		visitor.notifyStop();
@@ -142,8 +142,8 @@ public class NisAsyncTimerVisitorTest {
 
 	private static void assertVisitorSerialization(final boolean isExecuting) {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(71, 101, 101, 121, 121, 131, 142);
-		final NisAsyncTimerVisitor visitor = new NisAsyncTimerVisitor("timer a", timeProvider);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(71, 101, 101, 121, 121, 131, 142);
+		final NemAsyncTimerVisitor visitor = new NemAsyncTimerVisitor("timer a", timeProvider);
 
 		visitor.notifyOperationStart();
 		visitor.notifyOperationComplete();
@@ -175,7 +175,7 @@ public class NisAsyncTimerVisitorTest {
 	}
 
 	private static void assertDefaultValuesWithLastDelayTime(
-			final NisAsyncTimerVisitor visitor,
+			final NemAsyncTimerVisitor visitor,
 			final int expectedLastDelayTime) {
 		// Assert:
 		Assert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));

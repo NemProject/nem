@@ -4,7 +4,7 @@ import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.node.NodeApiId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.peer.*;
 
 import java.util.*;
@@ -41,7 +41,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int TIME_SYNC_BACK_OFF_TIME = 6 * ONE_HOUR;
 
 	private final TimeProvider timeProvider;
-	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
+	private final List<NemAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
 	private final Executor executor = Executors.newCachedThreadPool();
 
@@ -59,7 +59,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 *
 	 * @return All timer visitors.
 	 */
-	public List<NisAsyncTimerVisitor> getVisitors() {
+	public List<NemAsyncTimerVisitor> getVisitors() {
 		return this.timerVisitors;
 	}
 
@@ -184,8 +184,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		return () -> CompletableFuture.runAsync(runnable, this.executor);
 	}
 
-	private NisAsyncTimerVisitor createNamedVisitor(final String name) {
-		final NisAsyncTimerVisitor timerVisitor = new NisAsyncTimerVisitor(name, this.timeProvider);
+	private NemAsyncTimerVisitor createNamedVisitor(final String name) {
+		final NemAsyncTimerVisitor timerVisitor = new NemAsyncTimerVisitor(name, this.timeProvider);
 		this.timerVisitors.add(timerVisitor);
 		return timerVisitor;
 	}

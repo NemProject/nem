@@ -1,6 +1,7 @@
 package org.nem.core.time;
 
 import org.nem.core.model.primitive.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 
 import java.util.*;
 
@@ -44,8 +45,9 @@ public class SystemTimeProvider implements TimeProvider {
 	}
 
 	@Override
-	public void updateTimeOffset(TimeOffset offset) {
+	public TimeSynchronizationResult updateTimeOffset(final TimeOffset offset) {
 		this.timeOffset = this.timeOffset.add(offset);
+		return new TimeSynchronizationResult(this.getCurrentTime(), this.timeOffset, offset);
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 *
 	 * @return The current time in milliseconds.
 	 */
-	public long getCurrentTimeMillis() {
+	private long getCurrentTimeMillis() {
 		return System.currentTimeMillis() - EPOCH_TIME;
 	}
 

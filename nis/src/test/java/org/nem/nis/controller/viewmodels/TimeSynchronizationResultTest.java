@@ -1,4 +1,4 @@
-package org.nem.core.model;
+package org.nem.nis.controller.viewmodels;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

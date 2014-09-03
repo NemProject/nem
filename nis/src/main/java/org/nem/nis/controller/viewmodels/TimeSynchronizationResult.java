@@ -1,8 +1,8 @@
-package org.nem.core.model;
+package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.serialization.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 
 /**
  * Information about the result of a time synchronization with other nodes.
@@ -32,7 +32,7 @@ public class TimeSynchronizationResult implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public TimeSynchronizationResult(final Deserializer deserializer) {
-		this.timeStamp = TimeInstant.readFrom(deserializer, "timeStamp");
+		this.timeStamp = UnixTime.fromDateString(deserializer.readString("dateTime"), new TimeInstant(0)).getTimeInstant();
 		this.currentTimeOffset = TimeOffset.readFrom(deserializer, "currentTimeOffset");
 		this.change = TimeOffset.readFrom(deserializer, "change");
 	}
@@ -66,7 +66,7 @@ public class TimeSynchronizationResult implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		TimeInstant.writeTo(serializer, "timeStamp", this.timeStamp);
+		serializer.writeString("dateTime", UnixTime.fromTimeInstant(this.timeStamp).getDateString());
 		TimeOffset.writeTo(serializer, "currentTimeOffset", this.currentTimeOffset);
 		TimeOffset.writeTo(serializer, "change", this.change);
 	}

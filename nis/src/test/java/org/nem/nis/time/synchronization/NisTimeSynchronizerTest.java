@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
 
@@ -106,7 +107,7 @@ public class NisTimeSynchronizerTest {
 	}
 
 	@Test
-	public void synchronizeTimeIncrementsNodeAge() throws ExecutionException, InterruptedException {
+	public void synchronizeTimeUpdatesTimeSynchronizationResults() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
@@ -120,7 +121,7 @@ public class NisTimeSynchronizerTest {
 		synchronizer.synchronizeTime();
 
 		// Assert:
-		Mockito.verify(context.networkState, Mockito.times(1)).incrementAge();
+		Mockito.verify(context.networkState, Mockito.times(1)).updateTimeSynchronizationResults(Mockito.any());
 	}
 
 	private class TimeSynchronizationContext {

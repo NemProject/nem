@@ -3,9 +3,10 @@ package org.nem.nis.boot;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.peer.PeerNetwork;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class PeerNetworkSchedulerTest {
 			// Act:
 			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), true);
 			final List<String> taskNames = scheduler.getVisitors().stream()
-					.map(NisAsyncTimerVisitor::getTimerName)
+					.map(NemAsyncTimerVisitor::getTimerName)
 					.collect(Collectors.toList());
 
 			// Assert:
@@ -52,7 +53,7 @@ public class PeerNetworkSchedulerTest {
 			// Act:
 			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), false);
 			final List<String> taskNames = scheduler.getVisitors().stream()
-					.map(NisAsyncTimerVisitor::getTimerName)
+					.map(NemAsyncTimerVisitor::getTimerName)
 					.collect(Collectors.toList());
 
 			// Assert:

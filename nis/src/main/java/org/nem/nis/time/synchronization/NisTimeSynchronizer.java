@@ -3,6 +3,7 @@ package org.nem.nis.time.synchronization;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeProvider;
+import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
 
@@ -11,6 +12,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * NIS time synchronization with other NIS nodes.
+ */
 public class NisTimeSynchronizer implements TimeSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(NisTimeSynchronizer.class.getName());
 
@@ -34,9 +38,10 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 	}
 
 	@Override
-	public void synchronizeTime() {
+		public void synchronizeTime() {
 		List<TimeSynchronizationSample> samples = new ArrayList<>();
 		List<Node> nodes = this.selector.selectNodes();
+		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
 		final List<CompletableFuture> futures = nodes.stream()
 				.map(n -> {
 					final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();
@@ -52,8 +57,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.whenComplete((o, e) -> {
 					final TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
-					this.timeProvider.updateTimeOffset(timeOffset);
-					this.networkState.incrementAge();
+					this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
 				});
 	}
 }

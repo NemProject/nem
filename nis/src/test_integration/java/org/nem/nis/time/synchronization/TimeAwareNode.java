@@ -3,6 +3,7 @@ package org.nem.nis.time.synchronization;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
+import org.nem.core.time.synchronization.*;
 
 import java.util.List;
 import java.util.logging.Logger;

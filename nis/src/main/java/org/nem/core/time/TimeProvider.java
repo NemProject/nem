@@ -1,6 +1,7 @@
 package org.nem.core.time;
 
 import org.nem.core.model.primitive.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 /**
  * Interface that provides time-related information.
  */
@@ -29,6 +30,9 @@ public interface TimeProvider {
 
 	/**
 	 * Updates the time offset.
+	 *
+	 * @param offset The calculated time offset to the other nodes.
+	 * @return The time synchronization result.
 	 */
-	public void updateTimeOffset(TimeOffset offset);
+	public TimeSynchronizationResult updateTimeOffset(final TimeOffset offset);
 }

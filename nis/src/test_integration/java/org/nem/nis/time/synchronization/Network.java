@@ -2,6 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
+import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.poi.*;
 import org.nem.nis.time.synchronization.filter.*;

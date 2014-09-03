@@ -4,8 +4,8 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.primitive.NodeAge;
-import org.nem.nis.test.TimeSyncUtils;
-import org.nem.nis.time.synchronization.TimeSynchronizationSample;
+import org.nem.core.test.TimeSyncUtils;
+import org.nem.core.time.synchronization.TimeSynchronizationSample;
 
 import java.util.*;
 

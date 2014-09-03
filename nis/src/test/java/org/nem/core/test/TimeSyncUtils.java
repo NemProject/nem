@@ -1,16 +1,16 @@
-package org.nem.nis.test;
+package org.nem.core.test;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.NetworkTimeStamp;
 import org.nem.core.node.*;
-import org.nem.nis.time.synchronization.*;
-import org.nem.nis.time.synchronization.filter.FilterConstants;
+import org.nem.core.time.synchronization.*;
 
 import java.security.SecureRandom;
 import java.util.*;
 
 public class TimeSyncUtils {
 
+	private static final long TOLERATED_DEVIATION_START = 1000000;
 	private static final KeyPair KEY_PAIR = new KeyPair();
 
 	/**
@@ -102,7 +102,7 @@ public class TimeSyncUtils {
 	public static List<TimeSynchronizationSample> createIntolerableSamples(final int count) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i=1; i<=count; i++) {
-			samples.add(createTimeSynchronizationSample(FilterConstants.TOLERATED_DEVIATION_START + i));
+			samples.add(createTimeSynchronizationSample(TOLERATED_DEVIATION_START + i));
 		}
 
 		return samples;

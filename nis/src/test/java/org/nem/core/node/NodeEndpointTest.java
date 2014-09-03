@@ -64,6 +64,7 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_PUSH_BLOCK, "push/block");
 		apiIdToPathMap.put(NodeApiId.REST_PUSH_TRANSACTION, "push/transaction");
 		apiIdToPathMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, "transactions/unconfirmed");
+		apiIdToPathMap.put(NodeApiId.REST_TIME_SYNC_NETWORK_TIME, "time-sync/network-time");
 
 		for (final NodeApiId apiId : NodeApiId.values()) {
 			if (!apiIdToPathMap.containsKey(apiId)) {

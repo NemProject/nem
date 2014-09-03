@@ -2,9 +2,11 @@ package org.nem.peer;
 
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -18,6 +20,7 @@ public class PeerNetworkState {
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
 	private NodeAge nodeAge;
+	private final List<TimeSynchronizationResult> timeSynchronizationResults = new ArrayList<>();
 
 	/**
 	 * Creates new peer network state.
@@ -154,7 +157,27 @@ public class PeerNetworkState {
 	/**
 	 * Increments local the node's age by one.
 	 */
-	public void incrementAge() {
+	private void incrementAge() {
 		this.nodeAge = this.nodeAge.increment();
+	}
+
+	/**
+	 * Gets the list of the most recent time synchronization results.
+	 *
+	 * @return The list of time synchronization results.
+	 */
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.timeSynchronizationResults;
+	}
+	/**
+	 * Adds a time synchronization result to the list.
+	 * Removes the oldest result if the size of the is exceeding 100.
+	 */
+	public void updateTimeSynchronizationResults(final TimeSynchronizationResult result) {
+		this.incrementAge();
+		this.timeSynchronizationResults.add(result);
+		if (this.timeSynchronizationResults.size() > 100) {
+			this.timeSynchronizationResults.remove(0);
+		}
 	}
 }

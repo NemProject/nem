@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import net.minidev.json.*;
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
@@ -124,7 +125,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 *
 	 * @return All timer visitors.
 	 */
-	public List<NisAsyncTimerVisitor> getVisitors() {
+	public List<NemAsyncTimerVisitor> getVisitors() {
 		return this.scheduler.getVisitors();
 	}
 

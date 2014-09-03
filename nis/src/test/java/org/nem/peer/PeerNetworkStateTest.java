@@ -3,8 +3,10 @@ package org.nem.peer;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.NodeAge;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
@@ -259,20 +261,34 @@ public class PeerNetworkStateTest {
 
 	//endregion
 
-	//region node age
+	//region updateTimeSynchronizationResults
 
 	@Test
-	public void incrementAgeAddsOneToNodeAge() {
+	public void updateTimeSynchronizationResultsAddsOneToNodeAge() {
 		// Arrange:
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
 
 		// Act:
-		state.incrementAge();
-		state.incrementAge();
-		state.incrementAge();
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(5), new TimeOffset(10), new TimeOffset(20)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(15), new TimeOffset(20), new TimeOffset(30)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
 
 		// Assert:
 		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(3)));
+	}
+
+	@Test
+	public void updateTimeSynchronizationResultsAddsTimeSynchronizationResultToList() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(5), new TimeOffset(10), new TimeOffset(20)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(15), new TimeOffset(20), new TimeOffset(30)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
+
+		// Assert:
+		Assert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
 	}
 
 	//endregion

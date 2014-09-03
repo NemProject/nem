@@ -7,15 +7,15 @@ import org.nem.core.model.primitive.NetworkTimeStamp;
 import org.nem.core.node.Node;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.time.synchronization.CommunicationTimeStamps;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
 import java.util.function.Function;
 
-public class TimeSyncControllerTest {
+public class TimeSynchronizationControllerTest {
 
 	@Test
 	public void getNetworkTimeReturnsCommunicationTimeStamps() {
@@ -48,7 +48,7 @@ public class TimeSyncControllerTest {
 	private static class TestContext {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
-		private final TimeSyncController controller;
+		private final TimeSynchronizationController controller;
 		private final TimeProvider timeProvider;
 		private final CommunicationTimeStamps timeStamps;
 
@@ -61,7 +61,7 @@ public class TimeSyncControllerTest {
 			Mockito.when(this.timeProvider.getNetworkTime()).thenReturn(new NetworkTimeStamp(10), new NetworkTimeStamp(20));
 			timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(10), new NetworkTimeStamp(20));
 
-			this.controller = new TimeSyncController(this.timeProvider, this.host);
+			this.controller = new TimeSynchronizationController(this.timeProvider, this.host);
 		}
 	}
 }

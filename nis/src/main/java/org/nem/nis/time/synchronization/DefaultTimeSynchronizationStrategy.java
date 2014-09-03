@@ -2,6 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
+import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;

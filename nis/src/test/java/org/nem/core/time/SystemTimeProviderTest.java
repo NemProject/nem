@@ -69,26 +69,13 @@ public class SystemTimeProviderTest {
 	}
 
 	@Test
-	public void getCurrentMillisReturnsExpectedTime() {
-		// Arrange:
-		SystemTimeProvider provider = new SystemTimeProvider();
-
-		// Act:
-		long systemCurrentMillis = System.currentTimeMillis();
-		long curMillis = provider.getCurrentTimeMillis();
-
-		// Assert:
-		Assert.assertThat(curMillis, IsEqual.equalTo(systemCurrentMillis - SystemTimeProvider.getEpochTimeMillis()));
-	}
-
-	@Test
 	public void getNetworkTimeReturnsExpectedTime() {
 		// Arrange:
 		SystemTimeProvider provider = new SystemTimeProvider();
 		provider.updateTimeOffset(new TimeOffset(123));
 
 		// Act:
-		long curMillis = provider.getCurrentTimeMillis();
+		long curMillis = System.currentTimeMillis() - SystemTimeProvider.getEpochTimeMillis();
 		NetworkTimeStamp nts = provider.getNetworkTime();
 
 		// TODO BR: is there another way to test this?

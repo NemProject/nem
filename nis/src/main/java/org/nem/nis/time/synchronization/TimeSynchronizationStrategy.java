@@ -1,6 +1,7 @@
 package org.nem.nis.time.synchronization;
 
 import org.nem.core.model.primitive.*;
+import org.nem.core.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
 
