@@ -184,7 +184,9 @@ public class ImportanceTransfer {
 	}
 
 	public Integer getBlkIndex() {
-		return this.blkIndex;
+		// apparently hibernate does not CHANGE this value, when OrderColumn and OneToMany+mappedBy is used
+		//return this.blkIndex;
+		return block.getBlockImportanceTransfers().indexOf(this);
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {
