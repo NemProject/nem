@@ -101,7 +101,7 @@ public enum NisApiId {
 
 	//endregion
 
-	// region NIS/*
+	// region /*
 
 	/**
 	 * The /heartbeat API.
@@ -111,7 +111,12 @@ public enum NisApiId {
 	/**
 	 * The /shutdown API.
 	 */
-	NIS_REST_SHUTDOWN("/shutdown");
+	NIS_REST_SHUTDOWN("/shutdown"),
+
+	/**
+	 * The /status API.
+	 */
+	NIS_REST_STATUS("/status");
 
 	//endregion
 

@@ -91,6 +91,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the network is already booted.
+	 *
+	 * @return true if the network is booted, false otherwise.
+	 */
+	public boolean isNetworkBooted() {
+		return (null != this.network);
+	}
+
+	/**
 	 * Gets outgoing audit information.
 	 *
 	 * @return The outgoing audit information.
