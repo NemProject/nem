@@ -16,6 +16,7 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
+	private int chainSynchroniztion = 0;
 
 	/**
 	 * Creates new peer network state.
@@ -137,5 +138,27 @@ public class PeerNetworkState {
 
 		nodeArray[index] = localNode;
 		return nodeArray;
+	}
+
+	/**
+	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
+	 *
+	 * @return true if synchronized, false otherwise.
+	 */
+	public boolean isChainSynchronized() {
+		return this.chainSynchroniztion > 0;
+	}
+
+	/**
+	 * Set a value indicating if the local chain is synchronized with the rest of the network.
+	 *
+	 * @param isChainSynchronized true if the local chain is synchronized, false otherwise.
+	 */
+	public void setChainSynchronized(boolean isChainSynchronized) {
+		if (isChainSynchronized) {
+			this.chainSynchroniztion = 2;
+		} else {
+			this.chainSynchroniztion--;
+		}
 	}
 }

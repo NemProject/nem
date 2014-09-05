@@ -35,6 +35,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
 
+	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
+
 	private final TimeProvider timeProvider;
 	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
@@ -107,6 +109,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				this.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
 				UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
 				"UPDATING LOCAL NODE ENDPOINT");
+		this.addSimpleTask(
+				this.runnableToFutureSupplier(() -> network.checkChainSynchronization()),
+				CHECK_CHAIN_SYNC_INTERVAL,
+				"CHECKING CHAIN SYNCHRONIZATION");
 	}
 
 	private void addRefreshTask(final PeerNetwork network) {

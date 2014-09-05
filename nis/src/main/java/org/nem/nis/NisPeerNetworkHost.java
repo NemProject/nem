@@ -7,6 +7,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
@@ -26,6 +27,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
+	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
 	private final AuditCollection outgoingAudits = createAuditCollection();
@@ -41,6 +43,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final NisConfiguration nisConfiguration) {
 		this.accountLookup = accountLookup;
 		this.blockChain = blockChain;
+		this.chainServices = new ChainServices(this.blockChain);
 		this.nisConfiguration = nisConfiguration;
 		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
@@ -147,7 +150,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				: CommunicationMode.JSON;
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
 		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
-		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
+		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer, this.chainServices);
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {

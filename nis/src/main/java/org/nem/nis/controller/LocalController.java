@@ -107,8 +107,11 @@ public class LocalController {
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
 	@ClientApi
 	public NemRequestResult status() {
-		int status = this.host.isNetworkBooted()? NemStatus.BOOTED.getValue() : NemStatus.RUNNING.getValue();
+		if (!this.host.isNetworkBooted()) {
+			return new NemRequestResult(NemRequestResult.TYPE_STATUS,  NemStatus.RUNNING.getValue(), "status");
+		}
 
+		int status = this.host.getNetwork().isChainSynchronized()? NemStatus.SYNCHRONIZED.getValue() : NemStatus.BOOTED.getValue();
 		return new NemRequestResult(NemRequestResult.TYPE_STATUS, status, "status");
 	}
 }

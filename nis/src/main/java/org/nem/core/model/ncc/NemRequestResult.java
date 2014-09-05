@@ -4,7 +4,7 @@ import org.nem.core.model.ValidationResult;
 import org.nem.core.serialization.*;
 
 /**
- * Result for NIS request from NCC.
+ * Result for NEM request.
  */
 public class NemRequestResult implements SerializableEntity {
 	/**

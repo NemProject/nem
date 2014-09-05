@@ -6,11 +6,14 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface that is used to sync blocks and transactions across peers.
  */
 public interface SyncConnector {
+
+	// region synchronous requests
 
 	/**
 	 * Requests information about the last block in the chain from the specified node.
@@ -65,4 +68,21 @@ public interface SyncConnector {
 	 * @return All non conflicting unconfirmed transactions the endpoint has.
 	 */
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node);
+
+	// endregion
+
+	// TODO 20140905 BR: -> J wouldn't it be a good idea to have always both, an asynchronous and a synchronous version of a request?
+	// TODO                   The asynchronous should ideally return a CompletableFuture<Deserializer> as opposed to what I am doing here.
+	// TODO                   (I wanted to modify the HttpConnector just as much as needed for the ChainServices class)
+	// region asynchronous requests
+
+	/**
+	 * Requests information about the cumulative score of the remote chain.
+	 *
+	 * @param node The remote node.
+	 * @return The completable future containing the cumulative score of the remote chain.
+	 */
+	public CompletableFuture<BlockChainScore> getChainScoreAsync(final Node node);
+
+	// endregion
 }

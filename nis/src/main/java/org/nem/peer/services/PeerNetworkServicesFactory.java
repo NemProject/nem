@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.DefaultNodeVersionCheck;
@@ -13,6 +14,7 @@ public class PeerNetworkServicesFactory {
 	private final PeerConnector peerConnector;
 	private final SyncConnectorPool syncConnectorPool;
 	private final BlockSynchronizer blockSynchronizer;
+	private final ChainServices chainServices;
 
 	/**
 	 * Creates a new factory.
@@ -26,11 +28,13 @@ public class PeerNetworkServicesFactory {
 			final PeerNetworkState state,
 			final PeerConnector peerConnector,
 			final SyncConnectorPool syncConnectorPool,
-			final BlockSynchronizer blockSynchronizer) {
+			final BlockSynchronizer blockSynchronizer,
+			final ChainServices chainServices) {
 		this.state = state;
 		this.peerConnector = peerConnector;
 		this.syncConnectorPool = syncConnectorPool;
 		this.blockSynchronizer = blockSynchronizer;
+		this.chainServices = chainServices;
 	}
 
 	/**
@@ -76,5 +80,14 @@ public class PeerNetworkServicesFactory {
 	 */
 	public NodeSynchronizer createNodeSynchronizer() {
 		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
+	}
+
+	/**
+	 * Gets the chain services.
+	 *
+	 * @return The chain services.
+	 */
+	public ChainServices getChainServices() {
+		return this.chainServices;
 	}
 }

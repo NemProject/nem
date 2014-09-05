@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
 import org.nem.core.test.MockSerializableEntity;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
@@ -193,6 +194,38 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.times(1)).createLocalNodeEndpointUpdater();
 		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
+	}
+
+	@Test
+	public void checkChainSynchronizationDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).getChainServices();
+		Mockito.verify(services, Mockito.times(1)).isChainSynchronized(Mockito.any());
+	}
+
+	@Test
+	public void checkChainSynchronizationUpdatesNetworkState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		final Node node = PeerUtils.createNodeWithName("r");
+		Mockito.when(services.isChainSynchronized(node)).thenReturn(true);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+		Mockito.when(context.state.getLocalNode()).thenReturn(node);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).setChainSynchronized(true);
 	}
 
 	//endregion

@@ -38,6 +38,15 @@ public class PeerNetwork {
 	//region PeerNetworkState delegation
 
 	/**
+	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
+	 *
+	 * @return true if synchronized, false otherwise.
+	 */
+	public boolean isChainSynchronized() {
+		return this.state.isChainSynchronized();
+	}
+
+	/**
 	 * Gets the local node.
 	 *
 	 * @return The local node.
@@ -110,6 +119,13 @@ public class PeerNetwork {
 	 */
 	public void synchronize() {
 		this.servicesFactory.createNodeSynchronizer().synchronize(this.selector);
+	}
+
+	/**
+	 * Checks if the local chain is synchronized with the rest of the network and updates the network's state.
+	 */
+	public void checkChainSynchronization() {
+		this.state.setChainSynchronized(this.servicesFactory.getChainServices().isChainSynchronized(this.getLocalNode()));
 	}
 
 	/**

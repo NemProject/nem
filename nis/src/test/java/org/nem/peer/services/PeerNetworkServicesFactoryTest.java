@@ -3,6 +3,7 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 
@@ -38,11 +39,18 @@ public class PeerNetworkServicesFactoryTest {
 		Assert.assertThat(createFactory().createNodeSynchronizer(), IsNull.notNullValue());
 	}
 
+	@Test
+	public void getChainServicesReturnsNonNull() {
+		// Assert:
+		Assert.assertThat(createFactory().getChainServices(), IsNull.notNullValue());
+	}
+
 	private static PeerNetworkServicesFactory createFactory() {
 		return new PeerNetworkServicesFactory(
 				Mockito.mock(PeerNetworkState.class),
 				Mockito.mock(PeerConnector.class),
 				Mockito.mock(SyncConnectorPool.class),
-				Mockito.mock(BlockSynchronizer.class));
+				Mockito.mock(BlockSynchronizer.class),
+				Mockito.mock(ChainServices.class));
 	}
 }
