@@ -61,6 +61,14 @@ public class BlockExecutor {
 			transaction.execute(observer);
 		}
 
+		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
+		for (final Transaction transaction : block.getTransactions()) {
+			if (transaction instanceof ImportanceTransferTransaction) {
+				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
+				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
+			}
+		}
+
 		final Account signer = block.getSigner();
 		signer.incrementForagedBlocks();
 		signer.incrementBalance(block.getTotalFee());
@@ -104,6 +112,14 @@ public class BlockExecutor {
 		signer.decrementForagedBlocks();
 		signer.decrementBalance(block.getTotalFee());
 
+		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
+		for (final Transaction transaction : getReverseTransactions(block)) {
+			if (transaction instanceof ImportanceTransferTransaction) {
+				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
+				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
+			}
+		}
+
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(observer);
 			transaction.undo();
@@ -116,6 +132,13 @@ public class BlockExecutor {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
+	private ImportanceTransferObserver createImportanceTransferObserver(
+			final Block block,
+			final boolean isExecute) {
+
+		return new RemoteObserver(this.poiFacade, block.getHeight(), isExecute);
+
+	}
 	private TransferObserver createTransferObserver(
 			final Block block,
 			final boolean isExecute,

@@ -15,6 +15,9 @@ public class PoiAccountState {
 	private final WeightedBalances weightedBalances;
 	private BlockHeight height;
 
+	private RemoteState remoteState;
+	private RemoteState previousState;
+
 	/**
 	 * Creates a new NIS account state.
 	 */
@@ -81,11 +84,46 @@ public class PoiAccountState {
 	}
 
 	/**
+	 * Creates association between "remote" account and "owner" account.
+	 *
+	 * @param address Address of an owner account.
+	 * @param height Height where association was created.
+	 */
+	public void remoteFor(final Address address, final BlockHeight height) {
+		this.previousState = this.remoteState;
+		this.remoteState = new RemoteState(address, height, true);
+	}
+
+	/**
+	 * Creates association between "current" (owner) account and "remote" account.
+	 *
+	 * @param address Address of remote account.
+	 * @param height Height where association was created.
+	 */
+	public void setRemote(final Address address, final BlockHeight height) {
+		this.previousState = this.remoteState;
+		this.remoteState = new RemoteState(address,height, false);
+	}
+
+	/**
+	 * Removes association between "owner" and "remote".
+	 */
+	public void resetRemote() {
+		// We can do it this way, as there must be 1440 blocks between change of state.
+		this.remoteState = this.previousState;
+		this.previousState = null;
+	}
+
+	/**
 	 * Creates a copy of this state.
 	 *
 	 * @return A copy of this state.
 	 */
 	public PoiAccountState copy() {
-		return new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
+		final PoiAccountState ret = new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
+		// no need to copy
+		ret.previousState = this.previousState;
+		ret.remoteState = this.remoteState;
+		return ret;
 	}
 }
