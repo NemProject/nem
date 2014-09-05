@@ -64,6 +64,8 @@ public class ImportanceTransferTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransferObserver observer) {
+		// this might look dumb, but it's essential to trigger proper observers
+		observer.notifyTransfer(this.getSigner(), this.getRemote(), Amount.ZERO);
 		observer.notifyDebit(this.getSigner(), this.getFee());
 	}
 
