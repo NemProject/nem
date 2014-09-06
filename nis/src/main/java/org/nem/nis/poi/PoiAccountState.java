@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.utils.CircularStack;
 import org.nem.nis.secret.*;
 
 /**
@@ -10,13 +11,19 @@ import org.nem.nis.secret.*;
  * G->J, I think we can safely call it AccountState, can't we?
  */
 public class PoiAccountState {
+	private static final int REMOTE_STATE_SIZE = 2;
+
 	private final Address address;
 	private final AccountImportance importance;
 	private final WeightedBalances weightedBalances;
 	private BlockHeight height;
 
-	private RemoteState remoteState;
-	private RemoteState previousState;
+	// I thought we're gonna need 3 elements, but it would work with 2.
+	//    1. let's say there is alias created at block 1000, it becomes effective at block 2440
+	//    2. now at block 2500 user removes alias, removal will become effective at block 3940
+	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
+	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
+	private CircularStack<RemoteState> remoteStateStack;
 
 	/**
 	 * Creates a new NIS account state.
@@ -34,6 +41,8 @@ public class PoiAccountState {
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
 		this.height = height;
+
+		this.remoteStateStack = new CircularStack<>(REMOTE_STATE_SIZE);
 	}
 
 	/**
@@ -90,8 +99,7 @@ public class PoiAccountState {
 	 * @param height Height where association was created.
 	 */
 	public void remoteFor(final Address address, final BlockHeight height) {
-		this.previousState = this.remoteState;
-		this.remoteState = new RemoteState(address, height, true);
+		this.remoteStateStack.add(new RemoteState(address, height, true));
 	}
 
 	/**
@@ -101,17 +109,19 @@ public class PoiAccountState {
 	 * @param height Height where association was created.
 	 */
 	public void setRemote(final Address address, final BlockHeight height) {
-		this.previousState = this.remoteState;
-		this.remoteState = new RemoteState(address,height, false);
+		this.remoteStateStack.add(new RemoteState(address, height, false));
 	}
 
 	/**
 	 * Removes association between "owner" and "remote".
 	 */
 	public void resetRemote() {
-		// We can do it this way, as there must be 1440 blocks between change of state.
-		this.remoteState = this.previousState;
-		this.previousState = null;
+		// between changes of remoteState there must be 1440 blocks
+		this.remoteStateStack.remove();
+	}
+
+	public RemoteState getRemoteState() {
+		return this.remoteStateStack.get();
 	}
 
 	/**
@@ -121,9 +131,7 @@ public class PoiAccountState {
 	 */
 	public PoiAccountState copy() {
 		final PoiAccountState ret = new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
-		// no need to copy
-		ret.previousState = this.previousState;
-		ret.remoteState = this.remoteState;
+		this.remoteStateStack.shallowCopyTo(ret.remoteStateStack);
 		return ret;
 	}
 }
