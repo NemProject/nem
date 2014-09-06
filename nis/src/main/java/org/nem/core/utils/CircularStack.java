@@ -20,9 +20,30 @@ public class CircularStack<E> implements Iterable<E> {
 	 *
 	 * @param limit Maximum number of elements on the stack.
 	 */
-	CircularStack(final int limit) {
+	public CircularStack(final int limit) {
 		this.limit = limit;
 	}
+
+	/**
+	 * Creates shallow copy in dest.
+	 *
+	 * @param dest CircularStack to which elements should be copied.
+	 */
+	public void shallowCopyTo(final CircularStack<E> dest) {
+		dest.elements.clear();
+		dest.putAll(this);
+	}
+
+	private void putAll(final CircularStack<E> rhs) {
+		int i = 0;
+		for (final E element : rhs) {
+			if (i >= rhs.size() - this.limit) {
+				this.add(element);
+			}
+			++i;
+		}
+	}
+
 
 	/**
 	 * Adds element to the stack.
