@@ -29,16 +29,20 @@ public class RemoteObserver implements ImportanceTransferObserver {
 	public void notifyTransfer(final Account sender, final Account recipient, final int direction) {
 		if (this.isExecute) {
 			if (direction == ImportanceTransferTransactionDirection.Transfer) {
-				this.getState(sender).setRemote(recipient.getAddress(), this.height);
-				this.getState(recipient).remoteFor(sender.getAddress(), this.height);
+				this.getState(sender).setRemote(recipient.getAddress(), this.height, direction);
+				this.getState(recipient).remoteFor(sender.getAddress(), this.height, direction);
 			} else if (direction == ImportanceTransferTransactionDirection.Revert) {
-				this.getState(sender).setRemote(null, this.height);
-				this.getState(recipient).setRemote(null, this.height);
+				this.getState(sender).setRemote(null, this.height, direction);
+				this.getState(recipient).setRemote(null, this.height, direction);
 			}
 		} else {
-			// this does not depend on direction
-			this.getState(recipient).resetRemote();
-			this.getState(sender).resetRemote();
+			if (direction == ImportanceTransferTransactionDirection.Transfer) {
+				this.getState(recipient).resetRemote(sender.getAddress(), this.height, direction);
+				this.getState(sender).resetRemote(recipient.getAddress(), this.height, direction);
+			} else if (direction == ImportanceTransferTransactionDirection.Revert) {
+				this.getState(recipient).resetRemote(null, this.height, direction);
+				this.getState(sender).resetRemote(null, this.height, direction);
+			}
 		}
 	}
 

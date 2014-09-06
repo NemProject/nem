@@ -94,34 +94,57 @@ public class PoiAccountState {
 
 	/**
 	 * Creates association between "remote" account and "owner" account.
-	 *
-	 * @param address Address of an owner account.
+	 *  @param address Address of an owner account.
 	 * @param height Height where association was created.
+	 * @param direction
 	 */
-	public void remoteFor(final Address address, final BlockHeight height) {
-		this.remoteStateStack.add(new RemoteState(address, height, true));
+	public void remoteFor(final Address address, final BlockHeight height, int direction) {
+		this.remoteStateStack.add(new RemoteState(address, height, direction, true));
 	}
 
 	/**
 	 * Creates association between "current" (owner) account and "remote" account.
-	 *
-	 * @param address Address of remote account.
+	 *  @param address Address of remote account.
 	 * @param height Height where association was created.
+	 * @param direction Direction of an association.
 	 */
-	public void setRemote(final Address address, final BlockHeight height) {
-		this.remoteStateStack.add(new RemoteState(address, height, false));
+	public void setRemote(final Address address, final BlockHeight height, final int direction) {
+		this.remoteStateStack.add(new RemoteState(address, height, direction, false));
 	}
 
 	/**
 	 * Removes association between "owner" and "remote".
+	 *
+	 * @param address Address of the account of other side of association.
+	 * @param height Height where association was created.
+	 * @param direction Direction of an association.
 	 */
-	public void resetRemote() {
+	public void resetRemote(final Address address, final BlockHeight height, final int direction) {
 		// between changes of remoteState there must be 1440 blocks
+		final Address rAddr = this.remoteStateStack.get().getRemoteAddress();
+		if (this.remoteStateStack.get().getDirection() != direction ||
+				(rAddr != address && (rAddr == null || !rAddr.equals(address))) ||
+				!this.remoteStateStack.get().getRemoteHeight().equals(height)) {
+			throw new IllegalArgumentException("call to resetRemote must be 'paired' with call to remoteFor or setRemote");
+		}
 		this.remoteStateStack.remove();
 	}
 
+	/**
+	 * Gets state for remote.
+	 *
+	 * @return Remote state if account have one.
+	 */
 	public RemoteState getRemoteState() {
 		return this.remoteStateStack.get();
+	}
+
+	public boolean hasRemoteState() {
+		return this.remoteStateStack.size() != 0;
+	}
+
+	public boolean hasRemote() {
+		return this.remoteStateStack.size() != 0 && this.getRemoteState().hasRemote();
 	}
 
 	/**
