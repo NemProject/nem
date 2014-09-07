@@ -121,9 +121,8 @@ public class PoiAccountState {
 	 */
 	public void resetRemote(final Address address, final BlockHeight height, final int direction) {
 		// between changes of remoteState there must be 1440 blocks
-		final Address rAddr = this.remoteStateStack.get().getRemoteAddress();
 		if (this.remoteStateStack.get().getDirection() != direction ||
-				(rAddr != address && (rAddr == null || !rAddr.equals(address))) ||
+				!this.remoteStateStack.get().getRemoteAddress().equals(address) ||
 				!this.remoteStateStack.get().getRemoteHeight().equals(height)) {
 			throw new IllegalArgumentException("call to resetRemote must be 'paired' with call to remoteFor or setRemote");
 		}
@@ -146,15 +145,6 @@ public class PoiAccountState {
 	 */
 	public boolean hasRemoteState() {
 		return this.remoteStateStack.size() != 0;
-	}
-
-	/**
-	 * True if account has associated remote account.
-	 *
-	 * @return True if account has associated remote account, false otherwise.
-	 */
-	public boolean hasRemote() {
-		return this.remoteStateStack.size() != 0 && this.getRemoteState().hasRemote();
 	}
 
 	/**

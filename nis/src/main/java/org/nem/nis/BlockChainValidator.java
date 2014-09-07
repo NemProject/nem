@@ -113,7 +113,7 @@ public class BlockChainValidator {
 		final PoiAccountState state = poiFacade.findStateByAddress(transaction.getSigner().getAddress());
 		final int direction = transaction.getDirection();
 		if (direction == ImportanceTransferTransactionMode.Activate) {
-			if (state.hasRemote()) {
+			if (state.hasRemoteState() && state.getRemoteState().getDirection() == direction) {
 				return false;
 			}
 
@@ -125,7 +125,7 @@ public class BlockChainValidator {
 			return true;
 
 		} else if (direction == ImportanceTransferTransactionMode.Deactivate) {
-			if (!state.hasRemote()) {
+			if (!state.hasRemoteState() || state.getRemoteState().getDirection() == direction) {
 				return false;
 			}
 

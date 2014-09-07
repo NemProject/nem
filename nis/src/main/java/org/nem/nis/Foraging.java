@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -66,9 +67,13 @@ public class Foraging {
 		}
 
 		PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
-		if (accountState.hasRemote() && !accountState.getRemoteState().isOwner()) {
+		//@formatter:off
+		if (accountState.hasRemoteState() &&
+				accountState.getRemoteState().getDirection() == ImportanceTransferTransactionMode.Activate &&
+				!accountState.getRemoteState().isOwner()) {
 			accountState = this.poiFacade.findStateByAddress(accountState.getRemoteState().getRemoteAddress());
 		}
+		//@formatter:on
 
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(
 				-1,
