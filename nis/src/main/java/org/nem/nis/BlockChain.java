@@ -496,6 +496,7 @@ public class BlockChain implements BlockSynchronizer {
 			final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
 
 			final BlockChainValidator validator = new BlockChainValidator(
+					this.accountAnalyzer.getPoiFacade(),
 					block -> executor.execute(block, observer),
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT,

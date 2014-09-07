@@ -372,11 +372,11 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> false);
+		return new BlockChainValidator(null, block -> { }, scorer, 21, o -> false);
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false);
+		return new BlockChainValidator(null, blockExecutor, createMockBlockScorer(), 21, o -> false);
 	}
 
 	private static BlockChainValidator createValidator() {

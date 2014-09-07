@@ -4,6 +4,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -18,6 +21,7 @@ public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
 	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
+	private final PoiFacade poiFacade;
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
@@ -31,10 +35,12 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 */
 	public BlockChainValidator(
+			final PoiFacade poiFacade,
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final Predicate<Hash> transactionExists) {
+		this.poiFacade = poiFacade;
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
@@ -78,6 +84,14 @@ public class BlockChainValidator {
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;
 				}
+
+				if (transaction instanceof ImportanceTransferTransaction) {
+					if (checkImportanceTransfer(this.poiFacade, block.getHeight(), (ImportanceTransferTransaction)transaction))
+					{
+						return false;
+					}
+				}
+
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
 					if (transactionExists.test(HashUtils.calculateHash(transaction))) {
 						LOGGER.info("received block with duplicate TX");
@@ -93,6 +107,36 @@ public class BlockChainValidator {
 		}
 
 		return true;
+	}
+
+	public static boolean checkImportanceTransfer(final PoiFacade poiFacade, final BlockHeight height, final ImportanceTransferTransaction transaction) {
+		final PoiAccountState state = poiFacade.findStateByAddress(transaction.getSigner().getAddress());
+		final int direction = transaction.getDirection();
+		if (direction == ImportanceTransferTransactionDirection.Transfer) {
+			if (state.hasRemote()) {
+				return false;
+			}
+
+			// means there is previous state, which was "Revert" (due to check above)
+			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+				return false;
+			}
+
+			return true;
+
+		} else if (direction == ImportanceTransferTransactionDirection.Revert) {
+			if (!state.hasRemote()) {
+				return false;
+			}
+
+			// means there is previous state which was "Transfer"
+			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+				return false;
+			}
+
+			return true;
+		}
+		return false;
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {

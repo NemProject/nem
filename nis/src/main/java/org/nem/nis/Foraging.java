@@ -65,10 +65,16 @@ public class Foraging {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
+		PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+		if (accountState.hasRemote() && !accountState.getRemoteState().isOwner()) {
+			accountState = this.poiFacade.findStateByAddress(accountState.getRemoteState().getRemoteAddress());
+		}
+
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(
 				-1,
-				this.poiFacade.findStateByAddress(account.getAddress()),
+				accountState,
 				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
+
 		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}
@@ -206,9 +212,34 @@ public class Foraging {
 				.collect(Collectors.toList());
 	}
 
+	private boolean checkImportance(final Transaction transaction, final BlockHeight height) {
+		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
+			return BlockChainValidator.checkImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
+		}
+		return true;
+	}
+	private List<Transaction> removeConflictingImportanseTransactions(final BlockHeight height, final List<Transaction> transactions) {
+		if (height == null) {
+			return transactions;
+		}
+		return transactions.stream()
+				.filter(tx -> this.checkImportance(tx, height))
+				.collect(Collectors.toList());
+	}
+
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime) {
 		return this.unconfirmedTransactions.removeConflictingTransactions(
-				this.unconfirmedTransactions.getTransactionsBefore(blockTime));
+				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
+		);
+	}
+
+	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime, final BlockHeight blockHeight) {
+		return this.unconfirmedTransactions.removeConflictingTransactions(
+				this.removeConflictingImportanseTransactions(
+						blockHeight,
+						this.unconfirmedTransactions.getTransactionsBefore(blockTime)
+				)
+		);
 	}
 
 	/**
@@ -245,8 +276,8 @@ public class Foraging {
 
 		try {
 			synchronized (this.blockChainLastBlockLayer) {
-				final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime);
 				final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+				final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime, new BlockHeight(dbLastBlock.getHeight()));
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 

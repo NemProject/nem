@@ -139,10 +139,20 @@ public class PoiAccountState {
 		return this.remoteStateStack.get();
 	}
 
+	/**
+	 * Returns true if there is any remote state.
+	 *
+	 * @return True if there is any remote state, false otherwise.
+	 */
 	public boolean hasRemoteState() {
 		return this.remoteStateStack.size() != 0;
 	}
 
+	/**
+	 * True if account has associated remote account.
+	 *
+	 * @return True if account has associated remote account, false otherwise.
+	 */
 	public boolean hasRemote() {
 		return this.remoteStateStack.size() != 0 && this.getRemoteState().hasRemote();
 	}

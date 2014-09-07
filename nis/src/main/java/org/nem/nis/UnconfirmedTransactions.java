@@ -4,6 +4,8 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.ImportanceTransfer;
+import org.nem.nis.dbmodel.Transfer;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -69,6 +71,25 @@ public class UnconfirmedTransactions {
 			return ValidationResult.NEUTRAL;
 		}
 
+		// if we already have ImportanceTransfer from this account on the list....
+		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
+			for (final Transaction tx : transactions.values()) {
+				if (tx.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {
+					continue;
+				}
+
+				// already on the list
+				if (transaction.getSigner().equals(tx.getSigner())) {
+					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
+				}
+
+				// that would be bit unexpected, but better safe than sorry
+				if (((ImportanceTransferTransaction)transaction).getRemote().equals(((ImportanceTransferTransaction)tx).getRemote())) {
+					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
+				}
+			}
+		}
+
 		// not sure if adding to cache here is a good idea...
 		this.addToCache(transaction.getSigner());
 		if (!this.isValid(transaction)) {
@@ -123,6 +144,7 @@ public class UnconfirmedTransactions {
 			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
 			// maybe we should change Transaction.compare? also it
 			// TODO: should fee or time be more important inside Transaction.compare
+			// NOTE: sorting by type is currently crucial...
 			int result = -(lhs.getType() - rhs.getType());
 			if (result == 0) {
 				result = -lhs.getFee().compareTo(rhs.getFee());
