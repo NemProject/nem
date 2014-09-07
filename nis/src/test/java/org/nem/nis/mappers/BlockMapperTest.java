@@ -282,9 +282,9 @@ public class BlockMapperTest {
 
 		public void addImportanceTransferTransactions() {
 			this.model.addTransaction(new ImportanceTransferTransaction(
-					new TimeInstant(150), this.account1, ImportanceTransferTransactionDirection.Transfer, this.account2));
+					new TimeInstant(150), this.account1, ImportanceTransferTransactionMode.Activate, this.account2));
 			this.model.addTransaction(new ImportanceTransferTransaction(
-					new TimeInstant(250), this.account3, ImportanceTransferTransactionDirection.Transfer, this.account2));
+					new TimeInstant(250), this.account3, ImportanceTransferTransactionMode.Activate, this.account2));
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();

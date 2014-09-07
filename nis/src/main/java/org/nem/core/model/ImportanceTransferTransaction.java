@@ -31,7 +31,7 @@ public class ImportanceTransferTransaction extends Transaction {
 			throw new IllegalArgumentException("remoteAccount is required");
 		}
 
-		if (this.mode != ImportanceTransferTransactionDirection.Transfer && this.mode != ImportanceTransferTransactionDirection.Revert) {
+		if (this.mode != ImportanceTransferTransactionMode.Activate && this.mode != ImportanceTransferTransactionMode.Deactivate) {
 			throw new IllegalArgumentException("invalid mode");
 		}
 	}

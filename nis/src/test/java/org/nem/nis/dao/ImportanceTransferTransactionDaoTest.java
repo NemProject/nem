@@ -36,7 +36,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionDirection.Revert);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
 		final ImportanceTransfer entity = ImportanceTransferMapper.toDbModel(transaction, 0, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
@@ -57,7 +57,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionDirection.Revert);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
 		final ImportanceTransfer dbTransaction = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionDirection.Revert);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
 		final ImportanceTransfer dbTransfer1 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 		final ImportanceTransfer dbTransfer2 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 		final ImportanceTransfer dbTransfer3 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);

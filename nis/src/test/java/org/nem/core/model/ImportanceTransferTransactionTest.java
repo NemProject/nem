@@ -21,7 +21,7 @@ public class ImportanceTransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionDirection.Transfer, null);
+		this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionMode.Activate, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -41,7 +41,7 @@ public class ImportanceTransferTransactionTest {
 		final Account remote = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
 
-		final ImportanceTransferTransaction originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionDirection.Transfer, remote);
+		final ImportanceTransferTransaction originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionMode.Activate, remote);
 		originalEntity.sign();
 		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
@@ -56,12 +56,12 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void ctorCanCreateImportanceTransfer() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionDirection.Transfer);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionMode.Activate);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransferRevert() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionDirection.Revert);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionMode.Deactivate);
 	}
 
 	private void assertCtorCanCreateImportanceTransfer(int direction) {
@@ -91,12 +91,12 @@ public class ImportanceTransferTransactionTest {
 	// region roundtrip
 	@Test
 	public void canRoundTripImportanceTransfer()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionDirection.Transfer);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionMode.Activate);
 	}
 
 	@Test
 	public void canRoundTripImportanceTransferRevert()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionDirection.Revert);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionMode.Deactivate);
 	}
 
 	public void assertImportanceTransferCanBeRoundTripped(int direction) {
@@ -140,7 +140,7 @@ public class ImportanceTransferTransactionTest {
 
 	public void assertValidateImportanceTransfer(final int amount, final ValidationResult result) {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionDirection.Transfer;
+		final int direction = ImportanceTransferTransactionMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
@@ -157,7 +157,7 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void executeTransfersFeeFromSigner() {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionDirection.Transfer;
+		final int direction = ImportanceTransferTransactionMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(100));
 		final Account remote = Utils.generateRandomAccount();
@@ -176,7 +176,7 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void undoTransfersFeeFromSigner() {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionDirection.Transfer;
+		final int direction = ImportanceTransferTransactionMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();

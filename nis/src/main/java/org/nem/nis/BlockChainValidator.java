@@ -112,24 +112,24 @@ public class BlockChainValidator {
 	public static boolean checkImportanceTransfer(final PoiFacade poiFacade, final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final PoiAccountState state = poiFacade.findStateByAddress(transaction.getSigner().getAddress());
 		final int direction = transaction.getDirection();
-		if (direction == ImportanceTransferTransactionDirection.Transfer) {
+		if (direction == ImportanceTransferTransactionMode.Activate) {
 			if (state.hasRemote()) {
 				return false;
 			}
 
-			// means there is previous state, which was "Revert" (due to check above)
+			// means there is previous state, which was "Deactivate" (due to check above)
 			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return false;
 			}
 
 			return true;
 
-		} else if (direction == ImportanceTransferTransactionDirection.Revert) {
+		} else if (direction == ImportanceTransferTransactionMode.Deactivate) {
 			if (!state.hasRemote()) {
 				return false;
 			}
 
-			// means there is previous state which was "Transfer"
+			// means there is previous state which was "Activate"
 			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return false;
 			}

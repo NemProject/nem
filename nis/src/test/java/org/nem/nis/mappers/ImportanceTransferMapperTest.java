@@ -2,19 +2,16 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ImportanceTransferMapperTest {
@@ -22,7 +19,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void importanceTransferModelWithDirectionTransferCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionDirection.Transfer);
+		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Activate);
 
 		// Act:
 		final ImportanceTransfer dbModel = context.toDbModel(7);
@@ -34,7 +31,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void importanceTransferModelWithDirectionRevertCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionDirection.Revert);
+		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Deactivate);
 
 		// Act:
 		final ImportanceTransfer dbModel = context.toDbModel(7);
@@ -46,7 +43,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void  importanceTransferModelCanBeRoundTripped() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionDirection.Revert);
+		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Deactivate);
 		final ImportanceTransfer dbModel = context.toDbModel(7);
 
 		// Act:
