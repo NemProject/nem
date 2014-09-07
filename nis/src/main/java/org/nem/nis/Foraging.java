@@ -9,6 +9,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -286,9 +287,35 @@ public class Foraging {
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
+				// possibilities, unlocked account is:
+				//  real, but has eligible remote = reject
+				//  real, but no eligible remote = harvest with real
+				//  virtual, but is not eligible = reject
+				//  virtual and is eligible = harvest with virtual
 				for (final Account virtualForger : this.unlockedAccounts) {
+					final BlockHeight forgedBlockHeight = lastBlock.getHeight().next();
+					final PoiAccountState accountState = this.poiFacade.findStateByAddress(virtualForger.getAddress());
+
+					Account forgerOwner = virtualForger;
+					if (accountState.hasRemoteState()) {
+						final RemoteState forgerState = accountState.getRemoteState();
+						long settingHeight = forgedBlockHeight.subtract(forgerState.getRemoteHeight());
+
+						if (forgerState.isOwner()) {
+							if (settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+								continue;
+							}
+						} else {
+							if (settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+								continue;
+							}
+
+							forgerOwner = this.accountLookup.findByAddress(forgerState.getRemoteAddress());
+						}
+					}
+
 					// Don't allow a harvester to include his own transactions
-					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, virtualForger);
+					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, forgerOwner);
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					final Block newBlock = this.createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
