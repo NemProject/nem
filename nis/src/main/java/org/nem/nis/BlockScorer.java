@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.AccountImportance;
 
@@ -99,6 +100,26 @@ public class BlockScorer {
 	}
 
 	/**
+	 * Returns PoiAccountState for an address.
+	 * If address is remote address, finds owner, and returns state of an owner.
+	 *
+	 * @param poiFacade Poi facade to use for searching.
+	 * @param signerAddress Address of an account.
+	 * @return PoiAccountState.
+	 */
+	public static PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress) {
+		PoiAccountState accountState = poiFacade.findStateByAddress(signerAddress);
+		//@formatter:off
+		if (accountState.hasRemoteState() &&
+				accountState.getRemoteState().getDirection() == ImportanceTransferTransactionMode.Activate &&
+				!accountState.getRemoteState().isOwner()) {
+			accountState = poiFacade.findStateByAddress(accountState.getRemoteState().getRemoteAddress());
+		}
+		//@formatter:on
+		return accountState;
+	}
+
+	/**
 	 * Calculates forager balance for block.
 	 * This has the side-effect of recalculating importances.
 	 *
@@ -110,7 +131,8 @@ public class BlockScorer {
 		this.poiFacade.recalculateImportances(blockHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final AccountImportance accountImportance = this.poiFacade.findStateByAddress(signerAddress).getImportanceInfo();
+		final PoiAccountState accountState = getForwardedAccountState(this.poiFacade, signerAddress);
+		final AccountImportance accountImportance = accountState.getImportanceInfo();
 		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
 	}
 

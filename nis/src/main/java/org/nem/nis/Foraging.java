@@ -67,15 +67,7 @@ public class Foraging {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
-		PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
-		//@formatter:off
-		if (accountState.hasRemoteState() &&
-				accountState.getRemoteState().getDirection() == ImportanceTransferTransactionMode.Activate &&
-				!accountState.getRemoteState().isOwner()) {
-			accountState = this.poiFacade.findStateByAddress(accountState.getRemoteState().getRemoteAddress());
-		}
-		//@formatter:on
-
+		final PoiAccountState accountState = BlockScorer.getForwardedAccountState(this.poiFacade, account.getAddress());
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(
 				-1,
 				accountState,
