@@ -63,7 +63,7 @@ public class BlockExecutor {
 
 		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
 		for (final Transaction transaction : block.getTransactions()) {
-			if (transaction instanceof ImportanceTransferTransaction) {
+			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
 				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
 			}
@@ -114,7 +114,7 @@ public class BlockExecutor {
 
 		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
 		for (final Transaction transaction : getReverseTransactions(block)) {
-			if (transaction instanceof ImportanceTransferTransaction) {
+			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
 				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
 			}

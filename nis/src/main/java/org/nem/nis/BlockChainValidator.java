@@ -85,7 +85,7 @@ public class BlockChainValidator {
 					return false;
 				}
 
-				if (transaction instanceof ImportanceTransferTransaction) {
+				if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 					if (checkImportanceTransfer(this.poiFacade, block.getHeight(), (ImportanceTransferTransaction)transaction))
 					{
 						return false;
