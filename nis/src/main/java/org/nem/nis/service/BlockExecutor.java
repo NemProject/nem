@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
+import org.nem.nis.AccountCache;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
@@ -17,17 +18,25 @@ import java.util.*;
 @Service
 public class BlockExecutor {
 	private final PoiFacade poiFacade;
+	private final AccountCache accountCache	;
 
 	/**
 	 * Creates a new block executor.
 	 *
 	 * @param poiFacade The poi facade.
+	 * @param accountCache The account cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final PoiFacade poiFacade) {
+	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache) {
 		this.poiFacade = poiFacade;
+		this.accountCache = accountCache;
 	}
 
+	// this constructor is currently only to make the tests pass, visibility limited to package
+	BlockExecutor(final PoiFacade poiFacade) {
+		this.poiFacade = poiFacade;
+		this.accountCache = null;
+	}
 	//region execute
 
 	/**
@@ -73,7 +82,7 @@ public class BlockExecutor {
 
 		final Account signer = block.getSigner();
 		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
-		final Account endowed = signer; //(poiAccountState.getAddress().equals(signer.getAddress())) ? signer : getAccount(poiAccountState.getAddress());
+		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
 		endowed.incrementForagedBlocks();
 		endowed.incrementBalance(block.getTotalFee());
 		observer.notifyCredit(endowed, block.getTotalFee());
