@@ -78,6 +78,8 @@ public class BlockChainValidator {
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;
 				}
+
+				// TODO-CR: J->G please add tests for this
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
 					if (transactionExists.test(HashUtils.calculateHash(transaction))) {
 						LOGGER.info("received block with duplicate TX");
