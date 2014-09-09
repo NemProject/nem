@@ -106,6 +106,8 @@ public class BlockScorer {
 	 * Returns PoiAccountState for an address.
 	 * If address is remote address, finds owner, and returns state of an owner.
 	 *
+	 * Note, this doesn't take height and should be used only during unlocking
+	 *
 	 * @param poiFacade Poi facade to use for searching.
 	 * @param signerAddress Address of an account.
 	 * @return PoiAccountState.
@@ -113,23 +115,30 @@ public class BlockScorer {
 	public static PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress) {
 		PoiAccountState accountState = poiFacade.findStateByAddress(signerAddress);
 		//@formatter:off
-		if (accountState.hasRemoteState() &&
-				accountState.getRemoteState().getDirection() == ImportanceTransferTransactionMode.Activate &&
-				!accountState.getRemoteState().isOwner()) {
-			accountState = poiFacade.findStateByAddress(accountState.getRemoteState().getRemoteAddress());
+		if (accountState.hasRemoteState()) {
+			final RemoteState rState = accountState.getRemoteState();
+			if (!rState.isOwner() && rState.getDirection() == ImportanceTransferTransactionMode.Activate) {
+				accountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
+			}
 		}
 		//@formatter:on
 		return accountState;
 	}
 
 
-	private PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress, final BlockHeight height) {
+	/**
+	 * Returns PoiAccountState for an address.
+	 * If address is remote address, finds owner, and returns state of an owner.
+	 *
+	 * @param poiFacade Poi facade to use for searching.
+	 * @param signerAddress Address of an account.
+	 * @param height Height at which check should be performed.
+	 * @return PoiAccountState.
+	 */
+	public static PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress, final BlockHeight height) {
 		PoiAccountState poiAccountState = poiFacade.findStateByAddress(signerAddress);
 		if (poiAccountState.hasRemoteState()) {
 			final RemoteState rState = poiAccountState.getRemoteState();
-			final int mode = rState.getDirection();
-			final boolean activate = (mode == ImportanceTransferTransactionMode.Activate);
-			final boolean deactivate = (mode == ImportanceTransferTransactionMode.Deactivate);
 			final long settingHeight = height.subtract(rState.getRemoteHeight());
 
 			// only "valid" blocks should get here, so we have to deal only with two cases:
@@ -138,8 +147,10 @@ public class BlockScorer {
 			// @formatter:off
 			if (! rState.isOwner() &&
 					(
-							(activate && settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) ||
-							(deactivate && settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)
+							(rState.getDirection() == ImportanceTransferTransactionMode.Activate &&
+									settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) ||
+							(rState.getDirection() == ImportanceTransferTransactionMode.Deactivate &&
+									settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)
 					)) {
 				poiAccountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
 			}

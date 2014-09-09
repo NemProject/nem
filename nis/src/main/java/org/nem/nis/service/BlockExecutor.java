@@ -2,6 +2,8 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
+import org.nem.nis.BlockScorer;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +72,11 @@ public class BlockExecutor {
 		}
 
 		final Account signer = block.getSigner();
-		signer.incrementForagedBlocks();
-		signer.incrementBalance(block.getTotalFee());
-		observer.notifyCredit(block.getSigner(), block.getTotalFee());
+		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
+		final Account endowed = signer; //(poiAccountState.getAddress().equals(signer.getAddress())) ? signer : getAccount(poiAccountState.getAddress());
+		endowed.incrementForagedBlocks();
+		endowed.incrementBalance(block.getTotalFee());
+		observer.notifyCredit(endowed, block.getTotalFee());
 	}
 
 	//endregion
