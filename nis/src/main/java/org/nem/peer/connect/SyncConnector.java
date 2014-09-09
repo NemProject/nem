@@ -74,6 +74,7 @@ public interface SyncConnector {
 	// TODO 20140905 BR: -> J wouldn't it be a good idea to have always both, an asynchronous and a synchronous version of a request?
 	// TODO                   The asynchronous should ideally return a CompletableFuture<Deserializer> as opposed to what I am doing here.
 	// TODO                   (I wanted to modify the HttpConnector just as much as needed for the ChainServices class)
+	// TODO 20140909 J-B  ideally, these would all be async (like in PeerConnector)
 	// region asynchronous requests
 
 	/**

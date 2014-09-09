@@ -2,6 +2,9 @@ package org.nem.core.connect.client;
 
 /**
  * NIS REST API paths.
+ *
+ * TODO 20140909 J-B: i think i like what you did in NCC better regarding enum -> path mappings
+ * (this is just a more general comment because i'd eventually like to have something similar in NIS, but not necessarily now)
  */
 public enum NisApiId {
 

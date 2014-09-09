@@ -40,6 +40,8 @@ public class PeerNetwork {
 	/**
 	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
 	 *
+	 * TODO 20140909 J-B just add a test that this delegates too
+	 *
 	 * @return true if synchronized, false otherwise.
 	 */
 	public boolean isChainSynchronized() {

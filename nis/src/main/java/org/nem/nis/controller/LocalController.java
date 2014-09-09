@@ -101,6 +101,7 @@ public class LocalController {
 
 	/**
 	 * Gets the NIS status.
+	 * TODO 20140909: J-B please add tests for this (they should be simple)
 	 *
 	 * @return The NIS request result.
 	 */

@@ -16,6 +16,7 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
+	// TODO-CR 20140909 spelling; also should this be an atomicinteger?
 	private int chainSynchroniztion = 0;
 
 	/**

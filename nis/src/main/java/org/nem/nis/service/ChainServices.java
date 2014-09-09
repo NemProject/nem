@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 
 /**
  * This class provides higher-level functions around accessing information about the NIS block chain of other nodes.
+ *
+ * TODO 20140909 J-B: what is the relation between this class and the one in NCC?
+ *                    (i do like moving getMaxChainScoreAsync to NIS where i think it is more natural anyway)
  */
 public class ChainServices {
 	private static final int MAX_AUDIT_HISTORY_SIZE = 10;
@@ -30,6 +33,7 @@ public class ChainServices {
 	public ChainServices(final BlockChain blockChain) {
 		this.blockChain = blockChain;
 		// TODO 20140905 BR: What is the correct way to get a HttpConnector object into this class?
+		// TODO 20140909 J: You couldn't inject it with spring?
 		final Communicator communicator = new HttpCommunicator(new HttpMethodClient<>(), CommunicationMode.JSON, new DeserializationContext(null));
 		this.connector = new HttpConnector(new AuditedCommunicator(communicator, new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER)));
 	}
