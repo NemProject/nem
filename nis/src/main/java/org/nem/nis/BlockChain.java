@@ -3,12 +3,10 @@ package org.nem.nis;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.*;
@@ -499,8 +497,7 @@ public class BlockChain implements BlockSynchronizer {
 					block -> executor.execute(block, observer),
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT,
-					hash -> (null != this.transferDao.findByHash(hash.getRaw()))
-					);
+					hash -> (null != this.transferDao.findByHash(hash.getRaw())));
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
 		}

@@ -7,8 +7,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.logging.Logger;
 
 /**
@@ -81,7 +80,7 @@ public class BlockChainValidator {
 
 				// TODO-CR: J->G please add tests for this
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
-					if (transactionExists.test(HashUtils.calculateHash(transaction))) {
+					if (this.transactionExists.test(HashUtils.calculateHash(transaction))) {
 						LOGGER.info("received block with duplicate TX");
 						return false;
 					}

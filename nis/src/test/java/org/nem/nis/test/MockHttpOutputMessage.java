@@ -1,5 +1,6 @@
 package org.nem.nis.test;
 
+import org.nem.core.utils.*;
 import org.springframework.http.*;
 
 import java.io.*;
@@ -28,14 +29,6 @@ public class MockHttpOutputMessage implements HttpOutputMessage {
 	 * @return The body as a string.
 	 */
 	public String getBodyAsString() {
-		String result = null; 
-		try {
-			result = this.bodyStream.toString("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return result;
+		return ExceptionUtils.propagate(() -> this.bodyStream.toString("UTF-8"));
 	}
 }
