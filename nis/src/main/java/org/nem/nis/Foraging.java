@@ -6,10 +6,8 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -148,7 +146,7 @@ public class Foraging {
 	/**
 	 * Removes all block's transactions from list of unconfirmed transactions
 	 *
-	 * @param block
+	 * @param block Block containing TXes that are to be removed.
 	 */
 	public void removeFromUnconfirmedTransactions(final Block block) {
 		this.unconfirmedTransactions.removeAll(block);
@@ -212,7 +210,7 @@ public class Foraging {
 
 	private boolean checkImportance(final Transaction transaction, final BlockHeight height) {
 		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-			return BlockChainValidator.checkImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
+			return BlockChainValidator.verifyImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
 		}
 		return true;
 	}
@@ -291,17 +289,12 @@ public class Foraging {
 					Account forgerOwner = virtualForger;
 					if (accountState.hasRemoteState()) {
 						final RemoteState forgerState = accountState.getRemoteState();
-						long settingHeight = forgedBlockHeight.subtract(forgerState.getRemoteHeight());
 
-						if (forgerState.isOwner()) {
-							if (settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
-								continue;
-							}
-						} else {
-							if (settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
-								continue;
-							}
+						if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
+							continue;
+						}
 
+						if (!forgerState.isOwner()) {
 							forgerOwner = this.accountLookup.findByAddress(forgerState.getRemoteAddress());
 						}
 					}

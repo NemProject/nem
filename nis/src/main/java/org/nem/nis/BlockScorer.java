@@ -4,9 +4,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.poi.RemoteState;
 import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
+import java.rmi.Remote;
 
 /**
  * Provides functions for scoring block hits and targets.
@@ -119,6 +122,33 @@ public class BlockScorer {
 		return accountState;
 	}
 
+
+	private PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress, final BlockHeight height) {
+		PoiAccountState poiAccountState = poiFacade.findStateByAddress(signerAddress);
+		if (poiAccountState.hasRemoteState()) {
+			final RemoteState rState = poiAccountState.getRemoteState();
+			final int mode = rState.getDirection();
+			final boolean activate = (mode == ImportanceTransferTransactionMode.Activate);
+			final boolean deactivate = (mode == ImportanceTransferTransactionMode.Deactivate);
+			final long settingHeight = height.subtract(rState.getRemoteHeight());
+
+			// only "valid" blocks should get here, so we have to deal only with two cases:
+			//  * remote is active and operational,
+			//  * remote isn'd deactivated yet
+			// @formatter:off
+			if (! rState.isOwner() &&
+					(
+							(activate && settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) ||
+							(deactivate && settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)
+					)) {
+				poiAccountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
+			}
+			// @formatter:on
+		}
+		return poiAccountState;
+	}
+
+
 	/**
 	 * Calculates forager balance for block.
 	 * This has the side-effect of recalculating importances.
@@ -131,7 +161,7 @@ public class BlockScorer {
 		this.poiFacade.recalculateImportances(blockHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final PoiAccountState accountState = getForwardedAccountState(this.poiFacade, signerAddress);
+		final PoiAccountState accountState = getForwardedAccountState(this.poiFacade, signerAddress, block.getHeight());
 		final AccountImportance accountImportance = accountState.getImportanceInfo();
 		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
 	}

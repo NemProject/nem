@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.poi.RemoteState;
 import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
@@ -47,6 +48,39 @@ public class BlockChainValidator {
 		this.transactionExists = transactionExists;
 	}
 
+	public static boolean canAccountForageAtHeight(final RemoteState rState, final BlockHeight height) {
+		int mode = rState.getDirection();
+		boolean activate = (mode == ImportanceTransferTransactionMode.Activate);
+		boolean deactivate = (mode == ImportanceTransferTransactionMode.Deactivate);
+
+		if (!activate && !deactivate) {
+			throw new IllegalStateException("unhandled importance transfer mode");
+		}
+		long settingHeight = height.subtract(rState.getRemoteHeight());
+
+		// remote already activated, or already deactivated
+		if (((rState.isOwner() && activate) || (!rState.isOwner() && deactivate)) && (settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)) {
+			return false;
+		}
+
+		// remote already activated, or already deactivated
+		if (((rState.isOwner() && deactivate) || (!rState.isOwner() && activate)) && (settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean couldSignerForage(final Block block) {
+		final PoiAccountState accountState = this.poiFacade.findStateByAddress(block.getSigner().getAddress());
+		if (accountState.hasRemoteState()) {
+			if (!canAccountForageAtHeight(accountState.getRemoteState(), block.getHeight())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * Determines if blocks is a valid block chain given blocks and parentBlock.
 	 *
@@ -72,6 +106,10 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			if (!couldSignerForage(block)) {
+				return false;
+			}
+
 			if (!this.isBlockHit(parentBlock, block)) {
 				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
@@ -86,7 +124,7 @@ public class BlockChainValidator {
 				}
 
 				if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-					if (checkImportanceTransfer(this.poiFacade, block.getHeight(), (ImportanceTransferTransaction)transaction))
+					if (!verifyImportanceTransfer(this.poiFacade, block.getHeight(), (ImportanceTransferTransaction)transaction))
 					{
 						return false;
 					}
@@ -109,31 +147,26 @@ public class BlockChainValidator {
 		return true;
 	}
 
-	public static boolean checkImportanceTransfer(final PoiFacade poiFacade, final BlockHeight height, final ImportanceTransferTransaction transaction) {
+	public static boolean verifyImportanceTransfer(final PoiFacade poiFacade, final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final PoiAccountState state = poiFacade.findStateByAddress(transaction.getSigner().getAddress());
 		final int direction = transaction.getDirection();
 		if (direction == ImportanceTransferTransactionMode.Activate) {
 			if (state.hasRemoteState() && state.getRemoteState().getDirection() == direction) {
 				return false;
 			}
-
 			// means there is previous state, which was "Deactivate" (due to check above)
 			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return false;
 			}
-
 			return true;
-
 		} else if (direction == ImportanceTransferTransactionMode.Deactivate) {
 			if (!state.hasRemoteState() || state.getRemoteState().getDirection() == direction) {
 				return false;
 			}
-
 			// means there is previous state which was "Activate"
 			if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return false;
 			}
-
 			return true;
 		}
 		return false;
