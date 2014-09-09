@@ -6,6 +6,7 @@ package org.nem.core.model;
 public class TransactionTypes {
 	// currently transactions inside blocks are sorted by size,
 	// so changing those IDs might break a LOT of things...
+	// TODO 20140909 J-G: should we prioritize different *types* of transactions (i.e. is importance more important than transfer)?
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;
 	private static final int SNAPSHOT_TYPE = 0x0400;

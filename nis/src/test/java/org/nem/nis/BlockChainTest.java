@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// TODO 20140909 J-G: shouldn't we add a test for the rigel bug?
+
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;
 	public static final long RECIPIENT2_AMOUNT = 5 * 1000000L;

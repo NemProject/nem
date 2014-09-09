@@ -12,6 +12,8 @@ import java.util.*;
  * @param <E> Type of elements on the stack.
  */
 public class CircularStack<E> implements Iterable<E> {
+	// TODO 20140909 J-G: why did you choose a LinkedList instead of an array / ArrayList with a pointer to the current element?
+	// TODO 20140909 J-G: how many elements do you expect this to contain?
 	private final List<E> elements = new LinkedList<>();
 	private final int limit;
 
@@ -56,6 +58,8 @@ public class CircularStack<E> implements Iterable<E> {
 			elements.remove(0);
 		}
 	}
+
+	// TODO 20140909 J-G: since this is a stack, i think push / pop / peek (if needed) are better names
 
 	/**
 	 * Gets most recently added element.

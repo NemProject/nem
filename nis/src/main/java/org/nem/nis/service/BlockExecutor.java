@@ -32,6 +32,8 @@ public class BlockExecutor {
 		this.accountCache = accountCache;
 	}
 
+	// TODO 20140909 J-G: i would prefer to add something like createBlockExecutor(PoiFacade) in the test code
+
 	// this constructor is currently only to make the tests pass, visibility limited to package
 	BlockExecutor(final PoiFacade poiFacade) {
 		this.poiFacade = poiFacade;
@@ -72,10 +74,13 @@ public class BlockExecutor {
 			transaction.execute(observer);
 		}
 
+		// TODO 20140909 J-G: can we test this?
 		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
 		for (final Transaction transaction : block.getTransactions()) {
 			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
+				// TODO 20140909 J-G: it seems like you're explicitly calling notifyTransfer here, so do you really need the "phantom" zero transaction?
+				// TODO 20140909 J-G: actually, does the phantom transaction allow us to bypass this altogether?
 				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
 			}
 		}

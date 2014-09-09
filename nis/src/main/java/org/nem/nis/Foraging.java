@@ -214,6 +214,8 @@ public class Foraging {
 		}
 		return true;
 	}
+
+	// TODO 20140909 J-G: spelling -> 'importance'
 	private List<Transaction> removeConflictingImportanseTransactions(final BlockHeight height, final List<Transaction> transactions) {
 		if (height == null) {
 			return transactions;
@@ -276,6 +278,9 @@ public class Foraging {
 				final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime, new BlockHeight(dbLastBlock.getHeight()));
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
+
+				// TODO 20140909 J-G: this is a class that is in need of tests in general
+				// TODO 20140909 J-G: i have some questions around the BlockChainValidator / BlockChainScorer / BlockExecutor / Foraging interplay that might best be answered in IRC
 
 				// possibilities, unlocked account is:
 				//  real, but has eligible remote = reject

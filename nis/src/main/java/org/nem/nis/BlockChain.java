@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
+	// TODO 20140909 J-G: we really need to come up with a better structure for this (a lot of changes need to be made to push one thing down)
+
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;

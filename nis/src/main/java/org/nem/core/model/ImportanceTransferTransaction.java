@@ -43,6 +43,7 @@ public class ImportanceTransferTransaction extends Transaction {
 
 		// TODO-CR: J->G do you want to validate the mode here?
 		// G->J any reason not to? (would checkDerivedValidity be better place?)
+		// TODO 20140909 J-G: you could do it in either place
 	}
 
 	@Override
@@ -65,6 +66,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransferObserver observer) {
 		// this might look dumb, but it's essential to trigger proper observers
+		// TODO 20140909 J-G: please elaborate :)
 		observer.notifyTransfer(this.getSigner(), this.getRemote(), Amount.ZERO);
 		observer.notifyDebit(this.getSigner(), this.getFee());
 	}

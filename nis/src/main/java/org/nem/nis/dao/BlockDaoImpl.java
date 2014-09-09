@@ -60,6 +60,9 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
+	// TODO 20140909 J-G: can you add something link Criteria setTransfersFetchMode(Criteria, FetchMode)
+	// if we add a table per transfer type it would be easy to forget to update a line
+
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
@@ -177,6 +180,9 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> txToDelete = listAndCast(getTxes);
+
+		// TODO 20140909 J-G: likewise, i would probably refactor the query construction and delete if !empty
+		// (the differences are the join field name and the transfer table name)
 
 		final Query getImportanceTxes = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")

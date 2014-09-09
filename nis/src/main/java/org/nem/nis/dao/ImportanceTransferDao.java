@@ -2,6 +2,8 @@ package org.nem.nis.dao;
 
 import org.nem.nis.dbmodel.ImportanceTransfer;
 
+// TODO 20140909 J-G: not sure if this buys us anything, but we could have a generic TransferDao interface that we could use for all transaction types
+
 public interface ImportanceTransferDao {
 	/**
 	 * Save or update entity in the database.

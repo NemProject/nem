@@ -72,6 +72,7 @@ public class UnconfirmedTransactions {
 		}
 
 		// if we already have ImportanceTransfer from this account on the list....
+		// TODO 20140909 J-G: why isn't the hash check good enough?
 		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 			for (final Transaction tx : transactions.values()) {
 				if (tx.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {
@@ -84,6 +85,7 @@ public class UnconfirmedTransactions {
 				}
 
 				// that would be bit unexpected, but better safe than sorry
+				// TODO 20140909 J-G: this shouldn't have any observable effect, should it?
 				if (((ImportanceTransferTransaction)transaction).getRemote().equals(((ImportanceTransferTransaction)tx).getRemote())) {
 					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 				}

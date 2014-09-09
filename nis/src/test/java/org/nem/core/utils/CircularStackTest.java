@@ -30,7 +30,7 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.add(666);
+		intStack.add(666); // TODO 20140909 J-G: can you use any other number :)
 
 		// Assert:
 		Assert.assertThat(intStack.get(), IsEqual.equalTo(666));
@@ -111,6 +111,7 @@ public class CircularStackTest {
 		final CircularStack<Integer> destination = createStack(10);
 
 		// Act:
+		// TODO 20140909 J-G: i would just fill source with three numbers there's no need to test wraparound again imo
 		for (int i = 0; i < 10; ++i) {
 			source.add(i);
 		}
@@ -123,6 +124,7 @@ public class CircularStackTest {
 		for (final Integer element : destination) {
 			Assert.assertThat(element, IsEqual.equalTo(i++));
 		}
+		// TODO 20140909 J-G: i don't think you need to assert source here
 		i = 7;
 		for (final Integer element : source) {
 			Assert.assertThat(element, IsEqual.equalTo(i++));

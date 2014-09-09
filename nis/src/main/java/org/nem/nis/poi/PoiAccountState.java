@@ -9,6 +9,7 @@ import org.nem.nis.secret.*;
  * Class containing extrinsic NIS-account information that is used to calculate POI.
  * TODO-CR 20140808 J->ALL i think the naming is confusing between PoiAccountState and PoiAccountInfo ... should try to think of better names
  * G->J, I think we can safely call it AccountState, can't we?
+ * TODO 20140909 J-G: seems reasonable
  */
 public class PoiAccountState {
 	private static final int REMOTE_STATE_SIZE = 2;
@@ -23,6 +24,7 @@ public class PoiAccountState {
 	//    2. now at block 2500 user removes alias, removal will become effective at block 3940
 	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
 	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
+	// TODO 20140909 J-G: 'user won't be able to create new alias before 3940' - what prevents that (i see the check below, so maybe i should ask why)?
 	private CircularStack<RemoteState> remoteStateStack;
 
 	/**
@@ -42,6 +44,7 @@ public class PoiAccountState {
 		this.weightedBalances = weightedBalances;
 		this.height = height;
 
+		// TODO 20140909 J-G: to save on memory, i would probably create this lazily
 		this.remoteStateStack = new CircularStack<>(REMOTE_STATE_SIZE);
 	}
 
@@ -91,6 +94,8 @@ public class PoiAccountState {
 			this.height = height;
 		}
 	}
+
+	// TODO 20140909 J-G: i would definitely add tests for these
 
 	/**
 	 * Creates association between "remote" account and "owner" account.
