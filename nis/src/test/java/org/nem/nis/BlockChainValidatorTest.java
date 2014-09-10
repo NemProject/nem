@@ -8,7 +8,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.MockBlockScorer;
 
 import java.math.BigInteger;
@@ -246,7 +245,6 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
-
 	@Test
 	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -303,6 +301,7 @@ public class BlockChainValidatorTest {
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 	}
+
 	//endregion
 
 	//region block execution
