@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.nis.time.synchronization.*;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 
@@ -40,6 +41,11 @@ public class PeerNetworkServicesFactoryTest {
 		Assert.assertThat(createFactory().createNodeSynchronizer(), IsNull.notNullValue());
 	}
 
+	@Test
+	public void getChainServicesReturnsNonNull() {
+		// Assert:
+		Assert.assertThat(createFactory().getChainServices(), IsNull.notNullValue());
+	}
 
 	@Test
 	public void createTimeSynchronizerReturnsNonNull() {
@@ -55,6 +61,7 @@ public class PeerNetworkServicesFactoryTest {
 				Mockito.mock(TimeSynchronizationConnector.class),
 				Mockito.mock(SyncConnectorPool.class),
 				Mockito.mock(BlockSynchronizer.class),
+				Mockito.mock(ChainServices.class),
 				Mockito.mock(TimeSynchronizationStrategy.class));
 	}
 }

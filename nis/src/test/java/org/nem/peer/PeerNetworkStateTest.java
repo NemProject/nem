@@ -99,6 +99,45 @@ public class PeerNetworkStateTest {
 		Assert.assertThat(context.getParams(), IsSame.sameInstance(params));
 	}
 
+	@Test
+	public void isChainSynchronizedReturnsFalseAsDefault() {
+		// Act:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isChainSynchronizedReturnsTrueWhenSetToTrueAndThenToFalse() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.setChainSynchronized(true);
+		state.setChainSynchronized(false);
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isChainSynchronizedReturnsFalseWhenSetToTrueAndThenToFalseTwice() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.setChainSynchronized(true);
+		state.setChainSynchronized(false);
+		state.setChainSynchronized(false);
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
+	}
+
 	//endregion
 
 	//region updateExperience

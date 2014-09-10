@@ -8,6 +8,7 @@ import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
@@ -19,6 +20,18 @@ import java.util.concurrent.CompletableFuture;
 public class PeerNetworkTest {
 
 	//region PeerNetworkState delegation
+
+	@Test
+	public void isChainSynchronizedDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.isChainSynchronized();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).isChainSynchronized();
+	}
 
 	@Test
 	public void getLocalNodeDelegatesToState() {
@@ -196,6 +209,38 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.times(1)).createLocalNodeEndpointUpdater();
 		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
+	}
+
+	@Test
+	public void checkChainSynchronizationDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).getChainServices();
+		Mockito.verify(services, Mockito.times(1)).isChainSynchronized(Mockito.any());
+	}
+
+	@Test
+	public void checkChainSynchronizationUpdatesNetworkState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		final Node node = PeerUtils.createNodeWithName("r");
+		Mockito.when(services.isChainSynchronized(node)).thenReturn(true);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+		Mockito.when(context.state.getLocalNode()).thenReturn(node);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).setChainSynchronized(true);
 	}
 
 	@Test

@@ -41,7 +41,8 @@ public class PeerNetworkSchedulerTest {
 					"REFRESH",
 					"SYNC",
 					"UPDATING LOCAL NODE ENDPOINT",
-					"TIME SYNCHRONIZATION");
+					"TIME SYNCHRONIZATION",
+					"CHECKING CHAIN SYNCHRONIZATION");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}

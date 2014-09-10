@@ -109,6 +109,12 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE)).join().asCollection();
 	}
 
+	@Override
+	public CompletableFuture<BlockChainScore> getChainScoreAsync(final Node node) {
+		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_SCORE);
+		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj));
+	}
+
 	//endregion
 
 	// region TimeSynchronizationConnector

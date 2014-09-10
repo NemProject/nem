@@ -3,6 +3,7 @@ package org.nem.peer.services;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.time.synchronization.*;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.DefaultNodeVersionCheck;
@@ -18,6 +19,7 @@ public class PeerNetworkServicesFactory {
 	private final TimeSynchronizationConnector timeSynchronizationConnector;
 	private final SyncConnectorPool syncConnectorPool;
 	private final BlockSynchronizer blockSynchronizer;
+	private final ChainServices chainServices;
 	private final TimeSynchronizationStrategy timeSyncStrategy;
 
 	/**
@@ -25,8 +27,11 @@ public class PeerNetworkServicesFactory {
 	 *
 	 * @param state The peer network state.
 	 * @param peerConnector The peer connector to use.
+	 * @param timeSynchronizationConnector The time sync connector to use.
 	 * @param syncConnectorPool The sync connector pool to use.
 	 * @param blockSynchronizer The block synchronizer to use.
+	 * @param chainServices The chain services to use.
+	 * @param timeSyncStrategy The time sync strategy to use.
 	 */
 	public PeerNetworkServicesFactory(
 			final PeerNetworkState state,
@@ -34,12 +39,14 @@ public class PeerNetworkServicesFactory {
 			final TimeSynchronizationConnector timeSynchronizationConnector,
 			final SyncConnectorPool syncConnectorPool,
 			final BlockSynchronizer blockSynchronizer,
+			final ChainServices chainServices,
 			final TimeSynchronizationStrategy timeSyncStrategy) {
 		this.state = state;
 		this.peerConnector = peerConnector;
 		this.timeSynchronizationConnector = timeSynchronizationConnector;
 		this.syncConnectorPool = syncConnectorPool;
 		this.blockSynchronizer = blockSynchronizer;
+		this.chainServices = chainServices;
 		this.timeSyncStrategy = timeSyncStrategy;
 	}
 
@@ -86,6 +93,15 @@ public class PeerNetworkServicesFactory {
 	 */
 	public NodeSynchronizer createNodeSynchronizer() {
 		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
+	}
+
+	/**
+	 * Gets the chain services.
+	 *
+	 * @return The chain services.
+	 */
+	public ChainServices getChainServices() {
+		return this.chainServices;
 	}
 
 	/**

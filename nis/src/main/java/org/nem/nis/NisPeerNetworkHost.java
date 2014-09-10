@@ -4,11 +4,13 @@ import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.node.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
@@ -28,6 +30,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final BlockChain blockChain;
+	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
 	private final AuditCollection outgoingAudits = createAuditCollection();
@@ -40,9 +43,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	public NisPeerNetworkHost(
 			final AccountAnalyzer accountAnalyzer,
 			final BlockChain blockChain,
+			final ChainServices chainServices,
 			final NisConfiguration nisConfiguration) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.blockChain = blockChain;
+		this.chainServices = chainServices;
 		this.nisConfiguration = nisConfiguration;
 		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
@@ -90,6 +95,15 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		}
 
 		return this.network;
+	}
+
+	/**
+	 * Gets a value indicating whether or not the network is already booted.
+	 *
+	 * @return true if the network is booted, false otherwise.
+	 */
+	public boolean isNetworkBooted() {
+		return (null != this.network);
 	}
 
 	/**
@@ -153,6 +167,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				timeSynchronizationConnector,
 				connectorPool,
 				this.synchronizer,
+				this.chainServices,
 				createTimeSynchronizationStrategy());
 	}
 
