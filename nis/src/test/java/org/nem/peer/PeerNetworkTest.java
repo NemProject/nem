@@ -248,6 +248,7 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final TimeSynchronizer synchronizer = Mockito.mock(TimeSynchronizer.class);
+		Mockito.when(synchronizer.synchronizeTime()).thenReturn(CompletableFuture.completedFuture(null));
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		final ImportanceAwareNodeSelector nodeSelector = Mockito.mock(ImportanceAwareNodeSelector.class);
 		Mockito.when(context.importanceAwareSelectorFactory.createNodeSelector()).thenReturn(nodeSelector);
