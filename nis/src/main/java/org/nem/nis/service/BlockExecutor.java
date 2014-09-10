@@ -31,14 +31,6 @@ public class BlockExecutor {
 		this.poiFacade = poiFacade;
 		this.accountCache = accountCache;
 	}
-
-	// TODO 20140909 J-G: i would prefer to add something like createBlockExecutor(PoiFacade) in the test code
-
-	// this constructor is currently only to make the tests pass, visibility limited to package
-	BlockExecutor(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
-		this.accountCache = null;
-	}
 	//region execute
 
 	/**
@@ -75,6 +67,7 @@ public class BlockExecutor {
 		}
 
 		// TODO 20140909 J-G: can we test this?
+		// G-J: I hope we can ;-)  I will add tests.
 		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
 		for (final Transaction transaction : block.getTransactions()) {
 			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {

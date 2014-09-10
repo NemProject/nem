@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 // TODO 20140909 J-G: why can't these checks happen in checkValidity? (i'm probably missing something)
+// G-J: which checks?
 
 /**
  * Helper class for validating a block chain.

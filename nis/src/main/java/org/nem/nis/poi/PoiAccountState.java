@@ -25,6 +25,12 @@ public class PoiAccountState {
 	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
 	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
 	// TODO 20140909 J-G: 'user won't be able to create new alias before 3940' - what prevents that (i see the check below, so maybe i should ask why)?
+	// G-J: we were discussing it with BR, and it'll be best to keep thing simple, so the following rules will apply:
+	//  1. one will have to wait 1440 blocks to  activate/deactivate remote account (before it'll become operational)
+	//  2. in cannot make two SAME subsequent announcements: so let's say I've  announce address X as my remote address.
+	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
+	//
+	// This makes whole logic a lot simpler
 	private CircularStack<RemoteState> remoteStateStack;
 
 	/**
@@ -45,7 +51,7 @@ public class PoiAccountState {
 		this.height = height;
 
 		// TODO 20140909 J-G: to save on memory, i would probably create this lazily
-		this.remoteStateStack = new CircularStack<>(REMOTE_STATE_SIZE);
+		// you're right
 	}
 
 	/**
@@ -95,7 +101,15 @@ public class PoiAccountState {
 		}
 	}
 
+	private void createStack() {
+		if (this.remoteStateStack == null) {
+			this.remoteStateStack = new CircularStack<>(REMOTE_STATE_SIZE);
+		}
+	}
+
 	// TODO 20140909 J-G: i would definitely add tests for these
+	// I know many tests are missing, I was adding quite some code in hope,
+	// that I'll have it working after (6-7 Sep) weekend.
 
 	/**
 	 * Creates association between "remote" account and "owner" account.
@@ -104,6 +118,7 @@ public class PoiAccountState {
 	 * @param direction
 	 */
 	public void remoteFor(final Address address, final BlockHeight height, int direction) {
+		createStack();
 		this.remoteStateStack.push(new RemoteState(address, height, direction, true));
 	}
 
@@ -114,6 +129,7 @@ public class PoiAccountState {
 	 * @param direction Direction of an association.
 	 */
 	public void setRemote(final Address address, final BlockHeight height, final int direction) {
+		createStack();
 		this.remoteStateStack.push(new RemoteState(address, height, direction, false));
 	}
 
@@ -125,6 +141,9 @@ public class PoiAccountState {
 	 * @param direction Direction of an association.
 	 */
 	public void resetRemote(final Address address, final BlockHeight height, final int direction) {
+		// TODO: probably call to createStack should be removed from here
+		createStack();
+
 		// between changes of remoteState there must be 1440 blocks
 		if (this.remoteStateStack.peek().getDirection() != direction ||
 				!this.remoteStateStack.peek().getRemoteAddress().equals(address) ||
@@ -140,6 +159,8 @@ public class PoiAccountState {
 	 * @return Remote state if account have one.
 	 */
 	public RemoteState getRemoteState() {
+		// TODO: probably call to createStack should be removed from here
+		createStack();
 		return this.remoteStateStack.peek();
 	}
 
@@ -149,7 +170,7 @@ public class PoiAccountState {
 	 * @return True if there is any remote state, false otherwise.
 	 */
 	public boolean hasRemoteState() {
-		return this.remoteStateStack.size() != 0;
+		return this.remoteStateStack != null && this.remoteStateStack.size() != 0;
 	}
 
 	/**
@@ -159,7 +180,9 @@ public class PoiAccountState {
 	 */
 	public PoiAccountState copy() {
 		final PoiAccountState ret = new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
-		this.remoteStateStack.shallowCopyTo(ret.remoteStateStack);
+		if (this.remoteStateStack != null) {
+			this.remoteStateStack.shallowCopyTo(ret.remoteStateStack);
+		}
 		return ret;
 	}
 }

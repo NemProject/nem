@@ -30,10 +30,10 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.push(666); // TODO 20140909 J-G: can you use any other number :)
+		intStack.push(123);
 
 		// Assert:
-		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(123));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(1));
 	}
 
@@ -58,12 +58,12 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		for (int i = 0; i < 112; ++i) {
-			intStack.push(666 + i);
+		for (int i = 0; i < 100; ++i) {
+			intStack.push(123 + i);
 		}
 
 		// Assert:
-		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666 + 111));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(3));
 	}
 
@@ -73,13 +73,13 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		for (int i = 0; i < 112; ++i) {
-			intStack.push(666 + i);
+		for (int i = 0; i < 100; ++i) {
+			intStack.push(123 + i);
 		}
 		intStack.remove();
 
 		// Assert:
-		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666 + 111 - 1));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99 - 1));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(2));
 	}
 
@@ -159,12 +159,12 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		for (int i = 0; i < 112; ++i) {
-			intStack.push(666 + i);
+		for (int i = 0; i < 100; ++i) {
+			intStack.push(123 + i);
 		}
 
 		// Assert:
-		int i = 666 + 111 - 2;
+		int i = 123 + 99 - 2;
 		for (final Integer elem : intStack) {
 			Assert.assertThat(elem, IsEqual.equalTo(i));
 			++i;

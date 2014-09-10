@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // TODO 20140909 J-G: shouldn't we add a test for the rigel bug?
+// added simple test in master branch in BlockChainValidator
 
 public class BlockChainTest {
 	public static final long RECIPIENT1_AMOUNT = 3 * 1000000L;

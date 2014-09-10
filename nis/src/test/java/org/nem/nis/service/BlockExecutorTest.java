@@ -98,7 +98,7 @@ public class BlockExecutorTest {
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade);
+		private final BlockExecutor executor = createBlockExecutor(this.poiFacade);
 
 		public UndoExecuteTestContext() {
 			this.account = Utils.generateRandomAccount();
@@ -458,7 +458,7 @@ public class BlockExecutorTest {
 
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade);
+		private final BlockExecutor executor = createBlockExecutor(this.poiFacade);
 
 		private MockAccountContext addAccount() {
 			return new MockAccountContext(this.poiFacade);
@@ -505,5 +505,9 @@ public class BlockExecutorTest {
 
 			return account;
 		}
+	}
+
+	private static BlockExecutor createBlockExecutor(final PoiFacade poiFacade) {
+		return new BlockExecutor(poiFacade, null);
 	}
 }

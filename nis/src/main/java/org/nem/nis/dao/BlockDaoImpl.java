@@ -60,16 +60,29 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
-	// TODO 20140909 J-G: can you add something link Criteria setTransfersFetchMode(Criteria, FetchMode)
+	// TODO 20140909 J-G: can you add something link Criteria setTransfersToJoin(Criteria, FetchMode)
 	// if we add a table per transfer type it would be easy to forget to update a line
+    // G-J: yups you're right
+
+	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
+	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
+		return criteria
+				.setFetchMode("blockTransfers", FetchMode.JOIN)
+				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN);
+	}
+	private static Criteria setTransfersToJoin(final Criteria criteria) {
+		return setTransfersFetchMode(criteria, FetchMode.JOIN);
+	}
+
+	private static Criteria setTransfersToSelect(final Criteria criteria) {
+		return setTransfersFetchMode(criteria, FetchMode.SELECT);
+	}
 
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
 	public Block findById(final long id) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("id", id));
 		return this.executeSingleQuery(criteria);
 	}
@@ -77,9 +90,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Block findByHeight(final BlockHeight height) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("height", height.getRaw()));
 		return this.executeSingleQuery(criteria);
 	}
@@ -94,9 +105,7 @@ public class BlockDaoImpl implements BlockDao {
 		final byte[] blockHashBytes = blockHash.getRaw();
 		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
 
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("shortId", blockId));
 		final List<Block> blockList = listAndCast(criteria);
 
@@ -139,10 +148,10 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<Block> getBlocksForAccount(final Account account, final Integer timeStamp, final int limit) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
+		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
+		// TODO: add tests.
+		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
-				.setFetchMode("blockTransfers", FetchMode.SELECT)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.le("timeStamp", timeStamp))
 				.addOrder(Order.desc("timeStamp"))
 						// here we were lucky cause blocktransfers is set to select...
@@ -157,10 +166,8 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional
 	public Collection<Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
 		// whatever it takes : DO NOT ADD setMaxResults here!
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
 				.add(Restrictions.lt("height", blockHeight + (long)blocksCount))
 				.addOrder(Order.asc("height"));
@@ -183,6 +190,7 @@ public class BlockDaoImpl implements BlockDao {
 
 		// TODO 20140909 J-G: likewise, i would probably refactor the query construction and delete if !empty
 		// (the differences are the join field name and the transfer table name)
+		// G-J: I need to rewrite this method, as it's probably wrong anyway, but I'll do it later
 
 		final Query getImportanceTxes = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")

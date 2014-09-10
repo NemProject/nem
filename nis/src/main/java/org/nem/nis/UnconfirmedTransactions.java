@@ -73,6 +73,9 @@ public class UnconfirmedTransactions {
 
 		// if we already have ImportanceTransfer from this account on the list....
 		// TODO 20140909 J-G: why isn't the hash check good enough?
+		// ? cause there can be two transactions from a single person, with different recipient, that have different hashes.
+		// Although that may seem like a minor issue (since it's same recipient anyway), but it would make analyzing
+		// ImportanceTransfer transactions muuuuuch more complicated
 		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 			for (final Transaction tx : transactions.values()) {
 				if (tx.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {
@@ -86,6 +89,11 @@ public class UnconfirmedTransactions {
 
 				// that would be bit unexpected, but better safe than sorry
 				// TODO 20140909 J-G: this shouldn't have any observable effect, should it?
+				// well, it could happen, although HIGHLY unlikely, that two different account would try to announce
+				// same "remote". Most likely that wouldn't cause much harm, but it could lead to some weird state
+				// (i.e. users interface would most likely tell him he has associated remote account, he could start
+				//  remote harvesting (cause he knows the key), but he wouldn't get reward, as user who announced
+				//  as a second one would be getting them)
 				if (((ImportanceTransferTransaction)transaction).getRemote().equals(((ImportanceTransferTransaction)tx).getRemote())) {
 					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 				}

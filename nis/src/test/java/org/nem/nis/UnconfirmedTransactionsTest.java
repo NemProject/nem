@@ -185,9 +185,6 @@ public class UnconfirmedTransactionsTest {
 	public void returnedTransactionsAreSortedByType() {
 		// Arrange
 		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(2);
-		final Account sender = Utils.generateRandomAccount();
-		final Account remote = Utils.generateRandomAccount();
-		// TODO 20140909 J-G: you are not using sender or remote
 		final MockTransaction mockTransaction = new MockTransaction(MockTransaction.TYPE + 1000, 123, new TimeInstant(10));
 		unconfirmedTransactions.add(mockTransaction);
 
