@@ -1,12 +1,14 @@
 package org.nem.nis;
 
 import net.minidev.json.*;
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.node.*;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
+import org.nem.nis.time.synchronization.*;
+import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
@@ -14,7 +16,7 @@ import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NisPeerNetworkHost implements AutoCloseable {
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
 
-	private final AccountLookup accountLookup;
+	private final AccountAnalyzer accountAnalyzer;
 	private final BlockChain blockChain;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
@@ -36,10 +38,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
-			final AccountLookup accountLookup,
+			final AccountAnalyzer accountAnalyzer,
 			final BlockChain blockChain,
 			final NisConfiguration nisConfiguration) {
-		this.accountLookup = accountLookup;
+		this.accountAnalyzer = accountAnalyzer;
 		this.blockChain = blockChain;
 		this.nisConfiguration = nisConfiguration;
 		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
@@ -59,7 +61,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
 			this.network = network;
-			this.scheduler.addTasks(this.network, this.blockChain);
+			this.scheduler.addTasks(this.network, this.blockChain, this.nisConfiguration.useNetworkTime());
 		});
 	}
 
@@ -123,7 +125,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 *
 	 * @return All timer visitors.
 	 */
-	public List<NisAsyncTimerVisitor> getVisitors() {
+	public List<NemAsyncTimerVisitor> getVisitors() {
 		return this.scheduler.getVisitors();
 	}
 
@@ -132,13 +134,26 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.scheduler.close();
 	}
 
+	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
+		return new DefaultTimeSynchronizationStrategy(
+				new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter())),
+				this.accountAnalyzer.getPoiFacade());
+	}
+
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final CommunicationMode communicationMode = this.nisConfiguration.useBinaryTransport()
 				? CommunicationMode.BINARY
 				: CommunicationMode.JSON;
 		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
-		final PeerConnector connector = connectorPool.getPeerConnector(this.accountLookup);
-		return new PeerNetworkServicesFactory(networkState, connector, connectorPool, this.synchronizer);
+		final PeerConnector peerConnector = connectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
+		final TimeSynchronizationConnector timeSynchronizationConnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
+		return new PeerNetworkServicesFactory(
+				networkState,
+				peerConnector,
+				timeSynchronizationConnector,
+				connectorPool,
+				this.synchronizer,
+				createTimeSynchronizationStrategy());
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
@@ -147,10 +162,16 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.nisConfiguration.getNodeLimit(),
 				config.getTrustProvider(),
 				networkState);
+		final ImportanceAwareNodeSelectorFactory importanceAwareSelectorFactory = new ImportanceAwareNodeSelectorFactory(
+				this.nisConfiguration.getNodeLimit(),
+				config.getTrustProvider(),
+				networkState,
+				this.accountAnalyzer.getPoiFacade());
 		return new PeerNetworkBootstrapper(
 				networkState,
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
+				importanceAwareSelectorFactory,
 				!this.nisConfiguration.bootWithoutAck());
 	}
 

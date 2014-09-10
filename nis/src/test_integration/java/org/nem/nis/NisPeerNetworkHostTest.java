@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
@@ -72,7 +73,7 @@ public class NisPeerNetworkHostTest {
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode()).join();
-			final List<NisAsyncTimerVisitor> visitors = host.getVisitors();
+			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
 			Assert.assertThat(visitors.size(), IsEqual.equalTo(6));

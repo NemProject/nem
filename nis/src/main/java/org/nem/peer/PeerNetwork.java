@@ -2,11 +2,13 @@ package org.nem.peer;
 
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.time.TimeProvider;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -16,6 +18,7 @@ public class PeerNetwork {
 	private final PeerNetworkState state;
 	private final PeerNetworkServicesFactory servicesFactory;
 	private final NodeSelectorFactory selectorFactory;
+	private final NodeSelectorFactory importanceAwareSelectorFactory;
 	private NodeSelector selector;
 
 	/**
@@ -28,10 +31,12 @@ public class PeerNetwork {
 	public PeerNetwork(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory) {
+			final NodeSelectorFactory selectorFactory,
+			final NodeSelectorFactory importanceAwareSelectorFactory) {
 		this.state = state;
 		this.servicesFactory = servicesFactory;
 		this.selectorFactory = selectorFactory;
+		this.importanceAwareSelectorFactory = importanceAwareSelectorFactory;
 		this.selector = this.selectorFactory.createNodeSelector();
 	}
 
@@ -83,6 +88,10 @@ public class PeerNetwork {
 		this.state.setRemoteNodeExperiences(pair);
 	}
 
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.state.getTimeSynchronizationResults();
+	}
+
 	//endregion
 
 	//region PeerNetworkServicesFactory delegation
@@ -93,6 +102,17 @@ public class PeerNetwork {
 	public CompletableFuture<Void> refresh() {
 		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
 				.whenComplete((v, e) -> this.selector = this.selectorFactory.createNodeSelector());
+	}
+
+	/**
+	 * Does one round of network time synchronization.
+	 *
+	 * TODO 20140909 J-B i would prefer for this to be async
+	 * TODO 20140910 BR -> J: Is it not async?
+	 * * TODO 20140910 J-J: i'll fix
+	 */
+	public void synchronizeTime(TimeProvider timeProvider) {
+		this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
 	}
 
 	/**

@@ -1,6 +1,5 @@
-package org.nem.nis;
+package org.nem.core.async;
 
-import org.nem.core.async.AsyncTimerVisitor;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 
@@ -9,8 +8,8 @@ import java.util.logging.*;
 /**
  * An async timer visitor implementation used by NIS.
  */
-public class NisAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEntity {
-	private static final Logger LOGGER = Logger.getLogger(NisAsyncTimerVisitor.class.getName());
+public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEntity {
+	private static final Logger LOGGER = Logger.getLogger(NemAsyncTimerVisitor.class.getName());
 
 	private final String timerName;
 	private final TimeProvider timeProvider;
@@ -30,7 +29,7 @@ public class NisAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 	 * @param timerName The friendly name of the timer.
 	 * @param timeProvider The time provider.
 	 */
-	public NisAsyncTimerVisitor(final String timerName, final TimeProvider timeProvider) {
+	public NemAsyncTimerVisitor(final String timerName, final TimeProvider timeProvider) {
 		this.timerName = timerName;
 		this.timeProvider = timeProvider;
 	}

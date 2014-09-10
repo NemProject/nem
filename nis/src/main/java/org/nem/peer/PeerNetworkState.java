@@ -1,9 +1,12 @@
 package org.nem.peer;
 
+import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -16,6 +19,8 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
+	private NodeAge nodeAge;
+	private final List<TimeSynchronizationResult> timeSynchronizationResults = new ArrayList<>();
 
 	/**
 	 * Creates new peer network state.
@@ -32,6 +37,7 @@ public class PeerNetworkState {
 		this.localNode = config.getLocalNode();
 		this.nodeExperiences = nodeExperiences;
 		this.nodes = nodeCollection;
+		this.nodeAge = new NodeAge(0);
 
 		for (final Node node : this.config.getPreTrustedNodes().getNodes()) {
 			this.nodes.update(node, NodeStatus.ACTIVE);
@@ -137,5 +143,41 @@ public class PeerNetworkState {
 
 		nodeArray[index] = localNode;
 		return nodeArray;
+	}
+
+	/**
+	 * Gets the local node's age.
+	 *
+	 * @return the node's age.
+	 */
+	public NodeAge getNodeAge() {
+		return this.nodeAge;
+	}
+
+	/**
+	 * Increments local the node's age by one.
+	 */
+	private void incrementAge() {
+		this.nodeAge = this.nodeAge.increment();
+	}
+
+	/**
+	 * Gets the list of the most recent time synchronization results.
+	 *
+	 * @return The list of time synchronization results.
+	 */
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.timeSynchronizationResults;
+	}
+	/**
+	 * Adds a time synchronization result to the list.
+	 * Removes the oldest result if the size of the is exceeding 100.
+	 */
+	public void updateTimeSynchronizationResults(final TimeSynchronizationResult result) {
+		this.incrementAge();
+		this.timeSynchronizationResults.add(result);
+		if (this.timeSynchronizationResults.size() > 100) {
+			this.timeSynchronizationResults.remove(0);
+		}
 	}
 }

@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -103,14 +104,14 @@ public class DebugControllerTest {
 	@Test
 	public void timersInfoDelegatesToHost() {
 		// Arrange:
-		final List<NisAsyncTimerVisitor> originalVisitors = Arrays.asList(
-				new NisAsyncTimerVisitor("foo", null),
-				new NisAsyncTimerVisitor("bar", null));
+		final List<NemAsyncTimerVisitor> originalVisitors = Arrays.asList(
+				new NemAsyncTimerVisitor("foo", null),
+				new NemAsyncTimerVisitor("bar", null));
 		final TestContext context = new TestContext();
 		Mockito.when(context.host.getVisitors()).thenReturn(originalVisitors);
 
 		// Act:
-		final SerializableList<NisAsyncTimerVisitor> visitors = context.controller.timersInfo();
+		final SerializableList<NemAsyncTimerVisitor> visitors = context.controller.timersInfo();
 
 		// Assert:
 		Mockito.verify(context.host, Mockito.times(1)).getVisitors();

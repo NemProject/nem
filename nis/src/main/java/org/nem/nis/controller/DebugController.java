@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -123,7 +124,7 @@ public class DebugController {
 	 */
 	@RequestMapping(value = "/debug/timers", method = RequestMethod.GET)
 	@PublicApi
-	public SerializableList<NisAsyncTimerVisitor> timersInfo() {
+	public SerializableList<NemAsyncTimerVisitor> timersInfo() {
 		return new SerializableList<>(this.host.getVisitors());
 	}
 
@@ -147,6 +148,17 @@ public class DebugController {
 	@PublicApi
 	public AuditCollection outgoingConnectionsInfo() {
 		return this.host.getOutgoingAudits();
+	}
+
+	/**
+	 * Gets debug information about the time synchronization.
+	 *
+	 * @return Debug information about the time synchronization.
+	 */
+	@RequestMapping(value = "/debug/time-synchronization", method = RequestMethod.GET)
+	@PublicApi
+	public SerializableList<TimeSynchronizationResult> timeSynchronizationIno() {
+		return new SerializableList<>(this.host.getNetwork().getTimeSynchronizationResults());
 	}
 
 	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {

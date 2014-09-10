@@ -1,8 +1,12 @@
 package org.nem.peer.services;
 
+import org.nem.core.time.TimeProvider;
+import org.nem.core.time.synchronization.TimeSynchronizer;
+import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.DefaultNodeVersionCheck;
+import org.nem.peer.trust.NodeSelector;
 
 /**
  * Factory class for creating peer network services.
@@ -11,8 +15,10 @@ public class PeerNetworkServicesFactory {
 
 	private final PeerNetworkState state;
 	private final PeerConnector peerConnector;
+	private final TimeSynchronizationConnector timeSynchronizationConnector;
 	private final SyncConnectorPool syncConnectorPool;
 	private final BlockSynchronizer blockSynchronizer;
+	private final TimeSynchronizationStrategy timeSyncStrategy;
 
 	/**
 	 * Creates a new factory.
@@ -25,12 +31,16 @@ public class PeerNetworkServicesFactory {
 	public PeerNetworkServicesFactory(
 			final PeerNetworkState state,
 			final PeerConnector peerConnector,
+			final TimeSynchronizationConnector timeSynchronizationConnector,
 			final SyncConnectorPool syncConnectorPool,
-			final BlockSynchronizer blockSynchronizer) {
+			final BlockSynchronizer blockSynchronizer,
+			final TimeSynchronizationStrategy timeSyncStrategy) {
 		this.state = state;
 		this.peerConnector = peerConnector;
+		this.timeSynchronizationConnector = timeSynchronizationConnector;
 		this.syncConnectorPool = syncConnectorPool;
 		this.blockSynchronizer = blockSynchronizer;
+		this.timeSyncStrategy = timeSyncStrategy;
 	}
 
 	/**
@@ -76,5 +86,14 @@ public class PeerNetworkServicesFactory {
 	 */
 	public NodeSynchronizer createNodeSynchronizer() {
 		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
+	}
+
+	/**
+	 * Creates a time synchronizer.
+	 *
+	 * @return A time synchronizer.
+	 */
+	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {
+		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSynchronizationConnector, timeProvider, this.state);
 	}
 }

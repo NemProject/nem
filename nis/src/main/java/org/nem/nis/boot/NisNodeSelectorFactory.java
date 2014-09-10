@@ -6,7 +6,7 @@ import org.nem.peer.trust.*;
 import java.security.SecureRandom;
 
 /**
- * NodeSelector factor used by NIS.
+ * NodeSelector factory used by NIS.
  */
 public class NisNodeSelectorFactory implements NodeSelectorFactory {
 	private final int nodeLimit;

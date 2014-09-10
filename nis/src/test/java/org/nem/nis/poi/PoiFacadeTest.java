@@ -323,6 +323,40 @@ public class PoiFacadeTest {
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
+	@Test
+	public void recalculateImportancesUpdatesLastPoiVectorSize() {
+		// Arrange:
+		final int height1 = 70;
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+
+		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		createAccountStatesForRecalculateTests(3, facade);
+
+		// Act:
+		facade.recalculateImportances(new BlockHeight(height1));
+
+		// Assert:
+		Assert.assertThat(facade.getLastPoiVectorSize(), IsEqual.equalTo(3));
+
+	}
+
+	@Test
+	public void recalculateImportancesUpdatesLastPoiRecalculationHeight() {
+		// Arrange:
+		final int height1 = 70;
+		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+
+		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		createAccountStatesForRecalculateTests(3, facade);
+
+		// Act:
+		facade.recalculateImportances(new BlockHeight(height1));
+
+		// Assert:
+		Assert.assertThat(facade.getLastPoiRecalculationHeight(), IsEqual.equalTo(new BlockHeight(70)));
+
+	}
+
 	private static List<PoiAccountState> createAccountStatesForRecalculateTests(final int numAccounts, final PoiFacade facade) {
 		final List<PoiAccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; ++i) {
@@ -400,8 +434,8 @@ public class PoiFacadeTest {
 		// Assert:
 		Assert.assertThat(iteratedAccountStates.size(), IsEqual.equalTo(3));
 		Assert.assertThat(
-				iteratedAccountStates.stream().map(a -> a.getAddress()).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(accountStates.stream().map(a -> a.getAddress()).collect(Collectors.toList())));
+				iteratedAccountStates.stream().map(PoiAccountState::getAddress).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(accountStates.stream().map(PoiAccountState::getAddress).collect(Collectors.toList())));
 	}
 
 	//endregion

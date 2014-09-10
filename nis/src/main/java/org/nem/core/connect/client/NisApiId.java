@@ -111,7 +111,16 @@ public enum NisApiId {
 	/**
 	 * The /shutdown API.
 	 */
-	NIS_REST_SHUTDOWN("/shutdown");
+	NIS_REST_SHUTDOWN("/shutdown"),
+
+	//endregion
+
+	//region time sync/*
+
+	/**
+	 * The time-sync/network-time API
+	 */
+	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
 	//endregion
 
