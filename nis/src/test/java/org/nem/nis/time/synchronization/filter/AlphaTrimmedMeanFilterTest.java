@@ -12,8 +12,6 @@ public class AlphaTrimmedMeanFilterTest {
 	@Test
 	public void filterDiscardsSamplesAtBothEnds() {
 		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSortedSamples(0, 20));
-		// TODO-CR: J-B instead of using true/false for sorted/unsorted, consider separate functions like createTolerableUnsortedSamples
-		// TODO     BR -> J done.
 	}
 
 	@Test

@@ -15,6 +15,8 @@ import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.util.*;
 
+// TODO 20140909 since these seem to be based on the BasicNodeSelectorTest consider refactoring the common tests into an abstract NodeSelectorTest base class
+
 public class ImportanceAwareNodeSelectorTest {
 
 	//region recalculations

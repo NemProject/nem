@@ -14,6 +14,7 @@ public interface NodeSelectorFactory {
 	 */
 	public NodeSelector createNodeSelector();
 
+	// TODO 20140909 B-J as mentioned earlier i don't think this should be in the interface
 	/**
 	 * Creates an importance aware node selector.
 	 *

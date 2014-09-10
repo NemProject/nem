@@ -103,6 +103,8 @@ public class PeerNetwork {
 
 	/**
 	 * Does one round of network time synchronization.
+	 *
+	 * TODO 20140909 J-B i would prefer for this to be async
 	 */
 	public void synchronizeTime(TimeProvider timeProvider) {
 		this.servicesFactory.createTimeSynchronizer(this.selectorFactory.createImportanceAwareNodeSelector(), timeProvider).synchronizeTime();

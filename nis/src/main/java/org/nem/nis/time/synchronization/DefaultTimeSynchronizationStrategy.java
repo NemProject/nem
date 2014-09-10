@@ -40,12 +40,6 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * Gets a value indicating how strong the coupling should be.
 	 * Starting value should be chosen such that coupling is strong to achieve a fast convergence in the beginning.
 	 * Minimum value should be chosen such that the network time shows some inertia.
-	 * TODO 20140825 BR: Should the coupling be dependent on the trust in a node?
-	 * TODO J-B i think a node's trust similarity should influence coupling; i was also wondering if we could piggyback on the nodes returned by the NodeSelector
-	 * TODO BR -> J I think the only way to withstand a sybil attack is to additionally tie the coupling to the remote nodes importance.
-	 * TODO         Attacking nodes will have a low importance and thus a low coupling.
-	 * TODO J-B question - is this function public just for the testing?
-	 * TODO BR -> J yeah, didn't see another way to do testing.
 	 *
 	 * @param age The node's age.
 	 * @return The coupling.
@@ -67,7 +61,9 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		if (filteredSamples.isEmpty()) {
 			throw new TimeSynchronizationException("No synchronization samples available to calculate network time.");
 		}
+
 		// TODO BR: not sure about this approach but it seems quite reasonable.
+		// TODO 20140909 J-B interesting approach but does seem reasonable, althought you might want to consider a regular loop since you are looking up getAccountImportance twice for each node
 		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
 		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage? 1 / cumulativeImportance : 1 / viewSizePercentage;

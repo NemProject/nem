@@ -49,6 +49,9 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 				random);
 	}
 
+	// TODO 20140909 J-B couldn't this be just another NodeSelectorFactory implementation?
+	// thinking about this more ... i guess the reason for the two different selectors
+	// is to only select "better" nodes for time-sync and to allow more potentially unfriendly nodes in regular sync
 	@Override
 	public NodeSelector createImportanceAwareNodeSelector() {
 		final TrustContext context = this.state.getTrustContext();

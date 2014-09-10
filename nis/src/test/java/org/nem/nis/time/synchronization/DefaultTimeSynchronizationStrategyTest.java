@@ -58,10 +58,6 @@ public class DefaultTimeSynchronizationStrategyTest {
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, new NodeAge(0));
 	}
 
-	// TODO-CR: J-B question should you add a test with a coupling between min and max
-	// TODO     BR -> J I added it, though testing for linearity in coupling requires only 2 points.
-	// TODO             So I am testing if the calculation is proportional to the mean time offset in the additional test.
-
 	@Test
 	public void calculateTimeOffsetWithMaximumCouplingReturnsCorrectValue() {
 		// Act:
@@ -178,10 +174,6 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(createAggregateFilter(), createPoiFacade());
 
 		// Assert:
-		//TODO-CR: J-B i think checking the range [MIN, START] is too big or at least have one test that calculates a ~exact value
-		//TODO-CR: also, you might want to move assertDoubleIsWithingRange since you are using it in multiple tests
-		// TODO    BR -> J like this? If yes you can delete assertDoubleIsWithingRange.
-
 		final double epsilon = 1e-10;
 		// Assuming decay strength 0.3 for the following tests:
 		// coupling = exp(-0.3) = 0.74081822068171786606687377931782
@@ -195,11 +187,6 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// exp(-2.4) = 0.09071795328941250337517222007969 < COUPLING_MINIMUM
 		Assert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 8)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_MINIMUM));
-	}
-
-	private void assertDoubleIsWithingRange(final double value, final double min, final double max) {
-		Assert.assertThat(value > min, IsEqual.equalTo(true));
-		Assert.assertThat(value < max, IsEqual.equalTo(true));
 	}
 
 	private SynchronizationFilter createAggregateFilter() {

@@ -72,8 +72,6 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 				localTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) -
 				remoteTimeStamps.getSendTimeStamp().subtract(remoteTimeStamps.getReceiveTimeStamp());
 
-		//TODO-CR J-B consider storing remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) in a variable since you're calculating it twice
-		// TODO   BR -> J nothing is calculated twice.
 		return remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) - roundTripTime/2;
 	}
 

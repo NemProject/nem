@@ -8,6 +8,8 @@ import org.nem.peer.trust.*;
 import java.security.SecureRandom;
 import java.util.*;
 
+// TODO 20140909 i would actually have this derive from basic node selector by adding a virtual function to basicnodeselector like isCandidate(Node)
+
 public class ImportanceAwareNodeSelector implements NodeSelector {
 	private final int maxNodes;
 	private final PoiFacade poiFacade;

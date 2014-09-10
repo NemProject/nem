@@ -42,10 +42,6 @@ public class CommunicationTimeStampsTest {
 
 	//region equals / hashCode
 
-	// TODO-CR: J-B can you take a look at the equals / hashCode tests in ApplicationMetaDataTest (for example)
-	// i like how those are using strings (descriptive names for each test object) instead of integer indexes
-	// TODO     BR -> J good idea, done.
-
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
