@@ -17,9 +17,6 @@ import java.util.function.Function;
 
 public class TimeSynchronizationControllerTest {
 
-	// TODO 20140909 J-B do you want to add a test for the non-authenticated overload?
-	// TODO 20140910 BR -> J: done. Added delegation tests as well.
-
 	// region delegation
 
 	@Test

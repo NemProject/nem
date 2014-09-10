@@ -13,7 +13,4 @@ public interface NodeSelectorFactory {
 	 * @return A node selector.
 	 */
 	public NodeSelector createNodeSelector();
-
-	// TODO 20140909 B-J as mentioned earlier i don't think this should be in the interface
-	// TODO 20140910 BR -> J: removed it.
 }

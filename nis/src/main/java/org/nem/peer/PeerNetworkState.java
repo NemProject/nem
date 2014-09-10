@@ -145,13 +145,6 @@ public class PeerNetworkState {
 		return nodeArray;
 	}
 
-	// TODO 20140909 J-B might want to test (1) node age is initially 0, incrementAge works.
-	// TODO 20140910 BR -> J: implemented first test. incrementAge() is private, that's why I have the test updateTimeSynchronizationResultsAddsOneToNodeAge().
-	// TODO 20140909 J-B just thinking aloud ... if the time synchronization results all correspond to different nodes i guess we are assuming that the times should all converge to network time
-	// TODO 20140910 BR -> J: 1) The list of synchronization results correspond to a single node and reflect how the node's network time is behaving. The change should ideally converge to 0
-	// TODO 20140910             but as the node's local clock will shift in time the change will be something like 100ms I guess.
-	// TODO 20140910          2) The network time should indeed ideally converge to a common time, i.e. getNetworkTime() should be the same for all nodes.
-
 	/**
 	 * Gets the local node's age.
 	 *

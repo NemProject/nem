@@ -5,9 +5,6 @@ import org.nem.core.serialization.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 
-// TODO 20140909 J-B i think TimeSynchronizationConnector is missing
-// TODO 20140910 BR -> J: Added it again, somehow got lost.
-
 /**
  * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern
  * (where HttpMethodClient is the shared resource).

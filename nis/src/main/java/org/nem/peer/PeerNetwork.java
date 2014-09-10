@@ -109,6 +109,7 @@ public class PeerNetwork {
 	 *
 	 * TODO 20140909 J-B i would prefer for this to be async
 	 * TODO 20140910 BR -> J: Is it not async?
+	 * * TODO 20140910 J-J: i'll fix
 	 */
 	public void synchronizeTime(TimeProvider timeProvider) {
 		this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();

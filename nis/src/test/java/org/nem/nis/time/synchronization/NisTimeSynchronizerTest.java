@@ -18,8 +18,6 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeDelegatesToNodeSelector() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		// TODO 20140909 J-B you can move the creation of NisTimeSynchronizer to the test context too
-		// TODO 20140910 BR -> J: done.
 
 		// Act:
 		context.synchronizer.synchronizeTime();

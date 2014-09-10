@@ -52,10 +52,6 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 
 	/**
 	 * Gets the size of the last poi vector (needed for time synchronization).
-	 * TODO 20140909 J-B why do we need this for time sync?
-	 * TODO 20140910 BR -> J see DefaultTimeSynchronizationStrategy.calculateTimeOffset(). The scaling there might depend on the viewSizePercentage.
-	 * TODO 20140909 we should validate these new properties in our tests
-	 * TODO 20140910 BR -> J done.
 	 *
 	 * @return The size of the last poi vector.
 	 */

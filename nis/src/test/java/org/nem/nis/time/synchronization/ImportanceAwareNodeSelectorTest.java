@@ -18,6 +18,7 @@ import java.util.*;
 // TODO 20140909 since these seem to be based on the BasicNodeSelectorTest consider refactoring the common tests into an abstract NodeSelectorTest base class
 // TODO 20140910 BR -> J: I removed the tests that do not depend on isCandidate. The rest of the tests depends in one or aonther way on isCandidate
 // TODO 20140910          and is therefore specific to the class implementation. Good enough?
+// TODO 20140910 J-J let me take a stab at it
 
 public class ImportanceAwareNodeSelectorTest {
 

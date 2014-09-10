@@ -60,7 +60,7 @@ public class BasicNodeSelector implements NodeSelector {
 		return this.selectNodes(this.maxNodes);
 	}
 
-	protected List<Node> selectNodes(final int maxNodes) {
+	private List<Node> selectNodes(final int maxNodes) {
 		final Node[] nodes = this.context.getNodes();
 		final boolean[] usedNodes = new boolean[nodes.length];
 		final List<Node> partnerNodes = new ArrayList<>();

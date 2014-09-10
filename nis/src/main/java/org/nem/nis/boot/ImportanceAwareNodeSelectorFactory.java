@@ -35,13 +35,6 @@ public class ImportanceAwareNodeSelectorFactory implements NodeSelectorFactory {
 		this.poiFacade = poiFacade;
 	}
 
-
-	// TODO 20140909 J-B couldn't this be just another NodeSelectorFactory implementation?
-	// thinking about this more ... i guess the reason for the two different selectors
-	// is to only select "better" nodes for time-sync and to allow more potentially unfriendly nodes in regular sync
-	// TODO 20140910 BR -> J "better" in the sense that the selected nodes must have a minimum importance.
-	// TODO 20140910         A sybil attack will most likely have attacking nodes with very, very low importance
-	// TODO 20140910         because the attacker distributes his importance among many nodes.
 	@Override
 	public NodeSelector createNodeSelector() {
 		final TrustContext context = this.state.getTrustContext();
