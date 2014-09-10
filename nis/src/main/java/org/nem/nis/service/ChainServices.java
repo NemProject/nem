@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  * TODO 20140910          1) not requesting complete blocks (which could possibly contain many transactions)
  * TODO 20140910          2) holding all the information needed by NCC and this class.
  * TODO 20140910          Not sure about you last comment, getMaxChainScoreAsync is in NIS, did you mean the NCC getMaxBlockHeightAsync?
+ * TODO 20140910 i was wondering does it make sense for NIS to estimate how far behind it is
  */
 public class ChainServices {
 	private static final int MAX_AUDIT_HISTORY_SIZE = 10;
@@ -43,6 +44,7 @@ public class ChainServices {
 		// TODO 20140910 BR -> J: I could introduce a bean in NisAppConfig, but we already have a HttpConnectorPool.
 		// TODO 20140910          But I don't know how to access the pool from here and I need SyncConnector AND PeerConnector functionality.
 		// TODO 20140910          So the only way would be in NisAppConfig? We have MAX_AUDIT_HISTORY_SIZE defined twice then which is a bit ugly.
+		// TODO 20140910 J-J: i'll look into this
 		final Communicator communicator = new HttpCommunicator(new HttpMethodClient<>(), CommunicationMode.JSON, new DeserializationContext(null));
 		this.connector = new HttpConnector(new AuditedCommunicator(communicator, new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER)));
 	}

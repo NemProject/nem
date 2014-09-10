@@ -27,9 +27,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private final AccountLookup accountLookup;
 	private final BlockChain blockChain;
-	// TODO 20140909 J-B - i think you should inject this
-	// TODO 20140910 BR -> J done. I first had it injected but then thought since we already have the block chain object it is
-	// TODO                  not necessary to do it (I have to add another bean to NisAppConfig too). Why is injecting better?
 	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
@@ -99,9 +96,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	/**
 	 * Gets a value indicating whether or not the network is already booted.
-	 *
-	 * TODO 20140909 J-B: can you check this in NisPeerNetworkHostTest (an integration test)
-	 * TODO 20140910 BR -> J done.
 	 *
 	 * @return true if the network is booted, false otherwise.
 	 */
