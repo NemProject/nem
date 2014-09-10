@@ -254,7 +254,7 @@ public class PeerNetworkTest {
 		Mockito.when(context.servicesFactory.createTimeSynchronizer(nodeSelector, timeProvider)).thenReturn(synchronizer);
 
 		// Act:
-		context.network.synchronizeTime(timeProvider);
+		context.network.synchronizeTime(timeProvider).join();
 
 		// Assert:
 		Mockito.verify(context.importanceAwareSelectorFactory, Mockito.times(1)).createNodeSelector();

@@ -107,6 +107,8 @@ public class PeerNetwork {
 
 	/**
 	 * Refreshes the network.
+	 *
+	 * @return The future.
 	 */
 	public CompletableFuture<Void> refresh() {
 		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
@@ -116,12 +118,11 @@ public class PeerNetwork {
 	/**
 	 * Does one round of network time synchronization.
 	 *
-	 * TODO 20140909 J-B i would prefer for this to be async
-	 * TODO 20140910 BR -> J: Is it not async?
-	 * * TODO 20140910 J-J: i'll fix
+	 * @param timeProvider The time provider.
+	 * @return The future.
 	 */
-	public void synchronizeTime(TimeProvider timeProvider) {
-		this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
+	public CompletableFuture<Void> synchronizeTime(TimeProvider timeProvider) {
+		return this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
 	}
 
 	/**
@@ -129,6 +130,7 @@ public class PeerNetwork {
 	 *
 	 * @param broadcastId The type of entity.
 	 * @param entity The entity.
+	 * @return The future.
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		return this.servicesFactory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);

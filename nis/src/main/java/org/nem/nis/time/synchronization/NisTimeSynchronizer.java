@@ -38,7 +38,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 	}
 
 	@Override
-		public void synchronizeTime() {
+	public CompletableFuture<Void> synchronizeTime() {
 		List<TimeSynchronizationSample> samples = new ArrayList<>();
 		List<Node> nodes = this.selector.selectNodes();
 		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
@@ -54,7 +54,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 							});
 				})
 				.collect(Collectors.toList());
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.whenComplete((o, e) -> {
 					final TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
 					this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));

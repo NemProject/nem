@@ -135,7 +135,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private void addTimeSynchronizationTask(final PeerNetwork network) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("TIME SYNCHRONIZATION");
 		this.timers.add(new AsyncTimer(
-				this.runnableToFutureSupplier(() -> network.synchronizeTime(this.timeProvider)),
+				() -> network.synchronizeTime(this.timeProvider),
 				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
 				getTimeSynchronizationDelayStrategy(),
 				timerVisitor));
