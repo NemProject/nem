@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.MockBlockScorer;
 
 import java.math.BigInteger;
@@ -245,6 +246,39 @@ public class BlockChainValidatorTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
+
+	@Test
+	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidatorTrue(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void chainIsInvalidIfTransactionAlreadyExistAfterMarkerThread() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidatorTrue(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
 	@Test
 	public void chainIsValidIfAllTransactionChecksPass() {
 		// Arrange:
@@ -269,7 +303,6 @@ public class BlockChainValidatorTest {
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 	}
-
 	//endregion
 
 	//region block execution
@@ -377,6 +410,10 @@ public class BlockChainValidatorTest {
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
 		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false);
+	}
+
+	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
+		return new BlockChainValidator(block -> { }, scorer, 21, o -> true);
 	}
 
 	private static BlockChainValidator createValidator() {
