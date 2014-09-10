@@ -104,7 +104,7 @@ public class PoiAccountState {
 	 * @param direction
 	 */
 	public void remoteFor(final Address address, final BlockHeight height, int direction) {
-		this.remoteStateStack.add(new RemoteState(address, height, direction, true));
+		this.remoteStateStack.push(new RemoteState(address, height, direction, true));
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class PoiAccountState {
 	 * @param direction Direction of an association.
 	 */
 	public void setRemote(final Address address, final BlockHeight height, final int direction) {
-		this.remoteStateStack.add(new RemoteState(address, height, direction, false));
+		this.remoteStateStack.push(new RemoteState(address, height, direction, false));
 	}
 
 	/**
@@ -126,9 +126,9 @@ public class PoiAccountState {
 	 */
 	public void resetRemote(final Address address, final BlockHeight height, final int direction) {
 		// between changes of remoteState there must be 1440 blocks
-		if (this.remoteStateStack.get().getDirection() != direction ||
-				!this.remoteStateStack.get().getRemoteAddress().equals(address) ||
-				!this.remoteStateStack.get().getRemoteHeight().equals(height)) {
+		if (this.remoteStateStack.peek().getDirection() != direction ||
+				!this.remoteStateStack.peek().getRemoteAddress().equals(address) ||
+				!this.remoteStateStack.peek().getRemoteHeight().equals(height)) {
 			throw new IllegalArgumentException("call to resetRemote must be 'paired' with call to remoteFor or setRemote");
 		}
 		this.remoteStateStack.remove();
@@ -140,7 +140,7 @@ public class PoiAccountState {
 	 * @return Remote state if account have one.
 	 */
 	public RemoteState getRemoteState() {
-		return this.remoteStateStack.get();
+		return this.remoteStateStack.peek();
 	}
 
 	/**

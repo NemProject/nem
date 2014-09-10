@@ -13,7 +13,11 @@ import java.util.*;
  */
 public class CircularStack<E> implements Iterable<E> {
 	// TODO 20140909 J-G: why did you choose a LinkedList instead of an array / ArrayList with a pointer to the current element?
+	// G-J: there's no random access, so I thought linked list would be better
 	// TODO 20140909 J-G: how many elements do you expect this to contain?
+	// actually this class doesn't make much sense, as I've thought there might be >2 elements,
+	// but later I've noticed that in most cases there will be only two elements.
+	// But I'll probably use it also in BlockChain where it'll have 60 elements.
 	private final List<E> elements = new LinkedList<>();
 	private final int limit;
 
@@ -40,7 +44,7 @@ public class CircularStack<E> implements Iterable<E> {
 		int i = 0;
 		for (final E element : rhs) {
 			if (i >= rhs.size() - this.limit) {
-				this.add(element);
+				this.push(element);
 			}
 			++i;
 		}
@@ -52,7 +56,7 @@ public class CircularStack<E> implements Iterable<E> {
 	 *
 	 * @param element Element to be added.
 	 */
-	public void add(E element) {
+	public void push(E element) {
 		elements.add(element);
 		if (elements.size() > limit) {
 			elements.remove(0);
@@ -60,13 +64,14 @@ public class CircularStack<E> implements Iterable<E> {
 	}
 
 	// TODO 20140909 J-G: since this is a stack, i think push / pop / peek (if needed) are better names
+	// G-J: not sure about pop, as I actually wouldn't like to return popped element, would it still be ok, if it would be void?
 
 	/**
 	 * Gets most recently added element.
 	 *
 	 * @return Most recently added element.
 	 */
-	public E get() {
+	public E peek() {
 		return elements.get(elements.size() - 1);
 	}
 

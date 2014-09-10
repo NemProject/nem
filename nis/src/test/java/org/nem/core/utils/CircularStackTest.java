@@ -12,7 +12,7 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.get();
+		intStack.peek();
 	}
 
 	@Test(expected = IndexOutOfBoundsException.class)
@@ -30,10 +30,10 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.add(666); // TODO 20140909 J-G: can you use any other number :)
+		intStack.push(666); // TODO 20140909 J-G: can you use any other number :)
 
 		// Assert:
-		Assert.assertThat(intStack.get(), IsEqual.equalTo(666));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(1));
 	}
 
@@ -43,12 +43,12 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.add(666);
-		intStack.add(777);
-		intStack.add(888);
+		intStack.push(666);
+		intStack.push(777);
+		intStack.push(888);
 
 		// Assert:
-		Assert.assertThat(intStack.get(), IsEqual.equalTo(888));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(888));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(3));
 	}
 
@@ -59,11 +59,11 @@ public class CircularStackTest {
 
 		// Act:
 		for (int i = 0; i < 112; ++i) {
-			intStack.add(666 + i);
+			intStack.push(666 + i);
 		}
 
 		// Assert:
-		Assert.assertThat(intStack.get(), IsEqual.equalTo(666 + 111));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666 + 111));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(3));
 	}
 
@@ -74,12 +74,12 @@ public class CircularStackTest {
 
 		// Act:
 		for (int i = 0; i < 112; ++i) {
-			intStack.add(666 + i);
+			intStack.push(666 + i);
 		}
 		intStack.remove();
 
 		// Assert:
-		Assert.assertThat(intStack.get(), IsEqual.equalTo(666 + 111 - 1));
+		Assert.assertThat(intStack.peek(), IsEqual.equalTo(666 + 111 - 1));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(2));
 	}
 
@@ -91,7 +91,7 @@ public class CircularStackTest {
 
 		// Act:
 		for (int i = 0; i < 10; ++i) {
-			source.add(i);
+			source.push(i);
 		}
 		source.shallowCopyTo(destination);
 
@@ -113,7 +113,7 @@ public class CircularStackTest {
 		// Act:
 		// TODO 20140909 J-G: i would just fill source with three numbers there's no need to test wraparound again imo
 		for (int i = 0; i < 10; ++i) {
-			source.add(i);
+			source.push(i);
 		}
 		source.shallowCopyTo(destination);
 
@@ -139,7 +139,7 @@ public class CircularStackTest {
 
 		// Act:
 		for (int i = 0; i < 10; ++i) {
-			stack1.add(i);
+			stack1.push(i);
 		}
 		stack1.shallowCopyTo(stack2);
 
@@ -147,7 +147,7 @@ public class CircularStackTest {
 		Assert.assertThat(stack1.size(), IsEqual.equalTo(3));
 		Assert.assertThat(stack2.size(), IsEqual.equalTo(3));
 		for (int i = 0; i < 3; ++i) {
-			Assert.assertThat(stack1.get(), IsSame.sameInstance(stack2.get()));
+			Assert.assertThat(stack1.peek(), IsSame.sameInstance(stack2.peek()));
 			stack1.remove();
 			stack2.remove();
 		}
@@ -160,7 +160,7 @@ public class CircularStackTest {
 
 		// Act:
 		for (int i = 0; i < 112; ++i) {
-			intStack.add(666 + i);
+			intStack.push(666 + i);
 		}
 
 		// Assert:
