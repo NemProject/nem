@@ -261,6 +261,19 @@ public class PeerNetworkStateTest {
 
 	//endregion
 
+	//region node age
+
+	@Test
+	public void nodeAgeInitiallyIsZero() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Assert:
+		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(0)));
+	}
+
+	//endregion
+
 	//region updateTimeSynchronizationResults
 
 	@Test

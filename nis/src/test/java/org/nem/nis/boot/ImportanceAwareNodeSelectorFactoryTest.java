@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.NodeCollection;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.peer.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.*;
@@ -12,16 +13,17 @@ import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.HashSet;
 
-public class NisNodeSelectorFactoryTest {
+public class ImportanceAwareNodeSelectorFactoryTest {
 
 	@Test
 	public void createNodeSelectorReturnsNonNull() {
 		// Arrange:
 		final Config config = createConfig();
-		final NisNodeSelectorFactory factory = new NisNodeSelectorFactory(
+		final ImportanceAwareNodeSelectorFactory factory = new ImportanceAwareNodeSelectorFactory(
 				15,
 				config.getTrustProvider(),
-				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()));
+				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()),
+				createPoiFacade());
 
 		// Assert:
 		Assert.assertThat(factory.createNodeSelector(), IsNull.notNullValue());
@@ -38,5 +40,9 @@ public class NisNodeSelectorFactoryTest {
 		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
 		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
 		return config;
+	}
+
+	private PoiFacade createPoiFacade() {
+		return Mockito.mock(PoiFacade.class);
 	}
 }

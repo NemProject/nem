@@ -1,20 +1,17 @@
 package org.nem.nis.boot;
 
-import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 
 import java.security.SecureRandom;
 
 /**
- * NodeSelector factor used by NIS.
+ * NodeSelector factory used by NIS.
  */
 public class NisNodeSelectorFactory implements NodeSelectorFactory {
 	private final int nodeLimit;
 	private final TrustProvider trustProvider;
 	private final PeerNetworkState state;
-	private final PoiFacade poiFacade;
 
 	/**
 	 * Creates a new NIS node selector factory.
@@ -26,12 +23,10 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 	public NisNodeSelectorFactory(
 			final int nodeLimit,
 			final TrustProvider trustProvider,
-			final PeerNetworkState state,
-			final PoiFacade poiFacade) {
+			final PeerNetworkState state) {
 		this.nodeLimit = nodeLimit;
 		this.trustProvider = trustProvider;
 		this.state = state;
-		this.poiFacade = poiFacade;
 	}
 
 	@Override
@@ -45,21 +40,6 @@ public class NisNodeSelectorFactory implements NodeSelectorFactory {
 						context,
 						random),
 				this.state.getNodes(),
-				context,
-				random);
-	}
-
-	// TODO 20140909 J-B couldn't this be just another NodeSelectorFactory implementation?
-	// thinking about this more ... i guess the reason for the two different selectors
-	// is to only select "better" nodes for time-sync and to allow more potentially unfriendly nodes in regular sync
-	@Override
-	public NodeSelector createImportanceAwareNodeSelector() {
-		final TrustContext context = this.state.getTrustContext();
-		final SecureRandom random = new SecureRandom();
-		return new ImportanceAwareNodeSelector(
-				this.nodeLimit,
-				this.poiFacade,
-				new ActiveNodeTrustProvider(this.trustProvider, this.state.getNodes()),
 				context,
 				random);
 	}

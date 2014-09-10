@@ -60,7 +60,7 @@ public class BasicNodeSelector implements NodeSelector {
 		return this.selectNodes(this.maxNodes);
 	}
 
-	private List<Node> selectNodes(final int maxNodes) {
+	protected List<Node> selectNodes(final int maxNodes) {
 		final Node[] nodes = this.context.getNodes();
 		final boolean[] usedNodes = new boolean[nodes.length];
 		final List<Node> partnerNodes = new ArrayList<>();
@@ -75,7 +75,7 @@ public class BasicNodeSelector implements NodeSelector {
 			for (int i = 0; i < nodes.length; ++i) {
 				// skip nodes with zero trust and those that have already been used
 				final double trust = this.trustVector.getAt(i);
-				if (0 == trust || usedNodes[i]) {
+				if (0 == trust || usedNodes[i] || !this.isCandidate(nodes[i])) {
 					continue;
 				}
 
@@ -94,5 +94,9 @@ public class BasicNodeSelector implements NodeSelector {
 		} while (partnerNodes.size() != maxNodes && partnerNodes.size() != numSelectedNodes);
 
 		return partnerNodes;
+	}
+
+	protected boolean isCandidate(final Node node) {
+		return true;
 	}
 }

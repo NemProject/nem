@@ -161,12 +161,17 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(
 				this.nisConfiguration.getNodeLimit(),
 				config.getTrustProvider(),
+				networkState);
+		final ImportanceAwareNodeSelectorFactory importanceAwareSelectorFactory = new ImportanceAwareNodeSelectorFactory(
+				this.nisConfiguration.getNodeLimit(),
+				config.getTrustProvider(),
 				networkState,
 				this.accountAnalyzer.getPoiFacade());
 		return new PeerNetworkBootstrapper(
 				networkState,
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
+				importanceAwareSelectorFactory,
 				!this.nisConfiguration.bootWithoutAck());
 	}
 

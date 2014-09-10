@@ -16,62 +16,12 @@ import java.security.SecureRandom;
 import java.util.*;
 
 // TODO 20140909 since these seem to be based on the BasicNodeSelectorTest consider refactoring the common tests into an abstract NodeSelectorTest base class
+// TODO 20140910 BR -> J: I removed the tests that do not depend on isCandidate. The rest of the tests depends in one or aonther way on isCandidate
+// TODO 20140910          and is therefore specific to the class implementation. Good enough?
 
 public class ImportanceAwareNodeSelectorTest {
 
-	//region recalculations
-
-	@Test
-	public void constructorRecalculatesTrustValues() {
-		// Act:
-		final TestContext context = new TestContext(
-				new ColumnVector(1, 1, 1, 1, 1),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10, 10));
-
-		// Assert:
-		Mockito.verify(context.trustProvider, Mockito.times(1)).computeTrust(context.context);
-	}
-
-	@Test
-	public void selectNodeDoesNotRecalculateTrustValues() {
-		// Arrange:
-		final TestContext context = new TestContext(
-				new ColumnVector(1, 1, 1, 1, 1),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10, 10));
-
-		// Act:
-		for (int i = 0; i < 10; ++i) {
-			context.selector.selectNode();
-		}
-
-		// Assert:
-		Mockito.verify(context.trustProvider, Mockito.times(1)).computeTrust(context.context);
-	}
-
-	//endregion
-
 	//region selectNode
-
-	@Test
-	public void selectNodeReturnsNullWhenAllNodesHaveZeroTrustValues() {
-		// Arrange:
-		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(
-				10,
-				new ColumnVector(0, 0, 0),
-				new ColumnVector(0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10),
-				random);
-
-		// Act:
-		final Node node = context.selector.selectNode();
-
-		// Assert:
-		Assert.assertThat(node, IsNull.nullValue());
-	}
 
 	@Test
 	public void selectNodeReturnsNullWhenNoNodeHasRequiredImportance() {
@@ -135,67 +85,6 @@ public class ImportanceAwareNodeSelectorTest {
 	//region selectNodes
 
 	@Test
-	public void selectNodesReturnsEmptyListWhenAllNodesHaveZeroTrustValues() {
-		// Arrange:
-		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.50);
-		final TestContext context = new TestContext(
-				10,
-				new ColumnVector(0, 0, 0, 0),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10),
-				random);
-
-		// Act:
-		final List<Node> nodes = context.selector.selectNodes();
-
-		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void selectNodesSelectsNodesCorrectlyWhenTrustValuesSumToOne() {
-		// Arrange:
-		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(
-				2,
-				new ColumnVector(0.1, 0.2, 0.3, 0.4),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10),
-				random);
-
-		// Act:
-		final List<Node> nodes = context.selector.selectNodes();
-
-		// Assert:
-		Assert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
-	}
-
-	@Test
-	public void selectNodesSelectsNodesCorrectlyWhenTrustValuesDoNotSumToOne() {
-		// Arrange:
-		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(
-				2,
-				new ColumnVector(20, 40, 60, 80),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10),
-				random);
-
-		// Act:
-		final List<Node> nodes = context.selector.selectNodes();
-
-		// Assert:
-		Assert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
-	}
-
-	@Test
 	public void selectNodesReturnsEmptyListWhenNoNodeHasRequiredImportance() {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
@@ -243,27 +132,6 @@ public class ImportanceAwareNodeSelectorTest {
 				new ColumnVector(1, 0, 1, 0),
 				new ColumnVector(0.2, 0.0001, 0.2, 0.0001),
 				new ColumnVector(10, 12, 10, 14),
-				random);
-
-		// Act:
-		final List<Node> nodes = context.selector.selectNodes();
-
-		// Assert:
-		Assert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
-	}
-
-	@Test
-	public void selectNodesDoesNotReturnMoreThanMaxNodes() {
-		// Arrange:
-		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40);
-		final TestContext context = new TestContext(
-				2,
-				new ColumnVector(10, 20, 30, 40),
-				new ColumnVector(0.2, 0.2, 0.2, 0.2),
-				new ColumnVector(10, 10, 10, 10),
 				random);
 
 		// Act:

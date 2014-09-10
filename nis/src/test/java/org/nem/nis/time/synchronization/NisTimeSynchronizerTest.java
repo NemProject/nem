@@ -19,15 +19,10 @@ public class NisTimeSynchronizerTest {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
 		// TODO 20140909 J-B you can move the creation of NisTimeSynchronizer to the test context too
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
+		// TODO 20140910 BR -> J: done.
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.selector, Mockito.times(1)).selectNodes();
@@ -37,15 +32,9 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeDelegatesToTimeSynchronizationConnector() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(1)).getCommunicationTimeStamps(context.nodes.get(0));
@@ -57,15 +46,9 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeDelegatesToTimeSynchronizationStrategy() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.syncStrategy, Mockito.times(1)).calculateTimeOffset(context.samples, context.age);
@@ -75,15 +58,9 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeDelegatesToSystemTimeProvider() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.systemTimeProvider, Mockito.times(6)).getNetworkTime();
@@ -93,15 +70,9 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeUpdatesSystemTimeProviderTimeOffset() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.systemTimeProvider, Mockito.times(1)).updateTimeOffset(new TimeOffset(100));
@@ -111,15 +82,9 @@ public class NisTimeSynchronizerTest {
 	public void synchronizeTimeUpdatesTimeSynchronizationResults() throws ExecutionException, InterruptedException {
 		// Arrange:
 		TimeSynchronizationContext context = new TimeSynchronizationContext();
-		NisTimeSynchronizer synchronizer = new NisTimeSynchronizer(
-				context.selector,
-				context.syncStrategy,
-				context.connector,
-				context.systemTimeProvider,
-				context.networkState);
 
 		// Act:
-		synchronizer.synchronizeTime();
+		context.synchronizer.synchronizeTime();
 
 		// Assert:
 		Mockito.verify(context.networkState, Mockito.times(1)).updateTimeSynchronizationResults(Mockito.any());
@@ -131,28 +96,35 @@ public class NisTimeSynchronizerTest {
 		final TimeSynchronizationConnector connector = Mockito.mock(TimeSynchronizationConnector.class);
 		final SystemTimeProvider systemTimeProvider = Mockito.mock(SystemTimeProvider.class);
 		final PeerNetworkState networkState;
+		final NisTimeSynchronizer synchronizer;
 		final List<Node> nodes;
 		final List<TimeSynchronizationSample> samples;
-		NodeAge age = new NodeAge(0);
+		final NodeAge age = new NodeAge(0);
 
 		private TimeSynchronizationContext() throws ExecutionException, InterruptedException {
 			this.networkState = Mockito.mock(PeerNetworkState.class);
-			Mockito.when(networkState.getNodeAge()).thenReturn(this.age);
-			nodes = createPartnerNodes();
-			List<CompletableFuture<CommunicationTimeStamps>> timeStampsList = createCommunicationTimeStamps();
-			samples = createSamples(nodes, timeStampsList);
-			Mockito.when(selector.selectNodes()).thenReturn(nodes);
-			Mockito.when(systemTimeProvider.getNetworkTime()).thenReturn(
+			Mockito.when(this.networkState.getNodeAge()).thenReturn(this.age);
+			this.nodes = createPartnerNodes();
+			final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList = createCommunicationTimeStamps();
+			this.samples = createSamples(this.nodes, timeStampsList);
+			Mockito.when(this.selector.selectNodes()).thenReturn(this.nodes);
+			Mockito.when(this.systemTimeProvider.getNetworkTime()).thenReturn(
 					new NetworkTimeStamp(0),
 					new NetworkTimeStamp(20),
 					new NetworkTimeStamp(10),
 					new NetworkTimeStamp(30),
 					new NetworkTimeStamp(20),
 					new NetworkTimeStamp(40));
-			Mockito.when(connector.getCommunicationTimeStamps(nodes.get(0))).thenReturn(timeStampsList.get(0));
-			Mockito.when(connector.getCommunicationTimeStamps(nodes.get(1))).thenReturn(timeStampsList.get(1));
-			Mockito.when(connector.getCommunicationTimeStamps(nodes.get(2))).thenReturn(timeStampsList.get(2));
-			Mockito.when(syncStrategy.calculateTimeOffset(samples, age)).thenReturn(new TimeOffset(100));
+			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(0))).thenReturn(timeStampsList.get(0));
+			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(1))).thenReturn(timeStampsList.get(1));
+			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(2))).thenReturn(timeStampsList.get(2));
+			Mockito.when(this.syncStrategy.calculateTimeOffset(this.samples, this.age)).thenReturn(new TimeOffset(100));
+			this.synchronizer = new NisTimeSynchronizer(
+					this.selector,
+					this.syncStrategy,
+					this.connector,
+					this.systemTimeProvider,
+					this.networkState);
 		}
 
 		private List<Node> createPartnerNodes() {
@@ -172,7 +144,8 @@ public class NisTimeSynchronizerTest {
 			);
 		}
 
-		private List<TimeSynchronizationSample> createSamples(List<Node> nodes, List<CompletableFuture<CommunicationTimeStamps>> timeStampsList) throws ExecutionException, InterruptedException {
+		private List<TimeSynchronizationSample> createSamples(final List<Node> nodes, final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList)
+				throws ExecutionException, InterruptedException {
 			final List<TimeSynchronizationSample> samples = new ArrayList<>();
 			for (int i=0; i<3; i++) {
 				samples.add(new TimeSynchronizationSample(

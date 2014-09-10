@@ -18,6 +18,7 @@ public class PeerNetwork {
 	private final PeerNetworkState state;
 	private final PeerNetworkServicesFactory servicesFactory;
 	private final NodeSelectorFactory selectorFactory;
+	private final NodeSelectorFactory importanceAwareSelectorFactory;
 	private NodeSelector selector;
 
 	/**
@@ -30,10 +31,12 @@ public class PeerNetwork {
 	public PeerNetwork(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory) {
+			final NodeSelectorFactory selectorFactory,
+			final NodeSelectorFactory importanceAwareSelectorFactory) {
 		this.state = state;
 		this.servicesFactory = servicesFactory;
 		this.selectorFactory = selectorFactory;
+		this.importanceAwareSelectorFactory = importanceAwareSelectorFactory;
 		this.selector = this.selectorFactory.createNodeSelector();
 	}
 
@@ -105,9 +108,10 @@ public class PeerNetwork {
 	 * Does one round of network time synchronization.
 	 *
 	 * TODO 20140909 J-B i would prefer for this to be async
+	 * TODO 20140910 BR -> J: Is it not async?
 	 */
 	public void synchronizeTime(TimeProvider timeProvider) {
-		this.servicesFactory.createTimeSynchronizer(this.selectorFactory.createImportanceAwareNodeSelector(), timeProvider).synchronizeTime();
+		this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
 	}
 
 	/**

@@ -18,9 +18,74 @@ import java.util.function.Function;
 public class TimeSynchronizationControllerTest {
 
 	// TODO 20140909 J-B do you want to add a test for the non-authenticated overload?
+	// TODO 20140910 BR -> J: done. Added delegation tests as well.
+
+	// region delegation
 
 	@Test
-	public void getNetworkTimeReturnsCommunicationTimeStamps() {
+	public void nonAuthenticatedGetNetworkTimeDelegatesToTimeProvider() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.controller.getNetworkTime();
+
+		// Assert:
+		Mockito.verify(context.timeProvider, Mockito.times(2)).getNetworkTime();
+	}
+
+	@Test
+	public void authenticatedGetNetworkTimeDelegatesToNisPeerNetworkHost() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		// Assert:
+		runCommunicationTimeStampsTest(
+				context,
+				c -> c.controller.getNetworkTime(challenge),
+				r -> r.getEntity(localNode.getIdentity(), challenge));
+
+		// Assert:
+		Mockito.verify(context.host, Mockito.times(1)).getNetwork();
+	}
+
+	@Test
+	public void authenticatedGetNetworkTimeDelegatesToTimeProvider() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		// Assert:
+		runCommunicationTimeStampsTest(
+				context,
+				c -> c.controller.getNetworkTime(challenge),
+				r -> r.getEntity(localNode.getIdentity(), challenge));
+
+		// Assert:
+		Mockito.verify(context.timeProvider, Mockito.times(2)).getNetworkTime();
+	}
+
+	// endregion
+
+	// region getNetworkTime
+
+	@Test
+	public void nonAuthenticatedGetNetworkTimeReturnsCommunicationTimeStamps() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final CommunicationTimeStamps timeStamps = context.controller.getNetworkTime();
+
+		// Assert:
+		Assert.assertThat(timeStamps, IsEqual.equalTo(context.timeStamps));
+	}
+
+	@Test
+	public void authenticatedGetNetworkTimeReturnsCommunicationTimeStamps() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node localNode = context.network.getLocalNode();
@@ -33,6 +98,8 @@ public class TimeSynchronizationControllerTest {
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
+
+	// endregion
 
 	private static <T> T runCommunicationTimeStampsTest(
 			final TestContext context,

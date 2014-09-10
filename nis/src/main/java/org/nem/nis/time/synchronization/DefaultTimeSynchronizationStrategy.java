@@ -63,7 +63,8 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		}
 
 		// TODO BR: not sure about this approach but it seems quite reasonable.
-		// TODO 20140909 J-B interesting approach but does seem reasonable, althought you might want to consider a regular loop since you are looking up getAccountImportance twice for each node
+		// TODO 20140909 J-B interesting approach but does seem reasonable, although you might want to consider a regular loop since you are looking up getAccountImportance twice for each node
+		// TODO 20140910 BR -> J: true, I look it up twice, but the number of samples is rather small (<100) so speed should not be a problem. I like it more how it is now.
 		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
 		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage? 1 / cumulativeImportance : 1 / viewSizePercentage;
