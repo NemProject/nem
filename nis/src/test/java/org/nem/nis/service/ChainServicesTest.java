@@ -51,6 +51,7 @@ public class ChainServicesTest {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);
 
+		@SuppressWarnings("unchecked")
 		public TestContext(final long score) {
 			Mockito.when(this.blockChain.getScore()).thenReturn(new BlockChainScore(score));
 			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodes());
