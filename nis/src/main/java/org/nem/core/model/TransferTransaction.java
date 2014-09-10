@@ -41,6 +41,7 @@ public class TransferTransaction extends Transaction {
 	/**
 	 * Deserializes a transfer transaction.
 	 *
+	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.
 	 */
 	public TransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {

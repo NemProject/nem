@@ -81,6 +81,8 @@ public class BlockExecutor {
 				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
 				// TODO 20140909 J-G: it seems like you're explicitly calling notifyTransfer here, so do you really need the "phantom" zero transaction?
 				// TODO 20140909 J-G: actually, does the phantom transaction allow us to bypass this altogether?
+				// G-J no, the phantom transaction is made to trigger AccountsHeightObserver and this is supposed to call RemoteObserver,
+				// which doesn't call tx.notifyTransfer()
 				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
 			}
 		}

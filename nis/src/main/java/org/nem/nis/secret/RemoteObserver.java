@@ -26,13 +26,13 @@ public class RemoteObserver implements ImportanceTransferObserver {
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final int direction) {
+	public void notifyTransfer(final Account sender, final Account recipient, final int mode) {
 		if (this.isExecute) {
-			this.getState(sender).setRemote(recipient.getAddress(), this.height, direction);
-			this.getState(recipient).remoteFor(sender.getAddress(), this.height, direction);
+			this.getState(sender).setRemote(recipient.getAddress(), this.height, mode);
+			this.getState(recipient).remoteFor(sender.getAddress(), this.height, mode);
 		} else {
-			this.getState(recipient).resetRemote(sender.getAddress(), this.height, direction);
-			this.getState(sender).resetRemote(recipient.getAddress(), this.height, direction);
+			this.getState(recipient).resetRemote(sender.getAddress(), this.height, mode);
+			this.getState(sender).resetRemote(recipient.getAddress(), this.height, mode);
 		}
 	}
 
