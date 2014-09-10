@@ -8,6 +8,7 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.AccountImportance;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
@@ -15,12 +16,22 @@ import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.util.*;
 
-// TODO 20140909 since these seem to be based on the BasicNodeSelectorTest consider refactoring the common tests into an abstract NodeSelectorTest base class
-// TODO 20140910 BR -> J: I removed the tests that do not depend on isCandidate. The rest of the tests depends in one or aonther way on isCandidate
-// TODO 20140910          and is therefore specific to the class implementation. Good enough?
-// TODO 20140910 J-J let me take a stab at it
+public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
-public class ImportanceAwareNodeSelectorTest {
+	@Override
+	protected NodeSelector createSelector(final int maxNodes, final TrustProvider trustProvider, final TrustContext context, final Random random) {
+		final AccountImportance importance = Mockito.mock(AccountImportance.class);
+		Mockito.when(importance.getImportance(Mockito.any())).thenReturn(0.125);
+		Mockito.when(importance.getHeight()).thenReturn(new BlockHeight(14));
+
+		final PoiAccountState state = Mockito.mock(PoiAccountState.class);
+		Mockito.when(state.getImportanceInfo()).thenReturn(importance);
+
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		Mockito.when(poiFacade.findStateByAddress(Mockito.any())).thenReturn(state);
+		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(new BlockHeight(14));
+		return new ImportanceAwareNodeSelector(maxNodes, poiFacade, trustProvider, context, random);
+	}
 
 	//region selectNode
 
@@ -194,6 +205,7 @@ public class ImportanceAwareNodeSelectorTest {
 				PoiAccountState state = this.poiFacade.findStateByAddress(this.nodes[i].getIdentity().getAddress());
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
+
 			setFacadeInternalValues(this.poiFacade, this.nodes.length, new BlockHeight(10));
 
 			Mockito.when(this.context.getNodes()).thenReturn(this.nodes);
