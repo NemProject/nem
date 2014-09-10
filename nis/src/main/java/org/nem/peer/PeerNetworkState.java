@@ -145,6 +145,9 @@ public class PeerNetworkState {
 		return nodeArray;
 	}
 
+	// TODO 20140909 J-B might want to test (1) node age is initially 0, incrementAge works.
+	// TODO 20140909 J-B just thinking aloud ... if the time synchronization results all correspond to different nodes i guess we are assuming that the times should all converge to network time
+
 	/**
 	 * Gets the local node's age.
 	 *

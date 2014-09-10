@@ -21,6 +21,9 @@ public interface TimeProvider {
 	 */
 	public TimeInstant getCurrentTime();
 
+	// TODO 20140909 J-B i'm not sure i like this, but i need to give it a little more thought
+	// i guess the reason for networktimestamp is for more fine-grained ms resolution?
+
 	/**
 	 * Gets the network time in ms.
 	 *

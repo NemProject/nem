@@ -70,6 +70,7 @@ public class NisAppConfig {
 		// TODO-CR: 20140817 J->B why are different line-endings causing validation to fail?
 		// TODO-CR: 20140901 BR -> J during migration checksums are calculated which give different results for linux
 		// TODO-CR                   and windows line endings. Thus validation fails.
+		// TODO 20140909 J-G gimre?
 		flyway.setValidateOnMigrate(false);
 		return flyway;
 	}
@@ -81,6 +82,7 @@ public class NisAppConfig {
 
 		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
 		// TODO BR: like this?
+		// TODO 20140909 J-G gimre?
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);

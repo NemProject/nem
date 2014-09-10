@@ -69,9 +69,4 @@ public class AggregateSynchronizationFilterTest {
 		Mockito.verify(filter2, Mockito.times(1)).filter(samples1, new NodeAge(0));
 		Assert.assertThat(samples, IsEqual.equalTo(samples2));
 	}
-
-	//TODO-CR: can you add an additional test that ensures the filters are chained (e.g. the output of the first filter is the input to the second and the output of the last is returned)
-	// TODO: BR -> J done.
-	//TODO-CR: i will also make a general comment here that when using mocks it's important to validate that the return from the mock is used (even if it is passed through the function)
-	// TODO: BR -> J not sure I understand, this only is important in some tests like filtersAreChained but not in the first two tests.
 }
