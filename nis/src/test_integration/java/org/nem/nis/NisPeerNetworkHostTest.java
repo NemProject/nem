@@ -56,6 +56,27 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
+	@Test
+	public void isNetworkBootedReturnsFalseIfNetworkIsNotBooted() {
+		// Arrange:
+		final NisPeerNetworkHost host = createNetwork();
+
+		// Assert:
+		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isNetworkBootedReturnsTrueIfNetworkIsNotBooted() {
+		// Arrange:
+		final NisPeerNetworkHost host = createNetwork();
+
+		// Act:
+		host.boot(createLocalNode()).join();
+
+		// Assert:
+		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
+	}
+
 	@Test(expected = IllegalStateException.class)
 	public void networkCannotBeBootedMoreThanOnce() {
 		// Arrange:
@@ -67,7 +88,7 @@ public class NisPeerNetworkHostTest {
 	}
 
 	@Test
-	public void getVisitorsReturnsSixTimerVisitors() {
+	public void getVisitorsReturnsSevenTimerVisitors() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
@@ -75,7 +96,7 @@ public class NisPeerNetworkHostTest {
 			final List<NisAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(6));
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(7));
 		}
 	}
 
@@ -84,6 +105,6 @@ public class NisPeerNetworkHostTest {
 	}
 
 	private static NisPeerNetworkHost createNetwork() {
-		return new NisPeerNetworkHost(null, null, new NisConfiguration());
+		return new NisPeerNetworkHost(null, null, null, new NisConfiguration());
 	}
 }

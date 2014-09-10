@@ -4,6 +4,7 @@ package org.nem.core.model;
  * Possible NEM statuses.
  *
  * TODO 20140909: J-B just a comment - should these be bit flags so a node could be running + synched or running + booted + synced
+ * TODO 20140910 BR -> J since there are only few combination possible I don't see the merit in having bit flags. What's your use case for it?
  */
 public enum NemStatus {
 	/**
@@ -46,6 +47,7 @@ public enum NemStatus {
 	 * Creates a NEM status given a raw value.
 	 *
 	 * TODO 20140909: J-B add a test :)
+	 * TODO 20140910: BR -> J done.
 	 *
 	 * @param value The value.
 	 * @return The NEM status if the value is known.

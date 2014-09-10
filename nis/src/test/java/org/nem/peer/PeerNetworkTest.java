@@ -19,6 +19,18 @@ public class PeerNetworkTest {
 	//region PeerNetworkState delegation
 
 	@Test
+	public void isChainSynchronizedDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.isChainSynchronized();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).isChainSynchronized();
+	}
+
+	@Test
 	public void getLocalNodeDelegatesToState() {
 		// Arrange:
 		final TestContext context = new TestContext();

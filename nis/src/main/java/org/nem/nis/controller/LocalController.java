@@ -102,6 +102,7 @@ public class LocalController {
 	/**
 	 * Gets the NIS status.
 	 * TODO 20140909: J-B please add tests for this (they should be simple)
+	 * TODO 20140910: BR -> J done. (tests for the above requests still missing though)
 	 *
 	 * @return The NIS request result.
 	 */

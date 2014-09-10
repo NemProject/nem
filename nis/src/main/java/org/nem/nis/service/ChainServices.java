@@ -18,6 +18,12 @@ import java.util.stream.Collectors;
  *
  * TODO 20140909 J-B: what is the relation between this class and the one in NCC?
  *                    (i do like moving getMaxChainScoreAsync to NIS where i think it is more natural anyway)
+ * TODO 20140910 BR -> J: isChainSynchronized only returns boolean, therefore no need to move blocks across the wire.
+ * TODO 20140910          NCC needs more information because it estimates how far behind NIS is. Maybe we should have a
+ * TODO 20140910          lastBlockHeight request which has the advantage of
+ * TODO 20140910          1) not requesting complete blocks (which could possibly contain many transactions)
+ * TODO 20140910          2) holding all the information needed by NCC and this class.
+ * TODO 20140910          Not sure about you last comment, getMaxChainScoreAsync is in NIS, did you mean the NCC getMaxBlockHeightAsync?
  */
 public class ChainServices {
 	private static final int MAX_AUDIT_HISTORY_SIZE = 10;
@@ -34,6 +40,9 @@ public class ChainServices {
 		this.blockChain = blockChain;
 		// TODO 20140905 BR: What is the correct way to get a HttpConnector object into this class?
 		// TODO 20140909 J: You couldn't inject it with spring?
+		// TODO 20140910 BR -> J: I could introduce a bean in NisAppConfig, but we already have a HttpConnectorPool.
+		// TODO 20140910          But I don't know how to access the pool from here and I need SyncConnector AND PeerConnector functionality.
+		// TODO 20140910          So the only way would be in NisAppConfig? We have MAX_AUDIT_HISTORY_SIZE defined twice then which is a bit ugly.
 		final Communicator communicator = new HttpCommunicator(new HttpMethodClient<>(), CommunicationMode.JSON, new DeserializationContext(null));
 		this.connector = new HttpConnector(new AuditedCommunicator(communicator, new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER)));
 	}

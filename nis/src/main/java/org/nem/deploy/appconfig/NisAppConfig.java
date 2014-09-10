@@ -9,7 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -146,7 +146,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountCache(), this.blockChain(), this.nisConfiguration());
+		return new NisPeerNetworkHost(this.accountCache(), this.blockChain(), this.chainServices(), this.nisConfiguration());
 	}
 
 	@Bean
@@ -162,5 +162,10 @@ public class NisAppConfig {
 	@Bean
 	public NemConfigurationPolicy configurationPolicy() {
 		return new NisConfigurationPolicy();
+	}
+
+	@Bean
+	public ChainServices chainServices() {
+		return new ChainServices(this.blockChain());
 	}
 }

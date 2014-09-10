@@ -4,6 +4,7 @@ import org.nem.core.node.*;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
@@ -17,7 +18,8 @@ public class PeerNetworkState {
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
 	// TODO-CR 20140909 spelling; also should this be an atomicinteger?
-	private int chainSynchroniztion = 0;
+	// TODO-CR 20100910 BR -> J: Not sure I understand why. Is it really needed in this situation?
+	private AtomicInteger chainSynchronization = new AtomicInteger(0);
 
 	/**
 	 * Creates new peer network state.
@@ -147,7 +149,7 @@ public class PeerNetworkState {
 	 * @return true if synchronized, false otherwise.
 	 */
 	public boolean isChainSynchronized() {
-		return this.chainSynchroniztion > 0;
+		return this.chainSynchronization.get() > 0;
 	}
 
 	/**
@@ -157,9 +159,9 @@ public class PeerNetworkState {
 	 */
 	public void setChainSynchronized(boolean isChainSynchronized) {
 		if (isChainSynchronized) {
-			this.chainSynchroniztion = 2;
+			this.chainSynchronization.set(2);
 		} else {
-			this.chainSynchroniztion--;
+			this.chainSynchronization.decrementAndGet();
 		}
 	}
 }
