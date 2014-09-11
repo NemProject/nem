@@ -65,7 +65,7 @@ public class ChainServices {
 	 * @return true if the local chain is synchronized, false otherwise.
 	 */
 	public boolean isChainSynchronized(final Node node) {
-		return blockChain.getScore().compareTo(getMaxChainScoreAsync(node).join()) >= 0;
+		return this.blockChain.getScore().compareTo(getMaxChainScoreAsync(node).join()) >= 0;
 	}
 
 	/**

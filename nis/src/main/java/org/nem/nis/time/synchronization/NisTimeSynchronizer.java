@@ -39,8 +39,8 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 
 	@Override
 	public CompletableFuture<Void> synchronizeTime() {
-		List<TimeSynchronizationSample> samples = new ArrayList<>();
-		List<Node> nodes = this.selector.selectNodes();
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
+		final List<Node> nodes = this.selector.selectNodes();
 		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
 		final List<CompletableFuture> futures = nodes.stream()
 				.map(n -> {

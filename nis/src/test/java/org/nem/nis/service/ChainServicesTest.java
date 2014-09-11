@@ -17,9 +17,9 @@ public class ChainServicesTest {
 	@Test
 	public void isChainSynchronizedReturnsTrueIfLocalChainHasEqualChainScore() {
 		// Arrange:
-		TestContext context = new TestContext(30);
-		Node node = context.createNode("test");
-		ChainServices services = new ChainServices(context.blockChain, context.connector);
+		final TestContext context = new TestContext(30);
+		final Node node = context.createNode("test");
+		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
 		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(true));
@@ -28,9 +28,9 @@ public class ChainServicesTest {
 	@Test
 	public void isChainSynchronizedReturnsTrueIfLocalChainHasBetterChainScore() {
 		// Arrange:
-		TestContext context = new TestContext(31);
-		Node node = context.createNode("test");
-		ChainServices services = new ChainServices(context.blockChain, context.connector);
+		final TestContext context = new TestContext(31);
+		final Node node = context.createNode("test");
+		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
 		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(true));
@@ -39,9 +39,9 @@ public class ChainServicesTest {
 	@Test
 	public void isChainSynchronizedReturnsFalseIfLocalChainHasWorseChainScore() {
 		// Arrange:
-		TestContext context = new TestContext(29);
-		Node node = context.createNode("test");
-		ChainServices services = new ChainServices(context.blockChain, context.connector);
+		final TestContext context = new TestContext(29);
+		final Node node = context.createNode("test");
+		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
 		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(false));

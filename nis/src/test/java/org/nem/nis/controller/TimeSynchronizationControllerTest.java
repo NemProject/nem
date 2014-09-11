@@ -125,7 +125,7 @@ public class TimeSynchronizationControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 			this.timeProvider = Mockito.mock(SystemTimeProvider.class);
 			Mockito.when(this.timeProvider.getNetworkTime()).thenReturn(new NetworkTimeStamp(10), new NetworkTimeStamp(20));
-			timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(10), new NetworkTimeStamp(20));
+			this.timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(10), new NetworkTimeStamp(20));
 
 			this.controller = new TimeSynchronizationController(this.timeProvider, this.host);
 		}

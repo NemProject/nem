@@ -202,7 +202,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {
 				this.nodes[i] = new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1"));
-				PoiAccountState state = this.poiFacade.findStateByAddress(this.nodes[i].getIdentity().getAddress());
+				final PoiAccountState state = this.poiFacade.findStateByAddress(this.nodes[i].getIdentity().getAddress());
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
 

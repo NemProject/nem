@@ -96,12 +96,12 @@ public class TimeAwareNode {
 	 */
 	public void updateNetworkTime(final List<TimeSynchronizationSample> samples) {
 		try {
-			final TimeOffset diff = this.syncStrategy.calculateTimeOffset(samples, age);
+			final TimeOffset diff = this.syncStrategy.calculateTimeOffset(samples, this.age);
 			if (TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
 				this.timeOffset = this.timeOffset.add(diff);
 			}
 			this.age = this.age.increment();
-		} catch (TimeSynchronizationException e) {
+		} catch (final TimeSynchronizationException e) {
 			//LOGGER.info(e.toString());
 			LOGGER.info(String.format("Resetting age of %s.", this.getName()));
 			this.age = new NodeAge(0);

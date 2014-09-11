@@ -41,7 +41,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	@Override
 	public NetworkTimeStamp getNetworkTime() {
-		return new NetworkTimeStamp(getCurrentTimeMillis() + timeOffset.getRaw());
+		return new NetworkTimeStamp(getCurrentTimeMillis() + this.timeOffset.getRaw());
 	}
 
 	@Override

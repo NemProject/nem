@@ -201,7 +201,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 	private static void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
 		try {
-			Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {

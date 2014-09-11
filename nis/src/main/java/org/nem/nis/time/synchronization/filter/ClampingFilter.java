@@ -17,7 +17,7 @@ public class ClampingFilter implements SynchronizationFilter {
 	 * @param age The node's age.
 	 * @return The maximum deviation.
 	 */
-	public long getMaximumToleratedDeviation(NodeAge age) {
+	public long getMaximumToleratedDeviation(final NodeAge age) {
 		final long ageToUse = Math.max(age.getRaw() - FilterConstants.START_DECAY_AFTER_ROUND, 0);
 		return (long)(Math.max(
 				Math.exp(-FilterConstants.DECAY_STRENGTH * ageToUse) * FilterConstants.TOLERATED_DEVIATION_START,

@@ -121,7 +121,7 @@ public class PeerNetwork {
 	 * @param timeProvider The time provider.
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> synchronizeTime(TimeProvider timeProvider) {
+	public CompletableFuture<Void> synchronizeTime(final TimeProvider timeProvider) {
 		return this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
 	}
 

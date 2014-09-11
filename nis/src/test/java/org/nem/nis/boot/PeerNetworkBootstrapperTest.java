@@ -186,7 +186,7 @@ public class PeerNetworkBootstrapperTest {
 					this.state,
 					this.servicesFactory,
 					this.selectorFactory,
-					importanceAwareSelectorFactory,
+					this.importanceAwareSelectorFactory,
 					requirePeerAck);
 		}
 	}

@@ -65,8 +65,8 @@ public class LocalControllerTest {
 		private final LocalController controller;
 
 		private TestContext() {
-			this.controller = new LocalController(blockDao, host);
-			Mockito.when(this.host.getNetwork()).thenReturn(network);
+			this.controller = new LocalController(this.blockDao, this.host);
+			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 		}
 	}
 }

@@ -77,18 +77,18 @@ public class Network {
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
 		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-		this.syncStrategy = createSynchronizationStrategy(poiFacade);
+		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
 		for (int i = 1; i <= networkSize; i++) {
-			TimeAwareNode node = createNode();
+			final TimeAwareNode node = createNode();
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary().getRaw();
 			if (node.isEvil()) {
 				numberOfEvilNodes++;
 			}
 		}
-		this.initializeFacade(poiFacade);
+		this.initializeFacade(this.poiFacade);
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
@@ -139,11 +139,11 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode() {
-		TimeAwareNode node = new TimeAwareNode(
+		final TimeAwareNode node = new TimeAwareNode(
 				this.nodeId++,
 				new NodeAge(0),
 				this.syncStrategy,
-				new TimeOffset(this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2),
+				new TimeOffset(this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2),
 				this.nodeSettings.doesDelayCommunication() ? new TimeOffset(this.random.nextInt(100)) : new TimeOffset(0),
 				this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
 				this.nodeSettings.hasUnstableClock() ? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
@@ -158,8 +158,8 @@ public class Network {
 	 * @param oldNode The existing node.
 	 * @return The node.
 	 */
-	private TimeAwareNode createNode(TimeAwareNode oldNode) {
-		TimeAwareNode node = new TimeAwareNode(
+	private TimeAwareNode createNode(final TimeAwareNode oldNode) {
+		final TimeAwareNode node = new TimeAwareNode(
 				this.nodeId++,
 				oldNode.getAge(),
 				this.syncStrategy,
@@ -181,17 +181,17 @@ public class Network {
 	public void advanceInTime(final long timeInterval, final long loggingInterval) {
 		final int numberOfTicks = (int)(timeInterval / TICK_INTERVALL);
 		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVALL);
-		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVALL / nodes.size() / TICK_INTERVALL);
+		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVALL / this.nodes.size() / TICK_INTERVALL);
 		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVALL);
 		for (int i = 0; i < numberOfTicks; i++) {
 			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
 				updateStatistics();
 				logStatistics();
 			}
-			if (nodeSettings.hasClockAdjustment() && i % ticksUntilClockAdjustment == 0) {
+			if (this.nodeSettings.hasClockAdjustment() && i % ticksUntilClockAdjustment == 0) {
 				clockAdjustment();
 			}
-			if (nodeSettings.hasUnstableClock() && i % ticksUntilClockInaccuracy == 0) {
+			if (this.nodeSettings.hasUnstableClock() && i % ticksUntilClockInaccuracy == 0) {
 				this.nodes.stream().forEach(TimeAwareNode::applyClockInaccuracy);
 			}
 			tick();
@@ -238,7 +238,7 @@ public class Network {
 	 * @param age The age of the node.
 	 * @return The update interval in milli seconds.
 	 */
-	private long getUpdateInterval(NodeAge age) {
+	private long getUpdateInterval(final NodeAge age) {
 		if (START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND > age.getRaw()) {
 			return UPDATE_INTERVAL_START;
 		}
@@ -250,13 +250,13 @@ public class Network {
 
 	private PoiFacade resetFacade() {
 		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-		this.syncStrategy = createSynchronizationStrategy(poiFacade);
+		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
 		this.nodeId = 1;
 		oldNodes.stream().forEach(n -> this.nodes.add(createNode(n)));
-		return poiFacade;
+		return this.poiFacade;
 	}
 
 	/**
@@ -267,19 +267,19 @@ public class Network {
 	private void initializeFacade(final PoiFacade facade) {
 		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
 		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
-		for (TimeAwareNode node : this.nodes) {
+		for (final TimeAwareNode node : this.nodes) {
 			final double importance = node.isEvil() ?
 					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
 					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
-			PoiAccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
+			final PoiAccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
 		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(PoiFacade facade, final int lastPoiVectorSize) {
+	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
 		try {
-			Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
@@ -294,7 +294,7 @@ public class Network {
 	 */
 	public void grow(final double percentage) {
 		this.resetFacade();
-		final int numberOfNewNodes = (int)(nodes.size() * percentage / 100);
+		final int numberOfNewNodes = (int)(this.nodes.size() * percentage / 100);
 		for (int i = 1; i <= numberOfNewNodes; i++) {
 			this.nodes.add(createNode());
 		}
@@ -338,7 +338,7 @@ public class Network {
 		int tries = 0;
 		int hits = 0;
 		while (tries < maxTries && hits < this.viewSize) {
-			final int index = random.nextInt(this.nodes.size());
+			final int index = this.random.nextInt(this.nodes.size());
 			final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
 			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 				hits++;
@@ -374,7 +374,7 @@ public class Network {
 	public List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (final TimeAwareNode partner : partners) {
-			final int roundTripTime = random.nextInt(1000);
+			final int roundTripTime = this.random.nextInt(1000);
 			final NetworkTimeStamp localSend = node.getNetworkTime();
 			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
 			samples.add(new TimeSynchronizationSample(
@@ -392,8 +392,8 @@ public class Network {
 	 */
 	public void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {
-			final TimeAwareNode[] nodeArray = nodes.toArray(new TimeAwareNode[nodes.size()]);
-			nodeArray[random.nextInt(nodes.size())].adjustClock();
+			final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
+			nodeArray[this.random.nextInt(this.nodes.size())].adjustClock();
 		}
 	}
 
@@ -403,7 +403,7 @@ public class Network {
 	 * @return The mean value.
 	 */
 	public double calculateMean() {
-		return nodes.stream().mapToDouble(n -> n.getTimeOffset().getRaw()).sum() / nodes.size();
+		return this.nodes.stream().mapToDouble(n -> n.getTimeOffset().getRaw()).sum() / this.nodes.size();
 	}
 
 	/**
@@ -412,7 +412,7 @@ public class Network {
 	 * @return The standard deviation.
 	 */
 	public double calculateStandardDeviation() {
-		return Math.sqrt(nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / nodes.size());
+		return Math.sqrt(this.nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / this.nodes.size());
 	}
 
 	/**
@@ -421,7 +421,7 @@ public class Network {
 	 * @return The maximum deviation from the mean value.
 	 */
 	public double calculateMaxDeviationFromMean() {
-		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
+		final OptionalDouble value = this.nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
 		return value.isPresent() ? value.getAsDouble() : Double.NaN;
 	}
 

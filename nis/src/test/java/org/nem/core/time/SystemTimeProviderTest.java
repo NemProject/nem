@@ -57,12 +57,12 @@ public class SystemTimeProviderTest {
 	@Test
 	public void updateTimeOffsetAddsOffset() {
 		// Arrange:
-		SystemTimeProvider provider = new SystemTimeProvider();
+		final SystemTimeProvider provider = new SystemTimeProvider();
 
 		// Act:
 		provider.updateTimeOffset(new TimeOffset(123));
 		provider.updateTimeOffset(new TimeOffset(234));
-		TimeOffset offset = provider.getTimeOffset();
+		final TimeOffset offset = provider.getTimeOffset();
 
 		// Assert:
 		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset(123 + 234)));
@@ -71,12 +71,12 @@ public class SystemTimeProviderTest {
 	@Test
 	public void getNetworkTimeReturnsExpectedTime() {
 		// Arrange:
-		SystemTimeProvider provider = new SystemTimeProvider();
+		final SystemTimeProvider provider = new SystemTimeProvider();
 		provider.updateTimeOffset(new TimeOffset(123));
 
 		// Act:
-		long curMillis = System.currentTimeMillis() - SystemTimeProvider.getEpochTimeMillis();
-		NetworkTimeStamp nts = provider.getNetworkTime();
+		final long curMillis = System.currentTimeMillis() - SystemTimeProvider.getEpochTimeMillis();
+		final NetworkTimeStamp nts = provider.getNetworkTime();
 
 		// TODO BR: is there another way to test this?
 		// Assert:

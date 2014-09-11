@@ -69,10 +69,10 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 	 */
 	public Long getTimeOffsetToRemote() {
 		final long roundTripTime =
-				localTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) -
-						remoteTimeStamps.getSendTimeStamp().subtract(remoteTimeStamps.getReceiveTimeStamp());
+				this.localTimeStamps.getReceiveTimeStamp().subtract(this.localTimeStamps.getSendTimeStamp()) -
+						this.remoteTimeStamps.getSendTimeStamp().subtract(this.remoteTimeStamps.getReceiveTimeStamp());
 
-		return remoteTimeStamps.getReceiveTimeStamp().subtract(localTimeStamps.getSendTimeStamp()) - roundTripTime / 2;
+		return this.remoteTimeStamps.getReceiveTimeStamp().subtract(this.localTimeStamps.getSendTimeStamp()) - roundTripTime / 2;
 	}
 
 	@Override

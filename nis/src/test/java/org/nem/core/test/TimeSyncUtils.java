@@ -129,7 +129,7 @@ public class TimeSyncUtils {
 	 * @return The time synchronization sample
 	 */
 	public static List<TimeSynchronizationSample> createTimeSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
-		List<TimeSynchronizationSample> samples = new ArrayList<>();
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
 		}
@@ -166,7 +166,7 @@ public class TimeSyncUtils {
 	 * @param timeOffset The time offset in ms.
 	 * @return The time synchronization sample
 	 */
-	private static TimeSynchronizationSample createTimeSynchronizationSampleWithKeyPair(KeyPair keyPair, final long timeOffset) {
+	private static TimeSynchronizationSample createTimeSynchronizationSampleWithKeyPair(final KeyPair keyPair, final long timeOffset) {
 		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),

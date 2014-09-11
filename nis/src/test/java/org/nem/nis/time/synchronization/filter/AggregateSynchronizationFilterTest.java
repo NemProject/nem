@@ -62,7 +62,7 @@ public class AggregateSynchronizationFilterTest {
 				Arrays.asList(filter1, filter2));
 
 		// Act:
-		List<TimeSynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
+		final List<TimeSynchronizationSample> samples = filter.filter(originalSamples, new NodeAge(0));
 
 		// Assert:
 		Mockito.verify(filter1, Mockito.times(1)).filter(originalSamples, new NodeAge(0));

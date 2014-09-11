@@ -111,7 +111,7 @@ public class LocalController {
 			return new NemRequestResult(NemRequestResult.TYPE_STATUS, NemStatus.RUNNING.getValue(), "status");
 		}
 
-		int status = this.host.getNetwork().isChainSynchronized() ? NemStatus.SYNCHRONIZED.getValue() : NemStatus.BOOTED.getValue();
+		final int status = this.host.getNetwork().isChainSynchronized() ? NemStatus.SYNCHRONIZED.getValue() : NemStatus.BOOTED.getValue();
 		return new NemRequestResult(NemRequestResult.TYPE_STATUS, status, "status");
 	}
 }

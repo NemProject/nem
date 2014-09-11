@@ -17,7 +17,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToNodeSelector() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
@@ -29,7 +29,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToTimeSynchronizationConnector() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
@@ -43,7 +43,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToTimeSynchronizationStrategy() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
@@ -55,7 +55,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeDelegatesToSystemTimeProvider() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
@@ -67,7 +67,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeUpdatesSystemTimeProviderTimeOffset() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
@@ -79,7 +79,7 @@ public class NisTimeSynchronizerTest {
 	@Test
 	public void synchronizeTimeUpdatesTimeSynchronizationResults() throws ExecutionException, InterruptedException {
 		// Arrange:
-		TimeSynchronizationContext context = new TimeSynchronizationContext();
+		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
 		// Act:
 		context.synchronizer.synchronizeTime();
