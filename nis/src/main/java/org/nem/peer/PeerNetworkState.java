@@ -1,9 +1,13 @@
 package org.nem.peer;
 
+import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
@@ -16,6 +20,12 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
+	// TODO-CR 20140909 spelling; also should this be an atomicinteger?
+	// TODO-CR 20100910 BR -> J: Not sure I understand why. Is it really needed in this situation?
+	// TODO-CR 20100910 J-B: the second part was more of a question (i didn't look at all the places that call setChainSynchronized)
+	private final AtomicInteger chainSynchronization = new AtomicInteger(0);
+	private NodeAge nodeAge;
+	private final List<TimeSynchronizationResult> timeSynchronizationResults = new ArrayList<>();
 
 	/**
 	 * Creates new peer network state.
@@ -32,6 +42,7 @@ public class PeerNetworkState {
 		this.localNode = config.getLocalNode();
 		this.nodeExperiences = nodeExperiences;
 		this.nodes = nodeCollection;
+		this.nodeAge = new NodeAge(0);
 
 		for (final Node node : this.config.getPreTrustedNodes().getNodes()) {
 			this.nodes.update(node, NodeStatus.ACTIVE);
@@ -137,5 +148,64 @@ public class PeerNetworkState {
 
 		nodeArray[index] = localNode;
 		return nodeArray;
+	}
+
+	/**
+	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
+	 *
+	 * @return true if synchronized, false otherwise.
+	 */
+	public boolean isChainSynchronized() {
+		return this.chainSynchronization.get() > 0;
+	}
+
+	/**
+	 * Set a value indicating if the local chain is synchronized with the rest of the network.
+	 *
+	 * @param isChainSynchronized true if the local chain is synchronized, false otherwise.
+	 */
+	public void setChainSynchronized(final boolean isChainSynchronized) {
+		if (isChainSynchronized) {
+			this.chainSynchronization.set(2);
+		} else {
+			this.chainSynchronization.decrementAndGet();
+		}
+	}
+
+	/**
+	 * Gets the local node's age.
+	 *
+	 * @return the node's age.
+	 */
+	public NodeAge getNodeAge() {
+		return this.nodeAge;
+	}
+
+	/**
+	 * Increments local the node's age by one.
+	 */
+	private void incrementAge() {
+		this.nodeAge = this.nodeAge.increment();
+	}
+
+	/**
+	 * Gets the list of the most recent time synchronization results.
+	 *
+	 * @return The list of time synchronization results.
+	 */
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.timeSynchronizationResults;
+	}
+
+	/**
+	 * Adds a time synchronization result to the list.
+	 * Removes the oldest result if the size of the is exceeding 100.
+	 */
+	public void updateTimeSynchronizationResults(final TimeSynchronizationResult result) {
+		this.incrementAge();
+		this.timeSynchronizationResults.add(result);
+		if (this.timeSynchronizationResults.size() > 100) {
+			this.timeSynchronizationResults.remove(0);
+		}
 	}
 }

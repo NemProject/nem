@@ -165,6 +165,7 @@ public class PeerNetworkBootstrapperTest {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
 		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
+		private final NodeSelectorFactory importanceAwareSelectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
 		private final PeerNetworkBootstrapper bootstrapper;
 		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
@@ -185,6 +186,7 @@ public class PeerNetworkBootstrapperTest {
 					this.state,
 					this.servicesFactory,
 					this.selectorFactory,
+					this.importanceAwareSelectorFactory,
 					requirePeerAck);
 		}
 	}

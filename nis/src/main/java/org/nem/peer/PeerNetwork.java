@@ -2,11 +2,13 @@ package org.nem.peer;
 
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.time.TimeProvider;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -16,6 +18,7 @@ public class PeerNetwork {
 	private final PeerNetworkState state;
 	private final PeerNetworkServicesFactory servicesFactory;
 	private final NodeSelectorFactory selectorFactory;
+	private final NodeSelectorFactory importanceAwareSelectorFactory;
 	private NodeSelector selector;
 
 	/**
@@ -28,14 +31,25 @@ public class PeerNetwork {
 	public PeerNetwork(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory) {
+			final NodeSelectorFactory selectorFactory,
+			final NodeSelectorFactory importanceAwareSelectorFactory) {
 		this.state = state;
 		this.servicesFactory = servicesFactory;
 		this.selectorFactory = selectorFactory;
+		this.importanceAwareSelectorFactory = importanceAwareSelectorFactory;
 		this.selector = this.selectorFactory.createNodeSelector();
 	}
 
 	//region PeerNetworkState delegation
+
+	/**
+	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
+	 *
+	 * @return true if synchronized, false otherwise.
+	 */
+	public boolean isChainSynchronized() {
+		return this.state.isChainSynchronized();
+	}
 
 	/**
 	 * Gets the local node.
@@ -83,12 +97,18 @@ public class PeerNetwork {
 		this.state.setRemoteNodeExperiences(pair);
 	}
 
+	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
+		return this.state.getTimeSynchronizationResults();
+	}
+
 	//endregion
 
 	//region PeerNetworkServicesFactory delegation
 
 	/**
 	 * Refreshes the network.
+	 *
+	 * @return The future.
 	 */
 	public CompletableFuture<Void> refresh() {
 		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
@@ -96,10 +116,21 @@ public class PeerNetwork {
 	}
 
 	/**
+	 * Does one round of network time synchronization.
+	 *
+	 * @param timeProvider The time provider.
+	 * @return The future.
+	 */
+	public CompletableFuture<Void> synchronizeTime(final TimeProvider timeProvider) {
+		return this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
+	}
+
+	/**
 	 * Broadcasts an entity to all active nodes.
 	 *
 	 * @param broadcastId The type of entity.
 	 * @param entity The entity.
+	 * @return The future.
 	 */
 	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
 		return this.servicesFactory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);
@@ -110,6 +141,13 @@ public class PeerNetwork {
 	 */
 	public void synchronize() {
 		this.servicesFactory.createNodeSynchronizer().synchronize(this.selector);
+	}
+
+	/**
+	 * Checks if the local chain is synchronized with the rest of the network and updates the network's state.
+	 */
+	public void checkChainSynchronization() {
+		this.state.setChainSynchronized(this.servicesFactory.getChainServices().isChainSynchronized(this.getLocalNode()));
 	}
 
 	/**

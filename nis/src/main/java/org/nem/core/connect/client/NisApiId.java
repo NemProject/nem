@@ -2,6 +2,11 @@ package org.nem.core.connect.client;
 
 /**
  * NIS REST API paths.
+ * <br/>
+ * TODO 20140909 J-B: i think i like what you did in NCC better regarding enum -> path mappings
+ * (this is just a more general comment because i'd eventually like to have something similar in NIS, but not necessarily now)
+ * TODO 20140910 BR -> J I don't understand, which enum -> path mapping in NCC do you mean? (this file is part of NIS)
+ * TODO 20140910 J-B: i know ... i meant the way we use NodeApiId in NCC, but i wouldn't make that change now
  */
 public enum NisApiId {
 
@@ -101,7 +106,7 @@ public enum NisApiId {
 
 	//endregion
 
-	// region NIS/*
+	// region /*
 
 	/**
 	 * The /heartbeat API.
@@ -111,7 +116,21 @@ public enum NisApiId {
 	/**
 	 * The /shutdown API.
 	 */
-	NIS_REST_SHUTDOWN("/shutdown");
+	NIS_REST_SHUTDOWN("/shutdown"),
+
+	/**
+	 * The /status API.
+	 */
+	NIS_REST_STATUS("/status"),
+
+	//endregion
+
+	//region time sync/*
+
+	/**
+	 * The time-sync/network-time API
+	 */
+	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
 	//endregion
 

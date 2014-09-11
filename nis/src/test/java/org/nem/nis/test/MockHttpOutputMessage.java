@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import org.nem.core.utils.*;
+import org.nem.core.utils.ExceptionUtils;
 import org.springframework.http.*;
 
 import java.io.*;

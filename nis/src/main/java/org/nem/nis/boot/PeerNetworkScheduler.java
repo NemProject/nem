@@ -4,7 +4,7 @@ import org.nem.core.async.*;
 import org.nem.core.model.Block;
 import org.nem.core.node.NodeApiId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.peer.*;
 
 import java.util.*;
@@ -35,8 +35,15 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
 
+	private static final int TIME_SYNC_INITIAL_INTERVAL = ONE_MINUTE;
+	private static final int TIME_SYNC_INITIAL_INTERVAL_ROUNDS = 15;
+	private static final int TIME_SYNC_PLATEAU_INTERVAL = ONE_HOUR;
+	private static final int TIME_SYNC_BACK_OFF_TIME = 6 * ONE_HOUR;
+
+	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
+
 	private final TimeProvider timeProvider;
-	private final List<NisAsyncTimerVisitor> timerVisitors = new ArrayList<>();
+	private final List<NemAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
 	private final Executor executor = Executors.newCachedThreadPool();
 
@@ -54,7 +61,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 *
 	 * @return All timer visitors.
 	 */
-	public List<NisAsyncTimerVisitor> getVisitors() {
+	public List<NemAsyncTimerVisitor> getVisitors() {
 		return this.timerVisitors;
 	}
 
@@ -64,9 +71,9 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * @param network The network.
 	 * @param blockChain The block chain.
 	 */
-	public void addTasks(final PeerNetwork network, final BlockChain blockChain) {
+	public void addTasks(final PeerNetwork network, final BlockChain blockChain, final boolean useNetworkTime) {
 		this.addForagingTask(network, blockChain);
-		this.addNetworkTasks(network);
+		this.addNetworkTasks(network, useNetworkTime);
 	}
 
 	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain) {
@@ -88,8 +95,11 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				timerVisitor));
 	}
 
-	private void addNetworkTasks(final PeerNetwork network) {
+	private void addNetworkTasks(final PeerNetwork network, final boolean useNetworkTime) {
 		this.addRefreshTask(network);
+		if (useNetworkTime) {
+			this.addTimeSynchronizationTask(network);
+		}
 
 		this.addSimpleTask(
 				() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
@@ -107,6 +117,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				this.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
 				UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
 				"UPDATING LOCAL NODE ENDPOINT");
+		this.addSimpleTask(
+				this.runnableToFutureSupplier(() -> network.checkChainSynchronization()),
+				CHECK_CHAIN_SYNC_INTERVAL,
+				"CHECKING CHAIN SYNCHRONIZATION");
 	}
 
 	private void addRefreshTask(final PeerNetwork network) {
@@ -115,6 +129,15 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				() -> network.refresh(),
 				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
 				getRefreshDelayStrategy(),
+				timerVisitor));
+	}
+
+	private void addTimeSynchronizationTask(final PeerNetwork network) {
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("TIME SYNCHRONIZATION");
+		this.timers.add(new AsyncTimer(
+				() -> network.synchronizeTime(this.timeProvider),
+				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
+				getTimeSynchronizationDelayStrategy(),
 				timerVisitor));
 	}
 
@@ -144,6 +167,20 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		return new AggregateDelayStrategy(subStrategies);
 	}
 
+	private static AbstractDelayStrategy getTimeSynchronizationDelayStrategy() {
+		// initially refresh at TIME_SYNC_INITIAL_INTERVAL (1min), keeping it for TIME_SYNC_INITIAL_INTERVAL_ROUNDS rounds,
+		// then gradually increasing to TIME_SYNC_PLATEAU_INTERVAL (1h) over TIME_SYNC_BACK_OFF_TIME (6 hours),
+		// and then plateau at that rate forever
+		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
+				new UniformDelayStrategy(TIME_SYNC_INITIAL_INTERVAL, TIME_SYNC_INITIAL_INTERVAL_ROUNDS),
+				LinearDelayStrategy.withDuration(
+						TIME_SYNC_INITIAL_INTERVAL,
+						TIME_SYNC_PLATEAU_INTERVAL,
+						TIME_SYNC_BACK_OFF_TIME),
+				new UniformDelayStrategy(TIME_SYNC_PLATEAU_INTERVAL));
+		return new AggregateDelayStrategy(subStrategies);
+	}
+
 	@Override
 	public void close() {
 		this.timers.forEach(AsyncTimer::close);
@@ -153,8 +190,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		return () -> CompletableFuture.runAsync(runnable, this.executor);
 	}
 
-	private NisAsyncTimerVisitor createNamedVisitor(final String name) {
-		final NisAsyncTimerVisitor timerVisitor = new NisAsyncTimerVisitor(name, this.timeProvider);
+	private NemAsyncTimerVisitor createNamedVisitor(final String name) {
+		final NemAsyncTimerVisitor timerVisitor = new NemAsyncTimerVisitor(name, this.timeProvider);
 		this.timerVisitors.add(timerVisitor);
 		return timerVisitor;
 	}

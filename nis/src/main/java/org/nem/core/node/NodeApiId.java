@@ -94,4 +94,13 @@ public enum NodeApiId {
 	REST_TRANSACTIONS_UNCONFIRMED,
 
 	//endregion
+
+	//region time sync/*
+
+	/**
+	 * The time-sync/network-time API
+	 */
+	REST_TIME_SYNC_NETWORK_TIME
+
+	//endregion
 }

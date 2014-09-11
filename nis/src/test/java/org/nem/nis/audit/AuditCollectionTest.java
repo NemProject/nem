@@ -4,8 +4,8 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class AuditCollectionTest {
 	@Test
 	public void collectionSetsStartTimeOnAdd() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(1, 4, 6, 7, 9, 11, 17);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(1, 4, 6, 7, 9, 11, 17);
 		final AuditCollection collection = new AuditCollection(10, timeProvider);
 
 		// Act:
@@ -197,12 +197,12 @@ public class AuditCollectionTest {
 	//endregion
 
 	private static AuditCollection createCollection(final int maxEntries) {
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(1, 3);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(1, 3);
 		return new AuditCollection(maxEntries, timeProvider);
 	}
 
 	private static AuditEntry createEntry(final int id) {
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(1, 3);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(1, 3);
 		final String idAsString = String.format("%d", id);
 		return new AuditEntry(id, idAsString, idAsString, timeProvider);
 	}
