@@ -111,7 +111,9 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_MINIMUM / 100.0))));
+		Assert.assertThat(
+				offset,
+				IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_MINIMUM / 100.0))));
 	}
 
 	@Test
@@ -202,7 +204,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
-		} catch(IllegalAccessException | NoSuchFieldException e) {
+		} catch (IllegalAccessException | NoSuchFieldException e) {
 			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
 		}
 	}
@@ -211,7 +213,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			final PoiFacade facade,
 			final List<TimeSynchronizationSample> samples) {
 		final List<PoiAccountState> accountStates = new ArrayList<>();
-		for (int i=0; i<samples.size(); i++) {
+		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(facade.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), 1.0 / samples.size());
 		}
@@ -226,7 +228,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			final double[] importances,
 			final int lastPoiVectorSize) {
 		final List<PoiAccountState> accountStates = new ArrayList<>();
-		for (int i=0; i<samples.size(); i++) {
+		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(facade.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), importances[i]);
 		}

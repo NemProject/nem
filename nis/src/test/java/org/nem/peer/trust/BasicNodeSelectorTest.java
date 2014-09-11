@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import java.util.*;
+import java.util.Random;
 
 public class BasicNodeSelectorTest extends NodeSelectorTest {
 

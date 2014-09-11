@@ -178,7 +178,6 @@ public class TimeAwareNode {
 	 * Decrements and returns the update counter.
 	 *
 	 * @param decrement The value to subtract from the update counter.
-	 *
 	 * @return The decremented update counter.
 	 */
 	public long decrementUpdateCounter(final long decrement) {
@@ -204,7 +203,8 @@ public class TimeAwareNode {
 		}
 
 		return new CommunicationTimeStamps(
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry) + this.communicationDelay.getRaw()),
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry) +
+						this.communicationDelay.getRaw()),
 				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry)));
 	}
 

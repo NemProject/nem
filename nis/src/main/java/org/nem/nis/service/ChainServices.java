@@ -15,9 +15,8 @@ import java.util.stream.Collectors;
 
 /**
  * This class provides higher-level functions around accessing information about the NIS block chain of other nodes.
- *
  * TODO 20140909 J-B: what is the relation between this class and the one in NCC?
- *                    (i do like moving getMaxChainScoreAsync to NIS where i think it is more natural anyway)
+ * (i do like moving getMaxChainScoreAsync to NIS where i think it is more natural anyway)
  * TODO 20140910 BR -> J: isChainSynchronized only returns boolean, therefore no need to move blocks across the wire.
  * TODO 20140910          NCC needs more information because it estimates how far behind NIS is. Maybe we should have a
  * TODO 20140910          lastBlockHeight request which has the advantage of

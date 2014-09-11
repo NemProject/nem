@@ -16,7 +16,7 @@ public class NemStatusTest {
 		Assert.assertThat(NemStatus.fromValue(5), IsEqual.equalTo(NemStatus.SYNCHRONIZED));
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void fromValueThrowsExceptionIfSuppliedValueIsUnknown() {
 		NemStatus.fromValue(10);
 	}

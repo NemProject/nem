@@ -4,6 +4,7 @@ import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 
 import java.util.List;
+
 /**
  * Aggregate synchronization filter.
  */

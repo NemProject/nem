@@ -55,7 +55,7 @@ public class AggregateSynchronizationFilterTest {
 		final AlphaTrimmedMeanFilter filter2 = Mockito.mock(AlphaTrimmedMeanFilter.class);
 		final List<TimeSynchronizationSample> originalSamples = TimeSyncUtils.createTolerableSortedSamples(0, 10);
 		final List<TimeSynchronizationSample> samples1 = TimeSyncUtils.createTolerableSortedSamples(20, 10);
-		final List<TimeSynchronizationSample> samples2 = TimeSyncUtils.createTolerableSortedSamples(40,10);
+		final List<TimeSynchronizationSample> samples2 = TimeSyncUtils.createTolerableSortedSamples(40, 10);
 		Mockito.when(filter1.filter(originalSamples, new NodeAge(0))).thenReturn(samples1);
 		Mockito.when(filter2.filter(samples1, new NodeAge(0))).thenReturn(samples2);
 		final AggregateSynchronizationFilter filter = new AggregateSynchronizationFilter(

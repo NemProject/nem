@@ -43,7 +43,7 @@ public class TimeSyncUtils {
 
 	private static List<TimeSynchronizationSample> createTolerableSamples(final long startValue, final int count) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
-		for (int i=1; i<=count; i++) {
+		for (int i = 1; i <= count; i++) {
 			samples.add(createTimeSynchronizationSample(startValue + i));
 		}
 
@@ -84,7 +84,7 @@ public class TimeSyncUtils {
 		if (count % 2 == 1) {
 			samples.add(createTimeSynchronizationSample(mean));
 		}
-		for (int i = 0; i < count/2; i++) {
+		for (int i = 0; i < count / 2; i++) {
 			final int value = random.nextInt(1000);
 			samples.add(createTimeSynchronizationSample(mean + value));
 			samples.add(createTimeSynchronizationSample(mean - value));
@@ -101,7 +101,7 @@ public class TimeSyncUtils {
 	 */
 	public static List<TimeSynchronizationSample> createIntolerableSamples(final int count) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
-		for (int i=1; i<=count; i++) {
+		for (int i = 1; i <= count; i++) {
 			samples.add(createTimeSynchronizationSample(TOLERATED_DEVIATION_START + i));
 		}
 
@@ -130,7 +130,7 @@ public class TimeSyncUtils {
 	 */
 	public static List<TimeSynchronizationSample> createTimeSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
 		List<TimeSynchronizationSample> samples = new ArrayList<>();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
 		}
 
@@ -150,7 +150,7 @@ public class TimeSyncUtils {
 		if (count % 2 == 1) {
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean));
 		}
-		for (int i = 0; i < count/2; i++) {
+		for (int i = 0; i < count / 2; i++) {
 			final int value = random.nextInt(1000);
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean + value));
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), mean - value));
@@ -194,5 +194,4 @@ public class TimeSyncUtils {
 				new CommunicationTimeStamps(new NetworkTimeStamp(localSendTimeStamp), new NetworkTimeStamp(localReceiveTimeStamp)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(remoteSendTimeStamp), new NetworkTimeStamp(remoteReceiveTimeStamp)));
 	}
-
 }

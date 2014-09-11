@@ -64,11 +64,12 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 
 		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
 		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
-		final double scaling = cumulativeImportance > viewSizePercentage? 1 / cumulativeImportance : 1 / viewSizePercentage;
+		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {
 					final double importance = getAccountImportance(s.getNode().getIdentity().getAddress());
-					return s.getTimeOffsetToRemote() * importance * scaling; })
+					return s.getTimeOffsetToRemote() * importance * scaling;
+				})
 				.sum();
 
 		return new TimeOffset((long)(sum * this.getCoupling(age)));

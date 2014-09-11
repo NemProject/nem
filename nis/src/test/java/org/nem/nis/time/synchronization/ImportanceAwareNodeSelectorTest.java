@@ -225,7 +225,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 				field = PoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
 				field.setAccessible(true);
 				field.set(facade, height);
-			} catch(IllegalAccessException | NoSuchFieldException e) {
+			} catch (IllegalAccessException | NoSuchFieldException e) {
 				throw new RuntimeException("Exception in setFacadeInternalValues");
 			}
 		}

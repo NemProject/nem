@@ -337,7 +337,6 @@ public class PoiFacadeTest {
 
 		// Assert:
 		Assert.assertThat(facade.getLastPoiVectorSize(), IsEqual.equalTo(3));
-
 	}
 
 	@Test
@@ -354,7 +353,6 @@ public class PoiFacadeTest {
 
 		// Assert:
 		Assert.assertThat(facade.getLastPoiRecalculationHeight(), IsEqual.equalTo(new BlockHeight(70)));
-
 	}
 
 	private static List<PoiAccountState> createAccountStatesForRecalculateTests(final int numAccounts, final PoiFacade facade) {

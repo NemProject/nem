@@ -60,8 +60,8 @@ public class LocalControllerTest {
 
 	private class TestContext {
 		private final RequiredBlockDao blockDao = Mockito.mock(RequiredBlockDao.class);
-		private final NisPeerNetworkHost host =  Mockito.mock(NisPeerNetworkHost.class);
-		private final PeerNetwork network =  Mockito.mock(PeerNetwork.class);
+		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
+		private final PeerNetwork network = Mockito.mock(PeerNetwork.class);
 		private final LocalController controller;
 
 		private TestContext() {

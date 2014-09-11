@@ -48,7 +48,10 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 					return this.connector.getCommunicationTimeStamps(n)
 							.thenApply(c -> {
 								final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
-								final TimeSynchronizationSample sample = new TimeSynchronizationSample(n, new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp), c);
+								final TimeSynchronizationSample sample = new TimeSynchronizationSample(
+										n,
+										new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp),
+										c);
 								samples.add(sample);
 								return sample;
 							});

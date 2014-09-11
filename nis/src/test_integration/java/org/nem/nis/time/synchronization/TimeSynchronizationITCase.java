@@ -149,9 +149,9 @@ public class TimeSynchronizationITCase {
 			final long timeInterval,
 			final long loggingInterval) {
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		network.advanceInTime(timeInterval/2, loggingInterval);
+		network.advanceInTime(timeInterval / 2, loggingInterval);
 		final double mean = network.calculateMean();
-		network.advanceInTime(timeInterval/2, loggingInterval);
+		network.advanceInTime(timeInterval / 2, loggingInterval);
 		Network.log("Final state of network:");
 		network.updateStatistics();
 		network.logStatistics();
@@ -194,14 +194,14 @@ public class TimeSynchronizationITCase {
 				NO_EVIL_NODES,
 				EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
-		network.advanceInTime(timeInterval/2, 0);
+		network.advanceInTime(timeInterval / 2, 0);
 		Network.log("Matured network statistics:");
 		network.updateStatistics();
 		network.logStatistics();
 		final double oldMean = network.calculateMean();
 		Network.log(String.format("Adding %d%% new nodes.", percentageOfNewNodes));
 		network.grow(percentageOfNewNodes);
-		network.advanceInTime(timeInterval/2, loggingInterval);
+		network.advanceInTime(timeInterval / 2, loggingInterval);
 		Network.log("Final state of network:");
 		network.updateStatistics();
 		network.logStatistics();
@@ -268,7 +268,10 @@ public class TimeSynchronizationITCase {
 		networks.stream().forEach(Network::randomShiftNetworkTime);
 		networks.stream().forEach(network -> network.advanceInTime(6 * Network.HOUR, 0));
 		Network.log("Matured network statistics:");
-		networks.stream().forEach(network -> { network.updateStatistics(); network.logStatistics(); });
+		networks.stream().forEach(network -> {
+			network.updateStatistics();
+			network.logStatistics();
+		});
 		Network.log("Networks join...");
 		networks.stream().forEach(network -> networks.get(0).join(network, "global network"));
 

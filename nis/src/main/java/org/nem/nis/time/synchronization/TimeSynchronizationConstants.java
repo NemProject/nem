@@ -5,27 +5,27 @@ package org.nem.nis.time.synchronization;
  */
 public class TimeSynchronizationConstants {
 
-	/***
+	/**
 	 * Start value for the coupling of clocks.
 	 */
 	public static final double COUPLING_START = 1.0;
 
-	/***
+	/**
 	 * The minimal value for the coupling of clocks.
 	 */
 	public static final double COUPLING_MINIMUM = 0.1;
 
-	/***
+	/**
 	 * Value that indicates after which round the decay starts.
 	 */
 	public static final long START_COUPLING_DECAY_AFTER_ROUND = 5;
 
-	/***
+	/**
 	 * Value that indicates how fast the coupling decay is.
 	 */
 	public static final double COUPLING_DECAY_STRENGTH = 0.3;
 
-	/***
+	/**
 	 * Value that indicates how large the change in network time must be
 	 * in order to update the node's network time.
 	 * This constant is used to prevent slow shifts in network time.

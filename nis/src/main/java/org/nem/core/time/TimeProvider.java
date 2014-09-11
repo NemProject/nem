@@ -2,6 +2,7 @@ package org.nem.core.time;
 
 import org.nem.core.model.primitive.*;
 import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+
 /**
  * Interface that provides time-related information.
  */

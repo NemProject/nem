@@ -26,22 +26,22 @@ public class Network {
 	private static final long CLOCK_ADJUSTMENT_INTERVALL = DAY;
 	private static final BlockHeight HEIGHT = new BlockHeight(10);
 
-	/***
+	/**
 	 * Start value for the update interval of clocks in milli seconds.
 	 */
 	private static final long UPDATE_INTERVAL_START = 60000;
 
-	/***
+	/**
 	 * The maximal value for the update interval of clocks in milli seconds.
 	 */
 	private static final long UPDATE_INTERVAL_MAXIMUM = 60 * UPDATE_INTERVAL_START;
 
-	/***
+	/**
 	 * Value that indicates after which round the update interval elongation starts.
 	 */
 	private static final long START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND = 5;
 
-	/***
+	/**
 	 * Value that indicates how fast the update interval grows.
 	 */
 	private static final double UPDATE_INTERVAL_ELONGATION_STRENGTH = 0.1;
@@ -80,7 +80,7 @@ public class Network {
 		this.syncStrategy = createSynchronizationStrategy(poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
-		for (int i=1; i<=networkSize; i++) {
+		for (int i = 1; i <= networkSize; i++) {
 			TimeAwareNode node = createNode();
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary().getRaw();
@@ -143,11 +143,11 @@ public class Network {
 				this.nodeId++,
 				new NodeAge(0),
 				this.syncStrategy,
-				new TimeOffset(this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread()/2),
-				this.nodeSettings.doesDelayCommunication()? new TimeOffset(this.random.nextInt(100)) : new TimeOffset(0),
-				this.nodeSettings.hasAsymmetricChannels()? this.random.nextDouble() : 0.5,
-				this.nodeSettings.hasUnstableClock()? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
-				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+				new TimeOffset(this.random.nextInt(nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2),
+				this.nodeSettings.doesDelayCommunication() ? new TimeOffset(this.random.nextInt(100)) : new TimeOffset(0),
+				this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
+				this.nodeSettings.hasUnstableClock() ? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
+				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 
 		return node;
 	}
@@ -167,7 +167,7 @@ public class Network {
 				oldNode.getCommunicationDelay(),
 				oldNode.getChannelAsymmetry(),
 				oldNode.getClockInaccuary(),
-				oldNode.isEvil()? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+				oldNode.isEvil() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 
 		return node;
 	}
@@ -183,7 +183,7 @@ public class Network {
 		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVALL);
 		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVALL / nodes.size() / TICK_INTERVALL);
 		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVALL);
-		for (int i=0; i<numberOfTicks; i++) {
+		for (int i = 0; i < numberOfTicks; i++) {
 			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
 				updateStatistics();
 				logStatistics();
@@ -227,10 +227,11 @@ public class Network {
 	}
 
 	private void testUpdateIntervall() {
-		for (int i=0; i<20; i++) {
-			log(String.format("Age %d: %ds", i, getUpdateInterval(new NodeAge(i))/1000));
+		for (int i = 0; i < 20; i++) {
+			log(String.format("Age %d: %ds", i, getUpdateInterval(new NodeAge(i)) / 1000));
 		}
 	}
+
 	/**
 	 * Gets the update interval for a node based on its age.
 	 *
@@ -281,7 +282,7 @@ public class Network {
 			Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
-		} catch(IllegalAccessException | NoSuchFieldException e) {
+		} catch (IllegalAccessException | NoSuchFieldException e) {
 			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
 		}
 	}
@@ -294,7 +295,7 @@ public class Network {
 	public void grow(final double percentage) {
 		this.resetFacade();
 		final int numberOfNewNodes = (int)(nodes.size() * percentage / 100);
-		for (int i=1; i<=numberOfNewNodes; i++) {
+		for (int i = 1; i <= numberOfNewNodes; i++) {
 			this.nodes.add(createNode());
 		}
 		this.initializeFacade(this.poiFacade);
@@ -339,8 +340,7 @@ public class Network {
 		while (tries < maxTries && hits < this.viewSize) {
 			final int index = random.nextInt(this.nodes.size());
 			final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
-			if (!nodeArray[index].equals(node) &&
-				TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 				hits++;
 				partners.add(nodeArray[index]);
 				if (nodeArray[index].isEvil()) {
@@ -352,10 +352,9 @@ public class Network {
 
 		if (partners.isEmpty()) {
 			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
-			for (int i=0; i<this.nodes.size(); i++) {
+			for (int i = 0; i < this.nodes.size(); i++) {
 				final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
-				if (!nodeArray[i].equals(node) &&
-					TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+				if (!nodeArray[i].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 					partners.add(nodeArray[i]);
 					break;
 				}
@@ -404,7 +403,7 @@ public class Network {
 	 * @return The mean value.
 	 */
 	public double calculateMean() {
-		 return nodes.stream().mapToDouble(n -> n.getTimeOffset().getRaw()).sum() / nodes.size();
+		return nodes.stream().mapToDouble(n -> n.getTimeOffset().getRaw()).sum() / nodes.size();
 	}
 
 	/**
@@ -423,7 +422,7 @@ public class Network {
 	 */
 	public double calculateMaxDeviationFromMean() {
 		final OptionalDouble value = nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
-		return value.isPresent()? value.getAsDouble() : Double.NaN;
+		return value.isPresent() ? value.getAsDouble() : Double.NaN;
 	}
 
 	/**
@@ -452,7 +451,7 @@ public class Network {
 	}
 
 	private String getRealTimeString() {
-		final long day = this.realTime/86400000;
+		final long day = this.realTime / 86400000;
 		final long hour = (this.realTime - day * 86400000) / 3600000;
 		final long minute = (this.realTime - day * 86400000 - hour * 3600000) / 60000;
 		final long second = (this.realTime - day * 86400000 - hour * 3600000 - minute * 60000) / 1000;
@@ -466,7 +465,9 @@ public class Network {
 				.collect(Collectors.toList());
 		if (!outOfRangeNodes.isEmpty()) {
 			log("Detected nodes with out of allowed range network time:");
-			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s", n.getName(), format.format(this.mean - n.getTimeOffset().getRaw()))));
+			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s",
+					n.getName(),
+					format.format(this.mean - n.getTimeOffset().getRaw()))));
 		}
 	}
 

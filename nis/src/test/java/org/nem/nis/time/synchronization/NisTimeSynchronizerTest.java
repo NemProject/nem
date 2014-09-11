@@ -127,7 +127,7 @@ public class NisTimeSynchronizerTest {
 
 		private List<Node> createPartnerNodes() {
 			final List<Node> nodes = new ArrayList<>();
-			for (int i=0; i<3; i++) {
+			for (int i = 0; i < 3; i++) {
 				nodes.add(Mockito.mock(Node.class));
 			}
 
@@ -145,7 +145,7 @@ public class NisTimeSynchronizerTest {
 		private List<TimeSynchronizationSample> createSamples(final List<Node> nodes, final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList)
 				throws ExecutionException, InterruptedException {
 			final List<TimeSynchronizationSample> samples = new ArrayList<>();
-			for (int i=0; i<3; i++) {
+			for (int i = 0; i < 3; i++) {
 				samples.add(new TimeSynchronizationSample(
 						nodes.get(i),
 						new CommunicationTimeStamps(new NetworkTimeStamp(10 * i), new NetworkTimeStamp(10 * i + 20)),

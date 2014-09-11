@@ -6,8 +6,8 @@ import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
@@ -196,6 +196,7 @@ public class PeerNetworkState {
 	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
 		return this.timeSynchronizationResults;
 	}
+
 	/**
 	 * Adds a time synchronization result to the list.
 	 * Removes the oldest result if the size of the is exceeding 100.
