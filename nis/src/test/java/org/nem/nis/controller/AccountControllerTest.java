@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.*;
-import org.nem.nis.controller.requests.AccountTransactionsPageBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.*;
@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public class AccountControllerTest {
+
+	//region accountUnlock
 
 	@Test
 	public void unlockCopiesRelevantAccountData() {
@@ -70,6 +72,10 @@ public class AccountControllerTest {
 				IllegalArgumentException.class);
 	}
 
+	//endregion
+
+	//region accountLock
+
 	@Test
 	public void lockDelegatesToForaging() {
 		// Arrange:
@@ -93,17 +99,23 @@ public class AccountControllerTest {
 		return new TestContext(accountIoAdapter);
 	}
 
+	//endregion
+
+	//region accountGet
+
 	@Test
 	public void accountGetDelegatesToAccountInfoFactory() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
 
 		// Assert:
 		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
@@ -114,27 +126,24 @@ public class AccountControllerTest {
 	public void accountGetDelegatesToForaging() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
 		Mockito.when(context.foraging.isAccountUnlocked(address)).thenReturn(true);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
 
 		// Assert:
 		Mockito.verify(context.foraging, Mockito.times(1)).isAccountUnlocked(address);
 		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void accountGetReturnsErrorForInvalidAccount() {
-		// Arrange:
-		final TestContext context = new TestContext();
+	//endregion
 
-		// Act:
-		context.controller.accountGet("dummy");
-	}
+	//region accountTransfers[All|Incoming|Outgoing]
 
 	private void accountTransfersMethodsDelegatesToIo(
 			final ReadOnlyTransferDao.TransferType transferType,
@@ -161,25 +170,22 @@ public class AccountControllerTest {
 
 	@Test
 	public void accountTransfersAllDelegatesToIoAdapter() {
-		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersAll(accountTransactionsPageBuilder));
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL, AccountController::accountTransfersAll);
 	}
 
 	@Test
 	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersIncoming(accountTransactionsPageBuilder));
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING, AccountController::accountTransfersIncoming);
 	}
 
 	@Test
 	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersOutgoing(accountTransactionsPageBuilder));
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING, AccountController::accountTransfersOutgoing);
 	}
+
+	//endregion
+
+	//region getImportances
 
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
@@ -226,6 +232,8 @@ public class AccountControllerTest {
 
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
 	}
+
+	//endregion
 
 	private static class TestContext {
 		private final Foraging foraging;
