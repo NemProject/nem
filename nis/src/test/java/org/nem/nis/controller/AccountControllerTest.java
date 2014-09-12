@@ -9,6 +9,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
@@ -19,6 +20,7 @@ import org.nem.nis.service.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class AccountControllerTest {
 
@@ -163,6 +165,7 @@ public class AccountControllerTest {
 	private void accountTransfersMethodsDelegatesToIo(
 			final ReadOnlyTransferDao.TransferType transferType,
 			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
@@ -181,6 +184,36 @@ public class AccountControllerTest {
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
+	}
+
+	//endregion
+
+	//region transactionsUnconfirmed
+
+	@Test
+	public void transactionsUnconfirmedDelegatesToForaging() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
+
+		final List<Transaction> originalTransactions = Arrays.asList(
+				new MockTransaction(7, TimeInstant.ZERO),
+				new MockTransaction(11, TimeInstant.ZERO),
+				new MockTransaction(5, TimeInstant.ZERO));
+		final TestContext context = new TestContext();
+
+		Mockito.when(context.foraging.getUnconfirmedTransactions(address)).thenReturn(originalTransactions);
+
+		// Act:
+		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
+
+		// Assert:
+		Assert.assertThat(
+				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
+		Mockito.verify(context.foraging, Mockito.times(1)).getUnconfirmedTransactions(address);
+
 	}
 
 	//endregion
