@@ -7,7 +7,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.*;
@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -123,7 +124,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
-	@Test(expected = LazyInitializationException.class)
+	@Test
 	public void getBlocksForAccountDoesNotRetrieveTransfers() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
@@ -133,7 +134,7 @@ public class BlockDaoTest {
 
 		// Act:
 		this.blockDao.save(dbBlock);
-		final Collection<Block> entities = this.blockDao.getBlocksForAccount(signer, Integer.MAX_VALUE, 25);
+		final Collection<Block> entities = this.blockDao.getBlocksForAccount(signer, null, 25);
 
 		// Assert:
 		Assert.assertThat(entities.size(), equalTo(1));
@@ -141,28 +142,30 @@ public class BlockDaoTest {
 
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
 	}
 
 	@Test
-	public void getBlocksForAccountRespectsTimestamp() {
+	public void getBlocksForAccountRespectsHash() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
+		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456, 0);
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, 0);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			hashes.add(dbBlock.getBlockHash());
 
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, 123, 25);
-		final Collection<Block> entities2 = this.blockDao.getBlocksForAccount(signer, 122, 25);
+		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+		final Collection<Block> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(0));
+		Assert.assertThat(entities2.size(), equalTo(1));
 	}
 
 	@Test
@@ -171,25 +174,42 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
+		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23 * i + 3) % 30);
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			hashes.add(dbBlock.getBlockHash());
 
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, 123 + 30, 25);
-		final Collection<Block> entities2 = this.blockDao.getBlocksForAccount(signer, 122, 25);
+		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+		final Collection<Block> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+		final Collection<Block> entities3 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(0));
+		final Consumer<Collection<Block>> assertCollectionContainsLatestBlocks = entities -> {
+			Assert.assertThat(entities.size(), equalTo(25));
 
-		int lastTimestamp = 123 + 29;
-		for (final Block entity : entities1) {
-			Assert.assertThat(entity.getTimeStamp(), equalTo(lastTimestamp));
-			lastTimestamp = lastTimestamp - 1;
-		}
+			int lastTimestamp = 123 + 29;
+			for (final Block entity : entities) {
+				Assert.assertThat(entity.getTimeStamp(), equalTo(lastTimestamp));
+				lastTimestamp = lastTimestamp - 1;
+			}
+		};
+
+		final Consumer<Collection<Block>> assertCollectionContainsFirstBlocks = entities -> {
+			Assert.assertThat(entities.size(), equalTo(1));
+
+			long height = 456;
+			for (final Block entity : entities) {
+				Assert.assertThat(entity.getHeight(), equalTo(height++));
+			}
+		};
+
+		assertCollectionContainsLatestBlocks.accept(entities1);
+		assertCollectionContainsLatestBlocks.accept(entities2);
+		assertCollectionContainsFirstBlocks.accept(entities3);
 	}
 	//endregion
 
