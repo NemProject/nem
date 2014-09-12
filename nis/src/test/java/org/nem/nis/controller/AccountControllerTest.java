@@ -145,6 +145,21 @@ public class AccountControllerTest {
 
 	//region accountTransfers[All|Incoming|Outgoing]
 
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL, AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING, AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING, AccountController::accountTransfersOutgoing);
+	}
+
 	private void accountTransfersMethodsDelegatesToIo(
 			final ReadOnlyTransferDao.TransferType transferType,
 			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
@@ -166,21 +181,6 @@ public class AccountControllerTest {
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
-	}
-
-	@Test
-	public void accountTransfersAllDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL, AccountController::accountTransfersAll);
-	}
-
-	@Test
-	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING, AccountController::accountTransfersIncoming);
-	}
-
-	@Test
-	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING, AccountController::accountTransfersOutgoing);
 	}
 
 	//endregion
