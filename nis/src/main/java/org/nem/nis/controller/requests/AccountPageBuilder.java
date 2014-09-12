@@ -1,4 +1,4 @@
-package org.nem.nis.controller.viewmodels;
+package org.nem.nis.controller.requests;
 
 /**
  * Builder that is used by Spring to create an AccountPage from a GET request.
