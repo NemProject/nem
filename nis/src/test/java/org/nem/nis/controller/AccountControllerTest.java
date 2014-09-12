@@ -218,6 +218,33 @@ public class AccountControllerTest {
 
 	//endregion
 
+	//region accountHarvests
+
+	@Test
+	public void accountHarvestsDelegatesToAccountIo() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<HarvestInfo> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountHarvests(address, hash)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, hash);
+	}
+
+	//endregion
+
 	//region getImportances
 
 	@Test

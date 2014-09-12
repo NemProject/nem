@@ -42,8 +42,8 @@ public interface AccountIo extends Iterable<Account> {
 	 * Gets information about blocks harvested by an account.
 	 *
 	 * @param address The account address.
-	 * @param timeStamp The maximum timestamp of a block.
+	 * @param harvestHash The hash of "top-most" harvested block.
 	 * @return The information about harvested blocks.
 	 */
-	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timeStamp);
+	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash);
 }

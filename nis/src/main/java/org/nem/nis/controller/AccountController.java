@@ -152,10 +152,9 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvestInfo> accountHarvests(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		// TODO-CR J->G: should we use hash filtering for harvests too?
-		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimeStamp());
+	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountHarvests(page.getAddress(), page.getHash());
 	}
 
 	/**
