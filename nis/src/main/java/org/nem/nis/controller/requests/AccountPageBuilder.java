@@ -4,7 +4,6 @@ package org.nem.nis.controller.requests;
  * Builder that is used by Spring to create an AccountPage from a GET request.
  */
 public class AccountPageBuilder {
-
 	private String address;
 	private String timeStamp;
 

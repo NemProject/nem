@@ -1,12 +1,9 @@
 package org.nem.nis.controller.requests;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Address;
 import org.nem.core.utils.StringUtils;
 
-public class AccountTransactionsPage {
-
-	private final Address address;
+public class AccountTransactionsPage extends AccountId {
 	private final Hash hash;
 
 	/**
@@ -16,25 +13,8 @@ public class AccountTransactionsPage {
 	 * @param hash The hash.
 	 */
 	public AccountTransactionsPage(final String address, final String hash) {
-		if (null == address) {
-			throw new IllegalArgumentException("address is required");
-		}
-
-		this.address = Address.fromEncoded(address);
-		if (!this.address.isValid()) {
-			throw new IllegalArgumentException("address must be valid");
-		}
-
+		super(address);
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
-	}
-
-	/**
-	 * Gets the address
-	 *
-	 * @return The address.
-	 */
-	public Address getAddress() {
-		return this.address;
 	}
 
 	/**

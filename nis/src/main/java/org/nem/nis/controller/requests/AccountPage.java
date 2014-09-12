@@ -1,13 +1,9 @@
 package org.nem.nis.controller.requests;
 
-import org.nem.core.model.Address;
-
 /**
  * View model that represents a page of account-related information.
  */
-public class AccountPage {
-
-	private final Address address;
+public class AccountPage extends AccountId {
 	private final String timeStamp;
 
 	/**
@@ -17,25 +13,8 @@ public class AccountPage {
 	 * @param timeStamp The timestamp.
 	 */
 	public AccountPage(final String address, final String timeStamp) {
-		if (null == address) {
-			throw new IllegalArgumentException("address is required");
-		}
-
-		this.address = Address.fromEncoded(address);
-		if (!this.address.isValid()) {
-			throw new IllegalArgumentException("address must be valid");
-		}
-
+		super(address);
 		this.timeStamp = timeStamp;
-	}
-
-	/**
-	 * Gets the address
-	 *
-	 * @return The address.
-	 */
-	public Address getAddress() {
-		return this.address;
 	}
 
 	/**
