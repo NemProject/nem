@@ -5,15 +5,15 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.test.NisUtils;
 
 public class AuditEntryTest {
 
 	@Test
 	public void entryExposesConstructorParameters() {
 		// Act:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(12, 53, 60);
 		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", timeProvider);
 
 		// Assert:
@@ -26,7 +26,7 @@ public class AuditEntryTest {
 	@Test
 	public void getElapsedTimeReturnsCurrentElapsedTime() {
 		// Act:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(12, 53, 60);
 		final AuditEntry entry = new AuditEntry(7, "host", "path", timeProvider);
 
 		// Assert:
@@ -37,7 +37,7 @@ public class AuditEntryTest {
 	@Test
 	public void entryCanBeSerialized() {
 		// Arrange:
-		final TimeProvider timeProvider = NisUtils.createMockTimeProvider(12, 53, 60);
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(12, 53, 60);
 		final AuditEntry entry = new AuditEntry(7, "localhost", "/chain/last-block", timeProvider);
 
 		// Act:

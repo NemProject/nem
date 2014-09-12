@@ -5,6 +5,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
 import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.time.TimeProvider;
+import org.nem.core.time.synchronization.TimeSynchronizer;
+import org.nem.nis.service.ChainServices;
+import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
@@ -16,6 +20,18 @@ import java.util.concurrent.CompletableFuture;
 public class PeerNetworkTest {
 
 	//region PeerNetworkState delegation
+
+	@Test
+	public void isChainSynchronizedDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.isChainSynchronized();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).isChainSynchronized();
+	}
 
 	@Test
 	public void getLocalNodeDelegatesToState() {
@@ -195,12 +211,65 @@ public class PeerNetworkTest {
 		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
 	}
 
+	@Test
+	public void checkChainSynchronizationDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).getChainServices();
+		Mockito.verify(services, Mockito.times(1)).isChainSynchronized(Mockito.any());
+	}
+
+	@Test
+	public void checkChainSynchronizationUpdatesNetworkState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ChainServices services = Mockito.mock(ChainServices.class);
+		final Node node = PeerUtils.createNodeWithName("r");
+		Mockito.when(services.isChainSynchronized(node)).thenReturn(true);
+		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+		Mockito.when(context.state.getLocalNode()).thenReturn(node);
+
+		// Act:
+		context.network.checkChainSynchronization();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.times(1)).setChainSynchronized(true);
+	}
+
+	@Test
+	public void synchronizeTimeDelegatesToFactories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TimeSynchronizer synchronizer = Mockito.mock(TimeSynchronizer.class);
+		Mockito.when(synchronizer.synchronizeTime()).thenReturn(CompletableFuture.completedFuture(null));
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		final ImportanceAwareNodeSelector nodeSelector = Mockito.mock(ImportanceAwareNodeSelector.class);
+		Mockito.when(context.importanceAwareSelectorFactory.createNodeSelector()).thenReturn(nodeSelector);
+		Mockito.when(context.servicesFactory.createTimeSynchronizer(nodeSelector, timeProvider)).thenReturn(synchronizer);
+
+		// Act:
+		context.network.synchronizeTime(timeProvider).join();
+
+		// Assert:
+		Mockito.verify(context.importanceAwareSelectorFactory, Mockito.times(1)).createNodeSelector();
+		Mockito.verify(context.servicesFactory, Mockito.times(1)).createTimeSynchronizer(nodeSelector, timeProvider);
+		Mockito.verify(synchronizer, Mockito.times(1)).synchronizeTime();
+	}
+
 	//endregion
 
 	private static class TestContext {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
 		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
+		private final NodeSelectorFactory importanceAwareSelectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final PeerNetwork network;
 
 		public TestContext() {
@@ -208,7 +277,7 @@ public class PeerNetworkTest {
 			Mockito.when(selector.selectNodes()).thenReturn(new ArrayList<>());
 			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
 
-			this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory);
+			this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory, this.importanceAwareSelectorFactory);
 		}
 	}
 }

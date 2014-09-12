@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.NisRequestResult;
+import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
@@ -51,11 +51,11 @@ public class TransactionController {
 
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
-	public NisRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
+	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
 		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
-		return new NisRequestResult(result);
+		return new NemRequestResult(result);
 	}
 
 	/**

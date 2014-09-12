@@ -3,7 +3,10 @@ package org.nem.peer;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
@@ -94,6 +97,45 @@ public class PeerNetworkStateTest {
 		Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(experiences));
 		Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
 		Assert.assertThat(context.getParams(), IsSame.sameInstance(params));
+	}
+
+	@Test
+	public void isChainSynchronizedReturnsFalseAsDefault() {
+		// Act:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isChainSynchronizedReturnsTrueWhenSetToTrueAndThenToFalse() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.setChainSynchronized(true);
+		state.setChainSynchronized(false);
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isChainSynchronizedReturnsFalseWhenSetToTrueAndThenToFalseTwice() {
+		// Arrange:
+		final Config config = createTestConfig();
+		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.setChainSynchronized(true);
+		state.setChainSynchronized(false);
+		state.setChainSynchronized(false);
+
+		// Assert:
+		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -254,6 +296,51 @@ public class PeerNetworkStateTest {
 		// Assert:
 		Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
 		Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
+	}
+
+	//endregion
+
+	//region node age
+
+	@Test
+	public void nodeAgeInitiallyIsZero() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Assert:
+		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(0)));
+	}
+
+	//endregion
+
+	//region updateTimeSynchronizationResults
+
+	@Test
+	public void updateTimeSynchronizationResultsAddsOneToNodeAge() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(5), new TimeOffset(10), new TimeOffset(20)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(15), new TimeOffset(20), new TimeOffset(30)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
+
+		// Assert:
+		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(3)));
+	}
+
+	@Test
+	public void updateTimeSynchronizationResultsAddsTimeSynchronizationResultToList() {
+		// Arrange:
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
+
+		// Act:
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(5), new TimeOffset(10), new TimeOffset(20)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(15), new TimeOffset(20), new TimeOffset(30)));
+		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
+
+		// Assert:
+		Assert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
 	}
 
 	//endregion

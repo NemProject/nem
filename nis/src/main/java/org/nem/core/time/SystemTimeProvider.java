@@ -1,5 +1,8 @@
 package org.nem.core.time;
 
+import org.nem.core.model.primitive.*;
+import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+
 import java.util.*;
 
 /**
@@ -9,6 +12,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
+	private TimeOffset timeOffset = new TimeOffset(0);
 
 	static {
 		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -33,6 +37,39 @@ public class SystemTimeProvider implements TimeProvider {
 	public TimeInstant getCurrentTime() {
 		final long time = System.currentTimeMillis();
 		return new TimeInstant(getTime(time));
+	}
+
+	@Override
+	public NetworkTimeStamp getNetworkTime() {
+		return new NetworkTimeStamp(getCurrentTimeMillis() + this.timeOffset.getRaw());
+	}
+
+	@Override
+	public TimeSynchronizationResult updateTimeOffset(final TimeOffset offset) {
+		this.timeOffset = this.timeOffset.add(offset);
+		return new TimeSynchronizationResult(this.getCurrentTime(), this.timeOffset, offset);
+	}
+
+	/**
+	 * Returns the current time in milliseconds.
+	 * TODO-CR J-B: if you are using this (it doesn't look like it is being called) consider adding a test for it
+	 * TODO-CR J-B: but this seems to be a more precise version of getCurrentTime, so i'm not sure if you are
+	 * TODO    Br -> J This is unfinished, there probably will be getNetworkTime and getNetworkTimeMillis too.
+	 * TODO            I will add tests once I get to this point.
+	 *
+	 * @return The current time in milliseconds.
+	 */
+	private long getCurrentTimeMillis() {
+		return System.currentTimeMillis() - EPOCH_TIME;
+	}
+
+	/**
+	 * Gets the time offset.
+	 *
+	 * @return The time offset.
+	 */
+	public TimeOffset getTimeOffset() {
+		return this.timeOffset;
 	}
 
 	/**

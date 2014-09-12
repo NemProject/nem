@@ -9,7 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -71,6 +71,9 @@ public class NisAppConfig {
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
 		// TODO-CR: 20140817 J->B why are different line-endings causing validation to fail?
+		// TODO-CR: 20140901 BR -> J during migration checksums are calculated which give different results for linux
+		// TODO-CR                   and windows line endings. Thus validation fails.
+		// TODO 20140909 J-G gimre?
 		flyway.setValidateOnMigrate(false);
 		return flyway;
 	}
@@ -81,7 +84,8 @@ public class NisAppConfig {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 
 		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
-		// BR: like this?
+		// TODO BR: like this?
+		// TODO 20140909 J-G gimre?
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
@@ -150,7 +154,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountCache(), this.blockChain(), this.nisConfiguration());
+		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain(), this.chainServices(), this.nisConfiguration());
 	}
 
 	@Bean
@@ -166,5 +170,10 @@ public class NisAppConfig {
 	@Bean
 	public NemConfigurationPolicy configurationPolicy() {
 		return new NisConfigurationPolicy();
+	}
+
+	@Bean
+	public ChainServices chainServices() {
+		return new ChainServices(this.blockChain());
 	}
 }

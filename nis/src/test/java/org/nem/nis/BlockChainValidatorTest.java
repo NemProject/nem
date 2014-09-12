@@ -246,6 +246,38 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
+	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidatorTrue(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void chainIsInvalidIfTransactionAlreadyExistAfterMarkerThread() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidatorTrue(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void chainIsValidIfAllTransactionChecksPass() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -377,6 +409,10 @@ public class BlockChainValidatorTest {
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
 		return new BlockChainValidator(null, blockExecutor, createMockBlockScorer(), 21, o -> false);
+	}
+
+	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
+		return new BlockChainValidator(block -> { }, scorer, 21, o -> true);
 	}
 
 	private static BlockChainValidator createValidator() {

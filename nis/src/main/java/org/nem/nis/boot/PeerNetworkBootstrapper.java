@@ -27,9 +27,10 @@ public class PeerNetworkBootstrapper {
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
 			final NodeSelectorFactory selectorFactory,
+			final NodeSelectorFactory importanceAwareSelectorFactory,
 			final boolean requirePeerAck) {
 		this.requirePeerAck = requirePeerAck;
-		this.network = new PeerNetwork(state, servicesFactory, selectorFactory);
+		this.network = new PeerNetwork(state, servicesFactory, selectorFactory, importanceAwareSelectorFactory);
 	}
 
 	/**

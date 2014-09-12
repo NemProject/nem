@@ -1,11 +1,12 @@
 package org.nem.nis.controller;
 
 import org.nem.core.deploy.CommonStarter;
-import org.nem.core.model.Address;
-import org.nem.core.model.ncc.NisRequestResult;
+import org.nem.core.model.*;
+import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
+import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.secret.BlockChainConstants;
@@ -22,10 +23,12 @@ public class LocalController {
 
 	private final long SHUTDOWN_DELAY = 200;
 	private final RequiredBlockDao blockDao;
+	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
-	public LocalController(final RequiredBlockDao blockDao) {
+	public LocalController(final RequiredBlockDao blockDao, final NisPeerNetworkHost host) {
 		this.blockDao = blockDao;
+		this.host = host;
 	}
 
 	/**
@@ -51,8 +54,8 @@ public class LocalController {
 
 	@RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
 	@ClientApi
-	public NisRequestResult heartbeat() {
-		return new NisRequestResult(NisRequestResult.TYPE_HEARTBEAT, NisRequestResult.CODE_SUCCESS, "ok");
+	public NemRequestResult heartbeat() {
+		return new NemRequestResult(NemRequestResult.TYPE_HEARTBEAT, NemRequestResult.CODE_SUCCESS, "ok");
 	}
 
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)
@@ -94,5 +97,21 @@ public class LocalController {
 		}
 
 		return blockList;
+	}
+
+	/**
+	 * Gets the NIS status.
+	 *
+	 * @return The NIS request result.
+	 */
+	@RequestMapping(value = "/status", method = RequestMethod.GET)
+	@ClientApi
+	public NemRequestResult status() {
+		if (!this.host.isNetworkBooted()) {
+			return new NemRequestResult(NemRequestResult.TYPE_STATUS, NemStatus.RUNNING.getValue(), "status");
+		}
+
+		final int status = this.host.getNetwork().isChainSynchronized() ? NemStatus.SYNCHRONIZED.getValue() : NemStatus.BOOTED.getValue();
+		return new NemRequestResult(NemRequestResult.TYPE_STATUS, status, "status");
 	}
 }

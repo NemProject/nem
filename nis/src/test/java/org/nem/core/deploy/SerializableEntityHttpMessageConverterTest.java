@@ -100,13 +100,6 @@ public class SerializableEntityHttpMessageConverterTest {
 	@Test
 	public void writeCreatesUtf8JsonStringThatCanBeRoundTripped() throws Exception {
 		// Arrange:
-		// TODO-CR: G->J there's something wrong with this test.
-		// it succeeds when run from IDE, but fails when run via "mvn test" from cmd
-		// I've also tried changing string to "\u0024\u00a2\u20ac" and behaviour is the same.
-		// TODO-CR: T-J/G I guess I found the problem. It was related to the MockHttpOutputMessage
-		// It used toString without specifying the encoding. I added that and now the test case runs
-		// smooth.
-		// Testing is one thing...testing the test code another ;)
 		assertWriteCanRoundTripEntityWithString("$¢€");
 	}
 

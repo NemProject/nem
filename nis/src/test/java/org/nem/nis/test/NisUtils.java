@@ -1,11 +1,10 @@
 package org.nem.nis.test;
 
-import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.secret.AccountLink;
 
 import java.util.*;
@@ -83,23 +82,6 @@ public class NisUtils {
 		}
 
 		return hashes;
-	}
-
-	/**
-	 * Creates a time provider that returns the specified instants.
-	 *
-	 * @param rawInstants The raw instant values.
-	 * @return The time provider.
-	 */
-	public static TimeProvider createMockTimeProvider(final int... rawInstants) {
-		final TimeInstant[] instants = new TimeInstant[rawInstants.length - 1];
-		for (int i = 1; i < rawInstants.length; ++i) {
-			instants[i - 1] = new TimeInstant(rawInstants[i]);
-		}
-
-		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);
-		return timeProvider;
 	}
 
 	/**
