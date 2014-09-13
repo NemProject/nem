@@ -132,12 +132,17 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timeStamp, final int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+		final long height = null == hash ? Long.MAX_VALUE : this.findByHash(hash).getHeight();
+		return this.getLatestBlocksForAccount(account, height, limit);
+	}
+
+	private Collection<Block> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
-				.add(Restrictions.le("timeStamp", timeStamp))
-				.addOrder(Order.desc("timeStamp"))
+				.add(Restrictions.lt("height", height))
+				.addOrder(Order.desc("height"))
 						// here we were lucky cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria

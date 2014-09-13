@@ -9,8 +9,10 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
@@ -18,8 +20,11 @@ import org.nem.nis.service.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class AccountControllerTest {
+
+	//region accountUnlock
 
 	@Test
 	public void unlockCopiesRelevantAccountData() {
@@ -69,6 +74,10 @@ public class AccountControllerTest {
 				IllegalArgumentException.class);
 	}
 
+	//endregion
+
+	//region accountLock
+
 	@Test
 	public void lockDelegatesToForaging() {
 		// Arrange:
@@ -92,17 +101,23 @@ public class AccountControllerTest {
 		return new TestContext(accountIoAdapter);
 	}
 
+	//endregion
+
+	//region accountGet
+
 	@Test
 	public void accountGetDelegatesToAccountInfoFactory() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
 
 		// Assert:
 		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
@@ -113,31 +128,44 @@ public class AccountControllerTest {
 	public void accountGetDelegatesToForaging() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
 		Mockito.when(context.foraging.isAccountUnlocked(address)).thenReturn(true);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(address.getEncoded());
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
 
 		// Assert:
 		Mockito.verify(context.foraging, Mockito.times(1)).isAccountUnlocked(address);
 		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void accountGetReturnsErrorForInvalidAccount() {
-		// Arrange:
-		final TestContext context = new TestContext();
+	//endregion
 
-		// Act:
-		context.controller.accountGet("dummy");
+	//region accountTransfers[All|Incoming|Outgoing]
+
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL, AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING, AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapter() {
+		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING, AccountController::accountTransfersOutgoing);
 	}
 
 	private void accountTransfersMethodsDelegatesToIo(
 			final ReadOnlyTransferDao.TransferType transferType,
 			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
@@ -158,27 +186,66 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
 	}
 
-	@Test
-	public void accountTransfersAllDelegatesToIoAdapter() {
-		// TODO-CR 20140809 - (minor) you don't really need the types in the lambda (esp. since your param names are the class names) :)
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersAll(accountTransactionsPageBuilder));
-	}
+	//endregion
+
+	//region transactionsUnconfirmed
 
 	@Test
-	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersIncoming(accountTransactionsPageBuilder));
+	public void transactionsUnconfirmedDelegatesToForaging() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
+
+		final List<Transaction> originalTransactions = Arrays.asList(
+				new MockTransaction(7, TimeInstant.ZERO),
+				new MockTransaction(11, TimeInstant.ZERO),
+				new MockTransaction(5, TimeInstant.ZERO));
+		final TestContext context = new TestContext();
+
+		Mockito.when(context.foraging.getUnconfirmedTransactions(address)).thenReturn(originalTransactions);
+
+		// Act:
+		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
+
+		// Assert:
+		Assert.assertThat(
+				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
+		Mockito.verify(context.foraging, Mockito.times(1)).getUnconfirmedTransactions(address);
+
 	}
 
+	//endregion
+
+	//region accountHarvests
+
 	@Test
-	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING,
-				(AccountController accountController, AccountTransactionsPageBuilder accountTransactionsPageBuilder) ->
-						accountController.accountTransfersOutgoing(accountTransactionsPageBuilder));
+	public void accountHarvestsDelegatesToAccountIo() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<HarvestInfo> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		Mockito.when(accountIoAdapter.getAccountHarvests(address, hash)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, hash);
 	}
+
+	//endregion
+
+	//region getImportances
 
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
@@ -225,6 +292,8 @@ public class AccountControllerTest {
 
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
 	}
+
+	//endregion
 
 	private static class TestContext {
 		private final Foraging foraging;

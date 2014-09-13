@@ -1,22 +1,19 @@
-package org.nem.nis.controller.viewmodels;
+package org.nem.nis.controller.requests;
 
 import org.nem.core.model.Address;
 
 /**
- * View model that represents a page of account-related information.
+ * View model that represents an account id information.
  */
-public class AccountPage {
-
+public class AccountId {
 	private final Address address;
-	private final String timeStamp;
 
 	/**
-	 * Creates a new account page.
+	 * Creates a new account id.
 	 *
 	 * @param address The address.
-	 * @param timeStamp The timestamp.
 	 */
-	public AccountPage(final String address, final String timeStamp) {
+	public AccountId(final String address) {
 		if (null == address) {
 			throw new IllegalArgumentException("address is required");
 		}
@@ -25,8 +22,6 @@ public class AccountPage {
 		if (!this.address.isValid()) {
 			throw new IllegalArgumentException("address must be valid");
 		}
-
-		this.timeStamp = timeStamp;
 	}
 
 	/**
@@ -36,14 +31,5 @@ public class AccountPage {
 	 */
 	public Address getAddress() {
 		return this.address;
-	}
-
-	/**
-	 * Gets the timestamp.
-	 *
-	 * @return The timestamp.
-	 */
-	public String getTimeStamp() {
-		return this.timeStamp;
 	}
 }
