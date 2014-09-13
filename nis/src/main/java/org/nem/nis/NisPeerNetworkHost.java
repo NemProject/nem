@@ -25,15 +25,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
-	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
-
 	private final AccountAnalyzer accountAnalyzer;
 	private final BlockChain blockChain;
 	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
-	private final AuditCollection outgoingAudits = createAuditCollection();
-	private final AuditCollection incomingAudits = createAuditCollection();
+	private final HttpConnectorPool httpConnectorPool;
+	private final AuditCollection incomingAudits;
+	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
 	private final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(CommonStarter.TIME_PROVIDER);
 	private PeerNetwork network;
@@ -43,11 +42,17 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final AccountAnalyzer accountAnalyzer,
 			final BlockChain blockChain,
 			final ChainServices chainServices,
-			final NisConfiguration nisConfiguration) {
+			final NisConfiguration nisConfiguration,
+			final HttpConnectorPool httpConnectorPool,
+			final AuditCollection incomingAudits,
+			final AuditCollection outgoingAudits) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.blockChain = blockChain;
 		this.chainServices = chainServices;
 		this.nisConfiguration = nisConfiguration;
+		this.httpConnectorPool = httpConnectorPool;
+		this.incomingAudits = incomingAudits;
+		this.outgoingAudits = outgoingAudits;
 		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
 
@@ -154,17 +159,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
-		final CommunicationMode communicationMode = this.nisConfiguration.useBinaryTransport()
-				? CommunicationMode.BINARY
-				: CommunicationMode.JSON;
-		final HttpConnectorPool connectorPool = new HttpConnectorPool(communicationMode, this.getOutgoingAudits());
-		final PeerConnector peerConnector = connectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
-		final TimeSynchronizationConnector timeSynchronizationConnector = connectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
+		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
+		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
 		return new PeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
 				timeSynchronizationConnector,
-				connectorPool,
+				this.httpConnectorPool,
 				this.synchronizer,
 				this.chainServices,
 				createTimeSynchronizationStrategy());
@@ -187,9 +188,5 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				selectorFactory,
 				importanceAwareSelectorFactory,
 				!this.nisConfiguration.bootWithoutAck());
-	}
-
-	private static AuditCollection createAuditCollection() {
-		return new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER);
 	}
 }

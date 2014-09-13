@@ -1,13 +1,10 @@
 package org.nem.nis.service;
 
-import org.nem.core.connect.HttpMethodClient;
-import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.node.Node;
-import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.BlockChain;
-import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.connect.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -26,37 +23,18 @@ import java.util.stream.Collectors;
  * TODO 20140910 i was wondering does it make sense for NIS to estimate how far behind it is
  */
 public class ChainServices {
-	private static final int MAX_AUDIT_HISTORY_SIZE = 10;
-
 	private final BlockChain blockChain;
-	private final HttpConnector connector;
+	private final HttpConnectorPool connectorPool;
 
 	/**
 	 * Creates a new chain service instance.
 	 *
 	 * @param blockChain The block chain.
 	 */
-	public ChainServices(final BlockChain blockChain) {
+	@Autowired(required = true)
+	public ChainServices(final BlockChain blockChain, final HttpConnectorPool connectorPool) {
 		this.blockChain = blockChain;
-		// TODO 20140905 BR: What is the correct way to get a HttpConnector object into this class?
-		// TODO 20140909 J: You couldn't inject it with spring?
-		// TODO 20140910 BR -> J: I could introduce a bean in NisAppConfig, but we already have a HttpConnectorPool.
-		// TODO 20140910          But I don't know how to access the pool from here and I need SyncConnector AND PeerConnector functionality.
-		// TODO 20140910          So the only way would be in NisAppConfig? We have MAX_AUDIT_HISTORY_SIZE defined twice then which is a bit ugly.
-		// TODO 20140910 J-J: i'll look into this
-		final Communicator communicator = new HttpCommunicator(new HttpMethodClient<>(), CommunicationMode.JSON, new DeserializationContext(null));
-		this.connector = new HttpConnector(new AuditedCommunicator(communicator, new AuditCollection(MAX_AUDIT_HISTORY_SIZE, CommonStarter.TIME_PROVIDER)));
-	}
-
-	/**
-	 * Creates a new chain service instance.
-	 *
-	 * @param blockChain The block chain.
-	 * @param connector The http connector.
-	 */
-	public ChainServices(final BlockChain blockChain, final HttpConnector connector) {
-		this.blockChain = blockChain;
-		this.connector = connector;
+		this.connectorPool = connectorPool;
 	}
 
 	/**
@@ -75,7 +53,7 @@ public class ChainServices {
 	 * @return The maximum block chain score.
 	 */
 	private CompletableFuture<BlockChainScore> getMaxChainScoreAsync(final Node node) {
-		return this.connector.getKnownPeers(node)
+		return this.connectorPool.getPeerConnector(null).getKnownPeers(node)
 				.thenCompose(nodes -> this.getMaxChainScoreAsync(nodes.asCollection()));
 	}
 
@@ -87,7 +65,7 @@ public class ChainServices {
 	 */
 	private CompletableFuture<BlockChainScore> getMaxChainScoreAsync(final Collection<Node> nodes) {
 		final List<CompletableFuture<BlockChainScore>> chainScoreFutures = nodes.stream()
-				.map(n -> this.connector.getChainScoreAsync(n).exceptionally(e -> null))
+				.map(n -> this.connectorPool.getSyncConnector(null).getChainScoreAsync(n).exceptionally(e -> null))
 				.collect(Collectors.toList());
 
 		return CompletableFuture.allOf(chainScoreFutures.toArray(new CompletableFuture[chainScoreFutures.size()]))

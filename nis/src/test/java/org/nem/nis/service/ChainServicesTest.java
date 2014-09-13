@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.BlockChain;
-import org.nem.peer.connect.HttpConnector;
+import org.nem.peer.connect.*;
 import org.nem.peer.test.WeakNodeIdentity;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,10 +19,9 @@ public class ChainServicesTest {
 		// Arrange:
 		final TestContext context = new TestContext(30);
 		final Node node = context.createNode("test");
-		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
-		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(true));
+		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -30,10 +29,9 @@ public class ChainServicesTest {
 		// Arrange:
 		final TestContext context = new TestContext(31);
 		final Node node = context.createNode("test");
-		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
-		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(true));
+		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -41,19 +39,22 @@ public class ChainServicesTest {
 		// Arrange:
 		final TestContext context = new TestContext(29);
 		final Node node = context.createNode("test");
-		final ChainServices services = new ChainServices(context.blockChain, context.connector);
 
 		// Assert:
-		Assert.assertThat(services.isChainSynchronized(node), IsEqual.equalTo(false));
+		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(false));
 	}
 
 	private class TestContext {
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
+		private final HttpConnectorPool connectorPool = Mockito.mock(HttpConnectorPool.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);
+		private final ChainServices services = new ChainServices(this.blockChain, this.connectorPool);
 
 		@SuppressWarnings("unchecked")
 		public TestContext(final long score) {
 			Mockito.when(this.blockChain.getScore()).thenReturn(new BlockChainScore(score));
+			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
+			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodes());
 			Mockito.when(this.connector.getChainScoreAsync(Mockito.any(Node.class))).thenReturn(
 					CompletableFuture.completedFuture(new BlockChainScore(10)),
