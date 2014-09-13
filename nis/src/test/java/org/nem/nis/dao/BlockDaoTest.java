@@ -18,7 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -165,11 +165,11 @@ public class BlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(1));
+		Assert.assertThat(entities2.size(), equalTo(0));
 	}
 
 	@Test
-	public void getBlocksForAccountReturnsBlocksSortedByTime() {
+	public void getBlocksForAccountReturnsBlocksSortedByHeight() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
@@ -183,33 +183,23 @@ public class BlockDaoTest {
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, null, 25);
 		final Collection<Block> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
 		final Collection<Block> entities3 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
 
 		// Assert:
-		final Consumer<Collection<Block>> assertCollectionContainsLatestBlocks = entities -> {
+		final BiConsumer<Collection<Block>, Long> assertCollectionContainsBlocksStartingAtHeight = (entities, startHeight) -> {
 			Assert.assertThat(entities.size(), equalTo(25));
 
-			int lastTimestamp = 123 + 29;
+			long lastHeight = startHeight;
 			for (final Block entity : entities) {
-				Assert.assertThat(entity.getTimeStamp(), equalTo(lastTimestamp));
-				lastTimestamp = lastTimestamp - 1;
+				Assert.assertThat(entity.getHeight(), equalTo(lastHeight--));
 			}
 		};
 
-		final Consumer<Collection<Block>> assertCollectionContainsFirstBlocks = entities -> {
-			Assert.assertThat(entities.size(), equalTo(1));
-
-			long height = 456;
-			for (final Block entity : entities) {
-				Assert.assertThat(entity.getHeight(), equalTo(height++));
-			}
-		};
-
-		assertCollectionContainsLatestBlocks.accept(entities1);
-		assertCollectionContainsLatestBlocks.accept(entities2);
-		assertCollectionContainsFirstBlocks.accept(entities3);
+		assertCollectionContainsBlocksStartingAtHeight.accept(entities1, 456L + 29);
+		assertCollectionContainsBlocksStartingAtHeight.accept(entities2, 456L + 28);
+		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 	//endregion
 

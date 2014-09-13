@@ -141,8 +141,8 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
 				.setFetchMode("forger", FetchMode.JOIN)
 				.setFetchMode("blockTransfers", FetchMode.SELECT)
-				.add(Restrictions.le("height", height))
-				.addOrder(Order.desc("timeStamp"))
+				.add(Restrictions.lt("height", height))
+				.addOrder(Order.desc("height"))
 						// here we were lucky cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria
