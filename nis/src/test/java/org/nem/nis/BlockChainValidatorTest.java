@@ -262,7 +262,7 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfTransactionAlreadyExistAfterMarkerThread() {
+	public void chainIsInvalidIfTransactionAlreadyExistInDbAfterMarkerThread() {
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidatorTrue(scorer);
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
@@ -273,6 +273,42 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwiceAfterMarkerThread() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidator(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		final MockTransaction tx = createValidSignedTransaction();
+		middleBlock.addTransaction(tx);
+		middleBlock.addTransaction(tx);
+		middleBlock.sign();
+
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void chainIsInvalidIfTwoBlocksContainTheSameTransactionAfterMarkerThread() {
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = createValidator(scorer);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		parentBlock.sign();
+
+		final MockTransaction tx = createValidSignedTransaction();
+		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final Block block1 = blocks.get(1);
+		block1.addTransaction(tx);
+		final Block block2 = blocks.get(2);
+		block2.setPrevious(block1);
+		block2.addTransaction(tx);
+		signAllBlocks(blocks);
 
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
