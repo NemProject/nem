@@ -138,43 +138,43 @@ public class TransactionTest {
 	}
 
 	@Test
-	public void compareResultIsInfluencedByType() {
+	public void compareResultIsNotInfluencedByType() {
 		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction(7, 14, new TimeInstant(150), 90);
+		final MockTransaction transaction1 = new MockTransaction(7, 12, new TimeInstant(124), 70);
 		final MockTransaction transaction2 = new MockTransaction(11, 12, new TimeInstant(124), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void compareResultIsInfluencedByVersion() {
+	public void compareResultIsNotInfluencedByVersion() {
 		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 90);
+		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(124), 70);
 		final MockTransaction transaction2 = new MockTransaction(11, 20, new TimeInstant(124), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void compareResultIsInfluencedByTimeStamp() {
+	public void compareResultIsSecondlyInfluencedByTimeStamp() {
 		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 90);
+		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 70);
 		final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(1));
+		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(-1));
 	}
 
 	@Test
-	public void compareResultIsInfluencedByFee() {
+	public void compareResultIsFirstlyInfluencedByFee() {
 		// Arrange:
-		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(200), 50);
-		final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 70);
+		final MockTransaction transaction1 = new MockTransaction(11, 14, new TimeInstant(150), 70);
+		final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 90);
 
 		// Assert:
 		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));

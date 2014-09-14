@@ -72,7 +72,7 @@ public class UnconfirmedTransactions {
 		// not sure if adding to cache here is a good idea...
 		this.addToCache(transaction.getSigner());
 		if (!this.isValid(transaction)) {
-			LOGGER.warning(String.format("Transaction from %s rejected. not enough NEM.", transaction.getSigner().getAddress()));
+			LOGGER.warning(String.format("Transaction from %s rejected (invalid).", transaction.getSigner().getAddress()));
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 
@@ -89,7 +89,13 @@ public class UnconfirmedTransactions {
 				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
 	}
 
-	boolean remove(final Transaction transaction) {
+	/**
+	 * Removes the specified transaction from the list of unconfirmed transactions.
+	 *
+	 * @param transaction The transaction to remove.
+	 * @return true if the transaction was found and removed; false if the transaction was not found.
+	 */
+	public boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (!this.transactions.containsKey(transactionHash)) {
 			return false;
@@ -119,17 +125,7 @@ public class UnconfirmedTransactions {
 	}
 
 	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
-		Collections.sort(transactions, (lhs, rhs) -> {
-			// should we just use Transaction.compare (it weights things other than fees more heavily) ?
-			// maybe we should change Transaction.compare? also it
-			// TODO: should fee or time be more important inside Transaction.compare
-			int result = -lhs.getFee().compareTo(rhs.getFee());
-			if (result == 0) {
-				result = lhs.getTimeStamp().compareTo(rhs.getTimeStamp());
-			}
-			return result;
-		});
-
+		Collections.sort(transactions, (lhs, rhs) -> -1 * lhs.compareTo(rhs));
 		return transactions;
 	}
 
@@ -187,9 +183,9 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * drops transactions for which we are after the deadline already
+	 * Drops transactions that have already expired.
 	 *
-	 * @param time
+	 * @param time The current time.
 	 */
 	public void dropExpiredTransactions(final TimeInstant time) {
 		this.transactions.values().stream()

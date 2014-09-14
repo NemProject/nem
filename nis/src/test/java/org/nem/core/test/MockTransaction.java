@@ -61,13 +61,23 @@ public class MockTransaction extends Transaction {
 
 	/**
 	 * Creates a mock transaction.
-	 * This overload is intended to be used for comparison tests.
 	 *
 	 * @param customField The initial custom field value.
 	 * @param timeStamp The transaction timestamp.
 	 */
 	public MockTransaction(final int customField, final TimeInstant timeStamp) {
-		super(TYPE, VERSION, timeStamp, Utils.generateRandomAccount());
+		this(Utils.generateRandomAccount(), customField, timeStamp);
+	}
+
+	/**
+	 * Creates a mock transaction.
+	 *
+	 * @param sender The transaction sender's account.
+	 * @param customField The initial custom field value.
+	 * @param timeStamp The transaction timestamp.
+	 */
+	public MockTransaction(final Account sender, final int customField, final TimeInstant timeStamp) {
+		super(TYPE, VERSION, timeStamp, sender);
 		this.customField = customField;
 		this.setDeadline(timeStamp.addHours(2));
 	}
