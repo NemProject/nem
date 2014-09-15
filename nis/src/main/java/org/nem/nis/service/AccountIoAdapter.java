@@ -87,10 +87,9 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final String timeStamp) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, intTimeStamp, 25);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, 25);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

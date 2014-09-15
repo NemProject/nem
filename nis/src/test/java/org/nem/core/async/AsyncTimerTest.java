@@ -195,7 +195,6 @@ public class AsyncTimerTest {
 	}
 
 	@Test
-	// TODO-CR: G->J I've doubled the times, as this test was failing for me, not sure if that's a good idea
 	public void visitorIsNotifiedOfSuccessfulCompletions() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();

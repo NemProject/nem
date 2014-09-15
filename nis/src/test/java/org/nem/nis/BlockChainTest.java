@@ -108,20 +108,8 @@ public class BlockChainTest {
 		account.incrementBalance(amount);
 		final Account cachedAccount = accountCache.addAccountToCache(account.getAddress());
 
-		// TODO-CR 20140809 J->B i needed to increment the reference count because otherwise when adding the sibling block,
-		// undoTxesAndGetScore will remove the account and importance for the forager
-		//
 		// since we are assuming that the forager has a balance at block parent, it seems reasonable to assume that
 		// it has been added to the cache before and has a non-zero reference count
-		//
-		// if this is not reasonable, then there is a bug
-		// 2140810 G->B in master order was as follows (processBlock):
-		//  *  "get" peer block
-		//  * fix block via toDbModel/toModel, to get accounts from proper AccountAnalyzer
-		//  * undo block (which removes accounts from AA)
-		//  * process peer block (but because block was deserialized BEFORE undo, block.signer points to an account, that has been removed from AA)
-		// So I think test in master was actually buggy in this regard.
-		//
 		cachedAccount.incrementReferenceCount();
 
 		cachedAccount.incrementBalance(amount);

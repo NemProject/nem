@@ -57,11 +57,11 @@ public interface ReadOnlyBlockDao {
 	 * Retrieves all Blocks from the database that were forged by the specified account.
 	 *
 	 * @param account The account.
-	 * @param timeStamp The maximum timestamp of a block.
+	 * @param hash The hash of "top-most" block.
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksForAccount(final Account account, final Integer timeStamp, int limit);
+	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, int limit);
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.

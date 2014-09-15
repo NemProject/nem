@@ -84,11 +84,10 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	@Override
 	public int compareTo(final Transaction rhs) {
+		// first sort by fees (lowest first) and then timestamps (newest first)
 		final int[] comparisonResults = new int[] {
-				Integer.compare(this.getType(), rhs.getType()),
-				Integer.compare(this.getVersion(), rhs.getVersion()),
-				this.getTimeStamp().compareTo(rhs.getTimeStamp()),
-				this.getFee().compareTo(rhs.getFee())
+				this.getFee().compareTo(rhs.getFee()),
+				-1 * this.getTimeStamp().compareTo(rhs.getTimeStamp()),
 		};
 
 		for (final int result : comparisonResults) {

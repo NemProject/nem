@@ -71,14 +71,6 @@ public interface SyncConnector {
 
 	// endregion
 
-	// TODO 20140905 BR: -> J wouldn't it be a good idea to have always both, an asynchronous and a synchronous version of a request?
-	// TODO                   The asynchronous should ideally return a CompletableFuture<Deserializer> as opposed to what I am doing here.
-	// TODO                   (I wanted to modify the HttpConnector just as much as needed for the ChainServices class)
-	// TODO 20140909 J-B  ideally, these would all be async (like in PeerConnector)
-	// TODO 20140910 BR -> J: CompletableFuture<Deserializer> is better sometimes because deserialization might be expensive for some objects (like blocks).
-	// TODO 20140910          If you only need part of the information (like block height) it is more flexible not to do actual deserialization.
-	// TODO 20140911 J-B agree, but i would still go with the async api
-
 	// region asynchronous requests
 
 	/**

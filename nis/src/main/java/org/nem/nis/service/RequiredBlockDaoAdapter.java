@@ -65,8 +65,8 @@ public class RequiredBlockDaoAdapter implements RequiredBlockDao {
 	}
 
 	@Override
-	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Integer timeStamp, final int limit) {
-		return this.blockDao.getBlocksForAccount(account, timeStamp, limit);
+	public Collection<org.nem.nis.dbmodel.Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+		return this.blockDao.getBlocksForAccount(account, hash, limit);
 	}
 
 	@Override
