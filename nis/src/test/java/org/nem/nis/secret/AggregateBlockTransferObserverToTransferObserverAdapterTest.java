@@ -3,6 +3,7 @@ package org.nem.nis.secret;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.TransferObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 

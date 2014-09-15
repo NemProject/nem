@@ -1,5 +1,6 @@
-package org.nem.core.model;
+package org.nem.core.model.observers;
 
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 
 /**

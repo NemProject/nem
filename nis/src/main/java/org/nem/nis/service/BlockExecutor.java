@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.TransferObserver;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
