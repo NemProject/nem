@@ -194,7 +194,7 @@ public class UnconfirmedTransactions {
 				.forEach(obj -> this.remove(obj));
 	}
 
-	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {
+	private class UnconfirmedTransactionsTransferObserver extends TransferObserver {
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 			this.notifyDebit(sender, amount);

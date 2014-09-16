@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -12,7 +12,6 @@ import java.util.function.BiPredicate;
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
-
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
 
@@ -204,7 +203,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Amount getMinimumFee();
 
-	private static class ReverseTransferObserver implements TransferObserver {
+	private static class ReverseTransferObserver extends TransferObserver {
 
 		private final TransferObserver observer;
 		private final List<PendingTransfer> pendingTransfers = new ArrayList<>();
@@ -276,7 +275,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		}
 	}
 
-	private static class CommitTransferObserver implements TransferObserver {
+	private static class CommitTransferObserver extends TransferObserver {
 
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {

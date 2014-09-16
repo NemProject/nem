@@ -10,7 +10,7 @@ import java.math.BigInteger;
 /**
  * A transfer observer that updates outlink information.
  */
-public class OutlinkObserver implements TransferObserver {
+public class OutlinkObserver extends TransferObserver {
 	private final PoiFacade poiFacade;
 	private final BlockHeight height;
 	private final boolean isExecute;

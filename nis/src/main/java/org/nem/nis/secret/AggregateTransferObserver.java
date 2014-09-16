@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * An aggregate transfer observer.
  */
-public class AggregateTransferObserver implements TransferObserver {
+public class AggregateTransferObserver extends TransferObserver {
 
 	private final List<TransferObserver> transferObservers;
 

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * An adapter from an aggregate BlockTransferObserver to a TransferObserver.
  */
-public class AggregateBlockTransferObserverToTransferObserverAdapter implements TransferObserver {
+public class AggregateBlockTransferObserverToTransferObserverAdapter extends TransferObserver {
 
 	private final List<BlockTransferObserver> blockTransferObservers;
 	private final BlockHeight height;
