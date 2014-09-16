@@ -76,6 +76,7 @@ public class UnconfirmedTransactions {
 		// ? cause there can be two transactions from a single person, with different recipient, that have different hashes.
 		// Although that may seem like a minor issue (since it's same recipient anyway), but it would make analyzing
 		// ImportanceTransfer transactions muuuuuch more complicated
+		// TODO 20140909 J-G: i'm not sure i understand
 		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
 			for (final Transaction tx : transactions.values()) {
 				if (tx.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {

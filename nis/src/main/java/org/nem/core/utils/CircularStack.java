@@ -18,11 +18,12 @@ public class CircularStack<E> implements Iterable<E> {
 	// actually this class doesn't make much sense, as I've thought there might be >2 elements,
 	// but later I've noticed that in most cases there will be only two elements.
 	// But I'll probably use it also in BlockChain where it'll have 60 elements.
+	// TODO 20140915 J-G: with that small number of elements, i would probably not use a LinkedList :)
 	private final List<E> elements = new LinkedList<>();
 	private final int limit;
 
 	/**
-	 * Creates circular stack with at most limit elments.
+	 * Creates circular stack with at most limit elements.
 	 *
 	 * @param limit Maximum number of elements on the stack.
 	 */
@@ -31,13 +32,13 @@ public class CircularStack<E> implements Iterable<E> {
 	}
 
 	/**
-	 * Creates shallow copy in dest.
+	 * Creates shallow copy in destination.
 	 *
-	 * @param dest CircularStack to which elements should be copied.
+	 * @param destination CircularStack to which elements should be copied.
 	 */
-	public void shallowCopyTo(final CircularStack<E> dest) {
-		dest.elements.clear();
-		dest.putAll(this);
+	public void shallowCopyTo(final CircularStack<E> destination) {
+		destination.elements.clear();
+		destination.putAll(this);
 	}
 
 	private void putAll(final CircularStack<E> rhs) {
@@ -65,6 +66,7 @@ public class CircularStack<E> implements Iterable<E> {
 
 	// TODO 20140909 J-G: since this is a stack, i think push / pop / peek (if needed) are better names
 	// G-J: not sure about pop, as I actually wouldn't like to return popped element, would it still be ok, if it would be void?
+	// TODO 20140915 J-G: i think it's ok if pop doesn't return
 
 	/**
 	 * Gets most recently added element.

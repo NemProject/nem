@@ -60,16 +60,14 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
-	// TODO 20140909 J-G: can you add something link Criteria setTransfersToJoin(Criteria, FetchMode)
-	// if we add a table per transfer type it would be easy to forget to update a line
-    // G-J: yups you're right
-
 	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
+		// TODO 20140914 J-G: i assume you actually want to use fetchMode (i updated the code) :)
 		return criteria
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
-				.setFetchMode("blockImportanceTransfers", FetchMode.JOIN);
+				.setFetchMode("blockTransfers", fetchMode)
+				.setFetchMode("blockImportanceTransfers", fetchMode);
 	}
+
 	private static Criteria setTransfersToJoin(final Criteria criteria) {
 		return setTransfersFetchMode(criteria, FetchMode.JOIN);
 	}
@@ -196,6 +194,7 @@ public class BlockDaoImpl implements BlockDao {
 		// TODO 20140909 J-G: likewise, i would probably refactor the query construction and delete if !empty
 		// (the differences are the join field name and the transfer table name)
 		// G-J: I need to rewrite this method, as it's probably wrong anyway, but I'll do it later
+		// TODO 20140914 J-G: that's why tests are good :)
 
 		final Query getImportanceTxes = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")

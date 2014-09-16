@@ -9,6 +9,8 @@ public class TransactionTypes {
 	// TODO 20140909 J-G: should we prioritize different *types* of transactions (i.e. is importance more important than transfer)?
 	// by type, not by size, I don't know what I was thinking about when typing that comment, does your comment still apply?
 	// prioritizing by type is probably not the best idea, but it will make mapping blocks a lot easier :/
+	// TODO 20140915 J-G: i was thinking about this a little more in response to a different bug ... i think it makes sense to prioritize by fee instead
+	// (especially considering that not all of these will be on the same chain)
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;
 	private static final int SNAPSHOT_TYPE = 0x0400;
@@ -42,5 +44,5 @@ public class TransactionTypes {
 	/**
 	 * A snapshot transaction.
 	 */
-	public static final int SNAPSHOT = SNAPSHOT_TYPE | 0x00;
+	public static final int SNAPSHOT = SNAPSHOT_TYPE | 0x01;
 }

@@ -10,6 +10,7 @@ import org.nem.nis.secret.*;
  * TODO-CR 20140808 J->ALL i think the naming is confusing between PoiAccountState and PoiAccountInfo ... should try to think of better names
  * G->J, I think we can safely call it AccountState, can't we?
  * TODO 20140909 J-G: seems reasonable
+ * TODO 20140915 J-G: do you mind doing the rename?
  */
 public class PoiAccountState {
 	private static final int REMOTE_STATE_SIZE = 2;
@@ -19,18 +20,18 @@ public class PoiAccountState {
 	private final WeightedBalances weightedBalances;
 	private BlockHeight height;
 
-	// I thought we're gonna need 3 elements, but it would work with 2.
-	//    1. let's say there is alias created at block 1000, it becomes effective at block 2440
-	//    2. now at block 2500 user removes alias, removal will become effective at block 3940
-	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
-	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
-	// TODO 20140909 J-G: 'user won't be able to create new alias before 3940' - what prevents that (i see the check below, so maybe i should ask why)?
-	// G-J: we were discussing it with BR, and it'll be best to keep thing simple, so the following rules will apply:
+	// The following rules will apply:
 	//  1. one will have to wait 1440 blocks to  activate/deactivate remote account (before it'll become operational)
 	//  2. in cannot make two SAME subsequent announcements: so let's say I've  announce address X as my remote address.
 	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
 	//
 	// This makes whole logic a lot simpler
+
+	// I thought we're gonna need 3 elements, but it would work with 2.
+	//    1. let's say there is alias created at block 1000, it becomes effective at block 2440
+	//    2. now at block 2500 user removes alias, removal will become effective at block 3940
+	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
+	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
 	private CircularStack<RemoteState> remoteStateStack;
 
 	/**
@@ -49,9 +50,6 @@ public class PoiAccountState {
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
 		this.height = height;
-
-		// TODO 20140909 J-G: to save on memory, i would probably create this lazily
-		// you're right
 	}
 
 	/**
@@ -110,12 +108,14 @@ public class PoiAccountState {
 	// TODO 20140909 J-G: i would definitely add tests for these
 	// I know many tests are missing, I was adding quite some code in hope,
 	// that I'll have it working after (6-7 Sep) weekend.
+	// TODO 20140914 J-G: ok, but generally, i usually prefer to slip the date rather than sacrifice code quality / tests
+	// because once code is checked in, it tends to stay around :)
 
 	/**
 	 * Creates association between "remote" account and "owner" account.
 	 *  @param address Address of an owner account.
 	 * @param height Height where association was created.
-	 * @param direction
+	 * @param direction Direction of an association.
 	 */
 	public void remoteFor(final Address address, final BlockHeight height, int direction) {
 		createStack();
@@ -183,6 +183,7 @@ public class PoiAccountState {
 		if (this.remoteStateStack != null) {
 			this.remoteStateStack.shallowCopyTo(ret.remoteStateStack);
 		}
+
 		return ret;
 	}
 }

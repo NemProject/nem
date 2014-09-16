@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 
 // TODO 20140909 J-G: why can't these checks happen in checkValidity? (i'm probably missing something)
 // G-J: which checks?
+// TODO 20140909 J-G: all of the changes to this class - i'm not sure why it needs to know about importance transfers at all
+// it knows about transactions but i don't think it should know about concrete transactions
 
 /**
  * Helper class for validating a block chain.

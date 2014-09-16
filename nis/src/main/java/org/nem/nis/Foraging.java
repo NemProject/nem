@@ -210,8 +210,6 @@ public class Foraging {
 		return true;
 	}
 
-	// TODO 20140909 J-G: spelling -> 'importance'
-	// G-J: lol, maybe I was falling asleep :)
 	private List<Transaction> removeConflictingImportanceTransactions(final BlockHeight height, final List<Transaction> transactions) {
 		if (height == null) {
 			return transactions;
