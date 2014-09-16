@@ -109,7 +109,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Executes the transaction.
 	 */
 	public final void execute() {
-		this.execute(new CommitTransferObserver());
+		this.execute(new BalanceCommitTransferObserver());
 		this.executeCommit();
 	}
 
@@ -131,7 +131,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Undoes the transaction.
 	 */
 	public final void undo() {
-		this.undo(new CommitTransferObserver());
+		this.undo(new BalanceCommitTransferObserver());
 		this.undoCommit();
 	}
 
@@ -272,25 +272,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 			for (int i = this.pendingTransfers.size() - 1; i >= 0; --i) {
 				this.pendingTransfers.get(i).commit(this.observer);
 			}
-		}
-	}
-
-	private static class CommitTransferObserver extends TransferObserver {
-
-		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.notifyDebit(sender, amount);
-			this.notifyCredit(recipient, amount);
-		}
-
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
-			account.incrementBalance(amount);
-		}
-
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
-			account.decrementBalance(amount);
 		}
 	}
 }
