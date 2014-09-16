@@ -157,7 +157,8 @@ public class BlockDaoImpl implements BlockDao {
 				.setFetchMode("forger", FetchMode.JOIN)
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
-						// here we were lucky cause blocktransfers is set to select...
+						// setMaxResults limits results, not objects (so in case of join it could be block with
+						// many TXes), but this will work correctly cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria
 				.createCriteria("forger", "f")

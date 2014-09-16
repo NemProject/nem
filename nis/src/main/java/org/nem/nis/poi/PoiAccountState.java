@@ -11,6 +11,7 @@ import org.nem.nis.secret.*;
  * G->J, I think we can safely call it AccountState, can't we?
  * TODO 20140909 J-G: seems reasonable
  * TODO 20140915 J-G: do you mind doing the rename?
+ * 20140916, G-J: nope not at all
  */
 public class PoiAccountState {
 	private static final int REMOTE_STATE_SIZE = 2;
@@ -150,7 +151,7 @@ public class PoiAccountState {
 				!this.remoteStateStack.peek().getRemoteHeight().equals(height)) {
 			throw new IllegalArgumentException("call to resetRemote must be 'paired' with call to remoteFor or setRemote");
 		}
-		this.remoteStateStack.remove();
+		this.remoteStateStack.pop();
 	}
 
 	/**

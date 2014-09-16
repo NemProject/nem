@@ -21,7 +21,7 @@ public class CircularStackTest {
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		intStack.remove();
+		intStack.pop();
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class CircularStackTest {
 		for (int i = 0; i < 100; ++i) {
 			intStack.push(123 + i);
 		}
-		intStack.remove();
+		intStack.pop();
 
 		// Assert:
 		Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99 - 1));
@@ -150,8 +150,8 @@ public class CircularStackTest {
 		Assert.assertThat(stack2.size(), IsEqual.equalTo(3));
 		for (int i = 0; i < 3; ++i) {
 			Assert.assertThat(stack1.peek(), IsSame.sameInstance(stack2.peek()));
-			stack1.remove();
-			stack2.remove();
+			stack1.pop();
+			stack2.pop();
 		}
 	}
 

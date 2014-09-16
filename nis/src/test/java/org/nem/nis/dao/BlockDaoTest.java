@@ -315,6 +315,8 @@ public class BlockDaoTest {
 
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
+
+		// TODO G-J 20140916 : should I use ExceptionAssert instead of (expected = ...) ?
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
 	}
 

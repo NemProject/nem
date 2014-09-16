@@ -48,7 +48,28 @@ public class ImportanceTransferTransactionTest {
 		final JSONObject jsonObject = jsonSerializer.getObject();
 
 		// Act:
-		jsonObject.put("remoteAddress", null);
+		jsonObject.put("remoteAccount", null);
+		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
+		deserializer.readInt("type");
+		new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+	}
+
+
+	@Test(expected = IllegalArgumentException.class)
+	public void deserializationFailsWhenModeIsInvalid() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
+
+		final ImportanceTransferTransaction originalEntity = this.createImportanceTransferTransaction(signer, ImportanceTransferTransactionMode.Activate, remote);
+		originalEntity.sign();
+		final JsonSerializer jsonSerializer = new JsonSerializer(true);
+		originalEntity.serialize(jsonSerializer);
+		final JSONObject jsonObject = jsonSerializer.getObject();
+
+		// Act:
+		jsonObject.put("mode", 123);
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
 		deserializer.readInt("type");
 		new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);

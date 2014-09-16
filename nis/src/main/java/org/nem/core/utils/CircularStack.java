@@ -12,14 +12,7 @@ import java.util.*;
  * @param <E> Type of elements on the stack.
  */
 public class CircularStack<E> implements Iterable<E> {
-	// TODO 20140909 J-G: why did you choose a LinkedList instead of an array / ArrayList with a pointer to the current element?
-	// G-J: there's no random access, so I thought linked list would be better
-	// TODO 20140909 J-G: how many elements do you expect this to contain?
-	// actually this class doesn't make much sense, as I've thought there might be >2 elements,
-	// but later I've noticed that in most cases there will be only two elements.
-	// But I'll probably use it also in BlockChain where it'll have 60 elements.
-	// TODO 20140915 J-G: with that small number of elements, i would probably not use a LinkedList :)
-	private final List<E> elements = new LinkedList<>();
+	private final List<E> elements;
 	private final int limit;
 
 	/**
@@ -28,6 +21,7 @@ public class CircularStack<E> implements Iterable<E> {
 	 * @param limit Maximum number of elements on the stack.
 	 */
 	public CircularStack(final int limit) {
+		elements = new ArrayList<>(limit);
 		this.limit = limit;
 	}
 
@@ -38,10 +32,10 @@ public class CircularStack<E> implements Iterable<E> {
 	 */
 	public void shallowCopyTo(final CircularStack<E> destination) {
 		destination.elements.clear();
-		destination.putAll(this);
+		destination.pushAll(this);
 	}
 
-	private void putAll(final CircularStack<E> rhs) {
+	private void pushAll(final CircularStack<E> rhs) {
 		int i = 0;
 		for (final E element : rhs) {
 			if (i >= rhs.size() - this.limit) {
@@ -64,10 +58,6 @@ public class CircularStack<E> implements Iterable<E> {
 		}
 	}
 
-	// TODO 20140909 J-G: since this is a stack, i think push / pop / peek (if needed) are better names
-	// G-J: not sure about pop, as I actually wouldn't like to return popped element, would it still be ok, if it would be void?
-	// TODO 20140915 J-G: i think it's ok if pop doesn't return
-
 	/**
 	 * Gets most recently added element.
 	 *
@@ -80,7 +70,7 @@ public class CircularStack<E> implements Iterable<E> {
 	/**
 	 * Removes most recently added element.
 	 */
-	public void remove() {
+	public void pop() {
 		elements.remove(elements.size() - 1);
 	}
 
