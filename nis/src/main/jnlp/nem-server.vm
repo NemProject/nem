@@ -5,6 +5,8 @@
     <vendor>NEM Community</vendor>
     <homepage href="http://www.ournem.com"/>
     <description>NEM Server</description>
+    <icon href="images/nis_64x64.png"/>
+    <icon kind="shortcut" href="images/nis_32x32.png"/>
   </information>
   <security>
       <all-permissions/>

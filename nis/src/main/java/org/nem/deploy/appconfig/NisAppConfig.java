@@ -6,10 +6,12 @@ import org.nem.core.deploy.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
+import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.*;
+import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -43,6 +45,22 @@ public class NisAppConfig {
 
 	@Autowired
 	private ImportanceTransferDao importanceTransferDao;
+
+	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
+
+	@Bean
+	protected AuditCollection outgoingAudits() {
+		return this.createAuditCollection();
+	}
+
+	@Bean
+	protected AuditCollection incomingAudits() {
+		return this.createAuditCollection();
+	}
+
+	private AuditCollection createAuditCollection() {
+		return new AuditCollection(MAX_AUDIT_HISTORY_SIZE, this.timeProvider());
+	}
 
 	@Bean
 	public DataSource dataSource() throws IOException {
@@ -153,8 +171,23 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public HttpConnectorPool httpConnectorPool() {
+		final CommunicationMode communicationMode = this.nisConfiguration().useBinaryTransport()
+				? CommunicationMode.BINARY
+				: CommunicationMode.JSON;
+		return new HttpConnectorPool(communicationMode, this.outgoingAudits());
+	}
+
+	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		return new NisPeerNetworkHost(this.accountAnalyzer(), this.blockChain(), this.chainServices(), this.nisConfiguration());
+		return new NisPeerNetworkHost(
+				this.accountAnalyzer(),
+				this.blockChain(),
+				this.chainServices(),
+				this.nisConfiguration(),
+				this.httpConnectorPool(),
+				this.incomingAudits(),
+				this.outgoingAudits());
 	}
 
 	@Bean
@@ -174,6 +207,6 @@ public class NisAppConfig {
 
 	@Bean
 	public ChainServices chainServices() {
-		return new ChainServices(this.blockChain());
+		return new ChainServices(this.blockChain(), this.httpConnectorPool());
 	}
 }

@@ -10,7 +10,8 @@ import org.nem.nis.poi.RemoteState;
 import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
-import java.util.Collection;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
 import java.util.logging.Logger;
 
@@ -95,6 +96,7 @@ public class BlockChainValidator {
 			return false;
 		}
 
+		final Set<Hash> chainHashes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
 			block.setPrevious(parentBlock);
@@ -133,10 +135,13 @@ public class BlockChainValidator {
 				}
 
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
-					if (this.transactionExists.test(HashUtils.calculateHash(transaction))) {
+					final Hash hash = HashUtils.calculateHash(transaction);
+					if (this.transactionExists.test(hash) ||
+						chainHashes.contains(hash)) {
 						LOGGER.info("received block with duplicate TX");
 						return false;
 					}
+					chainHashes.add(hash);
 				}
 			}
 

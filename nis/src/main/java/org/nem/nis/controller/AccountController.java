@@ -6,7 +6,8 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.*;
@@ -41,13 +42,13 @@ public class AccountController {
 	/**
 	 * Gets information about an account.
 	 *
-	 * @param nemAddress The account address.
+	 * @param builder The account id builder.
 	 * @return The account information.
 	 */
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
-	public AccountMetaDataPair accountGet(@RequestParam(value = "address") final String nemAddress) {
-		final Address address = this.getAddress(nemAddress);
+	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
 		final AccountInfo account = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(address));
 		return new AccountMetaDataPair(account, metaData);
@@ -125,7 +126,6 @@ public class AccountController {
 		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
-	// TODO-CR J->G: sorry i can't resist having code top-down (so the calling functions are above)
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
 		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
@@ -133,16 +133,15 @@ public class AccountController {
 
 	/**
 	 * Gets unconfirmed transaction information for the specified account.
-	 * TODO: not sure if we should have an AccountPageBuilder here since there isn't paging.
 	 *
-	 * @param builder The page builder.
+	 * @param builder The account id builder.
 	 * @return Information about matching transactions
 	 */
 	@RequestMapping(value = "/account/unconfirmedTransactions", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Transaction> transactionsUnconfirmed(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(page.getAddress()));
+	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(address));
 	}
 
 	/**
@@ -153,19 +152,9 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvestInfo> accountHarvests(final AccountPageBuilder builder) {
-		final AccountPage page = builder.build();
-		// TODO-CR J->G: should we use hash filtering for harvests too?
-		return this.accountIo.getAccountHarvests(page.getAddress(), page.getTimeStamp());
-	}
-
-	private Address getAddress(final String nemAddress) {
-		final Address address = Address.fromEncoded(nemAddress);
-		if (!address.isValid()) {
-			throw new IllegalArgumentException("address is not valid");
-		}
-
-		return address;
+	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
+		final AccountTransactionsPage page = builder.build();
+		return this.accountIo.getAccountHarvests(page.getAddress(), page.getHash());
 	}
 
 	/**

@@ -2,10 +2,15 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
+import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
+import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.peer.connect.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -89,7 +94,7 @@ public class NisPeerNetworkHostTest {
 	}
 
 	@Test
-	public void getVisitorsReturnsSevenTimerVisitors() {
+	public void getVisitorsReturnsEightTimerVisitors() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
@@ -97,7 +102,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(7));
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(8));
 		}
 	}
 
@@ -106,6 +111,17 @@ public class NisPeerNetworkHostTest {
 	}
 
 	private static NisPeerNetworkHost createNetwork() {
-		return new NisPeerNetworkHost(null, null, null, new NisConfiguration());
+		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
+		Mockito.when(accountAnalyzer.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
+
+		final AuditCollection auditCollection = new AuditCollection(10, new SystemTimeProvider());
+		return new NisPeerNetworkHost(
+				accountAnalyzer,
+				null,
+				null,
+				new NisConfiguration(),
+				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
+				auditCollection,
+				auditCollection);
 	}
 }

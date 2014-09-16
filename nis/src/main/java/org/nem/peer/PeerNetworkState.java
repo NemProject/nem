@@ -20,9 +20,6 @@ public class PeerNetworkState {
 	private final Node localNode;
 	private final NodeCollection nodes;
 	private final NodeExperiences nodeExperiences;
-	// TODO-CR 20140909 spelling; also should this be an atomicinteger?
-	// TODO-CR 20100910 BR -> J: Not sure I understand why. Is it really needed in this situation?
-	// TODO-CR 20100910 J-B: the second part was more of a question (i didn't look at all the places that call setChainSynchronized)
 	private final AtomicInteger chainSynchronization = new AtomicInteger(0);
 	private NodeAge nodeAge;
 	private final List<TimeSynchronizationResult> timeSynchronizationResults = new ArrayList<>();

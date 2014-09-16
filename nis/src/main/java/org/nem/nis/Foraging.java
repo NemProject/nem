@@ -183,11 +183,6 @@ public class Foraging {
 	}
 
 	private boolean matchAddress(final Transaction transaction, final Address address) {
-		// TODO-CR: J->BR (reformatting) it's kind of unreadable having everything on a single line
-		// 08072014: BR -> J I agree, but it seems eclipse does not enforce this rule.
-		//                   Even worse, even if I format manually it reverts my changes :/
-		//                   I need to turn the formatter off here.
-		// TODO-CR: J->BR were you able to get intellij formatting working?
 		// @formatter:off
 		return (transaction.getSigner().getAddress().equals(address) ||
 				(transaction.getType() == TransactionTypes.TRANSFER &&
