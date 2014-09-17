@@ -203,6 +203,6 @@ public class NisAppConfig {
 
 	@Bean
 	public ChainServices chainServices() {
-		return new ChainServices(this.blockChain(), this.httpConnectorPool());
+		return new ChainServices(this.blockChainLastBlockLayer, this.httpConnectorPool());
 	}
 }

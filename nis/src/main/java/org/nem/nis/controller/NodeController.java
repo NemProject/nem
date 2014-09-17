@@ -1,11 +1,13 @@
 package org.nem.nis.controller;
 
 import org.nem.core.deploy.CommonStarter;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.nem.peer.trust.score.*;
@@ -21,10 +23,12 @@ import java.util.*;
 @RestController
 public class NodeController {
 	private final NisPeerNetworkHost host;
+	private final ChainServices chainServices;
 
 	@Autowired(required = true)
-	NodeController(final NisPeerNetworkHost host) {
+	NodeController(final NisPeerNetworkHost host, final ChainServices chainServices) {
 		this.host = host;
+		this.chainServices = chainServices;
 	}
 
 	//region getInfo / getExtendedInfo
@@ -185,4 +189,16 @@ public class NodeController {
 		final Node localNode = new LocalNodeDeserializer().deserialize(deserializer);
 		this.host.boot(localNode);
 	}
+
+
+	//region activePeersMaxChainHeight
+
+	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)
+	@PublicApi
+	public BlockHeight activePeersMaxChainHeight() {
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return this.chainServices.getMaxChainHeightAsync(localNode).join();
+	}
+
+	//endregion
 }

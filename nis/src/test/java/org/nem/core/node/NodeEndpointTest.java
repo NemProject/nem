@@ -55,6 +55,7 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, "chain/hashes-from");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, "chain/last-block");
 		apiIdToPathMap.put(NodeApiId.REST_CHAIN_SCORE, "chain/score");
+		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HEIGHT, "chain/height");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_CAN_YOU_SEE_ME, "node/cysm");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_EXTENDED_INFO, "node/extended-info");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_INFO, "node/info");

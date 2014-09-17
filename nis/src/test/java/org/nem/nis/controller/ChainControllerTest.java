@@ -138,6 +138,51 @@ public class ChainControllerTest {
 
 	//endregion
 
+	//region chainScore
+
+	@Test
+	public void chainHeightReturnsHeight() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		runChainHeightTest(context, c -> c.controller.chainHeight(), s -> s);
+	}
+
+	@Test
+	public void chainHeightAuthenticatedReturnsHeight() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		// Assert:
+		final AuthenticatedResponse<?> response = runChainHeightTest(
+				context,
+				c -> c.controller.chainHeight(challenge),
+				r -> r.getEntity(localNode.getIdentity(), challenge));
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	private static <T> T runChainHeightTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, BlockHeight> getChainHeight) {
+		// Arrange:
+		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1234L);
+
+		// Act:
+		final T result = action.apply(context);
+		final BlockHeight height = getChainHeight.apply(result);
+
+		// Assert:
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(1234L)));
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+		return result;
+	}
+
+	//endregion
+
 	private static class TestContext {
 		private final RequiredBlockDao blockDao = Mockito.mock(RequiredBlockDao.class);
 		private final AccountLookup accountLookup = new MockAccountLookup();

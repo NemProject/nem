@@ -113,6 +113,7 @@ public class NodeEndpoint implements SerializableEntity {
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, new URL(this.url, "chain/hashes-from"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, new URL(this.url, "chain/last-block"));
 			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_SCORE, new URL(this.url, "chain/score"));
+			nodeApiToUrlMap.put(NodeApiId.REST_CHAIN_HEIGHT, new URL(this.url, "chain/height"));
 			nodeApiToUrlMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, new URL(this.url, "transactions/unconfirmed"));
 			nodeApiToUrlMap.put(NodeApiId.REST_NODE_CAN_YOU_SEE_ME, new URL(this.url, "node/cysm"));
 			nodeApiToUrlMap.put(NodeApiId.REST_NODE_EXTENDED_INFO, new URL(this.url, "node/extended-info"));

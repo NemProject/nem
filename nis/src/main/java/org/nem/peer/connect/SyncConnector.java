@@ -81,5 +81,13 @@ public interface SyncConnector {
 	 */
 	public CompletableFuture<BlockChainScore> getChainScoreAsync(final Node node);
 
+	/**
+	 * Requests information about the block height of the remote chain.
+	 *
+	 * @param node The remote node.
+	 * @return The completable future containing the block height of the remote chain.
+	 */
+	public CompletableFuture<BlockHeight> getChainHeightAsync(final Node node);
+
 	// endregion
 }
