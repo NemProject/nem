@@ -197,7 +197,8 @@ public class NodeController {
 	@PublicApi
 	public BlockHeight activePeersMaxChainHeight() {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return this.chainServices.getMaxChainHeightAsync(localNode).join();
+		final BlockHeight height = this.chainServices.getMaxChainHeightAsync(localNode).join();
+		return height;
 	}
 
 	//endregion

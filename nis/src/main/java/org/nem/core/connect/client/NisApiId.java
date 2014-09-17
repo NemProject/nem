@@ -69,7 +69,7 @@ public enum NisApiId {
 	/**
 	 * The chain/height API.
 	 */
-	REST_CHAIN_HEIGHT("/chain/height"),
+	NIS_REST_CHAIN_HEIGHT("/chain/height"),
 
 	//endregion
 
