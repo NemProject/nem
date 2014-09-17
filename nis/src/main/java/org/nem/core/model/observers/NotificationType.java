@@ -23,5 +23,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents an importance transfer.
 	 */
-	ImportanceTransfer
+	ImportanceTransfer,
+
+	/**
+	 * The notification represents the announcement of a potentially new account.
+	 */
+	Account
 }

@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 public class TransactionObserverToTransferObserverAdapterTest {
 
 	@Test
-	public void notifyTransferIsForwardedAsBalanceTransferNotifications() {
+	public void notifyTransferIsForwardedAsAccountAndBalanceTransferNotifications() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -23,17 +23,24 @@ public class TransactionObserverToTransferObserverAdapterTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 
-		final BalanceTransferNotification notification = (BalanceTransferNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
-		Assert.assertThat(notification.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		{
+			final AccountNotification notification = (AccountNotification)notificationCaptor.getAllValues().get(0);
+			Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.Account));
+			Assert.assertThat(notification.getAccount(), IsEqual.equalTo(recipient));
+		}
+		{
+			final BalanceTransferNotification notification = (BalanceTransferNotification)notificationCaptor.getAllValues().get(1);
+			Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
+			Assert.assertThat(notification.getSender(), IsEqual.equalTo(sender));
+			Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(recipient));
+			Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		}
 	}
 
 	@Test
-	public void notifyCreditIsForwardedAsBalanceCreditNotifications() {
+	public void notifyCreditIsForwardedAsAccountAndBalanceCreditNotifications() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(444);
@@ -45,12 +52,19 @@ public class TransactionObserverToTransferObserverAdapterTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 
-		final BalanceAdjustmentNotification notification = (BalanceAdjustmentNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
-		Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
-		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		{
+			final AccountNotification notification = (AccountNotification)notificationCaptor.getAllValues().get(0);
+			Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.Account));
+			Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
+		}
+		{
+			final BalanceAdjustmentNotification notification = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(1);
+			Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
+			Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
+			Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		}
 	}
 
 	@Test

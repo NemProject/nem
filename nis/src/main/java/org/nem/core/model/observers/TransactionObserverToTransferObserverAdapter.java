@@ -22,11 +22,13 @@ public class TransactionObserverToTransferObserverAdapter implements TransferObs
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+		this.observer.notify(new AccountNotification(recipient));
 		this.observer.notify(new BalanceTransferNotification(sender, recipient, amount));
 	}
 
 	@Override
 	public void notifyCredit(final Account account, final Amount amount) {
+		this.observer.notify(new AccountNotification(account));
 		this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
 	}
 
