@@ -109,7 +109,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Executes the transaction.
 	 */
 	public final void execute() {
-		this.execute(new BalanceCommitTransferObserver());
+		this.execute(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
 		this.executeCommit();
 	}
 
@@ -118,7 +118,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The observer to use.
 	 */
-	public final void execute(final TransferObserver observer) {
+	public final void execute(final TransactionObserver observer) {
 		this.transfer(observer);
 	}
 
@@ -131,7 +131,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Undoes the transaction.
 	 */
 	public final void undo() {
-		this.undo(new BalanceCommitTransferObserver());
+		this.undo(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
 		this.undoCommit();
 	}
 
@@ -140,9 +140,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The observer to use.
 	 */
-	public final void undo(final TransferObserver observer) {
-		final ReverseTransferObserver reverseObserver = new ReverseTransferObserver(observer);
-		this.transfer(reverseObserver);
+	public final void undo(final TransactionObserver observer) {
+		final ReverseTransferObserver reverseObserver = new ReverseTransferObserver(new TransactionObserverToTransferObserverAdapter(observer));
+		this.transfer(new TransferObserverToTransactionObserverAdapter(reverseObserver));
 		reverseObserver.commit();
 	}
 
@@ -156,7 +156,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The transfer observer.
 	 */
-	protected abstract void transfer(final TransferObserver observer);
+	protected abstract void transfer(final TransactionObserver observer);
 
 	/**
 	 * Determines if this transaction is valid using a custom can-debit predicate.
@@ -203,7 +203,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Amount getMinimumFee();
 
-	private static class ReverseTransferObserver extends TransactionObserverToTransferObserverAdapter {
+	private static class ReverseTransferObserver implements TransferObserver {
 
 		private final TransferObserver observer;
 		private final List<PendingTransfer> pendingTransfers = new ArrayList<>();

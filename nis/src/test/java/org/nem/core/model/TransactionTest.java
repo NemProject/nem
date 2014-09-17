@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
@@ -228,7 +228,7 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
+		transaction.execute(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
@@ -254,7 +254,7 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
+		transaction.execute(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));

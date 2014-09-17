@@ -20,7 +20,7 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
-	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
+	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(new UnconfirmedTransactionsTransferObserver());
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -194,7 +194,7 @@ public class UnconfirmedTransactions {
 				.forEach(obj -> this.remove(obj));
 	}
 
-	private class UnconfirmedTransactionsTransferObserver extends TransactionObserverToTransferObserverAdapter {
+	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 			this.notifyDebit(sender, amount);

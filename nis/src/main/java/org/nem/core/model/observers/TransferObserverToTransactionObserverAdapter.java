@@ -1,36 +1,47 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
-
 /**
- * An observer that implements TransferObserver by forwarding all transfer notifications
- * to the wrapped TransactionObserver implementation.
+ * An observer that implements TransactionObserver by forwarding all transfer notifications
+ * to the wrapped TransferObserver implementation.
  */
-public class TransferObserverToTransactionObserverAdapter implements TransferObserver {
-	private final TransactionObserver observer;
+public class TransferObserverToTransactionObserverAdapter implements TransactionObserver {
+	private final TransferObserver observer;
 
 	/**
 	 * Creates a new adapter.
 	 *
-	 * @param observer The wrapped transaction observer.
+	 * @param observer The wrapped transfer observer.
 	 */
-	public TransferObserverToTransactionObserverAdapter(final TransactionObserver observer) {
+	public TransferObserverToTransactionObserverAdapter(final TransferObserver observer) {
 		this.observer = observer;
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-		this.observer.notify(new BalanceTransferNotification(sender, recipient, amount));
+	public final void notify(final Notification notification) {
+		switch (notification.getType()) {
+			case BalanceTransfer:
+				this.notifyTransfer((BalanceTransferNotification)notification);
+				break;
+
+			case BalanceCredit:
+				this.notifyCredit((BalanceAdjustmentNotification)notification);
+				break;
+
+			case BalanceDebit:
+				this.notifyDebit((BalanceAdjustmentNotification)notification);
+				break;
+		}
 	}
 
-	@Override
-	public void notifyCredit(final Account account, final Amount amount) {
-		this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
+	private void notifyTransfer(final BalanceTransferNotification notification) {
+		this.observer.notifyTransfer(notification.getSender(), notification.getRecipient(), notification.getAmount());
 	}
 
-	@Override
-	public void notifyDebit(final Account account, final Amount amount) {
-		this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount));
+	private void notifyCredit(final BalanceAdjustmentNotification notification) {
+		this.observer.notifyCredit(notification.getAccount(), notification.getAmount());
+	}
+
+	private void notifyDebit(final BalanceAdjustmentNotification notification) {
+		this.observer.notifyDebit(notification.getAccount(), notification.getAmount());
 	}
 }

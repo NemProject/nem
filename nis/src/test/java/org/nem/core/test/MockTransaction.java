@@ -1,7 +1,7 @@
 package org.nem.core.test;
 
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -218,8 +218,8 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer) {
-		this.transferAction.accept(observer);
+	protected void transfer(final TransactionObserver observer) {
+		this.transferAction.accept(new TransactionObserverToTransferObserverAdapter(observer));
 		++this.numTransferCalls;
 	}
 }

@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class BlockExecutor {
 
 		for (final Transaction transaction : block.getTransactions()) {
 			transaction.execute();
-			transaction.execute(observer);
+			transaction.execute(new TransferObserverToTransactionObserverAdapter(observer));
 		}
 
 		final Account signer = block.getSigner();
@@ -106,7 +106,7 @@ public class BlockExecutor {
 		signer.decrementBalance(block.getTotalFee());
 
 		for (final Transaction transaction : getReverseTransactions(block)) {
-			transaction.undo(observer);
+			transaction.undo(new TransferObserverToTransactionObserverAdapter(observer));
 			transaction.undo();
 		}
 	}
