@@ -2,13 +2,16 @@ package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class TransactionTest {
 
@@ -254,11 +257,60 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute(Mockito.mock(TransactionObserver.class));
+		transaction.undo(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void executeExposesAllDerivedClassNotificationsInOrder() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		transaction.setTransactionAction(o -> {
+			o.notify(new Notification(NotificationType.BalanceTransfer) { });
+			o.notify(new Notification(NotificationType.ImportanceTransfer) { });
+			o.notify(new Notification(NotificationType.BalanceDebit) { });
+		});
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceTransfer, NotificationType.ImportanceTransfer, NotificationType.BalanceDebit)));
+	}
+
+	@Test
+	public void undoExposesAllDerivedClassNotificationsInReverseOrder() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		final Amount amount = Amount.fromNem(12345);
+		transaction.setTransactionAction(o -> {
+			o.notify(new BalanceTransferNotification(account1, account2, amount) { });
+			o.notify(new Notification(NotificationType.ImportanceTransfer) { });
+			o.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) { });
+		});
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
 	}
 
 	@Test
