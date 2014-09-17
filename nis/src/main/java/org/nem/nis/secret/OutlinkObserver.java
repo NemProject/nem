@@ -1,7 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.*;
 
@@ -10,7 +10,7 @@ import java.math.BigInteger;
 /**
  * A transfer observer that updates outlink information.
  */
-public class OutlinkObserver extends TransferObserver {
+public class OutlinkObserver extends TransactionObserverToTransferObserverAdapter {
 	private final PoiFacade poiFacade;
 	private final BlockHeight height;
 	private final boolean isExecute;

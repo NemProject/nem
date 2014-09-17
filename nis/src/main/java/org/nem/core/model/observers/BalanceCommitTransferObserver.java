@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 /**
  * Transfer observer that commits balance changes to the underlying accounts.
  */
-public class BalanceCommitTransferObserver extends TransferObserver {
+public class BalanceCommitTransferObserver extends TransactionObserverToTransferObserverAdapter {
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {

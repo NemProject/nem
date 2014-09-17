@@ -1,7 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * An adapter from an aggregate BlockTransferObserver to a TransferObserver.
  */
-public class AggregateBlockTransferObserverToTransferObserverAdapter extends TransferObserver {
+public class AggregateBlockTransferObserverToTransferObserverAdapter extends TransactionObserverToTransferObserverAdapter {
 
 	private final List<BlockTransferObserver> blockTransferObservers;
 	private final BlockHeight height;

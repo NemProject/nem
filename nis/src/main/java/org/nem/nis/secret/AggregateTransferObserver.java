@@ -1,7 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * An aggregate transfer observer.
  */
-public class AggregateTransferObserver extends TransferObserver {
+public class AggregateTransferObserver extends TransactionObserverToTransferObserverAdapter {
 
 	private final List<TransferObserver> transferObservers;
 

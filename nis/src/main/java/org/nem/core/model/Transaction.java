@@ -203,7 +203,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Amount getMinimumFee();
 
-	private static class ReverseTransferObserver extends TransferObserver {
+	private static class ReverseTransferObserver extends TransactionObserverToTransferObserverAdapter {
 
 		private final TransferObserver observer;
 		private final List<PendingTransfer> pendingTransfers = new ArrayList<>();

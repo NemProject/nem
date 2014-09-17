@@ -6,7 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 
-public class TransferObserverTest {
+public class TransactionObserverToTransferObserverAdapterTest {
 
 	@Test
 	public void notifyTransferIsForwardedBalanceTransferNotifications() {
@@ -17,7 +17,7 @@ public class TransferObserverTest {
 		final BalanceTransferNotification notification = new BalanceTransferNotification(sender, recipient, amount);
 
 		// Act:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		final TransactionObserverToTransferObserverAdapter observer = Mockito.mock(TransactionObserverToTransferObserverAdapter.class);
 		observer.notify(notification);
 
 		// Assert:
@@ -34,7 +34,7 @@ public class TransferObserverTest {
 		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount);
 
 		// Act:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		final TransactionObserverToTransferObserverAdapter observer = Mockito.mock(TransactionObserverToTransferObserverAdapter.class);
 		observer.notify(notification);
 
 		// Assert:
@@ -52,7 +52,7 @@ public class TransferObserverTest {
 		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount);
 
 		// Act:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		final TransactionObserverToTransferObserverAdapter observer = Mockito.mock(TransactionObserverToTransferObserverAdapter.class);
 		observer.notify(notification);
 
 		// Assert:
@@ -69,7 +69,7 @@ public class TransferObserverTest {
 		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.ImportanceTransfer, account, amount);
 
 		// Act:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		final TransactionObserverToTransferObserverAdapter observer = Mockito.mock(TransactionObserverToTransferObserverAdapter.class);
 		observer.notify(notification);
 
 		// Assert:

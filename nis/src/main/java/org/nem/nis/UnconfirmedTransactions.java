@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 
@@ -194,7 +194,7 @@ public class UnconfirmedTransactions {
 				.forEach(obj -> this.remove(obj));
 	}
 
-	private class UnconfirmedTransactionsTransferObserver extends TransferObserver {
+	private class UnconfirmedTransactionsTransferObserver extends TransactionObserverToTransferObserverAdapter {
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 			this.notifyDebit(sender, amount);
