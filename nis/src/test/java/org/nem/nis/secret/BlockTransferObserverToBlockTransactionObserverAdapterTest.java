@@ -1,14 +1,11 @@
 package org.nem.nis.secret;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-import java.util.*;
 
 public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 

@@ -1,6 +1,6 @@
 package org.nem.nis.controller.requests;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;

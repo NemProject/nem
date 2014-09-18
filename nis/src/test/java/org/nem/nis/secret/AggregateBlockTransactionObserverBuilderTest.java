@@ -1,6 +1,5 @@
 package org.nem.nis.secret;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.observers.*;

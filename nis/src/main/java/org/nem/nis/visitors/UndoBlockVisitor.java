@@ -1,7 +1,7 @@
 package org.nem.nis.visitors;
 
 import org.nem.core.model.Block;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.service.BlockExecutor;
 
 /**

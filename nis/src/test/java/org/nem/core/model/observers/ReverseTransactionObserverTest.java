@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -22,9 +22,12 @@ public class ReverseTransactionObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) { });
-		reverseObserver.notify(new Notification(NotificationType.ImportanceTransfer) { });
-		reverseObserver.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) { });
+		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) {
+		});
+		reverseObserver.notify(new Notification(NotificationType.ImportanceTransfer) {
+		});
+		reverseObserver.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) {
+		});
 		reverseObserver.commit();
 
 		// Assert:
@@ -45,7 +48,8 @@ public class ReverseTransactionObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) { });
+		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) {
+		});
 		reverseObserver.commit();
 
 		// Assert:
@@ -79,7 +83,8 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceAdjustmentNotification(originalType, account, amount) { });
+		reverseObserver.notify(new BalanceAdjustmentNotification(originalType, account, amount) {
+		});
 		reverseObserver.commit();
 
 		// Assert:
@@ -101,7 +106,8 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
-		reverseObserver.notify(new ImportanceTransferNotification(account1, account2) { });
+		reverseObserver.notify(new ImportanceTransferNotification(account1, account2) {
+		});
 		reverseObserver.commit();
 
 		// Assert:

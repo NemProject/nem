@@ -376,7 +376,8 @@ public class Network {
 		for (final TimeAwareNode partner : partners) {
 			final int roundTripTime = this.random.nextInt(1000);
 			final NetworkTimeStamp localSend = node.getNetworkTime();
-			final NetworkTimeStamp localReceive = new NetworkTimeStamp(node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
+			final NetworkTimeStamp localReceive = new NetworkTimeStamp(
+					node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
 			samples.add(new TimeSynchronizationSample(
 					partner.getNode(),
 					new CommunicationTimeStamps(localSend, localReceive),

@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -318,7 +318,6 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	//endregion
-
 
 	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
 		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);

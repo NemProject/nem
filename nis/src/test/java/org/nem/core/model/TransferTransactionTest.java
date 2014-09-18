@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.*;
-import org.nem.core.model.observers.*;
+import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;

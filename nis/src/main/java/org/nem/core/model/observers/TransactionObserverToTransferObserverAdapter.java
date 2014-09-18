@@ -35,4 +35,5 @@ public class TransactionObserverToTransferObserverAdapter implements TransferObs
 	@Override
 	public void notifyDebit(final Account account, final Amount amount) {
 		this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount));
-	}}
+	}
+}

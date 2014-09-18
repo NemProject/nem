@@ -13,7 +13,8 @@ public class BlockTransactionObserverToTransactionObserverAdapterTest {
 		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 		final BlockNotificationContext context = new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute);
 		final TransactionObserver adapter = new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
-		final Notification notification = new Notification(NotificationType.BalanceCredit) { };
+		final Notification notification = new Notification(NotificationType.BalanceCredit) {
+		};
 
 		// Act:
 		adapter.notify(notification);

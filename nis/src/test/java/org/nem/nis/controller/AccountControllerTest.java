@@ -213,7 +213,6 @@ public class AccountControllerTest {
 				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.foraging, Mockito.times(1)).getUnconfirmedTransactions(address);
-
 	}
 
 	//endregion

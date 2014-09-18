@@ -270,9 +270,12 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		transaction.setTransactionAction(o -> {
-			o.notify(new Notification(NotificationType.BalanceTransfer) { });
-			o.notify(new Notification(NotificationType.ImportanceTransfer) { });
-			o.notify(new Notification(NotificationType.BalanceDebit) { });
+			o.notify(new Notification(NotificationType.BalanceTransfer) {
+			});
+			o.notify(new Notification(NotificationType.ImportanceTransfer) {
+			});
+			o.notify(new Notification(NotificationType.BalanceDebit) {
+			});
 		});
 
 		// Act:
@@ -296,9 +299,12 @@ public class TransactionTest {
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
 		transaction.setTransactionAction(o -> {
-			o.notify(new BalanceTransferNotification(account1, account2, amount) { });
-			o.notify(new Notification(NotificationType.ImportanceTransfer) { });
-			o.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) { });
+			o.notify(new BalanceTransferNotification(account1, account2, amount) {
+			});
+			o.notify(new Notification(NotificationType.ImportanceTransfer) {
+			});
+			o.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) {
+			});
 		});
 
 		// Act:
