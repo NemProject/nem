@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.observers.TransferObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.*;
 

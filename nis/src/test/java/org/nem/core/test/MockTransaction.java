@@ -1,6 +1,7 @@
 package org.nem.core.test;
 
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -23,7 +24,7 @@ public class MockTransaction extends Transaction {
 
 	private List<Integer> executeList = new ArrayList<>();
 	private List<Integer> undoList = new ArrayList<>();
-	private Consumer<TransferObserver> transferAction = to -> { };
+	private Consumer<TransactionObserver> transferAction = to -> { };
 
 	private int numExecuteCommitCalls;
 	private int numUndoCommitCalls;
@@ -189,6 +190,15 @@ public class MockTransaction extends Transaction {
 	 * @param transferAction The action.
 	 */
 	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
+		this.transferAction = o -> transferAction.accept(new TransactionObserverToTransferObserverAdapter(o));
+	}
+
+	/**
+	 * Sets an action that should be executed when transfer is called.
+	 *
+	 * @param transferAction The action.
+	 */
+	public void setTransactionAction(final Consumer<TransactionObserver> transferAction) {
 		this.transferAction = transferAction;
 	}
 
@@ -230,7 +240,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer) {
+	protected void transfer(final TransactionObserver observer) {
 		this.transferAction.accept(observer);
 		++this.numTransferCalls;
 	}

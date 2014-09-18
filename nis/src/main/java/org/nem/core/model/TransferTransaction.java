@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.messages.MessageFactory;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -138,8 +139,9 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer) {
-		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		observer.notifyDebit(this.getSigner(), this.getFee());
+	protected void transfer(final TransactionObserver observer) {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
+		transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

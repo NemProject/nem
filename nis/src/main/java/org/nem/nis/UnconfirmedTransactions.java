@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.ImportanceTransfer;
@@ -21,7 +22,7 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
-	private final TransferObserver transferObserver = new UnconfirmedTransactionsTransferObserver();
+	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(new UnconfirmedTransactionsTransferObserver());
 
 	/**
 	 * Gets the number of unconfirmed transactions.

@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
-import org.nem.nis.AccountCache;
+import org.nem.core.model.observers.*;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
@@ -48,7 +48,7 @@ public class BlockExecutor {
 	 * @param block The block.
 	 * @param observer The observer.
 	 */
-	public void execute(final Block block, final BlockTransferObserver observer) {
+	public void execute(final Block block, final BlockTransactionObserver observer) {
 		this.execute(block, Arrays.asList(observer));
 	}
 
@@ -58,8 +58,8 @@ public class BlockExecutor {
 	 * @param block The block.
 	 * @param observers The observers.
 	 */
-	public void execute(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = this.createTransferObserver(block, true, observers);
+	public void execute(final Block block, final Collection<BlockTransactionObserver> observers) {
+		final TransactionObserver observer = this.createTransferObserver(block, true, observers);
 
 		for (final Transaction transaction : block.getTransactions()) {
 			transaction.execute();
@@ -86,6 +86,7 @@ public class BlockExecutor {
 		endowed.incrementForagedBlocks();
 		endowed.incrementBalance(block.getTotalFee());
 		observer.notifyCredit(endowed, block.getTotalFee());
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, block.getSigner(), block.getTotalFee()));
 	}
 
 	//endregion
@@ -107,7 +108,7 @@ public class BlockExecutor {
 	 * @param block The block.
 	 * @param observer The observer.
 	 */
-	public void undo(final Block block, final BlockTransferObserver observer) {
+	public void undo(final Block block, final BlockTransactionObserver observer) {
 		this.undo(block, Arrays.asList(observer));
 	}
 
@@ -117,11 +118,11 @@ public class BlockExecutor {
 	 * @param block The block.
 	 * @param observers The observers.
 	 */
-	public void undo(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = this.createTransferObserver(block, false, observers);
+	public void undo(final Block block, final Collection<BlockTransactionObserver> observers) {
+		final TransactionObserver observer = this.createTransferObserver(block, false, observers);
 
 		final Account signer = block.getSigner();
-		observer.notifyDebit(block.getSigner(), block.getTotalFee());
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, block.getSigner(), block.getTotalFee()));
 		signer.decrementForagedBlocks();
 		signer.decrementBalance(block.getTotalFee());
 
@@ -150,29 +151,31 @@ public class BlockExecutor {
 			final boolean isExecute) {
 
 		return new RemoteObserver(this.poiFacade, block.getHeight(), isExecute);
-
 	}
-	private TransferObserver createTransferObserver(
+	
+	private TransactionObserver createTransferObserver(
 			final Block block,
 			final boolean isExecute,
-			final Collection<BlockTransferObserver> observers) {
-		final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
-		blockTransferObservers.add(new WeightedBalancesObserver(this.poiFacade));
-		blockTransferObservers.addAll(observers);
+			final Collection<BlockTransactionObserver> observers) {
+		final AggregateBlockTransactionObserverBuilder btoBuilder = new AggregateBlockTransactionObserverBuilder();
+		btoBuilder.add(new WeightedBalancesObserver(this.poiFacade));
+		observers.forEach(obj -> btoBuilder.add((obj)));
 
-		final TransferObserver aggregateObserver = new AggregateBlockTransferObserverToTransferObserverAdapter(
-				blockTransferObservers,
-				block.getHeight(),
-				isExecute);
-		final TransferObserver outlinkObserver = new OutlinkObserver(this.poiFacade, block.getHeight(), isExecute);
+		final TransactionObserver aggregateObserver = new BlockTransactionObserverToTransactionObserverAdapter(
+				btoBuilder.build(),
+				new BlockNotificationContext(block.getHeight(), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+		final TransactionObserver outlinkObserver = new TransferObserverToTransactionObserverAdapter(
+				new OutlinkObserver(this.poiFacade, block.getHeight(), isExecute));
 
 		// in an undo operation, the OutlinkObserver should be run before the balance is updated
 		// (so that the matching link can be found and removed)
-		final List<TransferObserver> transferObservers = Arrays.asList(aggregateObserver, outlinkObserver);
+		final List<TransactionObserver> transactionObservers = Arrays.asList(aggregateObserver, outlinkObserver);
 		if (!isExecute) {
-			Collections.reverse(transferObservers);
+			Collections.reverse(transactionObservers);
 		}
 
-		return new AggregateTransferObserver(transferObservers);
+		final AggregateTransactionObserverBuilder toBuilder = new AggregateTransactionObserverBuilder();
+		transactionObservers.forEach(obj -> toBuilder.add(obj));
+		return toBuilder.build();
 	}
 }

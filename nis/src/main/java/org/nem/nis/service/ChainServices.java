@@ -3,7 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.node.Node;
 import org.nem.nis.BlockChain;
-import org.nem.peer.connect.*;
+import org.nem.peer.connect.HttpConnectorPool;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

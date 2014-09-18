@@ -1,14 +1,15 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.secret.BlockTransferObserver;
+import org.nem.nis.secret.*;
 
 /**
- * A BlockTransferObserver implementation that updates account heights.
+ * A BlockTransactionObserver implementation that updates account heights.
  */
-public class AccountsHeightObserver implements BlockTransferObserver {
+public class AccountsHeightObserver implements BlockTransactionObserver {
 	final AccountAnalyzer accountAnalyzer;
 
 	/**
@@ -21,23 +22,17 @@ public class AccountsHeightObserver implements BlockTransferObserver {
 	}
 
 	@Override
-	public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
-		// no need to do anything here
-	}
+	public void notify(final Notification notification, final BlockNotificationContext context) {
+		if (NotificationType.Account != notification.getType()) {
+			return;
+		}
 
-	@Override
-	public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-		this.addToAccountAnalyzer(height, account);
-	}
-
-	@Override
-	public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
-		// no need to do anything here
-	}
-
-	@Override
-	public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-		this.tryRemoveFromAccountAnalyzer(account);
+		final Account account = ((AccountNotification)(notification)).getAccount();
+		if (NotificationTrigger.Execute == context.getTrigger()) {
+			this.addToAccountAnalyzer(context.getHeight(), account);
+		} else {
+			this.tryRemoveFromAccountAnalyzer(account);
+		}
 	}
 
 	private void addToAccountAnalyzer(final BlockHeight height, final Account account) {

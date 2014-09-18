@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.*;
+import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -390,7 +391,7 @@ public class TransferTransactionTest {
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
+		transaction.execute(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
@@ -500,7 +501,7 @@ public class TransferTransactionTest {
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.undo(Mockito.mock(TransferObserver.class));
+		transaction.undo(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));

@@ -10,6 +10,7 @@ import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BlockExecutorTest {
 
@@ -199,10 +200,13 @@ public class BlockExecutorTest {
 		final Block block = context.createBlockWithTransaction(height, Amount.fromNem(7), transaction);
 
 		// Act:
-		if (1 == observers.size()) {
-			context.executor.execute(block, observers.get(0));
+		final List<BlockTransactionObserver> transactionObservers = observers.stream()
+				.map(BlockTransferObserverToBlockTransactionObserverAdapter::new)
+				.collect(Collectors.toList());
+		if (1 == transactionObservers.size()) {
+			context.executor.execute(block, transactionObservers.get(0));
 		} else {
-			context.executor.execute(block, observers);
+			context.executor.execute(block, transactionObservers);
 		}
 
 		// Assert:
@@ -241,7 +245,14 @@ public class BlockExecutorTest {
 		context.executor.execute(block);
 
 		// Act:
-		context.executor.undo(block, observers);
+		final List<BlockTransactionObserver> transactionObservers = observers.stream()
+				.map(BlockTransferObserverToBlockTransactionObserverAdapter::new)
+				.collect(Collectors.toList());
+		if (1 == transactionObservers.size()) {
+			context.executor.undo(block, transactionObservers.get(0));
+		} else {
+			context.executor.undo(block, transactionObservers);
+		}
 
 		// Assert:
 		Assert.assertThat(!observers.isEmpty(), IsEqual.equalTo(true));
@@ -385,7 +396,7 @@ public class BlockExecutorTest {
 		};
 
 		// Act:
-		context.executor.execute(block, Arrays.asList(observer));
+		context.executor.execute(block, new BlockTransferObserverToBlockTransactionObserverAdapter(observer));
 
 		// Assert:
 		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));
@@ -424,8 +435,8 @@ public class BlockExecutorTest {
 		};
 
 		// Act:
-		context.executor.execute(block, Arrays.asList(observer));
-		context.executor.undo(block, Arrays.asList(observer));
+		context.executor.execute(block, new BlockTransferObserverToBlockTransactionObserverAdapter(observer));
+		context.executor.undo(block, new BlockTransferObserverToBlockTransactionObserverAdapter(observer));
 
 		// Assert:
 		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));

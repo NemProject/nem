@@ -1,17 +1,16 @@
 package org.nem.core.model;
 
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
 import java.util.function.BiPredicate;
 
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
-
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
 
@@ -109,7 +108,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Executes the transaction.
 	 */
 	public final void execute() {
-		this.execute(new CommitTransferObserver());
+		this.execute(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
 		this.executeCommit();
 	}
 
@@ -118,7 +117,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The observer to use.
 	 */
-	public final void execute(final TransferObserver observer) {
+	public final void execute(final TransactionObserver observer) {
 		this.transfer(observer);
 	}
 
@@ -131,7 +130,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Undoes the transaction.
 	 */
 	public final void undo() {
-		this.undo(new CommitTransferObserver());
+		this.undo(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
 		this.undoCommit();
 	}
 
@@ -140,8 +139,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The observer to use.
 	 */
-	public final void undo(final TransferObserver observer) {
-		final ReverseTransferObserver reverseObserver = new ReverseTransferObserver(observer);
+	public final void undo(final TransactionObserver observer) {
+		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
 		this.transfer(reverseObserver);
 		reverseObserver.commit();
 	}
@@ -156,7 +155,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @param observer The transfer observer.
 	 */
-	protected abstract void transfer(final TransferObserver observer);
+	protected abstract void transfer(final TransactionObserver observer);
 
 	/**
 	 * Determines if this transaction is valid using a custom can-debit predicate.
@@ -202,95 +201,4 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The minimum fee.
 	 */
 	protected abstract Amount getMinimumFee();
-
-	private static class ReverseTransferObserver implements TransferObserver {
-
-		private final TransferObserver observer;
-		private final List<PendingTransfer> pendingTransfers = new ArrayList<>();
-
-		private enum PendingTransferType {
-			TRANSFER,
-			CREDIT,
-			DEBIT
-		}
-
-		private static class PendingTransfer {
-			private final PendingTransferType type;
-			private final Account sender;
-			private final Account recipient;
-			private final Amount amount;
-
-			public PendingTransfer(
-					final PendingTransferType type,
-					final Account sender,
-					final Account recipient,
-					final Amount amount) {
-				this.type = type;
-				this.sender = sender;
-				this.recipient = recipient;
-				this.amount = amount;
-			}
-
-			public void commit(final TransferObserver observer) {
-				switch (this.type) {
-					case TRANSFER:
-						observer.notifyTransfer(this.sender, this.recipient, this.amount);
-						break;
-
-					case CREDIT:
-						observer.notifyCredit(this.sender, this.amount);
-						break;
-
-					case DEBIT:
-						observer.notifyDebit(this.sender, this.amount);
-						break;
-				}
-			}
-		}
-
-		public ReverseTransferObserver(final TransferObserver observer) {
-			this.observer = observer;
-		}
-
-		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.TRANSFER, recipient, sender, amount));
-		}
-
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
-			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.DEBIT, account, null, amount));
-		}
-
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
-			this.pendingTransfers.add(new PendingTransfer(PendingTransferType.CREDIT, account, null, amount));
-		}
-
-		public void commit() {
-			// apply the transfers in reverse order because order might be important for some observers
-			for (int i = this.pendingTransfers.size() - 1; i >= 0; --i) {
-				this.pendingTransfers.get(i).commit(this.observer);
-			}
-		}
-	}
-
-	private static class CommitTransferObserver implements TransferObserver {
-
-		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.notifyDebit(sender, amount);
-			this.notifyCredit(recipient, amount);
-		}
-
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
-			account.incrementBalance(amount);
-		}
-
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
-			account.decrementBalance(amount);
-		}
-	}
 }
