@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.ImportanceTransferTransactionMode;
+import org.nem.core.model.observers.ImportanceTransferNotification;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.PoiAccountState;
@@ -14,14 +15,24 @@ import org.nem.nis.poi.RemoteState;
 
 public class RemoteObserverTest {
 
+	private void doNotify(final RemoteObserver observer, final Account account1, final Account account2, final int activate, boolean execute) {
+		observer.notify(new ImportanceTransferNotification(account1, account2, activate),
+				new BlockNotificationContext(BlockHeight.ONE, execute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+	}
+
+	private void doNotify2(final RemoteObserver observer, final Account account1, final Account account2, final int activate, boolean execute) {
+		observer.notify(new ImportanceTransferNotification(account1, account2, activate),
+				new BlockNotificationContext(new BlockHeight(2), execute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+	}
+
 	@Test
 	public void notifyTransferForwardsToPoiAccountState() {
 		// Arrange:
 		final TestDummyContext context = new TestDummyContext();
-		final RemoteObserver observer = context.createObserver(new BlockHeight(123), true);
+		final RemoteObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
+		doNotify(observer, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
 
 		// Assert:
 		context.verifyForward();
@@ -31,10 +42,10 @@ public class RemoteObserverTest {
 	public void notifyTransferSetsProperFields() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver observer = context.createObserver(new BlockHeight(123), true);
+		final RemoteObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
+		doNotify(observer, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
 
 		// Assert:
 		context.verifyForward();
@@ -44,12 +55,12 @@ public class RemoteObserverTest {
 	public void canRollbackTransfer() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver(new BlockHeight(123), true);
-		final RemoteObserver rollback = context.createObserver(new BlockHeight(123), false);
+		final RemoteObserver forward = context.createObserver();
+		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		forward.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
-		rollback.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
+		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
 
 		// Assert:
 		context.verifyEmpty();
@@ -59,50 +70,50 @@ public class RemoteObserverTest {
 	public void invalidHeightInRollbackThrowsException() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver(new BlockHeight(123), true);
-		final RemoteObserver rollback = context.createObserver(new BlockHeight(124), false);
+		final RemoteObserver forward = context.createObserver();
+		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		forward.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
-		rollback.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
+		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify2(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidDirection1InRollbackThrowsException() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver(new BlockHeight(123), true);
-		final RemoteObserver rollback = context.createObserver(new BlockHeight(123), false);
+		final RemoteObserver forward = context.createObserver();
+		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		forward.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
-		rollback.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate);
+		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidDirection2InRollbackThrowsException() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver(new BlockHeight(123), true);
-		final RemoteObserver rollback = context.createObserver(new BlockHeight(123), false);
+		final RemoteObserver forward = context.createObserver();
+		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		forward.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate);
-		rollback.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
+		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, true);
+		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
 	}
 
 	@Test
 	public void rollbackRestoresPreviousState() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver(new BlockHeight(123), true);
-		final RemoteObserver cancel = context.createObserver(new BlockHeight(123 + 1440), true);
-		final RemoteObserver rollback = context.createObserver(new BlockHeight(123 + 1440), false);
+		final RemoteObserver forward = context.createObserver();
+		final RemoteObserver cancel = context.createObserver();
+		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		forward.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Activate);
-		cancel.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate);
-		rollback.notifyTransfer(context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate);
+		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify(cancel, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, true);
+		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, false);
 
 		// Assert:
 		context.verifyForward();
@@ -119,8 +130,8 @@ public class RemoteObserverTest {
 			this.hook();
 		}
 
-		public RemoteObserver createObserver(final BlockHeight height, boolean isExecute) {
-			return new RemoteObserver(this.poiFacade, height, isExecute);
+		public RemoteObserver createObserver() {
+			return new RemoteObserver(this.poiFacade);
 		}
 
 		public void verifyForward() {
@@ -141,8 +152,8 @@ public class RemoteObserverTest {
 		public final Account account1 = Utils.generateRandomAccount();
 		public final Account account2 = Utils.generateRandomAccount();
 
-		public RemoteObserver createObserver(final BlockHeight height, boolean isExecute) {
-			return new RemoteObserver(this.poiFacade, height, isExecute);
+		public RemoteObserver createObserver() {
+			return new RemoteObserver(this.poiFacade);
 		}
 
 		public void verifyForward() {

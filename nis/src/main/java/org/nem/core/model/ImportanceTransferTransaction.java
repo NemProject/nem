@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AddressEncoding;
 import org.nem.core.serialization.Deserializer;
@@ -94,7 +95,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransferObserver observer) {
+	protected void transfer(final TransactionObserver observer) {
 		// TODO 20140909 J-G: please elaborate :)
 		// We need to trigger AccountsHeightObserver (which will add "recipient" to account analyzer)
 		// TODO 20140914 J-G: i understand what you're doing but i don't really like overloading the meaning of (nem) transfer
@@ -102,8 +103,11 @@ public class ImportanceTransferTransaction extends Transaction {
 		// a better approach might be to add a new observer interface notifyImportanceTransfer
 		// but that could also get out of control if we need to add one for each transaction type
 		// TODO 20140916 G-J this is actually to reuse observers that we're using for Transactions, tried to explain it on trello
-		observer.notifyTransfer(this.getSigner(), this.getRemote(), Amount.ZERO);
-		observer.notifyDebit(this.getSigner(), this.getFee());
+		observer.notify(new AccountNotification(this.getRemote()));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.getDirection()));
+		//observer.notifyTransfer(this.getSigner(), this.getRemote(), Amount.ZERO);
+		//observer.notifyDebit(this.getSigner(), this.getFee());
 	}
 
 	@Override

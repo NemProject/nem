@@ -3,6 +3,7 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
+import org.nem.nis.AccountCache;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
@@ -68,25 +69,25 @@ public class BlockExecutor {
 
 		// TODO 20140909 J-G: can we test this?
 		// G-J: I hope we can ;-)  I will add tests.
-		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
-		for (final Transaction transaction : block.getTransactions()) {
-			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
-				// TODO 20140909 J-G: it seems like you're explicitly calling notifyTransfer here, so do you really need the "phantom" zero transaction?
-				// TODO 20140909 J-G: actually, does the phantom transaction allow us to bypass this altogether?
-				// G-J no, the phantom transaction is made to trigger AccountsHeightObserver and this is supposed to call RemoteObserver,
-				// which doesn't call tx.notifyTransfer()
-				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
-			}
-		}
+//		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
+//		for (final Transaction transaction : block.getTransactions()) {
+//			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
+//				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
+//				// TODO 20140909 J-G: it seems like you're explicitly calling notifyTransfer here, so do you really need the "phantom" zero transaction?
+//				// TODO 20140909 J-G: actually, does the phantom transaction allow us to bypass this altogether?
+//				// G-J no, the phantom transaction is made to trigger AccountsHeightObserver and this is supposed to call RemoteObserver,
+//				// which doesn't call tx.notifyTransfer()
+//				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
+//			}
+//		}
 
 		final Account signer = block.getSigner();
 		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
 		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
 		endowed.incrementForagedBlocks();
 		endowed.incrementBalance(block.getTotalFee());
-		observer.notifyCredit(endowed, block.getTotalFee());
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, block.getSigner(), block.getTotalFee()));
+		//observer.notifyCredit(endowed, block.getTotalFee());
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, endowed, block.getTotalFee()));
 	}
 
 	//endregion
@@ -126,13 +127,13 @@ public class BlockExecutor {
 		signer.decrementForagedBlocks();
 		signer.decrementBalance(block.getTotalFee());
 
-		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
-		for (final Transaction transaction : getReverseTransactions(block)) {
-			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
-				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
-			}
-		}
+//		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
+//		for (final Transaction transaction : getReverseTransactions(block)) {
+//			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
+//				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
+//				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
+//			}
+//		}
 
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(observer);
@@ -146,19 +147,13 @@ public class BlockExecutor {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
-	private ImportanceTransferObserver createImportanceTransferObserver(
-			final Block block,
-			final boolean isExecute) {
-
-		return new RemoteObserver(this.poiFacade, block.getHeight(), isExecute);
-	}
-	
 	private TransactionObserver createTransferObserver(
 			final Block block,
 			final boolean isExecute,
 			final Collection<BlockTransactionObserver> observers) {
 		final AggregateBlockTransactionObserverBuilder btoBuilder = new AggregateBlockTransactionObserverBuilder();
 		btoBuilder.add(new WeightedBalancesObserver(this.poiFacade));
+		btoBuilder.add(new RemoteObserver(this.poiFacade));
 		observers.forEach(obj -> btoBuilder.add((obj)));
 
 		final TransactionObserver aggregateObserver = new BlockTransactionObserverToTransactionObserverAdapter(

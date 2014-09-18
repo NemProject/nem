@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.ImportanceTransferTransactionMode;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 
@@ -106,7 +107,7 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
-		reverseObserver.notify(new ImportanceTransferNotification(account1, account2) {
+		reverseObserver.notify(new ImportanceTransferNotification(account1, account2, ImportanceTransferTransactionMode.Activate) {
 		});
 		reverseObserver.commit();
 
@@ -118,5 +119,6 @@ public class ReverseTransactionObserverTest {
 		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification.getLessor(), IsEqual.equalTo(account1));
 		Assert.assertThat(notification.getLessee(), IsEqual.equalTo(account2));
+		Assert.assertThat(notification.getMode(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
 	}
 }

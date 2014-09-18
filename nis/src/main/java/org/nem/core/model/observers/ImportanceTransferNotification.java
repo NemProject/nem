@@ -8,17 +8,20 @@ import org.nem.core.model.Account;
 public class ImportanceTransferNotification extends Notification {
 	private final Account lessor;
 	private final Account lessee;
+	private final int mode;
 
 	/**
 	 * Creates a new importance transfer notification.
 	 *
 	 * @param lessor The account leasing its importance.
 	 * @param lessee The account borrowing the importance.
+	 * @param mode The mode of importance transfer transaction.
 	 */
-	public ImportanceTransferNotification(final Account lessor, final Account lessee) {
+	public ImportanceTransferNotification(final Account lessor, final Account lessee, int mode) {
 		super(NotificationType.ImportanceTransfer);
 		this.lessor = lessor;
 		this.lessee = lessee;
+		this.mode = mode;
 	}
 
 	/**
@@ -37,5 +40,14 @@ public class ImportanceTransferNotification extends Notification {
 	 */
 	public Account getLessee() {
 		return this.lessee;
+	}
+
+	/**
+	 * Gets the mode of importance transfer.
+	 *
+	 * @return The mode of importance transfer.
+	 */
+	public int getMode() {
+		return this.mode;
 	}
 }
