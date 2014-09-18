@@ -4,16 +4,18 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.*;
 
 public class AccountsHeightObserverTest {
 
-	//region notifyReceive
+	//region AccountNotification / NotificationTrigger.Execute
 
 	@Test
-	public void notifyReceiveDelegatesToAccountCache() {
+	public void accountNotificationExecuteDelegatesToAccountCache() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
@@ -22,9 +24,9 @@ public class AccountsHeightObserverTest {
 		context.setupAccount(account2);
 
 		// Act:
-		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
-		context.observer.notifyReceive(new BlockHeight(34), account2, Amount.fromNem(10));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
+		context.observer.notify(new AccountNotification(account2), createExecuteNotificationContext(34));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.times(2)).findByAddress(account1.getAddress());
@@ -32,7 +34,7 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void notifyReceiveDelegatesToPoiFacade() {
+	public void accountNotificationExecuteDelegatesToPoiFacade() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
@@ -41,9 +43,9 @@ public class AccountsHeightObserverTest {
 		context.setupAccount(account2);
 
 		// Act:
-		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
-		context.observer.notifyReceive(new BlockHeight(34), account2, Amount.fromNem(10));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
+		context.observer.notify(new AccountNotification(account2), createExecuteNotificationContext(34));
 
 		// Assert:
 		Mockito.verify(context.poiFacade, Mockito.times(2)).findStateByAddress(account1.getAddress());
@@ -51,15 +53,15 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void notifyReceiveSetsAccountHeightToHeightAtWhichAccountWasFirstSeen() {
+	public void accountNotificationExecuteSetsAccountHeightToHeightAtWhichAccountWasFirstSeen() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
 		context.setupAccount(account1);
 
 		// Act:
-		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
 		final PoiAccountState state = context.poiFacade.findStateByAddress(account1.getAddress());
@@ -67,15 +69,15 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void notifyReceiveIncrementsReferenceCounter() {
+	public void accountNotificationExecuteIncrementsReferenceCounter() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
 		context.setupAccount(account1);
 
 		// Act:
-		context.observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		context.observer.notifyReceive(new BlockHeight(13), account1, Amount.fromNem(3));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
 		final Account cachedAccount = context.accountCache.findByAddress(account1.getAddress());
@@ -84,28 +86,28 @@ public class AccountsHeightObserverTest {
 
 	//endregion
 
-	//region notifyReceiveUndo
+	//region AccountNotification / NotificationTrigger.Undo
 
 	@Test
-	public void notifyReceiveUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void accountNotificationUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
 		// Assert:
-		assertReceiveUndoRemovesAccount(12, 12);
+		assertAccountNotificationUndoRemovesAccount(12, 12);
 	}
 
 	@Test
-	public void notifyReceiveUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void accountNotificationUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
 		// Assert: (the height doesn't have to match)
-		assertReceiveUndoRemovesAccount(12, 15);
+		assertAccountNotificationUndoRemovesAccount(12, 15);
 	}
 
-	private static void assertReceiveUndoRemovesAccount(final int accountHeight, final int undoHeight) {
+	private static void assertAccountNotificationUndoRemovesAccount(final int accountHeight, final int undoHeight) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(accountHeight);
 		account1.incrementReferenceCount();
 
 		// Act:
-		context.observer.notifyReceiveUndo(new BlockHeight(undoHeight), account1, Amount.fromNem(2));
+		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(undoHeight));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.times(1)).removeFromCache(account1.getAddress());
@@ -113,7 +115,7 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void notifyReceiveUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
+	public void accountNotificationUndoDoesNotRemoveAccountWithNonZeroReferenceCounterFromAccountAnalyzer() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
@@ -121,7 +123,7 @@ public class AccountsHeightObserverTest {
 		account1.incrementReferenceCount();
 
 		// Act:
-		context.observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
+		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.times(0)).removeFromCache(Mockito.any());
@@ -138,57 +140,85 @@ public class AccountsHeightObserverTest {
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(2));
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(4));
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(6));
-		observer.notifyReceive(new BlockHeight(12), account1, Amount.fromNem(7));
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(7));
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(6));
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(4));
+		observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createExecuteNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
+		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
 		Assert.assertThat(accountCache.size(), IsEqual.equalTo(1));
 
 		// Act:
-		observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
 		Assert.assertThat(accountCache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void notifyReceiveUndoFailsIfThereIsNoMatchingAccount() {
+	public void accountNotificationUndoFailsIfThereIsNoMatchingAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
 		account1.incrementReferenceCount();
 
 		// Act:
-		context.observer.notifyReceiveUndo(new BlockHeight(12), Utils.generateRandomAccount(), Amount.fromNem(2));
+		context.observer.notify(new AccountNotification(Utils.generateRandomAccount()), createUndoNotificationContext(12));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void notifyReceiveUndoFailsIfMatchingAccountHasUnsetHeight() {
+	public void accountNotificationUndoFailsIfMatchingAccountHasUnsetHeight() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(0);
 		account1.incrementReferenceCount();
 
 		// Act:
-		context.observer.notifyReceiveUndo(new BlockHeight(13), account1, Amount.fromNem(2));
+		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(13));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void notifyReceiveUndoFailsIfReferenceCounterUnderflows() {
+	public void accountNotificationUndoFailsIfReferenceCounterUnderflows() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
 
 		// Act:
-		context.observer.notifyReceiveUndo(new BlockHeight(12), account1, Amount.fromNem(2));
+		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 	}
 
 	//endregion
+
+	//region Other Notification
+
+	@Test
+	public void nonAccountNotificationsAreIgnored() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementReferenceCount();
+
+		// Act:
+		context.observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account1, Amount.fromNem(12)),
+				createExecuteNotificationContext(12));
+
+		// Assert:
+		Mockito.verifyZeroInteractions(context.accountCache, context.poiFacade);
+	}
+
+	//endregion
+
+	private static BlockNotificationContext createExecuteNotificationContext(final int height) {
+		return new BlockNotificationContext(new BlockHeight(height), NotificationTrigger.Execute);
+	}
+
+	private static BlockNotificationContext createUndoNotificationContext(final int height) {
+		return new BlockNotificationContext(new BlockHeight(height), NotificationTrigger.Undo);
+	}
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);

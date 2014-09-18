@@ -3,7 +3,7 @@ package org.nem.nis.visitors;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
-import org.nem.nis.secret.BlockTransferObserver;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 
 public class UndoBlockVisitorTest {
@@ -22,7 +22,7 @@ public class UndoBlockVisitorTest {
 	}
 
 	private static class TestContext {
-		private final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+		private final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 		private final BlockExecutor executor = Mockito.mock(BlockExecutor.class);
 		private final UndoBlockVisitor visitor = new UndoBlockVisitor(this.observer, this.executor);
 	}
