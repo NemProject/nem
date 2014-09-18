@@ -67,26 +67,12 @@ public class BlockExecutor {
 			transaction.execute(observer);
 		}
 
-		// TODO 20140909 J-G: can we test this?
-		// G-J: I hope we can ;-)  I will add tests.
-//		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
-//		for (final Transaction transaction : block.getTransactions()) {
-//			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-//				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
-//				// TODO 20140909 J-G: it seems like you're explicitly calling notifyTransfer here, so do you really need the "phantom" zero transaction?
-//				// TODO 20140909 J-G: actually, does the phantom transaction allow us to bypass this altogether?
-//				// G-J no, the phantom transaction is made to trigger AccountsHeightObserver and this is supposed to call RemoteObserver,
-//				// which doesn't call tx.notifyTransfer()
-//				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
-//			}
-//		}
-
+		// TODO 20140918: test this
 		final Account signer = block.getSigner();
 		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
 		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
 		endowed.incrementForagedBlocks();
 		endowed.incrementBalance(block.getTotalFee());
-		//observer.notifyCredit(endowed, block.getTotalFee());
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, endowed, block.getTotalFee()));
 	}
 
@@ -122,18 +108,13 @@ public class BlockExecutor {
 	public void undo(final Block block, final Collection<BlockTransactionObserver> observers) {
 		final TransactionObserver observer = this.createTransferObserver(block, false, observers);
 
+		// TODO 20140918: test this
 		final Account signer = block.getSigner();
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, block.getSigner(), block.getTotalFee()));
-		signer.decrementForagedBlocks();
-		signer.decrementBalance(block.getTotalFee());
-
-//		final ImportanceTransferObserver itObserver = this.createImportanceTransferObserver(block, true);
-//		for (final Transaction transaction : getReverseTransactions(block)) {
-//			if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-//				final ImportanceTransferTransaction tx = (ImportanceTransferTransaction)transaction;
-//				itObserver.notifyTransfer(tx.getSigner(), tx.getRemote(), tx.getDirection());
-//			}
-//		}
+		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
+		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, endowed, block.getTotalFee()));
+		endowed.decrementForagedBlocks();
+		endowed.decrementBalance(block.getTotalFee());
 
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(observer);
