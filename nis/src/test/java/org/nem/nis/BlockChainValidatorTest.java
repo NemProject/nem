@@ -440,15 +440,15 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> false);
+		return new BlockChainValidator(block -> { }, scorer, 21, (o1, o2) -> false);
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false);
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, (o1, o2) -> false);
 	}
 
 	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> true);
+		return new BlockChainValidator(block -> { }, scorer, 21, (o1, o2) -> true);
 	}
 
 	private static BlockChainValidator createValidator() {

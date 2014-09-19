@@ -37,6 +37,15 @@ public interface ReadOnlyTransferDao {
 	public Transfer findByHash(byte[] txHash);
 
 	/**
+	 * Retrieves Transfer from db given it's hash. The search is only up to a given block height
+	 *
+	 * @param txHash hash of a transfer to retrieve.
+	 * @param maxBlockHeight The maximum block height.
+	 * @return Transfer having given hash or null.
+	 */
+	public Transfer findByHash(byte[] txHash, long maxBlockHeight);
+
+	/**
 	 * Retrieves limit Transfers from db for given account.
 	 *
 	 * @param account The account.

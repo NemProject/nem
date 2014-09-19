@@ -21,7 +21,7 @@ public class BlockChainValidator {
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
-	private final Predicate<Hash> transactionExists;
+	private final BiPredicate<Hash, BlockHeight> transactionExists;
 
 	/**
 	 * Creates a new block chain validator.
@@ -34,7 +34,7 @@ public class BlockChainValidator {
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
-			final Predicate<Hash> transactionExists) {
+			final BiPredicate<Hash, BlockHeight> transactionExists) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
@@ -53,6 +53,7 @@ public class BlockChainValidator {
 			return false;
 		}
 
+		final BlockHeight commonBlockHeight = parentBlock.getHeight();
 		final Set<Hash> chainHashes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -82,7 +83,7 @@ public class BlockChainValidator {
 
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
 					final Hash hash = HashUtils.calculateHash(transaction);
-					if (this.transactionExists.test(hash) ||
+					if (this.transactionExists.test(hash, commonBlockHeight) ||
 						chainHashes.contains(hash)) {
 						LOGGER.info("received block with duplicate TX");
 						return false;
