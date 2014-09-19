@@ -3,7 +3,6 @@ package org.nem.core.model.observers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.ImportanceTransferTransactionMode;
 import org.nem.core.test.Utils;
 
 public class ImportanceTransferNotificationTest {
@@ -13,12 +12,12 @@ public class ImportanceTransferNotificationTest {
 		// Act:
 		final Account lessor = Utils.generateRandomAccount();
 		final Account lessee = Utils.generateRandomAccount();
-		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee, ImportanceTransferTransactionMode.Activate);
+		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee, 7);
 
 		// Assert:
 		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification.getLessor(), IsEqual.equalTo(lessor));
 		Assert.assertThat(notification.getLessee(), IsEqual.equalTo(lessee));
-		Assert.assertThat(notification.getMode(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
+		Assert.assertThat(notification.getMode(), IsEqual.equalTo(7));
 	}
 }

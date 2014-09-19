@@ -114,7 +114,7 @@ public class ImportanceTransferMapperTest {
 			// hackery
 			final org.nem.nis.dbmodel.Block b = Mockito.mock(org.nem.nis.dbmodel.Block.class);
 			final List<ImportanceTransfer> l = (List<ImportanceTransfer>)Mockito.mock(List.class);
-			Mockito.when(l.indexOf(ret)).thenReturn(new Integer(blockIndex));
+			Mockito.when(l.indexOf(ret)).thenReturn(blockIndex);
 			Mockito.when(b.getBlockImportanceTransfers()).thenReturn(l);
 			ret.setBlock(b);
 

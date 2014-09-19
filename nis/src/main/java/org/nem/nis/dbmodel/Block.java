@@ -1,7 +1,6 @@
 package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.nem.core.crypto.Hash;

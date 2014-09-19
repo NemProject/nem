@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
-import org.nem.core.model.ImportanceTransferTransactionMode;
 import org.nem.core.model.observers.ImportanceTransferNotification;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
@@ -32,7 +31,7 @@ public class RemoteObserverTest {
 		final RemoteObserver observer = context.createObserver();
 
 		// Act:
-		doNotify(observer, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify(observer, context.account1, context.account2, 1, true);
 
 		// Assert:
 		context.verifyForward();
@@ -45,7 +44,7 @@ public class RemoteObserverTest {
 		final RemoteObserver observer = context.createObserver();
 
 		// Act:
-		doNotify(observer, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
+		doNotify(observer, context.account1, context.account2, 1, true);
 
 		// Assert:
 		context.verifyForward();
@@ -59,8 +58,8 @@ public class RemoteObserverTest {
 		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
-		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
+		doNotify(forward, context.account1, context.account2, 1, true);
+		doNotify(rollback, context.account1, context.account2, 1, false);
 
 		// Assert:
 		context.verifyEmpty();
@@ -74,8 +73,8 @@ public class RemoteObserverTest {
 		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
-		doNotify2(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
+		doNotify(forward, context.account1, context.account2, 1, true);
+		doNotify2(rollback, context.account1, context.account2, 1, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -86,8 +85,8 @@ public class RemoteObserverTest {
 		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
-		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, false);
+		doNotify(forward, context.account1, context.account2, 1, true);
+		doNotify(rollback, context.account1, context.account2, 2, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -98,8 +97,8 @@ public class RemoteObserverTest {
 		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, true);
-		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, false);
+		doNotify(forward, context.account1, context.account2, 2, true);
+		doNotify(rollback, context.account1, context.account2, 1, false);
 	}
 
 	@Test
@@ -111,9 +110,9 @@ public class RemoteObserverTest {
 		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, ImportanceTransferTransactionMode.Activate, true);
-		doNotify(cancel, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, true);
-		doNotify(rollback, context.account1, context.account2, ImportanceTransferTransactionMode.Deactivate, false);
+		doNotify(forward, context.account1, context.account2, 1, true);
+		doNotify(cancel, context.account1, context.account2, 1, true);
+		doNotify(rollback, context.account1, context.account2, 2, false);
 
 		// Assert:
 		context.verifyForward();

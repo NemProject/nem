@@ -117,7 +117,7 @@ public class BlockScorer {
 		//@formatter:off
 		if (accountState.hasRemoteState()) {
 			final RemoteState rState = accountState.getRemoteState();
-			if (!rState.isOwner() && rState.getDirection() == ImportanceTransferTransactionMode.Activate) {
+			if (!rState.isOwner() && rState.getDirection() == ImportanceTransferTransaction.Mode.Activate.value()) {
 				accountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
 			}
 		}
@@ -147,9 +147,9 @@ public class BlockScorer {
 			// @formatter:off
 			if (! rState.isOwner() &&
 					(
-							(rState.getDirection() == ImportanceTransferTransactionMode.Activate &&
+							(rState.getDirection() == ImportanceTransferTransaction.Mode.Activate.value() &&
 									settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) ||
-							(rState.getDirection() == ImportanceTransferTransactionMode.Deactivate &&
+							(rState.getDirection() == ImportanceTransferTransaction.Mode.Deactivate.value() &&
 									settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)
 					)) {
 				poiAccountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
