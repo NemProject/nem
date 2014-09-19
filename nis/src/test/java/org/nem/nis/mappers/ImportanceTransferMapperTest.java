@@ -19,7 +19,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void importanceTransferModelWithDirectionTransferCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Activate);
+		final TestContext context = new TestContext(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
 		final ImportanceTransfer dbModel = context.toDbModel(7);
@@ -31,7 +31,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void importanceTransferModelWithDirectionRevertCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Deactivate);
+		final TestContext context = new TestContext(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
 		final ImportanceTransfer dbModel = context.toDbModel(7);
@@ -43,7 +43,7 @@ public class ImportanceTransferMapperTest {
 	@Test
 	public void  importanceTransferModelCanBeRoundTripped() {
 		// Arrange:
-		final TestContext context = new TestContext(ImportanceTransferTransactionMode.Deactivate);
+		final TestContext context = new TestContext(ImportanceTransferTransaction.Mode.Deactivate);
 		final ImportanceTransfer dbModel = context.toDbModel(7);
 
 		// Act:
@@ -56,7 +56,7 @@ public class ImportanceTransferMapperTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void importanceTransferDbModelWithUnknownDirectionTypeCannotBeMappedToModel() {
 		// Arrange:
-		final TestContext context = new TestContext(666);
+		final TestContext context = new TestContext(ImportanceTransferTransaction.Mode.Unknown);
 		final ImportanceTransfer dbModel = context.toDbModel(7);
 
 		// Act:
@@ -71,13 +71,12 @@ public class ImportanceTransferMapperTest {
 		private final Account remote;
 		private final MockAccountDao accountDao;
 		private final Hash hash;
-		private final Integer direction;
 
-		public TestContext(final int direction, final Account sender, final Account remote) {
+		public TestContext(final ImportanceTransferTransaction.Mode mode, final Account sender, final Account remote) {
 			this.model = new ImportanceTransferTransaction(
 					new TimeInstant(721),
 					sender,
-					direction,
+					mode,
 					remote);
 
 			this.model.setFee(Amount.fromNem(11));
@@ -85,8 +84,6 @@ public class ImportanceTransferMapperTest {
 			this.model.sign();
 
 			this.remote = remote;
-
-			this.direction = this.model.getDirection();
 
 			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
@@ -103,8 +100,8 @@ public class ImportanceTransferMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
-		public TestContext(final int direction) {
-			this(direction, Utils.generateRandomAccount(), Utils.generateRandomAccount());
+		public TestContext(final ImportanceTransferTransaction.Mode mode) {
+			this(mode, Utils.generateRandomAccount(), Utils.generateRandomAccount());
 		}
 
 		public ImportanceTransferTransaction getModel() {
@@ -143,7 +140,7 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
-			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.direction));
+			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.model.getMode().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			//Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
@@ -164,7 +161,7 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
 			Assert.assertThat(rhs.getRemote(), IsEqual.equalTo(this.model.getRemote()));
 			Assert.assertThat(rhs.getRemote().getAddress().getPublicKey(), IsEqual.equalTo(this.model.getRemote().getAddress().getPublicKey()));
-			Assert.assertThat(rhs.getDirection(), IsEqual.equalTo(this.model.getDirection()));
+			Assert.assertThat(rhs.getMode(), IsEqual.equalTo(this.model.getMode()));
 			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
 		}
 	}

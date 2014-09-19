@@ -54,9 +54,9 @@ public class BlockChainValidator {
 	}
 
 	public static boolean canAccountForageAtHeight(final RemoteState rState, final BlockHeight height) {
-		int mode = rState.getDirection();
-		boolean activate = (mode == ImportanceTransferTransactionMode.Activate);
-		boolean deactivate = (mode == ImportanceTransferTransactionMode.Deactivate);
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.fromValueOrDefault(rState.getDirection());
+		boolean activate = (mode == ImportanceTransferTransaction.Mode.Activate);
+		boolean deactivate = (mode == ImportanceTransferTransaction.Mode.Deactivate);
 
 		if (!activate && !deactivate) {
 			throw new IllegalStateException("unhandled importance transfer mode");
@@ -157,8 +157,8 @@ public class BlockChainValidator {
 
 	public static boolean verifyImportanceTransfer(final PoiFacade poiFacade, final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final PoiAccountState state = poiFacade.findStateByAddress(transaction.getSigner().getAddress());
-		final int direction = transaction.getDirection();
-		if (direction == ImportanceTransferTransactionMode.Activate) {
+		final int direction = transaction.getMode().value();
+		if (direction == ImportanceTransferTransaction.Mode.Activate.value()) {
 			if (state.hasRemoteState() && state.getRemoteState().getDirection() == direction) {
 				return false;
 			}
@@ -167,7 +167,7 @@ public class BlockChainValidator {
 				return false;
 			}
 			return true;
-		} else if (direction == ImportanceTransferTransactionMode.Deactivate) {
+		} else if (direction == ImportanceTransferTransaction.Mode.Deactivate.value()) {
 			if (!state.hasRemoteState() || state.getRemoteState().getDirection() == direction) {
 				return false;
 			}

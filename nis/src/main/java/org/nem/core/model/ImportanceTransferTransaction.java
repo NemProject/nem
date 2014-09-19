@@ -12,7 +12,72 @@ import java.util.function.BiPredicate;
  * transfer of importance from signer to remote account.
  */
 public class ImportanceTransferTransaction extends Transaction {
-	private final int mode;
+
+	//region Mode
+
+	/**
+	 * Static class containing modes of ImportanceTransferTransaction.
+	 */
+	public static enum Mode {
+		/**
+		 * An unknown mode.
+		 */
+		Unknown(0),
+
+		/**
+		 * When announcing importance transfer.
+		 */
+		Activate(1),
+
+		/**
+		 * When canceling association between account and importance transfer.
+		 */
+		Deactivate(2);
+
+		private final int value;
+		private Mode(final int value) {
+			this.value = value;
+		}
+
+		private boolean isValid() {
+			switch (this) {
+				case Activate:
+				case Deactivate:
+					return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Creates a mode given a raw value.
+		 *
+		 * @param value The value.
+		 * @return The mode if the value is known or Unknown if it was not.
+		 */
+		public static Mode fromValueOrDefault(final int value) {
+			for (final Mode mode : values()) {
+				if (mode.value() == value) {
+					return mode;
+				}
+			}
+
+			return Mode.Unknown;
+		}
+
+		/**
+		 * Gets the underlying integer representation of the mode.
+		 *
+		 * @return The underlying value.
+		 */
+		public int value() {
+			return this.value;
+		}
+	}
+
+	//endregion
+
+	private final Mode mode;
 	private final Account remoteAccount;
 
 	/**
@@ -23,7 +88,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	 * @param mode The transaction importance transfer mode.
 	 * @param remoteAccount The remote account.
 	 */
-	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final int mode, final Account remoteAccount) {
+	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final Mode mode, final Account remoteAccount) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
 		this.remoteAccount = remoteAccount;
@@ -32,7 +97,7 @@ public class ImportanceTransferTransaction extends Transaction {
 			throw new IllegalArgumentException("remoteAccount is required");
 		}
 
-		if (!isModeValid(this.mode)) {
+		if (!this.mode.isValid()) {
 			throw new IllegalArgumentException("invalid mode");
 		}
 	}
@@ -45,22 +110,12 @@ public class ImportanceTransferTransaction extends Transaction {
 	 */
 	public ImportanceTransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
-		this.mode = deserializer.readInt("mode");
+		this.mode = Mode.fromValueOrDefault(deserializer.readInt("mode"));
 		this.remoteAccount = Account.readFrom(deserializer, "remoteAccount", AddressEncoding.PUBLIC_KEY);
 
-		if (!isModeValid(this.mode)) {
+		if (!this.mode.isValid()) {
 			throw new TypeMismatchException("mode");
 		}
-	}
-
-	private static boolean isModeValid(final int mode) {
-		switch (mode) {
-			case ImportanceTransferTransactionMode.Activate:
-			case ImportanceTransferTransactionMode.Deactivate:
-				return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -77,15 +132,14 @@ public class ImportanceTransferTransaction extends Transaction {
 	 *
 	 * @return The direction.
 	 */
-	// TODO-CR: rename to getMode?
-	public int getDirection() {
+	public Mode getMode() {
 		return this.mode;
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeInt("mode", this.mode);
+		serializer.writeInt("mode", this.mode.value());
 		Account.writeTo(serializer, "remoteAccount", this.remoteAccount, AddressEncoding.PUBLIC_KEY);
 	}
 
@@ -103,7 +157,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new AccountNotification(this.getRemote()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
-		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.getDirection()));
+		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.mode.value()));
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
 		final ImportanceTransfer entity = ImportanceTransferMapper.toDbModel(transaction, 0, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
@@ -57,7 +57,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
 		final ImportanceTransfer dbTransaction = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
@@ -72,7 +72,7 @@ public class ImportanceTransferTransactionDaoTest {
 		Assert.assertThat(entity.getId(), equalTo(dbTransaction.getId()));
 		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getDirection(), equalTo(transaction.getDirection()));
+		Assert.assertThat(entity.getDirection(), equalTo(transaction.getMode().value()));
 		//Assert.assertThat(entity.getBlkIndex(), equalTo(12345));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transaction.getSignature().getBytes()));
 	}
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransactionMode.Deactivate);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
 		final ImportanceTransfer dbTransfer1 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 		final ImportanceTransfer dbTransfer2 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
 		final ImportanceTransfer dbTransfer3 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
@@ -117,7 +117,11 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 	}
 
-	private ImportanceTransferTransaction prepareImportanceTransferTransaction(final Account sender, final Account recipient, final int i, final int mode) {
+	private ImportanceTransferTransaction prepareImportanceTransferTransaction(
+			final Account sender,
+			final Account recipient,
+			final int i,
+			final ImportanceTransferTransaction.Mode mode) {
 		// Arrange:
 		final ImportanceTransferTransaction transferTransaction = new ImportanceTransferTransaction(
 				new TimeInstant(i),

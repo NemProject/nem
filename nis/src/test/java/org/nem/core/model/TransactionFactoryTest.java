@@ -21,12 +21,12 @@ public class TransactionFactoryTest {
 		TransactionFactory.VERIFIABLE.deserialize(deserializer);
 	}
 
+	//region TransferTransaction
+
 	@Test
 	public void canDeserializeVerifiableTransferTransaction() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+		final Transaction originalTransaction = createTransferTransaction();
 
 		// Assert:
 		assertCanDeserializeVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
@@ -35,20 +35,26 @@ public class TransactionFactoryTest {
 	@Test
 	public void canDeserializeNonVerifiableTransferTransaction() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+		final Transaction originalTransaction = createTransferTransaction();
 
 		// Assert:
 		assertCanDeserializeNonVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
 	}
 
+	private static Transaction createTransferTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+	}
+
+	//endregion
+
+	//region ImportanceTransferTransaction
+
 	@Test
 	public void canDeserializeVerifiableImportanceTransferTransaction() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionMode.Activate, recipient);
+		final Transaction originalTransaction = createImportanceTransferTransaction();
 
 		// Assert:
 		assertCanDeserializeVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
@@ -57,13 +63,23 @@ public class TransactionFactoryTest {
 	@Test
 	public void canDeserializeNonVerifiableImportanceTransferTransaction() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionMode.Activate, recipient);
+		final Transaction originalTransaction = createImportanceTransferTransaction();
 
 		// Assert:
 		assertCanDeserializeNonVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
 	}
+
+	private static Transaction createImportanceTransferTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		return new ImportanceTransferTransaction(
+				TimeInstant.ZERO,
+				sender,
+				ImportanceTransferTransaction.Mode.Activate,
+				recipient);
+	}
+
+	//endregion
 
 	private static void assertCanDeserializeVerifiable(
 			final Transaction originalTransaction,

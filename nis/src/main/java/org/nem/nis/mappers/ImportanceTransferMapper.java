@@ -34,7 +34,7 @@ public class ImportanceTransferMapper {
 				// proof
 				importanceTransferTransaction.getSignature().getBytes(),
 				remote,
-				importanceTransferTransaction.getDirection(),
+				importanceTransferTransaction.getMode().value(),
 				blockIndex, // index
 				0L); // referenced tx
 
@@ -58,7 +58,7 @@ public class ImportanceTransferMapper {
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
 				new TimeInstant(dbImportanceTransfer.getTimeStamp()),
 				sender,
-				dbImportanceTransfer.getDirection(),
+				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getDirection()),
 				remote);
 
 		transfer.setFee(new Amount(dbImportanceTransfer.getFee()));

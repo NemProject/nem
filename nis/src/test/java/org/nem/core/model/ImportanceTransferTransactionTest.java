@@ -20,27 +20,27 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void ctorCanCreateImportanceTransfer() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionMode.Activate);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransferRevert() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransactionMode.Deactivate);
+		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
-	private void assertCtorCanCreateImportanceTransfer(final int direction) {
+	private void assertCtorCanCreateImportanceTransfer(final ImportanceTransferTransaction.Mode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
 		// Act:
-		final ImportanceTransferTransaction importanceTransferTransaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction importanceTransferTransaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Assert:
 		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
+		Assert.assertThat(importanceTransferTransaction.getMode(), IsEqual.equalTo(mode));
 		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
@@ -50,7 +50,7 @@ public class ImportanceTransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		createImportanceTransferTransaction(signer, ImportanceTransferTransactionMode.Activate, null);
+		createImportanceTransferTransaction(signer, ImportanceTransferTransaction.Mode.Activate, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -60,7 +60,7 @@ public class ImportanceTransferTransactionTest {
 		final Account remote = Utils.generateRandomAccount();
 
 		// Act:
-		createImportanceTransferTransaction(signer, 123, remote);
+		createImportanceTransferTransaction(signer, ImportanceTransferTransaction.Mode.Unknown, remote);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionTest {
 
 		final ImportanceTransferTransaction originalEntity = createImportanceTransferTransaction(
 				signer,
-				ImportanceTransferTransactionMode.Activate,
+				ImportanceTransferTransaction.Mode.Activate,
 				remote);
 		originalEntity.sign();
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
@@ -103,20 +103,20 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void canRoundTripImportanceTransfer()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionMode.Activate);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
 	public void canRoundTripImportanceTransferRevert()  {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransactionMode.Deactivate);
+		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
-	public void assertImportanceTransferCanBeRoundTripped(final int direction) {
+	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferTransaction.Mode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
-		final ImportanceTransferTransaction originalTransaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction originalTransaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Act:
 		final ImportanceTransferTransaction importanceTransferTransaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -124,7 +124,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(direction));
+		Assert.assertThat(importanceTransferTransaction.getMode(), IsEqual.equalTo(mode));
 		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
@@ -154,11 +154,11 @@ public class ImportanceTransferTransactionTest {
 
 	public void assertValidationResult(final int senderBalance, final int fee, final ValidationResult expectedResult) {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionMode.Activate;
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(fee));
 		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
 		signer.incrementBalance(Amount.fromNem(senderBalance));
@@ -177,10 +177,10 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void minimumFeeIsOneNem() {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionMode.Activate;
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Act + Assert:
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1)));
@@ -217,11 +217,11 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionMode.Activate;
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -245,17 +245,17 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
 		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
+		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate));
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final int direction = ImportanceTransferTransactionMode.Activate;
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -279,22 +279,25 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
 		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
+		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate));
 	}
 
 	private Transaction createTransactionForExecuteUndoTests() {
-		final int direction = ImportanceTransferTransactionMode.Activate;
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, direction, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));
 		return transaction;
 	}
 
 	// endregion
 
-	private static ImportanceTransferTransaction createImportanceTransferTransaction(final Account sender, int mode, final Account remote) {
+	private static ImportanceTransferTransaction createImportanceTransferTransaction(
+			final Account sender,
+			ImportanceTransferTransaction.Mode mode,
+			final Account remote) {
 		return new ImportanceTransferTransaction(TIME, sender, mode, remote);
 	}
 }
