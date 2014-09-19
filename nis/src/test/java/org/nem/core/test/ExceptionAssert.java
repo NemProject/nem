@@ -36,7 +36,7 @@ public class ExceptionAssert {
 		try {
 			consumer.accept(null);
 		} catch (final Exception ex) {
-			if (ex.getClass() == exceptionClass) {
+			if (exceptionClass.isAssignableFrom(ex.getClass())) {
 				assertExceptionProperties.accept((T)ex);
 				return;
 			}

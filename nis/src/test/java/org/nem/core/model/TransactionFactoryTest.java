@@ -27,15 +27,9 @@ public class TransactionFactoryTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
-		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
-
-		// Act:
-		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
-		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+		assertCanDeserializeVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
 	}
 
 	@Test
@@ -44,17 +38,9 @@ public class TransactionFactoryTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Transaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				originalTransaction.asNonVerifiable(),
-				new MockAccountLookup());
-
-		// Act:
-		final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(TransferTransaction.class));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
-		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
+		assertCanDeserializeNonVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
 	}
 
 	@Test
@@ -63,18 +49,9 @@ public class TransactionFactoryTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionMode.Activate, recipient);
-		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
-
-		// Act:
-		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(ImportanceTransferTransaction.class));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
-		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
-		final ImportanceTransferTransaction importanceTransferTransaction = (ImportanceTransferTransaction)transaction;
-		Assert.assertThat(importanceTransferTransaction.getDirection(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(recipient));
+		assertCanDeserializeVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
 	}
 
 	@Test
@@ -83,16 +60,36 @@ public class TransactionFactoryTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Transaction originalTransaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransactionMode.Activate, recipient);
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				originalTransaction.asNonVerifiable(),
-				new MockAccountLookup());
 
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
+	}
+
+	private static void assertCanDeserializeVerifiable(
+			final Transaction originalTransaction,
+			final Class expectedClass,
+			final int expectedType) {
 		// Act:
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
+		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
+
+		// Assert:
+		Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
+		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+	}
+
+	private static void assertCanDeserializeNonVerifiable(
+			final Transaction originalTransaction,
+			final Class expectedClass,
+			final int expectedType) {
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
 		final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(ImportanceTransferTransaction.class));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
 		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
 	}
 }

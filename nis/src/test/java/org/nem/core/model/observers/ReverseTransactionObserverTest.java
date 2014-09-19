@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.ImportanceTransferTransactionMode;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 
@@ -23,12 +22,9 @@ public class ReverseTransactionObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) {
-		});
-		reverseObserver.notify(new Notification(NotificationType.ImportanceTransfer) {
-		});
-		reverseObserver.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) {
-		});
+		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount));
+		reverseObserver.notify(new AccountNotification(account1));
+		reverseObserver.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount));
 		reverseObserver.commit();
 
 		// Assert:
@@ -36,7 +32,7 @@ public class ReverseTransactionObserverTest {
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
 		Assert.assertThat(
 				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
-				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.Account, NotificationType.BalanceTransfer)));
 	}
 
 	@Test
@@ -49,8 +45,7 @@ public class ReverseTransactionObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount) {
-		});
+		reverseObserver.notify(new BalanceTransferNotification(account1, account2, amount));
 		reverseObserver.commit();
 
 		// Assert:
@@ -84,8 +79,7 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		reverseObserver.notify(new BalanceAdjustmentNotification(originalType, account, amount) {
-		});
+		reverseObserver.notify(new BalanceAdjustmentNotification(originalType, account, amount));
 		reverseObserver.commit();
 
 		// Assert:
@@ -105,20 +99,16 @@ public class ReverseTransactionObserverTest {
 		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
 
 		// Act:
-		final Account account1 = Utils.generateRandomAccount();
-		final Account account2 = Utils.generateRandomAccount();
-		reverseObserver.notify(new ImportanceTransferNotification(account1, account2, ImportanceTransferTransactionMode.Activate) {
-		});
+		final Account account = Utils.generateRandomAccount();
+		reverseObserver.notify(new AccountNotification(account));
 		reverseObserver.commit();
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final ImportanceTransferNotification notification = (ImportanceTransferNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
-		Assert.assertThat(notification.getLessor(), IsEqual.equalTo(account1));
-		Assert.assertThat(notification.getLessee(), IsEqual.equalTo(account2));
-		Assert.assertThat(notification.getMode(), IsEqual.equalTo(ImportanceTransferTransactionMode.Activate));
+		final AccountNotification notification = (AccountNotification)notificationCaptor.getValue();
+		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.Account));
+		Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
 	}
 }

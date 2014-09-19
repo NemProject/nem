@@ -321,7 +321,7 @@ public class AddressTest {
 	}
 
 	@Test
-	public void canRoundtripAddressWithAddressEncoding() {
+	public void canRoundtripAddressWithCompressedEncoding() {
 		// Assert:
 		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false, true);
 		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false, false);

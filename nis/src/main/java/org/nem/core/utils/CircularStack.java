@@ -41,6 +41,7 @@ public class CircularStack<E> implements Iterable<E> {
 			if (i >= rhs.size() - this.limit) {
 				this.push(element);
 			}
+
 			++i;
 		}
 	}

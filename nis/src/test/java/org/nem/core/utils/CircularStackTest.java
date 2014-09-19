@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class CircularStackTest {
 	@Test(expected = IndexOutOfBoundsException.class)
-	public void getOnEmptyStackThrowsException() {
+	public void peekOnEmptyStackThrowsException() {
 		// Arrange:
 		final CircularStack<Integer> intStack = createStack(3);
 
@@ -16,7 +16,7 @@ public class CircularStackTest {
 	}
 
 	@Test(expected = IndexOutOfBoundsException.class)
-	public void removingFromEmptyStackThrowsException() {
+	public void popFromEmptyStackThrowsException() {
 		// Arrange:
 		final CircularStack<Integer> intStack = createStack(3);
 
@@ -53,7 +53,7 @@ public class CircularStackTest {
 	}
 
 	@Test
-	public void canAddMultipleElementsToCircularStack() {
+	public void addingMoreThanLimitElementsToCircularStackAgesOutOlderElements() {
 		// Arrange:
 		final CircularStack<Integer> intStack = createStack(3);
 
@@ -68,7 +68,7 @@ public class CircularStackTest {
 	}
 
 	@Test
-	public void removingFromStackChangesSize() {
+	public void poppingFromStackDecreasesSizeByOne() {
 		// Arrange:
 		final CircularStack<Integer> intStack = createStack(3);
 
@@ -76,12 +76,15 @@ public class CircularStackTest {
 		for (int i = 0; i < 100; ++i) {
 			intStack.push(123 + i);
 		}
+
 		intStack.pop();
 
 		// Assert:
 		Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99 - 1));
 		Assert.assertThat(intStack.size(), IsEqual.equalTo(2));
 	}
+
+	//region shallowCopyTo
 
 	@Test
 	public void canCopyLargerToSmaller() {
@@ -93,6 +96,7 @@ public class CircularStackTest {
 		for (int i = 0; i < 10; ++i) {
 			source.push(i);
 		}
+
 		source.shallowCopyTo(destination);
 
 		// Assert:
@@ -111,24 +115,17 @@ public class CircularStackTest {
 		final CircularStack<Integer> destination = createStack(10);
 
 		// Act:
-		// TODO 20140909 J-G: i would just fill source with three numbers there's no need to test wraparound again imo
-		// TODO 20140915 J-G: still active
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 3; ++i) {
 			source.push(i);
 		}
+
 		source.shallowCopyTo(destination);
 
 		// Assert:
 		Assert.assertThat(source.size(), IsEqual.equalTo(3));
 		Assert.assertThat(destination.size(), IsEqual.equalTo(3));
-		int i = 7;
+		int i = 0;
 		for (final Integer element : destination) {
-			Assert.assertThat(element, IsEqual.equalTo(i++));
-		}
-		// TODO 20140909 J-G: i don't think you need to assert source here
-		// TODO 20140915 J-G: still active
-		i = 7;
-		for (final Integer element : source) {
 			Assert.assertThat(element, IsEqual.equalTo(i++));
 		}
 	}
@@ -155,26 +152,50 @@ public class CircularStackTest {
 		}
 	}
 
+	//endregion
+
+	//region iteration
+
 	@Test
-	public void canIterateOverStack() {
+	public void canIterateOverStackFromOldestToNewestElement() {
 		// Arrange:
 		final CircularStack<Integer> intStack = createStack(3);
 
 		// Act:
-		for (int i = 0; i < 100; ++i) {
+		for (int i = 0; i < 3; ++i) {
 			intStack.push(123 + i);
 		}
 
 		// Assert:
-		int i = 123 + 99 - 2;
+		int i = 123;
 		for (final Integer elem : intStack) {
 			Assert.assertThat(elem, IsEqual.equalTo(i));
 			++i;
 		}
 	}
 
+	@Test
+	public void canIterateOverStackFromNewestToOldestElementByPoppingAllElements() {
+		// Arrange:
+		final CircularStack<Integer> intStack = createStack(3);
+
+		// Act:
+		for (int i = 0; i < 3; ++i) {
+			intStack.push(123 + i);
+		}
+
+		// Assert:
+		for (int i = 125; i >= 123; --i) {
+			Assert.assertThat(intStack.peek(), IsEqual.equalTo(i));
+			intStack.pop();
+		}
+
+		Assert.assertThat(intStack.size(), IsEqual.equalTo(0));
+	}
+
+	//endregion
+
 	private CircularStack<Integer> createStack(final int i) {
 		return new CircularStack<>(i);
 	}
-
 }
