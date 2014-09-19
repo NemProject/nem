@@ -53,6 +53,7 @@ public class ImportanceTransferTransactionDaoTest {
 
 	@Test
 	public void canReadSavedData() {
+		// TODO-CR 20140919 J-G: comment - since the arrange block is mostly the same, consider using a private "TestContext" helper class to reduce duplication
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -73,6 +74,7 @@ public class ImportanceTransferTransactionDaoTest {
 		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getDirection(), equalTo(transaction.getMode().value()));
+		// TODO-CR 20140919 J-G: commented out code did you mean to remove this or verify it?
 		//Assert.assertThat(entity.getBlkIndex(), equalTo(12345));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transaction.getSignature().getBytes()));
 	}
@@ -131,6 +133,7 @@ public class ImportanceTransferTransactionDaoTest {
 		transferTransaction.sign();
 		return transferTransaction;
 	}
+
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();

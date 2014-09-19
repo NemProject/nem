@@ -62,7 +62,6 @@ public class BlockDaoImpl implements BlockDao {
 
 	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
-		// TODO 20140914 J-G: i assume you actually want to use fetchMode (i updated the code) :)
 		return criteria
 				.setFetchMode("blockTransfers", fetchMode)
 				.setFetchMode("blockImportanceTransfers", fetchMode);

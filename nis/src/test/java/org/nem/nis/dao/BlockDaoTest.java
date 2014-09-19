@@ -72,6 +72,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		// TODO-CR 20140919 J-G: any reason you're not verifying it's equal to 1 (here and other tests too)?
 		Assert.assertThat(entity.getBlockTransfers().size(), not(equalTo(0)));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
@@ -155,6 +156,7 @@ public class BlockDaoTest {
 	}
 
 	// TransferTransactions does not use OrderColumn, but maybe we should redo that
+	// TODO-CR 20140919 J-G: it probably makes sense to redo that so its used by both
 	@Test
 	public void savingDoesNotChangeTransferTransactionBlkIndex() {
 		// Arrange:
@@ -317,6 +319,10 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 
 		// TODO G-J 20140916 : should I use ExceptionAssert instead of (expected = ...) ?
+		// TODO-CR 20140919 J-G: for more complicated tests, i would use ExceptionAssert because it guarantees that the wrapped line throws the expected exception
+		//                       expected just verifies any line throws the exception
+		// 						 ExceptionAssert also lets you assert state after the exception is thrown, which is sometimes useful
+		//						 when i was fixing the harvest blocks paging, i came across one test that was using expected incorrectly, but i don't remember the exact details
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
 	}
 
@@ -633,7 +639,8 @@ public class BlockDaoTest {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		for (final Object o : accounts) {
 			final Account a = (Account)o;
-			final org.nem.nis.dbmodel.Account dbA = new org.nem.nis.dbmodel.Account(a.getAddress().getEncoded(), a.getKeyPair().getPublicKey());
+			final Address address = a.getAddress();
+			final org.nem.nis.dbmodel.Account dbA = new org.nem.nis.dbmodel.Account(address.getEncoded(), address.getPublicKey());
 			mockAccountDao.addMapping(a, dbA);
 		}
 		return new AccountDaoLookupAdapter(mockAccountDao);
