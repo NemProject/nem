@@ -29,6 +29,11 @@ public class MockTransferDaoImpl implements TransferDao {
 	}
 
 	@Override
+	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
+		return null;
+	}
+
+	@Override
 	public Collection<Object[]> getTransactionsForAccount(final Account account, final Integer timeStamp, final int limit) {
 		return null;
 	}

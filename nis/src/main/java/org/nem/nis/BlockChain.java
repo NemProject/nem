@@ -497,7 +497,7 @@ public class BlockChain implements BlockSynchronizer {
 					block -> executor.execute(block, observer),
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT,
-					hash -> (null != this.transferDao.findByHash(hash.getRaw())));
+					(hash, height) -> (null != this.transferDao.findByHash(hash.getRaw(), height.getRaw())));
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
 		}
