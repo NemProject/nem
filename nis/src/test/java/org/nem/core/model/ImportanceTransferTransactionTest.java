@@ -245,7 +245,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
 		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate));
+		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate.value()));
 	}
 
 	@Test
@@ -279,7 +279,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
 		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate));
+		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate.value()));
 	}
 
 	private Transaction createTransactionForExecuteUndoTests() {
