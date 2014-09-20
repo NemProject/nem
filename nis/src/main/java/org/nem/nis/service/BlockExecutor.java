@@ -3,9 +3,6 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.AccountCache;
-import org.nem.nis.BlockScorer;
-import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +16,17 @@ import java.util.*;
 @Service
 public class BlockExecutor {
 	private final PoiFacade poiFacade;
-	private final AccountCache accountCache	;
 
 	/**
 	 * Creates a new block executor.
 	 *
 	 * @param poiFacade The poi facade.
-	 * @param accountCache The account cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache) {
+	public BlockExecutor(final PoiFacade poiFacade) {
 		this.poiFacade = poiFacade;
-		this.accountCache = accountCache;
 	}
+
 	//region execute
 
 	/**
@@ -66,13 +61,7 @@ public class BlockExecutor {
 			transaction.execute(observer);
 		}
 
-		// TODO 20140918: test this
-		final Account signer = block.getSigner();
-		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(signer.getAddress(), block.getHeight());
-		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
-		endowed.incrementForagedBlocks();
-		endowed.incrementBalance(block.getTotalFee());
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, endowed, block.getTotalFee()));
+		observer.notify(createHarvestRewardNotification(block));
 	}
 
 	//endregion
@@ -107,13 +96,7 @@ public class BlockExecutor {
 	public void undo(final Block block, final Collection<BlockTransactionObserver> observers) {
 		final TransactionObserver observer = this.createTransferObserver(block, false, observers);
 
-		// TODO 20140918: test this
-		final Account signer = block.getSigner();
-		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(signer.getAddress(), block.getHeight());
-		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, endowed, block.getTotalFee()));
-		endowed.decrementForagedBlocks();
-		endowed.decrementBalance(block.getTotalFee());
+		observer.notify(createHarvestRewardNotification(block));
 
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(observer);
@@ -132,7 +115,7 @@ public class BlockExecutor {
 			final Collection<BlockTransactionObserver> observers) {
 		final AggregateBlockTransactionObserverBuilder btoBuilder = new AggregateBlockTransactionObserverBuilder();
 		btoBuilder.add(new WeightedBalancesObserver(this.poiFacade));
-		observers.forEach(obj -> btoBuilder.add((obj)));
+		observers.forEach(o -> btoBuilder.add(o));
 
 		final TransactionObserver aggregateObserver = new BlockTransactionObserverToTransactionObserverAdapter(
 				btoBuilder.build(),
@@ -148,7 +131,11 @@ public class BlockExecutor {
 		}
 
 		final AggregateTransactionObserverBuilder toBuilder = new AggregateTransactionObserverBuilder();
-		transactionObservers.forEach(obj -> toBuilder.add(obj));
+		transactionObservers.forEach(o -> toBuilder.add(o));
 		return toBuilder.build();
+	}
+
+	private static Notification createHarvestRewardNotification(final Block block) {
+		return new BalanceAdjustmentNotification(NotificationType.HarvestReward, block.getSigner(), block.getTotalFee());
 	}
 }

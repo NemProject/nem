@@ -50,7 +50,7 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
+		final BlockExecutor executor = new BlockExecutor(poiFacade);
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, this.createCommitObserver(accountAnalyzer)),
 				scorer,
@@ -70,6 +70,7 @@ public class BlockChainServices {
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new AccountsHeightObserver(accountAnalyzer));
 		builder.add(new BalanceCommitTransferObserver());
+		builder.add(new HarvestRewardCommitObserver(accountAnalyzer.getPoiFacade(), accountAnalyzer.getAccountCache()));
 		builder.add(new RemoteObserver(accountAnalyzer.getPoiFacade()));
 		return builder.build();
 	}
@@ -109,7 +110,7 @@ public class BlockChainServices {
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.createCommitObserver(accountAnalyzer),
-				new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache())));
+				new BlockExecutor(poiFacade)));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(

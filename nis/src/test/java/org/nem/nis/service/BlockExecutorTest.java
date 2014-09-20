@@ -520,6 +520,6 @@ public class BlockExecutorTest {
 	}
 
 	private static BlockExecutor createBlockExecutor(final PoiFacade poiFacade) {
-		return new BlockExecutor(poiFacade, null);
+		return new BlockExecutor(poiFacade);
 	}
 }

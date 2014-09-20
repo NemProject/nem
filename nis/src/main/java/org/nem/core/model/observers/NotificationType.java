@@ -28,5 +28,12 @@ public enum NotificationType {
 	/**
 	 * The notification represents the announcement of a potentially new account.
 	 */
-	Account
+	Account,
+
+	// TODO 20140920 J-G does it make sense to have this separate?
+	/**
+	 * The notification represents a block harvest reward (this is different from BalanceCredit
+	 * because harvest fees can be forwarded whereas regular credits cannot).
+	 */
+	HarvestReward
 }
