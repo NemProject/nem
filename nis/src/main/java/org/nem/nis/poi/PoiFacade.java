@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.secret.BlockChainConstants;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +27,8 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	}
 
 	/**
-	 * Finds a poi account state given an address.
+	 * Finds a poi account state given an address. This function will NOT return
+	 * forwarded states.
 	 *
 	 * @param address The address.
 	 * @return The poi account state.
@@ -39,6 +41,37 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 		}
 
 		return state;
+	}
+
+	/**
+	 * Finds a poi account state given an address following all forwards.
+	 *
+	 * @param address The address.
+	 * @param height Height at which check should be performed.
+	 * @return The poi account state.
+	 */
+	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
+		final PoiAccountState state = this.findStateByAddress(address);
+		if (!state.hasRemoteState() || !state.getRemoteState().isOwner()) { // TODO 20140919 revisit name "owner"
+			return state;
+		}
+
+		final RemoteState remoteState = state.getRemoteState();
+		final long settingHeight = height.subtract(remoteState.getRemoteHeight());
+		boolean shouldUseRemote = false;
+		switch (ImportanceTransferTransaction.Mode.fromValueOrDefault(remoteState.getDirection())) {
+			case Activate:
+				// the remote is active and operational
+				shouldUseRemote = settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+				break;
+
+			case Deactivate:
+				// the remote hasn't been deactivated yet
+				shouldUseRemote = settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+				break;
+		}
+
+		return !shouldUseRemote ? state : this.findStateByAddress(remoteState.getRemoteAddress());
 	}
 
 	/**

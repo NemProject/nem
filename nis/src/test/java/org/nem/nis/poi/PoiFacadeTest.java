@@ -46,6 +46,118 @@ public class PoiFacadeTest {
 
 	//endregion
 
+	//region findForwardedStateByAddress
+
+	@Test
+	public void findForwardedStateByAddressReturnsStateForAddress() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		final PoiAccountState state = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(state, IsNull.notNullValue());
+		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		final PoiAccountState state1 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final PoiAccountState state2 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(state2, IsEqual.equalTo(state1));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenAccountIsRemote() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+		state.remoteFor(Utils.generateRandomAddress(), BlockHeight.ONE, 1);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(2880));
+
+		// Assert:
+		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsRemoteStateWhenActiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		Assert.assertThat(isLocalState(1, 1, 1441), IsEqual.equalTo(false));
+		Assert.assertThat(isLocalState(1, 1000, 2880), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenActiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		Assert.assertThat(isLocalState(1, 1, 1440), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(1, 1000, 1000), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsRemoteStateWhenInactiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		Assert.assertThat(isLocalState(2, 1, 1440), IsEqual.equalTo(false));
+		Assert.assertThat(isLocalState(2, 1000, 1000), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenInactiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		Assert.assertThat(isLocalState(2, 1, 1441), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(2, 1000, 2880), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenRemoteModeIsUnknown() {
+		// Assert:
+		Assert.assertThat(isLocalState(7, 1, 1441), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(0, 1000, 1000), IsEqual.equalTo(true));
+	}
+
+	private static boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+		state.setRemote(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(currentBlockHeight));
+
+		// Assert:
+		return forwardedState.equals(state);
+	}
+
+	//endregion
+
 	//region removeFromCache
 
 	@Test
