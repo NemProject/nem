@@ -133,8 +133,15 @@ public class NisAppConfig {
 				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
-				this.transferDao,
 				this.foraging(),
+				this.blockChainServices());
+	}
+
+	@Bean
+	public BlockChainServices blockChainServices() {
+		return new BlockChainServices(
+				this.transferDao,
+				this.blockDao,
 				this.validator());
 	}
 

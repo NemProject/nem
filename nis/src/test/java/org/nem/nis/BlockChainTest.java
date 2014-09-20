@@ -15,6 +15,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
+import org.nem.nis.validators.*;
 
 import java.lang.reflect.*;
 import java.math.BigInteger;
@@ -146,17 +147,20 @@ public class BlockChainTest {
 
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
-		final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final Foraging foraging = Mockito.mock(Foraging.class);
+		final BlockChainServices services =
+				new BlockChainServices(
+						Mockito.mock(TransferDao.class),
+						mockBlockDao,
+						(transaction, predicate) -> ValidationResult.SUCCESS);
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
-				transferDao,
 				foraging,
-				null);
+				services);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));

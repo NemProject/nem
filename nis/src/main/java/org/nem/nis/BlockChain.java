@@ -3,16 +3,13 @@ package org.nem.nis;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
-import org.nem.nis.validators.TransactionValidator;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
@@ -32,10 +29,9 @@ public class BlockChain implements BlockSynchronizer {
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
-	private final TransferDao transferDao;
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
-	private final TransactionValidator validator;
+	private final BlockChainServices services;
 	private BlockChainScore score;
 
 	@Autowired(required = true)
@@ -44,16 +40,14 @@ public class BlockChain implements BlockSynchronizer {
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
-			final TransferDao transferDao,
 			final Foraging foraging,
-			final TransactionValidator validator) {
+			final BlockChainServices services) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
-		this.transferDao = transferDao;
 		this.foraging = foraging;
-		this.validator = validator;
+		this.services = services;
 		this.score = BlockChainScore.ZERO;
 	}
 
@@ -283,7 +277,7 @@ public class BlockChain implements BlockSynchronizer {
 				this.accountAnalyzer,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
-				this.transferDao,
+				this.services,
 				this.score);
 	}
 
@@ -296,7 +290,6 @@ public class BlockChain implements BlockSynchronizer {
 			final boolean shouldPunishLowerPeerScore) {
 		final UpdateChainResult updateResult = context.updateOurChain(
 				this.foraging,
-				this.validator,
 				dbParentBlock,
 				peerChain,
 				ourScore,
@@ -329,36 +322,24 @@ public class BlockChain implements BlockSynchronizer {
 	private static class BlockChainSyncContext {
 		private final AccountAnalyzer accountAnalyzer;
 		private final AccountAnalyzer originalAnalyzer;
-		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
-		private final TransferDao transferDao;
+		private final BlockChainServices services;
 		private final BlockChainScore ourScore;
-		private final BlockTransactionObserver observer;
 
 		private BlockChainSyncContext(
 				final AccountAnalyzer accountAnalyzer,
 				final AccountAnalyzer originalAnalyzer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
-				final TransferDao transferDao,
+				final BlockChainServices services,
 				final BlockChainScore ourScore) {
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
-			this.transferDao = transferDao;
+			this.services = services;
 			this.ourScore = ourScore;
-			this.observer = this.createCommitObserver();
-		}
-
-		private BlockTransactionObserver createCommitObserver() {
-			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-			builder.add(new AccountsHeightObserver(this.accountAnalyzer));
-			builder.add(new BalanceCommitTransferObserver());
-			builder.add(new RemoteObserver(this.accountAnalyzer.getPoiFacade()));
-			return builder.build();
 		}
 
 		/**
@@ -369,28 +350,11 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score for iterated blocks.
 		 */
 		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
-			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
-
-			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
-			// second visitor needs that information
-			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(
-					this.createCommitObserver(),
-					new BlockExecutor(this.accountAnalyzer.getPoiFacade(), this.accountAnalyzer.getAccountCache())));
-			visitors.add(scoreVisitor);
-			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
-			BlockIterator.unwindUntil(
-					this.createLocalBlockLookup(),
-					commonBlockHeight,
-					visitor);
-			this.accountAnalyzer.getPoiFacade().undoVesting(commonBlockHeight);
-
-			return scoreVisitor.getScore();
+			return this.services.undoAndGetScore(this.accountAnalyzer, this.createLocalBlockLookup(), commonBlockHeight);
 		}
 
 		public UpdateChainResult updateOurChain(
 				final Foraging foraging,
-				final TransactionValidator validator,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -399,12 +363,9 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
 					this.accountAnalyzer,
 					this.originalAnalyzer,
-					this.blockScorer,
 					this.blockChainLastBlockLayer,
 					this.blockDao,
-					this.transferDao,
-					this.observer,
-					validator,
+					this.services,
 					foraging,
 					dbParentBlock,
 					peerChain,
@@ -439,9 +400,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
-		private final TransferDao transferDao;
-		private final BlockTransactionObserver observer;
-		private final TransactionValidator validator;
+		private final BlockChainServices services;
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
@@ -452,12 +411,9 @@ public class BlockChain implements BlockSynchronizer {
 		public BlockChainUpdateContext(
 				final AccountAnalyzer accountAnalyzer,
 				final AccountAnalyzer originalAnalyzer,
-				final BlockScorer blockScorer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
-				final TransferDao transferDao,
-				final BlockTransactionObserver observer,
-				final TransactionValidator validator,
+				final BlockChainServices services,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
@@ -466,12 +422,10 @@ public class BlockChain implements BlockSynchronizer {
 
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = blockScorer;
+			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
-			this.transferDao = transferDao;
-			this.observer = observer;
-			this.validator = validator;
+			this.services = services;
 			this.foraging = foraging;
 
 			// do not trust peer, take first block from our db and convert it
@@ -521,47 +475,13 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score or -1 if chain is invalid
 		 */
 		private boolean validatePeerChain() {
-			final BlockExecutor executor = new BlockExecutor(this.accountAnalyzer.getPoiFacade(), this.accountAnalyzer.getAccountCache());
-			final BlockChainValidator validator = new BlockChainValidator(
-					this.accountAnalyzer.getPoiFacade(),
-					block -> executor.execute(block, this.observer),
-					this.blockScorer,
-					BlockChainConstants.BLOCKS_LIMIT,
-					hash -> (null != this.transferDao.findByHash(hash.getRaw())),
-					this.validator);
-			this.calculatePeerChainDifficulties();
-			return validator.isValid(this.parentBlock, this.peerChain);
+			return this.services.isPeerChainValid(this.accountAnalyzer, this.parentBlock, this.peerChain);
 		}
 
 		private BlockChainScore getPeerChainScore() {
 			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
 			BlockIterator.all(this.parentBlock, this.peerChain, scoreVisitor);
 			return scoreVisitor.getScore();
-		}
-
-		private void calculatePeerChainDifficulties() {
-			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
-			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
-
-			final int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-			final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
-			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-
-			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(
-						difficulties,
-						timeStamps,
-						block.getHeight().getRaw());
-				block.setDifficulty(difficulty);
-
-				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-				difficulties.add(difficulty);
-				timeStamps.add(block.getTimeStamp());
-				if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
-					difficulties.remove(0);
-					timeStamps.remove(0);
-				}
-			}
 		}
 
 		/*
