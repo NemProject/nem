@@ -330,21 +330,9 @@ public class TransferTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-
-		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(0);
-		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
-		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(recipient));
-
-		final BalanceTransferNotification notification2 = (BalanceTransferNotification)notificationCaptor.getAllValues().get(1);
-		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
-		Assert.assertThat(notification2.getSender(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification2.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(99)));
-
-		final BalanceAdjustmentNotification notification3 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(2);
-		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.BalanceDebit));
-		Assert.assertThat(notification3.getAccount(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification3.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient, Amount.fromNem(99));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
 	}
 
 	//endregion
@@ -367,21 +355,9 @@ public class TransferTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-
-		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(2);
-		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
-		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(recipient));
-
-		final BalanceTransferNotification notification2 = (BalanceTransferNotification)notificationCaptor.getAllValues().get(1);
-		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
-		Assert.assertThat(notification2.getSender(), IsEqual.equalTo(recipient));
-		Assert.assertThat(notification2.getRecipient(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(99)));
-
-		final BalanceAdjustmentNotification notification3 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(0);
-		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
-		Assert.assertThat(notification3.getAccount(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification3.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), recipient);
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer, Amount.fromNem(99));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
 	}
 
 	//endregion

@@ -207,21 +207,9 @@ public class ImportanceTransferTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-
-		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(0);
-		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
-		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(remote));
-
-		final BalanceAdjustmentNotification notification2 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(1);
-		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceDebit));
-		Assert.assertThat(notification2.getAccount(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
-
-		final ImportanceTransferNotification notification3 = (ImportanceTransferNotification)notificationCaptor.getAllValues().get(2);
-		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
-		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate.value()));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), remote);
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
+		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(2), signer, remote, ImportanceTransferTransaction.Mode.Activate.value());
 	}
 
 	@Test
@@ -241,28 +229,16 @@ public class ImportanceTransferTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-
-		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(2);
-		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
-		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(remote));
-
-		final BalanceAdjustmentNotification notification2 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(1);
-		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
-		Assert.assertThat(notification2.getAccount(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
-
-		final ImportanceTransferNotification notification3 = (ImportanceTransferNotification)notificationCaptor.getAllValues().get(0);
-		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
-		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
-		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
-		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate.value()));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), remote);
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
+		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(0), signer, remote, ImportanceTransferTransaction.Mode.Activate.value());
 	}
 
 	// endregion
 
 	private static ImportanceTransferTransaction createImportanceTransferTransaction(
 			final Account sender,
-			ImportanceTransferTransaction.Mode mode,
+			final ImportanceTransferTransaction.Mode mode,
 			final Account remote) {
 		return new ImportanceTransferTransaction(TIME, sender, mode, remote);
 	}
