@@ -352,6 +352,7 @@ public class BlockChain implements BlockSynchronizer {
 			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 			builder.add(new AccountsHeightObserver(this.accountAnalyzer));
 			builder.add(new BalanceCommitTransferObserver());
+			builder.add(new RemoteObserver(this.accountAnalyzer.getPoiFacade()));
 			return builder.build();
 		}
 

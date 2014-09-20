@@ -132,7 +132,6 @@ public class BlockExecutor {
 			final Collection<BlockTransactionObserver> observers) {
 		final AggregateBlockTransactionObserverBuilder btoBuilder = new AggregateBlockTransactionObserverBuilder();
 		btoBuilder.add(new WeightedBalancesObserver(this.poiFacade));
-		btoBuilder.add(new RemoteObserver(this.poiFacade));
 		observers.forEach(obj -> btoBuilder.add((obj)));
 
 		final TransactionObserver aggregateObserver = new BlockTransactionObserverToTransactionObserverAdapter(
