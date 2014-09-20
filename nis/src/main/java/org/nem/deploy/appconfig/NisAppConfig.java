@@ -10,8 +10,8 @@ import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
-import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -139,7 +139,10 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChainServices blockChainServices() {
-		return new BlockChainServices(this.transferDao, this.blockDao);
+		return new BlockChainServices(
+				this.transferDao,
+				this.blockDao,
+				new BlockTransactionObserverFactory());
 	}
 
 	@Bean

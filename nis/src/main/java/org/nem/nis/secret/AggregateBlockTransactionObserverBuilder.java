@@ -47,11 +47,21 @@ public class AggregateBlockTransactionObserverBuilder {
 	}
 
 	/**
-	 * Builds the aggregate observer.
+	 * Builds the aggregate observer by chaining all observers.
 	 *
-	 * @return the aggregate observer.
+	 * @return The aggregate observer.
 	 */
 	public BlockTransactionObserver build() {
+		return new AggregateBlockTransactionObserver(this.observers);
+	}
+
+	/**
+	 * Builds the aggregate observer by chaining all observers in reverse order.
+	 *
+	 * @return The aggregate observer.
+	 */
+	public BlockTransactionObserver buildReverse() {
+		Collections.reverse(this.observers);
 		return new AggregateBlockTransactionObserver(this.observers);
 	}
 

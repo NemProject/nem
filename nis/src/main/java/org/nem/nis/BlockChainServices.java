@@ -1,7 +1,6 @@
 package org.nem.nis;
 
 import org.nem.core.model.Block;
-import org.nem.core.model.observers.BalanceCommitTransferObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
@@ -27,11 +26,16 @@ import java.util.*;
 public class BlockChainServices {
 	private final TransferDao transferDao;
 	private final BlockDao blockDao;
+	private final BlockTransactionObserverFactory observerFactory;
 
 	@Autowired(required = true)
-	public BlockChainServices(final TransferDao transferDao, final BlockDao blockDao) {
+	public BlockChainServices(
+			final TransferDao transferDao,
+			final BlockDao blockDao,
+			final BlockTransactionObserverFactory observerFactory) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
+		this.observerFactory = observerFactory;
 	}
 
 	/**
@@ -50,29 +54,14 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
-		final BlockExecutor executor = new BlockExecutor(poiFacade);
+		final BlockExecutor executor = new BlockExecutor();
 		final BlockChainValidator validator = new BlockChainValidator(
-				block -> executor.execute(block, this.createCommitObserver(accountAnalyzer)),
+				block -> executor.execute(block, this.observerFactory.createExecuteCommitObserver(accountAnalyzer)),
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				hash -> (null != this.transferDao.findByHash(hash.getRaw())),
 				this.createValidator(accountAnalyzer));
 		return validator.isValid(parentBlock, peerChain);
-	}
-
-	/**
-	 * Creates a block transaction observer that commits all changes.
-	 *
-	 * @param accountAnalyzer The current account analyzer.
-	 * @return The observer.
-	 */
-	private BlockTransactionObserver createCommitObserver(final AccountAnalyzer accountAnalyzer) {
-		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-		builder.add(new AccountsHeightObserver(accountAnalyzer));
-		builder.add(new BalanceCommitTransferObserver());
-		builder.add(new HarvestRewardCommitObserver(accountAnalyzer.getPoiFacade(), accountAnalyzer.getAccountCache()));
-		builder.add(new RemoteObserver(accountAnalyzer.getPoiFacade()));
-		return builder.build();
 	}
 
 	/**
@@ -109,8 +98,8 @@ public class BlockChainServices {
 		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
-				this.createCommitObserver(accountAnalyzer),
-				new BlockExecutor(poiFacade)));
+				this.observerFactory.createUndoCommitObserver(accountAnalyzer),
+				new BlockExecutor()));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(
