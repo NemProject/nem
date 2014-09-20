@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.observers.Notification;
+import org.nem.core.model.observers.*;
 
 import java.util.*;
 
@@ -26,6 +26,24 @@ public class AggregateBlockTransactionObserverBuilder {
 	 */
 	public void add(final BlockTransferObserver observer) {
 		this.observers.add(new BlockTransferObserverToBlockTransactionObserverAdapter(observer));
+	}
+
+	/**
+	 * Adds an observer to the aggregate.
+	 *
+	 * @param observer The observer to add.
+	 */
+	public void add(final TransactionObserver observer) {
+		this.add(new TransactionObserverToBlockTransferObserverAdapter(observer));
+	}
+
+	/**
+	 * Adds an observer to the aggregate.
+	 *
+	 * @param observer The observer to add.
+	 */
+	public void add(final TransferObserver observer) {
+		this.add(new TransferObserverToTransactionObserverAdapter(observer));
 	}
 
 	/**

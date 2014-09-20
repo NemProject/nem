@@ -13,7 +13,7 @@ public class BlockTransactionObserverToTransactionObserverAdapter implements Tra
 	/**
 	 * Creates a new adapter.
 	 *
-	 * @param observer The wrapped transaction observer.
+	 * @param observer The wrapped block transaction observer.
 	 * @param context The supplementary context.
 	 */
 	public BlockTransactionObserverToTransactionObserverAdapter(
