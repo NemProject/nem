@@ -25,6 +25,7 @@ public class BlockChain implements BlockSynchronizer {
 	// TODO 20140909 J-G: we really need to come up with a better structure for this (a lot of changes need to be made to push one thing down)
 	// G-J: maybe we could wrap some of them into contexts?
 	// TODO 20140914 J-G: i'm not even sure how much the contexts help :/ i think when we add a second block chain this will naturally get cleaned up ... it's just annoying now :)
+	// TODO 20140920 J-G: started some of the refactoring by pulling stuff out into BlockChainServices (i wouldn't dump everything there), but it think it is a good facade that hides a lot of the helpers from this class
 
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
