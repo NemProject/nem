@@ -39,6 +39,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -55,6 +56,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -92,6 +94,29 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
+	}
+
+	//endregion
+
+	//region Message Length
+
+	@Test
+	public void messageLengthReturnsEncodedLength() {
+		// Arrange:
+		final TransferTransaction transaction = this.createTransactionWithMockMessage(100, 44);
+
+		// Assert:
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(100));
+	}
+
+	private TransferTransaction createTransactionWithMockMessage(final int encodedMessageSize, final int decodedMessageSize) {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final MockMessage message = new MockMessage(7);
+		message.setEncodedPayload(new byte[encodedMessageSize]);
+		message.setDecodedPayload(new byte[decodedMessageSize]);
+		return this.createTransferTransaction(signer, recipient, 0, message);
 	}
 
 	//endregion
@@ -164,12 +189,7 @@ public class TransferTransactionTest {
 
 	private Amount calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final MockMessage message = new MockMessage(7);
-		message.setEncodedPayload(new byte[encodedMessageSize]);
-		message.setDecodedPayload(new byte[decodedMessageSize]);
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 0, message);
+		final TransferTransaction transaction = this.createTransactionWithMockMessage(encodedMessageSize, decodedMessageSize);
 
 		// Act:
 		return transaction.getFee();

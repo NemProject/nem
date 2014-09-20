@@ -79,7 +79,12 @@ public class TransferTransaction extends Transaction {
 		return this.message;
 	}
 
-	private int getMessageLength() {
+	/**
+	 * Gets the transaction message length.
+	 *
+	 * @return The transaction message length.
+	 */
+	public int getMessageLength() {
 		return null == this.message ? 0 : this.message.getEncodedPayload().length;
 	}
 

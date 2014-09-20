@@ -11,23 +11,25 @@ public class AggregateTransactionValidatorBuilderTest {
 	public void canAddSingleValidator() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
+		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
 		final TransactionValidator validator = createValidator(ValidationResult.FAILURE_FUTURE_DEADLINE);
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 
 		// Act:
 		builder.add(validator);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction);
+		final ValidationResult result = aggregate.validate(transaction, predicate);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-		Mockito.verify(validator, Mockito.only()).validate(transaction);
+		Mockito.verify(validator, Mockito.only()).validate(transaction, predicate);
 	}
 
 	@Test
 	public void canAddMultipleValidators() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
+		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
 		final TransactionValidator validator1 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator2 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator3 = createValidator(ValidationResult.SUCCESS);
@@ -38,19 +40,20 @@ public class AggregateTransactionValidatorBuilderTest {
 		builder.add(validator2);
 		builder.add(validator3);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction);
+		final ValidationResult result = aggregate.validate(transaction, predicate);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Mockito.verify(validator1, Mockito.only()).validate(transaction);
-		Mockito.verify(validator2, Mockito.only()).validate(transaction);
-		Mockito.verify(validator3, Mockito.only()).validate(transaction);
+		Mockito.verify(validator1, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator2, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator3, Mockito.only()).validate(transaction, predicate);
 	}
 
 	@Test
 	public void validationShortCircuitsOnFirstSubValidatorFailure() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
+		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
 		final TransactionValidator validator1 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator2 = createValidator(ValidationResult.FAILURE_CHAIN_INVALID);
 		final TransactionValidator validator3 = createValidator(ValidationResult.SUCCESS);
@@ -61,18 +64,18 @@ public class AggregateTransactionValidatorBuilderTest {
 		builder.add(validator2);
 		builder.add(validator3);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction);
+		final ValidationResult result = aggregate.validate(transaction, predicate);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
-		Mockito.verify(validator1, Mockito.only()).validate(transaction);
-		Mockito.verify(validator2, Mockito.only()).validate(transaction);
-		Mockito.verify(validator3, Mockito.never()).validate(transaction);
+		Mockito.verify(validator1, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator2, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator3, Mockito.never()).validate(transaction, predicate);
 	}
 
 	private static TransactionValidator createValidator(final ValidationResult result) {
 		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(result);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		return validator;
 	}
 }

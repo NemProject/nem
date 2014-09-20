@@ -36,9 +36,9 @@ public class AggregateTransactionValidatorBuilder {
 		}
 
 		@Override
-		public ValidationResult validate(final Transaction transaction) {
+		public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
 			for (final TransactionValidator validator : this.validators) {
-				final ValidationResult result = validator.validate(transaction);
+				final ValidationResult result = validator.validate(transaction, predicate);
 				if (ValidationResult.SUCCESS != result) {
 					return result;
 				}
