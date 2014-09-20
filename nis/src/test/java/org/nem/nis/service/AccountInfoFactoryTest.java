@@ -70,8 +70,6 @@ public class AccountInfoFactoryTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
-		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
-		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
 	}
 

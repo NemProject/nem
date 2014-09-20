@@ -126,16 +126,10 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected void executeCommit() {
-		if (0 != this.getMessageLength()) {
-			this.recipient.addMessage(this.message);
-		}
 	}
 
 	@Override
 	protected void undoCommit() {
-		if (0 != this.getMessageLength()) {
-			this.recipient.removeMessage(this.message);
-		}
 	}
 
 	@Override

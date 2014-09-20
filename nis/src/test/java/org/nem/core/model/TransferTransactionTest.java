@@ -346,57 +346,6 @@ public class TransferTransactionTest {
 		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(99L)));
 	}
 
-	@Test
-	public void executeDoesNotAppendEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void executeAppendsNonEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
-	}
-
-	@Test
-	public void executeNonCommitDoesNotAppendNonEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute(Mockito.mock(TransactionObserver.class));
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
-	}
-
 	//endregion
 
 	//region undo
@@ -433,78 +382,6 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(1L)));
-	}
-
-	@Test
-	public void undoDoesNotRemoveEmptyMessageFomAccount() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		recipient.addMessage(new PlainMessage(new byte[] { 0x25, 0x52, 0x7F }));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(
-				recipient.getMessages().get(0).getDecodedPayload(),
-				IsEqual.equalTo(new byte[] { 0x25, 0x52, 0x7F }));
-	}
-
-	@Test
-	public void undoRemovesNonEmptyMessageFromAccount() {
-		// Arrange:
-		final byte[] messageInput1 = Utils.generateRandomBytes();
-		final byte[] messageInput2 = Utils.generateRandomBytes();
-		final Message message = new PlainMessage(messageInput1);
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(3));
-		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(messageInput1));
-		Assert.assertThat(recipient.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(messageInput2));
-		Assert.assertThat(recipient.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(messageInput2));
-	}
-
-	@Test
-	public void undoNonCommitDoesNotRemoveNonEmptyMessageFromAccount() {
-		// Arrange:
-		final byte[] messageInput1 = Utils.generateRandomBytes();
-		final byte[] messageInput2 = Utils.generateRandomBytes();
-		final Message message = new PlainMessage(messageInput1);
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo(Mockito.mock(TransactionObserver.class));
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));
 	}
 
 	//endregion

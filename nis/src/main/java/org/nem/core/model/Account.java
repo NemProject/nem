@@ -12,7 +12,6 @@ import java.util.*;
 public class Account {
 	private KeyPair keyPair;
 	private Address address;
-	private final List<Message> messages;
 	private String label;
 	private Amount balance = Amount.ZERO;
 	private BlockAmount foragedBlocks = BlockAmount.ZERO;
@@ -94,7 +93,6 @@ public class Account {
 	protected Account(final KeyPair keyPair, final Address address) {
 		this.keyPair = keyPair;
 		this.address = address;
-		this.messages = new ArrayList<>();
 	}
 
 	private Account(final Account rhs) {
@@ -104,10 +102,6 @@ public class Account {
 		this.balance = rhs.getBalance();
 		this.label = rhs.getLabel();
 		this.foragedBlocks = rhs.getForagedBlocks();
-
-		this.messages = new ArrayList<>();
-		this.messages.addAll(rhs.getMessages());
-
 		this.refCount = rhs.getReferenceCount();
 	}
 
@@ -117,8 +111,6 @@ public class Account {
 		this.balance = rhs.getBalance();
 		this.label = rhs.getLabel();
 		this.foragedBlocks = rhs.getForagedBlocks();
-
-		this.messages = rhs.getMessages();
 		this.refCount = rhs.getReferenceCount();
 	}
 
@@ -225,38 +217,6 @@ public class Account {
 	 */
 	public void setLabel(final String label) {
 		this.label = label;
-	}
-
-	/**
-	 * Gets all messages associated with the account.
-	 *
-	 * @return All messages associated with the account.
-	 */
-	public List<Message> getMessages() {
-		return this.messages;
-	}
-
-	/**
-	 * Associates message with the account.
-	 *
-	 * @param message The message to associate with this account.
-	 */
-	public void addMessage(final Message message) {
-		this.messages.add(message);
-	}
-
-	/**
-	 * Removes the last occurrence of the specified message from this account.
-	 *
-	 * @param message The message to remove from this account.
-	 */
-	public void removeMessage(final Message message) {
-		for (int i = this.messages.size() - 1; i >= 0; --i) {
-			if (message.equals(this.messages.get(i))) {
-				this.messages.remove(i);
-				break;
-			}
-		}
 	}
 
 	/**

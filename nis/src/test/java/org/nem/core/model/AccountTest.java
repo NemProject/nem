@@ -27,7 +27,6 @@ public class AccountTest {
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
@@ -42,7 +41,6 @@ public class AccountTest {
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
@@ -59,7 +57,6 @@ public class AccountTest {
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
@@ -75,7 +72,6 @@ public class AccountTest {
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
 		Assert.assertThat(account.getLabel(), IsEqual.equalTo("blah"));
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -269,95 +265,6 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	//endregion
-
-	//region Message
-
-	@Test
-	public void singleMessageCanBeAdded() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-		final Account account = new Account(new KeyPair());
-
-		// Act:
-		account.addMessage(new PlainMessage(input));
-
-		// Assert:
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input));
-	}
-
-	@Test
-	public void multipleMessagesCanBeAdded() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-		final Account account = new Account(new KeyPair());
-
-		// Act:
-		account.addMessage(new PlainMessage(input1));
-		account.addMessage(new PlainMessage(input2));
-
-		// Assert:
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(2));
-		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
-		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
-	}
-
-	@Test
-	public void messageCanBeRemoved() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-		final Account account = new Account(new KeyPair());
-
-		// Act:
-		account.addMessage(new PlainMessage(input1));
-		account.addMessage(new PlainMessage(input2));
-		account.removeMessage(new PlainMessage(input1));
-
-		// Assert:
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input2));
-	}
-
-	@Test
-	public void lastMatchingMessageIsRemoved() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-		final Account account = new Account(new KeyPair());
-
-		// Act:
-		account.addMessage(new PlainMessage(input1));
-		account.addMessage(new PlainMessage(input2));
-		account.addMessage(new PlainMessage(input1));
-		account.addMessage(new PlainMessage(input2));
-		account.removeMessage(new PlainMessage(input1));
-
-		// Assert:
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(3));
-		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
-		Assert.assertThat(account.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(input2));
-		Assert.assertThat(account.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(input2));
-	}
-
-	@Test
-	public void nothingHappensIfMessageNotAssociatedWithAccountIsRemoved() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-		final Account account = new Account(new KeyPair());
-
-		// Act:
-		account.addMessage(new PlainMessage(input1));
-		account.removeMessage(new PlainMessage(input2));
-
-		// Assert:
-		Assert.assertThat(account.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(account.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(input1));
 	}
 
 	//endregion
@@ -580,23 +487,6 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
 	}
 
-	@Test
-	public void copyCreatesUnlinkedCopyOfMessages() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
-		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
-
-		// Act:
-		final Account copyAccount = account.copy();
-
-		// Assert:
-		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
-		Assert.assertThat(copyAccount.getMessages().size(), IsEqual.equalTo(2));
-		Assert.assertThat(getEncodedMessageAt(copyAccount, 0), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
-		Assert.assertThat(getEncodedMessageAt(copyAccount, 1), IsEqual.equalTo(new byte[] { 7, 9, 8 }));
-	}
-
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
 		// Arrange:
 		setAccountValuesForCopyTests(account);
@@ -613,9 +503,6 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
-
-		// verify that the mutable objects are not the same
-		Assert.assertThat(copyAccount.getMessages(), IsNot.not(IsSame.sameInstance(account.getMessages())));
 		return copyAccount;
 	}
 
@@ -627,8 +514,6 @@ public class AccountTest {
 		account.setLabel("Alpha Sigma");
 		account.incrementReferenceCount();
 		account.incrementReferenceCount();
-		account.addMessage(new PlainMessage(new byte[] { 1, 2, 3 }));
-		account.addMessage(new PlainMessage(new byte[] { 7, 9, 8 }));
 	}
 
 	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
@@ -638,10 +523,6 @@ public class AccountTest {
 			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
 			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
 		}
-	}
-
-	private static byte[] getEncodedMessageAt(final Account account, final int index) {
-		return account.getMessages().get(index).getEncodedPayload();
 	}
 
 	//endregion
@@ -670,7 +551,6 @@ public class AccountTest {
 		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
 		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
 		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
-		Assert.assertThat(copy.getMessages(), IsSame.sameInstance(original.getMessages()));
 	}
 
 	//endregion
