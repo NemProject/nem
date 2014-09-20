@@ -202,22 +202,23 @@ public class BlockScorerTest {
 		}
 	}
 
-	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {
+	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
 
+		final BlockHeight groupedHeight = new BlockHeight(rawGroupedHeight);
 		final Address signerAddress = block.getSigner().getAddress();
-		Mockito.when(poiFacade.findStateByAddress(signerAddress))
-				.thenReturn(new PoiAccountState(signerAddress));
-		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(groupedHeight), 0.75);
+		final PoiAccountState state = new PoiAccountState(signerAddress);
+		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
+		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, groupedHeight)).thenReturn(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
 
 		// Assert:
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(new BlockHeight(groupedHeight));
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
 	}
 
 	//endregion

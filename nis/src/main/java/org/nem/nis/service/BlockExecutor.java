@@ -68,7 +68,7 @@ public class BlockExecutor {
 
 		// TODO 20140918: test this
 		final Account signer = block.getSigner();
-		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
+		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(signer.getAddress(), block.getHeight());
 		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
 		endowed.incrementForagedBlocks();
 		endowed.incrementBalance(block.getTotalFee());
@@ -109,7 +109,7 @@ public class BlockExecutor {
 
 		// TODO 20140918: test this
 		final Account signer = block.getSigner();
-		final PoiAccountState poiAccountState = BlockScorer.getForwardedAccountState(this.poiFacade, signer.getAddress(), block.getHeight());
+		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(signer.getAddress(), block.getHeight());
 		final Account endowed = poiAccountState.getAddress().equals(signer.getAddress()) ? signer : this.accountCache.findByAddress(poiAccountState.getAddress());
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, endowed, block.getTotalFee()));
 		endowed.decrementForagedBlocks();

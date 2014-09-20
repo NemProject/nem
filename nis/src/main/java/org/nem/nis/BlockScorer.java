@@ -2,14 +2,10 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.poi.RemoteState;
 import org.nem.nis.secret.AccountImportance;
-import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
-import java.rmi.Remote;
 
 /**
  * Provides functions for scoring block hits and targets.
@@ -103,64 +99,6 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Returns PoiAccountState for an address.
-	 * If address is remote address, finds owner, and returns state of an owner.
-	 *
-	 * Note, this doesn't take height and should be used only during unlocking
-	 *
-	 * @param poiFacade Poi facade to use for searching.
-	 * @param signerAddress Address of an account.
-	 * @return PoiAccountState.
-	 */
-	public static PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress) {
-		PoiAccountState accountState = poiFacade.findStateByAddress(signerAddress);
-		//@formatter:off
-		if (accountState.hasRemoteState()) {
-			final RemoteState rState = accountState.getRemoteState();
-			if (!rState.isOwner() && rState.getDirection() == ImportanceTransferTransaction.Mode.Activate.value()) {
-				accountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
-			}
-		}
-		//@formatter:on
-		return accountState;
-	}
-
-
-	/**
-	 * Returns PoiAccountState for an address.
-	 * If address is remote address, finds owner, and returns state of an owner.
-	 *
-	 * @param poiFacade Poi facade to use for searching.
-	 * @param signerAddress Address of an account.
-	 * @param height Height at which check should be performed.
-	 * @return PoiAccountState.
-	 */
-	public static PoiAccountState getForwardedAccountState(final PoiFacade poiFacade, final Address signerAddress, final BlockHeight height) {
-		PoiAccountState poiAccountState = poiFacade.findStateByAddress(signerAddress);
-		if (poiAccountState.hasRemoteState()) {
-			final RemoteState rState = poiAccountState.getRemoteState();
-			final long settingHeight = height.subtract(rState.getRemoteHeight());
-
-			// only "valid" blocks should get here, so we have to deal only with two cases:
-			//  * remote is active and operational,
-			//  * remote isn'd deactivated yet
-			// @formatter:off
-			if (! rState.isOwner() &&
-					(
-							(rState.getDirection() == ImportanceTransferTransaction.Mode.Activate.value() &&
-									settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) ||
-							(rState.getDirection() == ImportanceTransferTransaction.Mode.Deactivate.value() &&
-									settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY)
-					)) {
-				poiAccountState = poiFacade.findStateByAddress(rState.getRemoteAddress());
-			}
-			// @formatter:on
-		}
-		return poiAccountState;
-	}
-
-
-	/**
 	 * Calculates forager balance for block.
 	 * This has the side-effect of recalculating importances.
 	 *
@@ -172,8 +110,9 @@ public class BlockScorer {
 		this.poiFacade.recalculateImportances(blockHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final PoiAccountState accountState = getForwardedAccountState(this.poiFacade, signerAddress, block.getHeight());
-		final AccountImportance accountImportance = accountState.getImportanceInfo();
+		final AccountImportance accountImportance = this.poiFacade
+				.findForwardedStateByAddress(signerAddress, blockHeight)
+				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
 	}
 

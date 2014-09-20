@@ -65,11 +65,9 @@ public class Foraging {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
-		final PoiAccountState accountState = BlockScorer.getForwardedAccountState(this.poiFacade, account.getAddress());
-		final PoiAccountInfo accountInfo = new PoiAccountInfo(
-				-1,
-				accountState,
-				new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
+		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+		final PoiAccountState accountState = this.poiFacade.findForwardedStateByAddress(account.getAddress(), currentHeight);
+		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, accountState, currentHeight);
 
 		if (!accountInfo.canForage()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
