@@ -3,12 +3,13 @@ package org.nem.nis;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.*;
@@ -328,6 +329,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockDao blockDao;
 		private final TransferDao transferDao;
 		private final BlockChainScore ourScore;
+		private final BlockTransactionObserver observer;
 
 		private BlockChainSyncContext(
 				final AccountAnalyzer accountAnalyzer,
@@ -343,6 +345,16 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockDao = blockDao;
 			this.transferDao = transferDao;
 			this.ourScore = ourScore;
+			this.observer = this.createCommitObserver();
+		}
+
+		private BlockTransactionObserver createCommitObserver() {
+			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
+			builder.add(new AccountsHeightObserver(this.accountAnalyzer));
+			// TODO - this is broken!
+			//new TransferObserverToBlockTransferObserver(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver());
+			//builder.add(new BlockTransferObserverToBlockTransactionObserverAdapter(new BalanceCommitTransferObserver()));
+			return builder.build();
 		}
 
 		/**
@@ -358,7 +370,8 @@ public class BlockChain implements BlockSynchronizer {
 			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
 			// second visitor needs that information
 			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer),
+			visitors.add(new UndoBlockVisitor(
+					this.createCommitObserver(),
 					new BlockExecutor(this.accountAnalyzer.getPoiFacade(), this.accountAnalyzer.getAccountCache())));
 			visitors.add(scoreVisitor);
 			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
@@ -385,6 +398,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockChainLastBlockLayer,
 					this.blockDao,
 					this.transferDao,
+					this.observer,
 					foraging,
 					dbParentBlock,
 					peerChain,
@@ -420,6 +434,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
 		private final TransferDao transferDao;
+		private final BlockTransactionObserver observer;
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
@@ -434,6 +449,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
 				final TransferDao transferDao,
+				final BlockTransactionObserver observer,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
@@ -446,6 +462,7 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
 			this.transferDao = transferDao;
+			this.observer = observer;
 			this.foraging = foraging;
 
 			// do not trust peer, take first block from our db and convert it
@@ -496,11 +513,9 @@ public class BlockChain implements BlockSynchronizer {
 		 */
 		private boolean validatePeerChain() {
 			final BlockExecutor executor = new BlockExecutor(this.accountAnalyzer.getPoiFacade(), this.accountAnalyzer.getAccountCache());
-			final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
-
 			final BlockChainValidator validator = new BlockChainValidator(
 					this.accountAnalyzer.getPoiFacade(),
-					block -> executor.execute(block, observer),
+					block -> executor.execute(block, this.observer),
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT,
 					hash -> (null != this.transferDao.findByHash(hash.getRaw())));

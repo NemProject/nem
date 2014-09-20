@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -121,18 +121,19 @@ public class BlockExecutorTest {
 		}
 
 		private void execute() {
+			this.transaction1.setTransactionAction(o -> this.executeList.add(1));
+			this.transaction2.setTransactionAction(o -> this.executeList.add(2));
 			this.executor.execute(this.block);
 		}
 
 		private void undo() {
+			this.transaction1.setTransactionAction(o -> this.undoList.add(1));
+			this.transaction2.setTransactionAction(o -> this.undoList.add(2));
 			this.executor.undo(this.block);
 		}
 
 		private MockTransaction createTransaction(final int customField, final long fee) {
-			final MockTransaction transaction = BlockUtils.createTransactionWithFee(customField, fee);
-			transaction.setExecuteList(this.executeList);
-			transaction.setUndoList(this.undoList);
-			return transaction;
+			return BlockUtils.createTransactionWithFee(customField, fee);
 		}
 	}
 

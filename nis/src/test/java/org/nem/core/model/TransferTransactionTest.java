@@ -2,9 +2,9 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.messages.*;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -315,7 +315,7 @@ public class TransferTransactionTest {
 	//region Execute
 
 	@Test
-	public void executeTransfersAmountAndFeeFromSigner() {
+	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
@@ -324,26 +324,27 @@ public class TransferTransactionTest {
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.execute();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(891L)));
-	}
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 
-	@Test
-	public void executeTransfersAmountToRecipient() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
+		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(0);
+		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
+		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(recipient));
 
-		// Act:
-		transaction.execute();
+		final BalanceTransferNotification notification2 = (BalanceTransferNotification)notificationCaptor.getAllValues().get(1);
+		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
+		Assert.assertThat(notification2.getSender(), IsEqual.equalTo(signer));
+		Assert.assertThat(notification2.getRecipient(), IsEqual.equalTo(recipient));
+		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(99)));
 
-		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(99L)));
+		final BalanceAdjustmentNotification notification3 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(2);
+		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.BalanceDebit));
+		Assert.assertThat(notification3.getAccount(), IsEqual.equalTo(signer));
+		Assert.assertThat(notification3.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
 	}
 
 	//endregion
@@ -351,37 +352,36 @@ public class TransferTransactionTest {
 	//region undo
 
 	@Test
-	public void undoTransfersAmountAndFeeToSigner() {
+	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.undo();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(1109L)));
-	}
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 
-	@Test
-	public void undoTransfersAmountFromRecipient() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
+		final AccountNotification notification1 = (AccountNotification)notificationCaptor.getAllValues().get(2);
+		Assert.assertThat(notification1.getType(), IsEqual.equalTo(NotificationType.Account));
+		Assert.assertThat(notification1.getAccount(), IsEqual.equalTo(recipient));
 
-		// Act:
-		transaction.undo();
+		final BalanceTransferNotification notification2 = (BalanceTransferNotification)notificationCaptor.getAllValues().get(1);
+		Assert.assertThat(notification2.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
+		Assert.assertThat(notification2.getSender(), IsEqual.equalTo(recipient));
+		Assert.assertThat(notification2.getRecipient(), IsEqual.equalTo(signer));
+		Assert.assertThat(notification2.getAmount(), IsEqual.equalTo(Amount.fromNem(99)));
 
-		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(1L)));
+		final BalanceAdjustmentNotification notification3 = (BalanceAdjustmentNotification)notificationCaptor.getAllValues().get(0);
+		Assert.assertThat(notification3.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
+		Assert.assertThat(notification3.getAccount(), IsEqual.equalTo(signer));
+		Assert.assertThat(notification3.getAmount(), IsEqual.equalTo(Amount.fromNem(10)));
 	}
 
 	//endregion

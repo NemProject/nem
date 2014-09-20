@@ -63,7 +63,6 @@ public class BlockExecutor {
 		final TransactionObserver observer = this.createTransferObserver(block, true, observers);
 
 		for (final Transaction transaction : block.getTransactions()) {
-			transaction.execute();
 			transaction.execute(observer);
 		}
 
@@ -118,7 +117,6 @@ public class BlockExecutor {
 
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(observer);
-			transaction.undo();
 		}
 	}
 

@@ -22,12 +22,7 @@ public class MockTransaction extends Transaction {
 	private int customField;
 	private long minimumFee;
 
-	private List<Integer> executeList = new ArrayList<>();
-	private List<Integer> undoList = new ArrayList<>();
 	private Consumer<TransactionObserver> transferAction = to -> { };
-
-	private int numExecuteCommitCalls;
-	private int numUndoCommitCalls;
 	private int numTransferCalls;
 
 	private ValidationResult validationResult = ValidationResult.SUCCESS;
@@ -122,24 +117,6 @@ public class MockTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets the number executeCommit was called.
-	 *
-	 * @return The number of times executeCommit was called.
-	 */
-	public int getNumExecuteCommitCalls() {
-		return this.numExecuteCommitCalls;
-	}
-
-	/**
-	 * Gets the number undoCommit was called.
-	 *
-	 * @return The number of times undoCommit was called.
-	 */
-	public int getNumUndoCommitCalls() {
-		return this.numUndoCommitCalls;
-	}
-
-	/**
 	 * Gets the number of times transfer was called.
 	 *
 	 * @return The number of times transfer was called.
@@ -164,24 +141,6 @@ public class MockTransaction extends Transaction {
 	 */
 	public void setMinimumFee(final long minimumFee) {
 		this.minimumFee = minimumFee;
-	}
-
-	/**
-	 * Sets a list that this transaction should add its custom field to when execute is called.
-	 *
-	 * @param list The list.
-	 */
-	public void setExecuteList(final List<Integer> list) {
-		this.executeList = list;
-	}
-
-	/**
-	 * Sets a list that this transaction should add its custom field to when undo is called.
-	 *
-	 * @param list The list.
-	 */
-	public void setUndoList(final List<Integer> list) {
-		this.undoList = list;
 	}
 
 	/**
@@ -225,18 +184,6 @@ public class MockTransaction extends Transaction {
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeInt("customField", this.customField);
-	}
-
-	@Override
-	protected void executeCommit() {
-		++this.numExecuteCommitCalls;
-		this.executeList.add(this.customField);
-	}
-
-	@Override
-	protected void undoCommit() {
-		++this.numUndoCommitCalls;
-		this.undoList.add(this.customField);
 	}
 
 	@Override

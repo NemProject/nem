@@ -105,33 +105,12 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	/**
-	 * Executes the transaction.
-	 */
-	public final void execute() {
-		this.execute(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
-		this.executeCommit();
-	}
-
-	/**
 	 * Executes the transaction using the specified observer.
 	 *
 	 * @param observer The observer to use.
 	 */
 	public final void execute(final TransactionObserver observer) {
 		this.transfer(observer);
-	}
-
-	/**
-	 * Performs any other actions required to commit the transaction.
-	 */
-	protected abstract void executeCommit();
-
-	/**
-	 * Undoes the transaction.
-	 */
-	public final void undo() {
-		this.undo(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver()));
-		this.undoCommit();
 	}
 
 	/**
@@ -144,11 +123,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		this.transfer(reverseObserver);
 		reverseObserver.commit();
 	}
-
-	/**
-	 * Performs any other actions required to undo the transaction.
-	 */
-	protected abstract void undoCommit();
 
 	/**
 	 * Executes all transfers using the specified observer.

@@ -144,16 +144,6 @@ public class ImportanceTransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void executeCommit() {
-		// empty
-	}
-
-	@Override
-	protected void undoCommit() {
-		// empty
-	}
-
-	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new AccountNotification(this.getRemote()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));

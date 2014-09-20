@@ -191,30 +191,6 @@ public class ImportanceTransferTransactionTest {
 	//region execute / undo
 
 	@Test
-	public void executeCommitsBalanceChanges() {
-		// Arrange:
-		final Transaction transaction = createTransactionForExecuteUndoTests();
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(transaction.getSigner().getBalance(), IsEqual.equalTo(Amount.fromNem(80L)));
-	}
-
-	@Test
-	public void undoCommitsBalanceChanges() {
-		// Arrange:
-		final Transaction transaction = createTransactionForExecuteUndoTests();
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(transaction.getSigner().getBalance(), IsEqual.equalTo(Amount.fromNem(100L)));
-	}
-
-	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
@@ -280,16 +256,6 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(notification3.getLessor(), IsEqual.equalTo(signer));
 		Assert.assertThat(notification3.getLessee(), IsEqual.equalTo(remote));
 		Assert.assertThat(notification3.getMode(), IsEqual.equalTo(ImportanceTransferTransaction.Mode.Activate.value()));
-	}
-
-	private Transaction createTransactionForExecuteUndoTests() {
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
-		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
-		transaction.setFee(Amount.fromNem(10));
-		return transaction;
 	}
 
 	// endregion

@@ -125,14 +125,6 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void executeCommit() {
-	}
-
-	@Override
-	protected void undoCommit() {
-	}
-
-	@Override
 	protected void transfer(final TransactionObserver observer) {
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
 		transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
