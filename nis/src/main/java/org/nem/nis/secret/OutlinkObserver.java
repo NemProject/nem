@@ -1,63 +1,61 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.*;
 
 import java.math.BigInteger;
 
 /**
- * A transfer observer that updates outlink information.
+ * A block transaction observer that updates outlink information.
  */
-public class OutlinkObserver implements TransferObserver {
+public class OutlinkObserver implements BlockTransactionObserver {
 	private final PoiFacade poiFacade;
-	private final BlockHeight height;
-	private final boolean isExecute;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param poiFacade The poi facade.
-	 * @param height The block height.
-	 * @param isExecute true if the transfers represent an execute; false if they represent an undo.
 	 */
-	public OutlinkObserver(final PoiFacade poiFacade, final BlockHeight height, final boolean isExecute) {
+	public OutlinkObserver(final PoiFacade poiFacade) {
 		this.poiFacade = poiFacade;
-		this.height = height;
-		this.isExecute = isExecute;
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+	public void notify(final Notification notification, final BlockNotificationContext context) {
+		if (NotificationType.BalanceTransfer != notification.getType()) {
+			return;
+		}
+
+		this.notify(
+				(BalanceTransferNotification)notification,
+				NotificationTrigger.Execute == context.getTrigger(),
+				context.getHeight());
+	}
+
+	public void notify(final BalanceTransferNotification notification, final boolean isExecute, final BlockHeight height) {
 		// Trying to gain importance by sending nem to yourself?
+		final Account sender = notification.getSender();
+		final Account recipient = notification.getRecipient();
 		if (sender.getAddress().equals(recipient.getAddress())) {
 			return;
 		}
 
-		final Amount linkWeight = this.calculateLinkWeight(this.isExecute ? sender : recipient, amount);
-
-		if (this.isExecute) {
-			final AccountLink link = new AccountLink(this.height, linkWeight, recipient.getAddress());
+		final Amount linkWeight = this.calculateLinkWeight(height, isExecute ? sender : recipient, notification.getAmount());
+		if (isExecute) {
+			final AccountLink link = new AccountLink(height, linkWeight, recipient.getAddress());
 			this.getState(sender).getImportanceInfo().addOutlink(link);
 		} else {
-			final AccountLink link = new AccountLink(this.height, linkWeight, sender.getAddress());
+			final AccountLink link = new AccountLink(height, linkWeight, sender.getAddress());
 			this.getState(recipient).getImportanceInfo().removeOutlink(link);
 		}
 	}
 
-	@Override
-	public void notifyCredit(final Account account, final Amount amount) {
-	}
-
-	@Override
-	public void notifyDebit(final Account account, final Amount amount) {
-	}
-
-	private Amount calculateLinkWeight(final Account sender, final Amount amount) {
+	private Amount calculateLinkWeight(final BlockHeight height, final Account sender, final Amount amount) {
 		final WeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
-		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(this.height)));
-		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(this.height)));
+		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(height)));
+		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(height)));
 		if (unvested.compareTo(BigInteger.ZERO) <= 0) {
 			return amount;
 		}
