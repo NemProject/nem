@@ -156,7 +156,7 @@ public class TransactionTest {
 		signer.incrementBalance(Amount.fromNem(1000));
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 		transaction.setDeadline(new TimeInstant(60));
-		transaction.setMinimumFee(100);
+		transaction.setMinimumFee(Amount.fromNem(100).getNumMicroNem());
 		transaction.setFee(Amount.fromNem(200));
 
 		// Bob prefers a more user friendly fee structure
