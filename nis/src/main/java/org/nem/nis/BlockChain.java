@@ -351,9 +351,7 @@ public class BlockChain implements BlockSynchronizer {
 		private BlockTransactionObserver createCommitObserver() {
 			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 			builder.add(new AccountsHeightObserver(this.accountAnalyzer));
-			// TODO - this is broken!
-			//new TransferObserverToBlockTransferObserver(new TransferObserverToTransactionObserverAdapter(new BalanceCommitTransferObserver());
-			//builder.add(new BlockTransferObserverToBlockTransactionObserverAdapter(new BalanceCommitTransferObserver()));
+			builder.add(new BalanceCommitTransferObserver());
 			return builder.build();
 		}
 
