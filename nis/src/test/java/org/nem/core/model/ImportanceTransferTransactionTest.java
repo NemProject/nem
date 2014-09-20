@@ -139,39 +139,6 @@ public class ImportanceTransferTransactionTest {
 
 	// endregion
 
-	// region validate
-
-	@Test
-	public void transactionsWithFeesUpToSenderBalanceAreValid() {
-		assertValidationResult(100, 1, ValidationResult.SUCCESS);
-		assertValidationResult(100, 100, ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void transactionsWithFeesGreaterThanSenderBalanceAreNotValid() {
-		assertValidationResult(100, 101, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-	}
-
-	public void assertValidationResult(final int senderBalance, final int fee, final ValidationResult expectedResult) {
-		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
-		final Account signer = Utils.generateRandomAccount();
-		final Account remote = Utils.generateRandomAccount();
-
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
-		transaction.setFee(Amount.fromNem(fee));
-		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
-		signer.incrementBalance(Amount.fromNem(senderBalance));
-
-		// Act:
-		final ValidationResult result = transaction.checkValidity();
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-	}
-
-	// endregion
-
 	//region fee
 
 	@Test

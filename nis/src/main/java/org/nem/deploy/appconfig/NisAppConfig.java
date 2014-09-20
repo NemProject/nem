@@ -11,6 +11,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.*;
+import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Predicate;
 
+// TODO 20140920 J-G does spring support multiple configuration classes? this class is growing quite big and would be nice to split up
 @Configuration
 @ComponentScan(
 		basePackages = { "org.nem.nis" },
@@ -126,7 +128,14 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChain blockChain() {
-		return new BlockChain(this.accountAnalyzer(), this.accountDao, this.blockChainLastBlockLayer, this.blockDao, this.transferDao, this.foraging());
+		return new BlockChain(
+				this.accountAnalyzer(),
+				this.accountDao,
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.transferDao,
+				this.foraging(),
+				this.validator());
 	}
 
 	@Bean
@@ -136,7 +145,8 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transferDao);
+				this.transferDao,
+				this.validator());
 	}
 
 	@Bean
@@ -208,5 +218,13 @@ public class NisAppConfig {
 	@Bean
 	public ChainServices chainServices() {
 		return new ChainServices(this.blockChain(), this.httpConnectorPool());
+	}
+
+	@Bean
+	public TransactionValidator validator() {
+		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		builder.add(new UniversalTransactionValidator());
+		builder.add(new TransferTransactionValidator());
+		return builder.build();
 	}
 }

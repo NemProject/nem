@@ -8,6 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.service.PushService;
+import org.nem.nis.validators.TransactionValidator;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class TransactionController {
 	private final AccountLookup accountLookup;
 	private final PushService pushService;
 	private final Foraging foraging;
+	private final TransactionValidator validator;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
@@ -27,10 +29,12 @@ public class TransactionController {
 			final AccountLookup accountLookup,
 			final PushService pushService,
 			final Foraging foraging,
+			final TransactionValidator validator,
 			final NisPeerNetworkHost host) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.foraging = foraging;
+		this.validator = validator;
 		this.host = host;
 	}
 
@@ -40,8 +44,8 @@ public class TransactionController {
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationResult validationResult = transfer.checkValidity();
-		if (ValidationResult.SUCCESS != transfer.checkValidity()) {
+		final ValidationResult validationResult = this.validator.validate(transfer);
+		if (ValidationResult.SUCCESS != validationResult) {
 			throw new IllegalArgumentException(validationResult.toString());
 		}
 

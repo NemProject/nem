@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
@@ -53,7 +53,7 @@ public class TransactionTest {
 
 	//endregion
 
-	//region Validation
+	//region Deadline
 
 	@Test
 	public void transactionDeadlineCanBeSet() {
@@ -65,66 +65,7 @@ public class TransactionTest {
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
 	}
 
-	@Test
-	public void transactionWithDeadlineInRangeIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithLessThanMinimumDeadlineIsInvalid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp());
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-	}
-
-	@Test
-	public void transactionWithMinimumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithMaximumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-	}
-
-	@Test
-	public void checkValidityDelegatesToCheckDerivedValidity() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
-		transaction.setValidationResult(ValidationResult.FAILURE_UNKNOWN);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
-	}
+	//endregion
 
 	//endregion
 
@@ -206,6 +147,25 @@ public class TransactionTest {
 		transaction.setMinimumFee(minimumFee);
 		transaction.setFee(new Amount(fee));
 		return transaction.getFee().getNumMicroNem();
+	}
+
+	@Test
+	public void feeCannotBeSetBelowMinimum() {
+		// Arrange (category spam attack):
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setMinimumFee(100);
+		transaction.setFee(Amount.fromNem(200));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+		transaction.sign();
+
+		// Assert: the fee is set to the minimum fee
+		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	//endregion

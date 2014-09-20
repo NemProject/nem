@@ -365,7 +365,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions() {
-		return new UnconfirmedTransactions();
+		return new UnconfirmedTransactions(null);
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(final int numTransactions) {

@@ -9,6 +9,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.validators.TransactionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
@@ -44,7 +45,8 @@ public class Foraging {
 			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final TransferDao transferDao) {
+			final TransferDao transferDao,
+			final TransactionValidator transactionValidator) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
@@ -52,7 +54,7 @@ public class Foraging {
 		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions();
+		this.unconfirmedTransactions = new UnconfirmedTransactions(transactionValidator);
 	}
 
 	/**

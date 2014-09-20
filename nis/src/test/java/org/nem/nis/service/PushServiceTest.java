@@ -280,7 +280,7 @@ public class PushServiceTest {
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
 
-			this.service = new PushService(this.foraging, this.blockChain, host);
+			this.service = new PushService(this.foraging, null, this.blockChain, host);
 		}
 
 		public void assertNoUpdateExperience() {

@@ -84,6 +84,7 @@ public class TransactionControllerTest {
 					this.accountLookup,
 					this.pushService,
 					this.foraging,
+					null,
 					this.host);
 		}
 	}

@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.validators.TransactionValidator;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -23,6 +24,16 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(new UnconfirmedTransactionsTransferObserver());
+	private final TransactionValidator validator;
+
+	/**
+	 * Creates a new unconfirmed transactions collection.
+	 *
+	 * @param validator The transaction validator to use.
+	 */
+	public UnconfirmedTransactions(final TransactionValidator validator) {
+		this.validator = validator;
+	}
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -118,8 +129,10 @@ public class UnconfirmedTransactions {
 	}
 
 	private boolean isValid(final Transaction transaction) {
-		return ValidationResult.SUCCESS == transaction.checkValidity(
+		final ValidationResult result = this.validator.validate(
+				transaction,
 				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
+		return ValidationResult.SUCCESS == result;
 	}
 
 	/**
@@ -205,7 +218,7 @@ public class UnconfirmedTransactions {
 	 * @return filtered out list of unconfirmed transactions.
 	 */
 	public List<Transaction> removeConflictingTransactions(final List<Transaction> unconfirmedTransactions) {
-		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions();
+		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
 
 		// TODO: should we remove those that .add() failed?
 		unconfirmedTransactions.stream()

@@ -25,8 +25,6 @@ public class MockTransaction extends Transaction {
 	private Consumer<TransactionObserver> transferAction = to -> { };
 	private int numTransferCalls;
 
-	private ValidationResult validationResult = ValidationResult.SUCCESS;
-
 	/**
 	 * Creates a mock transaction.
 	 */
@@ -159,20 +157,6 @@ public class MockTransaction extends Transaction {
 	 */
 	public void setTransactionAction(final Consumer<TransactionObserver> transferAction) {
 		this.transferAction = transferAction;
-	}
-
-	/**
-	 * Sets the validation result that should be returned from checkDerivedValidity.
-	 *
-	 * @param validationResult The validation result.
-	 */
-	public void setValidationResult(final ValidationResult validationResult) {
-		this.validationResult = validationResult;
-	}
-
-	@Override
-	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		return this.validationResult;
 	}
 
 	@Override

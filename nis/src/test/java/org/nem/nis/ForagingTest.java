@@ -165,7 +165,7 @@ public class ForagingTest {
 		tx.sign();
 
 		// Assert:
-		Assert.assertThat(tx.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(null /*tx.checkValidity()*/, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		foraging.processTransaction(tx);
@@ -403,6 +403,7 @@ public class ForagingTest {
 				poiFacade,
 				new MockBlockDao(null),
 				lastBlockLayer,
-				new MockTransferDaoImpl());
+				new MockTransferDaoImpl(),
+				null);
 	}
 }

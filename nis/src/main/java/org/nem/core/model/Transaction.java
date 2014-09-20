@@ -5,8 +5,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.function.BiPredicate;
-
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
@@ -130,44 +128,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The transfer observer.
 	 */
 	protected abstract void transfer(final TransactionObserver observer);
-
-	/**
-	 * Determines if this transaction is valid using a custom can-debit predicate.
-	 *
-	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
-	 * has a balance of at least the second parameter (amount).
-	 * @return true if this transaction is valid.
-	 */
-	public final ValidationResult checkValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (this.getTimeStamp().compareTo(this.deadline) >= 0) {
-			return ValidationResult.FAILURE_PAST_DEADLINE;
-		}
-
-		if (this.deadline.compareTo(this.getTimeStamp().addDays(1)) > 0) {
-			return ValidationResult.FAILURE_FUTURE_DEADLINE;
-		}
-
-		return this.checkDerivedValidity(canDebitPredicate);
-	}
-
-	/**
-	 * Checks the validity of this transaction.
-	 *
-	 * @return The validation result.
-	 */
-	public final ValidationResult checkValidity() {
-		return this.checkValidity((account, amount) -> account.getBalance().compareTo(amount) >= 0);
-	}
-
-	/**
-	 * Determines if this transaction is valid using a custom can-debit predicate
-	 * by performing custom, implementation-specific validation checks.
-	 *
-	 * @param canDebitPredicate A predicate that should return true if the first parameter (account)
-	 * has a balance of at least the second parameter (amount).
-	 * @return true if this transaction is valid.
-	 */
-	protected abstract ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate);
 
 	/**
 	 * Gets the minimum fee for this transaction.

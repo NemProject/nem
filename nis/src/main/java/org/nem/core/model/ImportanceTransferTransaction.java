@@ -5,8 +5,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.function.BiPredicate;
-
 /**
  * A transaction which describes cancellation or creation of
  * transfer of importance from signer to remote account.
@@ -148,15 +146,6 @@ public class ImportanceTransferTransaction extends Transaction {
 		observer.notify(new AccountNotification(this.getRemote()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.mode.value()));
-	}
-
-	@Override
-	protected ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (!canDebitPredicate.test(this.getSigner(), this.getFee())) {
-			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		}
-
-		return ValidationResult.SUCCESS;
 	}
 
 	@Override

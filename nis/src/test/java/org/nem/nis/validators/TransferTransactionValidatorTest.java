@@ -122,6 +122,8 @@ public class TransferTransactionValidatorTest {
 
 	//endregion
 
+	// TODO: add other transaction test
+
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
 		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
 	}

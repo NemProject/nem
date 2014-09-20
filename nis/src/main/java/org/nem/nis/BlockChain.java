@@ -12,6 +12,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
+import org.nem.nis.validators.TransactionValidator;
 import org.nem.nis.visitors.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
@@ -34,6 +35,7 @@ public class BlockChain implements BlockSynchronizer {
 	private final TransferDao transferDao;
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
+	private final TransactionValidator validator;
 	private BlockChainScore score;
 
 	@Autowired(required = true)
@@ -43,13 +45,15 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final TransferDao transferDao,
-			final Foraging foraging) {
+			final Foraging foraging,
+			final TransactionValidator validator) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.transferDao = transferDao;
 		this.foraging = foraging;
+		this.validator = validator;
 		this.score = BlockChainScore.ZERO;
 	}
 
@@ -292,6 +296,7 @@ public class BlockChain implements BlockSynchronizer {
 			final boolean shouldPunishLowerPeerScore) {
 		final UpdateChainResult updateResult = context.updateOurChain(
 				this.foraging,
+				this.validator,
 				dbParentBlock,
 				peerChain,
 				ourScore,
@@ -385,6 +390,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		public UpdateChainResult updateOurChain(
 				final Foraging foraging,
+				final TransactionValidator validator,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -398,6 +404,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockDao,
 					this.transferDao,
 					this.observer,
+					validator,
 					foraging,
 					dbParentBlock,
 					peerChain,
@@ -434,6 +441,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockDao blockDao;
 		private final TransferDao transferDao;
 		private final BlockTransactionObserver observer;
+		private final TransactionValidator validator;
 		private final Foraging foraging;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
@@ -449,6 +457,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockDao blockDao,
 				final TransferDao transferDao,
 				final BlockTransactionObserver observer,
+				final TransactionValidator validator,
 				final Foraging foraging,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
@@ -462,6 +471,7 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockDao = blockDao;
 			this.transferDao = transferDao;
 			this.observer = observer;
+			this.validator = validator;
 			this.foraging = foraging;
 
 			// do not trust peer, take first block from our db and convert it
@@ -517,7 +527,8 @@ public class BlockChain implements BlockSynchronizer {
 					block -> executor.execute(block, this.observer),
 					this.blockScorer,
 					BlockChainConstants.BLOCKS_LIMIT,
-					hash -> (null != this.transferDao.findByHash(hash.getRaw())));
+					hash -> (null != this.transferDao.findByHash(hash.getRaw())),
+					this.validator);
 			this.calculatePeerChainDifficulties();
 			return validator.isValid(this.parentBlock, this.peerChain);
 		}

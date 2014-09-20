@@ -6,15 +6,11 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.function.BiPredicate;
-
 /**
  * A transaction that represents the exchange of funds and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
-	private static final int MAX_MESSAGE_SIZE = 512;
-
 	private final Amount amount;
 	private final Message message;
 	private final Account recipient;
@@ -86,19 +82,6 @@ public class TransferTransaction extends Transaction {
 	 */
 	public int getMessageLength() {
 		return null == this.message ? 0 : this.message.getEncodedPayload().length;
-	}
-
-	@Override
-	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (!canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee()))) {
-			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		}
-
-		if (this.getMessageLength() > MAX_MESSAGE_SIZE) {
-			return ValidationResult.FAILURE_MESSAGE_TOO_LARGE;
-		}
-
-		return ValidationResult.SUCCESS;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.poi.RemoteState;
 import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.validators.TransactionValidator;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -32,6 +33,7 @@ public class BlockChainValidator {
 	private final BlockScorer scorer;
 	private final int maxChainSize;
 	private final Predicate<Hash> transactionExists;
+	private final TransactionValidator validator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -45,12 +47,14 @@ public class BlockChainValidator {
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
-			final Predicate<Hash> transactionExists) {
+			final Predicate<Hash> transactionExists,
+			final TransactionValidator validator) {
 		this.poiFacade = poiFacade;
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.transactionExists = transactionExists;
+		this.validator = validator;
 	}
 
 	public static boolean canAccountForageAtHeight(final RemoteState rState, final BlockHeight height) {
@@ -122,7 +126,7 @@ public class BlockChainValidator {
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
-				if (ValidationResult.SUCCESS != transaction.checkValidity() ||
+				if (ValidationResult.SUCCESS != this.validator.validate(transaction) ||
 						!transaction.verify() ||
 						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {

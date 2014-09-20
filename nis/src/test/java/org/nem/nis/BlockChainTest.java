@@ -149,7 +149,14 @@ public class BlockChainTest {
 		final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final Foraging foraging = Mockito.mock(Foraging.class);
-		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, transferDao, foraging);
+		final BlockChain blockChain = new BlockChain(
+				accountAnalyzer,
+				accountDao,
+				blockChainLastBlockLayer,
+				mockBlockDao,
+				transferDao,
+				foraging,
+				null);
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
