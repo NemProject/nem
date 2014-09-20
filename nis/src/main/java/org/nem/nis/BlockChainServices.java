@@ -84,7 +84,7 @@ public class BlockChainServices {
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 		builder.add(new UniversalTransactionValidator());
 		builder.add(new TransferTransactionValidator());
-		builder.add(new ImportanceTransferTransactionValidator());
+		builder.add(new ImportanceTransferTransactionValidator(accountAnalyzer.getPoiFacade()));
 		return builder.build();
 	}
 

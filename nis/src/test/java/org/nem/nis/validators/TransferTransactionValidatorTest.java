@@ -122,7 +122,20 @@ public class TransferTransactionValidatorTest {
 
 	//endregion
 
-	// TODO: add other transaction test
+	//region other type
+
+	@Test
+	public void otherTransactionTypesPassValidation() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount(Amount.fromNem(100));
+		final MockTransaction transaction = new MockTransaction(account);
+		transaction.setFee(Amount.fromNem(200));
+
+		// Assert:
+		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	//endregion
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
 		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
