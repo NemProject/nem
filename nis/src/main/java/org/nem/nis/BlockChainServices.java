@@ -9,14 +9,14 @@ import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.sync.BlockLookup;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-// TODO 20140920 J-* this class needs tests
+// TODO 20140920 J-* this class needs tests!!!
 
 /**
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
@@ -27,16 +27,11 @@ import java.util.*;
 public class BlockChainServices {
 	private final TransferDao transferDao;
 	private final BlockDao blockDao;
-	private final TransactionValidator validator;
 
 	@Autowired(required = true)
-	public BlockChainServices(
-			final TransferDao transferDao,
-			final BlockDao blockDao,
-			final TransactionValidator validator) {
+	public BlockChainServices(final TransferDao transferDao, final BlockDao blockDao) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
-		this.validator = validator;
 	}
 
 	/**
@@ -57,18 +52,18 @@ public class BlockChainServices {
 
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
 		final BlockChainValidator validator = new BlockChainValidator(
-				poiFacade,
 				block -> executor.execute(block, this.createCommitObserver(accountAnalyzer)),
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				hash -> (null != this.transferDao.findByHash(hash.getRaw())),
-				this.validator);
+				this.createValidator(accountAnalyzer));
 		return validator.isValid(parentBlock, peerChain);
 	}
 
 	/**
 	 * Creates a block transaction observer that commits all changes.
 	 *
+	 * @param accountAnalyzer The current account analyzer.
 	 * @return The observer.
 	 */
 	private BlockTransactionObserver createCommitObserver(final AccountAnalyzer accountAnalyzer) {
@@ -76,6 +71,20 @@ public class BlockChainServices {
 		builder.add(new AccountsHeightObserver(accountAnalyzer));
 		builder.add(new BalanceCommitTransferObserver());
 		builder.add(new RemoteObserver(accountAnalyzer.getPoiFacade()));
+		return builder.build();
+	}
+
+	/**
+	 * Creates a transaction validator for validating all changes.
+	 *
+	 * @param accountAnalyzer The current account analyzer.
+	 * @return The validator.
+	 */
+	private TransactionValidator createValidator(final AccountAnalyzer accountAnalyzer) {
+		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		builder.add(new UniversalTransactionValidator());
+		builder.add(new TransferTransactionValidator());
+		builder.add(new ImportanceTransferTransactionValidator());
 		return builder.build();
 	}
 

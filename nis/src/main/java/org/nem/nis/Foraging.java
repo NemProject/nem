@@ -45,8 +45,7 @@ public class Foraging {
 			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final TransferDao transferDao,
-			final TransactionValidator transactionValidator) {
+			final TransferDao transferDao) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
@@ -54,7 +53,7 @@ public class Foraging {
 		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
-		this.unconfirmedTransactions = new UnconfirmedTransactions(transactionValidator);
+		this.unconfirmedTransactions = null; // TODO BUG TODO: new UnconfirmedTransactions(transactionValidator);
 	}
 
 	/**
@@ -204,9 +203,10 @@ public class Foraging {
 	}
 
 	private boolean checkImportance(final Transaction transaction, final BlockHeight height) {
-		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-			return BlockChainValidator.verifyImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
-		}
+		// TODO BUG TODO
+		//if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
+		//	return BlockChainValidator.verifyImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
+		//}
 		return true;
 	}
 
@@ -288,10 +288,10 @@ public class Foraging {
 					Account forgerOwner = virtualForger;
 					if (accountState.hasRemoteState()) {
 						final RemoteState forgerState = accountState.getRemoteState();
-
-						if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
-							continue;
-						}
+						// TODO BUG TODO
+						//if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
+						//	continue;
+						//}
 
 						if (!forgerState.isOwner()) {
 							forgerOwner = this.accountLookup.findByAddress(forgerState.getRemoteAddress());

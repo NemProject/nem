@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
+import org.nem.nis.validators.UniversalTransactionValidator;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -440,15 +441,15 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(null, block -> { }, scorer, 21, o -> false, null);
+		return new BlockChainValidator(block -> { }, scorer, 21, o -> false, new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(null, blockExecutor, createMockBlockScorer(), 21, o -> false, null);
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false, new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
-		return new BlockChainValidator(null, block -> { }, scorer, 21, o -> true, null);
+		return new BlockChainValidator(block -> { }, scorer, 21, o -> true, new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator() {

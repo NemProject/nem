@@ -152,8 +152,7 @@ public class BlockChainTest {
 		final BlockChainServices services =
 				new BlockChainServices(
 						Mockito.mock(TransferDao.class),
-						mockBlockDao,
-						(transaction, predicate) -> ValidationResult.SUCCESS);
+						mockBlockDao);
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,

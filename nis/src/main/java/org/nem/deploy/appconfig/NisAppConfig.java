@@ -139,10 +139,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChainServices blockChainServices() {
-		return new BlockChainServices(
-				this.transferDao,
-				this.blockDao,
-				this.validator());
+		return new BlockChainServices(this.transferDao, this.blockDao);
 	}
 
 	@Bean
@@ -152,8 +149,7 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transferDao,
-				this.validator());
+				this.transferDao);
 	}
 
 	@Bean
@@ -225,13 +221,5 @@ public class NisAppConfig {
 	@Bean
 	public ChainServices chainServices() {
 		return new ChainServices(this.blockChain(), this.httpConnectorPool());
-	}
-
-	@Bean
-	public TransactionValidator validator() {
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
-		builder.add(new UniversalTransactionValidator());
-		builder.add(new TransferTransactionValidator());
-		return builder.build();
 	}
 }

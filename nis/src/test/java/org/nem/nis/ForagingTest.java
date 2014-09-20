@@ -403,7 +403,6 @@ public class ForagingTest {
 				poiFacade,
 				new MockBlockDao(null),
 				lastBlockLayer,
-				new MockTransferDaoImpl(),
-				null);
+				new MockTransferDaoImpl());
 	}
 }
