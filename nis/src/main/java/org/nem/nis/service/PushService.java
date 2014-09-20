@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.function.*;
 import java.util.logging.Logger;
 
-// TODO: add unit tests for this
-
 /**
  * Spring service that provides functions for pushing entities
  */
