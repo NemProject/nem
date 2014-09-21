@@ -5,9 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.validators.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -32,7 +30,10 @@ public class UnconfirmedTransactions {
 	 * @param validator The transaction validator to use.
 	 */
 	public UnconfirmedTransactions(final TransactionValidator validator) {
-		this.validator = validator;
+		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		builder.add(validator);
+		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
+		this.validator = builder.build();
 	}
 
 	/**
@@ -83,41 +84,12 @@ public class UnconfirmedTransactions {
 			return ValidationResult.NEUTRAL;
 		}
 
-		// if we already have ImportanceTransfer from this account on the list....
-		// TODO 20140909 J-G: why isn't the hash check good enough?
-		// ? cause there can be two transactions from a single person, with different recipient, that have different hashes.
-		// Although that may seem like a minor issue (since it's same recipient anyway), but it would make analyzing
-		// ImportanceTransfer transactions muuuuuch more complicated
-		// TODO 20140909 J-G: i'm not sure i understand
-		if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-			for (final Transaction tx : transactions.values()) {
-				if (tx.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {
-					continue;
-				}
-
-				// already on the list
-				if (transaction.getSigner().equals(tx.getSigner())) {
-					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
-				}
-
-				// that would be bit unexpected, but better safe than sorry
-				// TODO 20140909 J-G: this shouldn't have any observable effect, should it?
-				// well, it could happen, although HIGHLY unlikely, that two different account would try to announce
-				// same "remote". Most likely that wouldn't cause much harm, but it could lead to some weird state
-				// (i.e. users interface would most likely tell him he has associated remote account, he could start
-				//  remote harvesting (cause he knows the key), but he wouldn't get reward, as user who announced
-				//  as a second one would be getting them)
-				if (((ImportanceTransferTransaction)transaction).getRemote().equals(((ImportanceTransferTransaction)tx).getRemote())) {
-					return ValidationResult.FAILURE_ENTITY_UNUSABLE;
-				}
-			}
-		}
-
 		// not sure if adding to cache here is a good idea...
 		this.addToCache(transaction.getSigner());
-		if (!this.isValid(transaction)) {
-			LOGGER.warning(String.format("Transaction from %s rejected (invalid).", transaction.getSigner().getAddress()));
-			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+		final ValidationResult validationResult = this.validate(transaction);
+		if (!validationResult.isSuccess()) {
+			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
+			return validationResult;
 		}
 
 		if (execute) {
@@ -128,11 +100,10 @@ public class UnconfirmedTransactions {
 		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
 
-	private boolean isValid(final Transaction transaction) {
-		final ValidationResult result = this.validator.validate(
+	private ValidationResult validate(final Transaction transaction) {
+		return this.validator.validate(
 				transaction,
 				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
-		return ValidationResult.SUCCESS == result;
 	}
 
 	/**
@@ -218,6 +189,8 @@ public class UnconfirmedTransactions {
 	 * @return filtered out list of unconfirmed transactions.
 	 */
 	public List<Transaction> removeConflictingTransactions(final List<Transaction> unconfirmedTransactions) {
+		// TODO 20140921 J-G: can you remind me how conflicting transactions can get a added in the first place?
+		// shouldn't we be failing to add conflicting transaction, or is there a good reason for allowing them to be added
 		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
 
 		// TODO: should we remove those that .add() failed?

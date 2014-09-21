@@ -2,11 +2,14 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.validators.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,6 +100,40 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void transactionCannotBeAddedIfValidationFails() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_PAST_DEADLINE);
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(validator);
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		final ValidationResult result = transactions.add(transaction, hash -> false);
+
+		// Assert:
+		Mockito.verify(validator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+	}
+
+	@Test
+	public void conflictingImportanceTransferTransactionCannotBeAdded() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
+		final Account remote = Utils.generateRandomAccount();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
+
+		transactions.add(new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote));
+
+		// Act:
+		final Transaction transaction = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		final ValidationResult result = transactions.add(transaction, hash -> false);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
 	}
 
 	//endregion
@@ -196,18 +233,19 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void returnedTransactionsAreSortedByType() {
+	public void getTransactionsBeforeSortsTransactions() {
 		// Arrange
-		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactionsWithAscendingFees(2);
-		final MockTransaction mockTransaction = new MockTransaction(MockTransaction.TYPE + 1000, 123, new TimeInstant(10));
-		unconfirmedTransactions.add(mockTransaction);
+		final UnconfirmedTransactions unconfirmedTransactions = createUnconfirmedTransactions();
+		final MockTransaction transaction1 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 1);
+		final MockTransaction transaction2 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(15), 1);
+		final MockTransaction transaction3 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 2);
 
 		// Act:
 		final Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
 		final ArrayList<Transaction> transactions = new ArrayList<>(transactionsBefore);
 
 		// Assert:
-		Assert.assertThat(transactions.get(0).getType(), IsEqual.equalTo(mockTransaction.getType()));
+		Assert.assertThat(transactions, IsEqual.equalTo(Arrays.asList(transaction3, transaction1, transaction2)));
 	}
 
 	//endregion
@@ -286,10 +324,16 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final Account sender = createSenderWithAmount(3);
 		final Account recipient = createSenderWithAmount(0);
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
+		// TODO 20140921 J-G: i think the removeConflictingTransactions is confusing in that it takes a list
+		// i think  getTransactionsBefore and removeConflictingTransactions should return UnconfirmedTransactions
+		// but that's a refactoring for another day ;)
+		// (also a smell that i needed to use the "real" validator to get this test to pass, imo)
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(
+				new TransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
 		final TimeInstant currentTime = new TimeInstant(11);
 
-		// Act:
+		// Act: the second transaction is invalid because the recipient has an insufficient balance
+		// TODO 20140921 J-G: why isn't the balance checked on add?
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
 		transactions.add(first);
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));
@@ -365,7 +409,13 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions() {
-		return new UnconfirmedTransactions(null);
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		return createUnconfirmedTransactions(validator);
+	}
+
+	private static UnconfirmedTransactions createUnconfirmedTransactions(final TransactionValidator validator) {
+		return new UnconfirmedTransactions(validator);
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(final int numTransactions) {
