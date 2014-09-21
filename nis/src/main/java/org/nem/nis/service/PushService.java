@@ -4,7 +4,8 @@ import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.validators.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,12 @@ public class PushService {
 	@Autowired(required = true)
 	public PushService(
 			final Foraging foraging,
-			final TransactionValidator validator,
+			final PoiFacade poiFacade,
+			final TransactionValidatorFactory validatorFactory,
 			final BlockChain blockChain,
 			final NisPeerNetworkHost host) {
 		this.foraging = foraging;
-		this.validator = validator;
+		this.validator = validatorFactory.create(poiFacade);
 		this.blockChain = blockChain;
 		this.host = host;
 	}

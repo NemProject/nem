@@ -10,6 +10,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 import org.nem.peer.*;
@@ -291,7 +292,17 @@ public class PushServiceTest {
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
 
-			this.service = new PushService(this.foraging, validator, this.blockChain, host);
+			this.service = new PushService(
+					this.foraging,
+					Mockito.mock(PoiFacade.class),
+					new TransactionValidatorFactory() {
+						@Override
+						public TransactionValidator create(final PoiFacade poiFacade) {
+							return validator;
+						}
+					},
+					this.blockChain,
+					host);
 		}
 
 		public void assertNoUpdateExperience() {

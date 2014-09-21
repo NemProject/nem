@@ -11,6 +11,7 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -79,7 +80,7 @@ public class NisMain {
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final BlockExecutor executor = new BlockExecutor();
-		final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(this.accountAnalyzer);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.getAccountCache().asAutoCache());
 
