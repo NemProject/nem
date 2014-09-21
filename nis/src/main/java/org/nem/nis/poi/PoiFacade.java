@@ -52,14 +52,15 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	 */
 	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 		final PoiAccountState state = this.findStateByAddress(address);
-		if (!state.hasRemoteState() || !state.getRemoteState().isOwner()) { // TODO 20140919 revisit name "owner"
+		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		if (!remoteLinks.isHarvestingRemotely()) {
 			return state;
 		}
 
-		final RemoteState remoteState = state.getRemoteState();
-		final long settingHeight = height.subtract(remoteState.getRemoteHeight());
+		final RemoteLink remoteLink = remoteLinks.getCurrent();
+		final long settingHeight = height.subtract(remoteLink.getEffectiveHeight());
 		boolean shouldUseRemote = false;
-		switch (ImportanceTransferTransaction.Mode.fromValueOrDefault(remoteState.getDirection())) {
+		switch (ImportanceTransferTransaction.Mode.fromValueOrDefault(remoteLink.getMode())) {
 			case Activate:
 				// the remote is active and operational
 				shouldUseRemote = settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
@@ -71,7 +72,7 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 				break;
 		}
 
-		return !shouldUseRemote ? state : this.findStateByAddress(remoteState.getRemoteAddress());
+		return !shouldUseRemote ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
 	}
 
 	/**

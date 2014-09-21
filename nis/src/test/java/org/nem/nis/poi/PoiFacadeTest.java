@@ -93,12 +93,12 @@ public class PoiFacadeTest {
 	}
 
 	@Test
-	public void findForwardedStateByAddressReturnsLocalStateWhenAccountIsRemote() {
+	public void findForwardedStateByAddressReturnsLocalStateWhenAccountIsRemoteHarvester() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final PoiFacade facade = createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
-		state.remoteFor(Utils.generateRandomAddress(), BlockHeight.ONE, 1);
+		state.getRemoteLinks().addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, 1, RemoteLink.Owner.RemoteHarvester));
 
 		// Act:
 		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(2880));
@@ -147,7 +147,8 @@ public class PoiFacadeTest {
 		final Address address = Utils.generateRandomAddress();
 		final PoiFacade facade = createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
-		state.setRemote(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, RemoteLink.Owner.HarvestingRemotely);
+		state.getRemoteLinks().addLink(link);
 
 		// Act:
 		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(currentBlockHeight));

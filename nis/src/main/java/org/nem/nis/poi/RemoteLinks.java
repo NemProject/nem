@@ -55,6 +55,25 @@ public class RemoteLinks {
 	}
 
 	/**
+	 * Gets a value indicating whether or the owning account has enabled remote harvesting
+	 * and is forwarding its foraging power to a remote account.
+	 *
+	 * @return true if the owning account has enabled remote harvesting.
+	 */
+	public boolean isHarvestingRemotely() {
+		return !this.isEmpty() && RemoteLink.Owner.HarvestingRemotely == this.remoteLinks.peek().getOwner();
+	}
+
+	/**
+	 * Gets a value indicating whether or not the owning account is a remote harvester account.
+	 *
+	 * @return true if the owning account is a remote harvester.
+	 */
+	public boolean isRemoteHarvester() {
+		return !this.isEmpty() && RemoteLink.Owner.RemoteHarvester == this.remoteLinks.peek().getOwner();
+	}
+
+	/**
 	 * Gets the current remote link.
 	 *
 	 * @return The current remote link.

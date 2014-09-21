@@ -287,16 +287,14 @@ public class Foraging {
 					final PoiAccountState accountState = this.poiFacade.findStateByAddress(virtualForger.getAddress());
 
 					Account forgerOwner = virtualForger;
-					if (accountState.hasRemoteState()) {
-						final RemoteState forgerState = accountState.getRemoteState();
-						// TODO BUG TODO
-						//if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
-						//	continue;
-						//}
+					final RemoteLinks remoteLinks = accountState.getRemoteLinks();
+					// TODO BUG TODO
+					//if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
+					//	continue;
+					//}
 
-						if (!forgerState.isOwner()) {
-							forgerOwner = this.accountLookup.findByAddress(forgerState.getRemoteAddress());
-						}
+					if (remoteLinks.isRemoteHarvester()) {
+						forgerOwner = this.accountLookup.findByAddress(remoteLinks.getCurrent().getLinkedAddress());
 					}
 
 					// Don't allow a harvester to include his own transactions
