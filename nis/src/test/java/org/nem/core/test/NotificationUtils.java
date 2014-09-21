@@ -52,6 +52,20 @@ public class NotificationUtils {
 	}
 
 	/**
+	 * Asserts that the specified notification is a harvest reward notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedAccount The expected account.
+	 * @param expectedAmount The expected amount.
+	 */
+	public static void assertHarvestRewardNotification(final Notification notification, final Account expectedAccount, final Amount expectedAmount) {
+		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.HarvestReward));
+		Assert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
+		Assert.assertThat(n.getAmount(), IsEqual.equalTo(expectedAmount));
+	}
+
+	/**
 	 * Asserts that the specified notification is a balance transfer notification.
 	 *
 	 * @param notification The notification to test.
