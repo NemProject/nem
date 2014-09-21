@@ -5,176 +5,117 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
-import org.nem.core.model.observers.ImportanceTransferNotification;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.poi.RemoteState;
+import org.nem.nis.poi.*;
 
 public class RemoteObserverTest {
 
-	private void doNotify(final RemoteObserver observer, final Account account1, final Account account2, final int activate, boolean execute) {
-		observer.notify(new ImportanceTransferNotification(account1, account2, activate),
-				new BlockNotificationContext(BlockHeight.ONE, execute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
-	}
+	//region execute
 
-	private void doNotify2(final RemoteObserver observer, final Account account1, final Account account2, final int activate, boolean execute) {
-		observer.notify(new ImportanceTransferNotification(account1, account2, activate),
-				new BlockNotificationContext(new BlockHeight(2), execute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+	@Test
+	public void notifyExecuteAddsCorrectLessorRemoteLink() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
+
+		// Assert:
+		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
+				.addLink(new RemoteLink(context.lessee.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.HarvestingRemotely));
 	}
 
 	@Test
-	public void notifyTransferForwardsToPoiAccountState() {
+	public void notifyExecuteAddsCorrectLesseeRemoteLink() {
 		// Arrange:
-		final TestDummyContext context = new TestDummyContext();
-		final RemoteObserver observer = context.createObserver();
+		final TestContext context = new TestContext();
 
 		// Act:
-		doNotify(observer, context.account1, context.account2, 1, true);
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
 
 		// Assert:
-		context.verifyForward();
+		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
+				.addLink(new RemoteLink(context.lessor.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.RemoteHarvester));
+	}
+
+	//endregion
+
+	//region undo
+
+	@Test
+	public void notifyUndoRemovesCorrectLessorRemoteLink() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
+
+		// Assert:
+		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
+				.removeLink(new RemoteLink(context.lessee.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.HarvestingRemotely));
 	}
 
 	@Test
-	public void notifyTransferSetsProperFields() {
+	public void notifyUndoRemovesCorrectLesseeRemoteLink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver observer = context.createObserver();
 
 		// Act:
-		doNotify(observer, context.account1, context.account2, 1, true);
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
 
 		// Assert:
-		context.verifyForward();
+		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
+				.removeLink(new RemoteLink(context.lessor.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.RemoteHarvester));
 	}
+
+	//endregion
+
+	//region other type
 
 	@Test
-	public void canRollbackTransfer() {
+	public void otherNotificationTypesAreIgnored() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver();
-		final RemoteObserver rollback = context.createObserver();
 
 		// Act:
-		doNotify(forward, context.account1, context.account2, 1, true);
-		doNotify(rollback, context.account1, context.account2, 1, false);
+		context.observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.lessor, Amount.fromNem(22)),
+				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
 
 		// Assert:
-		context.verifyEmpty();
+		Mockito.verify(context.lessorRemoteLinks, Mockito.never()).addLink(Mockito.any());
+		Mockito.verify(context.lessorRemoteLinks, Mockito.never()).removeLink(Mockito.any());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidHeightInRollbackThrowsException() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver();
-		final RemoteObserver rollback = context.createObserver();
+	//endregion
 
-		// Act:
-		doNotify(forward, context.account1, context.account2, 1, true);
-		doNotify2(rollback, context.account1, context.account2, 1, false);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidDirection1InRollbackThrowsException() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver();
-		final RemoteObserver rollback = context.createObserver();
-
-		// Act:
-		doNotify(forward, context.account1, context.account2, 1, true);
-		doNotify(rollback, context.account1, context.account2, 2, false);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidDirection2InRollbackThrowsException() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver();
-		final RemoteObserver rollback = context.createObserver();
-
-		// Act:
-		doNotify(forward, context.account1, context.account2, 2, true);
-		doNotify(rollback, context.account1, context.account2, 1, false);
-	}
-
-	@Test
-	public void rollbackRestoresPreviousState() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final RemoteObserver forward = context.createObserver();
-		final RemoteObserver cancel = context.createObserver();
-		final RemoteObserver rollback = context.createObserver();
-
-		// Act:
-		doNotify(forward, context.account1, context.account2, 1, true);
-		doNotify(cancel, context.account1, context.account2, 1, true);
-		doNotify(rollback, context.account1, context.account2, 2, false);
-
-		// Assert:
-		context.verifyForward();
-	}
-
-	private class TestDummyContext {
+	private static class TestContext {
+		private final Account lessor = Utils.generateRandomAccount();
+		private final Account lessee = Utils.generateRandomAccount();
+		private final RemoteLinks lessorRemoteLinks = Mockito.mock(RemoteLinks.class);
+		private final RemoteLinks lesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final PoiAccountState poiAccount1State = Mockito.mock(PoiAccountState.class);
-		private final PoiAccountState poiAccount2State = Mockito.mock(PoiAccountState.class);
-		public final Account account1 = Utils.generateRandomAccount();
-		public final Account account2 = Utils.generateRandomAccount();
+		private final BlockTransactionObserver observer = new RemoteObserver(this.poiFacade);
 
-		public TestDummyContext() {
-			this.hook();
+		private TestContext() {
+			this.hook(this.lessor, this.lessorRemoteLinks);
+			this.hook(this.lessee, this.lesseeRemoteLinks);
 		}
 
-		public RemoteObserver createObserver() {
-			return new RemoteObserver(this.poiFacade);
-		}
-
-		public void verifyForward() {
-			Mockito.verify(poiAccount1State, Mockito.times(1)).setRemote(Mockito.any(), Mockito.any(), Mockito.anyInt());
-			Mockito.verify(poiAccount2State, Mockito.times(1)).remoteFor(Mockito.any(), Mockito.any(), Mockito.anyInt());
-		}
-
-		private void hook() {
-			Mockito.when(this.poiFacade.findStateByAddress(account1.getAddress())).thenReturn(poiAccount1State);
-			Mockito.when(this.poiFacade.findStateByAddress(account2.getAddress())).thenReturn(poiAccount2State);
-			Mockito.when(poiAccount1State.getAddress()).thenReturn(account1.getAddress());
-			Mockito.when(poiAccount2State.getAddress()).thenReturn(account2.getAddress());
-		}
-	}
-
-	private class TestContext {
-		private final PoiFacade poiFacade = new PoiFacade(null);
-		public final Account account1 = Utils.generateRandomAccount();
-		public final Account account2 = Utils.generateRandomAccount();
-
-		public RemoteObserver createObserver() {
-			return new RemoteObserver(this.poiFacade);
-		}
-
-		public void verifyForward() {
-			final RemoteState remoteState1 = stateForAccount(this.account1).getRemoteState();
-			final RemoteState remoteState2 = stateForAccount(this.account2).getRemoteState();
-			Assert.assertTrue(remoteState1.hasRemote());
-			Assert.assertTrue(remoteState2.hasRemote());
-			Assert.assertTrue(remoteState1.isOwner());
-			Assert.assertFalse(remoteState2.isOwner());
-			Assert.assertThat(remoteState1.getRemoteAddress(), IsEqual.equalTo(this.account2.getAddress()));
-			Assert.assertThat(remoteState2.getRemoteAddress(), IsEqual.equalTo(this.account1.getAddress()));
-		}
-
-		private PoiAccountState stateForAccount(Account account) {
-			 return this.poiFacade.findStateByAddress(account.getAddress());
-		}
-
-		public void verifyEmpty() {
-			final PoiAccountState poiAccountState1 = stateForAccount(this.account1);
-			final PoiAccountState poiAccountState2 = stateForAccount(this.account2);
-			Assert.assertFalse(poiAccountState1.hasRemoteState());
-			Assert.assertFalse(poiAccountState2.hasRemoteState());
+		private void hook(final Account account, final RemoteLinks remoteLinks) {
+			final PoiAccountState state = Mockito.mock(PoiAccountState.class);
+			Mockito.when(state.getRemoteLinks()).thenReturn(remoteLinks);
+			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(state);
 		}
 	}
 }

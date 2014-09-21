@@ -4,13 +4,10 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.ImportanceTransferNotification;
 import org.nem.core.model.observers.Notification;
 import org.nem.core.model.observers.NotificationType;
-import org.nem.core.model.observers.TransactionObserver;
-import org.nem.core.model.primitive.*;
-import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.poi.*;
 
 /**
- * A transfer observer that updates outlink information.
+ * A block transaction observer that updates remote account associations.
  */
 public class RemoteObserver implements BlockTransactionObserver {
 	private final PoiFacade poiFacade;
@@ -24,8 +21,8 @@ public class RemoteObserver implements BlockTransactionObserver {
 		this.poiFacade = poiFacade;
 	}
 
-	private PoiAccountState getState(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress());
+	private RemoteLinks getRemoteLinks(final Account account) {
+		return this.poiFacade.findStateByAddress(account.getAddress()).getRemoteLinks();
 	}
 
 	@Override
@@ -34,17 +31,27 @@ public class RemoteObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		final ImportanceTransferNotification itn = (ImportanceTransferNotification)notification;
-		final Account sender = itn.getLessor();
-		final Account recipient = itn.getLessee();
-		final int mode = itn.getMode();
+		this.notify((ImportanceTransferNotification)notification, context);
+	}
+
+	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
+		final RemoteLink lessorLink = new RemoteLink(
+				notification.getLessee().getAddress(),
+				context.getHeight(),
+				notification.getMode(),
+				RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink lesseeLink = new RemoteLink(
+				notification.getLessor().getAddress(),
+				context.getHeight(),
+				notification.getMode(),
+				RemoteLink.Owner.RemoteHarvester);
 
 		if (context.getTrigger() == NotificationTrigger.Execute) {
-			this.getState(sender).setRemote(recipient.getAddress(), context.getHeight(), mode);
-			this.getState(recipient).remoteFor(sender.getAddress(), context.getHeight(), mode);
+			this.getRemoteLinks(notification.getLessor()).addLink(lessorLink);
+			this.getRemoteLinks(notification.getLessee()).addLink(lesseeLink);
 		} else {
-			this.getState(recipient).resetRemote(sender.getAddress(), context.getHeight(), mode);
-			this.getState(sender).resetRemote(recipient.getAddress(), context.getHeight(), mode);
+			this.getRemoteLinks(notification.getLessor()).removeLink(lessorLink);
+			this.getRemoteLinks(notification.getLessee()).removeLink(lesseeLink);
 		}
 	}
 }
