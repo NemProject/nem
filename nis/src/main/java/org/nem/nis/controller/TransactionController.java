@@ -38,21 +38,6 @@ public class TransactionController {
 		this.host = host;
 	}
 
-	@RequestMapping(value = "/transaction/prepare", method = RequestMethod.POST)
-	@ClientApi
-	@Deprecated
-	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
-		final Transaction transfer = deserializeTransaction(deserializer);
-
-		final ValidationResult validationResult = this.validator.validate(transfer);
-		if (ValidationResult.SUCCESS != validationResult) {
-			throw new IllegalArgumentException(validationResult.toString());
-		}
-
-		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
-		return new RequestPrepare(transferData);
-	}
-
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
