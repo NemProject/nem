@@ -16,6 +16,7 @@ import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.lang.reflect.*;
 import java.math.BigInteger;
@@ -153,7 +154,8 @@ public class BlockChainTest {
 				new BlockChainServices(
 						Mockito.mock(TransferDao.class),
 						mockBlockDao,
-						new BlockTransactionObserverFactory());
+						new BlockTransactionObserverFactory(),
+						new TransactionValidatorFactory());
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,

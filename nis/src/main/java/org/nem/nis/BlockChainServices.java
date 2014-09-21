@@ -27,15 +27,18 @@ public class BlockChainServices {
 	private final TransferDao transferDao;
 	private final BlockDao blockDao;
 	private final BlockTransactionObserverFactory observerFactory;
+	private final TransactionValidatorFactory validatorFactory;
 
 	@Autowired(required = true)
 	public BlockChainServices(
 			final TransferDao transferDao,
 			final BlockDao blockDao,
-			final BlockTransactionObserverFactory observerFactory) {
+			final BlockTransactionObserverFactory observerFactory,
+			final TransactionValidatorFactory validatorFactory) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
+		this.validatorFactory = validatorFactory;
 	}
 
 	/**
@@ -60,22 +63,8 @@ public class BlockChainServices {
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				hash -> (null != this.transferDao.findByHash(hash.getRaw())),
-				this.createValidator(accountAnalyzer));
+				this.validatorFactory.create(poiFacade));
 		return validator.isValid(parentBlock, peerChain);
-	}
-
-	/**
-	 * Creates a transaction validator for validating all changes.
-	 *
-	 * @param accountAnalyzer The current account analyzer.
-	 * @return The validator.
-	 */
-	private TransactionValidator createValidator(final AccountAnalyzer accountAnalyzer) {
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
-		builder.add(new UniversalTransactionValidator());
-		builder.add(new TransferTransactionValidator());
-		builder.add(new ImportanceTransferTransactionValidator(accountAnalyzer.getPoiFacade()));
-		return builder.build();
 	}
 
 	/**

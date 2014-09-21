@@ -12,6 +12,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -142,7 +143,18 @@ public class NisAppConfig {
 		return new BlockChainServices(
 				this.transferDao,
 				this.blockDao,
-				new BlockTransactionObserverFactory());
+				this.blockTransactionObserverFactory(),
+				this.transactionValidatorFactory());
+	}
+
+	@Bean
+	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
+		return new BlockTransactionObserverFactory();
+	}
+
+	@Bean
+	public TransactionValidatorFactory transactionValidatorFactory() {
+		return new TransactionValidatorFactory();
 	}
 
 	@Bean
@@ -152,7 +164,8 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transferDao);
+				this.transferDao,
+				this.transactionValidatorFactory());
 	}
 
 	@Bean

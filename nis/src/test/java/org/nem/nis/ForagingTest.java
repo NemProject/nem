@@ -12,6 +12,7 @@ import org.nem.core.time.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -403,6 +404,7 @@ public class ForagingTest {
 				poiFacade,
 				new MockBlockDao(null),
 				lastBlockLayer,
-				new MockTransferDaoImpl());
+				new MockTransferDaoImpl(),
+				new TransactionValidatorFactory());
 	}
 }
