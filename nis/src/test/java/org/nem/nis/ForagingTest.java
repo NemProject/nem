@@ -12,7 +12,7 @@ import org.nem.core.time.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -166,7 +166,9 @@ public class ForagingTest {
 		tx.sign();
 
 		// Assert:
-		Assert.assertThat(null /*tx.checkValidity()*/, IsEqual.equalTo(ValidationResult.SUCCESS));
+		// TODO 20140921 J-G: i'm guessing that this is more of a sanity check that the tx is valid? so i just used the "real" validator
+		final TransactionValidator validator = new TransactionValidatorFactory().create(Mockito.mock(PoiFacade.class));
+		Assert.assertThat(validator.validate(tx), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		foraging.processTransaction(tx);

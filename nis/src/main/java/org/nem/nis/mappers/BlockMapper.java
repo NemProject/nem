@@ -92,9 +92,12 @@ public class BlockMapper {
 
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
-		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
-			final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
-			block.addTransaction(importanceTransferTransaction);
+		// TODO 20140921 J-G: not sure if this is a test thing or not, but a number of tests were failing because dbBlock.getBlockImportanceTransfers() was null
+		if (null != dbBlock.getBlockImportanceTransfers()) {
+			for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
+				final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
+				block.addTransaction(importanceTransferTransaction);
+			}
 		}
 
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {

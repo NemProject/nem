@@ -11,6 +11,8 @@ import org.nem.nis.test.LocalHostConnector;
 //
 // json objects are used directly (on purpose), to make it easier
 // to follow/find/detect changes in /transfer/ API or serializers
+// TODO 20140921 J-G: i guess these tests are all deprecated now because they were going to the deprecated transaction/prepare api?
+@Ignore
 public class TransferControllerTest {
 
 	private static final String TRANSFER_PREPARE_PATH = "transaction/prepare";

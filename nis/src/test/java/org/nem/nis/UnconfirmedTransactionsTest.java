@@ -239,6 +239,7 @@ public class UnconfirmedTransactionsTest {
 		final MockTransaction transaction1 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 1);
 		final MockTransaction transaction2 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(15), 1);
 		final MockTransaction transaction3 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 2);
+		Arrays.asList(transaction1, transaction2, transaction3).forEach(unconfirmedTransactions::add);
 
 		// Act:
 		final Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
