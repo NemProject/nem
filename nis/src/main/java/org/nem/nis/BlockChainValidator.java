@@ -79,6 +79,7 @@ public class BlockChainValidator {
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
+				// TODO-CR 20140922 G-J: want ImportanceTransferValidator: yes
 				if (ValidationResult.SUCCESS != this.validator.validate(transaction) ||
 						!transaction.verify() ||
 						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||

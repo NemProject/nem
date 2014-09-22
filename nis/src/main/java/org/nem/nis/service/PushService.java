@@ -62,6 +62,7 @@ public class PushService {
 	private ValidationResult checkTransaction(final Transaction transaction) {
 		return !transaction.verify()
 				? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
+				// TODO-CR 20140922 G-J: want ImportanceTransferValidator: I think full validation cannot be run in this place
 				: this.validator.validate(transaction);
 	}
 

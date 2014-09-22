@@ -227,6 +227,7 @@ public class Foraging {
 	}
 
 	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime, final BlockHeight blockHeight) {
+		// TODO-CR 20140922 G-J: want ImportanceTransferValidator: yes it should probably be passed down the chain, to be passed as predicate to add()
 		return this.unconfirmedTransactions.removeConflictingTransactions(
 				this.removeConflictingImportanceTransactions(
 						blockHeight,
