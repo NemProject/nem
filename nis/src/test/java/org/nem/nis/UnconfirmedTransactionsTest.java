@@ -335,6 +335,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act: the second transaction is invalid because the recipient has an insufficient balance
 		// TODO 20140921 J-G: why isn't the balance checked on add?
+		// TODO 20140922 G-J: unconfirmed balance is checked, not sure if that answers your question
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
 		transactions.add(first);
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));

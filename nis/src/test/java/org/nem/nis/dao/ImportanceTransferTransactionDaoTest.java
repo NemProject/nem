@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
@@ -33,65 +34,51 @@ public class ImportanceTransferTransactionDaoTest {
 	@Test
 	public void savingTransferSavesAccounts() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
-		final ImportanceTransfer entity = ImportanceTransferMapper.toDbModel(transaction, 0, accountDaoLookup);
+		final TestContext testContext = new TestContext();
+		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
 
-		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
-		addToDummyBlock(account, entity);
-
-		// Act
-		this.importanceTransferDao.save(entity);
-
-		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getSender().getId(), notNullValue());
-		Assert.assertThat(entity.getRemote().getId(), notNullValue());
-	}
-
-	@Test
-	public void canReadSavedData() {
-		// TODO-CR 20140919 J-G: comment - since the arrange block is mostly the same, consider using a private "TestContext" helper class to reduce duplication
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
-		final ImportanceTransfer dbTransaction = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
-
-		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
+		final org.nem.nis.dbmodel.Account account = testContext.getSender();
 		addToDummyBlock(account, dbTransaction);
 
 		// Act
 		this.importanceTransferDao.save(dbTransaction);
-		final ImportanceTransfer entity = this.importanceTransferDao.findByHash(HashUtils.calculateHash(transaction).getRaw());
+
+		// Assert:
+		Assert.assertThat(dbTransaction.getId(), notNullValue());
+		Assert.assertThat(dbTransaction.getSender().getId(), notNullValue());
+		Assert.assertThat(dbTransaction.getRemote().getId(), notNullValue());
+	}
+
+	@Test
+	public void canReadSavedData() {
+		// Arrange:
+		final TestContext testContext = new TestContext();
+		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
+
+		final org.nem.nis.dbmodel.Account account = testContext.getSender();
+		addToDummyBlock(account, dbTransaction);
+
+		// Act
+		this.importanceTransferDao.save(dbTransaction);
+		final ImportanceTransfer entity = this.importanceTransferDao.findByHash(testContext.getTransactionHash().getRaw());
 
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbTransaction.getId()));
-		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getDirection(), equalTo(transaction.getMode().value()));
-		// TODO-CR 20140919 J-G: commented out code did you mean to remove this or verify it?
-		//Assert.assertThat(entity.getBlkIndex(), equalTo(12345));
-		Assert.assertThat(entity.getSenderProof(), equalTo(transaction.getSignature().getBytes()));
+
+		testContext.assertTransaction(entity);
 	}
 
 	@Test
 	public void countReturnsProperValue() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
-		final ImportanceTransfer dbTransfer1 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
-		final ImportanceTransfer dbTransfer2 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
-		final ImportanceTransfer dbTransfer3 = ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
+		final TestContext testContext = new TestContext();
+		final ImportanceTransfer dbTransfer1 = testContext.createDbTransaction();
+		final ImportanceTransfer dbTransfer2 = testContext.createDbTransaction();
+		final ImportanceTransfer dbTransfer3 = testContext.createDbTransaction();
 		final Long initialCount = this.importanceTransferDao.count();
 
-		final org.nem.nis.dbmodel.Account account = accountDaoLookup.findByAddress(sender.getAddress());
+		final org.nem.nis.dbmodel.Account account = testContext.getSender();
 		addToDummyBlock(account, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
@@ -119,28 +106,59 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 	}
 
-	private ImportanceTransferTransaction prepareImportanceTransferTransaction(
-			final Account sender,
-			final Account recipient,
-			final int i,
-			final ImportanceTransferTransaction.Mode mode) {
-		// Arrange:
-		final ImportanceTransferTransaction transferTransaction = new ImportanceTransferTransaction(
-				new TimeInstant(i),
-				sender,
-				mode,
-				recipient);
-		transferTransaction.sign();
-		return transferTransaction;
-	}
+	private class TestContext {
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup;
+		final ImportanceTransferTransaction transaction;
 
-	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
-		// Arrange:
-		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(), recipient.getKeyPair().getPublicKey());
-		mockAccountDao.addMapping(sender, dbSender);
-		mockAccountDao.addMapping(recipient, dbRecipient);
-		return new AccountDaoLookupAdapter(mockAccountDao);
+		TestContext() {
+			accountDaoLookup = this.prepareMapping(sender, recipient);
+			transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
+		}
+
+		private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
+			// Arrange:
+			final MockAccountDao mockAccountDao = new MockAccountDao();
+			final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
+			final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(), recipient.getKeyPair().getPublicKey());
+			mockAccountDao.addMapping(sender, dbSender);
+			mockAccountDao.addMapping(recipient, dbRecipient);
+			return new AccountDaoLookupAdapter(mockAccountDao);
+		}
+
+		private ImportanceTransferTransaction prepareImportanceTransferTransaction(
+				final Account sender,
+				final Account recipient,
+				final int i,
+				final ImportanceTransferTransaction.Mode mode) {
+			// Arrange:
+			final ImportanceTransferTransaction transferTransaction = new ImportanceTransferTransaction(
+					new TimeInstant(i),
+					sender,
+					mode,
+					recipient);
+			transferTransaction.sign();
+			return transferTransaction;
+		}
+
+		public ImportanceTransfer createDbTransaction() {
+			return ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
+		}
+
+		public org.nem.nis.dbmodel.Account getSender() {
+			return accountDaoLookup.findByAddress(sender.getAddress());
+		}
+
+		public Hash getTransactionHash() {
+			return HashUtils.calculateHash(transaction);
+		}
+
+		public void assertTransaction(final ImportanceTransfer entity) {
+			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
+			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
+			Assert.assertThat(entity.getDirection(), equalTo(transaction.getMode().value()));
+			Assert.assertThat(entity.getSenderProof(), equalTo(transaction.getSignature().getBytes()));
+		}
 	}
 }

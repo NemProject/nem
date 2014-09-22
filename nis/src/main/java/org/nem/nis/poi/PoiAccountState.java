@@ -6,11 +6,6 @@ import org.nem.nis.secret.*;
 
 /**
  * Class containing extrinsic NIS-account information that is used to calculate POI.
- * TODO-CR 20140808 J->ALL i think the naming is confusing between PoiAccountState and PoiAccountInfo ... should try to think of better names
- * G->J, I think we can safely call it AccountState, can't we?
- * TODO 20140909 J-G: seems reasonable
- * TODO 20140915 J-G: do you mind doing the rename?
- * 20140916, G-J: nope not at all
  */
 public class PoiAccountState {
 	private final Address address;

@@ -5,9 +5,6 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Objects;
 
-// TODO 20140920 J-G: not sure if this belongs in the POI package
-// TODO 20140920 J-G: might want to use the enum all the way to this point
-
 /**
  * Represents a link between an account and a remote account.
  */

@@ -189,11 +189,14 @@ public class UnconfirmedTransactions {
 	 * @return filtered out list of unconfirmed transactions.
 	 */
 	public List<Transaction> removeConflictingTransactions(final List<Transaction> unconfirmedTransactions) {
-		// TODO 20140921 J-G: can you remind me how conflicting transactions can get a added in the first place?
-		// shouldn't we be failing to add conflicting transaction, or is there a good reason for allowing them to be added
+		// UnconfirmedTransactions CAN contain conflicting TXes:
+		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
+		// b) B has 0 balance, A->B 10nems, B->X 5nems with 2nem fee, since we check unconfirmed balance,
+		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
+		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
+		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
 		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
 
-		// TODO: should we remove those that .add() failed?
 		unconfirmedTransactions.stream()
 				.forEach(tx -> filteredTxes.add(tx, hash -> false, false));
 

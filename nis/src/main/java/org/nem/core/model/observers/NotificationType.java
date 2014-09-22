@@ -31,6 +31,8 @@ public enum NotificationType {
 	Account,
 
 	// TODO 20140920 J-G does it make sense to have this separate?
+	// TODO 20140922 G-J It certainly does. Even if we won't use it now, it'll be good to have it,
+	// when we will want to have apps (i.e. chain explorer) register in nis and receive notifications.
 	/**
 	 * The notification represents a block harvest reward (this is different from BalanceCredit
 	 * because harvest fees can be forwarded whereas regular credits cannot).

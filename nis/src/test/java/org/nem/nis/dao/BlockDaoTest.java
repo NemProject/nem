@@ -73,7 +73,8 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		// TODO-CR 20140919 J-G: any reason you're not verifying it's equal to 1 (here and other tests too)?
-		Assert.assertThat(entity.getBlockTransfers().size(), not(equalTo(0)));
+		// TODO 20140922 G-J: I've probably did this, in case I'd add more txes in future, but that's probably dumb, so I'll change it
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
 	}
@@ -97,7 +98,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransfers().size(), not(equalTo(0)));
+		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 	}
 
@@ -157,6 +158,7 @@ public class BlockDaoTest {
 
 	// TransferTransactions does not use OrderColumn, but maybe we should redo that
 	// TODO-CR 20140919 J-G: it probably makes sense to redo that so its used by both
+	// TODO 20140922 G-J: as I've mentioned this will be breaking change but it is on my TODO list (also related to ImportanceTransferDao changes)
 	@Test
 	public void savingDoesNotChangeTransferTransactionBlkIndex() {
 		// Arrange:
@@ -318,11 +320,6 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 
-		// TODO G-J 20140916 : should I use ExceptionAssert instead of (expected = ...) ?
-		// TODO-CR 20140919 J-G: for more complicated tests, i would use ExceptionAssert because it guarantees that the wrapped line throws the expected exception
-		//                       expected just verifies any line throws the exception
-		// 						 ExceptionAssert also lets you assert state after the exception is thrown, which is sometimes useful
-		//						 when i was fixing the harvest blocks paging, i came across one test that was using expected incorrectly, but i don't remember the exact details
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
 	}
 
