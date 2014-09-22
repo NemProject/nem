@@ -336,6 +336,15 @@ public class UnconfirmedTransactionsTest {
 		// Act: the second transaction is invalid because the recipient has an insufficient balance
 		// TODO 20140921 J-G: why isn't the balance checked on add?
 		// TODO 20140922 G-J: unconfirmed balance is checked, not sure if that answers your question
+		// TODO 20140922 J-G: so, i think this is happening (please correct if i'm wrong), but i'm not sure if it's desirable?:
+		// UnconfirmedTransactions::add adds each transaction and "executes" them, which means it updates the unconfirmed balances
+		// initially the balances are: S = 3, R = 0
+		// after "first" transaction is added, the (unconfirmed) balances are: S = 0, R = 2, 1 Fee
+		// after the "second" transaction is added, the (unconfirmed) balances are: S = 1, R = 0, 2 Fee
+		// so, both transactions get added
+		// UnconfirmedTransactions::removeConflictingTransactions re-adds all transactions without "executing" them
+		// after "first" transaction is added, the balances are: S = 0, R = 0
+		// since R < 2, the second transaction is prevented from inclusion in the block
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
 		transactions.add(first);
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));

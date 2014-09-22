@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Predicate;
 
-// TODO 20140920 J-G does spring support multiple configuration classes? this class is growing quite big and would be nice to split up
-// TODO 20140922 G-J not sure, but I'd leave it for later (lower prio)
 @Configuration
 @ComponentScan(
 		basePackages = { "org.nem.nis" },
@@ -98,6 +96,7 @@ public class NisAppConfig {
 		// TODO 20140909 J-G gimre?
 		// TODO 20140922 G-J not sure if that is the reason, but from what I understand this failure happened only on dev machines
 		// TODO                         so I would rather set it to true by default, or use property from properties file, (devs than could have it set to false)
+		// TODO 20140922 J-G - can you make the change (and confirm that it works)?
 		flyway.setValidateOnMigrate(false);
 		return flyway;
 	}
@@ -106,13 +105,7 @@ public class NisAppConfig {
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
-
-		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
-		// TODO BR: like this?
-		// TODO 20140909 J-G gimre?
-		// TODO 20130922 G-J seems fine to me, and shouldn't cause problems
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
-
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);

@@ -72,8 +72,6 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		// TODO-CR 20140919 J-G: any reason you're not verifying it's equal to 1 (here and other tests too)?
-		// TODO 20140922 G-J: I've probably did this, in case I'd add more txes in future, but that's probably dumb, so I'll change it
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());

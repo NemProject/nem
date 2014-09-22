@@ -196,6 +196,7 @@ public class UnconfirmedTransactions {
 		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
 		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
 		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
+		// TODO-CR 20140922 J-G: it would be great to add a test for this exact case ;)
 		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
 
 		unconfirmedTransactions.stream()
