@@ -294,13 +294,7 @@ public class PushServiceTest {
 
 			this.service = new PushService(
 					this.foraging,
-					Mockito.mock(PoiFacade.class),
-					new TransactionValidatorFactory() {
-						@Override
-						public TransactionValidator create(final PoiFacade poiFacade) {
-							return validator;
-						}
-					},
+					validator,
 					this.blockChain,
 					host);
 		}

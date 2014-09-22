@@ -28,12 +28,11 @@ public class PushService {
 	@Autowired(required = true)
 	public PushService(
 			final Foraging foraging,
-			final PoiFacade poiFacade,
-			final TransactionValidatorFactory validatorFactory,
+			final TransactionValidator validator,
 			final BlockChain blockChain,
 			final NisPeerNetworkHost host) {
 		this.foraging = foraging;
-		this.validator = validatorFactory.create(poiFacade);
+		this.validator = validator;
 		this.blockChain = blockChain;
 		this.host = host;
 	}

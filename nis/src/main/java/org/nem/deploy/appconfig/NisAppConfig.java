@@ -12,7 +12,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -155,6 +155,11 @@ public class NisAppConfig {
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
 		return new TransactionValidatorFactory();
+	}
+
+	@Bean
+	public TransactionValidator transactionValidator() {
+		return this.transactionValidatorFactory().create(this.poiFacade());
 	}
 
 	@Bean
