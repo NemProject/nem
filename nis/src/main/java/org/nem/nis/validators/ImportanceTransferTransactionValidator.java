@@ -32,43 +32,46 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 		return this.validate((ImportanceTransferTransaction)transaction);
 	}
 
-	// TODO 20140920 J-G: should we have more specific results?
-	private ValidationResult validate(final ImportanceTransferTransaction transaction) {
-		final PoiAccountState state = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress());
-		switch (transaction.getMode()) {
-			case Activate:
-				return ValidationResult.SUCCESS;
-
-			case Deactivate:
-				return ValidationResult.SUCCESS;
+	public ValidationResult validate(final BlockHeight height, final Transaction transaction) {
+		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
+			return ValidationResult.SUCCESS;
 		}
 
-		return ValidationResult.FAILURE_ENTITY_UNUSABLE;
-
-		//final int direction = transaction.getMode().value();
-
-		//if (direction == ImportanceTransferTransaction.Mode.Activate.value()) {
-		//	if (state.hasRemoteState() && state.getRemoteState().getDirection() == direction) {
-		//		return false;
-		//	}
-		//	// means there is previous state, which was "Deactivate" (due to check above)
-		//	if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
-		//		return false;
-		//	}
-		//	return true;
-		//} else if (direction == ImportanceTransferTransaction.Mode.Deactivate.value()) {
-		//	if (!state.hasRemoteState() || state.getRemoteState().getDirection() == direction) {
-		//		return false;
-		//	}
-		//	// means there is previous state which was "Activate"
-		//	if (state.hasRemoteState() && height.subtract(state.getRemoteState().getRemoteHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
-		//		return false;
-		//	}
-		//	return true;
-		//}
-		//return false;
+		return this.validate(height, (ImportanceTransferTransaction)transaction)
+				? ValidationResult.SUCCESS
+				: ValidationResult.FAILURE_ENTITY_UNUSABLE;
 	}
 
+	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
+		return !remoteLinks.isEmpty() && ImportanceTransferTransaction.Mode.Activate.value() == remoteLinks.getCurrent().getMode();
+	}
+
+	private static boolean isRemoteDeactivated(final RemoteLinks remoteLinks) {
+		return remoteLinks.isEmpty() || ImportanceTransferTransaction.Mode.Deactivate.value() == remoteLinks.getCurrent().getMode();
+	}
+
+	private static boolean isRemoteChangeWithinOneDay(final RemoteLinks remoteLinks, final BlockHeight height) {
+		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	}
+
+	// TODO 20140920 J-G: should we have more specific results?
+	private boolean validate(final BlockHeight height, final ImportanceTransferTransaction transaction) {
+		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
+			return false;
+		}
+
+		switch (transaction.getMode()) {
+			case Activate:
+				// if a remote is already activated, it needs to be deactivated first
+				return !isRemoteActivated(remoteLinks);
+
+			case Deactivate:
+			default:
+				// if a remote is already deactivated, it needs to be activated first
+				return !isRemoteDeactivated(remoteLinks);
+		}
+	}
 
 	//public static boolean canAccountForageAtHeight(final RemoteState rState, final BlockHeight height) {
 	//	final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.fromValueOrDefault(rState.getDirection());

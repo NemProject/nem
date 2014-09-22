@@ -4,63 +4,186 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.poi.*;
 
 public class ImportanceTransferTransactionValidatorTest {
 
+	//region first link
+
 	@Test
-	public void activateImportanceTransferIsValid() {
+	public void activateImportanceTransferIsValidAsFirstLink() {
 		// Arrange:
-		final Transaction transaction = createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
 
 		// Assert:
-		Assert.assertThat(createValidator().validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	// TODO 20140920 J-G - does this test seem ok to you?
+	@Test
+	public void deactivateImportanceTransferIsNotValidAsFirstLink() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+	}
+
+	//endregion
+
+	//region one day after opposite link
+
+	@Test
+	public void activateImportanceTransferIsValidOneDayAfterDeactivateLink() {
+		// Assert:
+		assertTransferIsValidOneDayAfterOppositeLink(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
-	public void deactivateImportanceTransferIsValid() {
+	public void deactivateImportanceTransferIsValidOneDayAfterActivateLink() {
+		// Assert:
+		assertTransferIsValidOneDayAfterOppositeLink(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Deactivate);
+	}
+
+	private static void assertTransferIsValidOneDayAfterOppositeLink(
+			final ImportanceTransferTransaction.Mode initialLink,
+			final ImportanceTransferTransaction.Mode newLink) {
 		// Arrange:
-		final Transaction transaction = createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(newLink);
+		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(new BlockHeight(1441), transaction);
 
 		// Assert:
-		Assert.assertThat(createValidator().validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	//endregion
+
+	//region less than one day after opposite link
+
+	@Test
+	public void activateImportanceTransferIsNotValidLessThanOneDayAfterDeactivateLink() {
+		// Assert:
+		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
-	public void otherImportanceTransferIsNotValid() {
+	public void deactivateImportanceTransferIsNotValidLessThanOneDayAfterActivateLink() {
+		// Assert:
+		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Deactivate);
+	}
+
+	private static void assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
+			final ImportanceTransferTransaction.Mode initialLink,
+			final ImportanceTransferTransaction.Mode newLink) {
 		// Arrange:
-		final Transaction transaction = createTransaction(ImportanceTransferTransaction.Mode.Unknown);
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(newLink);
+		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(new BlockHeight(1440), transaction);
 
 		// Assert:
-		Assert.assertThat(createValidator().validate(transaction), IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
 	}
+
+	//endregion
+
+	//region after same link
+
+	@Test
+	public void activateImportanceTransferIsNotValidAfterActivateLink() {
+		// Assert:
+		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Activate);
+	}
+
+	@Test
+	public void deactivateImportanceTransferIsNotValidAfterDeactivateLink() {
+		// Assert:
+		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Activate);
+	}
+
+	private static void assertTransferIsNotValidAfterSameLink(final ImportanceTransferTransaction.Mode mode) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(mode);
+		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, mode);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(new BlockHeight(2882), transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+	}
+
+	//endregion
 
 	//region other type
 
 	@Test
 	public void otherTransactionTypesPassValidation() {
 		// Arrange:
+		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount(Amount.fromNem(100));
 		final MockTransaction transaction = new MockTransaction(account);
 		transaction.setFee(Amount.fromNem(200));
 
+		// Act:
+		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
+
 		// Assert:
-		Assert.assertThat(createValidator().validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
 
-	private static TransactionValidator createValidator() {
-		return new ImportanceTransferTransactionValidator(Mockito.mock(PoiFacade.class));
-	}
+	private static class TestContext {
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.poiFacade);
 
-	private static ImportanceTransferTransaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
-		return new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				mode, Utils.generateRandomAccount());
+		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
+			final Account signer = Utils.generateRandomAccount();
+			this.addRemoteLinks(signer);
+			return new ImportanceTransferTransaction(
+					TimeInstant.ZERO,
+					signer,
+					mode,
+					Utils.generateRandomAccount());
+		}
+
+		private void addRemoteLinks(final Account account) {
+			final Address address = account.getAddress();
+			final PoiAccountState state = new PoiAccountState(address);
+			Mockito.when(this.poiFacade.findStateByAddress(address))
+					.thenReturn(state);
+		}
+
+		private void setRemoteState(final Account account, final BlockHeight height, final ImportanceTransferTransaction.Mode mode) {
+			final RemoteLink link = new RemoteLink(account.getAddress(), height, mode.value(), RemoteLink.Owner.HarvestingRemotely);
+			this.poiFacade.findStateByAddress(account.getAddress()).getRemoteLinks().addLink(link);
+		}
 	}
 }
