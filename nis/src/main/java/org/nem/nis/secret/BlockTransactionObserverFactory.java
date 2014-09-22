@@ -34,10 +34,10 @@ public class BlockTransactionObserverFactory {
 	private static AggregateBlockTransactionObserverBuilder createBuilder(final AccountAnalyzer accountAnalyzer) {
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-		builder.add(new WeightedBalancesObserver(accountAnalyzer.getPoiFacade()));
+		builder.add(new WeightedBalancesObserver(poiFacade));
 		builder.add(new AccountsHeightObserver(accountAnalyzer));
 		builder.add(new BalanceCommitTransferObserver());
-		builder.add(new HarvestRewardCommitObserver(poiFacade, accountAnalyzer.getAccountCache()));
+		builder.add(new HarvestRewardCommitObserver());
 		builder.add(new RemoteObserver(poiFacade));
 		builder.add(new OutlinkObserver(poiFacade));
 		return builder;

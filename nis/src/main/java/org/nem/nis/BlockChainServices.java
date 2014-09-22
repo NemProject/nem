@@ -57,7 +57,7 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
-		final BlockExecutor executor = new BlockExecutor();
+		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, this.observerFactory.createExecuteCommitObserver(accountAnalyzer)),
 				scorer,
@@ -83,12 +83,12 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
-		// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
+		// this is delicate and the order matters, first visitor during undo changes amount of foraged blocks
 		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.observerFactory.createUndoCommitObserver(accountAnalyzer),
-				new BlockExecutor()));
+				new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache())));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(

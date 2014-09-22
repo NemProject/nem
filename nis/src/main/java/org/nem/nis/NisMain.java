@@ -10,7 +10,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,10 +79,12 @@ public class NisMain {
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
-		final BlockExecutor executor = new BlockExecutor();
+		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
+		final AccountCache accountCache = this.accountAnalyzer.getAccountCache();
+		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(this.accountAnalyzer);
 		do {
-			final Block block = BlockMapper.toModel(dbBlock, this.accountAnalyzer.getAccountCache().asAutoCache());
+			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
@@ -96,12 +98,12 @@ public class NisMain {
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
-				for (final Account account : this.accountAnalyzer.getAccountCache()) {
+				for (final Account account : accountCache) {
 					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
 						continue;
 					}
 
-					final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress());
+					final PoiAccountState accountState = poiFacade.findStateByAddress(account.getAddress());
 					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}

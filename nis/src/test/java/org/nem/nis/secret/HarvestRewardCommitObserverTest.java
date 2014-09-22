@@ -2,121 +2,79 @@ package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.*;
-import org.nem.nis.poi.*;
 
 public class HarvestRewardCommitObserverTest {
+	private static final BlockTransactionObserver OBSERVER = new HarvestRewardCommitObserver();
 
-	//region local harvesting
+	//region execute
 
 	@Test
-	public void localHarvestingExecuteCanBeCommitted() {
+	public void harvestRewardExecuteIncrementsForagedBlocks() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+		notifyHarvestRewardExecute(account);
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(122)));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
 	}
 
 	@Test
-	public void localHarvestingUndoCanBeCommitted() {
+	public void harvestRewardExecuteDoesNotChangeBalance() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Undo));
+		notifyHarvestRewardExecute(account);
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(78)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+
+	private static void notifyHarvestRewardExecute(final Account account) {
+		OBSERVER.notify(
+				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
+				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
 	}
 
 	//endregion
 
-	//region local harvesting
+	//region undo
 
 	@Test
-	public void remoteHarvestingExecuteCanBeCommitted() {
+	public void harvestRewardUndoDecrementsForagedBlocks() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
-		final Account remoteAccount = context.createRemoteAccount(account);
+		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, remoteAccount, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+		notifyHarvestRewardUndo(account);
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(122)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
-	}
-
-	@Test
-	public void remoteHarvestingUndoCanBeCommitted() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
-		final Account remoteAccount = context.createRemoteAccount(account);
-
-		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, remoteAccount, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Undo));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(78)));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
-	//endregion
-
-	//region delegation
-
 	@Test
-	public void observerDelegatesStateLookupToPoiFacade() {
+	public void harvestRewardUndoDoesNotChangeBalance() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+		notifyHarvestRewardUndo(account);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.times(1)).findForwardedStateByAddress(account.getAddress(), new BlockHeight(4));
+		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
-	@Test
-	public void observerDelegatesAccountLookupToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
-		final Account remoteAccount = context.createRemoteAccount(account);
-
-		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, remoteAccount, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
-
-		// Assert:
-		Mockito.verify(context.accountCache, Mockito.times(1)).findByAddress(account.getAddress());
+	private static void notifyHarvestRewardUndo(final Account account) {
+		OBSERVER.notify(
+				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
+				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Undo));
 	}
 
 	//endregion
@@ -126,11 +84,10 @@ public class HarvestRewardCommitObserverTest {
 	@Test
 	public void otherNotificationTypesAreIgnored() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
+		OBSERVER.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, Amount.fromNem(22)),
 				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
 
@@ -141,32 +98,13 @@ public class HarvestRewardCommitObserverTest {
 
 	//endregion
 
-	private static class TestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final BlockTransactionObserver observer = new HarvestRewardCommitObserver(this.poiFacade, this.accountCache);
-
-		private Account createAccountWithBalanceAndBlocks(final Amount balance, final int numHarvestedBlocks) {
-			final Account account = Utils.generateRandomAccount();
-			account.incrementBalance(balance);
-			for (int i = 0; i < numHarvestedBlocks; ++i) {
-				account.incrementForagedBlocks();
-			}
-
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
-			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, balance);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(accountState);
-			Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
-			return account;
+	private static Account createAccountWithBalanceAndBlocks(final Amount balance, final int numHarvestedBlocks) {
+		final Account account = Utils.generateRandomAccount();
+		account.incrementBalance(balance);
+		for (int i = 0; i < numHarvestedBlocks; ++i) {
+			account.incrementForagedBlocks();
 		}
 
-		private Account createRemoteAccount(final Account forwardedAccount) {
-			final Account account = createAccountWithBalanceAndBlocks(Amount.ZERO, 0);
-
-			final PoiAccountState forwardedAccountState = new PoiAccountState(forwardedAccount.getAddress());
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(forwardedAccountState);
-			return account;
-		}
+		return account;
 	}
 }
