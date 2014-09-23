@@ -90,14 +90,11 @@ public class NisAppConfig {
 		flyway.setDataSource(this.dataSource());
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
-		// TODO-CR: 20140817 J->B why are different line-endings causing validation to fail?
-		// TODO-CR: 20140901 BR -> J during migration checksums are calculated which give different results for linux
-		// TODO-CR                   and windows line endings. Thus validation fails.
-		// TODO 20140909 J-G gimre?
 		// TODO 20140922 G-J not sure if that is the reason, but from what I understand this failure happened only on dev machines
 		// TODO                         so I would rather set it to true by default, or use property from properties file, (devs than could have it set to false)
 		// TODO 20140922 J-G - can you make the change (and confirm that it works)?
-		flyway.setValidateOnMigrate(false);
+		// TODO 20140923 G-J: seems it is working for me, if anyone will notice problem, report :)
+		flyway.setValidateOnMigrate(Boolean.valueOf(prop.getProperty("flyway.validate")));
 		return flyway;
 	}
 

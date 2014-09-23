@@ -323,7 +323,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void filteringOutConflictingTransactions() {
 		// Arrange:
-		final Account sender = createSenderWithAmount(3);
+		final Account sender = createSenderWithAmount(10);
 		final Account recipient = createSenderWithAmount(0);
 		// TODO 20140921 J-G: i think the removeConflictingTransactions is confusing in that it takes a list
 		// i think  getTransactionsBefore and removeConflictingTransactions should return UnconfirmedTransactions
@@ -345,19 +345,62 @@ public class UnconfirmedTransactionsTest {
 		// UnconfirmedTransactions::removeConflictingTransactions re-adds all transactions without "executing" them
 		// after "first" transaction is added, the balances are: S = 0, R = 0
 		// since R < 2, the second transaction is prevented from inclusion in the block
-		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
+		// TODO 20140923 G-J: It took me 3h today, some going back and forth in time and some help from BR, to figure it out
+		//   This is how it INITIALLY this test was supposed to work.
+		//   - add two txes, S->R, R->S,   adding should succeed as it is done in proper order
+		//   - getTransactionsBefore() returns SORTED transactions, so the goal of setting the fee in second transaction,
+		//     was that it was supposed to be placed BEFORE S->R (after changing fee structure that actually didn't happen, as both txes had fee = 1)
+		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough "unconfirmed balance"
+		//
+		// However, this and test and one I'm gonna add below, should reject R's transaction for the following reason:
+		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
+		// of a block that would get discarded (TXes are validated first, and then executed)
+		//
+
+		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		transactions.addValid(first);
-		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));
-		second.setFee(Amount.fromNem(1));
+		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
+		second.setFee(Amount.fromNem(2));
 		transactions.addValid(second);
+
 
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
 		final List<Transaction> filtered = transactions.removeConflictingTransactions(transactionList);
 
 		// Assert:
-		Assert.assertThat(transactionList, IsEquivalent.equivalentTo(new Transaction[] { first, second }));
-		Assert.assertThat(filtered, IsEquivalent.equivalentTo(new Transaction[] { first }));
+		// note: this checks that both TXes have been added and that returned TXes are in proper order
+		Assert.assertThat(transactionList, IsEqual.equalTo(Arrays.asList(second, first)));
+		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(first)));
+	}
+
+
+	@Test
+	public void transactionIsRemovedIfAccountDoesntHaveEnoughFunds() {
+		// Arrange:
+		final Account sender = createSenderWithAmount(10);
+		final Account recipient = createSenderWithAmount(0);
+
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(
+				NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
+		first.setFee(Amount.fromNem(3));
+		transactions.addValid(first);
+		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
+		second.setFee(Amount.fromNem(2));
+		transactions.addValid(second);
+
+
+		transactions.dropExpiredTransactions(currentTime);
+		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
+		final List<Transaction> filtered = transactions.removeConflictingTransactions(transactionList);
+
+		// Assert:
+		// note: this checks that both TXes have been added and that returned TXes are in proper order
+		Assert.assertThat(transactionList, IsEqual.equalTo(Arrays.asList(first, second)));
+		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(first)));
 	}
 
 	@Test
