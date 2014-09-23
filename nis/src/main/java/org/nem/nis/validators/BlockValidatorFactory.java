@@ -14,6 +14,6 @@ public class BlockValidatorFactory {
 	 * @return The validator.
 	 */
 	public BlockValidator create(final PoiFacade poiFacade) {
-		return null;
+		return new EligibleSignerBlockValidator(poiFacade);
 	}
 }
