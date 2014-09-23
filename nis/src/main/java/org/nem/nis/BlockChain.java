@@ -527,6 +527,7 @@ public class BlockChain implements BlockSynchronizer {
 				// if the transaction is in DB it means at some point
 				// isValid and verify had to be called on it, so we can safely add it
 				// as unconfirmed
+				// TODO 20140922 J-G can you remind me why at this point the reverted transactions are still in the DB?
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
