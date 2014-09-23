@@ -96,6 +96,8 @@ public class UnconfirmedTransactions {
 			transaction.execute(this.transferObserver);
 		}
 
+		// TODO 20140922 J-G above the transaction result is NEUTRAL but here it is FAILURE_HASH_EXISTS
+		// TODO should (1) HASH_EXISTS be neutral status or should we use NEUTRAL here too?
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
