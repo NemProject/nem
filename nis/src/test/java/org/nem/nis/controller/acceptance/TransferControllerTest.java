@@ -13,7 +13,6 @@ import org.nem.nis.test.LocalHostConnector;
 // to follow/find/detect changes in /transfer/ API or serializers
 // TODO 20140921 J-G: i guess these tests are all deprecated now because they were going to the deprecated transaction/prepare api?
 // TODO 20140922 G-J: as mentioned, exchanges will probably want that API?
-@Ignore
 public class TransferControllerTest {
 
 	private static final String TRANSFER_PREPARE_PATH = "transaction/prepare";
