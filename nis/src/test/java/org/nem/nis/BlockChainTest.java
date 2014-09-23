@@ -155,7 +155,7 @@ public class BlockChainTest {
 						Mockito.mock(TransferDao.class),
 						mockBlockDao,
 						new BlockTransactionObserverFactory(),
-						new TransactionValidatorFactory());
+						NisUtils.createTransactionValidatorFactory());
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,

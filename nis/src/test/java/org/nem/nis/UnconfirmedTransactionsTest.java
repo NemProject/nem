@@ -330,7 +330,7 @@ public class UnconfirmedTransactionsTest {
 		// but that's a refactoring for another day ;)
 		// (also a smell that i needed to use the "real" validator to get this test to pass, imo)
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(
-				new TransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
+				NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act: the second transaction is invalid because the recipient has an insufficient balance

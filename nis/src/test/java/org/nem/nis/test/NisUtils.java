@@ -1,11 +1,14 @@
 package org.nem.nis.test;
 
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.secret.AccountLink;
+import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.util.*;
 
@@ -97,5 +100,14 @@ public class NisUtils {
 				new BlockHeight(blockHeight),
 				Amount.fromNem(amount),
 				Address.fromEncoded(address));
+	}
+
+	/**
+	 * Creates a transaction validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static TransactionValidatorFactory createTransactionValidatorFactory() {
+		return new TransactionValidatorFactory(Mockito.mock(TransferDao.class));
 	}
 }

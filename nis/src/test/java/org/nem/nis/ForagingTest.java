@@ -167,7 +167,7 @@ public class ForagingTest {
 
 		// Assert:
 		// TODO 20140921 J-B: i'm guessing that this is more of a sanity check that the tx is valid? so i just used the "real" validator
-		final TransactionValidator validator = new TransactionValidatorFactory().create(Mockito.mock(PoiFacade.class));
+		final TransactionValidator validator = NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class));
 		Assert.assertThat(validator.validate(tx), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
@@ -407,6 +407,6 @@ public class ForagingTest {
 				new MockBlockDao(null),
 				lastBlockLayer,
 				new MockTransferDaoImpl(),
-				new TransactionValidatorFactory());
+				NisUtils.createTransactionValidatorFactory());
 	}
 }

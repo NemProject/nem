@@ -151,7 +151,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory();
+		return new TransactionValidatorFactory(this.transferDao);
 	}
 
 	@Bean
