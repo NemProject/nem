@@ -36,10 +36,9 @@ public class AggregateTransactionValidatorBuilder {
 		}
 
 		@Override
-		public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
-			// TODO-CR 20140922 G-J: want ImportanceTransferValidator: already present in places where AggregateTransactionValidatorBuilder is created
+		public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 			for (final TransactionValidator validator : this.validators) {
-				final ValidationResult result = validator.validate(transaction, predicate);
+				final ValidationResult result = validator.validate(transaction, context);
 				if (ValidationResult.SUCCESS != result) {
 					return result;
 				}

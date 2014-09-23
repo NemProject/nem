@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -79,8 +79,7 @@ public class BlockChainValidator {
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
-				// TODO-CR 20140922 G-J: want ImportanceTransferValidator: yes
-				if (ValidationResult.SUCCESS != this.validator.validate(transaction) ||
+				if (ValidationResult.SUCCESS != this.validator.validate(transaction, new ValidationContext(block.getHeight())) ||
 						!transaction.verify() ||
 						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {

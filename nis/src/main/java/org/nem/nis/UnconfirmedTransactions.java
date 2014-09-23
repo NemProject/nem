@@ -101,10 +101,9 @@ public class UnconfirmedTransactions {
 	}
 
 	private ValidationResult validate(final Transaction transaction) {
-		// TODO-CR 20140922 G-J: want ImportanceTransferValidator: I think full validation cannot be run in this place
 		return this.validator.validate(
 				transaction,
-				(account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0);
+				new ValidationContext((account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0));
 	}
 
 	/**

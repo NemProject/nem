@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
-import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,6 @@ public class PushService {
 	private ValidationResult checkTransaction(final Transaction transaction) {
 		return !transaction.verify()
 				? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
-				// TODO-CR 20140922 G-J: want ImportanceTransferValidator: I think full validation cannot be run in this place
 				: this.validator.validate(transaction);
 	}
 

@@ -11,25 +11,25 @@ public class AggregateTransactionValidatorBuilderTest {
 	public void canAddSingleValidator() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
-		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
+		final ValidationContext context = Mockito.mock(ValidationContext.class);
 		final TransactionValidator validator = createValidator(ValidationResult.FAILURE_FUTURE_DEADLINE);
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 
 		// Act:
 		builder.add(validator);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction, predicate);
+		final ValidationResult result = aggregate.validate(transaction, context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-		Mockito.verify(validator, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator, Mockito.only()).validate(transaction, context);
 	}
 
 	@Test
 	public void canAddMultipleValidators() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
-		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
+		final ValidationContext context = Mockito.mock(ValidationContext.class);
 		final TransactionValidator validator1 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator2 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator3 = createValidator(ValidationResult.SUCCESS);
@@ -40,20 +40,20 @@ public class AggregateTransactionValidatorBuilderTest {
 		builder.add(validator2);
 		builder.add(validator3);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction, predicate);
+		final ValidationResult result = aggregate.validate(transaction, context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Mockito.verify(validator1, Mockito.only()).validate(transaction, predicate);
-		Mockito.verify(validator2, Mockito.only()).validate(transaction, predicate);
-		Mockito.verify(validator3, Mockito.only()).validate(transaction, predicate);
+		Mockito.verify(validator1, Mockito.only()).validate(transaction, context);
+		Mockito.verify(validator2, Mockito.only()).validate(transaction, context);
+		Mockito.verify(validator3, Mockito.only()).validate(transaction, context);
 	}
 
 	@Test
 	public void validationShortCircuitsOnFirstSubValidatorFailure() {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
-		final DebitPredicate predicate = Mockito.mock(DebitPredicate.class);
+		final ValidationContext context = Mockito.mock(ValidationContext.class);
 		final TransactionValidator validator1 = createValidator(ValidationResult.SUCCESS);
 		final TransactionValidator validator2 = createValidator(ValidationResult.FAILURE_CHAIN_INVALID);
 		final TransactionValidator validator3 = createValidator(ValidationResult.SUCCESS);
@@ -64,13 +64,13 @@ public class AggregateTransactionValidatorBuilderTest {
 		builder.add(validator2);
 		builder.add(validator3);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(transaction, predicate);
+		final ValidationResult result = aggregate.validate(transaction, context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
-		Mockito.verify(validator1, Mockito.only()).validate(transaction, predicate);
-		Mockito.verify(validator2, Mockito.only()).validate(transaction, predicate);
-		Mockito.verify(validator3, Mockito.never()).validate(transaction, predicate);
+		Mockito.verify(validator1, Mockito.only()).validate(transaction, context);
+		Mockito.verify(validator2, Mockito.only()).validate(transaction, context);
+		Mockito.verify(validator3, Mockito.never()).validate(transaction, context);
 	}
 
 	private static TransactionValidator createValidator(final ValidationResult result) {

@@ -24,20 +24,12 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
+	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
 			return ValidationResult.SUCCESS;
 		}
 
-		return this.validate((ImportanceTransferTransaction)transaction);
-	}
-
-	public ValidationResult validate(final BlockHeight height, final Transaction transaction) {
-		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate(height, (ImportanceTransferTransaction)transaction)
+		return this.validate(context.getBlockHeight(), (ImportanceTransferTransaction)transaction)
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_ENTITY_UNUSABLE;
 	}

@@ -14,15 +14,15 @@ public interface TransactionValidator {
 	 * @return The validation result.
 	 */
 	default public ValidationResult validate(final Transaction transaction) {
-		return this.validate(transaction, (account, amount) -> account.getBalance().compareTo(amount) >= 0);
+		return this.validate(transaction, new ValidationContext());
 	}
 
 	/**
 	 * Checks the validity of the specified transaction.
 	 *
 	 * @param transaction The transaction.
-	 * @param predicate A predicate for checking account debits.
+	 * @param context The validation context.
 	 * @return The validation result.
 	 */
-	public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate);
+	public ValidationResult validate(final Transaction transaction, final ValidationContext context);
 }

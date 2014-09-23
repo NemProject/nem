@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 public class UniversalTransactionValidator implements TransactionValidator {
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
+	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		final TimeInstant timeStamp = transaction.getTimeStamp();
 		final TimeInstant deadline = transaction.getDeadline();
 
@@ -21,7 +21,7 @@ public class UniversalTransactionValidator implements TransactionValidator {
 			return ValidationResult.FAILURE_FUTURE_DEADLINE;
 		}
 
-		if (!predicate.canDebit(transaction.getSigner(), transaction.getFee())) {
+		if (!context.getDebitPredicate().canDebit(transaction.getSigner(), transaction.getFee())) {
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 

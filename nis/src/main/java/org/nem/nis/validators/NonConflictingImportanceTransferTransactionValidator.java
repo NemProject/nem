@@ -24,7 +24,7 @@ public class NonConflictingImportanceTransferTransactionValidator implements Tra
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
+	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
 			return ValidationResult.SUCCESS;
 		}

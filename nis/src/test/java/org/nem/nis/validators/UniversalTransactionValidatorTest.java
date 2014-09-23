@@ -79,7 +79,7 @@ public class UniversalTransactionValidatorTest {
 
 		// Assert:
 		Assert.assertThat(
-				VALIDATOR.validate(transaction, (account, amount) -> true),
+				VALIDATOR.validate(transaction, new ValidationContext((account, amount) -> true)),
 				IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 }

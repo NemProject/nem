@@ -21,7 +21,7 @@ public class TransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(
-				VALIDATOR.validate(transaction, (account, amount) -> false),
+				VALIDATOR.validate(transaction, new ValidationContext((account, amount) -> false)),
 				IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 	}
 
@@ -33,7 +33,7 @@ public class TransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		Assert.assertThat(
-				VALIDATOR.validate(transaction, (account, amount) -> true),
+				VALIDATOR.validate(transaction, new ValidationContext((account, amount) -> true)),
 				IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 

@@ -20,7 +20,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -34,7 +34,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
@@ -69,7 +69,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(new BlockHeight(1441), transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1441)));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -104,7 +104,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(new BlockHeight(1440), transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1440)));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
@@ -133,7 +133,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, mode);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(new BlockHeight(2882), transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(2882)));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
@@ -152,7 +152,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		transaction.setFee(Amount.fromNem(200));
 
 		// Act:
-		final ValidationResult result = context.validator.validate(BlockHeight.ONE, transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));

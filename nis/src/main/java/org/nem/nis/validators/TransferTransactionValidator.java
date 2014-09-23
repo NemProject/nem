@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 
 /**
  * A TransferTransactionValidator implementation that applies to transfer transactions.
@@ -10,12 +10,12 @@ public class TransferTransactionValidator implements TransactionValidator {
 	private static final int MAX_MESSAGE_SIZE = 512;
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final DebitPredicate predicate) {
+	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (TransactionTypes.TRANSFER != transaction.getType()){
 			return ValidationResult.SUCCESS;
 		}
 
-		return validate((TransferTransaction)transaction, predicate);
+		return validate((TransferTransaction)transaction, context.getDebitPredicate());
 	}
 
 	private ValidationResult validate(final TransferTransaction transaction, final DebitPredicate predicate) {
