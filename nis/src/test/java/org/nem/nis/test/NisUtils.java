@@ -5,10 +5,10 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.secret.AccountLink;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.*;
 
 import java.util.*;
 
@@ -108,6 +108,18 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory() {
-		return new TransactionValidatorFactory(Mockito.mock(TransferDao.class));
+		return new TransactionValidatorFactory(
+				Mockito.mock(TransferDao.class),
+				new SystemTimeProvider());
 	}
+
+	/**
+	 * Creates a block validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static BlockValidatorFactory createBlockValidatorFactory() {
+		return new BlockValidatorFactory(new SystemTimeProvider());
+	}
+
 }

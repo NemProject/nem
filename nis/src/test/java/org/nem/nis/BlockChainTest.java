@@ -154,7 +154,7 @@ public class BlockChainTest {
 				new BlockChainServices(
 						mockBlockDao,
 						new BlockTransactionObserverFactory(),
-						new BlockValidatorFactory(),
+						NisUtils.createBlockValidatorFactory(),
 						NisUtils.createTransactionValidatorFactory());
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,

@@ -133,8 +133,8 @@ public class BlockChainValidatorTest {
 		Mockito.when(blockValidator.validate(Mockito.eq(blocks.get(1)))).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Assert:
-		Mockito.verify(blockValidator, Mockito.atLeastOnce()).validate(Mockito.any());
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Mockito.verify(blockValidator, Mockito.atLeastOnce()).validate(Mockito.any());
 	}
 
 	@Test
@@ -148,22 +148,6 @@ public class BlockChainValidatorTest {
 		final List<Block> blocks = createBlockList(parentBlock, 3);
 
 		scorer.setZeroTargetBlock(blocks.get(1));
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void allBlocksInChainMustHaveValidTimestamp() {
-		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 3);
-		final Block block = createFutureBlock(blocks.get(2));
-		blocks.add(block);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -218,25 +202,6 @@ public class BlockChainValidatorTest {
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createInvalidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void allTransactionsInChainMustHaveValidTimestamp() {
-		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createSignedFutureTransaction());
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 

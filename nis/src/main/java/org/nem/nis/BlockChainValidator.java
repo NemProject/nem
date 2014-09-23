@@ -3,7 +3,6 @@ package org.nem.nis;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
@@ -17,7 +16,6 @@ import java.util.logging.Logger;
  */
 public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
-	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
@@ -67,12 +65,6 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			// TODO-CR: not sure if i like having a hard dependency on NisMain here instead of injecting the TimeProvider
-			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-			if (block.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
-				return false;
-			}
-
 			if (ValidationResult.SUCCESS != this.blockValidator.validate(block)) {
 				return false;
 			}
@@ -85,7 +77,6 @@ public class BlockChainValidator {
 			for (final Transaction transaction : block.getTransactions()) {
 				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, new ValidationContext(block.getHeight())) ||
 						!transaction.verify() ||
-						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;
 				}

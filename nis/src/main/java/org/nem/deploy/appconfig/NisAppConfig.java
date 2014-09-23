@@ -151,12 +151,12 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockValidatorFactory blockValidatorFactory() {
-		return new BlockValidatorFactory();
+		return new BlockValidatorFactory(this.timeProvider());
 	}
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.transferDao);
+		return new TransactionValidatorFactory(this.transferDao, this.timeProvider());
 	}
 
 	@Bean
