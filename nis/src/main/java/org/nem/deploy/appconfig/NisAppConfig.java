@@ -138,7 +138,6 @@ public class NisAppConfig {
 	@Bean
 	public BlockChainServices blockChainServices() {
 		return new BlockChainServices(
-				this.transferDao,
 				this.blockDao,
 				this.blockTransactionObserverFactory(),
 				this.transactionValidatorFactory());

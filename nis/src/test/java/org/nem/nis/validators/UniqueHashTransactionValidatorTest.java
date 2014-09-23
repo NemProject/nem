@@ -5,25 +5,43 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 
 public class UniqueHashTransactionValidatorTest {
+	private static final long MARKER_HEIGHT = BlockMarkerConstants.FATAL_TX_BUG_HEIGHT;
 
 	@Test
-	public void validateReturnsNeutralIfTransactionAlreadyExistsInDao() {
+	public void validateReturnsSuccessIfTransactionAlreadyExistsInDaoBeforeMarkerHeight() {
 		// Assert:
-		assertFindByHashResultIsMappedToStatus(Mockito.mock(Transfer.class), ValidationResult.NEUTRAL);
+		assertFindByHashResultIsMappedToStatus(Mockito.mock(Transfer.class), MARKER_HEIGHT - 1, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validateReturnsSuccessIfTransactionDoesNotExistInDao() {
+	public void validateReturnsNeutralIfTransactionAlreadyExistsInDaoAtMarkerHeight() {
 		// Assert:
-		assertFindByHashResultIsMappedToStatus(null, ValidationResult.SUCCESS);
+		assertFindByHashResultIsMappedToStatus(Mockito.mock(Transfer.class), MARKER_HEIGHT, ValidationResult.NEUTRAL);
 	}
 
-	private static void assertFindByHashResultIsMappedToStatus(final Transfer findByHashResult, final ValidationResult expectedResult) {
+	@Test
+	public void validateReturnsNeutralIfTransactionAlreadyExistsInDaoAfterMarkerHeight() {
+		// Assert:
+		assertFindByHashResultIsMappedToStatus(Mockito.mock(Transfer.class), MARKER_HEIGHT + 1, ValidationResult.NEUTRAL);
+	}
+
+	@Test
+	public void validateReturnsSuccessIfTransactionDoesNotExistInDaoAfterMarkerHeight() {
+		// Assert:
+		assertFindByHashResultIsMappedToStatus(null, MARKER_HEIGHT + 1, ValidationResult.SUCCESS);
+	}
+
+	private static void assertFindByHashResultIsMappedToStatus(
+			final Transfer findByHashResult,
+			final long height,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), 7);
 		final Hash hash = HashUtils.calculateHash(transaction);
@@ -33,7 +51,7 @@ public class UniqueHashTransactionValidatorTest {
 		final TransactionValidator validator = new UniqueHashTransactionValidator(transferDao);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction);
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(new BlockHeight(height)));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));

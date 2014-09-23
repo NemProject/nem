@@ -22,7 +22,6 @@ public class BlockChainValidator {
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
-	private final Predicate<Hash> transactionExists;
 	private final TransactionValidator validator;
 
 	/**
@@ -31,19 +30,16 @@ public class BlockChainValidator {
 	 * @param executor The block executor to use.
 	 * @param scorer The block scorer to use.
 	 * @param maxChainSize The maximum chain size.
-	 * @param transactionExists Predicate that returns true if a transaction with the same hash already exists in the database.
 	 * @param validator The validator to use for validating transactions.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
-			final Predicate<Hash> transactionExists,
 			final TransactionValidator validator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
-		this.transactionExists = transactionExists;
 		this.validator = validator;
 	}
 
@@ -88,7 +84,7 @@ public class BlockChainValidator {
 
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
 					final Hash hash = HashUtils.calculateHash(transaction);
-					if (this.transactionExists.test(hash) || chainHashes.contains(hash)) {
+					if (chainHashes.contains(hash)) {
 						LOGGER.info("received block with duplicate TX");
 						return false;
 					}

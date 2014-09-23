@@ -247,38 +247,6 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidatorTrue(scorer);
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
-
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void chainIsInvalidIfTransactionAlreadyExistInDbAfterMarkerThread() {
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidatorTrue(scorer);
-		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
-		parentBlock.sign();
-
-		final List<Block> blocks = createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
-
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwiceAfterMarkerThread() {
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidator(scorer);
@@ -441,15 +409,11 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> false, new UniversalTransactionValidator());
+		return new BlockChainValidator(block -> { }, scorer, 21, new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false, new UniversalTransactionValidator());
-	}
-
-	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> true, new UniversalTransactionValidator());
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator() {

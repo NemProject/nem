@@ -132,15 +132,11 @@ public class Foraging {
 	 * @return false if given transaction has already been seen, true if it has been added
 	 */
 	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(final Transaction transaction) {
-		return this.unconfirmedTransactions.add(transaction);
+		return this.unconfirmedTransactions.addValidOrNeutral(transaction);
 	}
 
 	private ValidationResult addUnconfirmedTransaction(final Transaction transaction) {
-		return this.unconfirmedTransactions.add(transaction, hash -> {
-			synchronized (this.blockChainLastBlockLayer) {
-				return null != this.transferDao.findByHash(hash.getRaw());
-			}
-		});
+		return this.unconfirmedTransactions.addValid(transaction);
 	}
 
 	/**

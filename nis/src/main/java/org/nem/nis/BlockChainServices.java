@@ -24,18 +24,15 @@ import java.util.*;
  */
 @Service
 public class BlockChainServices {
-	private final TransferDao transferDao;
 	private final BlockDao blockDao;
 	private final BlockTransactionObserverFactory observerFactory;
 	private final TransactionValidatorFactory validatorFactory;
 
 	@Autowired(required = true)
 	public BlockChainServices(
-			final TransferDao transferDao,
 			final BlockDao blockDao,
 			final BlockTransactionObserverFactory observerFactory,
 			final TransactionValidatorFactory validatorFactory) {
-		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
 		this.validatorFactory = validatorFactory;
@@ -62,7 +59,6 @@ public class BlockChainServices {
 				block -> executor.execute(block, this.observerFactory.createExecuteCommitObserver(accountAnalyzer)),
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
-				hash -> (null != this.transferDao.findByHash(hash.getRaw())),
 				this.validatorFactory.create(poiFacade));
 		return validator.isValid(parentBlock, peerChain);
 	}

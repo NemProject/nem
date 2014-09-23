@@ -37,7 +37,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -48,11 +48,11 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
-		transactions.add(new MockTransaction(sender, 7));
+		transactions.addValid(new MockTransaction(sender, 7));
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -65,38 +65,38 @@ public class UnconfirmedTransactionsTest {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
 
 		// Act:
-		transactions.add(new MockTransaction(sender, 7));
+		transactions.addValid(new MockTransaction(sender, 7));
 
 		final MockTransaction transaction = new MockTransaction(sender, 8);
-		final ValidationResult result = transactions.add(transaction);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
-	public void transactionCanBeAddedIfTransactionPredicateReturnsFalse() {
+	public void transactionCanBeAddedIfValidationReturnNeutralAndNeutralIsAllowed() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(ValidationResult.NEUTRAL);
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = transactions.add(transaction, hash -> false);
+		final ValidationResult result = transactions.addValidOrNeutral(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
-	public void transactionCannotBeAddedIfTransactionPredicateReturnsTrue() {
+	public void transactionCannotBeAddedIfValidationReturnNeutralAndNeutralIsNotAllowed() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(ValidationResult.NEUTRAL);
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = transactions.add(transaction, hash -> true);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -112,7 +112,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = transactions.add(transaction, hash -> false);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Mockito.verify(validator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
@@ -126,11 +126,11 @@ public class UnconfirmedTransactionsTest {
 		final Account remote = Utils.generateRandomAccount();
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
 
-		transactions.add(new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote));
+		transactions.addValid(new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote));
 
 		// Act:
 		final Transaction transaction = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferTransaction.Mode.Activate, remote);
-		final ValidationResult result = transactions.add(transaction, hash -> false);
+		final ValidationResult result = transactions.addValid(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
@@ -149,10 +149,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final TimeInstant txTime = new TimeInstant(11);
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
+		transactions.addValid(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
 		final Transaction toRemove = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(8));
-		transactions.add(toRemove);
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
+		transactions.addValid(toRemove);
+		transactions.addValid(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
 
 		final boolean isRemoved = transactions.remove(toRemove);
 		final List<Amount> amountList = getAmountsBeforeAsList(transactions, txTime.addMinutes(5));
@@ -171,9 +171,9 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final TimeInstant txTime = new TimeInstant(11);
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
+		transactions.addValid(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(7)));
 		final Transaction toRemove = createTransferTransaction(txTime, sender, recipient, Amount.fromNem(8)); // never added
-		transactions.add(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
+		transactions.addValid(createTransferTransaction(txTime, sender, recipient, Amount.fromNem(9)));
 
 		final boolean isRemoved = transactions.remove(toRemove);
 		final List<Amount> amountList = getAmountsBeforeAsList(transactions, txTime.addMinutes(5));
@@ -193,17 +193,17 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		Transaction temp;
-		transactions.add(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7)));
+		transactions.addValid(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7)));
 		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(8));
 		temp.setDeadline(currentTime.addSeconds(-2));
-		transactions.add(temp);
-		transactions.add(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(9)));
+		transactions.addValid(temp);
+		transactions.addValid(createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(9)));
 		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(10));
 		temp.setDeadline(currentTime.addHours(-3));
-		transactions.add(temp);
+		transactions.addValid(temp);
 		temp = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(11));
 		temp.setDeadline(currentTime.addSeconds(1));
-		transactions.add(temp);
+		transactions.addValid(temp);
 
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Amount> amountList = getAmountsBeforeAsList(transactions, currentTime.addSeconds(1));
@@ -239,7 +239,7 @@ public class UnconfirmedTransactionsTest {
 		final MockTransaction transaction1 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 1);
 		final MockTransaction transaction2 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(15), 1);
 		final MockTransaction transaction3 = new MockTransaction(MockTransaction.TYPE, 123, new TimeInstant(10), 2);
-		Arrays.asList(transaction1, transaction2, transaction3).forEach(unconfirmedTransactions::add);
+		Arrays.asList(transaction1, transaction2, transaction3).forEach(unconfirmedTransactions::addValid);
 
 		// Act:
 		final Collection<Transaction> transactionsBefore = unconfirmedTransactions.getTransactionsBefore(new TimeInstant(100));
@@ -271,10 +271,10 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionsBeforeReturnsTransactionsInSortedOrder() {
 		// Arrange:
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
-		transactions.add(createTransaction(new TimeInstant(9), Amount.fromNem(1), 1));
-		transactions.add(createTransaction(new TimeInstant(11), Amount.fromNem(2), 2));
-		transactions.add(createTransaction(new TimeInstant(9), Amount.fromNem(4), 3));
-		transactions.add(createTransaction(new TimeInstant(7), Amount.fromNem(1), 4));
+		transactions.addValid(createTransaction(new TimeInstant(9), Amount.fromNem(1), 1));
+		transactions.addValid(createTransaction(new TimeInstant(11), Amount.fromNem(2), 2));
+		transactions.addValid(createTransaction(new TimeInstant(9), Amount.fromNem(4), 3));
+		transactions.addValid(createTransaction(new TimeInstant(7), Amount.fromNem(1), 4));
 
 		// Act:
 		final Collection<Transaction> transactionsBefore = transactions.getTransactionsBefore(new TimeInstant(10));
@@ -303,10 +303,10 @@ public class UnconfirmedTransactionsTest {
 	public void getAllReturnsTransactionsInSortedOrder() {
 		// Arrange:
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
-		transactions.add(createTransaction(new TimeInstant(9), Amount.fromNem(1), 1));
-		transactions.add(createTransaction(new TimeInstant(11), Amount.fromNem(2), 2));
-		transactions.add(createTransaction(new TimeInstant(9), Amount.fromNem(4), 3));
-		transactions.add(createTransaction(new TimeInstant(7), Amount.fromNem(1), 4));
+		transactions.addValid(createTransaction(new TimeInstant(9), Amount.fromNem(1), 1));
+		transactions.addValid(createTransaction(new TimeInstant(11), Amount.fromNem(2), 2));
+		transactions.addValid(createTransaction(new TimeInstant(9), Amount.fromNem(4), 3));
+		transactions.addValid(createTransaction(new TimeInstant(7), Amount.fromNem(1), 4));
 
 		// Act:
 		final Collection<Transaction> transactionsBefore = transactions.getAll();
@@ -346,10 +346,10 @@ public class UnconfirmedTransactionsTest {
 		// after "first" transaction is added, the balances are: S = 0, R = 0
 		// since R < 2, the second transaction is prevented from inclusion in the block
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(2));
-		transactions.add(first);
+		transactions.addValid(first);
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(1));
 		second.setFee(Amount.fromNem(1));
-		transactions.add(second);
+		transactions.addValid(second);
 
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
@@ -368,7 +368,7 @@ public class UnconfirmedTransactionsTest {
 		for (int i = 0; i < 10; ++i) {
 			final Transaction transaction = new MockTransaction(i, new TimeInstant(100));
 			transactions.add(transaction);
-			unconfirmedTransactions.add(transaction);
+			unconfirmedTransactions.addValid(transaction);
 		}
 
 		final List<Transaction> blockTransactions = Arrays.asList(
@@ -413,20 +413,24 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactions(final int numTransactions) {
 		final UnconfirmedTransactions transactions = createUnconfirmedTransactions();
 		for (int i = 0; i < numTransactions; ++i) {
-			transactions.add(new MockTransaction(i, new TimeInstant(i * 10)));
+			transactions.addValid(new MockTransaction(i, new TimeInstant(i * 10)));
 		}
 
 		return transactions;
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions() {
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-		return createUnconfirmedTransactions(validator);
+		return createUnconfirmedTransactions(ValidationResult.SUCCESS);
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactions(final TransactionValidator validator) {
 		return new UnconfirmedTransactions(validator);
+	}
+
+	private static UnconfirmedTransactions createUnconfirmedTransactions(final ValidationResult result) {
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
+		return createUnconfirmedTransactions(validator);
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithAscendingFees(final int numTransactions) {
@@ -434,7 +438,7 @@ public class UnconfirmedTransactionsTest {
 		for (int i = 0; i < numTransactions; ++i) {
 			final MockTransaction mockTransaction = new MockTransaction(i, new TimeInstant(i * 10));
 			mockTransaction.setFee(Amount.fromNem(i + 1));
-			transactions.add(mockTransaction);
+			transactions.addValid(mockTransaction);
 		}
 
 		return transactions;

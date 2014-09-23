@@ -46,40 +46,35 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds an unconfirmed transaction unconditionally.
+	 * Adds an unconfirmed transaction if it has a SUCCESS validation result.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
-	public ValidationResult add(final Transaction transaction) {
-		return this.add(transaction, hash -> false);
+	public ValidationResult addValid(final Transaction transaction) {
+		return this.add(transaction, false, true);
+	}
+
+	/**
+	 * Adds an unconfirmed transaction if it has a SUCCESS or NEUTRAL validation result.
+	 *
+	 * @param transaction The transaction.
+	 * @return true if the transaction was added.
+	 */
+	public ValidationResult addValidOrNeutral(final Transaction transaction) {
+		return this.add(transaction, true, true);
 	}
 
 	/**
 	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
 	 *
 	 * @param transaction The transaction.
-	 * @param exists Predicate that determines the existence of the transaction given its hash.
+	 * @param allowNeutral true if transactions should be considered valid if their validation result is NEUTRAL.
+	 * @param execute true if valid transactions should be executed.
 	 * @return true if the transaction was added.
 	 */
-	public ValidationResult add(final Transaction transaction, final Predicate<Hash> exists) {
-		return this.add(transaction, exists, true);
-	}
-
-	/**
-	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
-	 *
-	 * @param transaction The transaction.
-	 * @param exists Predicate that determines the existence of the transaction given its hash.
-	 * @param execute determines if the transaction should be executed if valid.
-	 * @return true if the transaction was added.
-	 */
-	private ValidationResult add(final Transaction transaction, final Predicate<Hash> exists, final boolean execute) {
+	private ValidationResult add(final Transaction transaction, final boolean allowNeutral, final boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (exists.test(transactionHash)) {
-			return ValidationResult.NEUTRAL;
-		}
-
 		if (this.transactions.containsKey(transactionHash)) {
 			return ValidationResult.NEUTRAL;
 		}
@@ -87,7 +82,7 @@ public class UnconfirmedTransactions {
 		// not sure if adding to cache here is a good idea...
 		this.addToCache(transaction.getSigner());
 		final ValidationResult validationResult = this.validate(transaction);
-		if (!validationResult.isSuccess()) {
+		if (!validationResult.isSuccess() && (!allowNeutral || ValidationResult.NEUTRAL != validationResult)) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
@@ -201,7 +196,7 @@ public class UnconfirmedTransactions {
 		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
 
 		unconfirmedTransactions.stream()
-				.forEach(tx -> filteredTxes.add(tx, hash -> false, false));
+				.forEach(tx -> filteredTxes.add(tx, true, false));
 
 		filteredTxes.executeAll();
 		return filteredTxes.getAll();

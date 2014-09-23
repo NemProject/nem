@@ -152,7 +152,6 @@ public class BlockChainTest {
 		final Foraging foraging = Mockito.mock(Foraging.class);
 		final BlockChainServices services =
 				new BlockChainServices(
-						Mockito.mock(TransferDao.class),
 						mockBlockDao,
 						new BlockTransactionObserverFactory(),
 						NisUtils.createTransactionValidatorFactory());

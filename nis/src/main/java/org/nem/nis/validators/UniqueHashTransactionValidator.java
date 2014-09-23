@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.dao.TransferDao;
 
 /**
@@ -21,6 +22,10 @@ public class UniqueHashTransactionValidator implements TransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+		if (context.getBlockHeight().getRaw() < BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
+			return ValidationResult.SUCCESS;
+		}
+
 		final Hash hash = HashUtils.calculateHash(transaction);
 		return null != this.transferDao.findByHash(hash.getRaw())
 				? ValidationResult.NEUTRAL
