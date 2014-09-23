@@ -140,12 +140,18 @@ public class NisAppConfig {
 		return new BlockChainServices(
 				this.blockDao,
 				this.blockTransactionObserverFactory(),
+				this.blockValidatorFactory(),
 				this.transactionValidatorFactory());
 	}
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
 		return new BlockTransactionObserverFactory();
+	}
+
+	@Bean
+	public BlockValidatorFactory blockValidatorFactory() {
+		return new BlockValidatorFactory();
 	}
 
 	@Bean

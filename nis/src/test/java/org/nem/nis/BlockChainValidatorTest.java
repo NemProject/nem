@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MockBlockScorer;
-import org.nem.nis.validators.UniversalTransactionValidator;
+import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -117,6 +117,23 @@ public class BlockChainValidatorTest {
 		blocks.get(1).setSignature(new Signature(Utils.generateRandomBytes(64)));
 
 		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void allBlocksInChainMustPassValidation() {
+		// Arrange:
+		final BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
+		final BlockChainValidator validator = createValidator(blockValidator);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = createBlockList(parentBlock, 3);
+		Mockito.when(blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(blockValidator.validate(Mockito.eq(blocks.get(1)))).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
+
+		// Assert:
+		Mockito.verify(blockValidator, Mockito.atLeastOnce()).validate(Mockito.any());
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
@@ -409,15 +426,19 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, new UniversalTransactionValidator());
+		return new BlockChainValidator(block -> { }, scorer, 21, createBlockValidator(), new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, new UniversalTransactionValidator());
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, createBlockValidator(), new UniversalTransactionValidator());
 	}
 
 	private static BlockChainValidator createValidator() {
 		return createValidator(new MockBlockScorer());
+	}
+
+	private static BlockChainValidator createValidator(final BlockValidator blockValidator) {
+		return new BlockChainValidator(block -> { }, new MockBlockScorer(), 21, blockValidator, new UniversalTransactionValidator());
 	}
 
 	private static Block createBlock(final Account account, final long height) {
@@ -426,6 +447,12 @@ public class BlockChainValidatorTest {
 
 	private static Block createBlock(final Account account, final Block parentBlock) {
 		return new Block(account, parentBlock, TimeInstant.ZERO);
+	}
+
+	private static BlockValidator createBlockValidator() {
+		final BlockValidator validator = Mockito.mock(BlockValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		return validator;
 	}
 
 	//endregion

@@ -22,7 +22,8 @@ public class BlockChainValidator {
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
-	private final TransactionValidator validator;
+	private final BlockValidator blockValidator;
+	private final TransactionValidator transactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -30,17 +31,20 @@ public class BlockChainValidator {
 	 * @param executor The block executor to use.
 	 * @param scorer The block scorer to use.
 	 * @param maxChainSize The maximum chain size.
-	 * @param validator The validator to use for validating transactions.
+	 * @param blockValidator The validator to use for validating blocks.
+	 * @param transactionValidator The validator to use for validating transactions.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
-			final TransactionValidator validator) {
+			final BlockValidator blockValidator,
+			final TransactionValidator transactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
-		this.validator = validator;
+		this.blockValidator = blockValidator;
+		this.transactionValidator = transactionValidator;
 	}
 
 	/**
@@ -69,13 +73,17 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			if (ValidationResult.SUCCESS != this.blockValidator.validate(block)) {
+				return false;
+			}
+
 			if (!this.isBlockHit(parentBlock, block)) {
 				LOGGER.fine(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
 				return false;
 			}
 
 			for (final Transaction transaction : block.getTransactions()) {
-				if (ValidationResult.SUCCESS != this.validator.validate(transaction, new ValidationContext(block.getHeight())) ||
+				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, new ValidationContext(block.getHeight())) ||
 						!transaction.verify() ||
 						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {
