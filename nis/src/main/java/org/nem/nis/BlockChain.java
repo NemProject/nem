@@ -528,6 +528,9 @@ public class BlockChain implements BlockSynchronizer {
 				// isValid and verify had to be called on it, so we can safely add it
 				// as unconfirmed
 				// TODO 20140922 J-G can you remind me why at this point the reverted transactions are still in the DB?
+				// TODO 20140923 G-J we revert only "state" (in accountAnalyzer and so on), removing (our) transactions from the db,
+				// is one of the last steps, main reason is that I/O is expensive, so someone could try to spam us with "fake" responses
+				// during synchronization (and therefore force us to drop our blocks). Does this answer your question?
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))

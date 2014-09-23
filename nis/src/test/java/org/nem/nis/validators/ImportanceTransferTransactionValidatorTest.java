@@ -27,6 +27,8 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	// TODO 20140920 J-G - does this test seem ok to you?
+	// TODO 20140923 G-J - if I understand correctly: if someone will try deactivate on non-activated, validation will fail == looks fine to me
+	// TODO 20140923 G-J - also went through other tests here, they look much more readable now :)
 	@Test
 	public void deactivateImportanceTransferIsNotValidAsFirstLink() {
 		// Arrange:
@@ -123,7 +125,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	@Test
 	public void deactivateImportanceTransferIsNotValidAfterDeactivateLink() {
 		// Assert:
-		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Activate);
+		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
 	private static void assertTransferIsNotValidAfterSameLink(final ImportanceTransferTransaction.Mode mode) {

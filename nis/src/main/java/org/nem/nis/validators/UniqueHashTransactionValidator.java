@@ -20,6 +20,7 @@ public class UniqueHashTransactionValidator implements TransactionValidator {
 		this.transferDao = transferDao;
 	}
 
+	// TODO-CR 20140923 G-J: I think this should check both TransferDao and ImportanceTransferDao, shouldn't it?
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (context.getBlockHeight().getRaw() < BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {

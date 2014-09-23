@@ -243,9 +243,9 @@ public class Foraging {
 	}
 
 	/**
-	 * returns foraged block or null
+	 * Returns foraged block or null.
 	 *
-	 * @return
+	 * @return Best block that could be created by unlocked accounts.
 	 */
 	public Block forageBlock(final BlockScorer blockScorer) {
 		if (this.blockChainLastBlockLayer.getLastDbBlock() == null || this.unlockedAccounts.size() == 0) {

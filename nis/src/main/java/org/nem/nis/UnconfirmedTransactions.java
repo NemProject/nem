@@ -93,6 +93,12 @@ public class UnconfirmedTransactions {
 
 		// TODO 20140922 J-G above the transaction result is NEUTRAL but here it is FAILURE_HASH_EXISTS
 		// TODO should (1) HASH_EXISTS be neutral status or should we use NEUTRAL here too?
+		// TODO 20140923 G-J I think there might be something wrong with this method. Basically, the only
+		// way, that check below would return FAILURE_HASH_EXISTS, is that if there was parallel add(),
+		// which succeeded first, but we probably wouldn't like .execute() above to be called twice for the same TX.
+		// OTOH making this method synchronized is rather poor idea, as most of the code could run in parallel
+		// (i.e. for different hashes) Should we try to solve it, and if so any idea how?
+		// maybe we should add hash to this.transactions on the top of the func, and here only replace it?
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}
