@@ -37,14 +37,17 @@ public class AggregateTransactionValidatorBuilder {
 
 		@Override
 		public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+			boolean isNeutral = false;
 			for (final TransactionValidator validator : this.validators) {
 				final ValidationResult result = validator.validate(transaction, context);
-				if (ValidationResult.SUCCESS != result) {
+				if (ValidationResult.NEUTRAL == result) {
+					isNeutral = true;
+				} else if (ValidationResult.SUCCESS != result) {
 					return result;
 				}
 			}
 
-			return ValidationResult.SUCCESS;
+			return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 		}
 	}
 }
