@@ -406,7 +406,6 @@ public class ForagingTest {
 				poiFacade,
 				new MockBlockDao(null),
 				lastBlockLayer,
-				new MockTransferDaoImpl(),
 				NisUtils.createTransactionValidatorFactory());
 	}
 }

@@ -37,7 +37,6 @@ public class Foraging {
 	private final PoiFacade poiFacade;
 	private final BlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-	private final TransferDao transferDao;
 
 	@Autowired(required = true)
 	public Foraging(
@@ -45,13 +44,11 @@ public class Foraging {
 			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final TransferDao transferDao,
 			final TransactionValidatorFactory validatorFactory) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-		this.transferDao = transferDao;
 
 		this.unlockedAccounts = new ConcurrentHashSet<>();
 		this.unconfirmedTransactions = new UnconfirmedTransactions(validatorFactory.create(this.poiFacade));

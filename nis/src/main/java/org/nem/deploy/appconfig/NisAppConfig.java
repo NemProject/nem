@@ -171,7 +171,6 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transferDao,
 				this.transactionValidatorFactory());
 	}
 
