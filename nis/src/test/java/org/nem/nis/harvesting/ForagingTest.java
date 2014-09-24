@@ -13,7 +13,7 @@ import org.nem.nis.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.TransactionValidator;
 
 import java.lang.reflect.*;
 import java.util.*;

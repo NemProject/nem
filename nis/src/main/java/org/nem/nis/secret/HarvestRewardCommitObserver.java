@@ -19,8 +19,7 @@ public class HarvestRewardCommitObserver implements BlockTransactionObserver {
 	public void notify(final BalanceAdjustmentNotification notification, final BlockNotificationContext context) {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			notification.getAccount().incrementForagedBlocks();
-		}
-		else {
+		} else {
 			notification.getAccount().decrementForagedBlocks();
 		}
 	}

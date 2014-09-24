@@ -33,6 +33,7 @@ public class ImportanceTransferTransaction extends Transaction {
 		Deactivate(2);
 
 		private final int value;
+
 		private Mode(final int value) {
 			this.value = value;
 		}

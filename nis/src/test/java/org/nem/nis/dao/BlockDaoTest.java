@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -99,7 +98,6 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 	}
-
 
 	@Test
 	public void savingBlockSavesTransactions() {

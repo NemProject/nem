@@ -141,7 +141,6 @@ public class AggregateBlockTransactionObserverBuilderTest {
 			this.builder.add(this.observer3);
 			this.builder.add(this.observer4);
 
-
 			Mockito.doAnswer(createAnswer(1)).when(this.observer1).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
 			Mockito.doAnswer(createAnswer(2)).when(this.observer2).notify(Mockito.any(), Mockito.any());
 			Mockito.doAnswer(createAnswer(3)).when(this.observer3).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());

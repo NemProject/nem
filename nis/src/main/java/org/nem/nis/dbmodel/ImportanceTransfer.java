@@ -1,11 +1,9 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cascade;
 import org.nem.core.crypto.Hash;
 
-import javax.persistence.Entity;
 import javax.persistence.*;
-import javax.persistence.Table;
 
 /**
  * Importance transfer db entity
@@ -44,7 +42,6 @@ public class ImportanceTransfer {
 	private Integer blkIndex; // blkIndex inside block
 
 	private Long referencedTransaction;
-
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	//@JoinTable(name = "block_importancetransfers",
@@ -85,7 +82,6 @@ public class ImportanceTransfer {
 		this.blkIndex = blkIndex;
 		this.referencedTransaction = referencedTransaction;
 	}
-
 
 	public Long getId() {
 		return this.id;

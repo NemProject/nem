@@ -1,9 +1,7 @@
 package org.nem.core.utils;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 
 public class CircularStackTest {
 	@Test(expected = IndexOutOfBoundsException.class)

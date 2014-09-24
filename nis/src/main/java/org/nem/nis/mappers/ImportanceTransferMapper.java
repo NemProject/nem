@@ -1,13 +1,11 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 
 public class ImportanceTransferMapper {
 	/**
@@ -66,5 +64,4 @@ public class ImportanceTransferMapper {
 		transfer.setSignature(new Signature(dbImportanceTransfer.getSenderProof()));
 		return transfer;
 	}
-
 }

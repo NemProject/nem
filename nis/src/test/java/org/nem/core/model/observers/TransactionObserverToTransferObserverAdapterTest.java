@@ -1,7 +1,6 @@
 package org.nem.core.model.observers;
 
-import org.hamcrest.core.IsEqual;
-import org.junit.*;
+import org.junit.Test;
 import org.mockito.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;

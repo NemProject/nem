@@ -5,11 +5,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.test.MockAccountDao;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class ImportanceTransferMapperTest {
 	}
 
 	@Test
-	public void  importanceTransferModelCanBeRoundTripped() {
+	public void importanceTransferModelCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext(ImportanceTransferTransaction.Mode.Deactivate);
 		final ImportanceTransfer dbModel = context.toDbModel(7);

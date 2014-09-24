@@ -59,11 +59,13 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 	 *
 	 * S=Send, R=Receive
 	 *
+	 * @formatter:off
 	 * remote node   ----------R------S------->
 	 *                        o        \
 	 *                      /           \    time
 	 *                    /              o
 	 * local node    ---S-----------------R--->
+	 * @formatter:on
 	 *
 	 * @return The offset in ms.
 	 */

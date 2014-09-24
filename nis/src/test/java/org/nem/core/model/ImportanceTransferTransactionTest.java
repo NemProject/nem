@@ -2,8 +2,7 @@ package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -102,12 +101,12 @@ public class ImportanceTransferTransactionTest {
 	// region roundtrip
 
 	@Test
-	public void canRoundTripImportanceTransfer()  {
+	public void canRoundTripImportanceTransfer() {
 		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
-	public void canRoundTripImportanceTransferRevert()  {
+	public void canRoundTripImportanceTransferRevert() {
 		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
@@ -176,7 +175,11 @@ public class ImportanceTransferTransactionTest {
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), remote);
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
-		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(2), signer, remote, ImportanceTransferTransaction.Mode.Activate.value());
+		NotificationUtils.assertImportanceTransferNotification(
+				notificationCaptor.getAllValues().get(2),
+				signer,
+				remote,
+				ImportanceTransferTransaction.Mode.Activate.value());
 	}
 
 	@Test
@@ -198,7 +201,11 @@ public class ImportanceTransferTransactionTest {
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), remote);
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
-		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(0), signer, remote, ImportanceTransferTransaction.Mode.Activate.value());
+		NotificationUtils.assertImportanceTransferNotification(
+				notificationCaptor.getAllValues().get(0),
+				signer,
+				remote,
+				ImportanceTransferTransaction.Mode.Activate.value());
 	}
 
 	// endregion

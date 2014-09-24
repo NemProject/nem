@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
@@ -19,7 +19,6 @@ import java.util.*;
 
 /**
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
- *
  * This class is intended to hide BlockExecutor and BlockChainValidator from the BlockChain COMPLETELY.
  */
 @Service
@@ -52,7 +51,7 @@ public class BlockChainServices {
 	public boolean isPeerChainValid(
 			final AccountAnalyzer accountAnalyzer,
 			final Block parentBlock,
-			final Collection<Block> peerChain)  {
+			final Collection<Block> peerChain) {
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);

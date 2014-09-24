@@ -5,11 +5,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;

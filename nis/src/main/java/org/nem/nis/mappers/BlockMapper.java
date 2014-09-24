@@ -1,12 +1,13 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 

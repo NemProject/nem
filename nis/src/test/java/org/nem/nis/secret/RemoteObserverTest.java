@@ -1,7 +1,5 @@
 package org.nem.nis.secret;
 
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;

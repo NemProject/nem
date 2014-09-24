@@ -1,18 +1,15 @@
 package org.nem.nis.dao;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.Block;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.ImportanceTransferMapper;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -95,8 +92,8 @@ public class ImportanceTransferTransactionDaoTest {
 	}
 
 	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, ImportanceTransfer... dbTransfers) {
-		final Block block = new Block(Hash.ZERO,1, Hash.ZERO, Hash.ZERO, 1,
-				account, new byte[]{1,2,3,4},
+		final Block block = new Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
+				account, new byte[] { 1, 2, 3, 4 },
 				1L, 1L, 1L, 123L);
 		this.blockDao.save(block);
 
@@ -120,7 +117,9 @@ public class ImportanceTransferTransactionDaoTest {
 			// Arrange:
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-			final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(), recipient.getKeyPair().getPublicKey());
+			final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
+					recipient.getAddress().getEncoded(),
+					recipient.getKeyPair().getPublicKey());
 			mockAccountDao.addMapping(sender, dbSender);
 			mockAccountDao.addMapping(recipient, dbRecipient);
 			return new AccountDaoLookupAdapter(mockAccountDao);

@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockChainConstants;
 
@@ -22,7 +22,7 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
+		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()) {
 			return ValidationResult.SUCCESS;
 		}
 

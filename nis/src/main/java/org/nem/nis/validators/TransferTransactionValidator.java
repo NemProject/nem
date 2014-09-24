@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 
 /**
  * A TransferTransactionValidator implementation that applies to transfer transactions.
@@ -11,7 +11,7 @@ public class TransferTransactionValidator implements TransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.TRANSFER != transaction.getType()){
+		if (TransactionTypes.TRANSFER != transaction.getType()) {
 			return ValidationResult.SUCCESS;
 		}
 

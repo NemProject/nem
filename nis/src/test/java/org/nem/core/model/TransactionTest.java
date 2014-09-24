@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
@@ -250,7 +250,6 @@ public class TransactionTest {
 				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
 	}
-
 
 	@Test
 	public void undoAppliesNotificationsInReverseOrder() {

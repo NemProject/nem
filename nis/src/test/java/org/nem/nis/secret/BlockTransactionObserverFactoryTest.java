@@ -7,7 +7,7 @@ import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
@@ -60,7 +60,6 @@ public class BlockTransactionObserverFactoryTest {
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
 		Mockito.verify(context.accountContext2.importance, Mockito.times(0)).addOutlink(Mockito.any());
-
 	}
 
 	@Test

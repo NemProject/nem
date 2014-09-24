@@ -1,11 +1,13 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.*;
 import org.nem.core.crypto.Hash;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.*;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import java.util.List;
 
 /**

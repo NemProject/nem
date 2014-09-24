@@ -2,13 +2,12 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
  * A TransferTransactionValidator implementation that ensures that a new importance transfer transactions
  * does not conflict with any known transactions.
- *
  * This is used by UnconfirmedTransactions and is not a default validator.
  */
 public class NonConflictingImportanceTransferTransactionValidator implements TransactionValidator {
@@ -25,7 +24,7 @@ public class NonConflictingImportanceTransferTransactionValidator implements Tra
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()){
+		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()) {
 			return ValidationResult.SUCCESS;
 		}
 

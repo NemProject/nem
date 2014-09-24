@@ -86,9 +86,9 @@ public class PoiAccountStateTest {
 		// Arrange:
 		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
 		final RemoteLinks links = state.getRemoteLinks();
-		final RemoteLink link1 = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);;
-		final RemoteLink link2 = new RemoteLink(Address.fromEncoded("b"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);;
-		final RemoteLink link3 = new RemoteLink(Address.fromEncoded("c"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);;
+		final RemoteLink link1 = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = new RemoteLink(Address.fromEncoded("b"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link3 = new RemoteLink(Address.fromEncoded("c"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
 		links.addLink(link1);
 		links.addLink(link2);
 		links.addLink(link3);

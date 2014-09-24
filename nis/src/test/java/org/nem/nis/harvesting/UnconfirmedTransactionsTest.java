@@ -7,10 +7,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.test.NisUtils;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.TransactionValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;

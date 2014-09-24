@@ -3,13 +3,14 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
 
 public class BlockMapperTest {

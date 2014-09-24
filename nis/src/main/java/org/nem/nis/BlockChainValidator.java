@@ -8,7 +8,7 @@ import org.nem.nis.validators.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
