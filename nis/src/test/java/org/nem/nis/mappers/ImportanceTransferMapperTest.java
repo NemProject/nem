@@ -54,6 +54,8 @@ public class ImportanceTransferMapperTest {
 	}
 
 	// TODO 20140923 J-G not sure if this test is valid because i think the ImportanceTransferTransaction ctor is throwing (so the failure is outside of the mapper layer) (this is hidden because of expected vs ExceptionAssert)
+	// TODO 20140924 G-J I wanted to be sure, that if in db, there will be some value different than those 2 values, that are mapped (Activate/Deactivate),
+	// calling toModel will fail (this is if we would like to add some other modes in future, but I guess this test in this place does not have any sense)
 	@Test(expected = IllegalArgumentException.class)
 	public void importanceTransferDbModelWithUnknownDirectionTypeCannotBeMappedToModel() {
 		// Arrange:
@@ -110,6 +112,9 @@ public class ImportanceTransferMapperTest {
 			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
 
 			// TODO 20140923 J-G i'm not following what you're doing here
+			// TODO 20140924 G-J: this was made to make .getBlock and .getBlkIndex inside asserts
+			// work, but I guess that doesn't make much sense, and it probably would be better to simply
+			// remove those asserts
 			// hackery
 			final org.nem.nis.dbmodel.Block b = Mockito.mock(org.nem.nis.dbmodel.Block.class);
 			final List<ImportanceTransfer> l = (List<ImportanceTransfer>)Mockito.mock(List.class);

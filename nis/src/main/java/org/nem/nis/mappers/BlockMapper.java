@@ -47,6 +47,20 @@ public class BlockMapper {
 		// > does it make sense to consider having something like a hash table so we can query a single table to
 		// > see if a transaction exists instead of N tables (not a big deal now since there are only 2
 		// > transaction types, but might become more important as N grows)
+		//
+		// It is possible to do class hierarchy using hibernate annotations.
+		// Let's assume that in dbmodel we would have Transaction, and Transfer that extends Transaction
+		// and ImportanceTransfer that extends Transaction.
+		//
+		// Now there is a way to tell hibernate it would hold List<> of Transactions.
+		// (Transaction would be @MappedSuperclass with InheritanceType.JOINED)
+		//
+		// I have a feeling we would sooner or later run into problems...
+		// performance is the other reason, haven't tried it, but I guess queries would be quite complicated
+		// (although I might be wrong on this).
+		//
+		// (slightly off-topic, since we want to sort TXes by fees, code below will be changed)
+		//
 		int i = 0;
 		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
 		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
