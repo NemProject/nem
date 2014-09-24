@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.MockBlockScorer;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
@@ -27,9 +27,9 @@ public class BlockChainValidatorTest {
 		parentBlock.sign();
 
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, createBlockList(parentBlock, 20)), IsEqual.equalTo(true));
-		Assert.assertThat(validator.isValid(parentBlock, createBlockList(parentBlock, 21)), IsEqual.equalTo(true));
-		Assert.assertThat(validator.isValid(parentBlock, createBlockList(parentBlock, 22)), IsEqual.equalTo(false));
+		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 20)), IsEqual.equalTo(true));
+		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 21)), IsEqual.equalTo(true));
+		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 22)), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -47,7 +47,7 @@ public class BlockChainValidatorTest {
 		final Block block = createBlock(Utils.generateRandomAccount(), parentBlock);
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -66,7 +66,7 @@ public class BlockChainValidatorTest {
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
 		blocks.get(blocks.size() - 1).setPrevious(dummyPrevious);
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -82,7 +82,7 @@ public class BlockChainValidatorTest {
 		final List<Block> blocks = new ArrayList<>();
 		blocks.add(createBlock(Utils.generateRandomAccount(), parentBlock, 12));
 		blocks.add(createBlock(Utils.generateRandomAccount(), blocks.get(0), 15));
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -99,7 +99,7 @@ public class BlockChainValidatorTest {
 		blocks.add(createBlock(Utils.generateRandomAccount(), parentBlock, 12));
 		blocks.add(createBlock(Utils.generateRandomAccount(), blocks.get(0), 14));
 		blocks.add(createBlock(Utils.generateRandomAccount(), blocks.get(1), 13));
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -112,7 +112,7 @@ public class BlockChainValidatorTest {
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 
 		blocks.get(1).setSignature(new Signature(Utils.generateRandomBytes(64)));
 
@@ -130,7 +130,7 @@ public class BlockChainValidatorTest {
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 		Mockito.when(blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(blockValidator.validate(Mockito.eq(blocks.get(1)))).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
@@ -143,11 +143,13 @@ public class BlockChainValidatorTest {
 	public void allBlocksInChainMustHit() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+		factory.scorer = scorer;
+		final BlockChainValidator validator = factory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 
 		scorer.setZeroTargetBlock(blocks.get(1));
 
@@ -158,12 +160,11 @@ public class BlockChainValidatorTest {
 	@Test
 	public void chainIsValidIfAllBlockChecksPass() {
 		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -176,12 +177,11 @@ public class BlockChainValidatorTest {
 	@Test
 	public void allTransactionsInChainMustVerify() {
 		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createValidNonVerifiableTransaction());
@@ -202,7 +202,7 @@ public class BlockChainValidatorTest {
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction(10));
 		middleBlock.addTransaction(createValidSignedTransaction(11));
@@ -222,12 +222,11 @@ public class BlockChainValidatorTest {
 	@Test
 	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
 		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block middleBlock = blocks.get(1);
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
@@ -240,12 +239,11 @@ public class BlockChainValidatorTest {
 
 	@Test
 	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwiceAfterMarkerThread() {
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
 		parentBlock.sign();
 
-		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block middleBlock = blocks.get(1);
 		final MockTransaction tx = createValidSignedTransaction();
 		middleBlock.addTransaction(tx);
@@ -257,19 +255,18 @@ public class BlockChainValidatorTest {
 
 	@Test
 	public void chainIsInvalidIfTwoBlocksContainTheSameTransactionAfterMarkerThread() {
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
 		parentBlock.sign();
 
 		final MockTransaction tx = createValidSignedTransaction();
-		final List<Block> blocks = createBlockList(parentBlock, 3);
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 		final Block block1 = blocks.get(1);
 		block1.addTransaction(tx);
 		final Block block2 = blocks.get(2);
 		block2.setPrevious(block1);
 		block2.addTransaction(tx);
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
@@ -277,8 +274,7 @@ public class BlockChainValidatorTest {
 	@Test
 	public void chainIsValidIfAllTransactionChecksPass() {
 		// Arrange:
-		final MockBlockScorer scorer = new MockBlockScorer();
-		final BlockChainValidator validator = createValidator(scorer);
+		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
@@ -293,7 +289,7 @@ public class BlockChainValidatorTest {
 		final Block lastBlock = new Block(account, middleBlock, TimeInstant.ZERO);
 
 		final List<Block> blocks = Arrays.asList(block, middleBlock, lastBlock);
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -317,7 +313,7 @@ public class BlockChainValidatorTest {
 		final Block block1 = Mockito.spy(createBlock(Utils.generateRandomAccount(), parentBlock));
 		final Block block2 = Mockito.spy(createBlock(Utils.generateRandomAccount(), block1));
 		final List<Block> blocks = Arrays.asList(block1, block2);
-		signAllBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Act:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -331,24 +327,7 @@ public class BlockChainValidatorTest {
 
 	//region helper functions
 
-	private static List<Block> createBlockList(Block parent, final int numBlocks) {
-		final List<Block> blocks = new ArrayList<>();
-		final Account account = Utils.generateRandomAccount();
-		for (int i = 0; i < numBlocks; ++i) {
-			final Block block = new Block(account, parent, TimeInstant.ZERO);
-			blocks.add(block);
-			parent = block;
-		}
-
-		signAllBlocks(blocks);
-		return blocks;
-	}
-
-	private static void signAllBlocks(final List<Block> blocks) {
-		for (final Block block : blocks) {
-			block.sign();
-		}
-	}
+	//region transactions
 
 	private static Transaction createValidNonVerifiableTransaction() {
 		final TimeInstant timeStamp = new TimeInstant(15);
@@ -377,39 +356,9 @@ public class BlockChainValidatorTest {
 		return transaction;
 	}
 
-	private static class BlockChainValidatorFactory {
-		public Consumer<Block> executor = block -> { };
-		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
-		public int maxChainSize = 21;
-		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
-		public TransactionValidator transactionValidator = new UniversalTransactionValidator();
+	//endregion
 
-		public BlockChainValidatorFactory() {
-			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
-			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
-
-			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-		}
-
-		public BlockChainValidator create() {
-			return new BlockChainValidator(
-					this.executor,
-					this.scorer,
-					this.maxChainSize,
-					this.blockValidator,
-					this.transactionValidator);
-		}
-	}
-
-	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		factory.scorer = scorer;
-		return factory.create();
-	}
-
-	private static BlockChainValidator createValidator() {
-		return new BlockChainValidatorFactory().create();
-	}
+	//region blocks
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
@@ -423,6 +372,38 @@ public class BlockChainValidatorTest {
 
 	private static Block createBlock(final Account account, final Block parentBlock) {
 		return new Block(account, parentBlock, TimeInstant.ZERO);
+	}
+
+	//endregion
+
+	private static class BlockChainValidatorFactory {
+		public Consumer<Block> executor = block -> { };
+		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
+		public int maxChainSize = 21;
+		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
+		public TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
+
+		public BlockChainValidatorFactory() {
+			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
+			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
+
+			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		}
+
+		public BlockChainValidator create() {
+			return new BlockChainValidator(
+					this.executor,
+					this.scorer,
+					this.maxChainSize,
+					this.blockValidator,
+					this.transactionValidator);
+		}
+	}
+
+	private static BlockChainValidator createValidator() {
+		return new BlockChainValidatorFactory().create();
 	}
 
 	//endregion

@@ -38,6 +38,8 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block.
+	 *
+	 * @return The block.
 	 */
 	public static Block createRandomBlock() {
 		return new Block(
@@ -50,6 +52,9 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block with the specified height.
+	 *
+	 * @param height The height.
+	 * @return The block.
 	 */
 	public static Block createRandomBlockWithHeight(final long height) {
 		return new Block(
@@ -62,6 +67,9 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block with the specified timestamp.
+	 *
+	 * @param timeStamp The time stamp.
+	 * @return The block.
 	 */
 	public static Block createRandomBlockWithTimeStamp(final int timeStamp) {
 		return new Block(
@@ -70,6 +78,37 @@ public class NisUtils {
 				Utils.generateRandomHash(),
 				new TimeInstant(timeStamp),
 				BlockHeight.ONE);
+	}
+
+	/**
+	 * Creates a new list of blocks.
+	 *
+	 * @param parent The parent block.
+	 * @param numBlocks The number of blocks.
+	 * @return The block list.
+	 */
+	public static List<Block> createBlockList(Block parent, final int numBlocks) {
+		final List<Block> blocks = new ArrayList<>();
+		final Account account = Utils.generateRandomAccount();
+		for (int i = 0; i < numBlocks; ++i) {
+			final Block block = new Block(account, parent, TimeInstant.ZERO);
+			blocks.add(block);
+			parent = block;
+		}
+
+		signAllBlocks(blocks);
+		return blocks;
+	}
+
+	/**
+	 * Signs all blocks.
+	 *
+	 * @param blocks The blocks to sign.
+	 */
+	public static void signAllBlocks(final List<Block> blocks) {
+		for (final Block block : blocks) {
+			block.sign();
+		}
 	}
 
 	/**
@@ -108,8 +147,18 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory() {
+		return createTransactionValidatorFactory(Mockito.mock(TransferDao.class));
+	}
+
+	/**
+	 * Creates a transaction validator factory.
+	 *
+	 * @param transferDao The transfer dao.
+	 * @return The factory.
+	 */
+	public static TransactionValidatorFactory createTransactionValidatorFactory(final TransferDao transferDao) {
 		return new TransactionValidatorFactory(
-				Mockito.mock(TransferDao.class),
+				transferDao,
 				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider());
 	}
@@ -122,5 +171,4 @@ public class NisUtils {
 	public static BlockValidatorFactory createBlockValidatorFactory() {
 		return new BlockValidatorFactory(new SystemTimeProvider());
 	}
-
 }
