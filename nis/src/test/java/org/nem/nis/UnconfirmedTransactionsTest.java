@@ -338,12 +338,11 @@ public class UnconfirmedTransactionsTest {
 		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 4, R = 5, 1 Fee
 		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 6, R = 1, 3 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough "unconfirmed balance"
+		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough balance
 		//
 		// However, this and test and one I'm gonna add below, should reject R's transaction for the following reason:
 		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
 		// of a block that would get discarded (TXes are validated first, and then executed)
-		// TODO 20140923 J-G: so, what benefits do we get checking by checking the unconfirmed balances?
 
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		transactions.addValid(first);
@@ -378,7 +377,7 @@ public class UnconfirmedTransactionsTest {
 		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 5, 3 Fee
 		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 4, R = 1, 5 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough "unconfirmed balance"
+		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
 
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		first.setFee(Amount.fromNem(3));
@@ -396,6 +395,35 @@ public class UnconfirmedTransactionsTest {
 		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
 		Assert.assertThat(transactionList, IsEqual.equalTo(Arrays.asList(first, second)));
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(first)));
+	}
+
+	// TODO 20140923 J-G: so, what benefits do we get checking by checking the unconfirmed balances?
+	// TODO 20140924 G-J well, not sure if that's gonna answer your question
+	// let's assume S has 10, and he makes two distinct TXes with amount of 7
+	// because we execute first TX unconfirmed balance is changed, and second one won't be added
+	// to unconfirmed TXes at all.
+	//
+	// If it WOULD be added, there's a chance, someone could hang whole network (I think we had such
+	// bug somewhere in the beginning)
+	// Let's say both TXes have been added, now harvester would fail to generate a block (as long as deadline haven't passed)
+	// If attacker would send those two TXes to whole network, he'd basically stop whole harvesting
+	@Test
+	public void checkingUnconfirmedTxesDisallowsAddingDoubleSpendTransactions() {
+		// Arrange:
+		final Account sender = createSenderWithAmount(10);
+		final Account recipient = createSenderWithAmount(0);
+
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		// Act:
+		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7));
+		transactions.addValid(first);
+		final Transaction second = createTransferTransaction(currentTime.addSeconds(-1), sender, recipient, Amount.fromNem(7));
+		transactions.addValid(second);
+
+		// Assert:
+		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(first)));
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
