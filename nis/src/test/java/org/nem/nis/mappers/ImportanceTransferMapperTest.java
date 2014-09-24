@@ -53,6 +53,7 @@ public class ImportanceTransferMapperTest {
 		context.assertModel(model);
 	}
 
+	// TODO 20140923 J-G not sure if this test is valid because i think the ImportanceTransferTransaction ctor is throwing (so the failure is outside of the mapper layer) (this is hidden because of expected vs ExceptionAssert)
 	@Test(expected = IllegalArgumentException.class)
 	public void importanceTransferDbModelWithUnknownDirectionTypeCannotBeMappedToModel() {
 		// Arrange:
@@ -68,7 +69,6 @@ public class ImportanceTransferMapperTest {
 		private final ImportanceTransferTransaction model;
 		private final org.nem.nis.dbmodel.Account dbSender;
 		private final org.nem.nis.dbmodel.Account dbRemote;
-		private final Account remote;
 		private final MockAccountDao accountDao;
 		private final Hash hash;
 
@@ -83,15 +83,13 @@ public class ImportanceTransferMapperTest {
 			this.model.setDeadline(new TimeInstant(800));
 			this.model.sign();
 
-			this.remote = remote;
-
 			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
 			this.dbRemote = new org.nem.nis.dbmodel.Account();
 			this.dbRemote.setPrintableKey(this.model.getRemote().getAddress().getEncoded());
-			this.dbRemote.setPublicKey(this.remote.getKeyPair().getPublicKey());
+			this.dbRemote.setPublicKey(remote.getKeyPair().getPublicKey());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbSender);
@@ -111,6 +109,7 @@ public class ImportanceTransferMapperTest {
 		public ImportanceTransfer toDbModel(final int blockIndex) {
 			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
 
+			// TODO 20140923 J-G i'm not following what you're doing here
 			// hackery
 			final org.nem.nis.dbmodel.Block b = Mockito.mock(org.nem.nis.dbmodel.Block.class);
 			final List<ImportanceTransfer> l = (List<ImportanceTransfer>)Mockito.mock(List.class);
@@ -124,7 +123,7 @@ public class ImportanceTransferMapperTest {
 		public ImportanceTransferTransaction toModel(final ImportanceTransfer dbTransfer) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
-			mockAccountLookup.setMockAccount(this.remote);
+			mockAccountLookup.setMockAccount(this.model.getRemote());
 			return ImportanceTransferMapper.toModel(dbTransfer, mockAccountLookup);
 		}
 
@@ -140,10 +139,12 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
+			// TODO 20140923 should the db method be called getMode too?
 			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.model.getMode().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-			//Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
+			// TODO 20140923 why is the block not null here (but null for transfer)?
+			Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
@@ -152,6 +153,7 @@ public class ImportanceTransferMapperTest {
 		}
 
 		public void assertModel(final ImportanceTransferTransaction rhs) {
+			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
 			Assert.assertThat(rhs.getVersion(), IsEqual.equalTo(this.model.getVersion()));
 			Assert.assertThat(rhs.getType(), IsEqual.equalTo(this.model.getType()));
 			Assert.assertThat(rhs.getFee(), IsEqual.equalTo(this.model.getFee()));
@@ -162,7 +164,6 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(rhs.getRemote(), IsEqual.equalTo(this.model.getRemote()));
 			Assert.assertThat(rhs.getRemote().getAddress().getPublicKey(), IsEqual.equalTo(this.model.getRemote().getAddress().getPublicKey()));
 			Assert.assertThat(rhs.getMode(), IsEqual.equalTo(this.model.getMode()));
-			Assert.assertThat(HashUtils.calculateHash(rhs), IsEqual.equalTo(this.hash));
 		}
 	}
 }

@@ -40,6 +40,13 @@ public class BlockMapper {
 				block.getTotalFee().getNumMicroNem(),
 				block.getDifficulty().getRaw());
 
+		// TODO 20140923 J-G [QUESTION] but any reason you didn't want to have a transfer hierarchy in the db?
+		// > something like class table inheritance: http://stackoverflow.com/tags/class-table-inheritance/info
+		// > i'm not a db expert by any stretch, so i'm not opposed to what you did, just curious why you chose it;
+		// > i guess performance is the main benefit?
+		// > does it make sense to consider having something like a hash table so we can query a single table to
+		// > see if a transaction exists instead of N tables (not a big deal now since there are only 2
+		// > transaction types, but might become more important as N grows)
 		int i = 0;
 		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
 		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
