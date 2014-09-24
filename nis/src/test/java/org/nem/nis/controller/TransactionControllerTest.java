@@ -10,6 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.harvesting.Foraging;
 import org.nem.nis.service.PushService;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;

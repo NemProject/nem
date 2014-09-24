@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.dao.*;
+import org.nem.nis.harvesting.Foraging;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;

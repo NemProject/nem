@@ -9,7 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.harvesting.UnlockedAccounts;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;

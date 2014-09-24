@@ -7,6 +7,7 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.harvesting.Foraging;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.TransactionValidator;
 import org.nem.peer.node.*;

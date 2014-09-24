@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.harvesting;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.harvesting.UnlockedAccounts;
+import org.nem.nis.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;

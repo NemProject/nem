@@ -10,7 +10,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.harvesting.Foraging;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 import org.nem.peer.*;

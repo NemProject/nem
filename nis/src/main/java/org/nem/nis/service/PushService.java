@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
+import org.nem.nis.harvesting.Foraging;
 import org.nem.nis.validators.*;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;

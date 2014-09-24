@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.harvesting;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -9,7 +9,6 @@ import org.nem.nis.validators.*;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
