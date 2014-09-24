@@ -90,10 +90,6 @@ public class NisAppConfig {
 		flyway.setDataSource(this.dataSource());
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
-		// TODO 20140922 G-J not sure if that is the reason, but from what I understand this failure happened only on dev machines
-		// TODO                         so I would rather set it to true by default, or use property from properties file, (devs than could have it set to false)
-		// TODO 20140922 J-G - can you make the change (and confirm that it works)?
-		// TODO 20140923 G-J: seems it is working for me, if anyone will notice problem, report :)
 		flyway.setValidateOnMigrate(Boolean.valueOf(prop.getProperty("flyway.validate")));
 		return flyway;
 	}

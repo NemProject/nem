@@ -99,6 +99,7 @@ public class UnconfirmedTransactions {
 		// OTOH making this method synchronized is rather poor idea, as most of the code could run in parallel
 		// (i.e. for different hashes) Should we try to solve it, and if so any idea how?
 		// maybe we should add hash to this.transactions on the top of the func, and here only replace it?
+		// review!
 		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
 		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
 	}

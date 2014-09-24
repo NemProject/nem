@@ -524,13 +524,11 @@ public class BlockChain implements BlockSynchronizer {
 			while (currentHeight != wantedHeight) {
 				final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
-				// if the transaction is in DB it means at some point
-				// isValid and verify had to be called on it, so we can safely add it
-				// as unconfirmed
-				// TODO 20140922 J-G can you remind me why at this point the reverted transactions are still in the DB?
-				// TODO 20140923 G-J we revert only "state" (in accountAnalyzer and so on), removing (our) transactions from the db,
-				// is one of the last steps, main reason is that I/O is expensive, so someone could try to spam us with "fake" responses
-				// during synchronization (and therefore force us to drop our blocks). Does this answer your question?
+				// if the transaction is in db, we should add it to unconfirmed transactions without a db check
+				// (otherwise, since it is not removed from the database, the database hash check would fail).
+				// at this point, only "state" (in accountAnalyzer and so on) is reverted.
+				// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
+				// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))

@@ -329,40 +329,28 @@ public class UnconfirmedTransactionsTest {
 		// i think  getTransactionsBefore and removeConflictingTransactions should return UnconfirmedTransactions
 		// but that's a refactoring for another day ;)
 		// (also a smell that i needed to use the "real" validator to get this test to pass, imo)
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(
-				NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
 		final TimeInstant currentTime = new TimeInstant(11);
 
-		// Act: the second transaction is invalid because the recipient has an insufficient balance
-		// TODO 20140921 J-G: why isn't the balance checked on add?
-		// TODO 20140922 G-J: unconfirmed balance is checked, not sure if that answers your question
-		// TODO 20140922 J-G: so, i think this is happening (please correct if i'm wrong), but i'm not sure if it's desirable?:
-		// UnconfirmedTransactions::add adds each transaction and "executes" them, which means it updates the unconfirmed balances
-		// initially the balances are: S = 3, R = 0
-		// after "first" transaction is added, the (unconfirmed) balances are: S = 0, R = 2, 1 Fee
-		// after the "second" transaction is added, the (unconfirmed) balances are: S = 1, R = 0, 2 Fee
-		// so, both transactions get added
-		// UnconfirmedTransactions::removeConflictingTransactions re-adds all transactions without "executing" them
-		// after "first" transaction is added, the balances are: S = 0, R = 0
-		// since R < 2, the second transaction is prevented from inclusion in the block
-		// TODO 20140923 G-J: It took me 3h today, some going back and forth in time and some help from BR, to figure it out
-		//   This is how it INITIALLY this test was supposed to work.
-		//   - add two txes, S->R, R->S,   adding should succeed as it is done in proper order
-		//   - getTransactionsBefore() returns SORTED transactions, so the goal of setting the fee in second transaction,
-		//     was that it was supposed to be placed BEFORE S->R (after changing fee structure that actually didn't happen, as both txes had fee = 1)
+		// Act:
+		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
+		// 		- initially the balances are: S = 10, R = 0
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 4, R = 5, 1 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 6, R = 1, 3 Fee
+		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough "unconfirmed balance"
 		//
 		// However, this and test and one I'm gonna add below, should reject R's transaction for the following reason:
 		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
 		// of a block that would get discarded (TXes are validated first, and then executed)
-		//
+		// TODO 20140923 J-G: so, what benefits do we get checking by checking the unconfirmed balances?
 
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		transactions.addValid(first);
+		first.setFee(Amount.fromNem(1));
 		final Transaction second = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
 		second.setFee(Amount.fromNem(2));
 		transactions.addValid(second);
-
 
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
@@ -370,10 +358,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		// note: this checks that both TXes have been added and that returned TXes are in proper order
+		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
 		Assert.assertThat(transactionList, IsEqual.equalTo(Arrays.asList(second, first)));
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(first)));
 	}
-
 
 	@Test
 	public void transactionIsRemovedIfAccountDoesntHaveEnoughFunds() {
@@ -381,9 +369,16 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = createSenderWithAmount(10);
 		final Account recipient = createSenderWithAmount(0);
 
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactions(
-				NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
 		final TimeInstant currentTime = new TimeInstant(11);
+
+		// Act:
+		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
+		// 		- initially the balances are: S = 10, R = 0
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 5, 3 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 4, R = 1, 5 Fee
+		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
+		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough "unconfirmed balance"
 
 		final Transaction first = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		first.setFee(Amount.fromNem(3));
@@ -392,15 +387,19 @@ public class UnconfirmedTransactionsTest {
 		second.setFee(Amount.fromNem(2));
 		transactions.addValid(second);
 
-
 		transactions.dropExpiredTransactions(currentTime);
 		final List<Transaction> transactionList = transactions.getTransactionsBefore(currentTime.addSeconds(1));
 		final List<Transaction> filtered = transactions.removeConflictingTransactions(transactionList);
 
 		// Assert:
-		// note: this checks that both TXes have been added and that returned TXes are in proper order
+		// - this checks that both TXes have been added and that returned TXes are in proper order
+		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
 		Assert.assertThat(transactionList, IsEqual.equalTo(Arrays.asList(first, second)));
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(first)));
+	}
+
+	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
+		return createUnconfirmedTransactions(NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
 	}
 
 	@Test
