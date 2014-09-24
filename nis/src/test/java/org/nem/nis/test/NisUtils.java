@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.dao.TransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.validators.*;
 
@@ -110,6 +110,7 @@ public class NisUtils {
 	public static TransactionValidatorFactory createTransactionValidatorFactory() {
 		return new TransactionValidatorFactory(
 				Mockito.mock(TransferDao.class),
+				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider());
 	}
 

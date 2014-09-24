@@ -149,7 +149,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.transferDao, this.timeProvider());
+		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider());
 	}
 
 	@Bean
