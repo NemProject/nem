@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
@@ -37,91 +38,6 @@ public class ForagingTest {
 		// TODO: is there some way to use mockito for this?
 		setFinalStatic(NisMain.class.getField("TIME_PROVIDER"), new SystemTimeProvider());
 	}
-
-	// region add/remove unlocked account
-
-	@Test
-	public void canUnlockKnownForagingEligibleAccount() {
-		// Arrange:
-		final Account account = RECIPIENT1;
-		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
-
-		// Act:
-		final UnlockResult result = foraging.addUnlockedAccount(account);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
-		assertAccountIsUnlocked(foraging, account);
-	}
-
-	@Test
-	public void cannotUnlockForagingIneligibleAccount() {
-		// Arrange:
-		final Account account = RECIPIENT1;
-		final Foraging foraging = createForaging(account, Amount.fromNem(100));
-
-		// Act:
-		final UnlockResult result = foraging.addUnlockedAccount(account);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_FORAGING_INELIGIBLE));
-		assertAccountIsLocked(foraging, account);
-	}
-
-	@Test
-	public void cannotUnlockUnknownAccount() {
-		// Arrange:
-		final Account account = RECIPIENT1;
-		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
-
-		// Act:
-		final UnlockResult result = foraging.addUnlockedAccount(RECIPIENT2);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_UNKNOWN_ACCOUNT));
-		assertAccountIsLocked(foraging, account);
-	}
-
-	@Test
-	public void canLockUnlockedAccount() {
-		// Arrange:
-		final Account account = RECIPIENT1;
-		final Foraging foraging = createForaging(account, Amount.fromNem(10000));
-
-		// Act:
-		foraging.addUnlockedAccount(account);
-
-		// Assert:
-		assertAccountIsUnlocked(foraging, account);
-
-		// Act:
-		foraging.removeUnlockedAccount(account);
-
-		// Assert:
-		assertAccountIsLocked(foraging, account);
-	}
-
-	private static Foraging createForaging(final Account original, final Amount amount) {
-		final AccountCache accountCache = new AccountCache();
-		accountCache.addAccountToCache(original.getAddress());
-
-		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
-		poiFacade.findStateByAddress(original.getAddress()).getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
-
-		return createMockForaging(accountCache, poiFacade);
-	}
-
-	private static void assertAccountIsLocked(final Foraging foraging, final Account account) {
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(false));
-		Assert.assertThat(foraging.isAccountUnlocked(account.getAddress()), IsEqual.equalTo(false));
-	}
-
-	private static void assertAccountIsUnlocked(final Foraging foraging, final Account account) {
-		Assert.assertThat(foraging.isAccountUnlocked(account), IsEqual.equalTo(true));
-		Assert.assertThat(foraging.isAccountUnlocked(account.getAddress()), IsEqual.equalTo(true));
-	}
-
-	// endregion
 
 	@Test
 	public void processTransactionsSavesTransactions() throws InterruptedException {
@@ -406,6 +322,7 @@ public class ForagingTest {
 				poiFacade,
 				new MockBlockDao(null),
 				lastBlockLayer,
-				NisUtils.createTransactionValidatorFactory());
+				NisUtils.createTransactionValidatorFactory(),
+				new UnlockedAccounts(accountLookup, poiFacade, lastBlockLayer));
 	}
 }

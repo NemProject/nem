@@ -1,11 +1,11 @@
 package org.nem.nis;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
+import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -31,7 +31,7 @@ public class Foraging {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 	private static final int TRANSACTION_MAX_ALLOWED_TIME_DEVIATION = 30;
 
-	private final ConcurrentHashSet<Account> unlockedAccounts;
+	private final UnlockedAccounts unlockedAccounts;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
@@ -44,73 +44,15 @@ public class Foraging {
 			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final TransactionValidatorFactory validatorFactory) {
+			final TransactionValidatorFactory validatorFactory,
+			final UnlockedAccounts unlockedAccounts) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.unlockedAccounts = unlockedAccounts;
 
-		this.unlockedAccounts = new ConcurrentHashSet<>();
 		this.unconfirmedTransactions = new UnconfirmedTransactions(validatorFactory.create(this.poiFacade));
-	}
-
-	/**
-	 * Unlocks the specified account for foraging.
-	 *
-	 * @param account The account.
-	 */
-	public UnlockResult addUnlockedAccount(final Account account) {
-		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
-			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
-		}
-
-		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
-		final PoiAccountState accountState = this.poiFacade.findForwardedStateByAddress(account.getAddress(), currentHeight);
-		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, accountState, currentHeight);
-
-		if (!accountInfo.canForage()) {
-			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
-		}
-
-		this.unlockedAccounts.add(account);
-		return UnlockResult.SUCCESS;
-	}
-
-	/**
-	 * Removes the specified account from the list of active foraging accounts.
-	 *
-	 * @param account The account.
-	 */
-	public void removeUnlockedAccount(final Account account) {
-		if (this.accountLookup.isKnownAddress(account.getAddress())) {
-			this.unlockedAccounts.remove(account);
-		}
-	}
-
-	/**
-	 * Determines if a given account is unlocked.
-	 *
-	 * @param account The account.
-	 * @return true if the account is unlocked, false otherwise.
-	 */
-	public boolean isAccountUnlocked(final Account account) {
-		return this.unlockedAccounts.contains(account);
-	}
-
-	/**
-	 * Determines if a given account is unlocked.
-	 *
-	 * @param address The account address.
-	 * @return true if the account is unlocked, false otherwise.
-	 */
-	public boolean isAccountUnlocked(final Address address) {
-		for (final Account account : this.unlockedAccounts) {
-			if (account.getAddress().equals(address)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**

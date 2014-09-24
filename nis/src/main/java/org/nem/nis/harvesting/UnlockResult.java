@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.harvesting;
 
 /**
  * Possible unlock results.

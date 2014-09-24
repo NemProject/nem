@@ -9,6 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
@@ -164,7 +165,8 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transactionValidatorFactory());
+				this.transactionValidatorFactory(),
+				this.unlockedAccounts());
 	}
 
 	@Bean
@@ -177,8 +179,14 @@ public class NisAppConfig {
 		return new PoiFacade(new PoiAlphaImportanceGeneratorImpl());
 	}
 
+	@Bean
 	public AccountAnalyzer accountAnalyzer() {
 		return new AccountAnalyzer(this.accountCache(), this.poiFacade());
+	}
+
+	@Bean
+	public UnlockedAccounts unlockedAccounts() {
+		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer);
 	}
 
 	@Bean
