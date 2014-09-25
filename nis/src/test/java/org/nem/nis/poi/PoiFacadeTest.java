@@ -95,17 +95,60 @@ public class PoiFacadeTest {
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateWhenAccountIsRemoteHarvester() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddress();
+		final Address remoteAddress = Utils.generateRandomAddress();
 		final PoiFacade facade = createPoiFacade();
-		final PoiAccountState state = facade.findStateByAddress(address);
-		state.getRemoteLinks().addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, 1, RemoteLink.Owner.RemoteHarvester));
+		final PoiAccountState state = facade.findStateByAddress(remoteAddress);
+		final Address ownerAddress =  Utils.generateRandomAddress();
+		final PoiAccountState localState = facade.findStateByAddress(ownerAddress);
+		state.getRemoteLinks().addLink(new RemoteLink(ownerAddress, BlockHeight.ONE, 1, RemoteLink.Owner.RemoteHarvester));
 
 		// Act:
-		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(2880));
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(remoteAddress, new BlockHeight(2880));
 
 		// Assert:
-		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
+		Assert.assertThat(forwardedState, IsEqual.equalTo(localState));
 	}
+
+	// probably this test should be split
+	@Test
+	public void findForwardedStateCombinations() {
+		// Arrange:
+		final PoiFacade facade = createPoiFacade();
+		final Address localAddress = Utils.generateRandomAddress();
+		final Address remoteAddress = Utils.generateRandomAddress();
+		final PoiAccountState remoteState = facade.findStateByAddress(remoteAddress);
+		final PoiAccountState localState = facade.findStateByAddress(localAddress);
+		localState.getRemoteLinks().addLink(new RemoteLink(remoteAddress, BlockHeight.ONE, 1, RemoteLink.Owner.HarvestingRemotely));
+		remoteState.getRemoteLinks().addLink(new RemoteLink(localAddress, BlockHeight.ONE, 1, RemoteLink.Owner.RemoteHarvester));
+
+		// Act:
+		final PoiAccountState st1 = facade.findForwardedStateByAddress(localAddress, new BlockHeight(1440));
+		final PoiAccountState st2 = facade.findForwardedStateByAddress(localAddress, new BlockHeight(1441));
+		final PoiAccountState rt1 = facade.findForwardedStateByAddress(remoteAddress, new BlockHeight(1440));
+		final PoiAccountState rt2 = facade.findForwardedStateByAddress(remoteAddress, new BlockHeight(1441));
+
+		localState.getRemoteLinks().addLink(new RemoteLink(remoteAddress, new BlockHeight(2000), 2, RemoteLink.Owner.HarvestingRemotely));
+		remoteState.getRemoteLinks().addLink(new RemoteLink(localAddress, new BlockHeight(2000), 2, RemoteLink.Owner.RemoteHarvester));
+
+		final PoiAccountState st3 = facade.findForwardedStateByAddress(localAddress, new BlockHeight(3439));
+		final PoiAccountState st4 = facade.findForwardedStateByAddress(localAddress, new BlockHeight(3440));
+		final PoiAccountState rt3 = facade.findForwardedStateByAddress(remoteAddress, new BlockHeight(3439));
+		final PoiAccountState rt4 = facade.findForwardedStateByAddress(remoteAddress, new BlockHeight(3441));
+
+
+		// Assert:
+		Assert.assertThat(st1, IsEqual.equalTo(localState));
+		Assert.assertThat(st2, IsEqual.equalTo(localState));
+		Assert.assertThat(st3, IsEqual.equalTo(localState));
+		Assert.assertThat(st4, IsEqual.equalTo(localState));
+
+		Assert.assertThat(rt1, IsEqual.equalTo(remoteState));
+		Assert.assertThat(rt2, IsEqual.equalTo(localState));
+		Assert.assertThat(rt3, IsEqual.equalTo(localState));
+		Assert.assertThat(rt4, IsEqual.equalTo(remoteState));
+
+	}
+
 
 	@Test
 	public void findForwardedStateByAddressReturnsRemoteStateWhenActiveRemoteIsAgedAtLeastOneDay() {
@@ -147,7 +190,7 @@ public class PoiFacadeTest {
 		final Address address = Utils.generateRandomAddress();
 		final PoiFacade facade = createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
-		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, RemoteLink.Owner.RemoteHarvester);
 		state.getRemoteLinks().addLink(link);
 
 		// Act:

@@ -53,7 +53,21 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 		final PoiAccountState state = this.findStateByAddress(address);
 		final RemoteLinks remoteLinks = state.getRemoteLinks();
-		if (!remoteLinks.isHarvestingRemotely()) {
+		/* TODO 20140925 G-J: I've changed it, findForwardedStateByAddress if passed address of RemoteHarvester
+		 * it is supposed to return state of "owner", that is the one that is HarvestingRemotely
+		 *
+		 * So I think the change is ok., this also fixes "second issue" I've described on trello
+		 *
+		 * Unless I've somehow misunderstood your states, but I think I got it right.
+		 * Let's say we have account A and remote account B,
+		 * A has link (B, height, HarvestingRemotely)
+		 * B has link (A, height, RemoteHarvester)
+		 *
+		 * findForwardedStateByAddress(A *) should return A
+		 * findForwardedStateByAddress(B, h+1439) should return B
+		 * findForwardedStateByAddress(B, h+1440) should return A
+		 */
+		if (! remoteLinks.isRemoteHarvester()) {
 			return state;
 		}
 
