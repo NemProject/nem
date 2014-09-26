@@ -41,7 +41,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		}
 
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
-		final PoiAccountState accountState = this.poiFacade.findForwardedStateByAddress(account.getAddress(), currentHeight);
+		final PoiAccountState accountState = this.poiFacade.findLatestForwardedStateByAddress(account.getAddress());
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, accountState, currentHeight);
 
 		if (!accountInfo.canForage()) {

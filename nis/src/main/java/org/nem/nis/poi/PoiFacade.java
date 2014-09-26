@@ -43,6 +43,17 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 		return state;
 	}
 
+	public PoiAccountState findLatestForwardedStateByAddress(final Address address) {
+		final PoiAccountState state = this.findStateByAddress(address);
+		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		final RemoteLink remoteLink = remoteLinks.getCurrent();
+		if (! remoteLinks.isRemoteHarvester()) {
+			return state;
+		}
+
+		return this.findStateByAddress(remoteLink.getLinkedAddress());
+	}
+
 	/**
 	 * Finds a poi account state given an address following all forwards.
 	 *
