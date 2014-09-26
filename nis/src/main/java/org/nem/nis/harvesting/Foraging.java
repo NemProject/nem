@@ -220,21 +220,12 @@ public class Foraging {
 				//  virtual and is eligible = harvest with virtual
 				for (final Account virtualForger : this.unlockedAccounts) {
 					final BlockHeight forgedBlockHeight = lastBlock.getHeight().next();
-					final PoiAccountState accountState = this.poiFacade.findStateByAddress(virtualForger.getAddress());
+					final PoiAccountState ownerState = this.poiFacade.findForwardedStateByAddress(virtualForger.getAddress(), forgedBlockHeight);
 
-					Account forgerOwner = virtualForger;
-					final RemoteLinks remoteLinks = accountState.getRemoteLinks();
-					// TODO BUG TODO
-					//if (!BlockChainValidator.canAccountForageAtHeight(forgerState, forgedBlockHeight)) {
-					//	continue;
-					//}
-
-					if (remoteLinks.isRemoteHarvester()) {
-						forgerOwner = this.accountLookup.findByAddress(remoteLinks.getCurrent().getLinkedAddress());
-					}
+					final Account ownerAddress = this.accountLookup.findByAddress(ownerState.getAddress());
 
 					// Don't allow a harvester to include his own transactions
-					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, forgerOwner);
+					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, ownerAddress);
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					final Block newBlock = this.createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);
