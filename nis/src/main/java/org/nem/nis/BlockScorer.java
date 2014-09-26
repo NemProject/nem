@@ -111,7 +111,7 @@ public class BlockScorer {
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountImportance accountImportance = this.poiFacade
-				.findForwardedStateByAddress(signerAddress, blockHeight)
+				.findForwardedStateByAddress(signerAddress, block.getHeight())
 				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
 	}
