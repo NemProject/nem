@@ -44,47 +44,14 @@ public class Foraging {
 			final PoiFacade poiFacade,
 			final BlockDao blockDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final TransactionValidatorFactory validatorFactory,
-			final UnlockedAccounts unlockedAccounts) {
+			final UnlockedAccounts unlockedAccounts,
+			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.unlockedAccounts = unlockedAccounts;
-
-		this.unconfirmedTransactions = new UnconfirmedTransactions(validatorFactory.create(this.poiFacade));
-	}
-
-	/**
-	 * Gets the number of unconfirmed transactions.
-	 *
-	 * @return The number of unconfirmed transactions.
-	 */
-	public int getNumUnconfirmedTransactions() {
-		return this.unconfirmedTransactions.size();
-	}
-
-	/**
-	 * Adds transaction to list of unconfirmed transactions.
-	 *
-	 * @param transaction transaction that isValid() and verify()-ed
-	 * @return false if given transaction has already been seen, true if it has been added
-	 */
-	public ValidationResult addUnconfirmedTransactionWithoutDbCheck(final Transaction transaction) {
-		return this.unconfirmedTransactions.addValidOrNeutral(transaction);
-	}
-
-	private ValidationResult addUnconfirmedTransaction(final Transaction transaction) {
-		return this.unconfirmedTransactions.addValid(transaction);
-	}
-
-	/**
-	 * Removes all block's transactions from list of unconfirmed transactions
-	 *
-	 * @param block Block containing TXes that are to be removed.
-	 */
-	public void removeFromUnconfirmedTransactions(final Block block) {
-		this.unconfirmedTransactions.removeAll(block);
+		this.unconfirmedTransactions = unconfirmedTransactions;
 	}
 
 	/**
@@ -104,7 +71,7 @@ public class Foraging {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
-		return this.addUnconfirmedTransaction(transaction);
+		return this.unconfirmedTransactions.add(transaction);
 	}
 
 	/**
@@ -115,73 +82,6 @@ public class Foraging {
 	 */
 	public void processTransactions(final Collection<Transaction> transactions) {
 		transactions.stream().forEach(tx -> this.processTransaction(tx));
-	}
-
-	private boolean matchAddress(final Transaction transaction, final Address address) {
-		// @formatter:off
-		return (transaction.getSigner().getAddress().equals(address) ||
-				(transaction.getType() == TransactionTypes.TRANSFER &&
-				((TransferTransaction)transaction).getRecipient().getAddress().equals(address)));
-		// @formatter:on
-	}
-
-	/**
-	 * This method is for GUI's usage.
-	 * Right now it returns only outgoing TXes, TODO: should it return incoming too?
-	 *
-	 * @param address - sender of transactions.
-	 * @return The list of transactions.
-	 */
-	public List<Transaction> getUnconfirmedTransactions(final Address address) {
-		return this.unconfirmedTransactions.getTransactionsBefore(NisMain.TIME_PROVIDER.getCurrentTime()).stream()
-				.filter(tx -> this.matchAddress(tx, address))
-				.collect(Collectors.toList());
-	}
-
-	private boolean checkImportance(final Transaction transaction, final BlockHeight height) {
-		// TODO BUG TODO
-		//if (transaction.getType() == TransactionTypes.IMPORTANCE_TRANSFER) {
-		//	return BlockChainValidator.verifyImportanceTransfer(this.poiFacade, height, (ImportanceTransferTransaction)transaction);
-		//}
-		return true;
-	}
-
-	private List<Transaction> removeConflictingImportanceTransactions(final BlockHeight height, final List<Transaction> transactions) {
-		if (height == null) {
-			return transactions;
-		}
-		return transactions.stream()
-				.filter(tx -> this.checkImportance(tx, height))
-				.collect(Collectors.toList());
-	}
-
-	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime) {
-		return this.unconfirmedTransactions.removeConflictingTransactions(
-				this.unconfirmedTransactions.getTransactionsBefore(blockTime)
-		);
-	}
-
-	public List<Transaction> getUnconfirmedTransactionsForNewBlock(final TimeInstant blockTime, final BlockHeight blockHeight) {
-		// TODO-CR 20140922 G-J: want ImportanceTransferValidator: yes it should probably be passed down the chain, to be passed as predicate to add()
-		return this.unconfirmedTransactions.removeConflictingTransactions(
-				this.removeConflictingImportanceTransactions(
-						blockHeight,
-						this.unconfirmedTransactions.getTransactionsBefore(blockTime)
-				)
-		);
-	}
-
-	/**
-	 * Filter out any transaction that has the harvester as sender.
-	 *
-	 * @param transactions The original list of transactions.
-	 * @param harvester The harvester's account.
-	 * @return The filtered list of transactions.
-	 */
-	public List<Transaction> filterTransactionsForHarvester(final Collection<Transaction> transactions, final Account harvester) {
-		return transactions.stream()
-				.filter(tx -> !tx.getSigner().equals(harvester))
-				.collect(Collectors.toList());
 	}
 
 	/**
@@ -206,12 +106,10 @@ public class Foraging {
 		try {
 			synchronized (this.blockChainLastBlockLayer) {
 				final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
-				final Collection<Transaction> transactionList = this.getUnconfirmedTransactionsForNewBlock(blockTime, new BlockHeight(dbLastBlock.getHeight()));
 				final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 				final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock);
 
 				// TODO 20140909 J-G: this is a class that is in need of tests in general
-				// TODO 20140909 J-G: i have some questions around the BlockChainValidator / BlockChainScorer / BlockExecutor / Foraging interplay that might best be answered in IRC
 
 				// possibilities, unlocked account is:
 				//  real, but has eligible remote = reject
@@ -234,7 +132,7 @@ public class Foraging {
 					}
 
 					// Don't allow a harvester to include his own transactions
-					final Collection<Transaction> eligibleTxList = this.filterTransactionsForHarvester(transactionList, forgerOwner);
+					final Collection<Transaction> eligibleTxList = this.unconfirmedTransactions.getTransactionsForNewBlock(forgerOwner.getAddress(), blockTime).getAll();
 
 					// unlocked accounts are only dummies, so we need to find REAL accounts to get the balance
 					final Block newBlock = this.createSignedBlock(blockTime, eligibleTxList, lastBlock, virtualForger, difficulty);

@@ -7,7 +7,7 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.TransactionValidator;
 import org.nem.peer.node.*;
@@ -21,7 +21,7 @@ import java.util.Collection;
 public class TransactionController {
 	private final AccountLookup accountLookup;
 	private final PushService pushService;
-	private final Foraging foraging;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final TransactionValidator validator;
 	private final NisPeerNetworkHost host;
 
@@ -29,12 +29,12 @@ public class TransactionController {
 	TransactionController(
 			final AccountLookup accountLookup,
 			final PushService pushService,
-			final Foraging foraging,
+			final UnconfirmedTransactions unconfirmedTransactions,
 			final TransactionValidator validator,
 			final NisPeerNetworkHost host) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
-		this.foraging = foraging;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
 	}
@@ -80,7 +80,7 @@ public class TransactionController {
 	}
 
 	private Collection<Transaction> getUnconfirmedTransactions() {
-		return this.foraging.getUnconfirmedTransactionsForNewBlock(NisMain.TIME_PROVIDER.getCurrentTime());
+		return this.unconfirmedTransactions.getAll();
 	}
 
 	private Transaction deserializeTransaction(final byte[] bytes) throws Exception {

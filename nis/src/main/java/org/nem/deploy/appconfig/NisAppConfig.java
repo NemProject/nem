@@ -126,7 +126,8 @@ public class NisAppConfig {
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.foraging(),
-				this.blockChainServices());
+				this.blockChainServices(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -165,8 +166,8 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockDao,
 				this.blockChainLastBlockLayer,
-				this.transactionValidatorFactory(),
-				this.unlockedAccounts());
+				this.unlockedAccounts(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -187,6 +188,11 @@ public class NisAppConfig {
 	@Bean
 	public UnlockedAccounts unlockedAccounts() {
 		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer);
+	}
+
+	@Bean
+	public UnconfirmedTransactions unconfirmedTransactions() {
+		return new UnconfirmedTransactions(this.transactionValidator());
 	}
 
 	@Bean

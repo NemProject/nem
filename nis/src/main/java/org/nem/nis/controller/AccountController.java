@@ -22,7 +22,7 @@ import java.util.stream.*;
  */
 @RestController
 public class AccountController {
-	private final Foraging foraging;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final AccountInfoFactory accountInfoFactory;
@@ -30,12 +30,12 @@ public class AccountController {
 
 	@Autowired(required = true)
 	AccountController(
-			final Foraging foraging,
+			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
 			final AccountInfoFactory accountInfoFactory,
 			final PoiFacade poiFacade) {
-		this.foraging = foraging;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
 		this.accountInfoFactory = accountInfoFactory;
@@ -144,7 +144,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(address));
+		return new SerializableList<>(this.unconfirmedTransactions.getTransactionsForAccount(address).getAll());
 	}
 
 	/**

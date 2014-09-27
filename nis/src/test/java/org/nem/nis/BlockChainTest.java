@@ -11,12 +11,13 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.lang.reflect.*;
 import java.math.BigInteger;
@@ -150,19 +151,21 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final Foraging foraging = Mockito.mock(Foraging.class);
+		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
-						NisUtils.createTransactionValidatorFactory());
+						transactionValidatorFactory);
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				foraging,
-				services);
+				services,
+				new UnconfirmedTransactions(transactionValidatorFactory.create(poiFacade)));
 
 		// Act:
 		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
