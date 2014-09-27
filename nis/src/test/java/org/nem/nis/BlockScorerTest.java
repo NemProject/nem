@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
@@ -170,7 +171,7 @@ public class BlockScorerTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final BlockHeight groupedHeight = context.scorer.getGroupedHeight(new BlockHeight(height));
+		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
@@ -221,6 +222,31 @@ public class BlockScorerTest {
 		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
 	}
 
+	@Test
+	public void accountAtProperHeightIsForwardedIfRemoteHarvestingAccountIsUsed() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(1442);
+		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(height);
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final TestContext context = new TestContext(poiFacade);
+		final Block block = NisUtils.createRandomBlockWithHeight(height.getRaw());
+
+		final Address remoteHarvesterAddress = block.getSigner().getAddress();
+		final Address ownerAddress = Utils.generateRandomAddress();
+		final PoiAccountState remoteState = new PoiAccountState(remoteHarvesterAddress);
+		final PoiAccountState ownerState = new PoiAccountState(ownerAddress);
+		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
+		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
+		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+
+		// Act:
+		final long score = context.scorer.calculateForgerBalance(block);
+
+		// Assert:
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
+		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
+		Mockito.verify(poiFacade, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
+	}
 	//endregion
 
 	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {

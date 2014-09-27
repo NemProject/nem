@@ -177,7 +177,7 @@ public class NisMain {
 		LOGGER.info("Known accounts: " + this.accountAnalyzer.getAccountCache().size());
 		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.getAccountCache().size()));
 		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-		final BlockHeight blockHeight = blockScorer.getGroupedHeight(height);
+		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
 		this.accountAnalyzer.getPoiFacade().recalculateImportances(blockHeight);
 		LOGGER.info("PoI initialized");
 	}

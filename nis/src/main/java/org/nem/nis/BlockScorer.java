@@ -92,7 +92,7 @@ public class BlockScorer {
 	 * @param height The un-grouped height.
 	 * @return The grouped height.
 	 */
-	public BlockHeight getGroupedHeight(final BlockHeight height) {
+	public static BlockHeight getGroupedHeight(final BlockHeight height) {
 		final long backInTime = height.getRaw() - 1;
 		final long grouped = (backInTime / POI_GROUPING) * POI_GROUPING;
 		return 0 == grouped ? BlockHeight.ONE : new BlockHeight(grouped);
@@ -106,14 +106,14 @@ public class BlockScorer {
 	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
-		final BlockHeight blockHeight = this.getGroupedHeight(block.getHeight());
-		this.poiFacade.recalculateImportances(blockHeight);
+		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
+		this.poiFacade.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountImportance accountImportance = this.poiFacade
 				.findForwardedStateByAddress(signerAddress, block.getHeight())
 				.getImportanceInfo();
-		return (long)(accountImportance.getImportance(blockHeight) * multiplier);
+		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);
 	}
 
 	/**
