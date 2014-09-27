@@ -76,7 +76,7 @@ public class BlockGeneratorTest {
 	}
 
 	@Test
-	public void generatedBlockHasNullLessor() {
+	public void generatedBlockHasNullLessorWhenSelfSigned() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account signerAccount = context.accountLookup.findByAddress(Utils.generateRandomAddress());
@@ -87,11 +87,12 @@ public class BlockGeneratorTest {
 				signerAccount).getBlock();
 
 		// Assert:
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
 		Assert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
-	public void generatedBlockHasRemoteAccountAsSigner() {
+	public void generatedBlockHasNonNullLessorWhenRemoteAccountIsSigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account remoteAccount = Utils.generateRandomAccount();
