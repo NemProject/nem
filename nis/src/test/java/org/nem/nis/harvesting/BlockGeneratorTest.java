@@ -76,6 +76,21 @@ public class BlockGeneratorTest {
 	}
 
 	@Test
+	public void generatedBlockHasNullLessor() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signerAccount = context.accountLookup.findByAddress(Utils.generateRandomAddress());
+
+		// Act:
+		final Block block = context.generateNextBlock(
+				NisUtils.createRandomBlockWithHeight(7),
+				signerAccount).getBlock();
+
+		// Assert:
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+	}
+
+	@Test
 	public void generatedBlockHasRemoteAccountAsSigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -92,6 +107,7 @@ public class BlockGeneratorTest {
 
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
+		Assert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
 		Mockito.verify(context.poiFacade, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(8));
 		Mockito.verify(context.accountLookup, Mockito.only()).findByAddress(ownerAccount.getAddress());
 	}
