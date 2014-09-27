@@ -35,6 +35,7 @@ public class BlockTest {
 
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(BlockUtils.DUMMY_GENERATION_HASH));
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
@@ -62,6 +63,7 @@ public class BlockTest {
 				previousBlock.getGenerationHash(),
 				signer.getKeyPair().getPublicKey());
 		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -114,6 +116,18 @@ public class BlockTest {
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
 	}
 
+	@Test
+	public void blockLessorCanBeSet() {
+		// Arrange:
+		final Block block = BlockUtils.createBlock(Utils.generateRandomAccount());
+		final Account account = Utils.generateRandomAccount();
+
+		// Act:
+		block.setLessor(account);
+
+		// Assert:
+		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
+	}
 	//endregion
 
 	//region Serialization
@@ -154,6 +168,15 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+	}
+
+	@Test
+	public void blockLessorIsNotRoundTripped() {
+		// Act:
+		final Block block = this.createBlockForRoundTripTests(true, null);
+
+		// Assert:
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
@@ -226,6 +249,7 @@ public class BlockTest {
 	private Block createBlockForRoundTripTests(final boolean verifiable, final Account signer) {
 		// Arrange:
 		final Block originalBlock = BlockUtils.createBlock(null == signer ? Utils.generateRandomAccount() : signer);
+		originalBlock.setLessor(Utils.generateRandomAccount());
 		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(17);
 		originalBlock.addTransaction(transaction1);
 
