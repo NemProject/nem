@@ -238,6 +238,9 @@ public class BlockChain implements BlockSynchronizer {
 
 		this.fixGenerationHash(receivedBlock, dbParent);
 
+		// TODO BUG TODO need to set lessor here
+		// this.accountAnalyzer.getPoiFacade().findForwardedStateByAddress();
+
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
