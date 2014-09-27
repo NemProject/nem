@@ -10,7 +10,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 import org.nem.peer.*;
@@ -91,7 +91,7 @@ public class PushServiceTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
 
-		Mockito.when(context.foraging.processTransaction(transaction)).thenReturn(result);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(result);
 
 		// Act:
 		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
@@ -240,7 +240,7 @@ public class PushServiceTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
 
-		Mockito.when(context.foraging.processTransaction(transaction)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
 		context.service.pushTransaction(transaction, null);
@@ -264,7 +264,7 @@ public class PushServiceTest {
 		private final Node remoteNode;
 		private final NodeIdentity localNodeIdentity;
 		private final PeerNetwork network;
-		private final Foraging foraging;
+		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final BlockChain blockChain;
 		private final PushService service;
 
@@ -286,14 +286,14 @@ public class PushServiceTest {
 			Mockito.when(this.network.getNodes()).thenReturn(collection);
 			Mockito.when(this.network.getLocalNode()).thenReturn(localNode);
 
-			this.foraging = Mockito.mock(Foraging.class);
+			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
 
 			this.service = new PushService(
-					this.foraging,
+					this.unconfirmedTransactions,
 					validator,
 					this.blockChain,
 					host);

@@ -53,12 +53,6 @@ public class BlockChainTest {
 		field.set(null, newValue);
 	}
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		// TODO: is there some way to use mockito for this?
-		setFinalStatic(NisMain.class.getField("TIME_PROVIDER"), new SystemTimeProvider());
-	}
-
 	@Test
 	public void analyzeSavesResults() {
 		// Arrange:
@@ -150,7 +144,6 @@ public class BlockChainTest {
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
-		final Foraging foraging = Mockito.mock(Foraging.class);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 		final BlockChainServices services =
 				new BlockChainServices(
@@ -163,12 +156,10 @@ public class BlockChainTest {
 				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
-				foraging,
 				services,
-				new UnconfirmedTransactions(transactionValidatorFactory.create(poiFacade)));
+				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
 
 		// Act:
-		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
 		final ValidationResult result = blockChain.processBlock(block);
 		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
 		TransferTransaction transaction;

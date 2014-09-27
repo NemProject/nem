@@ -29,7 +29,6 @@ public class BlockChain implements BlockSynchronizer {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final AccountAnalyzer accountAnalyzer;
-	private final Foraging foraging;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private BlockChainScore score;
@@ -40,14 +39,12 @@ public class BlockChain implements BlockSynchronizer {
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
-			final Foraging foraging,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
-		this.foraging = foraging;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.score = BlockChainScore.ZERO;
@@ -177,7 +174,7 @@ public class BlockChain implements BlockSynchronizer {
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-			this.foraging.processTransactions(unconfirmedTransactions);
+			unconfirmedTransactions.forEach(this.unconfirmedTransactions::addNew);
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
@@ -526,7 +523,7 @@ public class BlockChain implements BlockSynchronizer {
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
-						.forEach(tr -> this.unconfirmedTransactions.add(tr, UnconfirmedTransactions.AddOptions.AllowNeutral));
+						.forEach(this.unconfirmedTransactions::addExisting);
 				currentHeight--;
 			}
 		}

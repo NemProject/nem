@@ -49,7 +49,7 @@ public class UnlockedAccountsTest {
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_FORAGING_INELIGIBLE));
 		context.assertAccountIsLocked(account);
 		context.assertIsKnownAddressDelegation(account);
-		context.assertCanForageDelegation(account, 17);
+		context.assertCanForageDelegation(account);
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(0));
 	}
 
@@ -68,7 +68,7 @@ public class UnlockedAccountsTest {
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
 		context.assertAccountIsUnlocked(account);
 		context.assertIsKnownAddressDelegation(account);
-		context.assertCanForageDelegation(account, 17);
+		context.assertCanForageDelegation(account);
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(1));
 	}
 
@@ -157,17 +157,16 @@ public class UnlockedAccountsTest {
 
 			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
 			accountState.getWeightedBalances().addFullyVested(new BlockHeight(lastBlockHeight), Amount.fromNem(canForage ? 10000 : 1));
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(account.getAddress(), new BlockHeight(lastBlockHeight)))
-					.thenReturn(accountState);
+			Mockito.when(this.poiFacade.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 		}
 
 		private void assertIsKnownAddressDelegation(final Account account) {
 			Mockito.verify(this.accountLookup, Mockito.times(1)).isKnownAddress(account.getAddress());
 		}
 
-		private void assertCanForageDelegation(final Account account, final long lastBlockHeight) {
+		private void assertCanForageDelegation(final Account account) {
 			Mockito.verify(this.lastBlockLayer, Mockito.times(1)).getLastBlockHeight();
-			Mockito.verify(this.poiFacade, Mockito.times(1)).findForwardedStateByAddress(account.getAddress(), new BlockHeight(lastBlockHeight));
+			Mockito.verify(this.poiFacade, Mockito.times(1)).findLatestForwardedStateByAddress(account.getAddress());
 		}
 
 		private void assertAccountIsLocked(final Account account) {

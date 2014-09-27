@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -17,25 +17,17 @@ import java.util.stream.Collectors;
  */
 public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
+	private static final int TRANSACTION_MAX_ALLOWED_TIME_DEVIATION = 30;
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
 	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+	private final TimeProvider timeProvider;
 	private final TransactionValidator validator;
 
-	/**
-	 * Options for adding a transaction.
-	 */
-	public enum AddOptions {
-		/**
-		 * Neutral transactions should be added.
-		 */
+	private enum AddOptions {
 		AllowNeutral,
-
-		/**
-		 * Neutral transactions should be rejected.
-		 */
 		RejectNeutral
 	}
 
@@ -47,9 +39,14 @@ public class UnconfirmedTransactions {
 	/**
 	 * Creates a new unconfirmed transactions collection.
 	 *
+	 * @param timeProvider The time provider to use.
 	 * @param validator The transaction validator to use.
 	 */
-	public UnconfirmedTransactions(final TransactionValidator validator) {
+	public UnconfirmedTransactions(
+			final TimeProvider timeProvider,
+			final TransactionValidator validator) {
+		this.timeProvider = timeProvider;
+
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 		builder.add(validator);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
@@ -59,7 +56,9 @@ public class UnconfirmedTransactions {
 	private UnconfirmedTransactions(
 			final List<Transaction> transactions,
 			final ValidationOptions options,
+			final TimeProvider timeProvider,
 			final TransactionValidator validator) {
+		this.timeProvider = timeProvider;
 		this.validator = validator;
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, AddOptions.AllowNeutral, options == ValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -86,24 +85,32 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds an unconfirmed transaction.
+	 * Adds a new unconfirmed transaction.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
-	public ValidationResult add(final Transaction transaction) {
-		return this.add(transaction, AddOptions.RejectNeutral);
+	public ValidationResult addNew(final Transaction transaction) {
+		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
+		}
+
+		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) < 0) {
+			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
+		}
+
+		return this.add(transaction, AddOptions.RejectNeutral, true);
 	}
 
 	/**
-	 * Adds an unconfirmed transaction.
+	 * Adds an unconfirmed transaction that has been added previously (so some validation checks can be skipped).
 	 *
 	 * @param transaction The transaction.
-	 * @param options The add options.
 	 * @return true if the transaction was added.
 	 */
-	public ValidationResult add(final Transaction transaction, final AddOptions options) {
-		return this.add(transaction, options, true);
+	public ValidationResult addExisting(final Transaction transaction) {
+		return this.add(transaction, AddOptions.AllowNeutral, true);
 	}
 
 	private ValidationResult add(final Transaction transaction, final AddOptions options, final boolean execute) {
@@ -235,6 +242,7 @@ public class UnconfirmedTransactions {
 							.filter(tx -> matchAddress(tx, address))
 							.collect(Collectors.toList()),
 					ValidationOptions.ValidateAgainstUnconfirmedBalance,
+					this.timeProvider,
 					this.validator);
 	}
 
@@ -276,6 +284,7 @@ public class UnconfirmedTransactions {
 						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
 						.collect(Collectors.toList()),
 				ValidationOptions.ValidateAgainstConfirmedBalance,
+				this.timeProvider,
 				this.validator);
 	}
 

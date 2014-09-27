@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.nis.*;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.validators.TransactionValidator;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +20,18 @@ import java.util.logging.Logger;
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
 
-	private final Foraging foraging;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final TransactionValidator validator;
 	private final BlockChain blockChain;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	public PushService(
-			final Foraging foraging,
+			final UnconfirmedTransactions unconfirmedTransactions,
 			final TransactionValidator validator,
 			final BlockChain blockChain,
 			final NisPeerNetworkHost host) {
-		this.foraging = foraging;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.blockChain = blockChain;
 		this.host = host;
@@ -46,8 +46,8 @@ public class PushService {
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
 		final ValidationResult result = this.pushEntity(
 				entity,
-				obj -> this.checkTransaction(obj),
-				obj -> this.foraging.processTransaction(obj),
+				transaction -> this.checkTransaction(transaction),
+				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
 				NodeApiId.REST_PUSH_TRANSACTION,
 				identity);

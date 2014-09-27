@@ -125,7 +125,6 @@ public class NisAppConfig {
 				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
-				this.foraging(),
 				this.blockChainServices(),
 				this.unconfirmedTransactions());
 	}
@@ -157,13 +156,6 @@ public class NisAppConfig {
 	@Bean
 	public TransactionValidator transactionValidator() {
 		return this.transactionValidatorFactory().create(this.poiFacade());
-	}
-
-	@Bean
-	public Foraging foraging() {
-		return new Foraging(
-				this.harvester(),
-				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -206,7 +198,7 @@ public class NisAppConfig {
 
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
-		return new UnconfirmedTransactions(this.transactionValidator());
+		return new UnconfirmedTransactions(this.timeProvider(), this.transactionValidator());
 	}
 
 	@Bean
