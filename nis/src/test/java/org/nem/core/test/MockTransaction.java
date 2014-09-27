@@ -171,6 +171,9 @@ public class MockTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
+		transferObserver.notifyDebit(this.getSigner(), this.getFee());
+
 		this.transferAction.accept(observer);
 		++this.numTransferCalls;
 	}
