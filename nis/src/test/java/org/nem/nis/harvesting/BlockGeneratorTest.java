@@ -77,6 +77,9 @@ public class BlockGeneratorTest {
 	}
 
 	@Test
+	@Ignore
+	// TODO-CR 20140927 G-J: this test does not make sense? "remote harvester" account is a signer
+	// "owner's" TXes are removed, from the block, and "owner's ballance" is used when calculating block's target
 	public void generatedBlockHasForwardedAccountAsSigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -122,6 +125,9 @@ public class BlockGeneratorTest {
 		final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		Mockito.when(context.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
 		Mockito.when(filteredTransactions.getAll()).thenReturn(transactions);
+
+		// override TestContext result
+		Mockito.when(context.accountLookup.findByAddress(Mockito.any())).thenReturn(blockSignerAccount);
 
 		// Act:
 		final Block block = context.generateNextBlock(
