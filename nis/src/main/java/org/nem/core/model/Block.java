@@ -143,6 +143,7 @@ public class Block extends VerifiableEntity {
 
 	/**
 	 * Gets the lessor if block has been harvested by lessee.
+	 * TODO 20140927 we should try to come up with a better name for this
 	 *
 	 * @return Lessor or null.
 	 */
